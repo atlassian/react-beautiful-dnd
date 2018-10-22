@@ -307,7 +307,7 @@ it('should shift draggables after multiple changes', () => {
     preset.inHome4,
   ].map(getId);
   const ordered: DraggableId[] = getDraggablesInsideDroppable(
-    preset.home,
+    preset.home.descriptor.id,
     draggables,
   ).map(getId);
   expect(ordered).toEqual(expected);

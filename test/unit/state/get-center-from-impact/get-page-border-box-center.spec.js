@@ -1,5 +1,13 @@
 // @flow
 import { offset, type Position, type BoxModel } from 'css-box-model';
+import type {
+  Axis,
+  DisplacedBy,
+  Displacement,
+  DragImpact,
+  DraggableDimension,
+  DroppableDimension,
+} from '../../../../src/types';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../src/state/get-center-from-impact/get-page-border-box-center';
 import {
@@ -15,14 +23,11 @@ import {
   backward,
   forward,
 } from '../../../../src/state/user-direction/user-direction-preset';
-import { getPreset } from '../../../utils/dimension';
-import type {
-  Axis,
-  DisplacedBy,
-  Displacement,
-  DragImpact,
-  DraggableDimension,
-} from '../../../../src/types';
+import { getPreset, makeScrollable } from '../../../utils/dimension';
+
+import withDroppableDisplacement from '../../../../src/state/with-scroll-change/with-droppable-displacement';
+import { negate, add } from '../../../../src/state/position';
+import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 
 const getDisplacement = (draggable: DraggableDimension): Displacement => ({
   isVisible: true,
@@ -355,6 +360,101 @@ const getDisplacement = (draggable: DraggableDimension): Displacement => ({
       );
       const expectedCenter: Position = displacedInHome3.borderBox.center;
       expect(result).toEqual(expectedCenter);
+    });
+
+    it('should account for any scroll in the droppable being dropped into (into home list)', () => {
+      // into home list (without scroll)
+      {
+        const result: Position = getPageBorderBoxCenter({
+          impact: getHomeImpact(preset.inHome1, preset.home),
+          draggable: preset.inHome1,
+          draggables: preset.dimensions.draggables,
+          droppable: preset.home,
+        });
+
+        expect(result).toEqual(original);
+      }
+      // into home list (with scroll)
+      {
+        const scroll: Position = { x: 10, y: 20 };
+        const displacement: Position = negate(scroll);
+        const scrollable: DroppableDimension = makeScrollable(preset.home);
+        const scrolled: DroppableDimension = scrollDroppable(
+          scrollable,
+          scroll,
+        );
+
+        const result: Position = getPageBorderBoxCenter({
+          impact: getHomeImpact(preset.inHome1, preset.home),
+          draggable: preset.inHome1,
+          draggables: preset.dimensions.draggables,
+          droppable: scrolled,
+        });
+
+        expect(result).toEqual(add(original, displacement));
+      }
+    });
+
+    it('should account for any scroll in the droppable being dropped into (into foreign list)', () => {
+      // inHome1 over the end of empty
+      const willDisplaceForward: boolean = true;
+      const displacedBy: DisplacedBy = getDisplacedBy(
+        axis,
+        preset.inHome1.displaceBy,
+        willDisplaceForward,
+      );
+      const impact: DragImpact = {
+        movement: {
+          displaced: [],
+          map: {},
+          willDisplaceForward,
+          displacedBy,
+        },
+        direction: axis.direction,
+        // moving into the last position
+        destination: {
+          index: 0,
+          droppableId: preset.emptyForeign.descriptor.id,
+        },
+        merge: null,
+      };
+      const expectedCenter: Position = goIntoStart({
+        axis,
+        moveInto: preset.emptyForeign.page,
+        isMoving: preset.inHome1.page,
+      });
+      // into start of empty foreign list (without scroll)
+      {
+        const result: Position = getPageBorderBoxCenter({
+          impact,
+          draggable: preset.inHome1,
+          draggables: preset.dimensions.draggables,
+          droppable: preset.emptyForeign,
+        });
+
+        expect(result).toEqual(expectedCenter);
+      }
+      // into home list (with scroll)
+      {
+        const scroll: Position = { x: 10, y: 20 };
+        const displacement: Position = negate(scroll);
+        const scrollable: DroppableDimension = makeScrollable(
+          preset.emptyForeign,
+        );
+        const scrolled: DroppableDimension = scrollDroppable(
+          scrollable,
+          scroll,
+        );
+
+        const result: Position = getPageBorderBoxCenter({
+          impact,
+          draggable: preset.inHome1,
+          draggables: preset.dimensions.draggables,
+          droppable: scrolled,
+        });
+
+        expect(result).toEqual(add(expectedCenter, displacement));
+      }
     });
   });
 });

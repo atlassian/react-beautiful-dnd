@@ -19,11 +19,7 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
 
   const postActionState: State = store.getState();
 
-  if (postActionState.phase !== 'DROP_PENDING') {
-    return;
-  }
-
-  if (!postActionState.isWaiting) {
+  if (postActionState.phase === 'DROP_PENDING' && !postActionState.isWaiting) {
     store.dispatch(
       drop({
         reason: postActionState.reason,

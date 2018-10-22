@@ -2,16 +2,16 @@
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import passThrough from './util/pass-through-middleware';
-import middleware from '../../../../src/state/middleware/viewport-destination-change-scroll-updater';
+import middleware from '../../../../src/state/middleware/update-viewport-max-scroll-on-destination-change';
 import createStore from './util/create-store';
 import {
-  updateViewportScroll,
+  updateViewportMaxScroll,
   initialPublish,
   moveDown,
   moveRight,
   clean,
   updateDroppableIsCombineEnabled,
-  type UpdateViewportScrollArgs,
+  type UpdateViewportMaxScrollArgs,
 } from '../../../../src/state/action-creators';
 import type { Store } from '../../../../src/state/store-types';
 import type {
@@ -21,10 +21,8 @@ import type {
   DroppableId,
 } from '../../../../src/types';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
-import { setViewport, setWindowScroll } from '../../../utils/viewport';
+import { setViewport } from '../../../utils/viewport';
 import { initialPublishArgs, preset } from '../../../utils/preset-action-args';
-// import getViewport from '../../../../src/view/window/get-viewport';
-import { origin, add } from '../../../../src/state/position';
 
 // using viewport from initial publish args
 const viewport: Viewport = initialPublishArgs.viewport;
@@ -78,19 +76,17 @@ it('should update if the max scroll position has changed and the destination has
     scrollHeight: scrollHeight + 10,
     scrollWidth: scrollWidth + 10,
   });
-  const expected: UpdateViewportScrollArgs = {
-    max: newMax,
-    shift: origin,
-    current: viewport.scroll.current,
+  const expected: UpdateViewportMaxScrollArgs = {
+    maxScroll: newMax,
   };
   // changing droppable
   store.dispatch(moveRight());
   expect(mock).toHaveBeenCalledTimes(2);
   expect(mock).toHaveBeenCalledWith(moveRight());
-  expect(mock).toHaveBeenCalledWith(updateViewportScroll(expected));
+  expect(mock).toHaveBeenCalledWith(updateViewportMaxScroll(expected));
 });
 
-it('should update if the current scroll position has changed and the destination has changed', () => {
+it('should not update if the max scroll has not changed and destination has', () => {
   const mock = jest.fn();
   const store: Store = createStore(middleware, passThrough(mock));
 
@@ -103,37 +99,7 @@ it('should update if the current scroll position has changed and the destination
   }
   mock.mockClear();
 
-  // change in scroll
-  const shift: Position = { x: 10, y: 20 };
-  const newScroll: Position = add(viewport.scroll.current, shift);
-  setWindowScroll(newScroll);
-
-  const expected: UpdateViewportScrollArgs = {
-    max: viewport.scroll.max,
-    shift,
-    current: newScroll,
-  };
-  // changing droppable
-  store.dispatch(moveRight());
-  expect(mock).toHaveBeenCalledTimes(2);
-  expect(mock).toHaveBeenCalledWith(moveRight());
-  expect(mock).toHaveBeenCalledWith(updateViewportScroll(expected));
-});
-
-it('should not update if the max and current scroll have not changed and destination has', () => {
-  const mock = jest.fn();
-  const store: Store = createStore(middleware, passThrough(mock));
-
-  // now dragging
-  store.dispatch(initialPublish(initialPublishArgs));
-  {
-    const current: State = store.getState();
-    invariant(current.isDragging);
-    expect(current.isDragging).toBe(true);
-  }
-  mock.mockClear();
-
-  // no change in scroll but there is a change in destination
+  // no change in max scroll but there is a change in destination
   store.dispatch(moveRight());
   expect(mock).toHaveBeenCalledWith(moveRight());
   expect(mock).toHaveBeenCalledTimes(1);
@@ -246,14 +212,12 @@ it('should change if moving from combine to another list', () => {
     scrollHeight: scrollHeight + 20,
     scrollWidth: scrollWidth + 20,
   });
-  const expected: UpdateViewportScrollArgs = {
-    max: newMax,
-    shift: origin,
-    current: viewport.scroll.current,
+  const expected: UpdateViewportMaxScrollArgs = {
+    maxScroll: newMax,
   };
   // changing droppable
   store.dispatch(moveRight());
   expect(mock).toHaveBeenCalledTimes(2);
   expect(mock).toHaveBeenCalledWith(moveRight());
-  expect(mock).toHaveBeenCalledWith(updateViewportScroll(expected));
+  expect(mock).toHaveBeenCalledWith(updateViewportMaxScroll(expected));
 });
