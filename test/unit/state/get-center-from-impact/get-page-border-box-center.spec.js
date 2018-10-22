@@ -25,7 +25,6 @@ import {
 } from '../../../../src/state/user-direction/user-direction-preset';
 import { getPreset, makeScrollable } from '../../../utils/dimension';
 
-import withDroppableDisplacement from '../../../../src/state/with-scroll-change/with-droppable-displacement';
 import { negate, add } from '../../../../src/state/position';
 import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 

@@ -14,7 +14,7 @@ import moveToNextIndex from './move-to-next-index';
 import isHomeOf from '../../droppable/is-home-of';
 import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border-box-center';
 import speculativelyIncrease from '../../update-displacement-visibility/speculatively-increase';
-import fromPageBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center/from-page-border-box-center';
+import getClientFromPageBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
 import { subtract } from '../../position';
 import isTotallyVisibleInNewLocation from './is-totally-visible-in-new-location';
 
@@ -95,7 +95,7 @@ export default ({
   if (isVisibleInNewLocation) {
     console.warn('👓 is visible in new position');
     // using the client center as the selection point
-    const clientSelection: Position = fromPageBorderBoxCenter({
+    const clientSelection: Position = getClientFromPageBorderBoxCenter({
       pageBorderBoxCenter,
       draggable,
       viewport,

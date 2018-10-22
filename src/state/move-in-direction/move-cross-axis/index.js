@@ -13,8 +13,7 @@ import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getClosestDraggable from './get-closest-draggable';
 import moveToNewDroppable from './move-to-new-droppable';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
-
-import fromPageBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center/from-page-border-box-center';
+import getClientFromPageBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
 import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border-box-center';
 
 type Args = {|
@@ -94,7 +93,7 @@ export default ({
     draggables,
   });
 
-  const clientSelection: Position = fromPageBorderBoxCenter({
+  const clientSelection: Position = getClientFromPageBorderBoxCenter({
     pageBorderBoxCenter,
     draggable,
     viewport,

@@ -8,7 +8,7 @@ import type {
   DraggableDimensionMap,
 } from '../../../types';
 import getPageBorderBoxCenterFromImpact from '../get-page-border-box-center';
-import fromPageBorderBoxCenter from './from-page-border-box-center';
+import getClientFromPageBorderBoxCenter from './get-client-from-page-border-box-center';
 
 type Args = {|
   impact: DragImpact,
@@ -32,7 +32,9 @@ export default ({
     droppable,
   });
 
-  return fromPageBorderBoxCenter({
+  console.log('pageBorderBoxCenter', pageBorderBoxCenter);
+
+  return getClientFromPageBorderBoxCenter({
     pageBorderBoxCenter,
     draggable,
     viewport,

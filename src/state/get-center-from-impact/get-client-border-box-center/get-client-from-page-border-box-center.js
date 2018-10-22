@@ -15,15 +15,19 @@ export default ({
   draggable,
   viewport,
 }: Args): Position => {
-  const offsetWithWindowScrollChange: Position = subtract(
+  const withoutPageScrollChange: Position = withViewportDisplacement(
+    viewport,
     pageBorderBoxCenter,
+  );
+
+  console.log('window scroll change', viewport.scroll.diff);
+
+  const offset: Position = subtract(
+    withoutPageScrollChange,
     draggable.page.borderBox.center,
   );
 
-  const clientOffset: Position = withViewportDisplacement(
-    viewport,
-    offsetWithWindowScrollChange,
-  );
+  console.log('offset', offset);
 
-  return add(draggable.client.borderBox.center, clientOffset);
+  return add(draggable.client.borderBox.center, offset);
 };

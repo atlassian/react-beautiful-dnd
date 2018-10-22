@@ -383,6 +383,8 @@ export default (state: State = idle, action: Action): State => {
       // appeasing flow
       phase: 'DROP_PENDING',
       ...state,
+      // eslint-disable-next-line
+      phase: 'DROP_PENDING',
       isWaiting: true,
       reason,
     };

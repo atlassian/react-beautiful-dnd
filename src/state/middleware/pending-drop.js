@@ -14,16 +14,24 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
   }
 
   // A bulk replace occurred - check if
-  // 1. there was a pending drop
+  // 1. there is a pending drop
   // 2. that the pending drop is no longer waiting
 
   const postActionState: State = store.getState();
 
-  if (postActionState.phase === 'DROP_PENDING' && !postActionState.isWaiting) {
-    store.dispatch(
-      drop({
-        reason: postActionState.reason,
-      }),
-    );
+  // no pending drop after the publish
+  if (postActionState.phase !== 'DROP_PENDING') {
+    return;
   }
+
+  // the pending drop is still waiting for completion
+  if (postActionState.isWaiting) {
+    return;
+  }
+
+  store.dispatch(
+    drop({
+      reason: postActionState.reason,
+    }),
+  );
 };
