@@ -2,7 +2,7 @@
 import invariant from 'tiny-invariant';
 import type { Announce } from '../../types';
 import type { Announcer } from './announcer-types';
-import { warning } from '../../debug/dev-warning';
+import { warning } from '../../dev-warning';
 
 let count: number = 0;
 

@@ -1,6 +1,6 @@
 // @flow
 import getDragHandleRef from './get-drag-handle-ref';
-import { warning } from '../../../debug/dev-warning';
+import { warning } from '../../../dev-warning';
 import type { DraggableId } from '../../../types';
 
 type FocusRetainer = {|

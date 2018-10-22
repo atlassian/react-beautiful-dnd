@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 
-import { warning } from '../../debug/dev-warning';
+import { warning } from '../../dev-warning';
 
 type Version = {|
   major: number,

@@ -11,7 +11,7 @@ import type {
 import type { Entries, DroppableEntry } from './dimension-marshal-types';
 import * as timings from '../../debug/timings';
 import { origin } from '../position';
-import { warning } from '../../debug/dev-warning';
+import { warning } from '../../dev-warning';
 
 export type Publisher = {|
   add: (descriptor: DraggableDescriptor) => void,

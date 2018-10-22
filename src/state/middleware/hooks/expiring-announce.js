@@ -1,6 +1,6 @@
 // @flow
 import type { Announce } from '../../../types';
-import { warning } from '../../../debug/dev-warning';
+import { warning } from '../../../dev-warning';
 
 export default (announce: Announce) => {
   let wasCalled: boolean = false;

@@ -19,7 +19,7 @@ import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-tar
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
-import { warning } from '../../debug/dev-warning';
+import { warning } from '../../dev-warning';
 
 const preventHtml5Dnd = (event: DragEvent) => {
   event.preventDefault();

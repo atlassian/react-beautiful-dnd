@@ -23,7 +23,7 @@ import type {
   ScrollOptions,
 } from '../../types';
 import getDimension from './get-dimension';
-import { warning } from '../../debug/dev-warning';
+import { warning } from '../../dev-warning';
 
 type Props = {|
   droppableId: DroppableId,

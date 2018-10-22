@@ -36,7 +36,7 @@ import {
   updateDroppableIsCombineEnabled,
   collectionStarting,
 } from '../../state/action-creators';
-import { getFormattedMessage } from '../../debug/dev-warning';
+import { getFormattedMessage } from '../../dev-warning';
 import { peerDependencies } from '../../../package.json';
 import checkReactVersion from './check-react-version';
 

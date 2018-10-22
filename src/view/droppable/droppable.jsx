@@ -12,7 +12,7 @@ import {
   droppableTypeKey,
   styleContextKey,
 } from '../context-keys';
-import { warning } from '../../debug/dev-warning';
+import { warning } from '../../dev-warning';
 
 type Context = {
   [string]: DroppableId | TypeId,

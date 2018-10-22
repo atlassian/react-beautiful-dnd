@@ -1,6 +1,6 @@
 // @flow
 import getClosestScrollable from './get-closest-scrollable';
-import { warning } from '../../debug/dev-warning';
+import { warning } from '../../dev-warning';
 
 // We currently do not support nested scroll containers
 // But will hopefully support this soon!

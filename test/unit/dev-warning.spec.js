@@ -1,5 +1,5 @@
 // @flow
-import { warning } from '../../../src/debug/dev-warning';
+import { warning } from '../../src/dev-warning';
 
 jest.spyOn(console, 'warn').mockImplementation(() => {});
 

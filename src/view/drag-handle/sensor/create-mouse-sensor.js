@@ -16,7 +16,7 @@ import createEventMarshal, {
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
 import type { MouseSensor, CreateSensorArgs } from './sensor-types';
-import { warning } from '../../../debug/dev-warning';
+import { warning } from '../../../dev-warning';
 
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
