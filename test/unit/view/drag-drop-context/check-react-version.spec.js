@@ -103,3 +103,28 @@ it('should pass on the current repo setup', () => {
 
   expect(console.warn).not.toHaveBeenCalled();
 });
+
+it('should warn if the version would result in devtool slowdown', () => {
+  const peerDep: string = peerDependencies.react;
+
+  // no warnings for anything below 16.5
+  checkReactVersion(peerDep, '16.4.9');
+  expect(console.warn).not.toHaveBeenCalled();
+
+  const wasCalled = () => {
+    expect(console.warn).toHaveBeenCalledTimes(1);
+    console.warn.mockClear();
+  };
+
+  checkReactVersion(peerDep, '16.5.0');
+  wasCalled();
+
+  checkReactVersion(peerDep, '16.5.2');
+  wasCalled();
+
+  checkReactVersion(peerDep, '16.6.0');
+  wasCalled();
+
+  checkReactVersion(peerDep, '17.0.0');
+  wasCalled();
+});

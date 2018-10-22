@@ -10,6 +10,8 @@ type Version = {|
   raw: string,
 |};
 
+// known performance issue with dev tools
+// https://github.com/atlassian/react-beautiful-dnd/issues/808
 const issueWithDevTools: Version = {
   major: 16,
   minor: 5,
@@ -59,22 +61,14 @@ const isSatisfied = (expected: Version, actual: Version): boolean => {
 
   // minor is equal, continue on
 
-  if (actual.patch >= expected.patch) {
-    return true;
-  }
-
-  return false;
+  return actual.patch >= expected.patch;
 };
 
 export default (peerDepValue: string, actualValue: string) => {
   const peerDep: Version = getVersion(peerDepValue);
   const actual: Version = getVersion(actualValue);
-  console.log('actual', actual);
-  console.log('peer', peerDep);
-  console.log('is satisfied?', isSatisfied(peerDep, actual));
 
   if (!isSatisfied(peerDep, actual)) {
-    console.log('warning time');
     warning(`
       React version: [${actual.raw}]
       does not satisfy expected peer dependency version: [${peerDep.raw}]
