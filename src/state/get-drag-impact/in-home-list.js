@@ -33,7 +33,7 @@ const getNewIndex = (
 };
 
 type Args = {|
-  pageBorderBoxCenterWithDroppableScroll: Position,
+  pageBorderBoxCenterWithDroppableScrollChange: Position,
   draggable: DraggableDimension,
   home: DroppableDimension,
   insideHome: DraggableDimension[],
@@ -43,7 +43,7 @@ type Args = {|
 |};
 
 export default ({
-  pageBorderBoxCenterWithDroppableScroll: currentCenter,
+  pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
   draggable,
   home,
   insideHome,

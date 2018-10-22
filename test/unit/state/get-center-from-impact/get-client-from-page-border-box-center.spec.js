@@ -1,7 +1,7 @@
 // @flow
 import type { Position } from 'css-box-model';
 import type { DraggableDimension, Viewport } from '../../../../src/types';
-import { add, subtract } from '../../../../src/state/position';
+import { add } from '../../../../src/state/position';
 import { getPreset } from '../../../utils/dimension';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import getClientFromPageBorderBoxCenter from '../../../../src/state/get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
@@ -16,8 +16,7 @@ it('should unwind window scroll changes', () => {
   const scroll: Position = { x: 10, y: 20 };
   const newScroll: Position = add(preset.windowScroll, scroll);
   const scrolled: Viewport = scrollViewport(preset.viewport, newScroll);
-  // not applying window scroll to pageBorderBoxCenter (not applied to getPageBorderBoxCenter)
-  const pageBorderBoxCenter: Position = originalPageCenter;
+  const pageBorderBoxCenter: Position = add(originalPageCenter, scroll);
 
   const result: Position = getClientFromPageBorderBoxCenter({
     pageBorderBoxCenter,
@@ -25,7 +24,7 @@ it('should unwind window scroll changes', () => {
     viewport: scrolled,
   });
 
-  expect(result).toEqual(subtract(originalClientCenter, scroll));
+  expect(result).toEqual(originalClientCenter);
 });
 
 it('should account for manual offsets', () => {

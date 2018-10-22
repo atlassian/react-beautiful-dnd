@@ -32,8 +32,6 @@ export default ({
     droppable,
   });
 
-  console.log('pageBorderBoxCenter', pageBorderBoxCenter);
-
   return getClientFromPageBorderBoxCenter({
     pageBorderBoxCenter,
     draggable,

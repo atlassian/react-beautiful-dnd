@@ -69,7 +69,7 @@ const isCombiningWith = ({
 };
 
 type Args = {|
-  pageBorderBoxCenterWithDroppableScroll: Position,
+  pageBorderBoxCenterWithDroppableScrollChange: Position,
   previousImpact: DragImpact,
   draggable: DraggableDimension,
   destination: DroppableDimension,
@@ -77,7 +77,7 @@ type Args = {|
   userDirection: UserDirection,
 |};
 export default ({
-  pageBorderBoxCenterWithDroppableScroll: currentCenter,
+  pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
   previousImpact,
   draggable,
   destination,

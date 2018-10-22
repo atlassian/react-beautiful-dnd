@@ -17,7 +17,7 @@ import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 
 type Args = {|
-  pageBorderBoxCenterWithDroppableScroll: Position,
+  pageBorderBoxCenterWithDroppableScrollChange: Position,
   draggable: DraggableDimension,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
@@ -27,7 +27,7 @@ type Args = {|
 |};
 
 export default ({
-  pageBorderBoxCenterWithDroppableScroll: currentCenter,
+  pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
   draggable,
   destination,
   insideDestination,

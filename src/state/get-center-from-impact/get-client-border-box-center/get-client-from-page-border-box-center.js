@@ -20,14 +20,10 @@ export default ({
     pageBorderBoxCenter,
   );
 
-  console.log('window scroll change', viewport.scroll.diff);
-
   const offset: Position = subtract(
     withoutPageScrollChange,
     draggable.page.borderBox.center,
   );
-
-  console.log('offset', offset);
 
   return add(draggable.client.borderBox.center, offset);
 };

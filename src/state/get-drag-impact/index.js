@@ -62,13 +62,13 @@ export default ({
   );
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
-  const pageBorderBoxCenterWithDroppableScroll: Position = withDroppableScroll(
+  const pageBorderBoxCenterWithDroppableScrollChange: Position = withDroppableScroll(
     destination,
     pageBorderBoxCenter,
   );
 
   const withMerge: ?DragImpact = getCombineImpact({
-    pageBorderBoxCenterWithDroppableScroll,
+    pageBorderBoxCenterWithDroppableScrollChange,
     previousImpact,
     draggable,
     destination,
@@ -82,7 +82,7 @@ export default ({
 
   return isWithinHomeDroppable
     ? inHomeList({
-        pageBorderBoxCenterWithDroppableScroll,
+        pageBorderBoxCenterWithDroppableScrollChange,
         draggable,
         home: destination,
         insideHome: insideDestination,
@@ -91,7 +91,7 @@ export default ({
         userDirection,
       })
     : inForeignList({
-        pageBorderBoxCenterWithDroppableScroll,
+        pageBorderBoxCenterWithDroppableScrollChange,
         draggable,
         destination,
         insideDestination,

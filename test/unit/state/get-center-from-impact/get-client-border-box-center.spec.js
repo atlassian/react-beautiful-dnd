@@ -5,7 +5,7 @@ import type {
   Viewport,
   DragImpact,
 } from '../../../../src/types';
-import { add, subtract, negate } from '../../../../src/state/position';
+import { add, subtract } from '../../../../src/state/position';
 import { getPreset } from '../../../utils/dimension';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import getClientBorderBoxCenter from '../../../../src/state/get-center-from-impact/get-client-border-box-center';
@@ -42,5 +42,5 @@ it('should unwind any changes in viewport scroll', () => {
     viewport: scrolled,
   });
 
-  expect(result).toEqual(originalClientCenter);
+  expect(result).toEqual(subtract(originalClientCenter, scroll));
 });
