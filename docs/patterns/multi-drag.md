@@ -65,9 +65,9 @@ This is providing the ability for a user to add or remove items to a selection g
 
 #### Event handlers
 
-We perform this action if the user performs a `click` or presses the **enter** <kbd>⏎</kbd> key in addition to holding the the [meta key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey).
+We perform this action if the user performs a `click` or presses the **enter** <kbd>⏎</kbd> key in addition to holding the appropriate modifier key to toggle item selection for their operating system.
 
-> Note: On Macintosh keyboards, this is the `⌘ Command` key. On Windows keyboards, this is the Windows key (`⊞ Windows`) - [MDN](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey)
+> Note: On Macintosh systems, this is the `⌘ Command` key. On Windows systems, this is the `⎈ Ctrl` key.
 
 #### Toggle selection in a group behaviour
 
@@ -135,10 +135,7 @@ class Task extends Component<Props> {
     // we are using the event for selection
     event.preventDefault();
 
-    const wasMetaKeyUsed: boolean = event.metaKey;
-    const wasShiftKeyUsed: boolean = event.shiftKey;
-
-    this.performAction(wasMetaKeyUsed, wasShiftKeyUsed);
+    this.performAction(event);
   };
 
   // Using onClick as it will be correctly
@@ -155,13 +152,19 @@ class Task extends Component<Props> {
     // marking the event as used
     event.preventDefault();
 
-    const wasMetaKeyUsed: boolean = event.metaKey;
-    const wasShiftKeyUsed: boolean = event.shiftKey;
-
-    this.performAction(wasMetaKeyUsed, wasShiftKeyUsed);
+    this.performAction(event);
   };
 
-  performAction = (wasMetaKeyUsed: boolean, wasShiftKeyUsed: boolean) => {
+  // Determines if the platform specific toggle selection in group key was used
+  wasToggleInSelectionGroupKeyUsed = (event: MouseEvent | KeyboardEvent) => {
+    const isUsingWindows = navigator.platform.indexOf('Win') >= 0;
+    return isUsingWindows ? event.ctrlKey : event.metaKey;
+  };
+
+  // Determines if the multiSelect key was used
+  wasMultiSelectKeyUsed = (event: MouseEvent | KeyboardEvent) => event.shiftKey;
+
+  performAction = (event: MouseEvent | KeyboardEvent) => {
     const {
       task,
       toggleSelection,
@@ -169,12 +172,12 @@ class Task extends Component<Props> {
       multiSelectTo,
     } = this.props;
 
-    if (wasMetaKeyUsed) {
+    if (this.wasToggleInSelectionGroupKeyUsed(event)) {
       toggleSelectionInGroup(task.id);
       return;
     }
 
-    if (wasShiftKeyUsed) {
+    if (this.wasMultiSelectKeyUsed(event)) {
       multiSelectTo(task.id);
       return;
     }
