@@ -7,6 +7,7 @@ import replace from 'rollup-plugin-replace';
 import strip from 'rollup-plugin-strip';
 import { uglify } from 'rollup-plugin-uglify';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
+import json from 'rollup-plugin-json';
 import pkg from './package.json';
 
 const input = './src/index.js';
@@ -45,6 +46,7 @@ export default [
     // Only deep dependency required is React
     external: ['react'],
     plugins: [
+      json(),
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
@@ -65,6 +67,7 @@ export default [
     // Only deep dependency required is React
     external: ['react'],
     plugins: [
+      json(),
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
       commonjs({ include: 'node_modules/**' }),
@@ -83,6 +86,7 @@ export default [
     output: { file: pkg.main, format: 'cjs' },
     external: excludeAllExternals,
     plugins: [
+      json(),
       resolve({ extensions }),
       babel(getBabelOptions({ useESModules: false })),
     ],
@@ -96,6 +100,7 @@ export default [
     output: { file: pkg.module, format: 'esm' },
     external: excludeAllExternals,
     plugins: [
+      json(),
       resolve({ extensions }),
       babel(getBabelOptions({ useESModules: true })),
       sizeSnapshot(snapshotArgs),

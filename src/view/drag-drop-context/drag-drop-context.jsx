@@ -37,6 +37,8 @@ import {
   collectionStarting,
 } from '../../state/action-creators';
 import { getFormattedMessage } from '../../debug/dev-warning';
+import { peerDependencies } from '../../../package.json';
+import checkReactVersion from './check-react-version';
 
 type Props = {|
   ...Hooks,
@@ -170,6 +172,10 @@ export default class DragDropContext extends React.Component<Props> {
     window.addEventListener('error', this.onWindowError);
     this.styleMarshal.mount();
     this.announcer.mount();
+
+    if (process.env.NODE_ENV !== 'production') {
+      checkReactVersion(peerDependencies.react, React.version);
+    }
   }
 
   componentDidCatch(error: Error) {
