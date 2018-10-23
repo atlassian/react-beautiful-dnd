@@ -128,10 +128,7 @@ export default class Task extends Component<Props> {
     // we are using the event for selection
     event.preventDefault();
 
-    const wasMetaKeyUsed: boolean = event.metaKey;
-    const wasShiftKeyUsed: boolean = event.shiftKey;
-
-    this.performAction(wasMetaKeyUsed, wasShiftKeyUsed);
+    this.performAction(event);
   };
 
   // Using onClick as it will be correctly
@@ -148,10 +145,7 @@ export default class Task extends Component<Props> {
     // marking the event as used
     event.preventDefault();
 
-    const wasMetaKeyUsed: boolean = event.metaKey;
-    const wasShiftKeyUsed: boolean = event.shiftKey;
-
-    this.performAction(wasMetaKeyUsed, wasShiftKeyUsed);
+    this.performAction(event);
   };
 
   onTouchEnd = (event: TouchEvent) => {
@@ -166,7 +160,16 @@ export default class Task extends Component<Props> {
     this.props.toggleSelectionInGroup(this.props.task.id);
   };
 
-  performAction = (wasMetaKeyUsed: boolean, wasShiftKeyUsed: boolean) => {
+  // Determines if the platform specific toggle selection in group key was used
+  wasToggleInSelectionGroupKeyUsed = (event: MouseEvent | KeyboardEvent) => {
+    const isUsingWindows = navigator.platform.indexOf('Win') >= 0;
+    return isUsingWindows ? event.ctrlKey : event.metaKey;
+  };
+
+  // Determines if the multiSelect key was used
+  wasMultiSelectKeyUsed = (event: MouseEvent | KeyboardEvent) => event.shiftKey;
+
+  performAction = (event: MouseEvent | KeyboardEvent) => {
     const {
       task,
       toggleSelection,
@@ -174,12 +177,12 @@ export default class Task extends Component<Props> {
       multiSelectTo,
     } = this.props;
 
-    if (wasMetaKeyUsed) {
+    if (this.wasToggleInSelectionGroupKeyUsed(event)) {
       toggleSelectionInGroup(task.id);
       return;
     }
 
-    if (wasShiftKeyUsed) {
+    if (this.wasMultiSelectKeyUsed(event)) {
       multiSelectTo(task.id);
       return;
     }
