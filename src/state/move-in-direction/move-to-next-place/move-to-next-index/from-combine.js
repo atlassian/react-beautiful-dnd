@@ -56,7 +56,6 @@ export default ({
 
       if (isMovingForward) {
         // we skip displacement when we move past a displaced item
-        console.warn('skipping displacement 1');
         return {
           proposedIndex: combineIndex + 1,
           modifyDisplacement: false,
@@ -77,15 +76,12 @@ export default ({
         modifyDisplacement: true,
       };
     }
-    console.warn('skipping displacement 2');
     // we skip displacement when we move past a displaced item
     return {
       proposedIndex: combineIndex - 1,
       modifyDisplacement: false,
     };
   }
-
-  console.warn('from YES combined');
 
   // moving from an item that is already displaced
   const isDisplacedForward: boolean = movement.willDisplaceForward;
@@ -103,7 +99,6 @@ export default ({
     }
     // if moving backwards, will move in front of the displaced item
     // want to leave the displaced item in place
-    console.warn('skipping displacement 3');
     // we skip displacement when we move past a displaced item
     return {
       proposedIndex: visualIndex - 1,
@@ -115,7 +110,6 @@ export default ({
 
   // moving forward will increase the displacement
   if (isMovingForward) {
-    console.warn('skipping displacement 4');
     // we skip displacement when we move past a displaced item
     return {
       proposedIndex: visualIndex + 1,

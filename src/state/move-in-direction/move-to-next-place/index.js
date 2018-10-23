@@ -93,7 +93,6 @@ export default ({
   });
 
   if (isVisibleInNewLocation) {
-    console.warn('👓 is visible in new position');
     // using the client center as the selection point
     const clientSelection: Position = getClientFromPageBorderBoxCenter({
       pageBorderBoxCenter,
@@ -106,7 +105,6 @@ export default ({
       scrollJumpRequest: null,
     };
   }
-  console.warn('👻 is not visible in new position');
 
   const distance: Position = subtract(
     pageBorderBoxCenter,

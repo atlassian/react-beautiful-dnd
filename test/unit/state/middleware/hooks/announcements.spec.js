@@ -42,11 +42,13 @@ const moveForwardUpdate: DragUpdate = {
 
 const start = (dispatch: Dispatch) => {
   dispatch(initialPublish(initialPublishArgs));
+  // release async hook
   jest.runOnlyPendingTimers();
 };
 
 const update = (dispatch: Dispatch) => {
   dispatch(moveDown());
+  // release async hook
   jest.runOnlyPendingTimers();
 };
 

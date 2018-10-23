@@ -244,7 +244,6 @@ export default (state: State = idle, action: Action): State => {
       isEnabled,
     };
 
-    console.log('post droppable change');
     return postDroppableChange(state, updated, true);
   }
 

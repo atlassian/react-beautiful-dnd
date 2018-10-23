@@ -57,7 +57,6 @@ export default ({
     }
 
     // speculatively visible!
-    console.log(entry.draggableId, 'SPECULATIVELY INCREASED');
     return {
       draggableId: entry.draggableId,
       isVisible: true,
