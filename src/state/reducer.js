@@ -33,22 +33,25 @@ import update from './post-reducer/when-moving/update';
 import refreshSnap from './post-reducer/when-moving/refresh-snap';
 import patchDroppableMap from './patch-droppable-map';
 
-const getIsSnapping = (state: StateWhenUpdatesAllowed): boolean =>
+const isSnapping = (state: StateWhenUpdatesAllowed): boolean =>
   state.movementMode === 'SNAP';
 
 const postDroppableChange = (
   state: StateWhenUpdatesAllowed,
   updated: DroppableDimension,
+  isEnabledChanging: boolean,
 ): StateWhenUpdatesAllowed => {
   const dimensions: DimensionMap = patchDroppableMap(state.dimensions, updated);
 
-  if (getIsSnapping(state)) {
-    return refreshSnap({
+  // if the enabled state is changing, we need to force a update
+  if (!isSnapping(state) || isEnabledChanging) {
+    return update({
       state,
       dimensions,
     });
   }
-  return update({
+
+  return refreshSnap({
     state,
     dimensions,
   });
@@ -175,7 +178,7 @@ export default (state: State = idle, action: Action): State => {
       state,
       clientSelection,
       // If we are snap moving - manual movements should not update the impact
-      impact: getIsSnapping(state) ? state.impact : null,
+      impact: isSnapping(state) ? state.impact : null,
     });
   }
 
@@ -208,7 +211,7 @@ export default (state: State = idle, action: Action): State => {
     }
 
     const scrolled: DroppableDimension = scrollDroppable(target, offset);
-    return postDroppableChange(state, scrolled);
+    return postDroppableChange(state, scrolled, false);
   }
 
   if (action.type === 'UPDATE_DROPPABLE_IS_ENABLED') {
@@ -241,7 +244,8 @@ export default (state: State = idle, action: Action): State => {
       isEnabled,
     };
 
-    return postDroppableChange(state, updated);
+    console.log('post droppable change');
+    return postDroppableChange(state, updated, true);
   }
 
   if (action.type === 'UPDATE_DROPPABLE_IS_COMBINE_ENABLED') {
@@ -274,7 +278,7 @@ export default (state: State = idle, action: Action): State => {
       isCombineEnabled,
     };
 
-    return postDroppableChange(state, updated);
+    return postDroppableChange(state, updated, true);
   }
 
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
@@ -302,7 +306,7 @@ export default (state: State = idle, action: Action): State => {
 
     const viewport: Viewport = scrollViewport(state.viewport, newScroll);
 
-    if (getIsSnapping(state)) {
+    if (isSnapping(state)) {
       return refreshSnap({
         state,
         viewport,

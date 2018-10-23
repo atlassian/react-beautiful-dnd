@@ -51,10 +51,6 @@ export default ({
 
   const destination: DroppableDimension = droppables[destinationId];
 
-  if (!destination.isEnabled) {
-    return noImpact;
-  }
-
   const isWithinHomeDroppable: boolean = isHomeOf(draggable, destination);
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     destination.descriptor.id,

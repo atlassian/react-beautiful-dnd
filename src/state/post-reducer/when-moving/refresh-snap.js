@@ -25,7 +25,8 @@ export default ({
   state,
   dimensions: forcedDimensions,
   viewport: forcedViewport,
-}: Args): StateWhenUpdatesAllowed => {
+}: // when a draggable is changing enabled state, sometimes it needs to force refresh an impact
+Args): StateWhenUpdatesAllowed => {
   invariant(state.movementMode === 'SNAP');
 
   const needsVisibilityCheck: DragImpact = state.impact;

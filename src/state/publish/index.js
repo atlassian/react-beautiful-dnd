@@ -94,6 +94,7 @@ export default ({
   });
 
   // Get the impact of all of our changes
+  // this could result in a strange snap placement (will be fixed on next move)
   const impact: DragImpact = withNoAnimatedDisplacement(
     getDragImpact({
       pageBorderBoxCenter: current.page.borderBoxCenter,

@@ -86,15 +86,15 @@ export default ({
   }
 
   const draggable: DraggableDimension =
-    state.dimensions.draggables[state.critical.draggable.id];
+    dimensions.draggables[state.critical.draggable.id];
 
   const newImpact: DragImpact =
     forcedImpact ||
     getDragImpact({
       pageBorderBoxCenter: page.borderBoxCenter,
       draggable,
-      draggables: state.dimensions.draggables,
-      droppables: state.dimensions.droppables,
+      draggables: dimensions.draggables,
+      droppables: dimensions.droppables,
       previousImpact: state.impact,
       viewport,
       userDirection,

@@ -7,15 +7,16 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import { uglify } from 'rollup-plugin-uglify';
 
-const extensions = ['.js', '.jsx'];
-
-const getBabelOptions = ({ useESModules }) => ({
-  exclude: 'node_modules/**',
-  runtimeHelpers: true,
-  plugins: [['@babel/transform-runtime', { corejs: 2, useESModules }]],
-});
+// 60 second timeout
+jest.setTimeout(60 * 100);
 
 const getCode = async ({ mode }): Promise<string> => {
+  const getBabelOptions = ({ useESModules }) => ({
+    exclude: 'node_modules/**',
+    runtimeHelpers: true,
+    plugins: [['@babel/transform-runtime', { corejs: 2, useESModules }]],
+  });
+  const extensions = ['.js', '.jsx'];
   const plugins = [
     json(),
     replace({ 'process.env.NODE_ENV': JSON.stringify(mode) }),

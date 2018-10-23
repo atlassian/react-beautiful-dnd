@@ -213,25 +213,9 @@ it('should call the onBeforeDragStart before connected components are updated, a
   expect(second.onRender).toHaveBeenCalledTimes(1);
   clearRenderMocks();
 
-  // start drop
+  // drop (there is no animation because already in the home spot)
   pressSpacebar(wrapper.find('.drag-handle').first());
-  // Drop animation has started
-  expect(first.onRender).toHaveBeenCalledTimes(1);
-  expect(second.onRender).toHaveBeenCalledTimes(0);
-  clearRenderMocks();
 
-  // simulate transition end
-  wrapper
-    .find(Draggable)
-    .first()
-    .simulate('transitionEnd');
-  // order has changed
-  expect(
-    wrapper
-      .find(Draggable)
-      .first()
-      .props().draggableId,
-  ).toBe(second.id);
   // only a single render for the reorder and connected component update
   expect(first.onRender).toHaveBeenCalledTimes(1);
   expect(second.onRender).toHaveBeenCalledTimes(1);
