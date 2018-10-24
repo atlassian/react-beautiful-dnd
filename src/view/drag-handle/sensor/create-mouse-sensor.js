@@ -132,7 +132,10 @@ export default ({
         if (!state.pending) {
           // we cannot use kill directly as it checks if there is a pending drag
           stopPendingDrag();
-          invariant(false, 'Expected there to be a pending drag');
+          invariant(
+            false,
+            'Expected there to be an active or pending drag when window mousemove event is received',
+          );
         }
 
         // threshold not yet exceeded
