@@ -46,7 +46,7 @@ export default ({
   // When finding the target we need to consider displacement
   // We need to move onto things in their current displacement
 
-  const current: DraggableDimension[] = (() => {
+  const inList: DraggableDimension[] = (() => {
     const shallow = insideDestination.slice();
 
     if (isInHomeList) {
@@ -65,11 +65,11 @@ export default ({
   }
 
   // The last item that can be grouped with is the last one
-  if (targetIndex > current.length - 1) {
+  if (targetIndex > inList.length - 1) {
     return null;
   }
 
-  const target: DraggableDimension = current[targetIndex];
+  const target: DraggableDimension = inList[targetIndex];
 
   const merge: CombineImpact = {
     whenEntered: isMovingForward ? forward : backward,
