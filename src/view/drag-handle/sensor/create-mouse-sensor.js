@@ -126,10 +126,12 @@ export default ({
           return;
         }
 
+        // There should be a pending drag at this point
+
         // drag should be pending
         if (!state.pending) {
           // we cannot use kill directly as it checks if there is a pending drag
-          stopDragging(noop, false);
+          stopPendingDrag();
           invariant(false, 'Expected there to be a pending drag');
         }
 
