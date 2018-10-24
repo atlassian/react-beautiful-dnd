@@ -806,13 +806,165 @@ import getDisplacementMap from '../../../../../../src/state/get-displacement-map
 
       it('should not allow movement before the start of the list', () => {
         // cross axis move inHome1 before inForeign1
+        const willDisplaceForward: boolean = true;
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          preset.inHome1.displaceBy,
+          willDisplaceForward,
+        );
+        const initial: Displacement[] = [
+          {
+            draggableId: preset.inForeign1.descriptor.id,
+            isVisible: true,
+            shouldAnimate: true,
+          },
+          {
+            draggableId: preset.inForeign2.descriptor.id,
+            isVisible: true,
+            shouldAnimate: true,
+          },
+          {
+            draggableId: preset.inForeign3.descriptor.id,
+            isVisible: true,
+            shouldAnimate: true,
+          },
+          {
+            draggableId: preset.inForeign4.descriptor.id,
+            isVisible: true,
+            shouldAnimate: true,
+          },
+        ];
+        const crossAxisMove: DragImpact = {
+          movement: {
+            displaced: initial,
+            map: getDisplacementMap(initial),
+            willDisplaceForward,
+            displacedBy,
+          },
+          direction: axis.direction,
+          merge: null,
+          destination: {
+            droppableId: preset.foreign.descriptor.id,
+            index: preset.inForeign1.descriptor.index,
+          },
+        };
+
         // cannot move backwards
-        throw new Error('TODO');
+
+        const impact: ?DragImpact = moveToNextIndex({
+          isMovingForward: false,
+          isInHomeList: false,
+          draggable: preset.inHome1,
+          draggables: preset.draggables,
+          destination: preset.home,
+          insideDestination: preset.inForeignList,
+          previousImpact: crossAxisMove,
+        });
+
+        expect(impact).toBe(null);
       });
 
-      it('should not allow movement after the end of the list', () => {
+      it('should allow movement into a spot after the last item in a list', () => {
+        // cross axis move inHome4 before inForeign4
+        const willDisplaceForward: boolean = true;
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          preset.inHome4.displaceBy,
+          willDisplaceForward,
+        );
+        const initial: Displacement[] = [
+          {
+            draggableId: preset.inForeign4.descriptor.id,
+            isVisible: true,
+            shouldAnimate: true,
+          },
+        ];
+        const crossAxisMove: DragImpact = {
+          movement: {
+            // nothing is displaced at this point
+            displaced: initial,
+            map: getDisplacementMap(initial),
+            willDisplaceForward,
+            displacedBy,
+          },
+          direction: axis.direction,
+          merge: null,
+          // trying to move after spot after inForeign4
+          destination: {
+            droppableId: preset.foreign.descriptor.id,
+            index: preset.inForeign4.descriptor.index,
+          },
+        };
+
+        // move forwards into spot after inForeign4
+
+        const impact: ?DragImpact = moveToNextIndex({
+          isMovingForward: true,
+          isInHomeList: false,
+          draggable: preset.inHome4,
+          draggables: preset.draggables,
+          destination: preset.foreign,
+          insideDestination: preset.inForeignList,
+          previousImpact: crossAxisMove,
+        });
+        invariant(impact);
+        const expected: DragImpact = {
+          movement: {
+            // nothing is displaced at this point
+            displaced: [],
+            map: {},
+            willDisplaceForward,
+            displacedBy,
+          },
+          direction: axis.direction,
+          merge: null,
+          // trying to move after spot after inForeign4
+          destination: {
+            droppableId: preset.foreign.descriptor.id,
+            index: preset.inForeign4.descriptor.index + 1,
+          },
+        };
+        expect(impact).toEqual(expected);
+      });
+
+      it('should not allow movement after it is already after the last item in a list', () => {
         // cross axis move inHome4 after inForeign4
-        // cannot move forwards
+        const willDisplaceForward: boolean = true;
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          preset.inHome4.displaceBy,
+          willDisplaceForward,
+        );
+        const crossAxisMove: DragImpact = {
+          movement: {
+            // nothing is displaced at this point
+            displaced: [],
+            map: {},
+            willDisplaceForward,
+            displacedBy,
+          },
+          direction: axis.direction,
+          merge: null,
+          // trying to move after spot after inForeign4
+          destination: {
+            droppableId: preset.foreign.descriptor.id,
+            index: preset.inForeign4.descriptor.index + 1,
+          },
+        };
+
+        // cannot move forwards outside of list
+
+        const impact: ?DragImpact = moveToNextIndex({
+          isMovingForward: true,
+          isInHomeList: false,
+          draggable: preset.inHome4,
+          draggables: preset.draggables,
+          destination: preset.foreign,
+          insideDestination: preset.inForeignList,
+          previousImpact: crossAxisMove,
+        });
+
+        expect(impact).toBe(null);
       });
     });
   });
