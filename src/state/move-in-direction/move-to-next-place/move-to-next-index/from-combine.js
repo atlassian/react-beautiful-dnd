@@ -76,7 +76,7 @@ export default ({
         modifyDisplacement: true,
       };
     }
-    // we skip displacement when we move past a displaced item
+    // we are moving behind the displaced item and leaving it in place
     return {
       proposedIndex: combineIndex - 1,
       modifyDisplacement: false,
