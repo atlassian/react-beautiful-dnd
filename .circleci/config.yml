@@ -110,7 +110,7 @@ jobs:
 
       - run:
           name: Browser Suite
-          command: node tools/testHarness.js yarn test:browser
+          command: node browser-test-harness.js yarn test:browser
 
       - store_test_results:
           path: test-reports/browser
