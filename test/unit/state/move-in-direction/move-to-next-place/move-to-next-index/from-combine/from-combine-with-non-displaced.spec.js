@@ -6,7 +6,6 @@ import type {
   Displacement,
   DisplacedBy,
   DroppableDimension,
-  DraggableDimension,
 } from '../../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../../src/state/axis';
 import {
@@ -17,16 +16,11 @@ import { getPreset } from '../../../../../../utils/dimension';
 import moveToNextIndex from '../../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-index/index';
 import getDisplacedBy from '../../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../../src/state/get-displacement-map';
+import getVisibleDisplacement from '../../../../../../utils/get-visible-displacement';
 
 const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
   ...droppable,
   isCombineEnabled: true,
-});
-
-const visibleDisplacement = (draggable: DraggableDimension): Displacement => ({
-  draggableId: draggable.descriptor.id,
-  isVisible: true,
-  shouldAnimate: true,
 });
 
 [vertical, horizontal].forEach((axis: Axis) => {
@@ -41,7 +35,7 @@ const visibleDisplacement = (draggable: DraggableDimension): Displacement => ({
         willDisplaceForward,
       );
 
-      const initial: Displacement[] = [visibleDisplacement(preset.inHome2)];
+      const initial: Displacement[] = [getVisibleDisplacement(preset.inHome2)];
       const combinedWithInHome3: DragImpact = {
         movement: {
           displaced: initial,
@@ -75,8 +69,8 @@ const visibleDisplacement = (draggable: DraggableDimension): Displacement => ({
 
           // ordered by closest
           const displaced: Displacement[] = [
-            visibleDisplacement(preset.inHome3),
-            visibleDisplacement(preset.inHome2),
+            getVisibleDisplacement(preset.inHome3),
+            getVisibleDisplacement(preset.inHome2),
           ];
           const expected: DragImpact = {
             movement: {
@@ -111,7 +105,7 @@ const visibleDisplacement = (draggable: DraggableDimension): Displacement => ({
           invariant(impact);
 
           const displaced: Displacement[] = [
-            visibleDisplacement(preset.inHome2),
+            getVisibleDisplacement(preset.inHome2),
           ];
           const expected: DragImpact = {
             movement: {
@@ -141,7 +135,7 @@ const visibleDisplacement = (draggable: DraggableDimension): Displacement => ({
         willDisplaceForward,
       );
 
-      const initial: Displacement[] = [visibleDisplacement(preset.inHome2)];
+      const initial: Displacement[] = [getVisibleDisplacement(preset.inHome2)];
       const combinedWithInHome1: DragImpact = {
         movement: {
           displaced: initial,
@@ -175,7 +169,7 @@ const visibleDisplacement = (draggable: DraggableDimension): Displacement => ({
 
           // ordered by closest
           const displaced: Displacement[] = [
-            visibleDisplacement(preset.inHome2),
+            getVisibleDisplacement(preset.inHome2),
           ];
           const expected: DragImpact = {
             movement: {
@@ -210,8 +204,8 @@ const visibleDisplacement = (draggable: DraggableDimension): Displacement => ({
           invariant(impact);
 
           const displaced: Displacement[] = [
-            visibleDisplacement(preset.inHome1),
-            visibleDisplacement(preset.inHome2),
+            getVisibleDisplacement(preset.inHome1),
+            getVisibleDisplacement(preset.inHome2),
           ];
           const expected: DragImpact = {
             movement: {
