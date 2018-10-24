@@ -30,6 +30,7 @@ waitPort({
     });
   })
   .catch(() => {
+    // eslint-disable-next-line no-console
     console.error('Storybook did not start in time');
     storybook.kill();
     process.exit(1);
