@@ -70,7 +70,10 @@ export default ({
     // will displace backwards (eg home list moving forward from start)
     // moving forward will increase displacement
     // moving backward will decrease displacement
+
     if (isMovingForward) {
+      // we are moving into the visual spot of the combine item
+      // and pushing it backwards
       return {
         proposedIndex: combineIndex,
         modifyDisplacement: true,
@@ -99,7 +102,6 @@ export default ({
     }
     // if moving backwards, will move in front of the displaced item
     // want to leave the displaced item in place
-    // we skip displacement when we move past a displaced item
     return {
       proposedIndex: visualIndex - 1,
       modifyDisplacement: false,
@@ -107,17 +109,19 @@ export default ({
   }
 
   // is displaced backwards
-
   // moving forward will increase the displacement
+  // moving backward will decrease the displacement
+
   if (isMovingForward) {
-    // we skip displacement when we move past a displaced item
+    // we are moving forwards off the backwards displaced item, leaving it displaced
     return {
       proposedIndex: visualIndex + 1,
       modifyDisplacement: false,
     };
   }
 
-  // moving backwards will undo the displacement
+  // we are moving backwards into the visual spot that the displaced item is occupying
+  // this will undo the displacement of the item
   return {
     proposedIndex: visualIndex,
     modifyDisplacement: true,
