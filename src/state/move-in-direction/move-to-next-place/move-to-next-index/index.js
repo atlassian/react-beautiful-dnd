@@ -60,7 +60,7 @@ export default ({
   destination,
   insideDestination,
   previousImpact,
-}: Args) => {
+}: Args): ?DragImpact => {
   const instruction: ?Instruction = (() => {
     if (previousImpact.destination) {
       return fromReorder({
