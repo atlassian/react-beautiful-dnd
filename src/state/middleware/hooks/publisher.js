@@ -118,8 +118,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
   };
 
   // Passing in the critical location again as it can change during a drag
-  // TODO: rename: update
-  const move = (critical: Critical, impact: DragImpact) => {
+  const update = (critical: Critical, impact: DragImpact) => {
     const location: ?DraggableLocation = impact.destination;
     const combine: ?Combine = impact.merge ? impact.merge.combine : null;
     invariant(
@@ -209,7 +208,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
   return {
     beforeStart,
     start,
-    move,
+    update,
     drop,
     abort,
   };

@@ -19,7 +19,7 @@ import type {
   DropResult,
   HookProvided,
 } from '../../../../../src/types';
-import type { Store } from '../../../../../src/state/store-types';
+import type { Store, Dispatch } from '../../../../../src/state/store-types';
 import createHooks from './util/get-hooks-stub';
 import getAnnounce from './util/get-announce-stub';
 

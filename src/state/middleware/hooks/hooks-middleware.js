@@ -50,7 +50,7 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
 
     const state: State = store.getState();
     if (state.phase === 'DRAGGING') {
-      publisher.move(state.critical, state.impact);
+      publisher.update(state.critical, state.impact);
     }
   };
 };
