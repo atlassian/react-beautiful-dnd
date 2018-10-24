@@ -26,7 +26,7 @@ export default ({
   isInHomeList,
   draggable,
   destination,
-  insideDestination,
+  insideDestination: originalInsideDestination,
   previousImpact,
 }: Args): ?DragImpact => {
   if (!destination.isCombineEnabled) {
@@ -38,20 +38,26 @@ export default ({
     return null;
   }
 
+  // we are on a location, and we are trying to combine onto a sibling
+  // that sibling might be displaced
+
   const location: ?DraggableLocation = previousImpact.destination;
-  invariant(location, 'previous location required for combining');
+  invariant(location, 'Need a previous location to move from into a combine');
 
   const currentIndex: number = location.index;
 
-  // When finding the target we need to consider displacement
-  // We need to move onto things in their current displacement
+  // update the insideDestination list to reflect the current
+  // list order
+  const currentInsideDestination: DraggableDimension[] = (() => {
+    const shallow = originalInsideDestination.slice();
 
-  const inList: DraggableDimension[] = (() => {
-    const shallow = insideDestination.slice();
-
+    // if we are in the home list we need to remove the item from its original position
+    // before we insert it into its new position
     if (isInHomeList) {
       shallow.splice(draggable.descriptor.index, 1);
     }
+
+    // put the draggable into its current position in the list
     shallow.splice(location.index, 0, draggable);
     return shallow;
   })();
@@ -65,11 +71,11 @@ export default ({
   }
 
   // The last item that can be grouped with is the last one
-  if (targetIndex > inList.length - 1) {
+  if (targetIndex > currentInsideDestination.length - 1) {
     return null;
   }
 
-  const target: DraggableDimension = inList[targetIndex];
+  const target: DraggableDimension = currentInsideDestination[targetIndex];
 
   const merge: CombineImpact = {
     whenEntered: isMovingForward ? forward : backward,
