@@ -127,6 +127,7 @@ export default ({
     const pending: ?Position = state.pending;
 
     if (!pending) {
+      // this should be an impossible state
       // cannot use kill() as it will not unbind when there is no pending
       stopPendingDrag();
       invariant(false, 'cannot start a touch drag without a pending position');

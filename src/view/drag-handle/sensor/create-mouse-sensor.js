@@ -128,8 +128,8 @@ export default ({
 
         // There should be a pending drag at this point
 
-        // drag should be pending
         if (!state.pending) {
+          // this should be an impossible state
           // we cannot use kill directly as it checks if there is a pending drag
           stopPendingDrag();
           invariant(
