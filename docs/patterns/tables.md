@@ -45,7 +45,7 @@ For tables with less than 50 rows this should approach be fine!
 
 If you want to use `React.Portal` in combination with table row reordering then there are few extra steps you need to go through.
 
-First up, have a read of our [using a portal guide](docs/guides/using-a-portal.md) to get familiar with the approach.
+First up, have a read of our [using a portal pattern](docs/patterns/using-a-portal.md) to get familiar with the approach.
 
 It is important to know things timings of mount / unmount actions in React. We have created a [codesandbox.io example](https://codesandbox.io/s/nkl52y1wn0) to show how the mount timings work when moving in and out of a `React.Portal`.
 

@@ -1136,7 +1136,7 @@ When dragging a `Draggable` we leave behind a _placeholder_ `React.Element` to m
 
 ### Adding an `onClick` handler to a `Draggable` or a _drag handle_
 
-You are welcome to add your own `onClick` handler to a `Draggable` or a _drag handle_ (which might be the same element). `onClick` events handlers will always be called if a click occurred. If we are preventing the click then we the `event.defaultPrevented` property will be set to `true`. We prevent click events from occurring when the user was dragging an item. See [#sloppy-clicks-and-click-prevention-](sloppy clicks and click prevention) for more information.
+You are welcome to add your own `onClick` handler to a `Draggable` or a _drag handle_ (which might be the same element). `onClick` events handlers will always be called if a click occurred. If we are preventing the click then we the `event.defaultPrevented` property will be set to `true`. We prevent click events from occurring when the user was dragging an item. See [sloppy clicks and click prevention](#sloppy-clicks-and-click-prevention-) for more information.
 
 ### Interactive child elements within a `Draggable`
 
@@ -1287,6 +1287,14 @@ Here is an [example written in typescript](https://github.com/abeaudoin2013/reac
 
 We have created a [sample application](https://github.com/alexreardon/react-beautiful-dnd-flow-example) which exercises the flowtypes. It is a super simple `React` project based on [`react-create-app`](https://github.com/facebookincubator/create-react-app). You can use this as a reference to see how to set things up correctly.
 
+## Community
+
+- [kanban-dnd](https://kanban-dnd.glitch.me) \- A Kanban style to-do list, with the ability to create custom lanes and reorder them on the fly. 
+
+## Addons
+
+- [natural-drag-animation-rbdnd](https://github.com/rokborf/natural-drag-animation-rbdnd) adds natural dragging animation
+
 ## Engineering health
 
 ### Typed
@@ -1314,13 +1322,13 @@ Great care has been taken to keep the library as light as possible. It is curren
 
 This library supports the standard [Atlassian supported browsers](https://confluence.atlassian.com/cloud/supported-browsers-744721663.html) for desktop:
 
-| Desktop                              | Version                                              |
-| ------------------------------------ | ---------------------------------------------------- |
-| Microsoft Internet Explorer(Windows) | Version 11                                           |
-| Microsoft Edge                       | Latest stable version supported                      |
-| Mozilla Firefox (all platforms)      | Latest stable version supported                      |
-| Google Chrome (Windows and Mac)      | Latest stable version supported                      |
-| Safari (Mac)                         | Latest stable version on latest OS release supported |
+| Desktop                              | Version                                                                                                                                                      |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Microsoft Internet Explorer(Windows) | Version 11 (Need to [polyfill `Array.prototype.find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find#Polyfill)) |
+| Microsoft Edge                       | Latest stable version supported                                                                                                                              |
+| Mozilla Firefox (all platforms)      | Latest stable version supported                                                                                                                              |
+| Google Chrome (Windows and Mac)      | Latest stable version supported                                                                                                                              |
+| Safari (Mac)                         | Latest stable version on latest OS release supported                                                                                                         |
 
 | Mobile                   | Version                                                   |
 | ------------------------ | --------------------------------------------------------- |

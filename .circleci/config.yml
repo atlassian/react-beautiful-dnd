@@ -30,7 +30,7 @@ jobs:
           name: Install Dependencies
           command: yarn
 
-      - run:
+      - run: 
           name: Update Lockfile
           command: $(yarn global bin)/greenkeeper-lockfile-update
 
@@ -41,7 +41,7 @@ jobs:
       - run:
           name: Validate Yarn Lock File
           command: |
-            if [ -n "$(git status -s)" ]; then
+            if [[ "$(git status -s)" != "" ]] && [[ "$CIRCLE_BRANCH" != greenkeeper/* ]]; then
               echo "Your yarn.lock was modified during install, please check in any changes to the yarn.lock file"
               exit 1
             fi
