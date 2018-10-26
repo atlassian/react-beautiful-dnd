@@ -29,6 +29,7 @@ export default ({
   maxScrollChange,
 }: SpeculativeArgs): DragImpact => {
   const displaced: Displacement[] = impact.movement.displaced;
+
   const scrolledViewport: Viewport = scrollViewport(
     viewport,
     add(viewport.scroll.current, maxScrollChange),
