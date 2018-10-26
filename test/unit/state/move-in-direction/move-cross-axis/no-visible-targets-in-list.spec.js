@@ -1,20 +1,20 @@
 // @flow
-import moveCrossAxis from '../../../../../../src/state/move-in-direction/move-cross-axis';
-import noImpact from '../../../../../../src/state/no-impact';
-import getViewport from '../../../../../../src/view/window/get-viewport';
-import {
-  getPreset,
-  getDroppableDimension,
-  getDraggableDimension,
-} from '../../../../../utils/dimension';
-import type { Result } from '../../../../../../src/state/move-in-direction/move-cross-axis/move-cross-axis-types';
+import type { PublicResult } from '../../../../../src/state/move-in-direction/move-in-direction-types';
 import type {
   Viewport,
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
-} from '../../../../../../src/types';
+} from '../../../../../src/types';
+import moveCrossAxis from '../../../../../src/state/move-in-direction/move-cross-axis';
+import noImpact from '../../../../../src/state/no-impact';
+import getViewport from '../../../../../src/view/window/get-viewport';
+import {
+  getPreset,
+  getDroppableDimension,
+  getDraggableDimension,
+} from '../../../../utils/dimension';
 
 const preset = getPreset();
 const viewport: Viewport = getViewport();
@@ -59,11 +59,11 @@ it('should return null if there are draggables in a destination list but none ar
     [custom.descriptor.id]: custom,
   };
 
-  const result: ?Result = moveCrossAxis({
+  const result: ?PublicResult = moveCrossAxis({
     isMovingForward: true,
-    pageBorderBoxCenter: preset.inHome1.page.borderBox.center,
-    draggableId: preset.inHome1.descriptor.id,
-    droppableId: preset.home.descriptor.id,
+    previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
+    draggable: preset.inHome1,
+    isOver: preset.home,
     draggables,
     droppables,
     previousImpact: noImpact,
