@@ -28,7 +28,7 @@ import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-
 import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visible';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
 
-[vertical /* , horizontal */].forEach((axis: Axis) => {
+[vertical, horizontal].forEach((axis: Axis) => {
   const hugeViewport: Viewport = createViewport({
     frame: getRect({
       top: 0,
