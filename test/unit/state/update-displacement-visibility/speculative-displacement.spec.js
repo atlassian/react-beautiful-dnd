@@ -42,7 +42,7 @@ const getVisibleDisplacementWithoutAnimation = (
   isVisible: true,
 });
 
-[vertical, horizontal].forEach((axis: Axis) => {
+[vertical /* , horizontal */].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     it('should do nothing when there is no displacement', () => {
       const preset = getPreset();
@@ -75,15 +75,6 @@ const getVisibleDisplacementWithoutAnimation = (
       const sizeOfInHome1: number = 50;
       const sizeOfInForeign1: number = 50;
       const sizeOfInForeign2: number = 50;
-      const sizeOfInForeign3: number = 10;
-      const sizeOfInForeign4: number = 100;
-      const sizeOfInForeign5: number = 100;
-
-      const sizeOfInHome1: number = 100;
-      // will be visible originally
-      const sizeOfInForeign1: number = 50;
-      const sizeOfInForeign2: number = 50;
-      // won't be visible originally
       const sizeOfInForeign3: number = 10;
       const sizeOfInForeign4: number = 100;
       const sizeOfInForeign5: number = 100;
@@ -264,7 +255,7 @@ const getVisibleDisplacementWithoutAnimation = (
         getVisibleDisplacementWithoutAnimation(inForeign2),
         getVisibleDisplacementWithoutAnimation(inForeign3),
         getVisibleDisplacementWithoutAnimation(inForeign4),
-        getNotVisibleDisplacement(inForeign5),
+        getVisibleDisplacementWithoutAnimation(inForeign5),
       ];
       const expected: DragImpact = {
         movement: {
