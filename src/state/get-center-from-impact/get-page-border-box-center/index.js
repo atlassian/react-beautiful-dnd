@@ -1,8 +1,5 @@
 // @flow
 import type { Position } from 'css-box-model';
-import whenCombining from './when-combining';
-import whenReordering from './when-reordering';
-import withDroppableDisplacement from '../../with-scroll-change/with-droppable-displacement';
 import type {
   DragImpact,
   DraggableDimension,
@@ -11,6 +8,10 @@ import type {
   CombineImpact,
   DraggableLocation,
 } from '../../../types';
+import whenCombining from './when-combining';
+import whenReordering from './when-reordering';
+import withDroppableDisplacement from '../../with-scroll-change/with-droppable-displacement';
+import { subtract } from '../../position';
 
 type Args = {|
   impact: DragImpact,
@@ -19,7 +20,7 @@ type Args = {|
   draggables: DraggableDimensionMap,
 |};
 
-const withoutDroppableDisplacement = ({
+const getResultWithoutDroppableDisplacement = ({
   impact,
   draggable,
   droppable,
@@ -55,7 +56,9 @@ const withoutDroppableDisplacement = ({
 };
 
 export default (args: Args): Position => {
-  const withoutDisplacement: Position = withoutDroppableDisplacement(args);
+  const withoutDisplacement: Position = getResultWithoutDroppableDisplacement(
+    args,
+  );
 
   const droppable: ?DroppableDimension = args.droppable;
 

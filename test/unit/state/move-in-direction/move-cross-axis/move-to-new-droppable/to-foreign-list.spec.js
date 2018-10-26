@@ -9,10 +9,11 @@ import type {
   DroppableDimension,
   DisplacedBy,
   Displacement,
+  DraggableDimensionMap,
 } from '../../../../../../src/types';
 import moveToNewDroppable from '../../../../../../src/state/move-in-direction/move-cross-axis/move-to-new-droppable';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
-import { add, negate, patch } from '../../../../../../src/state/position';
+import { add, patch } from '../../../../../../src/state/position';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import {
   getPreset,
@@ -66,11 +67,15 @@ const willDisplaceForward: boolean = true;
         expect(result).toEqual(expected);
       });
 
-      describe('do not move if first position is not visible', () => {
+      describe.only('do not move if first position is not visible', () => {
         const distanceToContentBoxStart = (box: BoxModel): number =>
           box.margin[axis.start] +
           box.border[axis.start] +
           box.padding[axis.start];
+
+        const withoutForeignDraggables: DraggableDimensionMap = toDraggableMap(
+          preset.inHomeList,
+        );
 
         const foreignPageBox: BoxModel = preset.foreign.page;
         const distanceToStartOfDroppableContent: number = distanceToContentBoxStart(
@@ -81,7 +86,7 @@ const willDisplaceForward: boolean = true;
           distanceToContentBoxStart(inHome1PageBox) +
           inHome1PageBox.contentBox[axis.size] / 2;
 
-        it('should not move into the start of list if the position is not visible due to droppable scroll', () => {
+        it.only('should not move into the start of list if the position is not visible due to droppable scroll', () => {
           const onVisibleEdge: Position = patch(
             axis.line,
             distanceToStartOfDroppableContent + distanceToCenterOfDragging,
@@ -104,7 +109,7 @@ const willDisplaceForward: boolean = true;
             const result: ?DragImpact = moveToNewDroppable({
               previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
               draggable: preset.inHome1,
-              draggables: preset.draggables,
+              draggables: withoutForeignDraggables,
               moveRelativeTo: null,
               destination: scrolled,
               // pretending it is empty
@@ -127,7 +132,7 @@ const willDisplaceForward: boolean = true;
             const result: ?DragImpact = moveToNewDroppable({
               previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
               draggable: preset.inHome1,
-              draggables: preset.draggables,
+              draggables: withoutForeignDraggables,
               moveRelativeTo: null,
               destination: scrolled,
               // pretending it is empty
