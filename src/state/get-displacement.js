@@ -34,9 +34,9 @@ const getShouldAnimate = (isVisible: boolean, previous: ?Displacement) => {
   return previous.shouldAnimate;
 };
 
-// Note: it is also an optimisation to undo the displacement on
-// items when they are no longer visible.
-// This prevents a lot of .render() calls when leaving a list
+// Note: it is also an optimisation to not render the displacement on
+// items when they are not longer visible.
+// This prevents a lot of .render() calls when leaving / entering a list
 
 export default ({
   draggable,
