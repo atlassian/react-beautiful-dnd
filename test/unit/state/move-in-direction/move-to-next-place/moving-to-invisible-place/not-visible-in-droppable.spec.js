@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { getRect, type Position } from 'css-box-model';
+import { getRect, type Position, type Rect } from 'css-box-model';
 import type {
   Axis,
   DragImpact,
@@ -16,6 +16,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
 import {
   getDraggableDimension,
   getDroppableDimension,
+  getFrame,
 } from '../../../../../utils/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
@@ -24,104 +25,119 @@ import moveToNextPlace from '../../../../../../src/state/move-in-direction/move-
 import { type PublicResult } from '../../../../../../src/state/move-in-direction/move-in-direction-types';
 import { origin, subtract } from '../../../../../../src/state/position';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
-import scrollViewport from '../../../../../../src/state/scroll-viewport';
 import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visible';
+import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
 
-[vertical, horizontal].forEach((axis: Axis) => {
-  const viewport: Viewport = createViewport({
+[vertical /* , horizontal */].forEach((axis: Axis) => {
+  const hugeViewport: Viewport = createViewport({
     frame: getRect({
       top: 0,
       left: 0,
-      bottom: 1000,
-      right: 1000,
+      bottom: 10000,
+      right: 10000,
     }),
     scroll: origin,
-    scrollHeight: 2000,
-    scrollWidth: 2000,
+    scrollHeight: 10000,
+    scrollWidth: 10000,
   });
 
-  const hugeDroppable: DroppableDimension = getDroppableDimension({
+  const scrollable: DroppableDimension = getDroppableDimension({
     descriptor: {
-      id: 'much bigger than viewport',
-      type: 'huge',
+      id: 'scrollable droppable',
+      type: 'hey',
     },
     direction: axis.direction,
+    // huge subject that will be cut by frame
     borderBox: {
       top: 0,
       right: 10000,
       bottom: 10000,
       left: 0,
     },
+    closest: {
+      borderBox: {
+        top: 0,
+        right: 1000,
+        bottom: 1000,
+        left: 0,
+      },
+      shouldClipSubject: true,
+      scroll: origin,
+      scrollSize: {
+        scrollWidth: 2000,
+        scrollHeight: 2000,
+      },
+    },
   });
+
+  const frameBorderBox: Rect = getFrame(scrollable).frameClient.borderBox;
 
   describe(`on ${axis.direction} axis`, () => {
     describe('moving forward', () => {
-      const asBigAsViewport: DraggableDimension = getDraggableDimension({
+      const asBigAsFrame: DraggableDimension = getDraggableDimension({
         descriptor: {
-          id: 'inside',
+          id: 'asBigAsFrame',
           index: 0,
-          droppableId: hugeDroppable.descriptor.id,
-          type: hugeDroppable.descriptor.type,
+          droppableId: scrollable.descriptor.id,
+          type: scrollable.descriptor.type,
         },
-        borderBox: viewport.frame,
+        borderBox: frameBorderBox,
       });
-      const outsideViewport: DraggableDimension = getDraggableDimension({
+      const outsideFrame: DraggableDimension = getDraggableDimension({
         descriptor: {
           id: 'outside',
           index: 1,
-          droppableId: hugeDroppable.descriptor.id,
-          type: hugeDroppable.descriptor.type,
+          droppableId: scrollable.descriptor.id,
+          type: scrollable.descriptor.type,
         },
         borderBox: {
-          // is bottom left of the viewport
-          top: viewport.frame.bottom + 1,
-          right: viewport.frame.right + 100,
-          left: viewport.frame.right + 1,
-          bottom: viewport.frame.bottom + 100,
+          // is bottom left of the frame
+          top: frameBorderBox.bottom + 1,
+          right: frameBorderBox.right + 100,
+          left: frameBorderBox.right + 1,
+          bottom: frameBorderBox.bottom + 100,
         },
       });
       // in home list moving forward
       const willDisplaceForward: boolean = false;
       const displacedBy: DisplacedBy = getDisplacedBy(
         axis,
-        asBigAsViewport.displaceBy,
+        asBigAsFrame.displaceBy,
         willDisplaceForward,
       );
       const draggables: DraggableDimensionMap = {
-        [asBigAsViewport.descriptor.id]: asBigAsViewport,
-        [outsideViewport.descriptor.id]: outsideViewport,
+        [asBigAsFrame.descriptor.id]: asBigAsFrame,
+        [outsideFrame.descriptor.id]: outsideFrame,
       };
 
       it('should request a jump scroll for movement that is outside of the viewport', () => {
         // verify visibility is as expected
-        // before scroll
         expect(
           isTotallyVisible({
-            target: asBigAsViewport.page.borderBox,
-            viewport: viewport.frame,
+            target: asBigAsFrame.page.borderBox,
+            viewport: hugeViewport.frame,
             withDroppableDisplacement: true,
-            destination: hugeDroppable,
+            destination: scrollable,
           }),
         ).toBe(true);
         expect(
           isTotallyVisible({
-            target: outsideViewport.page.borderBox,
-            viewport: viewport.frame,
+            target: outsideFrame.page.borderBox,
+            viewport: hugeViewport.frame,
             withDroppableDisplacement: true,
-            destination: hugeDroppable,
+            destination: scrollable,
           }),
         ).toBe(false);
 
         const displaced: Displacement[] = [
           {
-            draggableId: outsideViewport.descriptor.id,
+            draggableId: outsideFrame.descriptor.id,
             // Even though the item started in an invisible place we force
             // the displacement to be visible.
             isVisible: true,
             shouldAnimate: true,
           },
         ];
-
         const expectedImpact: DragImpact = {
           movement: {
             displaced,
@@ -131,21 +147,21 @@ import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visi
           },
           merge: null,
           destination: {
-            droppableId: hugeDroppable.descriptor.id,
-            index: outsideViewport.descriptor.index,
+            droppableId: scrollable.descriptor.id,
+            index: outsideFrame.descriptor.index,
           },
           direction: axis.direction,
         };
         const previousPageBorderBoxCenter: Position =
-          asBigAsViewport.page.borderBox.center;
+          asBigAsFrame.page.borderBox.center;
         const previousClientSelection: Position =
-          asBigAsViewport.client.borderBox.center;
+          asBigAsFrame.client.borderBox.center;
 
         // figure out where we would have been if it was visible
         const nonVisibleCenter = getPageBorderBoxCenter({
           impact: expectedImpact,
-          draggable: asBigAsViewport,
-          droppable: hugeDroppable,
+          draggable: asBigAsFrame,
+          droppable: scrollable,
           draggables,
         });
         const expectedScrollJump: Position = subtract(
@@ -155,11 +171,11 @@ import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visi
 
         const result: ?PublicResult = moveToNextPlace({
           isMovingForward: true,
-          draggable: asBigAsViewport,
-          destination: hugeDroppable,
+          draggable: asBigAsFrame,
+          destination: scrollable,
           draggables,
-          previousImpact: getHomeImpact(asBigAsViewport, hugeDroppable),
-          viewport,
+          previousImpact: getHomeImpact(asBigAsFrame, scrollable),
+          viewport: hugeViewport,
           previousPageBorderBoxCenter,
           previousClientSelection,
         });
@@ -177,31 +193,29 @@ import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visi
 
     describe('moving backward', () => {
       it('should request a jump scroll for movement that is outside of the viewport', () => {
-        const initiallyInsideViewport: DraggableDimension = getDraggableDimension(
-          {
-            descriptor: {
-              id: 'inside',
-              index: 0,
-              droppableId: hugeDroppable.descriptor.id,
-              type: hugeDroppable.descriptor.type,
-            },
-            borderBox: viewport.frame,
+        const initiallyInsideFrame: DraggableDimension = getDraggableDimension({
+          descriptor: {
+            id: 'inside',
+            index: 0,
+            droppableId: scrollable.descriptor.id,
+            type: scrollable.descriptor.type,
           },
-        );
-        const initiallyOutsideViewport: DraggableDimension = getDraggableDimension(
+          borderBox: frameBorderBox,
+        });
+        const initiallyOutsideFrame: DraggableDimension = getDraggableDimension(
           {
             descriptor: {
               id: 'outside',
               index: 1,
-              droppableId: hugeDroppable.descriptor.id,
-              type: hugeDroppable.descriptor.type,
+              droppableId: scrollable.descriptor.id,
+              type: scrollable.descriptor.type,
             },
             borderBox: {
-              // is bottom left of the viewport
-              top: viewport.frame.bottom + 1,
-              right: viewport.frame.right + 100,
-              left: viewport.frame.right + 1,
-              bottom: viewport.frame.bottom + 100,
+              // is bottom left of the frame
+              top: frameBorderBox.bottom + 1,
+              right: frameBorderBox.right + 100,
+              left: frameBorderBox.right + 1,
+              bottom: frameBorderBox.bottom + 100,
             },
           },
         );
@@ -209,60 +223,64 @@ import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visi
         const willDisplaceForward: boolean = true;
         const displacedBy: DisplacedBy = getDisplacedBy(
           axis,
-          initiallyOutsideViewport.displaceBy,
+          initiallyOutsideFrame.displaceBy,
           willDisplaceForward,
         );
         const draggables: DraggableDimensionMap = {
-          [initiallyInsideViewport.descriptor.id]: initiallyInsideViewport,
-          [initiallyOutsideViewport.descriptor.id]: initiallyOutsideViewport,
+          [initiallyInsideFrame.descriptor.id]: initiallyInsideFrame,
+          [initiallyOutsideFrame.descriptor.id]: initiallyOutsideFrame,
         };
 
         const newScroll: Position = {
-          x: viewport.frame.bottom + 1,
-          y: viewport.frame.right + 1,
+          x: frameBorderBox.bottom + 1,
+          y: frameBorderBox.right + 1,
         };
-        const scrolled: Viewport = scrollViewport(viewport, newScroll);
+        const scrolled: DroppableDimension = scrollDroppable(
+          scrollable,
+          newScroll,
+        );
 
         // verify visibility is as expected
         // before scroll
         expect(
           isTotallyVisible({
-            target: initiallyInsideViewport.page.borderBox,
-            viewport: viewport.frame,
+            target: initiallyInsideFrame.page.borderBox,
+            viewport: hugeViewport.frame,
             withDroppableDisplacement: true,
-            destination: hugeDroppable,
+            destination: scrollable,
           }),
         ).toBe(true);
         expect(
           isTotallyVisible({
-            target: initiallyOutsideViewport.page.borderBox,
-            viewport: viewport.frame,
+            target: initiallyOutsideFrame.page.borderBox,
+            viewport: hugeViewport.frame,
             withDroppableDisplacement: true,
-            destination: hugeDroppable,
+            destination: scrollable,
           }),
         ).toBe(false);
 
         // after scroll: visibility is swapped
         expect(
           isTotallyVisible({
-            target: initiallyInsideViewport.page.borderBox,
-            viewport: scrolled.frame,
+            target: initiallyInsideFrame.page.borderBox,
+            viewport: hugeViewport.frame,
             withDroppableDisplacement: true,
-            destination: hugeDroppable,
+            destination: scrolled,
           }),
         ).toBe(false);
+
         expect(
           isTotallyVisible({
-            target: initiallyOutsideViewport.page.borderBox,
-            viewport: scrolled.frame,
+            target: initiallyOutsideFrame.page.borderBox,
+            viewport: hugeViewport.frame,
             withDroppableDisplacement: true,
-            destination: hugeDroppable,
+            destination: scrolled,
           }),
         ).toBe(true);
 
         const displaced: Displacement[] = [
           {
-            draggableId: initiallyInsideViewport.descriptor.id,
+            draggableId: initiallyInsideFrame.descriptor.id,
             // Even though the item started in an invisible place we force
             // the displacement to be visible.
             isVisible: true,
@@ -278,21 +296,21 @@ import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visi
           },
           merge: null,
           destination: {
-            droppableId: hugeDroppable.descriptor.id,
-            index: initiallyInsideViewport.descriptor.index,
+            droppableId: scrolled.descriptor.id,
+            index: initiallyInsideFrame.descriptor.index,
           },
           direction: axis.direction,
         };
         const previousPageBorderBoxCenter: Position =
-          initiallyOutsideViewport.page.borderBox.center;
+          initiallyOutsideFrame.page.borderBox.center;
         const previousClientSelection: Position =
-          initiallyOutsideViewport.client.borderBox.center;
+          initiallyOutsideFrame.client.borderBox.center;
 
         // figure out where we would have been if it was visible
         const nonVisibleCenter = getPageBorderBoxCenter({
           impact: expectedImpact,
-          draggable: initiallyOutsideViewport,
-          droppable: hugeDroppable,
+          draggable: initiallyOutsideFrame,
+          droppable: scrolled,
           draggables,
         });
         const expectedScrollJump: Position = subtract(
@@ -302,14 +320,11 @@ import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visi
 
         const result: ?PublicResult = moveToNextPlace({
           isMovingForward: false,
-          draggable: initiallyOutsideViewport,
-          destination: hugeDroppable,
+          draggable: initiallyOutsideFrame,
+          destination: scrolled,
           draggables,
-          previousImpact: getHomeImpact(
-            initiallyOutsideViewport,
-            hugeDroppable,
-          ),
-          viewport: scrolled,
+          previousImpact: getHomeImpact(initiallyOutsideFrame, scrollable),
+          viewport: hugeViewport,
           previousPageBorderBoxCenter,
           previousClientSelection,
         });
