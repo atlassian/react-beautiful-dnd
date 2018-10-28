@@ -1170,6 +1170,22 @@ resetServerContext();
 renderToString(...);
 ```
 
+## Developer only warnings 👷‍
+
+For common setup and usage issues `react-beautiful-dnd` will long some warnings to the `console`. These warnings are stripped from productions builds.
+
+How to drop the messages from your bundles:
+
+- [webpack instructions](https://webpack.js.org/guides/production/#specify-the-mode)
+- [rollup instructions](https://github.com/rollup/rollup-plugin-replace)
+
+If you want to disable the warnings in development, you just need to update a flag:
+
+```js
+// disable all react-beautiful-dnd development warnings
+window['__react-beautiful-dnd-disable-dev-warnings'] = true;
+```
+
 ## Flow usage
 
 `react-beautiful-dnd` is typed using [`flowtype`](https://flow.org). This greatly improves internal consistency within the codebase. We also expose a number of public types which will allow you to type your javascript if you would like to. If you are not using `flowtype` this will not inhibit you from using the library. It is just extra safety for those who want it.
@@ -1289,7 +1305,7 @@ We have created a [sample application](https://github.com/alexreardon/react-beau
 
 ## Community
 
-- [kanban-dnd](https://kanban-dnd.glitch.me) \- A Kanban style to-do list, with the ability to create custom lanes and reorder them on the fly. 
+- [kanban-dnd](https://kanban-dnd.glitch.me) \- A Kanban style to-do list, with the ability to create custom lanes and reorder them on the fly.
 
 ## Addons
 
