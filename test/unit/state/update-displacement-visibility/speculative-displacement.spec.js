@@ -47,7 +47,6 @@ const getVisibleDisplacementWithoutAnimation = (
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
-    console.warn('axis', axis.direction);
     it('should do nothing when there is no displacement', () => {
       const preset = getPreset();
 
