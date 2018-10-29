@@ -22,7 +22,7 @@ const issueWithDevTools: Version = {
 // We can use a simple regex here given that:
 // - the version that react supplies is always full: eg 16.5.2
 // - our peer dependency version is to a full version (eg ^16.3.1)
-const semver: RegExp = /(\d+)\.(\d+)\.(\d+)$/;
+const semver: RegExp = /(\d+)\.(\d+)\.(\d+)/;
 const getVersion = (value: string): Version => {
   const result: ?(string[]) = semver.exec(value);
 

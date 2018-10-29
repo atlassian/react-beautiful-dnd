@@ -94,6 +94,17 @@ it('should throw if unable to parse the peer dep version', () => {
   expect(() => checkReactVersion(peerDep, actual)).toThrow();
 });
 
+it('should allow pre release provided versions', () => {
+  const peerDep: string = '1.0.0';
+  const alpha: string = '1.2.3-alpha';
+  const beta: string = '1.2.3-beta';
+
+  checkReactVersion(peerDep, alpha);
+  checkReactVersion(peerDep, beta);
+
+  expect(console.warn).not.toHaveBeenCalled();
+});
+
 // actually an integration test, but this feels like the right place for it
 it('should pass on the current repo setup', () => {
   const peerDep: string = peerDependencies.react;
