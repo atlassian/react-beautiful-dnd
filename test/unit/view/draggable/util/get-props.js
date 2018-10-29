@@ -17,6 +17,7 @@ import getSimpleStatePreset from '../../../../utils/get-simple-state-preset';
 
 const state = getSimpleStatePreset();
 const dragging: DraggingState = state.dragging();
+export const preset = state.preset;
 export const draggable: DraggableDescriptor = dragging.critical.draggable;
 export const droppable: DroppableDescriptor = dragging.critical.droppable;
 
@@ -38,6 +39,10 @@ const selector: Selector = makeMapStateToProps();
 
 export const atRestMapProps: MapProps = selector(state.idle, defaultOwnProps);
 export const whileDragging: MapProps = selector(dragging, defaultOwnProps);
+export const whileDropping: MapProps = selector(
+  state.dropAnimating(),
+  defaultOwnProps,
+);
 
 export const getDispatchPropsStub = (): DispatchProps => ({
   lift: jest.fn(),

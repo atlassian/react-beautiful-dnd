@@ -24,7 +24,7 @@ const outOfTheWayTiming = `${outOfTheWayTime}s ${curves.outOfTheWay}`;
 
 export const transitions = {
   fluid: `opacity ${outOfTheWayTiming}`,
-  jump: `transform ${outOfTheWayTiming}, opacity ${outOfTheWayTiming}`,
+  snap: `transform ${outOfTheWayTiming}, opacity ${outOfTheWayTiming}`,
   drop: (duration: number): string => {
     const timing: string = `${duration}s ${curves.drop}`;
     return `transform ${timing}, opacity ${timing}`;

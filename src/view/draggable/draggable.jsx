@@ -53,7 +53,7 @@ const getDraggingTransition = (
     return transitions.drop(dropping.duration);
   }
   if (shouldAnimateDragMovement) {
-    return transitions.jump;
+    return transitions.snap;
   }
   return transitions.fluid;
 };
@@ -154,8 +154,8 @@ export default class Draggable extends Component<Props> {
     timings.finish('LIFT');
   };
 
-  // React calls ref callback twice for every render
-  // https://github.com/facebook/react/pull/8333/files
+  // React can call ref callback twice for every render
+  // if using an arrow function
   setRef = (ref: ?HTMLElement) => {
     if (ref === null) {
       return;

@@ -190,5 +190,6 @@ export default (axis?: Axis = vertical) => {
     userCancel,
     allPhases,
     collecting,
+    preset,
   };
 };
