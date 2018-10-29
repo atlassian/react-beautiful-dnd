@@ -3,10 +3,6 @@ import invariant from 'tiny-invariant';
 import type { Props } from './draggable-types';
 
 export default (props: Props) => {
-  if (process.env.NODE_ENV === 'production') {
-    return;
-  }
-
   // Number.isInteger will be provided by @babel/runtime-corejs2
   invariant(
     Number.isInteger(props.index),
