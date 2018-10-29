@@ -8,7 +8,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import { uglify } from 'rollup-plugin-uglify';
 
 // 60 second timeout
-jest.setTimeout(60 * 100);
+jest.setTimeout(60 * 1000);
 
 const getCode = async ({ mode }): Promise<string> => {
   const getBabelOptions = ({ useESModules }) => ({
