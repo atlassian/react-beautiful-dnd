@@ -18,7 +18,7 @@ import {
 import Placeholder from '../../../../src/view/placeholder';
 import getLastCall from './util/get-last-call';
 import { zIndexOptions } from '../../../../src/view/draggable/draggable';
-import { transitions } from '../../../../src/view/animation';
+import { transitions, combine } from '../../../../src/view/animation';
 
 it('should render a placeholder', () => {
   const myMock = jest.fn();
@@ -130,6 +130,43 @@ it('should animate snap movements', () => {
     pointerEvents: 'none',
     opacity: null,
     transition: transitions.snap,
+    transform: `translate(${offset.x}px, ${offset.y}px)`,
+  };
+
+  const provided: Provided = getLastCall(myMock)[0].provided;
+  expect(provided.draggableProps.style).toEqual(expected);
+});
+
+it('should update the opacity when combining with another item', () => {
+  const myMock = jest.fn();
+  const offset: Position = { x: 10, y: 20 };
+  const mapProps: MapProps = {
+    ...whileDragging,
+    dragging: {
+      ...whileDragging.dragging,
+      offset,
+      draggingOver: preset.home.descriptor.id,
+      combineWith: preset.inHome2.descriptor.id,
+    },
+  };
+
+  mount({
+    mapProps,
+    WrappedComponent: getStubber(myMock),
+  });
+
+  const expected: DraggingStyle = {
+    position: 'fixed',
+    zIndex: zIndexOptions.dragging,
+    boxSizing: 'border-box',
+    width: preset.inHome1.client.borderBox.width,
+    height: preset.inHome1.client.borderBox.height,
+    top: preset.inHome1.client.marginBox.top,
+    left: preset.inHome1.client.marginBox.left,
+    pointerEvents: 'none',
+    // key line
+    opacity: combine.opacity.combining,
+    transition: transitions.fluid,
     transform: `translate(${offset.x}px, ${offset.y}px)`,
   };
 
