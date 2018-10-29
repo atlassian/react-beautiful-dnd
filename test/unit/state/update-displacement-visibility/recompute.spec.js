@@ -12,10 +12,9 @@ import getDisplacementMap from '../../../../src/state/get-displacement-map';
 import recompute from '../../../../src/state/update-displacement-visibility/recompute';
 import { horizontal, vertical } from '../../../../src/state/axis';
 
-const preset = getPreset();
-
 [horizontal, vertical].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
+    const preset = getPreset(axis);
     it('should recompute a displacement', () => {
       // moving inHome1 down past inHome2 and inHome3
 
