@@ -3,15 +3,15 @@ import React, { Component } from 'react';
 import { mount } from 'enzyme';
 // eslint-disable-next-line no-duplicate-imports
 import type { ReactWrapper } from 'enzyme';
-import Droppable from '../../../src/view/droppable/droppable';
-import Placeholder from '../../../src/view/placeholder';
+import Droppable from '../../../../src/view/droppable/droppable';
+import Placeholder from '../../../../src/view/placeholder';
 import {
   withStore,
   combine,
   withDimensionMarshal,
   withStyleContext,
-} from '../../utils/get-context-options';
-import { getPreset } from '../../utils/dimension';
+} from '../../../utils/get-context-options';
+import { getPreset } from '../../../utils/dimension';
 import type {
   DraggableId,
   DroppableId,
