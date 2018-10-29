@@ -162,38 +162,44 @@ import patchDroppableMap from '../../../../src/state/patch-droppable-map';
         },
       };
 
-      const first: DimensionMap = getDimensionMapWithPlaceholder({
-        dimensions: preset.dimensions,
-        previousImpact: homeImpact,
-        impact: overForeign,
-        draggable: preset.inHome1,
-      });
+      // has a placeholder when moving over foreign
+      {
+        const toForeign: DimensionMap = getDimensionMapWithPlaceholder({
+          dimensions: preset.dimensions,
+          previousImpact: homeImpact,
+          impact: overForeign,
+          draggable: preset.inHome1,
+        });
 
-      // now has a placeholder
-      expect(first).not.toEqual(preset.dimensions);
-      expect(
-        first.droppables[preset.foreign.descriptor.id].subject.withPlaceholder,
-      ).toBeTruthy();
+        expect(toForeign).not.toEqual(preset.dimensions);
+        expect(
+          toForeign.droppables[preset.foreign.descriptor.id].subject
+            .withPlaceholder,
+        ).toBeTruthy();
+      }
+      // no placeholder when moving back over home
+      {
+        const toHome: DimensionMap = getDimensionMapWithPlaceholder({
+          dimensions: preset.dimensions,
+          previousImpact: overForeign,
+          impact: homeImpact,
+          draggable: preset.inHome1,
+        });
 
-      const second: DimensionMap = getDimensionMapWithPlaceholder({
-        dimensions: preset.dimensions,
-        previousImpact: overForeign,
-        impact: homeImpact,
-        draggable: preset.inHome1,
-      });
+        expect(toHome).toEqual(preset.dimensions);
+      }
 
-      // now no placeholder
-      expect(second).toEqual(preset.dimensions);
+      // no placeholder when moving over nothing
+      {
+        const toNoWhere: DimensionMap = getDimensionMapWithPlaceholder({
+          dimensions: preset.dimensions,
+          previousImpact: overForeign,
+          impact: noImpact,
+          draggable: preset.inHome1,
+        });
 
-      const third: DimensionMap = getDimensionMapWithPlaceholder({
-        dimensions: preset.dimensions,
-        previousImpact: overForeign,
-        impact: noImpact,
-        draggable: preset.inHome1,
-      });
-
-      // now no placeholder
-      expect(third).toEqual(preset.dimensions);
+        expect(toNoWhere).toEqual(preset.dimensions);
+      }
     });
   });
 });
