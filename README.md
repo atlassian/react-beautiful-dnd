@@ -62,16 +62,18 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - Vertical lists ↕
 - Horizontal lists ↔
 - Movement between lists (▤ ↔ ▤)
+- Combining items
 - Mouse 🐭, keyboard 🎹 and touch 👉📱 (mobile, tablet and so on) support
-- Auto scrolling - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
 - [Multi drag support](/docs/patterns/multi-drag.md)
+- Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) package 🌲
 - Incredible screen reader support - we provide an amazing experience for english screen readers out of the box 📦. We also provide complete customisation control and internationalisation support for those who need it 💖
 - Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
 - Flexible item sizes - the draggable items can have different heights (vertical lists) or widths (horizontal lists)
 - Compatible with semantic table reordering - [table pattern](/docs/patterns/tables.md)
-- Compatible with [`React.Portal`](https://reactjs.org/docs/portals.html) - [portal pattern](/docs/patterns/using-a-portal.md)
+- Auto scrolling - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
 - Custom drag handles - you can drag a whole item by just a part of it
+- Compatible with [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html) - [portal pattern](/docs/patterns/using-a-portal.md)
 - A `Droppable` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
 - Server side rendering compatible
@@ -1174,7 +1176,7 @@ renderToString(...);
 
 For common setup and usage issues `react-beautiful-dnd` will long some warnings to the `console`. These warnings are stripped from productions builds.
 
-How to drop the messages from your bundles:
+How to drop the developer messages from your bundles:
 
 - [webpack instructions](https://webpack.js.org/guides/production/#specify-the-mode)
 - [rollup instructions](https://github.com/rollup/rollup-plugin-replace)

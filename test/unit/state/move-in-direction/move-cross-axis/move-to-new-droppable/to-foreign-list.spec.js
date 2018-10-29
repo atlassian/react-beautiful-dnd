@@ -1,6 +1,11 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { offset, type Position, type BoxModel } from 'css-box-model';
+import {
+  offset,
+  type Position,
+  type BoxModel,
+  type Spacing,
+} from 'css-box-model';
 import type {
   Viewport,
   Axis,
@@ -13,7 +18,12 @@ import type {
 } from '../../../../../../src/types';
 import moveToNewDroppable from '../../../../../../src/state/move-in-direction/move-cross-axis/move-to-new-droppable';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
-import { add, patch } from '../../../../../../src/state/position';
+import {
+  add,
+  patch,
+  subtract,
+  negate,
+} from '../../../../../../src/state/position';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import {
   getPreset,
@@ -28,6 +38,8 @@ import { toDraggableMap } from '../../../../../../src/state/dimension-structures
 import scrollViewport from '../../../../../../src/state/scroll-viewport';
 import getHomeImpact from '../../../../../../src/state/get-home-impact';
 import getVisibleDisplacement from '../../../../../utils/get-visible-displacement';
+import { goIntoStart } from '../../../../../../src/state/get-center-from-impact/move-relative-to';
+import { offsetByPosition } from '../../../../../../src/state/spacing';
 
 const dontCare: Position = { x: 0, y: 0 };
 
@@ -67,52 +79,75 @@ const willDisplaceForward: boolean = true;
         expect(result).toEqual(expected);
       });
 
-      describe.only('do not move if first position is not visible', () => {
+      describe('do not move if first position is not visible', () => {
         const distanceToContentBoxStart = (box: BoxModel): number =>
           box.margin[axis.start] +
           box.border[axis.start] +
           box.padding[axis.start];
 
+        // calculating this as getPageBorderBoxCenter will recompute the insideDestination
         const withoutForeignDraggables: DraggableDimensionMap = toDraggableMap(
           preset.inHomeList,
         );
 
-        const foreignPageBox: BoxModel = preset.foreign.page;
-        const distanceToStartOfDroppableContent: number = distanceToContentBoxStart(
-          foreignPageBox,
-        );
-        const inHome1PageBox: BoxModel = preset.inHome1.page;
-        const distanceToCenterOfDragging: number =
-          distanceToContentBoxStart(inHome1PageBox) +
-          inHome1PageBox.contentBox[axis.size] / 2;
-
-        it.only('should not move into the start of list if the position is not visible due to droppable scroll', () => {
-          const onVisibleEdge: Position = patch(
-            axis.line,
-            distanceToStartOfDroppableContent + distanceToCenterOfDragging,
+        it('should not move into the start of list if the position is not visible due to droppable scroll', () => {
+          const whatNewCenterWouldBeWithoutScroll: Position = goIntoStart({
+            axis,
+            moveInto: preset.foreign.page,
+            isMoving: preset.inHome1.page,
+          });
+          const totalShift: Position = subtract(
+            whatNewCenterWouldBeWithoutScroll,
+            preset.inHome1.page.borderBox.center,
           );
-          const pastVisibleEdge: Position = add(
-            onVisibleEdge,
+          const shiftedInHome1Page: Spacing = offsetByPosition(
+            preset.inHome1.page.borderBox,
+            totalShift,
+          );
+          invariant(preset.foreign.subject.active);
+          const maxAllowableScroll: Position = negate(
+            subtract(
+              patch(axis.line, preset.foreign.subject.active[axis.start]),
+              patch(axis.line, shiftedInHome1Page[axis.start]),
+            ),
+          );
+          const pastMaxAllowableScroll: Position = add(
+            maxAllowableScroll,
             patch(axis.line, 1),
           );
+
+          // validation: no scrolled droppable
+          {
+            const result: ?DragImpact = moveToNewDroppable({
+              previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
+              draggable: preset.inHome1,
+              draggables: withoutForeignDraggables,
+              moveRelativeTo: null,
+              destination: preset.foreign,
+              insideDestination: [],
+              previousImpact: getHomeImpact(preset.inHome1, preset.home),
+              viewport,
+            });
+            expect(result).toBeTruthy();
+          }
 
           // center on visible edge = can move
           {
             const scrollable: DroppableDimension = makeScrollable(
               preset.foreign,
-              onVisibleEdge[axis.line],
+              maxAllowableScroll[axis.line],
             );
             const scrolled: DroppableDimension = scrollDroppable(
               scrollable,
-              onVisibleEdge,
+              maxAllowableScroll,
             );
+
             const result: ?DragImpact = moveToNewDroppable({
               previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
               draggable: preset.inHome1,
               draggables: withoutForeignDraggables,
               moveRelativeTo: null,
               destination: scrolled,
-              // pretending it is empty
               insideDestination: [],
               previousImpact: getHomeImpact(preset.inHome1, preset.home),
               viewport,
@@ -123,11 +158,11 @@ const willDisplaceForward: boolean = true;
           {
             const scrollable: DroppableDimension = makeScrollable(
               preset.foreign,
-              pastVisibleEdge[axis.line],
+              pastMaxAllowableScroll[axis.line],
             );
             const scrolled: DroppableDimension = scrollDroppable(
               scrollable,
-              pastVisibleEdge,
+              pastMaxAllowableScroll,
             );
             const result: ?DragImpact = moveToNewDroppable({
               previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
@@ -146,12 +181,21 @@ const willDisplaceForward: boolean = true;
         });
 
         it('should not move into the start of list if the position is not visible due to page scroll', () => {
+          const foreignPageBox: BoxModel = preset.foreign.page;
+          const distanceToStartOfDroppableContentBox: number = distanceToContentBoxStart(
+            foreignPageBox,
+          );
+          const inHome1PageBox: BoxModel = preset.inHome1.page;
+          const distanceToCenterOfDragging: number =
+            distanceToContentBoxStart(inHome1PageBox) +
+            inHome1PageBox.contentBox[axis.size] / 2;
+
           const distanceToStartOfViewport: number =
             foreignPageBox.marginBox[axis.start];
           const onVisibleEdge: Position = patch(
             axis.line,
             distanceToStartOfViewport +
-              distanceToStartOfDroppableContent +
+              distanceToStartOfDroppableContentBox +
               distanceToCenterOfDragging,
           );
           const pastVisibleEdge: Position = add(
@@ -186,7 +230,7 @@ const willDisplaceForward: boolean = true;
             const result: ?DragImpact = moveToNewDroppable({
               previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
               draggable: preset.inHome1,
-              draggables: preset.draggables,
+              draggables: withoutForeignDraggables,
               moveRelativeTo: null,
               destination: preset.foreign,
               // pretending it is empty
