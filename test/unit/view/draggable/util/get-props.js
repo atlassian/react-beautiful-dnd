@@ -29,6 +29,11 @@ export const defaultOwnProps: OwnProps = {
   children: () => null,
 };
 
+export const disabledOwnProps: OwnProps = {
+  ...defaultOwnProps,
+  isDragDisabled: true,
+};
+
 const selector: Selector = makeMapStateToProps();
 
 export const atRestMapProps: MapProps = selector(state.idle, defaultOwnProps);
