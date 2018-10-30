@@ -5,7 +5,7 @@ import type {
   OwnProps,
 } from '../../../../../src/view/droppable/droppable-types';
 
-const preset = getPreset();
+export const preset = getPreset();
 
 export const ownProps: OwnProps = {
   droppableId: preset.home.descriptor.id,
@@ -17,19 +17,31 @@ export const ownProps: OwnProps = {
   children: () => null,
 };
 
+export const foreignOwnProps: OwnProps = {
+  ...ownProps,
+  droppableId: preset.foreign.descriptor.id,
+  type: preset.foreign.descriptor.type,
+  direction: preset.foreign.axis.direction,
+};
+
 export const atRest: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
   placeholder: null,
 };
-export const draggingOverHome: MapProps = {
+export const isOverHome: MapProps = {
   isDraggingOver: true,
   draggingOverWith: preset.inHome1.descriptor.id,
   placeholder: null,
 };
-
-export const isDraggingOverForeignMapProps: MapProps = {
+export const isOverForeign: MapProps = {
   isDraggingOver: true,
   draggingOverWith: preset.inHome1.descriptor.id,
   placeholder: preset.inHome1.placeholder,
+};
+
+export const isNotOver: MapProps = {
+  isDraggingOver: false,
+  draggingOverWith: null,
+  placeholder: null,
 };

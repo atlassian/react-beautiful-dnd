@@ -15,20 +15,20 @@ import {
   withDimensionMarshal,
   withStyleContext,
 } from '../../../../utils/get-context-options';
+import getStubber from './get-stubber';
 
 type MountArgs = {|
-  WrappedComponent: any,
+  WrappedComponent?: any,
   ownProps?: OwnProps,
   mapProps?: MapProps,
 |};
 
 export default ({
-  WrappedComponent,
+  WrappedComponent = getStubber(),
   ownProps = defaultOwnProps,
   mapProps = atRest,
 }: MountArgs = {}): ReactWrapper =>
   mount(
-    // $ExpectError - using spread
     <Droppable {...ownProps} {...mapProps}>
       {(provided: Provided, snapshot: StateSnapshot) => (
         <WrappedComponent provided={provided} snapshot={snapshot} />

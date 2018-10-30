@@ -1,7 +1,16 @@
 // @flow
 import React from 'react';
+import type { ReactWrapper } from 'enzyme';
+import type { Provided } from '../../../../src/view/droppable/droppable-types';
+import {
+  atRest,
+  foreignOwnProps,
+  isOverForeign,
+  isNotOver,
+} from './util/get-props';
+import mount from './util/mount';
 
-class WithConditionalPlaceholder extends React.Component<{|
+class WithNoPlaceholder extends React.Component<{|
   provided: Provided,
 |}> {
   render() {
@@ -23,30 +32,50 @@ afterEach(() => {
   console.warn.mockRestore();
 });
 
-it('should log a warning when mounting', () => {
-  mount({
-    mapProps: isDraggingOverForeignMapProps,
-    WrappedComponent: WithConditionalPlaceholder,
+describe('is over foreign', () => {
+  it('should log a warning when mounting', () => {
+    mount({
+      ownProps: foreignOwnProps,
+      mapProps: isOverForeign,
+      WrappedComponent: WithNoPlaceholder,
+    });
+
+    expect(console.warn).toHaveBeenCalled();
   });
 
-  expect(console.warn).toHaveBeenCalledWith(
-    expect.stringContaining(
-      'Droppable setup issue: DroppableProvided > placeholder could not be found.',
-    ),
-  );
+  it('should log a warning when updating', () => {
+    const wrapper: ReactWrapper = mount({
+      ownProps: foreignOwnProps,
+      mapProps: atRest,
+      WrappedComponent: WithNoPlaceholder,
+    });
+    expect(console.warn).not.toHaveBeenCalled();
+
+    wrapper.setProps(isOverForeign);
+    expect(console.warn).toHaveBeenCalled();
+  });
 });
 
-it('should log a warning when updating', () => {
-  const wrapper = mount({
-    mapProps: notDraggingOverMapProps,
-    WrappedComponent: WithConditionalPlaceholder,
+describe('is not over foreign', () => {
+  it('should not log a warning when mounting', () => {
+    mount({
+      ownProps: foreignOwnProps,
+      mapProps: isNotOver,
+      WrappedComponent: WithNoPlaceholder,
+    });
+
+    expect(console.warn).not.toHaveBeenCalled();
   });
 
-  wrapper.setProps(isDraggingOverForeignMapProps);
+  it('should not log a warning when updating', () => {
+    const wrapper: ReactWrapper = mount({
+      ownProps: foreignOwnProps,
+      mapProps: atRest,
+      WrappedComponent: WithNoPlaceholder,
+    });
+    expect(console.warn).not.toHaveBeenCalled();
 
-  expect(console.warn).toHaveBeenCalledWith(
-    expect.stringContaining(
-      'Droppable setup issue: DroppableProvided > placeholder could not be found.',
-    ),
-  );
+    wrapper.setProps(isNotOver);
+    expect(console.warn).not.toHaveBeenCalled();
+  });
 });
