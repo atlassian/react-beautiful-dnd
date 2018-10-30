@@ -17,8 +17,6 @@ See how beautiful it is for yourself!
 
 [All the examples!](https://react-beautiful-dnd.netlify.com)
 
-Simple Trello - [Demo](https://simple-trello.netlify.com/) - [Source](https://github.com/ng-hai/simple-trello)
-
 ### Viewing on a mobile or tablet
 
 - [Simple list](https://react-beautiful-dnd.netlify.com/iframe.html)
@@ -1273,6 +1271,9 @@ We have created a [sample application](https://github.com/alexreardon/react-beau
 ## Community
 
 - [kanban-dnd](https://kanban-dnd.glitch.me) \- A Kanban style to-do list, with the ability to create custom lanes and reorder them on the fly. 
+- Simple Trello - A simple cloning version of Trello, using React ecosystem.
+  - [Demo](https://simple-trello.netlify.com/)
+  - [Source](https://github.com/ng-hai/simple-trello)
 
 ## Addons
 
