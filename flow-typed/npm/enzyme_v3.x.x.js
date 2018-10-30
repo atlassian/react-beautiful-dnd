@@ -1,5 +1,5 @@
-// flow-typed signature: e50486ad88c5bbfcdfde9fef4fc4c5d1
-// flow-typed version: ab187b275b/enzyme_v3.x.x/flow_>=v0.53.x
+// flow-typed signature: 18b4f758845087df07c11351959fbbb4
+// flow-typed version: d169442efa/enzyme_v3.x.x/flow_>=v0.53.x
 
 import * as React from "react";
 
@@ -26,7 +26,7 @@ declare module "enzyme" {
     containsAllMatchingElements(nodes: NodeOrNodes): boolean,
     containsAnyMatchingElements(nodes: NodeOrNodes): boolean,
     dive(option?: { context?: Object }): this,
-    exists(): boolean,
+    exists(selector?: EnzymeSelector): boolean,
     isEmptyRender(): boolean,
     matchesElement(node: React.Node): boolean,
     hasClass(className: string): boolean,
