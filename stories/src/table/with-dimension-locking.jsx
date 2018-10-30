@@ -120,7 +120,7 @@ type TableRowProps = {|
   snapshot: DraggableStateSnapshot,
 |};
 
-const IsDraggingContext = React.createContext(false);
+const IsDraggingContext = React.createContext<boolean>(false);
 
 class TableRow extends Component<TableRowProps> {
   render() {

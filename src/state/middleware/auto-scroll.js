@@ -3,8 +3,7 @@ import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
 import type { State } from '../../types';
 import type { Action, Dispatch, MiddlewareStore } from '../store-types';
 
-const shouldCancel = (action: Action) =>
-  action.type === 'CANCEL' ||
+const shouldCancel = (action: Action): boolean =>
   action.type === 'DROP_ANIMATE' ||
   action.type === 'DROP' ||
   action.type === 'DROP_COMPLETE' ||

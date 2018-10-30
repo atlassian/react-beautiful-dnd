@@ -37,14 +37,6 @@ import type {
 
 const preset = getPreset();
 
-type ScrollableItemProps = {|
-  // scrollable item prop (default: false)
-  isScrollable: boolean,
-  isDropDisabled: boolean,
-  droppableId: DroppableId,
-  type: TypeId,
-|};
-
 const margin: Spacing = {
   top: 1,
   right: 2,
@@ -89,12 +81,22 @@ const bigClient: BoxModel = createBox({
 
 const withSpacing = getComputedSpacing({ padding, margin, border });
 
+type ScrollableItemProps = {|
+  // scrollable item prop (default: false)
+  isScrollable: boolean,
+  isDropDisabled: boolean,
+  isCombineEnabled: boolean,
+  droppableId: DroppableId,
+  type: TypeId,
+|};
+
 class ScrollableItem extends Component<ScrollableItemProps> {
   static defaultProps = {
     isScrollable: true,
     type: preset.home.descriptor.type,
     droppableId: preset.home.descriptor.id,
     isDropDisabled: false,
+    isCombineEnabled: true,
   };
   /* eslint-disable react/sort-comp */
   ref: ?HTMLElement;
@@ -114,6 +116,7 @@ class ScrollableItem extends Component<ScrollableItemProps> {
         isDropDisabled={this.props.isDropDisabled}
         ignoreContainerClipping={false}
         getDroppableRef={this.getRef}
+        isCombineEnabled={this.props.isCombineEnabled}
       >
         <div
           className="scroll-container"
