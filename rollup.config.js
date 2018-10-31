@@ -31,6 +31,15 @@ const snapshotArgs =
       }
     : {};
 
+const commonjsArgs = {
+  include: 'node_modules/**',
+  // needed for react-is via react-redux v5.1
+  // https://stackoverflow.com/questions/50080893/rollup-error-isvalidelementtype-is-not-exported-by-node-modules-react-is-inde/50098540
+  namedExports: {
+    'node_modules/react-is/index.js': ['isValidElementType'],
+  },
+};
+
 export default [
   // Universal module definition (UMD) build
   // - including console.* statements
@@ -49,7 +58,7 @@ export default [
       json(),
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
-      commonjs({ include: 'node_modules/**' }),
+      commonjs(commonjsArgs),
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
       sizeSnapshot(snapshotArgs),
     ],
@@ -70,7 +79,7 @@ export default [
       json(),
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
-      commonjs({ include: 'node_modules/**' }),
+      commonjs(commonjsArgs),
       strip({ debugger: true }),
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot(snapshotArgs),
