@@ -47,10 +47,10 @@ const getClosestScrollable = (dragging: ?WhileDragging): ?Element =>
   (dragging && dragging.env.closestScrollable) || null;
 
 const immediate = {
-  passive: true,
+  passive: false,
 };
 const delayed = {
-  passive: false,
+  passive: true,
 };
 
 const getListenerOptions = (options: ScrollOptions) =>
@@ -312,13 +312,16 @@ export default class DroppableDimensionPublisher extends React.Component<
 
     if (env.closestScrollable) {
       // bind scroll listener
+
       env.closestScrollable.addEventListener(
         'scroll',
         this.onClosestScroll,
         getListenerOptions(dragging.scrollOptions),
       );
       // print a debug warning if using an unsupported nested scroll container setup
-      checkForNestedScrollContainers(env.closestScrollable);
+      if (process.env.NODE_ENV !== 'production') {
+        checkForNestedScrollContainers(env.closestScrollable);
+      }
     }
 
     return dimension;

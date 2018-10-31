@@ -5,10 +5,6 @@ import { warning } from '../../dev-warning';
 // We currently do not support nested scroll containers
 // But will hopefully support this soon!
 export default (scrollable: ?Element) => {
-  if (process.env.NODE_ENV === 'production') {
-    return;
-  }
-
   if (!scrollable) {
     return;
   }

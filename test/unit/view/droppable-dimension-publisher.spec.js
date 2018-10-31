@@ -96,7 +96,7 @@ class ScrollableItem extends Component<ScrollableItemProps> {
     type: preset.home.descriptor.type,
     droppableId: preset.home.descriptor.id,
     isDropDisabled: false,
-    isCombineEnabled: true,
+    isCombineEnabled: false,
   };
   /* eslint-disable react/sort-comp */
   ref: ?HTMLElement;
@@ -677,11 +677,6 @@ describe('DraggableDimensionPublisher', () => {
             immediate,
           );
           expect(console.warn).toHaveBeenCalled();
-          expect(console.warn).toHaveBeenCalledWith(
-            expect.stringContaining(
-              'Droppable: unsupported nested scroll container detected',
-            ),
-          );
 
           expect(result).toEqual(expected);
           console.warn.mockRestore();
@@ -1219,12 +1214,15 @@ describe('DraggableDimensionPublisher', () => {
   });
 
   describe('is enabled changes', () => {
-    it('should publish updates to the enabled state', () => {
+    it('should publish updates to the enabled state when dragging', () => {
       const marshal: DimensionMarshal = getMarshalStub();
       const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
-
       // not called yet
       expect(marshal.updateDroppableIsEnabled).not.toHaveBeenCalled();
+
+      const callbacks: DroppableCallbacks =
+        marshal.registerDroppable.mock.calls[0][1];
+      callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
 
       wrapper.setProps({
         isDropDisabled: true,
@@ -1237,13 +1235,33 @@ describe('DraggableDimensionPublisher', () => {
       );
     });
 
-    it('should not publish updates when there is no change', () => {
+    it('should not publish updates to the enabled state when there is no drag', () => {
       const marshal: DimensionMarshal = getMarshalStub();
       const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
 
       // not called yet
       expect(marshal.updateDroppableIsEnabled).not.toHaveBeenCalled();
 
+      // no yet dragging
+
+      wrapper.setProps({
+        isDropDisabled: true,
+      });
+
+      expect(marshal.updateDroppableIsEnabled).not.toHaveBeenCalled();
+    });
+
+    it('should not publish updates when there is no change', () => {
+      const marshal: DimensionMarshal = getMarshalStub();
+      const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
+
+      // not called yet
+      expect(marshal.updateDroppableIsEnabled).not.toHaveBeenCalled();
+      const callbacks: DroppableCallbacks =
+        marshal.registerDroppable.mock.calls[0][1];
+      callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
+
+      // no change
       wrapper.setProps({
         isDropDisabled: true,
       });
