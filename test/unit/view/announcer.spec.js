@@ -77,11 +77,7 @@ describe('announcing', () => {
 
     announcer.announce('test');
 
-    expect(console.warn).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'A screen reader message was trying to be announced but it was unable to do so',
-      ),
-    );
+    expect(console.warn).toHaveBeenCalled();
 
     console.warn.mockRestore();
   });

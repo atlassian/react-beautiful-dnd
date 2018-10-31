@@ -20,6 +20,16 @@ import {
 
 setViewport(preset.viewport);
 
+afterEach(() => {
+  // clean up any stubs
+  if (Element.prototype.getBoundingClientRect.mockRestore) {
+    Element.prototype.getBoundingClientRect.mockRestore();
+  }
+  if (window.getComputedStyle.mockRestore) {
+    window.getComputedStyle.mockRestore();
+  }
+});
+
 it('should throw if the droppable has no closest scrollable', () => {
   const marshal: DimensionMarshal = getMarshalStub();
   // no scroll parent
