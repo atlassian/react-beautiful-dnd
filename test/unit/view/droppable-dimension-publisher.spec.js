@@ -193,6 +193,7 @@ class App extends Component<AppProps> {
               droppableId={descriptor.id}
               direction="vertical"
               isDropDisabled={false}
+              isCombineEnabled={false}
               type={descriptor.type}
               ignoreContainerClipping={ignoreContainerClipping}
               getDroppableRef={this.getRef}
@@ -300,7 +301,7 @@ describe('DraggableDimensionPublisher', () => {
       // should now return a dimension with the correct descriptor
       const callbacks: DroppableCallbacks =
         marshal.updateDroppable.mock.calls[0][2];
-      callbacks.unwatchScroll();
+      callbacks.dragStopped();
       expect(
         callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled),
       ).toEqual(updated);
@@ -1001,7 +1002,7 @@ describe('DraggableDimensionPublisher', () => {
         // no animation frame to release event fired yet
 
         // unwatching before frame fired
-        callbacks.unwatchScroll();
+        callbacks.dragStopped();
 
         // flushing any frames
         requestAnimationFrame.flush();
@@ -1026,7 +1027,7 @@ describe('DraggableDimensionPublisher', () => {
       expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
       marshal.updateDroppableScroll.mockReset();
 
-      callbacks.unwatchScroll();
+      callbacks.dragStopped();
 
       // scroll event after no longer watching
       scroll(container, { x: 190, y: 400 });
@@ -1071,7 +1072,7 @@ describe('DraggableDimensionPublisher', () => {
       expect(request).toThrow();
 
       // cleanup
-      callbacks.unwatchScroll();
+      callbacks.dragStopped();
       wrapper.unmount();
     });
 
@@ -1103,7 +1104,7 @@ describe('DraggableDimensionPublisher', () => {
       container.addEventListener.mockReset();
 
       // unwatching scroll
-      callbacks.unwatchScroll();
+      callbacks.dragStopped();
 
       // assertion
       expect(container.removeEventListener).toHaveBeenCalledWith(
@@ -1211,7 +1212,7 @@ describe('DraggableDimensionPublisher', () => {
         callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
 
         // no longer watching scroll
-        callbacks.unwatchScroll();
+        callbacks.dragStopped();
         expect(() => callbacks.scroll({ x: 500, y: 1000 })).toThrow();
       });
     });
