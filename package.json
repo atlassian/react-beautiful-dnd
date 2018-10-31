@@ -61,7 +61,7 @@
     "memoize-one": "^4.0.2",
     "prop-types": "^15.6.1",
     "raf-schd": "^4.0.0",
-    "react-redux": "^5.1.0",
+    "react-redux": "^5.0.7",
     "redux": "^4.0.1",
     "tiny-invariant": "^1.0.2"
   },
