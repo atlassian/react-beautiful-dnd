@@ -14,7 +14,8 @@ function loadStories() {
 
 configure(loadStories, module);
 
-const table = Object.hasOwnProperty(console, 'table')
+// Doing this more complex check as console.table || console.log makes CI cry
+const table = Object.prototype.hasOwnProperty.call(console, 'table')
   ? console.table
   : console.log;
 

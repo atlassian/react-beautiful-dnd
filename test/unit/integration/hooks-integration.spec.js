@@ -22,6 +22,7 @@ import type { Provided as DraggableProvided } from '../../../src/view/draggable/
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import * as keyCodes from '../../../src/view/key-codes';
 import { getComputedSpacing } from '../../utils/dimension';
+import tryCleanPrototypeStubs from '../../utils/try-clean-prototype-stubs';
 
 const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
 const windowMouseUp = dispatchWindowMouseEvent.bind(null, 'mouseup');
@@ -109,12 +110,7 @@ describe('hooks integration', () => {
     jest.useRealTimers();
 
     // clean up any stubs
-    if (Element.prototype.getBoundingClientRect.mockRestore) {
-      Element.prototype.getBoundingClientRect.mockRestore();
-    }
-    if (window.getComputedStyle.mockRestore) {
-      window.getComputedStyle.mockRestore();
-    }
+    tryCleanPrototypeStubs();
 
     // eslint-disable-next-line no-console
     console.warn.mockRestore();

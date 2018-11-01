@@ -58,7 +58,6 @@ class Item extends Component<Props> {
 }
 
 beforeEach(() => {
-  tryCleanPrototypeStubs();
   jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 
@@ -130,13 +129,7 @@ describe('dimension registration', () => {
 
 describe('dimension publishing', () => {
   afterEach(() => {
-    // clean up any stubs
-    if (Element.prototype.getBoundingClientRect.mockRestore) {
-      Element.prototype.getBoundingClientRect.mockRestore();
-    }
-    if (window.getComputedStyle.mockRestore) {
-      window.getComputedStyle.mockRestore();
-    }
+    tryCleanPrototypeStubs();
   });
 
   it('should publish the dimensions of the target when requested', () => {

@@ -17,17 +17,12 @@ import {
   scheduled,
   ScrollableItem,
 } from './util/shared';
+import tryCleanPrototypeStubs from '../../../utils/try-clean-prototype-stubs';
 
 setViewport(preset.viewport);
 
 afterEach(() => {
-  // clean up any stubs
-  if (Element.prototype.getBoundingClientRect.mockRestore) {
-    Element.prototype.getBoundingClientRect.mockRestore();
-  }
-  if (window.getComputedStyle.mockRestore) {
-    window.getComputedStyle.mockRestore();
-  }
+  tryCleanPrototypeStubs();
 });
 
 it('should throw if the droppable has no closest scrollable', () => {

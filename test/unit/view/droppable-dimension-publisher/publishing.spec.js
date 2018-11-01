@@ -27,19 +27,14 @@ import {
   smallFrameClient,
 } from './util/shared';
 import { setViewport } from '../../../utils/viewport';
+import tryCleanPrototypeStubs from '../../../utils/try-clean-prototype-stubs';
 
 beforeEach(() => {
   setViewport(preset.viewport);
 });
 
 afterEach(() => {
-  // clean up any stubs
-  if (Element.prototype.getBoundingClientRect.mockRestore) {
-    Element.prototype.getBoundingClientRect.mockRestore();
-  }
-  if (window.getComputedStyle.mockRestore) {
-    window.getComputedStyle.mockRestore();
-  }
+  tryCleanPrototypeStubs();
 });
 
 it('should publish the dimensions of the target', () => {
