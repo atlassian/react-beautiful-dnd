@@ -4,25 +4,28 @@ Out of the box we provide a beautiful drop animation for you to use. We have wor
 
 ## Styling a drop
 
-You are able to add your own style to a `Draggable` while it is dropping (such as `background-color`). You know a drop is occurring when `DraggableStateSnapshot > DraggableDroppingState` is populated.
+You are able to add your own style to a `Draggable` while it is dropping (such as `background-color`). You know a drop is occurring when `DraggableStateSnapshot > DropAnimation` is populated.
 
 ## Patching the drop animation
 
 In some cases you might want to add an additional `transform` or change the `transition`. In which case, you can patch the style of a `Draggable` while a drop is occurring. (patch `DraggableProvided > DraggableProps > DraggableStyle`)
 
-Here is the shape of `DraggableDroppingState`:
+Here is the shape of `DropAnimation`:
 
 ```js
 type DropReason = 'DROP' | 'CANCEL';
 
-type DraggableDroppingState = {|
-  reason: DropReason,
+type DropAnimation = {|
   // how long the animation will run for
   duration: number,
   // the animation curve that we will be using for the drop
   curve: string,
   // the x,y position will be be animating to as a part of the drop
   moveTo: Position,
+  // when combining with another item, we animate the opacity when dropping
+  opacity: ?number,
+  // when combining with another item, we animate the scale when dropping
+  scale: ?number,
 |};
 ```
 

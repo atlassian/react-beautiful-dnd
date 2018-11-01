@@ -177,8 +177,8 @@ type OnBeforeDragStartHook = (start: DragStart) => mixed;
 ### Phase 4: drop
 
 - User drops a dragging item
-- There is an optional drop animation runs
-- When the drop animation finishes:
+- There is an optional drop animation
+- When the drop animation finishes (or if there is ):
   -- Any pending `onDragStart` and `onDragUpdate` calls are flushed
   -- `Draggable` and `Droppable` components are updated with resting `snapshot` values.
   -- You perform your reorder operation in `onDragEnd` which can result in a `setState` to update the order. The `Draggable` and `Droppable` snapshot updates and any `setState` caused by `onDragEnd` are batched together into the render cycle by `react ⚛️` 🤘
@@ -214,7 +214,7 @@ This could mean:
 - stop your server poll during a drag
 - ignore any results from server calls during a drag (do not call `this.setState` in your component with the new data)
 
-### No update blocking can lead to bad times
+### No update blocking will probably lead to bad times
 
 Here are a few poor user experiences that can occur if you change things _during a drag_:
 
