@@ -22,7 +22,14 @@ const getCode = async ({ mode }): Promise<string> => {
     replace({ 'process.env.NODE_ENV': JSON.stringify(mode) }),
     babel(getBabelOptions({ useESModules: true })),
     resolve({ extensions }),
-    commonjs({ include: 'node_modules/**' }),
+    commonjs({
+      include: 'node_modules/**',
+      // needed for react-is via react-redux v5.1
+      // https://stackoverflow.com/questions/50080893/rollup-error-isvalidelementtype-is-not-exported-by-node-modules-react-is-inde/50098540
+      namedExports: {
+        'node_modules/react-is/index.js': ['isValidElementType'],
+      },
+    }),
   ];
   if (mode === 'production') {
     // not mangling so we can be sure we are matching in tests
