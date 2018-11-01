@@ -174,14 +174,17 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     });
   };
 
+  const flush = () => {
+    invariant(dragging, 'Can only flush hooks while dragging');
+    asyncMarshal.flush();
+  };
+
   const drop = (result: DropResult) => {
     invariant(
       dragging,
       'Cannot fire onDragEnd when there is no matching onDragStart',
     );
     dragging = null;
-    // ensure any pending hooks are flushed
-    asyncMarshal.flush();
     // not adding to frame marshal - we want this to be done in the same render pass
     // we also want the consumers reorder logic to be in the same render pass
     withTimings('onDragEnd', () =>
@@ -209,6 +212,7 @@ export default (getHooks: () => Hooks, announce: Announce) => {
     beforeStart,
     start,
     update,
+    flush,
     drop,
     abort,
   };

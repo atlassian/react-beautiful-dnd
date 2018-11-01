@@ -18,7 +18,7 @@ Hooks are top level application events that you can use to perform your own stat
 
 > Generally you will not need to use `onBeforeDragStart`, and it has a slightly different function signature to the rest of the hooks
 
-- `onBeforeDragStart`\: Called just before `onDragStart` and can be useful to do dimension locking for [table reordering](docs/patterns/tables.md).
+- `onBeforeDragStart`: Called just before `onDragStart`. It is called immediately before any `snapshot` values are updated. It can be useful to do dimension locking for [table reordering](docs/patterns/tables.md).
 
 ## The second argument to hooks: `provided: HookProvided`
 
@@ -166,20 +166,22 @@ type OnBeforeDragStartHook = (start: DragStart) => mixed;
 
 - `onBeforeDragStart` is called
 - `Draggable` and `Droppable` components are updated with initial `snapshot` values
-- `onDragStart` is called in the next [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame)
+- `onDragStart` is called in the next event loop (via `setTimeout`)
 
 ### Phase 3: updates
 
 - User moves a dragging item
 - `Draggable` and `Droppable` components are updated with latest `snapshot` values
-- `onDragUpdate` is called in the next [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame)
+- `onDragUpdate` is called in the next event loop (via `setTimeout`)
 
 ### Phase 4: drop
 
 - User drops a dragging item
-- Once drop animation is finished the `Draggable` and `Droppable` components are updated with resting `snapshot` values and the `onDragEnd` hook is called
-- You perform your reorder operation in `onDragEnd` which can result in a `setState` to update the order
-- The `Draggable` and `Droppable` snapshot updates and any `setState` caused by `onDragEnd` are batched together into the render cycle by `react ⚛️` 🤘
+- There is an optional drop animation runs
+- When the drop animation finishes:
+  -- Any pending `onDragStart` and `onDragUpdate` calls are flushed
+  -- `Draggable` and `Droppable` components are updated with resting `snapshot` values.
+  -- You perform your reorder operation in `onDragEnd` which can result in a `setState` to update the order. The `Draggable` and `Droppable` snapshot updates and any `setState` caused by `onDragEnd` are batched together into the render cycle by `react ⚛️` 🤘
 
 ## Synchronous reordering
 

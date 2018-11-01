@@ -28,15 +28,18 @@ export default (getHooks: () => Hooks, announce: Announce): Middleware => {
       return;
     }
 
-    // All other hooks can fire after we have updated our connected components
-    next(action);
-
     // Drag end
     if (action.type === 'DROP_COMPLETE') {
       const result: DropResult = action.payload;
+      // flushing all pending hooks before snapshots are updated
+      publisher.flush();
+      next(action);
       publisher.drop(result);
       return;
     }
+
+    // All other hooks can fire after we have updated our connected components
+    next(action);
 
     // Drag state resetting - need to check if
     // we should fire a onDragEnd hook

@@ -545,6 +545,10 @@ type Props = {|
 import { DragDropContext } from 'react-beautiful-dnd';
 
 class App extends React.Component {
+  onBeforeDragStart = () => {
+    /*...*/
+  };
+
   onDragStart = () => {
     /*...*/
   };
@@ -558,6 +562,7 @@ class App extends React.Component {
   render() {
     return (
       <DragDropContext
+        onBeforeDragStart={this.onBeforeDragStart}
         onDragStart={this.onDragStart}
         onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
@@ -598,9 +603,30 @@ import { Droppable } from 'react-beautiful-dnd';
 
 ### Droppable props
 
+```js
+import type { Node } from 'react';
+
+type Props = {|
+  droppableId: DroppableId,
+  // optional
+  type?: TypeId,
+  isDropDisabled?: boolean,
+  isCombineEnabled?: boolean,
+  direction?: Direction,
+  ignoreContainerClipping?: boolean,
+  children: (Provided, StateSnapshot) => Node,
+|};
+```
+
+#### Required props
+
 - `droppableId`: A _required_ `DroppableId(string)` that uniquely identifies the droppable for the application. Please do not change this prop - especially during a drag.
-- `type`: An _optional_ `TypeId(string)` that can be used to simply accept a class of `Draggable`. For example, if you use the type `PERSON` then it will only allow `Draggable`s of type `PERSON` to be dropped on itself. `Draggable`s of type `TASK` would not be able to be dropped on a `Droppable` with type `PERSON`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of the `Draggable`s within a `Droppable` **must be** the same. This restriction might be loosened in the future if there is a valid use case.
-- `isDropDisabled`: An _optional_ flag to control whether or not dropping is currently allowed on the `Droppable`. You can use this to implement your own conditional dropping logic. It will default to `false`.
+
+#### Optional props
+
+- `type`: A `TypeId(string)` that can be used to simply accept a class of `Draggable`. For example, if you use the type `PERSON` then it will only allow `Draggable`s of type `PERSON` to be dropped on itself. `Draggable`s of type `TASK` would not be able to be dropped on a `Droppable` with type `PERSON`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of the `Draggable`s within a `Droppable` **must be** the same. This restriction might be loosened in the future if there is a valid use case.
+- `isDropDisabled`: A flag to control whether or not dropping is currently allowed on the `Droppable`. You can use this to implement your own conditional dropping logic. It will default to `false`.
+- `isCombineEnabled`: A flag to control whether or not _all_ the `Draggables` in the list will be able to be **combined** with. It will default to `false`.
 - `direction`: The direction in which items flow in this droppable. Options are `vertical` (default) and `horizontal`.
 - `ignoreContainerClipping`: When a `Droppable` is inside a scrollable container its area is constrained so that you can only drop on the part of the `Droppable` that you can see. Setting this prop opts out of this behavior, allowing you to drop anywhere on a `Droppable` even if it's visually hidden by a scrollable parent. The default behavior is suitable for most cases so odds are you'll never need to use this prop, but it can be useful if you've got very long `Draggable`s inside a short scroll container. Keep in mind that it might cause some unexpected behavior if you have multiple `Droppable`s inside scroll containers on the same page.
 
