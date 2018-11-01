@@ -14,7 +14,9 @@ function loadStories() {
 
 configure(loadStories, module);
 
-const table = console.table || console.log;
+const table = Object.hasOwnProperty(console, 'table')
+  ? console.table
+  : console.log;
 
 console.log('environment');
 table([
