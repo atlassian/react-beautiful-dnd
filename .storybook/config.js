@@ -14,10 +14,6 @@ function loadStories() {
 
 configure(loadStories, module);
 
-if (process.env.CI) {
-  return;
-}
-
 const table = console.table || console.log;
 
 console.log('environment');
