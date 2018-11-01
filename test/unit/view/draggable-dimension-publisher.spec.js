@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import invariant from 'tiny-invariant';
 import { type Position, type Spacing } from 'css-box-model';
 import { mount } from 'enzyme';
 import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher';
@@ -152,6 +153,10 @@ describe('dimension publishing', () => {
         left: 0,
       },
     });
+    invariant(
+      !Element.prototype.getBoundingClientRect.mock,
+      'getBoundingClientRect already mocked',
+    );
 
     jest
       .spyOn(Element.prototype, 'getBoundingClientRect')
