@@ -130,6 +130,9 @@ describe('dimension registration', () => {
 });
 
 describe('dimension publishing', () => {
+  beforeEach(() => {
+    tryCleanPrototypeStubs();
+  });
   afterEach(() => {
     tryCleanPrototypeStubs();
   });
