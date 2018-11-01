@@ -58,6 +58,8 @@ class Item extends Component<Props> {
 }
 
 beforeEach(() => {
+  // having issues on CI
+  tryCleanPrototypeStubs();
   jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 

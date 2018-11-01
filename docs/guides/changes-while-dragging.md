@@ -19,6 +19,10 @@
 
 ![lazy-loading 2018-11-01 17_01_21](https://user-images.githubusercontent.com/2182637/47835395-ec8b1a80-ddf7-11e8-88e6-848848ab4af1.gif)
 
+In this example we are adding more `Draggable`s to a list we scroll closer to the bottom of the list
+
 ### Collapsing and expanding groups
+
+> We recommend you use the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) component for this behaviour
 
 [TODO gif]
