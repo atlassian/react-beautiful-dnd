@@ -19,7 +19,7 @@ import {
   backward,
   forward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
-import { getDisplacedWithMap } from './utils';
+import getDisplacedWithMap from './utils/get-displaced-with-map';
 import getHomeImpact from '../../../../../../src/state/get-home-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {

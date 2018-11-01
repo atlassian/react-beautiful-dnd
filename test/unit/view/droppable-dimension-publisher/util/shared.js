@@ -1,37 +1,14 @@
 // @flow
 /* eslint-disable react/no-multi-comp */
+import { createBox, type Spacing, type BoxModel } from 'css-box-model';
 import React, { Component } from 'react';
-import {
-  createBox,
-  type BoxModel,
-  type Spacing,
-  type Position,
-} from 'css-box-model';
 import DroppableDimensionPublisher from '../../../../../src/view/droppable-dimension-publisher/droppable-dimension-publisher';
-import {
-  getPreset,
-  getComputedSpacing,
-  getDroppableDimension,
-} from '../../../../utils/dimension';
-import { offsetByPosition } from '../../../../../src/state/spacing';
-import { negate } from '../../../../../src/state/position';
-import setWindowScroll from '../../../../utils/set-window-scroll';
-import forceUpdate from '../../../../utils/force-update';
-import { getMarshalStub } from '../../../../utils/dimension-marshal';
-import { withDimensionMarshal } from '../../../../utils/get-context-options';
-import getWindowScroll from '../../../../../src/view/window/get-window-scroll';
-import { setViewport, resetViewport } from '../../../../utils/viewport';
-import type {
-  DimensionMarshal,
-  DroppableCallbacks,
-} from '../../../../../src/state/dimension-marshal/dimension-marshal-types';
+import { getComputedSpacing, getPreset } from '../../../../utils/dimension';
 import type {
   ScrollOptions,
   DroppableId,
-  DroppableDimension,
   DroppableDescriptor,
   TypeId,
-  ScrollSize,
 } from '../../../../../src/types';
 
 export const scheduled: ScrollOptions = {

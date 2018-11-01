@@ -3,9 +3,7 @@ import type {
   OwnProps,
   MapProps,
   DispatchProps,
-  Provided,
   Selector,
-  StateSnapshot,
 } from '../../../../../src/view/draggable/draggable-types';
 import type {
   DraggableDescriptor,

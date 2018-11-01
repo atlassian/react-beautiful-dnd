@@ -18,7 +18,7 @@ import type { PixelThresholds } from '../../../../src/state/auto-scroller/fluid-
 import { add, patch, subtract } from '../../../../src/state/position';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import { createViewport } from '../../../utils/viewport';
-import noImpact, { noMovement } from '../../../../src/state/no-impact';
+import noImpact from '../../../../src/state/no-impact';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import fluidScroller, {
   getPixelThresholds,

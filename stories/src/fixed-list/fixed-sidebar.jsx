@@ -145,6 +145,7 @@ export default class App extends React.Component<*, State> {
   state: State = initial;
 
   onDragEnd = (result: DropResult) => {
+    // eslint-disable-next-line no-console
     console.log('TODO: reorder', result);
   };
 

@@ -135,6 +135,7 @@ export default class WithControls extends React.Component<*, State> {
 
     // Add quote to start of list ('before')
     if (event.key === 'b') {
+      // eslint-disable-next-line no-console
       console.log(`Adding ${this.state.changeBy} to start`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {
@@ -157,6 +158,7 @@ export default class WithControls extends React.Component<*, State> {
 
     // Add quote to end of list ('after')
     if (event.key === 'a') {
+      // eslint-disable-next-line no-console
       console.log(`Adding ${this.state.changeBy} to end`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {
@@ -179,6 +181,7 @@ export default class WithControls extends React.Component<*, State> {
 
     // Remove quote from end of list
     if (event.key === 'd') {
+      // eslint-disable-next-line no-console
       console.log(`Removing ${this.state.changeBy} from end`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {
@@ -199,6 +202,7 @@ export default class WithControls extends React.Component<*, State> {
 
     // Remove quote from start of list
     if (event.key === 's') {
+      // eslint-disable-next-line no-console
       console.log(`Removing ${this.state.changeBy} from start`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {

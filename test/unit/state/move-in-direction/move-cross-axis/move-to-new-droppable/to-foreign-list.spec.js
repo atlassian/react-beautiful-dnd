@@ -1,11 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import {
-  offset,
-  type Position,
-  type BoxModel,
-  type Spacing,
-} from 'css-box-model';
+import { type Position, type BoxModel, type Spacing } from 'css-box-model';
 import type {
   Viewport,
   Axis,
