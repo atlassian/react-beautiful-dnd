@@ -11,7 +11,6 @@ import type {
 import whenCombining from './when-combining';
 import whenReordering from './when-reordering';
 import withDroppableDisplacement from '../../with-scroll-change/with-droppable-displacement';
-import { subtract } from '../../position';
 
 type Args = {|
   impact: DragImpact,

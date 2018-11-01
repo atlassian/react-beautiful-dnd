@@ -53,10 +53,16 @@ export default ({
     // Remove any options that are not enabled
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
     // Remove any droppables that do not have a visible subject
-    // it is okay if the droppable is not visible on the window
     .filter(
       (droppable: DroppableDimension): boolean =>
         Boolean(droppable.subject.active),
+    )
+    // Remove any that are not visible in the window
+    .filter(
+      (droppable: DroppableDimension): boolean =>
+        isPartiallyVisibleThroughFrame(viewport.frame)(
+          getKnownActive(droppable),
+        ),
     )
     .filter(
       (droppable: DroppableDimension): boolean => {
