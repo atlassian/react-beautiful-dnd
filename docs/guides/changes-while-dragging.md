@@ -16,7 +16,7 @@
 
 ### Lazy loading of list items
 
-[TODO gif]
+![lazy-loading 2018-11-01 17_01_21](https://user-images.githubusercontent.com/2182637/47835395-ec8b1a80-ddf7-11e8-88e6-848848ab4af1.gif)
 
 ### Collapsing and expanding groups
 
