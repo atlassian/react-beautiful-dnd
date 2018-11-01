@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import type { Column, ColumnMap, Entities } from './types';
 import type { Id } from '../types';
 import type { DraggableLocation } from '../../../src/types';
@@ -90,10 +91,7 @@ export const getHomeColumn = (entities: Entities, taskId: TaskId): Column => {
     return column.taskIds.includes(taskId);
   });
 
-  if (!columnId) {
-    console.error('Count not find column for task', taskId, entities);
-    throw new Error('boom');
-  }
+  invariant(columnId, 'Count not find column for task');
 
   return entities.columns[columnId];
 };

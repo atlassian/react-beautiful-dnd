@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'react-emotion';
+import invariant from 'tiny-invariant';
 import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src';
 import { colors, grid } from '../constants';
@@ -90,10 +91,7 @@ export default class QuoteApp extends Component<*, State> {
           Object.prototype.hasOwnProperty.call(item, 'children'),
       )[0]: any);
 
-      if (!nested) {
-        console.error('could not find nested list');
-        return;
-      }
+      invariant(nested, 'could not find nested list');
 
       // $ExpectError - using spread
       const updated: NestedQuoteList = {
