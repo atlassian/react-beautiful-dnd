@@ -7,7 +7,8 @@
 ## Rules
 
 - You are allowed to add or remove `Draggables` during a drag
-- These changes must occur within a `Droppable` that is a scroll container. _This is prevent accidental shifts to other `Droppables` on the page_
+- These changes must occur within a `Droppable` that is a _scroll container_ (has `overflow: auto` or `overflow: scroll`). _This is prevent accidental shifts to other `Droppables` on the page_
+- The internal content of the _scroll container_ can change, but the dimensions of the _scroll container_ itself cannot change.
 - You cannot modify the sizes of any existing `Draggable` or `Droppable` during a drag
 - You cannot add or remove a `Droppable` during a drag. _We did this to avoid accidental shifting of other `Droppable`s_
 - When an item is removed or added it must be done instantly. You cannot animate the size of the item. You are welcome to animate a property when adding a `Draggable` that does not impact the size of the item, such as opacity
