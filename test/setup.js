@@ -27,10 +27,6 @@ if (typeof window !== 'undefined') {
       value: document.documentElement.scrollHeight,
     },
   });
-
-  // in case of previous leaks (this can occur in CI)
-  const tryCleanPrototypeStubs = require('./utils/try-clean-prototype-stubs');
-  tryCleanPrototypeStubs.default();
 }
 
 // Setting initial viewport
