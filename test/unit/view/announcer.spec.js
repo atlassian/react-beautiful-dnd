@@ -71,7 +71,7 @@ describe('unmounting', () => {
 });
 
 describe('announcing', () => {
-  it('should warm if not mounted', () => {
+  it('should warn if not mounted', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {});
     const announcer: Announcer = createAnnouncer();
 

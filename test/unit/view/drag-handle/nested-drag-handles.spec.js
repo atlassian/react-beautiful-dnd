@@ -78,6 +78,7 @@ forEach((control: Control) => {
     expect(parentCallbacks.onLift).not.toHaveBeenCalled();
 
     control.drop(child);
+    nested.unmount();
   });
 
   it('should start a drag on a parent the event is trigged on the parent', () => {
@@ -96,5 +97,6 @@ forEach((control: Control) => {
     expect(parentCallbacks.onLift).toHaveBeenCalled();
 
     control.drop(parent);
+    nested.unmount();
   });
 });

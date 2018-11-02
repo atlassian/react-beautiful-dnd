@@ -226,4 +226,6 @@ it('should call the onBeforeDragStart before connected components are updated, a
   jest.runAllTimers();
   expect(first.onRender).toHaveBeenCalledTimes(0);
   expect(second.onRender).toHaveBeenCalledTimes(0);
+
+  wrapper.unmount();
 });

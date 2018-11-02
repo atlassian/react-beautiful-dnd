@@ -109,6 +109,7 @@ it('should keep focus if moving to a portal', () => {
 
   // cleanup
   looseFocus(wrapper);
+  wrapper.unmount();
 });
 
 it('should not take focus if moving to a portal and did not previously have focus', () => {
@@ -149,4 +150,7 @@ it('should not take focus if moving to a portal and did not previously have focu
   expect(latest).not.toBe(original);
   // no longer in a portal
   expect(latest).not.toBe(wrapper.find(WithPortal).instance().portal);
+
+  // cleanup
+  wrapper.unmount();
 });

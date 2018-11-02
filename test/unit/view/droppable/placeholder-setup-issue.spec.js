@@ -34,13 +34,15 @@ afterEach(() => {
 
 describe('is over foreign', () => {
   it('should log a warning when mounting', () => {
-    mount({
+    const wrapper: ReactWrapper = mount({
       ownProps: foreignOwnProps,
       mapProps: isOverForeign,
       WrappedComponent: WithNoPlaceholder,
     });
 
     expect(console.warn).toHaveBeenCalled();
+
+    wrapper.unmount();
   });
 
   it('should log a warning when updating', () => {
@@ -53,18 +55,22 @@ describe('is over foreign', () => {
 
     wrapper.setProps(isOverForeign);
     expect(console.warn).toHaveBeenCalled();
+
+    wrapper.unmount();
   });
 });
 
 describe('is not over foreign', () => {
   it('should not log a warning when mounting', () => {
-    mount({
+    const wrapper: ReactWrapper = mount({
       ownProps: foreignOwnProps,
       mapProps: isNotOver,
       WrappedComponent: WithNoPlaceholder,
     });
 
     expect(console.warn).not.toHaveBeenCalled();
+
+    wrapper.unmount();
   });
 
   it('should not log a warning when updating', () => {
@@ -77,5 +83,7 @@ describe('is not over foreign', () => {
 
     wrapper.setProps(isNotOver);
     expect(console.warn).not.toHaveBeenCalled();
+
+    wrapper.unmount();
   });
 });

@@ -10,15 +10,6 @@ type Version = {|
   raw: string,
 |};
 
-// known performance issue with dev tools
-// https://github.com/atlassian/react-beautiful-dnd/issues/808
-const issueWithDevTools: Version = {
-  major: 16,
-  minor: 5,
-  patch: 0,
-  raw: `^16.5.0`,
-};
-
 // We can use a simple regex here given that:
 // - the version that react supplies is always full: eg 16.5.2
 // - our peer dependency version is to a full version (eg ^16.3.1)
@@ -68,21 +59,14 @@ export default (peerDepValue: string, actualValue: string) => {
   const peerDep: Version = getVersion(peerDepValue);
   const actual: Version = getVersion(actualValue);
 
-  if (!isSatisfied(peerDep, actual)) {
-    warning(`
-      React version: [${actual.raw}]
-      does not satisfy expected peer dependency version: [${peerDep.raw}]
-
-      This can result in run time bugs, and even fatal crashes
-    `);
+  if (isSatisfied(peerDep, actual)) {
+    return;
   }
 
-  if (isSatisfied(issueWithDevTools, actual)) {
-    warning(`
-      Provided React version: ${actual.raw} has a known
-      dev only performance issue with when dev tools
+  warning(`
+    React version: [${actual.raw}]
+    does not satisfy expected peer dependency version: [${peerDep.raw}]
 
-      More information: https://github.com/atlassian/react-beautiful-dnd/issues/808
-    `);
-  }
+    This can result in run time bugs, and even fatal crashes
+  `);
 };
