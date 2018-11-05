@@ -59,9 +59,13 @@ type Props = {|
   listId: string,
   listType?: string,
   internalScroll?: boolean,
+  isCombineEnabled?: boolean,
 |};
 
 export default class AuthorList extends Component<Props> {
+  static defaultProps = {
+    isCombineEnabled: false,
+  };
   renderBoard = (dropProvided: DroppableProvided) => {
     const { listType, quotes } = this.props;
 
@@ -94,10 +98,15 @@ export default class AuthorList extends Component<Props> {
   };
 
   render() {
-    const { listId, listType, internalScroll } = this.props;
+    const { listId, listType, internalScroll, isCombineEnabled } = this.props;
 
     return (
-      <Droppable droppableId={listId} type={listType} direction="horizontal">
+      <Droppable
+        droppableId={listId}
+        type={listType}
+        direction="horizontal"
+        isCombineEnabled={isCombineEnabled}
+      >
         {(
           dropProvided: DroppableProvided,
           dropSnapshot: DroppableStateSnapshot,

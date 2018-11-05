@@ -34,6 +34,7 @@ type Props = {|
   quotes: Quote[],
   index: number,
   isScrollable?: boolean,
+  isCombineEnabled?: boolean,
 |};
 
 export default class Column extends Component<Props> {
@@ -58,6 +59,7 @@ export default class Column extends Component<Props> {
               listType="QUOTE"
               quotes={quotes}
               internalScroll={this.props.isScrollable}
+              isCombineEnabled={Boolean(this.props.isCombineEnabled)}
             />
           </Container>
         )}
