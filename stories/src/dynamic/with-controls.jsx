@@ -106,10 +106,7 @@ const createQuote = (() => {
 
 export default class WithControls extends React.Component<*, State> {
   state: State = {
-    quoteMap: {
-      // simple for now
-      BMO: initial.BMO,
-    },
+    quoteMap: initial,
     changeBy: 2,
     isCombineEnabled: false,
   };
