@@ -62,18 +62,19 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - Vertical lists ↕
 - Horizontal lists ↔
 - Movement between lists (▤ ↔ ▤)
-- Combining items
+- Combining items (see [combining guide](/docs/guides/combining.md))
 - Mouse 🐭, keyboard 🎹 and touch 👉📱 (mobile, tablet and so on) support
 - [Multi drag support](/docs/patterns/multi-drag.md)
-- Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) package 🌲
 - Incredible screen reader support - we provide an amazing experience for english screen readers out of the box 📦. We also provide complete customisation control and internationalisation support for those who need it 💖
 - Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
 - Flexible item sizes - the draggable items can have different heights (vertical lists) or widths (horizontal lists)
+- Add and remove `Draggable`s during a drag (see [changes while dragging guide](/docs/guides/changes-while-dragging.md))
 - Compatible with semantic table reordering - [table pattern](/docs/patterns/tables.md)
 - Auto scrolling - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
 - Custom drag handles - you can drag a whole item by just a part of it
 - Compatible with [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html) - [portal pattern](/docs/patterns/using-a-portal.md)
+- 🌲 Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) package
 - A `Droppable` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
 - Server side rendering compatible
@@ -597,6 +598,16 @@ The `children` function is also provided with a small amount of state relating t
 - Using the `isDropDisabled` prop you can conditionally allow dropping. This allows you to do arbitrarily complex conditional transitions. This will only be considered if the `type` of the `Droppable` matches the `type` of the currently dragging `Draggable`.
 - You can disable dropping on a `Droppable` altogether by always setting `isDropDisabled` to `true`. You can do this to create a list that is never able to be dropped on, but contains `Draggable`s.
 - Technically you do not need to use `type` and do all of your conditional drop logic with the `isDropDisabled` function. The `type` parameter is a convenient shortcut for a common use case.
+
+### Combining
+
+[TODO: image]
+
+You can enable a _combining_ mode for a `Droppable` by setting `isCombineEnabled` to `true` on a `Droppable`. We have created a [combining guide](/docs/guides/combining.md) to help you implement combining in your lists.
+
+### Adding and removing `Draggable`s while dragging
+
+It is possible to change the `Draggable`s in a `Droppable` for a limited set of circumstances. We have created a comprehensive [changes while dragging guide](/docs/guides/changes-while-dragging.md)
 
 ### Scroll containers
 
