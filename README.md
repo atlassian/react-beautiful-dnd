@@ -415,16 +415,15 @@ type Hooks = {|
   onDragEnd: OnDragEndHook,
 |};
 
-type OnBeforeDragStartHook = (start: DragStart) => mixed;
-type OnDragStartHook = (start: DragStart, provided: HookProvided) => mixed;
-type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => mixed;
-type OnDragEndHook = (result: DropResult, provided: HookProvided) => mixed;
+import type { Node } from 'react';
 
 type Props = {|
   ...Hooks,
   children: ?Node,
 |};
 ```
+
+> See our [type guide](/docs/guides/types.md) for more details
 
 ### Basic usage
 
@@ -494,6 +493,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import type { Node } from 'react';
 
 type Props = {|
+  // required
   droppableId: DroppableId,
   // optional
   type?: TypeId,
@@ -506,6 +506,8 @@ type Props = {|
 ```
 
 #### Required props
+
+> `react-beautiful-dnd` will throw an error if a required prop is not provided
 
 - `droppableId`: A _required_ `DroppableId(string)` that uniquely identifies the droppable for the application. Please do not change this prop - especially during a drag.
 
@@ -727,8 +729,10 @@ type Props = {|
 
 #### Required props
 
+> `react-beautiful-dnd` will throw an error if a required prop is not provided
+
 - `draggableId`: A _required_ `DraggableId(string)` that uniquely identifies the `Draggable` for the application. Please do not change this prop - especially during a drag.
-- `index`: A _required_ `number` that matches the order of the `Draggable` in the `Droppable`. It is simply the index of the `Draggable` in the list. The `index` needs to be unique within a `Droppable` but does not need to be unique between `Droppables`. Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
+- `index`: A _required_ `number` that matches the order of the `Draggable` in the `Droppable`. It is simply the index of the `Draggable` in the list. The `index` needs to be unique within a `Droppable` but does not need to be unique between `Droppables`. The `index`s in a list must start from `0` and be consecutive. `[0, 1, 2]` and not `[1, 2, 8]`. Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
 
 ```js
 {
@@ -800,7 +804,7 @@ Everything within the _provided_ object must be applied for the `Draggable` to f
 
 - `provided.draggableProps (DraggableProps)`: This is an Object that contains a `data` attribute and an inline `style`. This Object needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to `DraggableProps.style` – but please do not remove or replace any of the properties.
 
-##### `draggableProps` Type information
+##### `draggableProps` type information
 
 ```js
 // Props that can be spread onto the element directly
@@ -810,25 +814,9 @@ export type DraggableProps = {|
   // used for shared global styles
   'data-react-beautiful-dnd-draggable': string,
 |};
-
-type DraggableStyle = DraggingStyle | NotDraggingStyle;
-type DraggingStyle = {|
-  position: 'fixed',
-  width: number,
-  height: number,
-  boxSizing: 'border-box',
-  pointerEvents: 'none',
-  top: number,
-  left: number,
-  transition: 'none',
-  transform: ?string,
-  zIndex: ZIndex,
-|};
-type NotDraggingStyle = {|
-  transform: ?string,
-  transition: null | 'none',
-|};
 ```
+
+> For more type information please see [our types guide](/docs/guies/types.md).
 
 ##### `draggableProps` Example
 
@@ -971,7 +959,7 @@ type DragHandleProps = {|
 </Draggable>
 ```
 
-##### `dragHandleProps` Example: custom drag handle
+##### `dragHandleProps` example: custom drag handle
 
 Controlling a whole draggable by just a part of it
 
@@ -1125,122 +1113,9 @@ window['__react-beautiful-dnd-disable-dev-warnings'] = true;
 
 Disabling the warnings will not stop a drag from being aborted in the case of an error. It only disabling the logging about it.
 
-## Flow usage
+## `Flow` and `TypeScript` usage
 
-`react-beautiful-dnd` is typed using [`flowtype`](https://flow.org). This greatly improves internal consistency within the codebase. We also expose a number of public types which will allow you to type your javascript if you would like to. If you are not using `flowtype` this will not inhibit you from using the library. It is just extra safety for those who want it.
-
-### Public flow types
-
-```js
-// id's
-type Id = string;
-type TypeId = Id;
-type DroppableId = Id;
-type DraggableId = Id;
-
-// hooks
-type DragStart = {|
-  draggableId: DraggableId,
-  type: TypeId,
-  source: DraggableLocation,
-|};
-
-type DragUpdate = {|
-  ...DragStart,
-  // may not have any destination (drag to nowhere)
-  destination: ?DraggableLocation,
-|};
-
-type DropResult = {|
-  ...DragUpdate,
-  reason: DropReason,
-|};
-
-type DropReason = 'DROP' | 'CANCEL';
-
-type DraggableLocation = {|
-  droppableId: DroppableId,
-  // the position of the droppable within a droppable
-  index: number,
-|};
-
-// Droppable
-type DroppableProvided = {|
-  innerRef: (?HTMLElement) => void,
-  placeholder: ?ReactElement,
-|};
-
-type DroppableStateSnapshot = {|
-  isDraggingOver: boolean,
-  draggingOverWith: ?DraggableId,
-|};
-
-// Draggable
-type DraggableProvided = {|
-  innerRef: (?HTMLElement) => void,
-  draggableProps: DraggableProps,
-  dragHandleProps: ?DragHandleProps,
-|};
-
-type DraggableStateSnapshot = {|
-  isDragging: boolean,
-  isDropAnimating: boolean,
-  draggingOver: ?DroppableId,
-|};
-
-export type DraggableProps = {|
-  style: ?DraggableStyle,
-  'data-react-beautiful-dnd-draggable': string,
-|};
-type DraggableStyle = DraggingStyle | NotDraggingStyle;
-type DraggingStyle = {|
-  position: 'fixed',
-  width: number,
-  height: number,
-  boxSizing: 'border-box',
-  pointerEvents: 'none',
-  top: number,
-  left: number,
-  transition: 'none',
-  transform: ?string,
-  zIndex: ZIndex,
-|};
-type NotDraggingStyle = {|
-  transition: ?string,
-  transition: null | 'none',
-|};
-
-type DragHandleProps = {|
-  onFocus: () => void,
-  onBlur: () => void,
-  onMouseDown: (event: MouseEvent) => void,
-  onKeyDown: (event: KeyboardEvent) => void,
-  onTouchStart: (event: TouchEvent) => void,
-  'data-react-beautiful-dnd-drag-handle': string,
-  'aria-roledescription': string,
-  tabIndex: number,
-  draggable: boolean,
-  onDragStart: (event: DragEvent) => void,
-|};
-```
-
-### Using the flow types
-
-The types are exported as part of the module so using them is as simple as:
-
-```js
-import type { DroppableProvided } from 'react-beautiful-dnd';
-```
-
-## Typescript
-
-If you are using [TypeScript](https://www.typescriptlang.org/) you can use the community maintained [DefinitelyTyped type definitions](https://www.npmjs.com/package/@types/react-beautiful-dnd). [Installation instructions](http://definitelytyped.org/).
-
-Here is an [example written in typescript](https://github.com/abeaudoin2013/react-beautiful-dnd-multi-list-typescript-example).
-
-### Sample application with flow types
-
-We have created a [sample application](https://github.com/alexreardon/react-beautiful-dnd-flow-example) which exercises the flowtypes. It is a super simple `React` project based on [`react-create-app`](https://github.com/facebookincubator/create-react-app). You can use this as a reference to see how to set things up correctly.
+Please see our [types guide](/docs/guides/types.md)
 
 ## Community
 

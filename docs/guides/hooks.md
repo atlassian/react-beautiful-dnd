@@ -49,12 +49,14 @@ type DragStart = {|
   draggableId: DraggableId,
   type: TypeId,
   source: DraggableLocation,
+  mode: MovementMode,
 |};
 ```
 
 - `start.draggableId`: the id of the `Draggable` that is now dragging
 - `start.type`: the `type` of the `Draggable` that is now dragging
 - `start.source`: the location (`droppableId` and `index`) of where the dragging item has started within a `Droppable`.
+- `start.mode`: either `'SNAP'` or `'FLUID'`. This is a little bit of information about the type of movement that will be performed during this drag. `'SNAP'` mode is where items jump around between positions (such as with keyboard dragging) and `'FLUID'` mode is where the item moves underneath a pointer (such as mouse dragging).
 
 ### `onDragStart` type information
 
@@ -79,6 +81,8 @@ type Id = string;
 type DraggableId = Id;
 type DroppableId = Id;
 type TypeId = Id;
+
+export type MovementMode = 'FLUID' | 'SNAP';
 ```
 
 ## `onDragUpdate` (optional)
@@ -102,15 +106,23 @@ type DragUpdate = {|
   ...DragStart,
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation,
+  // populated when a draggable is dragging over another in combine mode
+  combine: ?Combine,
+|};
+
+type Combine = {|
+  draggableId: DraggableId,
+  droppableId: DroppableId,
 |};
 ```
 
-- `update.draggableId`: the id of the `Draggable` that is now dragging
-- `update.type`: the `type` of the `Draggable` that is now dragging
-- `update.source`: the location (`droppableId` and `index`) of where the dragging item has started within a `Droppable`.
+- `...DragStart`: _see above_
 - `update.destination`: the location (`droppableId` and `index`) of where the dragging item is now. This can be null if the user is currently not dragging over any `Droppable`.
+- `update.combine`: details of a `Draggable` that is currently being combine with. For more information see our [combining guide](/docs/guides/combining.md)
 
 ## `onDragEnd` (required)
+
+> `react-beautiful-dnd` will throw an error if a `onDragEnd` prop is not provided
 
 This function is _extremely_ important and has an critical role to play in the application lifecycle. **This function must result in the _synchronous_ reordering of a list of `Draggables`**
 
@@ -127,10 +139,7 @@ type DropResult = {|
 type DropReason = 'DROP' | 'CANCEL';
 ```
 
-- `result.draggableId`: the id of the `Draggable` that was dragging.
-- `result.type`: the `type` of the `Draggable` that was dragging.
-- `result.source`: the location where the `Draggable` started.
-- `result.destination`: the location where the `Draggable` finished. The `destination` will be `null` if the user dropped while not over a `Droppable`.
+- `...DragUpdate`: _see above_
 - `result.reason`: the reason a drop occurred. This information can be helpful in crafting more useful messaging in the `HookProvided` > `announce` function.
 
 ## Secondary: `onBeforeDragStart`

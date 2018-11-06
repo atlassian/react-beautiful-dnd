@@ -5,7 +5,6 @@ import type {
   DraggableId,
   DroppableId,
   DraggableDimension,
-  ZIndex,
   State,
   MovementMode,
 } from '../../types';
@@ -31,7 +30,7 @@ export type DraggingStyle = {|
   height: number,
   transition: string,
   transform: ?string,
-  zIndex: ZIndex,
+  zIndex: number,
 
   // for combining
   opacity: ?number,

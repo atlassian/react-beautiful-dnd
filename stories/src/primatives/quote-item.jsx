@@ -12,26 +12,23 @@ type Props = {
   isGroupedOver?: boolean,
 };
 
-const getBackgroundColor = (isDragging: boolean) => {
+const getBackgroundColor = (isDragging: boolean, isGroupedOver: boolean) => {
   if (isDragging) {
     return colors.green;
   }
-  return colors.white;
-};
 
-const getBorderColor = (isGroupedOver: boolean) => {
   if (isGroupedOver) {
-    return colors.purple;
+    return colors.grey.N30;
   }
-  return 'grey';
+
+  return colors.white;
 };
 
 const Container = styled('a')`
   border-radius: ${borderRadius}px;
-  border-width: 1px;
-  border-style: solid;
-  border-color: ${props => getBorderColor(props.isGroupedOver)};
-  background-color: ${props => getBackgroundColor(props.isDragging)};
+  border: 1px solid grey;
+  background-color: ${props =>
+    getBackgroundColor(props.isDragging, props.isGroupedOver)};
   box-shadow: ${({ isDragging }) =>
     isDragging ? `2px 2px 1px ${colors.shadow}` : 'none'};
   padding: ${grid}px;
@@ -44,7 +41,8 @@ const Container = styled('a')`
   /* anchor overrides */
   color: ${colors.black};
 
-  &:hover {
+  &:hover,
+  &:active {
     color: ${colors.black};
     text-decoration: none;
   }
