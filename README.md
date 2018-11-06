@@ -43,7 +43,7 @@ We have created some basic examples on `codesandbox` for you to play with direct
 - Plays extremely well with standard browser interactions
 - Unopinionated styling
 - No creation of additional wrapper dom nodes - flexbox and focus management friendly!
-- Accessible
+- Accessible ♿️🚀
 
 ## Get started 🤩
 
