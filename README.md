@@ -413,6 +413,25 @@ This is what we use to control `Draggable`s that need to move out of the way of 
 transition: ${string};
 ```
 
+#### (Phase: dragging): Droppable element
+
+**Styles applied using the `data-react-beautiful-dnd-droppable` attribute**
+
+We apply `pointer-events: none` to a `Droppable` during a drag. This is technically not required as an optimisation. However, it gets around a common issue where hover styles are triggered during a drag. You are welcome to opt out of this one as it is it not required for functinality.
+
+```css
+pointer-events: none;
+```
+
+You are also welcome to extend this to every element under the body to ensure no hover styles for the entire application fire during a drag.
+
+```css
+/* You can add this yourself during onDragStart if you like */
+body > * {
+  pointer-events: none;
+}
+```
+
 **Styles applied using inline styles**
 
 This is described by the type [`DraggableStyle`](https://github.com/atlassian/react-beautiful-dnd#type-information-1).
@@ -725,6 +744,10 @@ where a _scrollable parent_ refers to a scroll container that is not the window 
 
 It is recommended that you put a `min-height` on a vertical `Droppable` or a `min-width` on a horizontal `Droppable`. Otherwise when the `Droppable` is empty there may not be enough of a target for `Draggable` being dragged with touch or mouse inputs to be _over_ the `Droppable`.
 
+### Fixed `Droppable`s
+
+`react-beautiful-dnd` has partial support for `Droppable` lists that use `position: fixed`. When you start a drag and _any_ list of the same type is `position:fixed` then auto window scrolling will be disabled. This is because our virtual model assumes that when the page scroll changes the position of a `Droppable` will shift too. If a manual window scroll is detected then the scroll will be aborted. Scroll container scroll is still allowed. We could improve this support, but it would just be a big effort. Please raise an issue if you would be keen to be a part of this effort ❤️
+
 ### Recommended `Droppable` performance optimisation
 
 When a user drags over, or stops dragging over, a `Droppable` we re-render the `Droppable` with an updated `DroppableStateSnapshot > isDraggingOver` value. This is useful for styling the `Droppable`. However, by default this will cause a render of all of the children of the `Droppable` - which might be 100's of `Draggable`s! This can result in a noticeable frame rate drop. To avoid this problem we recommend that you create a component that is the child of a `Droppable` who's responsibility it is to avoid rendering children if it is not required.
@@ -984,9 +1007,9 @@ If you are overriding inline styles be sure to do it after you spread the `provi
 </Draggable>
 ```
 
-##### Avoid margin collapsing between `Draggable`s
+##### Unsupported `margin` setups
 
-[margin collapsing](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing) is one of those really hard parts of CSS. For our purposes, if you have one `Draggable` with a `margin-bottom: 10px` and the next `Draggable` has a `margin-top: 12px` these margins will _collapse_ and the resulting margin will be the greater of the two: `12px`. When we do our calculations we are currently not accounting for margin collapsing. If you do want to have a margin on the siblings, wrap them both in a `div` and apply the margin to the inner `div` so they are not direct siblings.
+Avoid margin collapsing between `Draggable`s. [margin collapsing](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing) is one of those really hard parts of CSS. For our purposes, if you have one `Draggable` with a `margin-bottom: 10px` and the next `Draggable` has a `margin-top: 12px` these margins will _collapse_ and the resulting space between the elements will be the greater of the two: `12px`. When we do our calculations we are currently not accounting for margin collapsing. If you do want to have a margin on the siblings, wrap them both in a `div` and apply the margin to the inner `div` so they are not direct siblings.
 
 ##### `Draggable`s should be visible siblings
 
@@ -1203,12 +1226,17 @@ renderToString(...);
 
 ## Developer only warnings 👷‍
 
-For common setup and usage issues `react-beautiful-dnd` will long some warnings to the `console`. These warnings are stripped from productions builds.
+For common setup and usage issues and errors `react-beautiful-dnd` will log some information `console` for development builds (`process.env.NODE_ENV !== 'production'`). These logs are stripped from productions builds to save kbs and to keep the `console` clean.
+
+![dev only warnings](https://user-images.githubusercontent.com/2182637/46385261-98a8eb00-c6fe-11e8-9b46-0699bf3e6043.png)
 
 How to drop the developer messages from your bundles:
 
+- [React docs](https://reactjs.org/docs/optimizing-performance.html#use-the-production-build)
 - [webpack instructions](https://webpack.js.org/guides/production/#specify-the-mode)
 - [rollup instructions](https://github.com/rollup/rollup-plugin-replace)
+
+### Disable warnings
 
 If you want to disable the warnings in development, you just need to update a flag:
 
@@ -1216,6 +1244,8 @@ If you want to disable the warnings in development, you just need to update a fl
 // disable all react-beautiful-dnd development warnings
 window['__react-beautiful-dnd-disable-dev-warnings'] = true;
 ```
+
+Disabling the warnings will not stop a drag from being aborted in the case of an error. It only disabling the logging about it.
 
 ## Flow usage
 
