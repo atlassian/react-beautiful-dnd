@@ -1,12 +1,27 @@
 # Changes while dragging
 
-> ⚠️ This is fairly advanced behaviour
+> ⚠️ This is fairly advanced behavior
+> 👶 This feature is still quite young. The circumstances that we support are fairly limited. We wanted to get it out there for people to play with
 
-`react-beautiful-dnd` supports the addition and removal of `Draggable`s during a drag. The circumstances that we support are fairly limited. We could look into supporting an increased set of behaviours in the future, but we opted to start small and stable.
+`react-beautiful-dnd` supports the addition and removal of `Draggable`s during a drag.
 
-> We attempt to print helpful debug information to the `console` if you do not follow these rules
+## What behaviours does this unlock?
+
+### Lazy loading of list items
+
+> In this example we are adding more `Draggable`s to a list we scroll closer to the bottom of the list
+
+![lazy-loading 2018-11-01 17_01_21](https://user-images.githubusercontent.com/2182637/47835395-ec8b1a80-ddf7-11e8-88e6-848848ab4af1.gif)
+
+### Collapsing and expanding groups
+
+> We recommend you use the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) component for this behaviour
+
+![hover_to_expand](https://user-images.githubusercontent.com/2182637/45996092-3d637100-c0de-11e8-8837-8d66e7cc73b8.gif)
 
 ## Rules
+
+> We attempt to print helpful debug information to the `console` if you do not follow these rules in development builds
 
 - You are allowed to add or remove `Draggables` during a drag
 - You can only add or remove `Draggables` that are of the same `type` as the dragging item.
@@ -83,17 +98,3 @@
 ## Drag end while we are patching the virtual model
 
 If a drag ends after a `Draggable` has been added or removed, but we have not finished collecting and patching the _virtual dimension model_ then we will delay the drop until the patch is finished. This is usually only a single frame. The `onDropEnd` callback will be called with a `DropResult` that is correct after the patch.
-
-## What behaviours does this unlock?
-
-### Lazy loading of list items
-
-![lazy-loading 2018-11-01 17_01_21](https://user-images.githubusercontent.com/2182637/47835395-ec8b1a80-ddf7-11e8-88e6-848848ab4af1.gif)
-
-In this example we are adding more `Draggable`s to a list we scroll closer to the bottom of the list
-
-### Collapsing and expanding groups
-
-> We recommend you use the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) component for this behaviour
-
-[TODO gif]

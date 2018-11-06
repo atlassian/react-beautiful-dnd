@@ -1,5 +1,7 @@
 # Combining
 
+> 👶 This feature is still quite young. We wanted to get it out there for people to play with
+
 `react-beautiful-dnd` supports the combining of `Draggable`s 🤩
 
 ![combining](https://user-images.githubusercontent.com/2182637/48045145-318dc300-e1e3-11e8-83bd-22c9bd44c442.gif)
