@@ -603,7 +603,9 @@ The `children` function is also provided with a small amount of state relating t
 
 ### Combining
 
-[TODO: image]
+`react-beautiful-dnd` supports the combining of `Draggable`s 🤩
+
+![combining](https://user-images.githubusercontent.com/2182637/48045145-318dc300-e1e3-11e8-83bd-22c9bd44c442.gif)
 
 You can enable a _combining_ mode for a `Droppable` by setting `isCombineEnabled` to `true` on a `Droppable`. We have created a [combining guide](/docs/guides/combining.md) to help you implement combining in your lists.
 
@@ -787,6 +789,8 @@ type DraggableProvided = {|
   dragHandleProps: ?DragHandleProps,
 |};
 ```
+
+> For more type information please see [our types guide](/docs/guies/types.md).
 
 Everything within the _provided_ object must be applied for the `Draggable` to function correctly.
 
@@ -1016,15 +1020,25 @@ const myOnMouseDown = event => console.log('mouse down on', event.target);
 type DraggableStateSnapshot = {|
   // Set to true if a Draggable is being actively dragged, or if it is drop animating
   // Both active dragging and the drop animation are considered part of the drag
+  // Generally this is the only property you will be using
   isDragging: boolean,
   // Set to true if a Draggable is drop animating. Not every drag and drop interaction
   // as a drop animation. There is no drop animation when a Draggable is already in its final
   // position when dropped. This is commonly the case when dragging with a keyboard
   isDropAnimating: boolean,
+  // Information about a drop animation
+  dropAnimation: ?DropAnimation
   // What Droppable (if any) the Draggable is currently over
   draggingOver: ?DroppableId,
+  // the id of a draggable that you are combining with
+  combineWith: ?DraggableId,
+  // if something else is dragging and you are a combine target, then this is the id of the item that is dragging
+  combineTargetFor: ?DraggableId,
+  mode: ?MovementMode,
 |};
 ```
+
+> See our [type guide](/docs/guides/types.md) for more details
 
 The `children` function is also provided with a small amount of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Draggable` while it is being dragged. Note: if you want to change the cursor to something like `grab` you will need to add the style to the draggable. (See [Extending `DraggableProps.style`](#extending-draggableprops-style) above)
 

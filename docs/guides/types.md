@@ -39,8 +39,16 @@ type DragStart = {|
 
 type DragUpdate = {|
   ...DragStart,
-  // may not have any destination (drag to nowhere)
+  // populated if in a reorder position
   destination: ?DraggableLocation,
+  // populated if combining with another draggable
+  combine: ?Combine,
+|};
+
+// details about the draggable that is being combined with
+type Combine = {|
+  draggableId: DraggableId,
+  droppableId: DroppableId,
 |};
 
 type DropResult = {|
@@ -88,7 +96,11 @@ type DraggableProvided = {|
 type DraggableStateSnapshot = {|
   isDragging: boolean,
   isDropAnimating: boolean,
+  dropAnimation: ?DropAnimation,
   draggingOver: ?DroppableId,
+  combineWith: ?DraggableId,
+  combineTargetFor: ?DraggableId,
+  mode: ?MovementMode,
 |};
 
 export type DraggableProps = {|
@@ -125,6 +137,14 @@ type DragHandleProps = {|
   tabIndex: number,
   draggable: boolean,
   onDragStart: (event: DragEvent) => void,
+|};
+
+type DropAnimation = {|
+  duration: number,
+  curve: string,
+  moveTo: Position,
+  opacity: ?number,
+  scale: ?number,
 |};
 ```
 
