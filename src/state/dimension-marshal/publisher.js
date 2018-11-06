@@ -69,13 +69,10 @@ export default ({ getEntries, callbacks }: Args): Publisher => {
 
       warning(`
         Advanced usage warning: you are adding or removing a dimension during a drag
-        This an advanced feature used to support dynamic interactions such as lazy loading lists.
+        This an advanced feature.
 
-        Keep in mind the following restrictions:
-
-        - Draggable's can only be added to Droppable's that are scroll containers
-        - Adding a Droppable cannot impact the placement of other Droppables
-          (it cannot push a Droppable on the page)
+        Please check out: https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/changes-while-dragging.md
+        For more information
       `);
     };
   })();
