@@ -95,11 +95,18 @@ export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
       const entries: Entries = getEntries();
       const { additions, removals, modified } = staging;
 
-      const added: DraggableDimension[] = Object.keys(additions).map(
-        // Using the origin as the window scroll. This will be adjusted when processing the published values
-        (id: DraggableId): DraggableDimension =>
-          entries.draggables[id].getDimension(origin),
-      );
+      const added: DraggableDimension[] = Object.keys(additions)
+        .map(
+          // Using the origin as the window scroll. This will be adjusted when processing the published values
+          (id: DraggableId): DraggableDimension =>
+            entries.draggables[id].getDimension(origin),
+        )
+        // Dimensions are not guarenteed to be ordered in the same order as keys
+        // So we need to sort them so they are in the correct order
+        .sort(
+          (a: DraggableDimension, b: DraggableDimension): number =>
+            a.descriptor.index - b.descriptor.index,
+        );
 
       const updated: DroppableDimension[] = Object.keys(modified).map(
         (id: DroppableId) => {

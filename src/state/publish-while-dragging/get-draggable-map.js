@@ -119,6 +119,7 @@ export default ({
     );
 
     // Insert additions into the correct positions
+    // We can do this because the additions are correctly ordered
     const withAdditions: DraggableDimension[] = withRemovals.slice(0);
     additions.forEach((item: DraggableDimension) => {
       withAdditions.splice(item.descriptor.index, 0, item);

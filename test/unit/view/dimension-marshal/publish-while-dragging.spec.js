@@ -158,6 +158,51 @@ describe('additions', () => {
       'This is not of the same type as the dragging item',
     );
   });
+
+  it('should order published draggables by their index', () => {
+    const beforeInHome1: DraggableDimension = {
+      ...preset.inHome1,
+      descriptor: {
+        ...preset.inHome1.descriptor,
+        id: 'b',
+        index: 0,
+      },
+    };
+    const beforeInHome2: DraggableDimension = {
+      ...preset.inHome2,
+      descriptor: {
+        ...preset.inHome2.descriptor,
+        // if ordered by a key, this would be first
+        id: 'a',
+        index: 1,
+      },
+    };
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    populateMarshal(marshal, withScrollables);
+
+    // A publish has started
+    marshal.startPublishing(defaultRequest);
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+
+    // publishing the higher index value first
+    withExpectedAdvancedUsageWarning(() => {
+      marshal.registerDraggable(beforeInHome2.descriptor, () => beforeInHome2);
+    });
+    // publishing the lower index value second
+    marshal.registerDraggable(beforeInHome1.descriptor, () => beforeInHome1);
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+
+    // Fire the collection / publish step
+    requestAnimationFrame.step();
+    const expected: Published = {
+      ...empty,
+      // we expect this to be ordered by index
+      additions: [beforeInHome1, beforeInHome2],
+      modified: [scrollableHome],
+    };
+    expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
+  });
 });
 
 describe('removals', () => {
