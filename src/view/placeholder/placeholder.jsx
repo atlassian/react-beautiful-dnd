@@ -5,23 +5,16 @@ import type { PlaceholderStyle } from './placeholder-types';
 
 type Props = {|
   placeholder: PlaceholderType,
-  onMount?: () => void,
-  onUnmount?: () => void,
+  innerRef?: () => ?HTMLElement,
 |};
 
 export default class Placeholder extends PureComponent<Props> {
   componentDidMount() {
-    if (this.props.onMount) {
-      this.props.onMount();
-    }
+    console.warn('PLACEHOLDER: MOUNT');
   }
-
   componentWillUnmount() {
-    if (this.props.onUnmount) {
-      this.props.onUnmount();
-    }
+    console.warn('PLACEHOLDER: UNMOUNT');
   }
-
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
     const { client, display, tagName } = placeholder;
@@ -56,6 +49,6 @@ export default class Placeholder extends PureComponent<Props> {
       pointerEvents: 'none',
     };
 
-    return React.createElement(tagName, { style });
+    return React.createElement(tagName, { style, ref: this.props.innerRef });
   }
 }

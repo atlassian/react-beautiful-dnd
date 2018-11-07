@@ -12,6 +12,7 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
+  DroppableDimensionMap,
 } from '../../types';
 import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
@@ -22,6 +23,9 @@ import getDraggableMap from './get-draggable-map';
 import withNoAnimatedDisplacement from './with-no-animated-displacement';
 import { toDroppableMap } from '../dimension-structures';
 import noImpact from '../no-impact';
+import reapplyPlaceholder from './reapply-placeholder';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
+import getDimensionMapWithPlaceholder from '../post-reducer/when-moving/util/get-dimension-map-with-placeholder';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -37,13 +41,13 @@ export default ({
   timings.start(timingsKey);
 
   // Change the subject size and scroll of droppables
+  // will remove any subject.withPlaceholder
   const adjusted: DroppableDimension[] = adjustModifiedDroppables({
     modified: published.modified,
-    existing: state.dimensions.droppables,
+    existingDroppables: state.dimensions.droppables,
     initialWindowScroll: state.viewport.scroll.initial,
   });
 
-  // TODO: write validate that every removed draggable must have a removed droppable
   const shifted: DraggableDimension[] = adjustAdditionsForScrollChanges({
     additions: published.additions,
     // using our already adjusted droppables as they have the correct scroll changes
@@ -59,7 +63,7 @@ export default ({
     },
   };
 
-  // Add, remove and shift dimensions
+  // Add, remove and shift draggables
   const draggables: DraggableDimensionMap = getDraggableMap({
     existing: patched,
     additions: shifted,
@@ -67,14 +71,26 @@ export default ({
     initialWindowScroll: state.viewport.scroll.initial,
   });
 
-  const dimensions: DimensionMap = {
-    droppables: patched.droppables,
-    draggables,
-  };
+  // const droppables: DroppableDimensionMap = reapplyPlaceholder({
+  //   wasOver: whatIsDraggedOver(state.impact),
+  //   previous: state.dimensions.droppables,
+  //   proposed: patched.droppables,
+  //   draggables,
+  // });
 
   const dragging: DraggableId = state.critical.draggable.id;
   const original: DraggableDimension = state.dimensions.draggables[dragging];
-  const updated: DraggableDimension = dimensions.draggables[dragging];
+  const updated: DraggableDimension = draggables[dragging];
+
+  const dimensions: DimensionMap = getDimensionMapWithPlaceholder({
+    previousImpact: state.impact,
+    impact: state.impact,
+    draggable: updated,
+    dimensions: {
+      draggables,
+      droppables: patched.droppables,
+    },
+  });
 
   const critical: Critical = {
     // droppable cannot change during a drag

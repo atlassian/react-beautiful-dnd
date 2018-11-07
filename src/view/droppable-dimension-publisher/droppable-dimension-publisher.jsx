@@ -24,6 +24,7 @@ import type {
 } from '../../types';
 import getDimension from './get-dimension';
 import { warning } from '../../dev-warning';
+import getMaxScroll from '../../state/get-max-scroll';
 
 type Props = {|
   droppableId: DroppableId,
@@ -32,6 +33,7 @@ type Props = {|
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
   ignoreContainerClipping: boolean,
+  getPlaceholderRef: () => ?HTMLElement,
   getDroppableRef: () => ?HTMLElement,
   children: Node,
 |};
@@ -55,6 +57,24 @@ const delayed = {
 
 const getListenerOptions = (options: ScrollOptions) =>
   options.shouldPublishImmediately ? immediate : delayed;
+
+const withoutPlaceholder = (
+  placeholder: ?HTMLElement,
+  fn: () => DroppableDimension,
+): DroppableDimension => {
+  if (!placeholder) {
+    return fn();
+  }
+
+  console.log('before', placeholder.getBoundingClientRect().height);
+  const last: string = placeholder.style.display;
+  placeholder.style.display = 'none';
+  const result: DroppableDimension = fn();
+  placeholder.style.display = last;
+  console.log('after', placeholder.getBoundingClientRect().height);
+
+  return result;
+};
 
 export default class DroppableDimensionPublisher extends React.Component<
   Props,
@@ -100,8 +120,14 @@ export default class DroppableDimensionPublisher extends React.Component<
   });
 
   updateScroll = () => {
-    const offset: Position = this.getClosestScroll();
-    this.memoizedUpdateScroll(offset.x, offset.y);
+    const scroll: Position = this.getClosestScroll();
+    console.log('element scroll', scroll);
+    console.log(
+      'scrollHeight',
+      this.dragging.env.closestScrollable.scrollHeight,
+    );
+    console.log('scrollWidth', this.dragging.env.closestScrollable.scrollWidth);
+    this.memoizedUpdateScroll(scroll.x, scroll.y);
   };
 
   scheduleScrollUpdate = rafSchedule(this.updateScroll);
@@ -261,20 +287,18 @@ export default class DroppableDimensionPublisher extends React.Component<
       'Can only recollect Droppable client for Droppables that have a scroll container',
     );
 
-    // TODO: needs to disable the placeholder for the collection
-    // this.props.placeholder.hide();
-    const dimension: DroppableDimension = getDimension({
-      ref: dragging.ref,
-      descriptor: dragging.descriptor,
-      env: dragging.env,
-      windowScroll: origin,
-      direction: this.props.direction,
-      isDropDisabled: this.props.isDropDisabled,
-      isCombineEnabled: this.props.isCombineEnabled,
-      shouldClipSubject: !this.props.ignoreContainerClipping,
-    });
-    // this.props.placeholder.show();
-    return dimension;
+    return withoutPlaceholder(this.props.getPlaceholderRef(), () =>
+      getDimension({
+        ref: dragging.ref,
+        descriptor: dragging.descriptor,
+        env: dragging.env,
+        windowScroll: origin,
+        direction: this.props.direction,
+        isDropDisabled: this.props.isDropDisabled,
+        isCombineEnabled: this.props.isCombineEnabled,
+        shouldClipSubject: !this.props.ignoreContainerClipping,
+      }),
+    );
   };
 
   getDimensionAndWatchScroll = (

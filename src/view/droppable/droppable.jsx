@@ -22,7 +22,7 @@ export default class Droppable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   styleContext: string;
   ref: ?HTMLElement = null;
-  isPlaceholderMounted: boolean = false;
+  placeholderRef: ?HTMLElement = null;
 
   // Need to declare childContextTypes without flow
   static contextTypes = {
@@ -64,6 +64,12 @@ export default class Droppable extends Component<Props> {
     this.warnIfPlaceholderNotMounted();
   }
 
+  componentWillUnmount() {
+    // allowing garbage collection
+    this.ref = null;
+    this.placeholderRef = null;
+  }
+
   warnIfPlaceholderNotMounted() {
     if (process.env.NODE_ENV === 'production') {
       return;
@@ -73,7 +79,7 @@ export default class Droppable extends Component<Props> {
       return;
     }
 
-    if (this.isPlaceholderMounted) {
+    if (this.placeholderRef) {
       return;
     }
 
@@ -87,18 +93,15 @@ export default class Droppable extends Component<Props> {
 
   /* eslint-enable */
 
-  onPlaceholderMount = () => {
-    this.isPlaceholderMounted = true;
+  setPlaceholderRef = (ref: ?HTMLElement) => {
+    this.placeholderRef = ref;
   };
 
-  onPlaceholderUnmount = () => {
-    this.isPlaceholderMounted = false;
-  };
+  getPlaceholderRef = () => this.placeholderRef;
 
   // React calls ref callback twice for every render
   // https://github.com/facebook/react/pull/8333/files
   setRef = (ref: ?HTMLElement) => {
-    // TODO: need to clear this.state.ref on unmount
     if (ref === null) {
       return;
     }
@@ -121,8 +124,7 @@ export default class Droppable extends Component<Props> {
     return (
       <Placeholder
         placeholder={this.props.placeholder}
-        onMount={this.onPlaceholderMount}
-        onUnmount={this.onPlaceholderUnmount}
+        innerRef={this.setPlaceholderRef}
       />
     );
   }
@@ -162,6 +164,7 @@ export default class Droppable extends Component<Props> {
         isDropDisabled={isDropDisabled}
         isCombineEnabled={isCombineEnabled}
         getDroppableRef={this.getDroppableRef}
+        getPlaceholderRef={this.getPlaceholderRef}
       >
         {children(provided, snapshot)}
       </DroppableDimensionPublisher>

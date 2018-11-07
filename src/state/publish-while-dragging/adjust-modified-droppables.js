@@ -8,8 +8,6 @@ import {
   type Spacing,
   type Rect,
 } from 'css-box-model';
-import { isEqual } from '../spacing';
-import scrollDroppable from '../droppable/scroll-droppable';
 import getDroppableDimension, {
   type Closest,
 } from '../droppable/get-droppable';
@@ -19,11 +17,14 @@ import type {
   Scrollable,
   Axis,
 } from '../../types';
+import { isEqual } from '../spacing';
+import scrollDroppable from '../droppable/scroll-droppable';
+import { removePlaceholder } from '../droppable/with-placeholder';
 
 const throwIfSpacingChange = (old: BoxModel, fresh: BoxModel) => {
   if (process.env.NODE_ENV !== 'production') {
-    const getMessage = (type: string) =>
-      `Cannot change the ${type} of a Droppable during a drag`;
+    const getMessage = (spacingType: string) =>
+      `Cannot change the ${spacingType} of a Droppable during a drag`;
     invariant(isEqual(old.margin, fresh.margin), getMessage('margin'));
     invariant(isEqual(old.border, fresh.border), getMessage('border'));
     invariant(isEqual(old.padding, fresh.padding), getMessage('padding'));
@@ -50,13 +51,13 @@ const getFrame = (droppable: DroppableDimension): Scrollable => {
 
 type Args = {|
   modified: DroppableDimension[],
-  existing: DroppableDimensionMap,
+  existingDroppables: DroppableDimensionMap,
   initialWindowScroll: Position,
 |};
 
 export default ({
   modified,
-  existing: existingDroppables,
+  existingDroppables,
   initialWindowScroll,
 }: Args): DroppableDimension[] => {
   // dynamically adjusting the client subject and page subject
@@ -69,9 +70,18 @@ export default ({
 
   const adjusted: DroppableDimension[] = modified.map(
     (provided: DroppableDimension): DroppableDimension => {
-      const existing: ?DroppableDimension =
+      const raw: ?DroppableDimension =
         existingDroppables[provided.descriptor.id];
-      invariant(existing, 'Could not locate droppable in existing droppables');
+      invariant(raw, 'Could not locate droppable in existing droppables');
+
+      const existing: DroppableDimension = raw.subject.withPlaceholder
+        ? removePlaceholder(raw)
+        : raw;
+
+      if (raw.subject.withPlaceholder) {
+        console.warn('REMOVING PLACEHOLDER');
+      }
+
       const oldClient: BoxModel = existing.client;
       const newClient: BoxModel = provided.client;
       const oldScrollable: Scrollable = getFrame(existing);

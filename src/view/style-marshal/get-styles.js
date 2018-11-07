@@ -123,16 +123,11 @@ export default (styleContext: string): Styles => {
   // This does not work well with reordering DOM nodes.
   // When we drop a Draggable it already has the correct scroll applied.
 
-  // pointer-events: none;
-  // It is very common for users to have accidental mouse handlers and
-  // hover styles on elements around a draggable which can cause
-  // performance and visual issues. So just turning it off here
-
   const droppable: Rule = {
     selector: getSelector(attributes.droppable),
     styles: {
       always: `overflow-anchor: none;`,
-      dragging: noPointerEvents,
+      // need pointer events on the droppable to allow manual scrolling
     },
   };
 

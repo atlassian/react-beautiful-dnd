@@ -85,12 +85,18 @@ export class ScrollableItem extends React.Component<ScrollableItemProps> {
   };
   /* eslint-disable react/sort-comp */
   ref: ?HTMLElement;
+  placeholderRef: ?HTMLElement;
 
   setRef = (ref: ?HTMLElement) => {
     this.ref = ref;
   };
 
+  setPlaceholderRef = (ref: ?HTMLElement) => {
+    this.placeholderRef = ref;
+  };
+
   getRef = (): ?HTMLElement => this.ref;
+  getPlaceholderRef = (): ?HTMLElement => this.placeholderRef;
 
   render() {
     return (
@@ -101,6 +107,7 @@ export class ScrollableItem extends React.Component<ScrollableItemProps> {
         isDropDisabled={this.props.isDropDisabled}
         ignoreContainerClipping={false}
         getDroppableRef={this.getRef}
+        getPlaceholderRef={this.getPlaceholderRef}
         isCombineEnabled={this.props.isCombineEnabled}
       >
         <div
@@ -115,6 +122,7 @@ export class ScrollableItem extends React.Component<ScrollableItemProps> {
           ref={this.setRef}
         >
           hi
+          <div className="placeholder" ref={this.setPlaceholderRef} />
         </div>
       </DroppableDimensionPublisher>
     );
@@ -125,20 +133,30 @@ type AppProps = {|
   droppableIsScrollable: boolean,
   parentIsScrollable: boolean,
   ignoreContainerClipping: boolean,
+  showPlaceholder: boolean,
 |};
 
 export class App extends Component<AppProps> {
   ref: ?HTMLElement;
+  placeholderRef: ?HTMLElement;
+
   static defaultProps = {
     ignoreContainerClipping: false,
     droppableIsScrollable: false,
     parentIsScrollable: false,
+    showPlaceholder: false,
   };
 
   setRef = (ref: ?HTMLElement) => {
     this.ref = ref;
   };
+
+  setPlaceholderRef = (ref: ?HTMLElement) => {
+    this.placeholderRef = ref;
+  };
+
   getRef = (): ?HTMLElement => this.ref;
+  getPlaceholderRef = (): ?HTMLElement => this.placeholderRef;
 
   render() {
     const {
@@ -177,8 +195,12 @@ export class App extends Component<AppProps> {
               type={descriptor.type}
               ignoreContainerClipping={ignoreContainerClipping}
               getDroppableRef={this.getRef}
+              getPlaceholderRef={this.getPlaceholderRef}
             >
               <div>hello world</div>
+              {this.props.showPlaceholder ? (
+                <div className="placeholder" ref={this.setPlaceholderRef} />
+              ) : null}
             </DroppableDimensionPublisher>
           </div>
         </div>
