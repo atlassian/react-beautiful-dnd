@@ -5,7 +5,7 @@ import {
   initialPublish,
   moveDown,
   moveUp,
-  publish,
+  publishWhileDragging,
   type InitialPublishArgs,
 } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/hooks';
@@ -40,7 +40,7 @@ it('should not call onDragUpdate if the destination or source have not changed',
   expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
   store.dispatch(collectionStarting());
-  store.dispatch(publish(publishAdditionArgs));
+  store.dispatch(publishWhileDragging(publishAdditionArgs));
   // checking there are no queued hooks
   jest.runAllTimers();
   // not called yet as position has not changed
@@ -135,7 +135,7 @@ it('should call onDragUpdate if the source has changed - even if the destination
   };
 
   store.dispatch(collectionStarting());
-  store.dispatch(publish(customPublish));
+  store.dispatch(publishWhileDragging(customPublish));
   // releasing update frame
   jest.runOnlyPendingTimers();
 

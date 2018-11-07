@@ -104,14 +104,14 @@ describe('additions', () => {
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // Registering a new draggable (inserted before inHome1)
     withExpectedAdvancedUsageWarning(() => {
       marshal.registerDraggable(beforeInHome1.descriptor, () => beforeInHome1);
     });
     marshal.registerDraggable(beforeInHome2.descriptor, () => beforeInHome2);
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
     requestAnimationFrame.step();
@@ -120,7 +120,7 @@ describe('additions', () => {
       additions: [beforeInHome1, beforeInHome2],
       modified: [scrollableHome],
     };
-    expect(callbacks.publish).toHaveBeenCalledWith(expected);
+    expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
   });
 
   it('should throw if trying to add a droppable', () => {
@@ -130,7 +130,7 @@ describe('additions', () => {
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     const register = () =>
       marshal.registerDroppable(
@@ -148,7 +148,7 @@ describe('additions', () => {
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // Registering a new draggable (inserted before inHome1)
     const execute = () =>
@@ -168,14 +168,14 @@ describe('removals', () => {
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     withExpectedAdvancedUsageWarning(() => {
       marshal.unregisterDraggable(preset.inHome2.descriptor);
     });
     marshal.unregisterDraggable(preset.inHome3.descriptor);
     marshal.unregisterDraggable(preset.inForeign1.descriptor);
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
     requestAnimationFrame.flush();
@@ -188,7 +188,7 @@ describe('removals', () => {
       ],
       modified: [scrollableHome, scrollableForeign],
     };
-    expect(callbacks.publish).toHaveBeenCalledWith(expected);
+    expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
   });
 
   it('should throw if tying to remove a draggable of a different type', () => {
@@ -256,14 +256,14 @@ describe('cancelling mid publish', () => {
       );
     });
     // no request animation fired yet
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // marshal told to stop - which should cancel any pending publishes
     marshal.stopPublishing();
 
     // flushing any frames
     requestAnimationFrame.flush();
-    expect(callbacks.publish).not.toHaveBeenCalled();
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
   });
 });
 
@@ -282,12 +282,12 @@ describe('subsequent', () => {
       );
     });
     requestAnimationFrame.step();
-    expect(callbacks.publish).toHaveBeenCalledTimes(1);
-    callbacks.publish.mockReset();
+    expect(callbacks.publishWhileDragging).toHaveBeenCalledTimes(1);
+    callbacks.publishWhileDragging.mockReset();
 
     marshal.registerDraggable(preset.inHome3.descriptor, () => preset.inHome3);
     requestAnimationFrame.step();
-    expect(callbacks.publish).toHaveBeenCalledTimes(1);
+    expect(callbacks.publishWhileDragging).toHaveBeenCalledTimes(1);
   });
 
   it('should allow subsequent publishes between drags', () => {
@@ -304,8 +304,8 @@ describe('subsequent', () => {
       );
     });
     requestAnimationFrame.step();
-    expect(callbacks.publish).toHaveBeenCalledTimes(1);
-    callbacks.publish.mockReset();
+    expect(callbacks.publishWhileDragging).toHaveBeenCalledTimes(1);
+    callbacks.publishWhileDragging.mockReset();
 
     marshal.stopPublishing();
 
@@ -314,7 +314,7 @@ describe('subsequent', () => {
 
     marshal.registerDraggable(preset.inHome3.descriptor, () => preset.inHome3);
     requestAnimationFrame.step();
-    expect(callbacks.publish).toHaveBeenCalledTimes(1);
+    expect(callbacks.publishWhileDragging).toHaveBeenCalledTimes(1);
   });
 });
 

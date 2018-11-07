@@ -11,7 +11,7 @@ import type {
   CollectingState,
   DraggableId,
 } from '../../../../src/types';
-import publish from '../../../../src/state/publish';
+import publish from '../../../../src/state/publish-while-dragging';
 import { getPreset } from '../../../utils/dimension';
 import { patch, negate } from '../../../../src/state/position';
 import getDraggablesInsideDroppable from '../../../../src/state/get-draggables-inside-droppable';

@@ -108,7 +108,7 @@ export type DimensionMarshal = {|
 
 export type Callbacks = {|
   collectionStarting: () => mixed,
-  publish: (args: Published) => mixed,
+  publishWhileDragging: (args: Published) => mixed,
   updateDroppableScroll: (args: UpdateDroppableScrollArgs) => mixed,
   updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => mixed,
   updateDroppableIsCombineEnabled: (

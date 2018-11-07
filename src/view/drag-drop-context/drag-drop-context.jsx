@@ -30,7 +30,7 @@ import {
 import {
   clean,
   move,
-  publish,
+  publishWhileDragging,
   updateDroppableScroll,
   updateDroppableIsEnabled,
   updateDroppableIsCombineEnabled,
@@ -116,7 +116,7 @@ export default class DragDropContext extends React.Component<Props> {
     });
     const callbacks: DimensionMarshalCallbacks = bindActionCreators(
       {
-        publish,
+        publishWhileDragging,
         updateDroppableScroll,
         updateDroppableIsEnabled,
         updateDroppableIsCombineEnabled,

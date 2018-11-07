@@ -23,7 +23,7 @@ import {
 } from '../../../utils/dimension';
 import { isEqual, noSpacing } from '../../../../src/state/spacing';
 import getStatePreset from '../../../utils/get-simple-state-preset';
-import publish from '../../../../src/state/publish';
+import publish from '../../../../src/state/publish-while-dragging';
 import { empty, adjustBox } from './util';
 
 const preset = getPreset();

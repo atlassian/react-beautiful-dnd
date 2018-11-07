@@ -51,13 +51,15 @@ export const initialPublish = (
   payload: args,
 });
 
-export type PublishAction = {|
-  type: 'PUBLISH',
+export type WhileDraggingPublishAction = {|
+  type: 'PUBLISH_WHILE_DRAGGING',
   payload: Published,
 |};
 
-export const publish = (args: Published): PublishAction => ({
-  type: 'PUBLISH',
+export const publishWhileDragging = (
+  args: Published,
+): WhileDraggingPublishAction => ({
+  type: 'PUBLISH_WHILE_DRAGGING',
   payload: args,
 });
 
@@ -297,7 +299,7 @@ export const dropAnimationFinished = (): DropAnimationFinishedAction => ({
 export type Action =
   | LiftAction
   | InitialPublishAction
-  | PublishAction
+  | WhileDraggingPublishAction
   | CollectionStartingAction
   | UpdateDroppableScrollAction
   | UpdateDroppableIsEnabledAction

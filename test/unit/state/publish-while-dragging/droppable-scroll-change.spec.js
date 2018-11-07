@@ -19,7 +19,7 @@ import {
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 import getDroppable from '../../../../src/state/droppable/get-droppable';
-import publish from '../../../../src/state/publish';
+import publish from '../../../../src/state/publish-while-dragging';
 import { empty, adjustBox } from './util';
 import { withScroll } from '../../../../node_modules/css-box-model';
 

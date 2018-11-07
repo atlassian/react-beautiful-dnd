@@ -13,7 +13,7 @@ import type {
 } from '../../../../src/types';
 import { scrollableHome, empty } from './util';
 import getSimpleStatePreset from '../../../utils/get-simple-state-preset';
-import publish from '../../../../src/state/publish';
+import publish from '../../../../src/state/publish-while-dragging';
 import getDisplacementMap from '../../../../src/state/get-displacement-map';
 import { patch } from '../../../../src/state/position';
 

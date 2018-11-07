@@ -10,7 +10,7 @@ import type {
   DimensionMap,
   CollectingState,
 } from '../../../../src/types';
-import publish from '../../../../src/state/publish';
+import publish from '../../../../src/state/publish-while-dragging';
 import { getPreset } from '../../../utils/dimension';
 import { copy } from '../../../utils/preset-action-args';
 import { empty, withScrollables, scrollableForeign } from './util';

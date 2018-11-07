@@ -13,7 +13,7 @@ import * as timings from '../../debug/timings';
 import { origin } from '../position';
 import { warning } from '../../dev-warning';
 
-export type Publisher = {|
+export type WhileDraggingPublisher = {|
   add: (descriptor: DraggableDescriptor) => void,
   remove: (descriptor: DraggableDescriptor) => void,
   stop: () => void,
@@ -51,7 +51,7 @@ const clean = (): Staging => ({
 
 const timingKey: string = 'Publish collection from DOM';
 
-export default ({ getEntries, callbacks }: Args): Publisher => {
+export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
   const advancedUsageWarning = (() => {
     // noop for production
     if (process.env.NODE_ENV === 'production') {

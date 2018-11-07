@@ -11,7 +11,7 @@ import {
   initialPublish,
   drop,
   completeDrop,
-  publish,
+  publishWhileDragging,
   collectionStarting,
 } from '../../../../src/state/action-creators';
 import {
@@ -43,7 +43,7 @@ it('should trigger a drop on a dynamic publish if a drop pending is waiting', ()
 
   // This will finish the drag
   mock.mockReset();
-  store.dispatch(publish(publishAdditionArgs));
+  store.dispatch(publishWhileDragging(publishAdditionArgs));
 
   expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
   const expected: DropResult = {
@@ -70,8 +70,8 @@ it('should not trigger a drop on a publish if a drop is not pending', () => {
   store.dispatch(collectionStarting());
 
   mock.mockReset();
-  store.dispatch(publish(publishAdditionArgs));
+  store.dispatch(publishWhileDragging(publishAdditionArgs));
 
-  expect(mock).toHaveBeenCalledWith(publish(publishAdditionArgs));
+  expect(mock).toHaveBeenCalledWith(publishWhileDragging(publishAdditionArgs));
   expect(mock).toHaveBeenCalledTimes(1);
 });

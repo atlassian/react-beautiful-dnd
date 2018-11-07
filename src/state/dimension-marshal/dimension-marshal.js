@@ -1,7 +1,9 @@
 // @flow
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import createPublisher, { type Publisher } from './publisher';
+import createPublisher, {
+  type WhileDraggingPublisher,
+} from './while-dragging-publisher';
 import getInitialPublish from './get-initial-publish';
 import type {
   DroppableId,
@@ -50,9 +52,9 @@ export default (callbacks: Callbacks) => {
   };
   let collection: ?Collection = null;
 
-  const publisher: Publisher = createPublisher({
+  const publisher: WhileDraggingPublisher = createPublisher({
     callbacks: {
-      publish: callbacks.publish,
+      publish: callbacks.publishWhileDragging,
       collectionStarting: callbacks.collectionStarting,
     },
     getEntries: (): Entries => entries,

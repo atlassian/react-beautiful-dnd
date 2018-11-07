@@ -1,7 +1,7 @@
 // @flow
 import { offset, type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import publish from '../../../../src/state/publish';
+import publish from '../../../../src/state/publish-while-dragging';
 import {
   getPreset,
   getDraggableDimension,

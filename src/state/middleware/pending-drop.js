@@ -9,7 +9,7 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
   // Always let the action go through first
   next(action);
 
-  if (action.type !== 'PUBLISH') {
+  if (action.type !== 'PUBLISH_WHILE_DRAGGING') {
     return;
   }
 

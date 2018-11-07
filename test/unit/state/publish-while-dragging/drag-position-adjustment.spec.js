@@ -1,7 +1,7 @@
 // @flow
 import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import publish from '../../../../src/state/publish';
+import publish from '../../../../src/state/publish-while-dragging';
 import { getPreset } from '../../../utils/dimension';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import { empty, shift, withScrollables, scrollableHome } from './util';

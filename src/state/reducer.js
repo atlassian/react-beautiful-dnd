@@ -21,7 +21,7 @@ import type {
 import type { Action } from './store-types';
 import type { PublicResult as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
 import scrollDroppable from './droppable/scroll-droppable';
-import publish from './publish';
+import publishWhileDragging from './publish-while-dragging';
 import moveInDirection from './move-in-direction';
 import { add, isEqual, origin } from './position';
 import scrollViewport from './scroll-viewport';
@@ -143,14 +143,14 @@ export default (state: State = idle, action: Action): State => {
     return result;
   }
 
-  if (action.type === 'PUBLISH') {
+  if (action.type === 'PUBLISH_WHILE_DRAGGING') {
     // Unexpected bulk publish
     invariant(
       state.phase === 'COLLECTING' || state.phase === 'DROP_PENDING',
       `Unexpected ${action.type} received in phase ${state.phase}`,
     );
 
-    return publish({
+    return publishWhileDragging({
       state,
       published: action.payload,
     });

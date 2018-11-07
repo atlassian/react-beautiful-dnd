@@ -3,7 +3,7 @@ import { type Position } from 'css-box-model';
 import { bindActionCreators } from 'redux';
 import createDimensionMarshal from '../../src/state/dimension-marshal/dimension-marshal';
 import {
-  publish,
+  publishWhileDragging,
   updateDroppableScroll,
   updateDroppableIsEnabled,
   updateDroppableIsCombineEnabled,
@@ -26,7 +26,7 @@ import type {
 export default (dispatch: Function): DimensionMarshal => {
   const callbacks: Callbacks = bindActionCreators(
     {
-      publish,
+      publishWhileDragging,
       collectionStarting,
       updateDroppableScroll,
       updateDroppableIsEnabled,
@@ -137,7 +137,7 @@ export const populateMarshal = (
 };
 
 export const getCallbacksStub = (): Callbacks => ({
-  publish: jest.fn(),
+  publishWhileDragging: jest.fn(),
   updateDroppableScroll: jest.fn(),
   updateDroppableIsEnabled: jest.fn(),
   updateDroppableIsCombineEnabled: jest.fn(),
