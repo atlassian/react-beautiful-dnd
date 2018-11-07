@@ -2,7 +2,7 @@
 import type { Position } from 'css-box-model';
 import getDragImpact from '../../get-drag-impact';
 import { add, subtract } from '../../position';
-import getDimensionMapWithPlaceholder from './util/get-dimension-map-with-placeholder';
+import getDimensionMapWithPlaceholder from '../../get-dimension-map-with-placeholder';
 import getUserDirection from '../../user-direction/get-user-direction';
 import type {
   DraggableDimension,

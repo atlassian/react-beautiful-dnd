@@ -1,20 +1,18 @@
 // @flow
-import type { Position } from 'css-box-model';
 import {
   addPlaceholder,
   removePlaceholder,
-} from '../../../droppable/with-placeholder';
-import { patch } from '../../../position';
-import shouldUsePlaceholder from '../../../droppable/should-use-placeholder';
-import whatIsDraggedOver from '../../../droppable/what-is-dragged-over';
+} from './droppable/with-placeholder';
+import shouldUsePlaceholder from './droppable/should-use-placeholder';
+import whatIsDraggedOver from './droppable/what-is-dragged-over';
 import type {
   DroppableDimension,
   DimensionMap,
   DraggableDimension,
   DragImpact,
   DroppableId,
-} from '../../../../types';
-import patchDroppableMap from '../../../patch-droppable-map';
+} from '../types';
+import patchDroppableMap from './patch-droppable-map';
 
 type ClearArgs = {|
   previousImpact: DragImpact,
@@ -89,15 +87,10 @@ export default ({
     return base;
   }
 
-  const placeholderSize: Position = patch(
-    droppable.axis.line,
-    draggable.displaceBy[droppable.axis.line],
-  );
-
   // Need to patch the existing droppable
   const patched: DroppableDimension = addPlaceholder(
     droppable,
-    placeholderSize,
+    draggable.displaceBy,
     base.draggables,
   );
 

@@ -52,7 +52,7 @@ const withMaxScroll = (frame: Scrollable, max: Position): Scrollable => ({
 
 export const addPlaceholder = (
   droppable: DroppableDimension,
-  placeholderSize: Position,
+  displaceBy: Position,
   draggables: DraggableDimensionMap,
 ): DroppableDimension => {
   const frame: ?Scrollable = droppable.frame;
@@ -60,6 +60,11 @@ export const addPlaceholder = (
   invariant(
     !droppable.subject.withPlaceholder,
     'Cannot add placeholder size to a subject when it already has one',
+  );
+
+  const placeholderSize: Position = patch(
+    droppable.axis.line,
+    displaceBy[droppable.axis.line],
   );
 
   const requiredGrowth: ?Position = getRequiredGrowthForPlaceholder(

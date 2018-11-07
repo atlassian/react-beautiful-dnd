@@ -14,6 +14,9 @@ import type {
   DraggableDimension,
   Published,
   Scrollable,
+  Displacement,
+  DragImpact,
+  DisplacedBy,
 } from '../../../../src/types';
 import {
   getPreset,
@@ -25,6 +28,10 @@ import { isEqual, noSpacing } from '../../../../src/state/spacing';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import publish from '../../../../src/state/publish-while-dragging';
 import { empty, adjustBox } from './util';
+import { addPlaceholder } from '../../../../src/state/droppable/with-placeholder';
+import getDisplacedBy from '../../../../src/state/get-displaced-by';
+import getDisplacementMap from '../../../../src/state/get-displacement-map';
+import getVisibleDisplacement from '../../../utils/get-visible-displacement';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -224,4 +231,99 @@ it('should throw if any spacing changes to the frame', () => {
       /Cannot change the (margin|padding|border) of a Droppable during a drag/,
     );
   });
+});
+
+it('should reapply any with placeholder spacing', () => {
+  const draggable: DraggableDimension = preset.inHome1;
+  const scrollableForeign: DroppableDimension = makeScrollable(
+    preset.foreign,
+    0,
+  );
+  {
+    const withPlaceholder: DroppableDimension = addPlaceholder(
+      scrollableForeign,
+      draggable.displaceBy,
+      preset.draggables,
+    );
+    // will always displace forward in a foreign list
+    const willDisplaceForward: boolean = true;
+    const displacedBy: DisplacedBy = getDisplacedBy(
+      withPlaceholder.axis,
+      draggable.displaceBy,
+      willDisplaceForward,
+    );
+    const displaced: Displacement[] = [
+      getVisibleDisplacement(preset.inForeign1),
+      getVisibleDisplacement(preset.inForeign2),
+      getVisibleDisplacement(preset.inForeign3),
+      getVisibleDisplacement(preset.inForeign4),
+    ];
+    const impact: DragImpact = {
+      movement: {
+        displacedBy,
+        displaced,
+        map: getDisplacementMap(displaced),
+        willDisplaceForward,
+      },
+      merge: null,
+      direction: withPlaceholder.axis.direction,
+      destination: {
+        index: preset.inForeign1.descriptor.index,
+        droppableId: withPlaceholder.descriptor.id,
+      },
+    };
+    // $FlowFixMe - wrong type
+    const whileCollecting: CollectingState = {
+      ...addDroppable(
+        // $FlowFixMe - wrong type
+        state.collecting(),
+        withPlaceholder,
+      ),
+      impact,
+    };
+    const published: Published = {
+      ...empty,
+      additions: [],
+      // no net size change (placeholder is removed when recollecting)
+      modified: [scrollableForeign],
+    };
+
+    const result: DraggingState | DropPendingState = publish({
+      state: whileCollecting,
+      published,
+    });
+    invariant(result.phase === 'DRAGGING');
+
+    // result has had the placeholder reapplied!
+    expect(result.dimensions.droppables[preset.foreign.descriptor.id]).toEqual(
+      withPlaceholder,
+    );
+  }
+
+  // validation: no placeholder added if not over foreign
+  {
+    // $FlowFixMe - wrong type
+    const whileCollecting: CollectingState = addDroppable(
+      // $FlowFixMe - wrong type
+      state.collecting(),
+      scrollableForeign,
+    );
+    const published: Published = {
+      ...empty,
+      additions: [],
+      // no net size change
+      modified: [scrollableForeign],
+    };
+
+    const result: DraggingState | DropPendingState = publish({
+      state: whileCollecting,
+      published,
+    });
+    invariant(result.phase === 'DRAGGING');
+
+    // result has had the placeholder reapplied!
+    expect(result.dimensions.droppables[preset.foreign.descriptor.id]).toEqual(
+      scrollableForeign,
+    );
+  }
 });

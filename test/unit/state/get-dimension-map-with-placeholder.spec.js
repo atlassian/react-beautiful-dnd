@@ -7,18 +7,18 @@ import type {
   Displacement,
   DragImpact,
   DroppableDimension,
-} from '../../../../src/types';
-import { getPreset } from '../../../utils/dimension';
-import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../../src/state/get-displacement-map';
-import { horizontal, vertical } from '../../../../src/state/axis';
-import getHomeImpact from '../../../../src/state/get-home-impact';
-import getDimensionMapWithPlaceholder from '../../../../src/state/post-reducer/when-moving/util/get-dimension-map-with-placeholder';
-import noImpact from '../../../../src/state/no-impact';
-import getVisibleDisplacement from '../../../utils/get-visible-displacement';
-import { addPlaceholder } from '../../../../src/state/droppable/with-placeholder';
-import { patch } from '../../../../src/state/position';
-import patchDroppableMap from '../../../../src/state/patch-droppable-map';
+} from '../../../src/types';
+import { getPreset } from '../../utils/dimension';
+import getDisplacedBy from '../../../src/state/get-displaced-by';
+import getDisplacementMap from '../../../src/state/get-displacement-map';
+import { horizontal, vertical } from '../../../src/state/axis';
+import getHomeImpact from '../../../src/state/get-home-impact';
+import getDimensionMapWithPlaceholder from '../../../src/state/get-dimension-map-with-placeholder';
+import noImpact from '../../../src/state/no-impact';
+import getVisibleDisplacement from '../../utils/get-visible-displacement';
+import { addPlaceholder } from '../../../src/state/droppable/with-placeholder';
+import { patch } from '../../../src/state/position';
+import patchDroppableMap from '../../../src/state/patch-droppable-map';
 
 [horizontal, vertical].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

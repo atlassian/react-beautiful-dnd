@@ -22,7 +22,7 @@ import getDraggableMap from './get-draggable-map';
 import withNoAnimatedDisplacement from './with-no-animated-displacement';
 import { toDroppableMap } from '../dimension-structures';
 import noImpact from '../no-impact';
-import getDimensionMapWithPlaceholder from '../post-reducer/when-moving/util/get-dimension-map-with-placeholder';
+import getDimensionMapWithPlaceholder from '../get-dimension-map-with-placeholder';
 
 type Args = {|
   state: CollectingState | DropPendingState,
