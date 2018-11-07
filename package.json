@@ -58,13 +58,13 @@
   },
   "dependencies": {
     "@babel/runtime-corejs2": "^7.1.5",
-    "css-box-model": "^1.1.0",
-    "memoize-one": "^4.0.2",
+    "css-box-model": "^1.1.1",
+    "memoize-one": "^4.0.3",
     "prop-types": "^15.6.1",
     "raf-schd": "^4.0.0",
     "react-redux": "^5.0.7",
     "redux": "^4.0.1",
-    "tiny-invariant": "^1.0.2"
+    "tiny-invariant": "^1.0.3"
   },
   "devDependencies": {
     "@atlaskit/css-reset": "^3.0.2",
@@ -98,7 +98,7 @@
     "jest": "^23.6.0",
     "jest-junit": "^5.2.0",
     "jest-watch-typeahead": "^0.2.0",
-    "prettier": "^1.15.0",
+    "prettier": "^1.15.1",
     "raf-stub": "^2.0.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",

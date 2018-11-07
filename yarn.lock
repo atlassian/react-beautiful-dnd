@@ -3655,11 +3655,11 @@ crypto-md5@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/crypto-md5/-/crypto-md5-1.0.0.tgz#ccc8da750c753c7edcbabc542967472a384e86bb"
 
-css-box-model@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/css-box-model/-/css-box-model-1.1.0.tgz#a667444ea059f50f8118cf680a0fdcf309b56be4"
+css-box-model@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/css-box-model/-/css-box-model-1.1.1.tgz#c9fd8e7a8b1d59d41d6812fd1765433f671b2ee0"
   dependencies:
-    tiny-invariant "^1.0.1"
+    tiny-invariant "^1.0.3"
 
 css-color-names@0.0.4:
   version "0.0.4"
@@ -7161,9 +7161,9 @@ mem@^1.1.0:
   dependencies:
     mimic-fn "^1.0.0"
 
-memoize-one@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-4.0.2.tgz#3fb8db695aa14ab9c0f1644e1585a8806adc1aee"
+memoize-one@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-4.0.3.tgz#cdfdd942853f1a1b4c71c5336b8c49da0bf0273c"
 
 memory-fs@^0.4.0, memory-fs@^0.4.1, memory-fs@~0.4.1:
   version "0.4.1"
@@ -8461,9 +8461,9 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@^1.15.0:
-  version "1.15.0"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.15.0.tgz#c6191a50fbc9056ff770577d64ebd9987cca1dd7"
+prettier@^1.15.1:
+  version "1.15.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.15.1.tgz#06c67106afb1b40e74b002353b2079cc7e0e67bf"
 
 pretty-error@^2.0.2:
   version "2.1.1"
@@ -10612,13 +10612,9 @@ timers-browserify@^2.0.4:
   dependencies:
     setimmediate "^1.0.4"
 
-tiny-invariant@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-1.0.1.tgz#54700d039a0384ef2e83afd0e81af84c6d67b140"
-
-tiny-invariant@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-1.0.2.tgz#8d343bf86acce627a2e0857d48a46a297fda2cc3"
+tiny-invariant@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-1.0.3.tgz#91efaaa0269ccb6271f0296aeedb05fc3e067b7a"
 
 tmp@0.0.28:
   version "0.0.28"
