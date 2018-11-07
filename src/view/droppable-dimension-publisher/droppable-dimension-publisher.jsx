@@ -24,7 +24,6 @@ import type {
 } from '../../types';
 import getDimension from './get-dimension';
 import { warning } from '../../dev-warning';
-import getMaxScroll from '../../state/get-max-scroll';
 
 type Props = {|
   droppableId: DroppableId,
@@ -66,12 +65,10 @@ const withoutPlaceholder = (
     return fn();
   }
 
-  console.log('before', placeholder.getBoundingClientRect().height);
   const last: string = placeholder.style.display;
   placeholder.style.display = 'none';
   const result: DroppableDimension = fn();
   placeholder.style.display = last;
-  console.log('after', placeholder.getBoundingClientRect().height);
 
   return result;
 };
@@ -121,12 +118,6 @@ export default class DroppableDimensionPublisher extends React.Component<
 
   updateScroll = () => {
     const scroll: Position = this.getClosestScroll();
-    console.log('element scroll', scroll);
-    console.log(
-      'scrollHeight',
-      this.dragging.env.closestScrollable.scrollHeight,
-    );
-    console.log('scrollWidth', this.dragging.env.closestScrollable.scrollWidth);
     this.memoizedUpdateScroll(scroll.x, scroll.y);
   };
 

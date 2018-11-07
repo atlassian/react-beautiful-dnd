@@ -9,12 +9,6 @@ type Props = {|
 |};
 
 export default class Placeholder extends PureComponent<Props> {
-  componentDidMount() {
-    console.warn('PLACEHOLDER: MOUNT');
-  }
-  componentWillUnmount() {
-    console.warn('PLACEHOLDER: UNMOUNT');
-  }
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
     const { client, display, tagName } = placeholder;

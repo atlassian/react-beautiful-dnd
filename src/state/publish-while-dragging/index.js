@@ -12,7 +12,6 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
-  DroppableDimensionMap,
 } from '../../types';
 import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
@@ -23,8 +22,6 @@ import getDraggableMap from './get-draggable-map';
 import withNoAnimatedDisplacement from './with-no-animated-displacement';
 import { toDroppableMap } from '../dimension-structures';
 import noImpact from '../no-impact';
-import reapplyPlaceholder from './reapply-placeholder';
-import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import getDimensionMapWithPlaceholder from '../post-reducer/when-moving/util/get-dimension-map-with-placeholder';
 
 type Args = {|

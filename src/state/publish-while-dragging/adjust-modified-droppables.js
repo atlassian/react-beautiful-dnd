@@ -78,10 +78,6 @@ export default ({
         ? removePlaceholder(raw)
         : raw;
 
-      if (raw.subject.withPlaceholder) {
-        console.warn('REMOVING PLACEHOLDER');
-      }
-
       const oldClient: BoxModel = existing.client;
       const newClient: BoxModel = provided.client;
       const oldScrollable: Scrollable = getFrame(existing);
