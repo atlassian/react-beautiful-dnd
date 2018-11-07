@@ -1,33 +1,27 @@
 // @flow
-import { type Position } from 'css-box-model';
 import { mount } from 'enzyme';
 import React from 'react';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
-import type { DroppableDimension, ScrollSize } from '../../../../src/types';
-import { negate, origin } from '../../../../src/state/position';
-import { offsetByPosition } from '../../../../src/state/spacing';
+import type { DroppableDimension } from '../../../../src/types';
 import { getDroppableDimension } from '../../../utils/dimension';
 import { getMarshalStub } from '../../../utils/dimension-marshal';
 import { withDimensionMarshal } from '../../../utils/get-context-options';
-import setWindowScroll from '../../../utils/set-window-scroll';
+import tryCleanPrototypeStubs from '../../../utils/try-clean-prototype-stubs';
+import { setViewport } from '../../../utils/viewport';
 import {
   App,
-  ScrollableItem,
-  scheduled,
-  immediate,
-  preset,
   bigClient,
-  margin,
-  padding,
   border,
   descriptor,
+  immediate,
+  margin,
+  padding,
+  preset,
   smallFrameClient,
 } from './util/shared';
-import { setViewport } from '../../../utils/viewport';
-import tryCleanPrototypeStubs from '../../../utils/try-clean-prototype-stubs';
 
 beforeEach(() => {
   setViewport(preset.viewport);
