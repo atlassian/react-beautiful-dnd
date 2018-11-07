@@ -51,7 +51,7 @@ const SimpleQuote = styled('div')`
       content: "in portal";
     }
   `
-      : ''} /* stylelint-enable */;
+      : ''}/* stylelint-enable */;
 `;
 
 class PortalAwareItem extends Component<ItemProps> {

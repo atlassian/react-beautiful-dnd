@@ -116,17 +116,20 @@ it('should hide any placeholder when recollecting dimensions', () => {
   });
 
   // will be called when unhiding the element
-  jest.spyOn(placeholderEl.style, 'removeProperty');
+  const spy = jest.spyOn(placeholderEl.style, 'display', 'set');
+  jest.spyOn(placeholderEl.style, 'display', 'get').mockReturnValue('original');
 
   const callbacks: DroppableCallbacks =
     marshal.registerDroppable.mock.calls[0][1];
 
   callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
-
-  expect(placeholderEl.style.removeProperty).not.toHaveBeenCalled();
+  expect(spy).not.toHaveBeenCalled();
 
   callbacks.recollect();
-  expect(placeholderEl.style.removeProperty).toHaveBeenCalled();
+  // hidden at one point
+  expect(spy).toHaveBeenCalledWith('none');
+  // finishes back with the original value
+  expect(placeholderEl.style.display).toBe('original');
 });
 
 it('should throw if there is no drag occurring when a recollection is requested', () => {

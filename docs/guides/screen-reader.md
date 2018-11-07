@@ -196,7 +196,7 @@ The user has dropped onto another `Draggable` in [combine mode](/docs/guides/com
 
 You can't do this with a keyboard, but it's worthwhile having a message for this scenario, in case the user has a pointer for dragging.
 
-**Default message**: "The item has been dropped while not over a droppable location. The item has returned to its starting position of ${startPosition}"
+**Default message**: "The item has been dropped while not over a droppable location. The item has returned to its starting position of \${startPosition}"
 
 We tell the user the following:
 
