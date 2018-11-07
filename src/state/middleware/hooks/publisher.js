@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import messagePreset from '../util/message-preset';
+import messagePreset from '../util/screen-reader-message-preset';
 import * as timings from '../../../debug/timings';
 import getExpiringAnnounce from './expiring-announce';
 import getAsyncMarshal, { type AsyncMarshal } from './async-marshal';

@@ -79,3 +79,19 @@ class App extends React.Component {
   }
 }
 ```
+
+## Drop animation
+
+One of the goals of `react-beautiful-dnd` is to create a drag and drop experience that feels physical. This is a bit tricky to achieve in a generic way when it comes to combining two things.
+
+What we have gone for out of the box in the following animation:
+
+- move the dragging item onto the center of the item being grouped with
+- fade the opacity of the dragging item down to `0`
+- scale the dragging item down
+
+This animation attempts to communicate one item _moving into_ another item in a fairly generic way.
+
+![combining](https://user-images.githubusercontent.com/2182637/48045145-318dc300-e1e3-11e8-83bd-22c9bd44c442.gif)
+
+You are welcome to customise this animation using the information found in our [drop animation guide](/docs/guides/drop-animation.md)

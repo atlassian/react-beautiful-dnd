@@ -6,7 +6,7 @@ import {
   moveDown,
 } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/hooks';
-import messagePreset from '../../../../../src/state/middleware/util/message-preset';
+import messagePreset from '../../../../../src/state/middleware/util/screen-reader-message-preset';
 import {
   getDragStart,
   initialPublishArgs,
