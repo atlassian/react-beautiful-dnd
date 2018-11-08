@@ -1,6 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
-import { mount } from 'enzyme';
+import { mount, type ReactWrapper } from 'enzyme';
 import React from 'react';
 import type {
   DimensionMarshal,
@@ -50,12 +50,7 @@ it('should publish the dimensions of the target', () => {
     border,
     windowScroll: { x: 0, y: 0 },
   });
-
-  jest
-    .spyOn(Element.prototype, 'getBoundingClientRect')
-    .mockImplementation(() => expected.client.borderBox);
-
-  mount(
+  const wrapper: ReactWrapper = mount(
     <ScrollableItem
       droppableId={expected.descriptor.id}
       type={expected.descriptor.type}
@@ -63,6 +58,10 @@ it('should publish the dimensions of the target', () => {
     />,
     withDimensionMarshal(marshal),
   );
+  const el: HTMLElement = wrapper.instance().getRef();
+  jest
+    .spyOn(el, 'getBoundingClientRect')
+    .mockImplementation(() => bigClient.borderBox);
 
   // pull the get dimension function out
   const callbacks: DroppableCallbacks =
@@ -98,11 +97,8 @@ it('should consider the window scroll when calculating dimensions', () => {
     border,
     windowScroll,
   });
-  jest
-    .spyOn(Element.prototype, 'getBoundingClientRect')
-    .mockImplementation(() => bigClient.borderBox);
 
-  mount(
+  const wrapper: ReactWrapper = mount(
     <ScrollableItem
       droppableId={expected.descriptor.id}
       type={expected.descriptor.type}
@@ -110,6 +106,10 @@ it('should consider the window scroll when calculating dimensions', () => {
     />,
     withDimensionMarshal(marshal),
   );
+  const el: HTMLElement = wrapper.instance().getRef();
+  jest
+    .spyOn(el, 'getBoundingClientRect')
+    .mockImplementation(() => bigClient.borderBox);
 
   // pull the get dimension function out
   const callbacks: DroppableCallbacks =
