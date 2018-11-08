@@ -73,9 +73,7 @@ const withoutPlaceholder = (
   return result;
 };
 
-export default class DroppableDimensionPublisher extends React.Component<
-  Props,
-> {
+export default class DroppableDimensionPublisher extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   dragging: ?WhileDragging;
   callbacks: DroppableCallbacks;

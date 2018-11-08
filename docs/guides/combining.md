@@ -45,15 +45,19 @@ If they entered closer to the _start of the item_, the the user will be able to 
 
 If they entered closer to the _end of the item_, the the user will be able to combine with the item when they are moving in the _end 2/3_ of the item. This includes forwards and backwards movements.
 
-> We allow 2/3 of the size as this will allow users to combine items when the centers of the items are on top of each other
-
 If the user moves beyond the 2/3 allocated, then the target item will reorder as normal.
+
+#### Combining with displaced item
 
 Combining is displacement aware. This means that if you try to combine with an item that is already displaced, that displacement will be respected and the user will be able to combine with the item while it is displaced. This yields a really nice user experience
 
 ![combine-with-displaced](https://user-images.githubusercontent.com/2182637/48169674-49328c00-e348-11e8-8d35-d3d41916cd89.gif)
 
 > Combining with a displaced item works as expected
+
+#### Why 2/3?
+
+We allow 2/3 of the size as a combine target as this will allow users a nice amount of room to combine items with. It is enough to allow the centers of the two items to be over each other with a little bit of grace distance. There is also a 1/3 area for reordering which allows enough room for both combining and reordering to occur in the same list.
 
 ## Current limitations
 
