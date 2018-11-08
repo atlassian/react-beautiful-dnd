@@ -363,7 +363,7 @@ describe('progress', () => {
     windowMouseMove(expected);
     requestAnimationFrame.step();
 
-    expect(callbacks.onMove).toBeCalledWith(expected);
+    expect(callbacks.onMove).toHaveBeenCalledWith(expected);
   });
 
   it('should prevent the default behaviour of a mousemove', () => {
@@ -456,7 +456,7 @@ describe('progress', () => {
     // will fire the first move
     windowMouseMove({ x: 10, y: 20 });
     requestAnimationFrame.step();
-    expect(callbacks.onMove).toBeCalledWith({ x: 10, y: 20 });
+    expect(callbacks.onMove).toHaveBeenCalledWith({ x: 10, y: 20 });
 
     // second move event
     windowMouseMove({ x: 11, y: 21 });
@@ -467,7 +467,7 @@ describe('progress', () => {
     requestAnimationFrame.step();
 
     expect(callbacks.onMove).toHaveBeenCalledTimes(1);
-    expect(callbacks.onMove).toBeCalledWith({ x: 10, y: 20 });
+    expect(callbacks.onMove).toHaveBeenCalledWith({ x: 10, y: 20 });
 
     // being super safe and flushing the animation queue
     requestAnimationFrame.flush();
@@ -489,7 +489,7 @@ describe('progress', () => {
     requestAnimationFrame.step();
 
     // should only be calling onMove with the last value
-    expect(callbacks.onMove).toBeCalledWith({
+    expect(callbacks.onMove).toHaveBeenCalledWith({
       x: 0,
       y: sloppyClickThreshold + 4,
     });
