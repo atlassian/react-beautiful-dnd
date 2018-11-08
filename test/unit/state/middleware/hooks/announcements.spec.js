@@ -4,10 +4,12 @@ import {
   completeDrop,
   initialPublish,
   moveDown,
+  updateDroppableIsCombineEnabled,
 } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/hooks';
 import messagePreset from '../../../../../src/state/middleware/util/screen-reader-message-preset';
 import {
+  preset,
   getDragStart,
   initialPublishArgs,
 } from '../../../../utils/preset-action-args';
@@ -26,7 +28,8 @@ import getAnnounce from './util/get-announce-stub';
 jest.useFakeTimers();
 
 type Case = {|
-  title: 'onDragStart' | 'onDragUpdate' | 'onDragEnd',
+  hook: 'onDragStart' | 'onDragUpdate' | 'onDragEnd',
+  description?: string,
   execute: (store: Store) => void,
   defaultMessage: string,
 |};
@@ -38,6 +41,15 @@ const moveForwardUpdate: DragUpdate = {
     index: initialPublishArgs.critical.draggable.index + 1,
   },
   combine: null,
+};
+
+const combineUpdate: DragUpdate = {
+  ...getDragStart(),
+  destination: null,
+  combine: {
+    draggableId: preset.inHome2.descriptor.id,
+    droppableId: initialPublishArgs.critical.droppable.id,
+  },
 };
 
 const start = (dispatch: Dispatch) => {
@@ -62,14 +74,16 @@ const end = (dispatch: Dispatch) => {
 
 const cases: Case[] = [
   {
-    title: 'onDragStart',
+    hook: 'onDragStart',
     execute: (store: Store) => {
       start(store.dispatch);
     },
     defaultMessage: messagePreset.onDragStart(getDragStart()),
   },
   {
-    title: 'onDragUpdate',
+    // a reorder upate
+    hook: 'onDragUpdate',
+    description: 'a reorder update',
     execute: (store: Store) => {
       start(store.dispatch);
       update(store.dispatch);
@@ -77,7 +91,23 @@ const cases: Case[] = [
     defaultMessage: messagePreset.onDragUpdate(moveForwardUpdate),
   },
   {
-    title: 'onDragEnd',
+    // a combine update
+    hook: 'onDragUpdate',
+    description: 'a combine update',
+    execute: (store: Store) => {
+      start(store.dispatch);
+      store.dispatch(
+        updateDroppableIsCombineEnabled({
+          id: initialPublishArgs.critical.droppable.id,
+          isCombineEnabled: true,
+        }),
+      );
+      update(store.dispatch);
+    },
+    defaultMessage: messagePreset.onDragUpdate(combineUpdate),
+  },
+  {
+    hook: 'onDragEnd',
     execute: (store: Store) => {
       start(store.dispatch);
       update(store.dispatch);
@@ -91,7 +121,9 @@ const cases: Case[] = [
 ];
 
 cases.forEach((current: Case) => {
-  describe(`for hook: ${current.title}`, () => {
+  describe(`for hook: ${current.hook}${
+    current.description ? `: ${current.description}` : ''
+  }`, () => {
     let hooks: Hooks;
     let announce: Announce;
     let store: Store;
@@ -104,11 +136,11 @@ cases.forEach((current: Case) => {
 
     it('should announce with the default message if no hook is provided', () => {
       // This test is not relevant for onDragEnd as it must always be provided
-      if (current.title === 'onDragEnd') {
+      if (current.hook === 'onDragEnd') {
         return;
       }
       // unsetting hook
-      hooks[current.title] = undefined;
+      hooks[current.hook] = undefined;
       current.execute(store);
       expect(announce).toHaveBeenCalledWith(current.defaultMessage);
     });
@@ -120,7 +152,7 @@ cases.forEach((current: Case) => {
 
     it('should not announce twice if the hook makes an announcement', () => {
       // $ExpectError - property does not exist on hook property
-      hooks[current.title] = jest.fn((data: any, provided: HookProvided) => {
+      hooks[current.hook] = jest.fn((data: any, provided: HookProvided) => {
         announce.mockReset();
         provided.announce('hello');
         expect(announce).toHaveBeenCalledWith('hello');
@@ -136,7 +168,7 @@ cases.forEach((current: Case) => {
 
       let provided: HookProvided;
       // $ExpectError - property does not exist on hook property
-      hooks[current.title] = jest.fn((data: any, supplied: HookProvided) => {
+      hooks[current.hook] = jest.fn((data: any, supplied: HookProvided) => {
         announce.mockReset();
         provided = supplied;
       });
@@ -165,7 +197,7 @@ cases.forEach((current: Case) => {
 
       let provided: HookProvided;
       // $ExpectError - property does not exist on hook property
-      hooks[current.title] = jest.fn((data: any, supplied: HookProvided) => {
+      hooks[current.hook] = jest.fn((data: any, supplied: HookProvided) => {
         announce.mockReset();
         provided = supplied;
         provided.announce('hello');

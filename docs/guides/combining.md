@@ -22,6 +22,39 @@ In order to enable combining you need to set `isCombineEnabled` to `true` on a `
 
 When `isCombineEnabled` is set on a list _any_ item in the list can be combine with. You can toggle `isCombineEnabled` during a drag.
 
+## When we combine and when we reorder
+
+`react-beautiful-dnd` works hard to ensure that users are able to combine and reorder within the same list in a way that feels intuitive and natural.
+
+| When entering from the start                                                                                             | When entering from the end                                                                                                |
+| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| Theory                                                                                                                   |
+| ![enter-from-top](https://user-images.githubusercontent.com/2182637/48168370-08844400-e343-11e8-8954-6b4f3c5c825e.png)   | ![enter-from-bottom](https://user-images.githubusercontent.com/2182637/48168369-07ebad80-e343-11e8-9402-caf6e91307a3.png) |
+| In practice                                                                                                              |
+| ![enter-from-start](https://user-images.githubusercontent.com/2182637/48169676-49cb2280-e348-11e8-8f11-5eeaf392cae6.gif) | ![enter-from-end](https://user-images.githubusercontent.com/2182637/48169675-49cb2280-e348-11e8-854a-04b913d3851b.gif)    |
+
+### How it works
+
+> You do not really need to know how this works, but if you are interested you are welcome to read on. We are using the language 'forward', 'backwards', 'start', 'end' as it is `axis` independent
+
+If a user moves the center point of a `Draggable` over a visible edge of a target `Draggable` then the user will be able to combine with the target.
+
+We detect which direction the user is moving in when they cross the visible edge of a `Draggable`. We use this to know if they entered closer to the front or the back of the item.
+
+If they entered closer to the _start of the item_, the the user will be able to combine with the item when they are moving in the _start 2/3_ of the item. This includes forwards and backwards movements.
+
+If they entered closer to the _end of the item_, the the user will be able to combine with the item when they are moving in the _end 2/3_ of the item. This includes forwards and backwards movements.
+
+> We allow 2/3 of the size as this will allow users to combine items when the centers of the items are on top of each other
+
+If the user moves beyond the 2/3 allocated, then the target item will reorder as normal.
+
+Combining is displacement aware. This means that if you try to combine with an item that is already displaced, that displacement will be respected and the user will be able to combine with the item while it is displaced. This yields a really nice user experience
+
+![combine-with-displaced](https://user-images.githubusercontent.com/2182637/48169674-49328c00-e348-11e8-8d35-d3d41916cd89.gif)
+
+> Combining with a displaced item works as expected
+
 ## Current limitations
 
 - No granular control over which items can be combined with within the list. We could move to the `isCombineEnabled` prop from a `Droppable` to a `Draggable` to allow this sort of customisation. However, in order to ship this huge feature we went a bit simplier to start with
