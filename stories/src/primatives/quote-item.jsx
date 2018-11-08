@@ -34,8 +34,6 @@ const Container = styled('a')`
   padding: ${grid}px;
   min-height: 40px;
   margin-bottom: ${grid}px;
-  margin-left: ${grid}px;
-  margin-right: ${grid}px;
   user-select: none;
 
   /* anchor overrides */
