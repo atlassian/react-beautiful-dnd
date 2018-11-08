@@ -20,7 +20,7 @@ export default (getMarshal: () => DimensionMarshal) => ({
 
   // flush dropping animation if needed
   // this can change the descriptor of the dragging item
-  // Will call the onDragEnd hooks
+  // Will call the onDragEnd handle
   if (initial.phase === 'DROP_ANIMATING') {
     dispatch(completeDrop(initial.pending.result));
   }

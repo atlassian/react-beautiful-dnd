@@ -11,7 +11,7 @@ import type {
   DragUpdate,
   DropResult,
 } from '../../../src';
-import type { Hooks } from '../../../src/types';
+import type { Handles } from '../../../src/types';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import { getComputedSpacing } from '../../utils/dimension';
 
@@ -109,15 +109,15 @@ class App extends React.Component<*, State> {
 
 jest.useFakeTimers();
 it('should allow the changing of combining in onDragStart', () => {
-  const hooks: Hooks = {
+  const handles: Handles = {
     onDragStart: jest.fn(),
     onDragUpdate: jest.fn(),
     onDragEnd: jest.fn(),
   };
-  const wrapper: ReactWrapper = mount(<App {...hooks} />);
+  const wrapper: ReactWrapper = mount(<App {...handles} />);
 
   pressSpacebar(wrapper.find('.drag-handle').first());
-  // flush onDragStart  hook
+  // flush onDragStart handle
   jest.runOnlyPendingTimers();
 
   const start: DragStart = {
@@ -129,7 +129,7 @@ it('should allow the changing of combining in onDragStart', () => {
     type: 'DEFAULT',
     mode: 'SNAP',
   };
-  expect(hooks.onDragStart).toHaveBeenCalledWith(start);
+  expect(handles.onDragStart).toHaveBeenCalledWith(start);
 
   // now moving down will cause a combine impact!
   pressArrowDown(wrapper.find('.drag-handle').first());
@@ -142,5 +142,5 @@ it('should allow the changing of combining in onDragStart', () => {
       droppableId: 'droppable',
     },
   };
-  expect(hooks.onDragUpdate).toHaveBeenCalledWith(update);
+  expect(handles.onDragUpdate).toHaveBeenCalledWith(update);
 });

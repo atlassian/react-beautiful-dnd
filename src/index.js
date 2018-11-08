@@ -21,13 +21,13 @@ export type {
   DragStart,
   DragUpdate,
   DropResult,
-  HookProvided,
+  HandleProvided,
   Announce,
   DraggableLocation,
-  OnBeforeDragStartHook,
-  OnDragStartHook,
-  OnDragUpdateHook,
-  OnDragEndHook,
+  OnBeforeDragStartHandle,
+  OnDragStartHandle,
+  OnDragUpdateHandle,
+  OnDragEndHandle,
 } from './types';
 
 // Droppable
