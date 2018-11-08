@@ -1,7 +1,7 @@
 // @flow
-import type { Hooks } from '../../../../../../src/types';
+import type { Handles } from '../../../../../../src/types';
 
-export default (): Hooks => ({
+export default (): Handles => ({
   onBeforeDragStart: jest.fn(),
   onDragStart: jest.fn(),
   onDragUpdate: jest.fn(),

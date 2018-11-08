@@ -1,44 +1,44 @@
-# Hooks
+# Handles
 
-> `DragDropContext > Hooks`
+> `DragDropContext > Handles`
 
-Hooks are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
+Handles are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
 
 > For more information about controlling the screen reader see our [screen reader guide](docs/guides/screen-reader.md)
 
-## What hooks are available?
+## What handles are available?
 
 ### Primary
 
 - `onDragStart`: A drag has started
 - `onDragUpdate`: Something has changed during a drag
-- `onDragEnd` **(required)**: A drag has ended. It is the responsibility of this hook to synchronously apply changes that has resulted from the drag
+- `onDragEnd` **(required)**: A drag has ended. It is the responsibility of this handle to synchronously apply changes that has resulted from the drag
 
 ### Secondary
 
-> Generally you will not need to use `onBeforeDragStart`, and it has a slightly different function signature to the rest of the hooks
+> Generally you will not need to use `onBeforeDragStart`, and it has a slightly different function signature to the rest of the handles
 
 - `onBeforeDragStart`: Called just before `onDragStart`. It is called immediately before any `snapshot` values are updated. It can be useful to do dimension locking for [table reordering](docs/patterns/tables.md).
 
-## The second argument to hooks: `provided: HookProvided`
+## The second argument to handles: `provided: HandleProvided`
 
 ```js
-type HookProvided = {|
+type HandleProvided = {|
   announce: Announce,
 |};
 
 type Announce = (message: string) => void;
 ```
 
-All hooks (except for `onBeforeDragStart`) are provided with a second argument: `HookProvided`. This object has one property: `announce`. This function is used to synchronously announce a message to screen readers. If you do not use this function we will announce a default english message. We have created a [guide for screen reader usage](docs/guides/screen-reader.md) which we recommend using if you are interested in controlling the screen reader messages for yourself and to support internationalisation. If you are using `announce` it must be called synchronously.
+All handles (except for `onBeforeDragStart`) are provided with a second argument: `HandleProvided`. This object has one property: `announce`. This function is used to synchronously announce a message to screen readers. If you do not use this function we will announce a default english message. We have created a [guide for screen reader usage](docs/guides/screen-reader.md) which we recommend using if you are interested in controlling the screen reader messages for yourself and to support internationalisation. If you are using `announce` it must be called synchronously.
 
 ## `onDragStart` (optional)
 
 ```js
-type OnDragStartHook = (start: DragStart, provided: HookProvided) => mixed;
+type OnDragStartHandle = (start: DragStart, provided: HandleProvided) => mixed;
 ```
 
-`onDragStart` will get notified when a drag starts. This hook is _optional_ and therefore does not need to be provided. It is **highly recommended** that you use this function to block updates to all `Draggable` and `Droppable` components during a drag. (See **Block updates during a drag** below)
+`onDragStart` will get notified when a drag starts. This handle is _optional_ and therefore does not need to be provided. It is **highly recommended** that you use this function to block updates to all `Draggable` and `Droppable` components during a drag. (See **Block updates during a drag** below)
 
 You are provided with the following details:
 
@@ -63,7 +63,7 @@ type DragStart = {|
 **Note:** while the return type is `mixed`, the return value is not used.
 
 ```js
-type OnDragStartHook = (start: DragStart, provided: HookProvided) => mixed;
+type OnDragStartHandle = (start: DragStart, provided: HandleProvided) => mixed;
 
 // supporting types
 type DragStart = {|
@@ -88,10 +88,13 @@ export type MovementMode = 'FLUID' | 'SNAP';
 ## `onDragUpdate` (optional)
 
 ```js
-type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => mixed;
+type OnDragUpdateHandle = (
+  update: DragUpdate,
+  provided: HandleProvided,
+) => mixed;
 ```
 
-This hook is called whenever something changes during a drag. The possible changes are:
+This handle is called whenever something changes during a drag. The possible changes are:
 
 - The position of the `Draggable` has changed
 - The `Draggable` is now over a different `Droppable`
@@ -140,36 +143,36 @@ type DropReason = 'DROP' | 'CANCEL';
 ```
 
 - `...DragUpdate`: _see above_
-- `result.reason`: the reason a drop occurred. This information can be helpful in crafting more useful messaging in the `HookProvided` > `announce` function.
+- `result.reason`: the reason a drop occurred. This information can be helpful in crafting more useful messaging in the `HandleProvided` > `announce` function.
 
 ## Secondary: `onBeforeDragStart`
 
-> The use cases for this hook is super limited
+> The use cases for this handle is super limited
 
-Once we have all of the information we need to start a drag we call the `onBeforeDragStart` function. This is called just before we update the `snapshot` values for the `Draggable` and `Droppable` components. At this point the application is not in a dragging state and so changing of props such as `isDropDisabled` will fail. The `onBeforeDragStart` hook is a good opportunity to do any dimension locking required for [table reordering](docs/patterns/tables.md).
+Once we have all of the information we need to start a drag we call the `onBeforeDragStart` function. This is called just before we update the `snapshot` values for the `Draggable` and `Droppable` components. At this point the application is not in a dragging state and so changing of props such as `isDropDisabled` will fail. The `onBeforeDragStart` handle is a good opportunity to do any dimension locking required for [table reordering](docs/patterns/tables.md).
 
 - ✅ Can apply modifications to existing components to lock their sizes
 - ❌ Cannot remove or add any `Draggable` or `Droppable`
 - ❌ Cannot modify the sizes of any `Draggable` or `Droppable`
 - ❌ No screen reader announcement yet
 
-### `OnBeforeDragStartHook` type information
+### `OnBeforeDragStartHandle` type information
 
 **Note:** while the return type is `mixed`, the return value is not used.
 
 ```js
 // No second 'provided' argument
-type OnBeforeDragStartHook = (start: DragStart) => mixed;
+type OnBeforeDragStartHandle = (start: DragStart) => mixed;
 
-// Otherwise the same type information as OnDragStartHook
+// Otherwise the same type information as OnDragStartHandle
 ```
 
-## When are the hooks called?
+## When are the handles called?
 
 ### Phase 1: prepare
 
 - User initiates a drag
-- We prepare and collect information required for the drag (async). If the drag ends before this phase is completed then no hooks will be fired.
+- We prepare and collect information required for the drag (async). If the drag ends before this phase is completed then no handles will be fired.
 
 ### Phase 2: publish
 

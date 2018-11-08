@@ -5,17 +5,17 @@ import {
   completeDrop,
   initialPublish,
 } from '../../../../../src/state/action-creators';
-import middleware from '../../../../../src/state/middleware/hooks';
+import middleware from '../../../../../src/state/middleware/handles';
 import {
   getDragStart,
   initialPublishArgs,
 } from '../../../../utils/preset-action-args';
 import createStore from '../util/create-store';
 import getAnnounce from './util/get-announce-stub';
-import createHooks from './util/get-hooks-stub';
+import createHandles from './util/get-handles-stub';
 import type {
   DraggableLocation,
-  Hooks,
+  Handles,
   State,
   DropResult,
 } from '../../../../../src/types';
@@ -24,13 +24,13 @@ import type { Store } from '../../../../../src/state/store-types';
 jest.useFakeTimers();
 
 it('should call onDragEnd with the last published critical descriptor', () => {
-  const hooks: Hooks = createHooks();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
+  const handles: Handles = createHandles();
+  const store: Store = createStore(middleware(() => handles, getAnnounce()));
 
   store.dispatch(clean());
   store.dispatch(initialPublish(initialPublishArgs));
   jest.runOnlyPendingTimers();
-  expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+  expect(handles.onDragStart).toHaveBeenCalledTimes(1);
 
   store.dispatch(clean());
   const expected: DropResult = {
@@ -39,12 +39,12 @@ it('should call onDragEnd with the last published critical descriptor', () => {
     combine: null,
     reason: 'CANCEL',
   };
-  expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, expect.any(Object));
+  expect(handles.onDragEnd).toHaveBeenCalledWith(expected, expect.any(Object));
 });
 
 it('should publish an onDragEnd with no destination even if there is a current destination', () => {
-  const hooks: Hooks = createHooks();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
+  const handles: Handles = createHandles();
+  const store: Store = createStore(middleware(() => handles, getAnnounce()));
 
   store.dispatch(clean());
   store.dispatch(initialPublish(initialPublishArgs));
@@ -67,18 +67,18 @@ it('should publish an onDragEnd with no destination even if there is a current d
     combine: null,
     reason: 'CANCEL',
   };
-  expect(hooks.onDragEnd).toHaveBeenCalledWith(expected, expect.any(Object));
+  expect(handles.onDragEnd).toHaveBeenCalledWith(expected, expect.any(Object));
 });
 
 it('should not publish an onDragEnd if aborted after a drop', () => {
-  const hooks: Hooks = createHooks();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
+  const handles: Handles = createHandles();
+  const store: Store = createStore(middleware(() => handles, getAnnounce()));
 
   // lift
   store.dispatch(clean());
   store.dispatch(initialPublish(initialPublishArgs));
   jest.runOnlyPendingTimers();
-  expect(hooks.onDragStart).toHaveBeenCalled();
+  expect(handles.onDragStart).toHaveBeenCalled();
 
   // drop
   const result: DropResult = {
@@ -88,24 +88,24 @@ it('should not publish an onDragEnd if aborted after a drop', () => {
     reason: 'CANCEL',
   };
   store.dispatch(completeDrop(result));
-  expect(hooks.onDragEnd).toHaveBeenCalledTimes(1);
+  expect(handles.onDragEnd).toHaveBeenCalledTimes(1);
   // $ExpectError - unknown mock reset property
-  hooks.onDragEnd.mockReset();
+  handles.onDragEnd.mockReset();
 
   // abort
   store.dispatch(clean());
-  expect(hooks.onDragEnd).not.toHaveBeenCalled();
+  expect(handles.onDragEnd).not.toHaveBeenCalled();
 });
 
 it('should publish an on drag end if aborted before the publish of an onDragStart', () => {
-  const hooks: Hooks = createHooks();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
+  const handles: Handles = createHandles();
+  const store: Store = createStore(middleware(() => handles, getAnnounce()));
 
   // lift
   store.dispatch(clean());
   store.dispatch(initialPublish(initialPublishArgs));
   // onDragStart not flushed yet
-  expect(hooks.onDragStart).not.toHaveBeenCalled();
+  expect(handles.onDragStart).not.toHaveBeenCalled();
 
   // drop
   const result: DropResult = {
@@ -115,8 +115,8 @@ it('should publish an on drag end if aborted before the publish of an onDragStar
     reason: 'CANCEL',
   };
   store.dispatch(completeDrop(result));
-  expect(hooks.onDragEnd).toHaveBeenCalledTimes(1);
+  expect(handles.onDragEnd).toHaveBeenCalledTimes(1);
 
   // validation - onDragStart has been flushed
-  expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+  expect(handles.onDragStart).toHaveBeenCalledTimes(1);
 });
