@@ -1,5 +1,5 @@
 // @flow
-import { type BoxModel, type Position, type Rect } from 'css-box-model';
+import { type BoxModel, type Position } from 'css-box-model';
 import type {
   Axis,
   DroppableDimension,
@@ -76,11 +76,10 @@ export default ({
     };
   })();
 
-  const subjectPageMarginBox: Rect = page.marginBox;
   const axis: Axis = direction === 'vertical' ? vertical : horizontal;
 
   const subject: DroppableSubject = getSubject({
-    pageMarginBox: subjectPageMarginBox,
+    page,
     withPlaceholder: null,
     axis,
     frame,

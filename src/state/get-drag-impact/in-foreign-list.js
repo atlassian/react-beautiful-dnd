@@ -45,6 +45,7 @@ export default ({
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
+    // always displace forward in foreign list
     true,
   );
 

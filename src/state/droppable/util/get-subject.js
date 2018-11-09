@@ -1,5 +1,5 @@
 // @flow
-import { getRect, type Rect, type Spacing } from 'css-box-model';
+import { getRect, type Rect, type Spacing, type BoxModel } from 'css-box-model';
 import type {
   Axis,
   Scrollable,
@@ -39,24 +39,24 @@ const clip = (target: Spacing, frame: ?Scrollable): ?Rect => {
 };
 
 type Args = {|
-  pageMarginBox: Rect,
+  page: BoxModel,
   withPlaceholder: ?PlaceholderInSubject,
   axis: Axis,
   frame: ?Scrollable,
 |};
 
 export default ({
-  pageMarginBox,
+  page,
   withPlaceholder,
   axis,
   frame,
 }: Args): DroppableSubject => {
-  const scrolled: Spacing = scroll(pageMarginBox, frame);
+  const scrolled: Spacing = scroll(page.marginBox, frame);
   const increased: Spacing = increase(scrolled, axis, withPlaceholder);
   const clipped: ?Rect = clip(increased, frame);
 
   return {
-    pageMarginBox,
+    page,
     withPlaceholder,
     active: clipped,
   };

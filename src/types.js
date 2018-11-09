@@ -112,7 +112,7 @@ export type PlaceholderInSubject = {|
 
 export type DroppableSubject = {|
   // raw, unchanging
-  pageMarginBox: Rect,
+  page: BoxModel,
   withPlaceholder: ?PlaceholderInSubject,
   // The hitbox for a droppable
   // - page margin box
