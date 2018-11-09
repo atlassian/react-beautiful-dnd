@@ -92,7 +92,7 @@ const gap: number = 10;
 
           const expected: DroppableSubject = {
             // unchanged
-            pageMarginBox: withoutFrame.subject.pageMarginBox,
+            page: withoutFrame.subject.page,
             active: withoutFrame.subject.active,
             // added
             withPlaceholder: {
@@ -118,7 +118,7 @@ const gap: number = 10;
           invariant(active);
           const expected: DroppableSubject = {
             // unchanged
-            pageMarginBox: withoutFrame.subject.pageMarginBox,
+            page: withoutFrame.subject.page,
             // increased
             active: getRect({
               ...active,
@@ -182,7 +182,7 @@ const gap: number = 10;
 
         const expected: DroppableSubject = {
           // unchanged
-          pageMarginBox: withFrame.subject.pageMarginBox,
+          page: withFrame.subject.page,
           active: withFrame.subject.active,
           // added
           withPlaceholder: {
@@ -215,7 +215,7 @@ const gap: number = 10;
         invariant(active);
         const expected: DroppableSubject = {
           // unchanged
-          pageMarginBox: withFrame.subject.pageMarginBox,
+          page: withFrame.subject.page,
           // increased
           active: getRect({
             ...active,
