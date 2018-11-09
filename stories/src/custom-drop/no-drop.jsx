@@ -68,6 +68,7 @@ const List = styled('div')`
   font-size: 16px;
   line-height: 1.5;
   width: 200px;
+  margin: ${grid}px;
 `;
 const initial: Task[] = Array.from(
   { length: 10 },

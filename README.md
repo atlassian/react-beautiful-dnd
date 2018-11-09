@@ -144,7 +144,13 @@ With things moving a lot it would be easy for the user to become distracted by t
 
 ### Dropping
 
-When you drop a dragging item its movement is based on physics (thanks [`react-motion`](https://github.com/chenglou/react-motion)). This results in the drop feeling more weighted and physical.
+We have designed a drop animation that feels weighted and physical. It is based on a [`spring`](https://developer.android.com/guide/topics/graphics/spring-animation) and uses a CSS animation with a dynamic duration to achieve the effect.
+
+![result-curve](https://user-images.githubusercontent.com/2182637/48235467-1ce34200-e412-11e8-8c69-2060a0c2f61a.png)
+
+> Animation curve used when dropping. Duration is dynamic based on distance to travel
+
+You can tweak the drop animation if you would like to. We have created a guide: [drop animation](/docs/guides/drop-animation.md)
 
 ### Moving out of the way
 
@@ -158,7 +164,7 @@ How it is composed:
 
 ![animation curve](https://raw.githubusercontent.com/alexreardon/files/master/resources/dnd-ease-in-out-small.png?raw=true)
 
-> animation curve used when moving out of the way
+> Animation curve used when moving out of the way
 
 ## Caring about the interaction details
 
@@ -1020,7 +1026,7 @@ const myOnMouseDown = event => console.log('mouse down on', event.target);
 type DraggableStateSnapshot = {|
   // Set to true if a Draggable is being actively dragged, or if it is drop animating
   // Both active dragging and the drop animation are considered part of the drag
-  // Generally this is the only property you will be using
+  // *Generally this is the only property you will be using*
   isDragging: boolean,
   // Set to true if a Draggable is drop animating. Not every drag and drop interaction
   // as a drop animation. There is no drop animation when a Draggable is already in its final
@@ -1034,6 +1040,9 @@ type DraggableStateSnapshot = {|
   combineWith: ?DraggableId,
   // if something else is dragging and you are a combine target, then this is the id of the item that is dragging
   combineTargetFor: ?DraggableId,
+  // There are two modes that a drag can be in
+  // 'FLUID': everything is done in response to highly granular input (eg mouse)
+  // 'SNAP': items snap between positions (eg keyboard);
   mode: ?MovementMode,
 |};
 ```

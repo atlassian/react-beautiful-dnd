@@ -215,7 +215,7 @@ export type PagePositions = {|
 
 // There are two seperate modes that a drag can be in
 // FLUID: everything is done in response to highly granular input (eg mouse)
-// SNAP: items move in response to commands (eg arrowDown);
+// SNAP: items move in response to commands (eg keyboard);
 export type MovementMode = 'FLUID' | 'SNAP';
 
 export type DragPositions = {|
