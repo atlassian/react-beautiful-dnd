@@ -195,7 +195,7 @@ describe('handling drag handle events', () => {
           .props()
           .callbacks.onDrop();
 
-        expect(dispatchProps.drop).toBeCalled();
+        expect(dispatchProps.drop).toHaveBeenCalled();
       });
     });
 
@@ -298,7 +298,7 @@ describe('handling drag handle events', () => {
           .props()
           .callbacks.onCancel();
 
-        expect(dispatchProps.drop).toBeCalled();
+        expect(dispatchProps.drop).toHaveBeenCalled();
       });
     });
 
@@ -315,7 +315,7 @@ describe('handling drag handle events', () => {
           .props()
           .callbacks.onWindowScroll();
 
-        expect(dispatchProps.moveByWindowScroll).toBeCalledWith({
+        expect(dispatchProps.moveByWindowScroll).toHaveBeenCalledWith({
           newScroll: viewport.scroll.current,
         });
       });

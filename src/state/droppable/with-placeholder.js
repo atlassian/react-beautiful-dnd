@@ -21,6 +21,7 @@ const getRequiredGrowthForPlaceholder = (
 ): ?Position => {
   const axis: Axis = droppable.axis;
   // TODO: consider margin collapsing?
+  // Using contentBox as that is where the Draggables will sit
   const availableSpace: number = droppable.subject.page.contentBox[axis.size];
   const insideDroppable: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable.descriptor.id,
