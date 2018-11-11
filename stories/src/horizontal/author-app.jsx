@@ -1,20 +1,17 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'react-emotion';
-import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src';
-import type { DropResult, DragStart } from '../../../src';
+import type { DropResult } from '../../../src';
 import type { Quote } from '../types';
 import AuthorList from '../primatives/author-list';
 import reorder from '../reorder';
 import { colors, grid } from '../constants';
 
-const publishOnDragStart = action('onDragStart');
-const publishOnDragEnd = action('onDragEnd');
-
 type Props = {|
   initial: Quote[],
   internalScroll?: boolean,
+  isCombineEnabled?: boolean,
 |};
 
 type State = {|
@@ -28,18 +25,23 @@ const Root = styled('div')`
 
 export default class AuthorApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
+  static defaultProps = {
+    isCombineEnabled: false,
+  };
 
   state: State = {
     quotes: this.props.initial,
   };
   /* eslint-enable react/sort-comp */
 
-  onDragStart = (initial: DragStart) => {
-    publishOnDragStart(initial);
-  };
-
   onDragEnd = (result: DropResult) => {
-    publishOnDragEnd(result);
+    // super simple, just removing the dragging item
+    if (result.combine) {
+      const quotes: Quote[] = [...this.state.quotes];
+      quotes.splice(result.source.index, 1);
+      this.setState({ quotes });
+      return;
+    }
 
     // dropped outside the list
     if (!result.destination) {
@@ -63,14 +65,12 @@ export default class AuthorApp extends Component<Props, State> {
 
   render() {
     return (
-      <DragDropContext
-        onDragStart={this.onDragStart}
-        onDragEnd={this.onDragEnd}
-      >
+      <DragDropContext onDragEnd={this.onDragEnd}>
         <Root>
           <AuthorList
             listId="AUTHOR"
             internalScroll={this.props.internalScroll}
+            isCombineEnabled={this.props.isCombineEnabled}
             quotes={this.state.quotes}
           />
         </Root>

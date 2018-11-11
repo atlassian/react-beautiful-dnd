@@ -22,7 +22,7 @@ We can break the user experience down in three phases.
 
 ## Announcements
 
-Keep in mind that internally `react-beautiful-dnd` is not aware of multi drag. Therefore it is advised that you use the `HookProvided > Announce` to announce meaningful screen reader messages for a multi drag. See our [screen reader guide](docs/guides/screen-reader.md) for details on how to control screen reader messaging.
+Keep in mind that internally `react-beautiful-dnd` is not aware of multi drag. Therefore it is advised that you use the `ResponderProvided > Announce` to announce meaningful screen reader messages for a multi drag. See our [screen reader guide](docs/guides/screen-reader.md) for details on how to control screen reader messaging.
 
 ## Selection
 

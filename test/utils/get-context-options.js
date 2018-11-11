@@ -23,7 +23,6 @@ export const withStore = () => ({
     [storeKey]: createStore({
       getDimensionMarshal: () => getMarshalStub(),
       styleMarshal: {
-        collecting: jest.fn(),
         dragging: jest.fn(),
         dropping: jest.fn(),
         resting: jest.fn(),
@@ -31,7 +30,7 @@ export const withStore = () => ({
         unmount: jest.fn(),
         mount: jest.fn(),
       },
-      getHooks: () => ({
+      getResponders: () => ({
         onDragEnd: () => {},
       }),
       announce: () => {},

@@ -27,7 +27,7 @@ An `SVGElement` does not implement `HTMLElement`, and directly extends `Element`
 
 One of the core values of `react-beautiful-dnd` is accessibility
 
-> Beautiful, **accessible** drag and drop for lists with React.js
+> Beautiful and **accessible** drag and drop for lists with `React`
 
 ## But I want to drag using a `<svg>`!
 

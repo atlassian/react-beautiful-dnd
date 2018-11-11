@@ -1,18 +1,19 @@
 // @flow
-import invariant from 'tiny-invariant';
-
 type Records = {
   [key: string]: number,
 };
 
 const records: Records = {};
+let isEnabled: boolean = false;
 
-const flag: string = '__react-beautiful-dnd-debug-timings-hook__';
+const isTimingsEnabled = (): boolean => isEnabled;
 
-const isTimingsEnabled = (): boolean => Boolean(window[flag]);
+export const forceEnable = () => {
+  isEnabled = true;
+};
 
 // Debug: uncomment to enable
-// window[flag] = true;
+// forceEnable();
 
 export const start = (key: string) => {
   // we want to strip all the code out for production builds
@@ -41,7 +42,11 @@ export const finish = (key: string) => {
 
     const previous: ?number = records[key];
 
-    invariant(previous, 'cannot finish timing as no previous time found');
+    if (!previous) {
+      // eslint-disable-next-line no-console
+      console.warn('cannot finish timing as no previous time found', key);
+      return;
+    }
 
     const result: number = now - previous;
     const rounded: string = result.toFixed(2);
@@ -69,7 +74,7 @@ export const finish = (key: string) => {
     console.log(
       `${style.symbol} %cTiming %c${rounded} %cms %c${key}`,
       // title
-      'color: blue; font-weight: bold; ',
+      'color: blue; font-weight: bold;',
       // result
       `color: ${style.textColor}; font-size: 1.1em;`,
       // ms

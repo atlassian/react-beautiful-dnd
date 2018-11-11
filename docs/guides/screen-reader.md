@@ -14,9 +14,30 @@ Choose a tone that best supports what your audience is trying to do. If you need
 
 ## How to control announcements
 
-The `announce` function is provided to each of the `DragDropContext > Hook` functions and can be used to deliver your own screen reader messages. Messages will be immediately read out. It's important to deliver messages immediately, so your users have a fast and responsive experience.
+The `announce` function is provided to each of the `DragDropContext > Responder` functions and can be used to deliver your own screen reader messages. Messages will be immediately read out. It's important to deliver messages immediately, so your users have a fast and responsive experience.
 
 If you attempt to hold onto the `announce` function and call it later, it won't work and will just print a warning to the console. If you try to call announce twice for the same event, only the first will be read by the screen reader with subsequent calls to announce being ignored and a warning printed.
+
+## Use position, not index
+
+> `position = index + 1`
+
+When making a screen reader announcement we recommend announcing the position of an item in a list, rather than an index. index based listed start at `0`, where as position based lists start a `1`.
+
+It reads more natural to hear "You have moved an item to position 2" than "You have moved an item to index 1"
+
+```js
+const position = index => index + 1;
+
+const startPosition = position(source.index);
+const endPosition = destination ? position(destination.index) : null;
+```
+
+## Use names where possible
+
+All of our built in screen reader messages use `id`'s to identify `Draggable` and `Droppable`s. You might want to consider replacing these with more readable names.
+
+> Potentially this could be a prop for `Draggable` and `Droppable` 🤔. Please raise an issue if you would like to see this happen!
 
 ## Instructions to cover
 
@@ -39,7 +60,7 @@ Think about substituting the word "item" for a noun that matches your problem do
 
 When a user lifts a `Draggable` by using the `spacebar` we want to tell them a number of things.
 
-**Default message**: "You have lifted an item in position `${start.source.index + 1}`. Use the arrow keys to move, space bar to drop, and escape to cancel."
+**Default message**: "You have lifted an item in position `${startPosition}`. Use the arrow keys to move, space bar to drop, and escape to cancel."
 
 We tell the user the following:
 
@@ -51,10 +72,10 @@ Notice that we don't tell them that they are in position `1 of x`. This is becau
 
 **Message with more info**: "You have lifted an item in position `${startPosition}` of `${listLength}` in the `${listName}` list. Use the arrow keys to move, space bar to drop, and escape to cancel."
 
-You control the message printed to the user through the `DragDropContext` > `onDragStart` hook
+You control the message printed to the user through the `DragDropContext` > `onDragStart` responder
 
 ```js
-onDragStart = (start: DragStart, provided: HookProvided) => {
+onDragStart = (start: DragStart, provided: ResponderProvided) => {
   provided.announce('My super cool message');
 };
 ```
@@ -63,10 +84,10 @@ onDragStart = (start: DragStart, provided: HookProvided) => {
 
 When a user has started a drag, there are different scenarios that can spring from that, so we'll create different messaging for each scenario.
 
-We can control the announcement through the `DragDropContext` > `onDragUpdate` hook.
+We can control the announcement through the `DragDropContext` > `onDragUpdate` responder.
 
 ```js
-onDragUpdate = (update: DragUpdate, provided: HookProvided) => {
+onDragUpdate = (update: DragUpdate, provided: ResponderProvided) => {
   provided.announce('Update message');
 };
 ```
@@ -75,7 +96,7 @@ onDragUpdate = (update: DragUpdate, provided: HookProvided) => {
 
 The user has moved backwards or forwards within the same list, so we want to tell the user what position they are now in.
 
-**Default message**: "You have moved the item to position `${update.destination.index + 1}`".
+**Default message**: "You have moved the item from position `${startPosition}` to position `${endPosition}`"
 
 Think about including of `${listLength}` in your messaging.
 
@@ -83,7 +104,7 @@ Think about including of `${listLength}` in your messaging.
 
 The user has moved on the cross axis into a different list, so we want to tell them a number of things.
 
-**Default message**: "You have moved the item from list `${update.source.droppableId}` in position `${update.source.index + 1}` to list `${update.destination.droppableId}` in position `${update.destination.index + 1}`".
+**Default message** "You have moved the item from position `${startPosition}` in list `${source.droppableId}` to list `${destination.droppableId}` in position `${endPosition}`"
 
 We tell the user the following:
 
@@ -94,9 +115,21 @@ We tell the user the following:
 
 Think about using friendlier text for the name of the droppable, and including the length of the lists in the messaging.
 
-**Message with more info**: "You have moved the item from list `${sourceName}` in position `${lastIndex}` of `${sourceLength}` to list `${destinationName}` in position `${newIndex}` of `${destinationLength}`".
+**Message with more info**: "You have moved the item from list `${sourceName}` in position `${sourcePosition}` of `${sourceLength}` to list `${destinationName}` in position `${newPosition}` of `${destinationLength}`".
 
-#### Scenario 3. Moved over no list
+#### Scenario 4. Combining in same list
+
+The user has moved over another `Draggable` in [combine mode](/docs/guides/combining.md) in the same list
+
+**Default message** "The item `${source.draggableId}` has been combined with `${combine.draggableId}`"
+
+#### Scenario 5: Combining in different list
+
+The user has moved over another `Draggable` in [combine mode](/docs/guides/combining.md) in a list that is not the list the dragging item started in
+
+**Default message** "The item `${source.draggableId}` in list `${source.droppableId}` has been combined with `${combine.draggableId}` in list `${combine.droppableId}`"
+
+#### Scenario 6. Over no drop target
 
 You can't do this with a keyboard, but it's worthwhile having a message for this scenario, in case the user has a pointer for dragging.
 
@@ -106,14 +139,14 @@ Think about how you could make this messaging friendlier and clearer.
 
 ### Step 4: On drop
 
-There are two ways a drop can happen. Either the drag is cancelled or the user drops the dragging item. You can control the messaging for these events using the `DragDropContext > onDragEnd` hook.
+There are two ways a drop can happen. Either the drag is cancelled or the user drops the dragging item. You can control the messaging for these events using the `DragDropContext > onDragEnd` responder.
 
 #### Scenario 1. Drag cancelled
 
 A `DropResult` object has a `reason` property which can either be `DROP` or `CANCEL`. You can use this to announce your cancel message.
 
 ```js
-onDragEnd = (result: DropResult, provided: HookProvided) => {
+onDragEnd = (result: DropResult, provided: ResponderProvided) => {
   if (result.reason === 'CANCEL') {
     provided.announce('Your cancel message');
     return;
@@ -121,7 +154,7 @@ onDragEnd = (result: DropResult, provided: HookProvided) => {
 };
 ```
 
-**Default message**: "Movement cancelled. The item has returned to its starting position of ${result.source.index + 1}"
+**Default message**: "Movement cancelled. The item has returned to its starting position of `${startPosition}`"
 
 We tell the user the following:
 
@@ -130,45 +163,51 @@ We tell the user the following:
 
 Think about adding information about the length of the list, and the name of the list you have dropped into.
 
-**Message with more info**: "Movement cancelled. The item has returned to list `${listName}` to its starting position of `${startPosition}` of`${listLength}`".
+**Message with more info**: "Movement cancelled. The item has returned to its starting position `${startPosition}` of `${listLength}`"
 
-#### Scenario 2. Dropped in the home list (in new position)
+#### Scenario 2. Dropped in the home list
 
-**Default message**: "You have dropped the item. It has moved from position `${result.source.index + 1}` to `${result.destination.index + 1}`"
+**Default message**: "You have dropped the item. It has moved from position `${startPosition}` to `${endPosition}`"
 
 We tell the user the following:
 
 - They have completed the drag
 - What position the item is in now
 
-#### Scenario 3. Dropped in the home list (in original position)
-
-**Default message**: "You have dropped the item. It has been dropped on its starting position of `${result.source.index + 1}`"
-
-We tell the user the following:
-
-- They have completed the drag
-- That they dropped the item in the starting position
-- The starting position
-
-#### Scenario 4. Dropped on a foreign list
+#### Scenario 3. Dropped on a foreign list
 
 The messaging for this scenario should be similar to 'dropped in a home list', but we also add what list the item started in and where it finished.
 
-**Default message**: "You have dropped the item. It has moved from position `${result.source.index + 1}` in list `${result.source.droppableId}` to position `${result.destination.index + 1}` in list `${result.destination.droppableId}`"
+**Default message**: "You have dropped the item. It has moved from position `${startPosition}` in list `${result.source.droppableId}` to position `${endPosition}` in list `${result.destination.droppableId}`"
 
-Think about including the name of the `Droppable`, instead of the ID. You might also want to include the position if your `Droppable`s are ordered.
+#### Scenario 4. Dropped on another `Draggable` in the home list
 
-#### Scenario 5. Dropped on no destination
+The user has dropped onto another `Draggable` in [combine mode](/docs/guides/combining.md) in the same list that the drag started in
+
+**Default message**: "You have dropped the item. The item `${source.draggableId}` has been combined with `${combine.draggableId}`"
+
+#### Scenario 5. Dropped on another `Draggable` in a foreign list
+
+The user has dropped onto another `Draggable` in [combine mode](/docs/guides/combining.md) in a list that is not the list the dragging item started in
+
+**Default message**: "The item `${source.draggableId}` in list `${source.droppableId}` has been combined with `${combine.draggableId}` in list `${combine.droppableId}`"
+
+#### Scenario 6. Dropped on no destination
 
 You can't do this with a keyboard, but it's worthwhile having a message for this scenario, in case the user has a pointer for dragging.
 
-**Default message**: "The item has been dropped while not over a droppable location. The item has returned to its starting position of ${result.source.index + 1}"
+**Default message**: "The item has been dropped while not over a droppable location. The item has returned to its starting position of \${startPosition}"
 
 We tell the user the following:
 
 - They dropped over a location that is not droppable
 - Where the item has returned to
+
+## `VoiceOver` on Mac
+
+If you are using Mac, then you are welcome to test against the inbuilt `VoiceOver` screen reader. Here is a [quick start guide](https://www.imore.com/how-enable-voiceover-mac)
+
+> To start `VoiceOver`: <kbd>`cmd`</kbd> + <kbd>`f5`</kbd>
 
 ## That's all folks
 

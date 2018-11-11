@@ -22,6 +22,7 @@ test-reports/
 
 # storybook
 .storybook.out
+.cache/
 
 # logs
 yarn-error.log

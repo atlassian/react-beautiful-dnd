@@ -6,13 +6,11 @@ import getViewport from '../../src/view/window/get-viewport';
 import { add } from '../../src/state/position';
 import getHomeImpact from '../../src/state/get-home-impact';
 import getHomeLocation from '../../src/state/get-home-location';
+import { forward } from '../../src/state/user-direction/user-direction-preset';
 import type {
   Axis,
   State,
   IdleState,
-  PreparingState,
-  DraggableDescriptor,
-  DroppableDescriptor,
   DraggableDimension,
   DroppableDimension,
   PendingDrop,
@@ -22,7 +20,8 @@ import type {
   Critical,
   CollectingState,
   Viewport,
-  ItemPositions,
+  ClientPositions,
+  PagePositions,
   DragPositions,
   DraggingState,
   DropPendingState,
@@ -37,10 +36,6 @@ export default (axis?: Axis = vertical) => {
 
   const idle: IdleState = {
     phase: 'IDLE',
-  };
-
-  const preparing: PreparingState = {
-    phase: 'PREPARING',
   };
 
   const origin: Position = { x: 0, y: 0 };
@@ -61,16 +56,15 @@ export default (axis?: Axis = vertical) => {
       droppable: droppable.descriptor,
     };
 
-    const client: ItemPositions = {
+    const client: ClientPositions = {
       selection: clientSelection,
       borderBoxCenter: clientSelection,
       offset: origin,
     };
 
-    const page: ItemPositions = {
+    const page: PagePositions = {
       selection: add(client.selection, viewport.scroll.initial),
       borderBoxCenter: add(client.borderBoxCenter, viewport.scroll.initial),
-      offset: origin,
     };
 
     const initial: DragPositions = {
@@ -82,22 +76,28 @@ export default (axis?: Axis = vertical) => {
       phase: 'DRAGGING',
       critical: ourCritical,
       isDragging: true,
-      autoScrollMode: 'FLUID',
+      movementMode: 'FLUID',
       dimensions: preset.dimensions,
       initial,
       current: initial,
-      impact: getHomeImpact(ourCritical, preset.dimensions),
+      impact: getHomeImpact(draggable, droppable),
+      userDirection: forward,
+      isWindowScrollAllowed: true,
       viewport,
       scrollJumpRequest: null,
-      shouldAnimate: false,
+      forceShouldAnimate: null,
     };
 
     return result;
   };
 
-  const collecting = (): CollectingState => ({
+  const collecting = (
+    id?: DraggableId,
+    selection?: Position,
+    viewport?: Viewport,
+  ): CollectingState => ({
     phase: 'COLLECTING',
-    ...dragging(),
+    ...dragging(id, selection, viewport),
     // eslint-disable-next-line
     phase: 'COLLECTING',
   });
@@ -130,7 +130,7 @@ export default (axis?: Axis = vertical) => {
 
     return {
       ...state,
-      autoScrollMode: 'JUMP',
+      movementMode: 'SNAP',
       scrollJumpRequest: request,
     };
   };
@@ -139,21 +139,24 @@ export default (axis?: Axis = vertical) => {
     id: DraggableId,
     reason: DropReason,
   ): DropAnimatingState => {
-    const descriptor: DraggableDescriptor = preset.draggables[id].descriptor;
-    const home: DroppableDescriptor =
-      preset.droppables[descriptor.droppableId].descriptor;
+    const draggable: DraggableDimension = preset.draggables[id];
+    const home: DroppableDimension =
+      preset.droppables[draggable.descriptor.droppableId];
     const pending: PendingDrop = {
-      newHomeOffset: { x: 10, y: 20 },
-      impact: getHomeImpact(critical, preset.dimensions),
+      newHomeClientOffset: { x: 10, y: 20 },
+      dropDuration: 1,
+      impact: getHomeImpact(draggable, home),
       result: {
-        draggableId: descriptor.id,
-        type: home.type,
+        draggableId: draggable.descriptor.id,
+        type: draggable.descriptor.type,
         source: {
-          droppableId: home.id,
-          index: descriptor.index,
+          droppableId: draggable.descriptor.droppableId,
+          index: draggable.descriptor.index,
         },
-        destination: getHomeLocation(critical),
+        destination: getHomeLocation(draggable.descriptor),
         reason,
+        combine: null,
+        mode: 'FLUID',
       },
     };
 
@@ -175,18 +178,11 @@ export default (axis?: Axis = vertical) => {
 
   const allPhases = (
     id?: DraggableId = preset.inHome1.descriptor.id,
-  ): State[] => [
-    idle,
-    preparing,
-    dragging(id),
-    dropAnimating(id),
-    userCancel(id),
-  ];
+  ): State[] => [idle, dragging(id), dropAnimating(id), userCancel(id)];
 
   return {
     critical,
     idle,
-    preparing,
     dragging,
     scrollJumpRequest,
     dropPending,
@@ -194,5 +190,6 @@ export default (axis?: Axis = vertical) => {
     userCancel,
     allPhases,
     collecting,
+    preset,
   };
 };

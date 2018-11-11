@@ -47,13 +47,17 @@ export default ({
     bindWindowEvents();
     fn();
   };
-  const stopDragging = (fn?: Function = noop) => {
+  const stopDragging = (postDragFn?: Function = noop) => {
     schedule.cancel();
     unbindWindowEvents();
     setState({ isDragging: false });
-    fn();
+    postDragFn();
   };
-  const kill = () => stopDragging();
+  const kill = () => {
+    if (state.isDragging) {
+      stopDragging();
+    }
+  };
   const cancel = () => {
     stopDragging(callbacks.onCancel);
   };
@@ -91,7 +95,7 @@ export default ({
       startDragging(() =>
         callbacks.onLift({
           clientSelection: center,
-          autoScrollMode: 'JUMP',
+          movementMode: 'SNAP',
         }),
       );
       return;
@@ -175,6 +179,10 @@ export default ({
     {
       eventName: 'wheel',
       fn: cancel,
+      // chrome says it is a violation for this to not be passive
+      // it is fine for it to be passive as we just cancel as soon as we get
+      // any event
+      options: { passive: true },
     },
     // Need to respond instantly to a jump scroll request
     // Not using the scheduler

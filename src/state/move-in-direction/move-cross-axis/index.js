@@ -1,62 +1,54 @@
 // @flow
 import { type Position } from 'css-box-model';
-import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
-import getClosestDraggable from './get-closest-draggable';
-import moveToNewDroppable from './move-to-new-droppable';
-import noImpact from '../../no-impact';
-import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
-import type { Result } from './move-cross-axis-types';
+import type { PublicResult } from '../move-in-direction-types';
 import type {
-  DraggableId,
-  DroppableId,
   DroppableDimension,
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
-  DraggableLocation,
   DragImpact,
   Viewport,
 } from '../../../types';
+import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
+import getClosestDraggable from './get-closest-draggable';
+import moveToNewDroppable from './move-to-new-droppable';
+import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
+import getClientFromPageBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
+import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border-box-center';
 
 type Args = {|
   isMovingForward: boolean,
   // the current page center of the dragging item
-  pageBorderBoxCenter: Position,
+  previousPageBorderBoxCenter: Position,
   // the dragging item
-  draggableId: DraggableId,
+  draggable: DraggableDimension,
   // the droppable the dragging item is in
-  droppableId: DroppableId,
-  // the original location of the draggable
-  home: DraggableLocation,
+  isOver: DroppableDimension,
   // all the dimensions in the system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
   // any previous impact
-  previousImpact: ?DragImpact,
+  previousImpact: DragImpact,
   // the current viewport
   viewport: Viewport,
 |};
 
 export default ({
   isMovingForward,
-  pageBorderBoxCenter,
-  draggableId,
-  droppableId,
-  home,
+  previousPageBorderBoxCenter,
+  draggable,
+  isOver,
   draggables,
   droppables,
   previousImpact,
   viewport,
-}: Args): ?Result => {
-  const draggable: DraggableDimension = draggables[draggableId];
-  const source: DroppableDimension = droppables[droppableId];
-
+}: Args): ?PublicResult => {
   // not considering the container scroll changes as container scrolling cancels a keyboard drag
 
   const destination: ?DroppableDimension = getBestCrossAxisDroppable({
     isMovingForward,
-    pageBorderBoxCenter,
-    source,
+    pageBorderBoxCenter: previousPageBorderBoxCenter,
+    source: isOver,
     droppables,
     viewport,
   });
@@ -67,32 +59,49 @@ export default ({
   }
 
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
-    destination,
+    destination.descriptor.id,
     draggables,
   );
 
-  const movingRelativeTo: ?DraggableDimension = getClosestDraggable({
+  const moveRelativeTo: ?DraggableDimension = getClosestDraggable({
     axis: destination.axis,
-    pageBorderBoxCenter,
+    pageBorderBoxCenter: previousPageBorderBoxCenter,
+    viewport,
     destination,
     insideDestination,
+  });
+
+  const impact: ?DragImpact = moveToNewDroppable({
+    previousPageBorderBoxCenter,
+    destination,
+    draggable,
+    draggables,
+    moveRelativeTo,
+    insideDestination,
+    previousImpact,
     viewport,
   });
 
-  // Draggables available, but none are candidates for movement (eg none are visible)
-  // Cannot move into the list
-  if (insideDestination.length && !movingRelativeTo) {
+  if (!impact) {
     return null;
   }
 
-  return moveToNewDroppable({
-    pageBorderBoxCenter,
-    destination,
+  const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
+    impact,
     draggable,
-    movingRelativeTo,
-    insideDestination,
-    home,
-    previousImpact: previousImpact || noImpact,
+    droppable: destination,
+    draggables,
+  });
+
+  const clientSelection: Position = getClientFromPageBorderBoxCenter({
+    pageBorderBoxCenter,
+    draggable,
     viewport,
   });
+
+  return {
+    clientSelection,
+    impact,
+    scrollJumpRequest: null,
+  };
 };

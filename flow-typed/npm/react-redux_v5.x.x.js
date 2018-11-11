@@ -1,20 +1,30 @@
-// flow-typed signature: 3d2adf9e3c8823252a60ff4631b486a3
-// flow-typed version: 844b6ca3d3/react-redux_v5.x.x/flow_>=v0.63.0
-
-import type { Dispatch, Store } from "redux";
+// flow-typed signature: 502cfd4f5e95c6308f747cdf16dc93ce
+// flow-typed version: 1751d5bf0a/react-redux_v5.x.x/flow_>=v0.68.0
 
 declare module "react-redux" {
   import type { ComponentType, ElementConfig } from 'react';
 
-  declare export class Provider<S, A> extends React$Component<{
-    store: Store<S, A>,
+  // These types are copied directly from the redux libdef. Importing them in
+  // this libdef causes a loss in type coverage.
+  declare type DispatchAPI<A> = (action: A) => A;
+  declare type Dispatch<A: { type: $Subtype<string> }> = DispatchAPI<A>;
+  declare type Reducer<S, A> = (state: S | void, action: A) => S;
+  declare type Store<S, A, D = Dispatch<A>> = {
+    dispatch: D;
+    getState(): S;
+    subscribe(listener: () => void): () => void;
+    replaceReducer(nextReducer: Reducer<S, A>): void
+  };
+
+  declare export class Provider<S, A, D> extends React$Component<{
+    store: Store<S, A, D>,
     children?: any
   }> {}
 
   declare export function createProvider(
     storeKey?: string,
     subKey?: string
-  ): Provider<*, *>;
+  ): Provider<*, *, *>;
 
   /*
 
@@ -31,6 +41,7 @@ declare module "react-redux" {
   CP = Props for returned component
   Com = React Component
   ST = Static properties of Com
+  EFO = Extra factory options (used only in connectAdvanced)
   */
 
   declare type MapStateToProps<S: Object, SP: Object, RSP: Object> = (state: S, props: SP) => RSP;
@@ -53,7 +64,51 @@ declare module "react-redux" {
     storeKey?: string
   |};
 
-  declare type OmitDispatch<Component> = $Diff<Component, {dispatch: Dispatch<*>}>;
+  declare type OmitDispatch<Component> = $Diff<Component, {dispatch?: Dispatch<*>}>;
+
+  declare type ConnectAdvancedOptions = {
+    getDisplayName?: (name: string) => string,
+    methodName?: string,
+    renderCountProp?: string,
+    shouldHandleStateChanges?: boolean,
+    storeKey?: string,
+    withRef?: boolean,
+  };
+
+  declare type SelectorFactoryOptions<Com> = {
+    getDisplayName: (name: string) => string,
+    methodName: string,
+    renderCountProp: ?string,
+    shouldHandleStateChanges: boolean,
+    storeKey: string,
+    withRef: boolean,
+    displayName: string,
+    wrappedComponentName: string,
+    WrappedComponent: Com,
+  };
+
+  declare type SelectorFactory<
+    Com: ComponentType<*>,
+    A,
+    S: Object,
+    OP: Object,
+    EFO: Object,
+    CP: Object
+  > = (dispatch: Dispatch<A>, factoryOptions: SelectorFactoryOptions<Com> & EFO) =>
+      MapStateToProps<S, OP, CP>;
+
+  declare export function connectAdvanced<
+    Com: ComponentType<*>,
+    A,
+    S: Object,
+    OP: Object,
+    CP: Object,
+    EFO: Object,
+    ST: {[_: $Keys<Com>]: any}
+    >(
+    selectorFactory: SelectorFactory<Com, A, S, OP, EFO, CP>,
+    connectAdvancedOptions: ?(ConnectAdvancedOptions & EFO),
+  ): (component: Com) => ComponentType<OP> & $Shape<ST>;
 
   declare export function connect<
     Com: ComponentType<*>,
@@ -201,5 +256,6 @@ declare module "react-redux" {
     Provider: typeof Provider,
     createProvider: typeof createProvider,
     connect: typeof connect,
+    connectAdvanced: typeof connectAdvanced,
   };
 }

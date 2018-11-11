@@ -10,8 +10,12 @@ import {
   canScrollDroppable,
 } from '../../../../src/state/auto-scroller/can-scroll';
 import { add, subtract } from '../../../../src/state/position';
-import { getPreset, getDroppableDimension } from '../../../utils/dimension';
-import { scrollDroppable } from '../../../../src/state/droppable-dimension';
+import {
+  getPreset,
+  getDroppableDimension,
+  getFrame,
+} from '../../../utils/dimension';
+import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 import { createViewport } from '../../../utils/viewport';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
 
@@ -42,8 +46,10 @@ const scrollable: DroppableDimension = getDroppableDimension({
       right: 100,
       bottom: 100,
     },
-    scrollWidth: scrollableScrollSize.scrollWidth,
-    scrollHeight: scrollableScrollSize.scrollHeight,
+    scrollSize: {
+      scrollWidth: scrollableScrollSize.scrollWidth,
+      scrollHeight: scrollableScrollSize.scrollHeight,
+    },
     scroll: { x: 0, y: 0 },
     shouldClipSubject: true,
   },
@@ -500,8 +506,7 @@ describe('get droppable overlap', () => {
       y: 20,
     };
     const scrolled: DroppableDimension = scrollDroppable(scrollable, scroll);
-    // $ExpectError - not checking for null
-    const max: Position = scrolled.viewport.closestScrollable.scroll.max;
+    const max: Position = getFrame(scrolled).scroll.max;
     const totalSpace: Position = {
       x: scrollableScrollSize.scrollWidth - max.x,
       y: scrollableScrollSize.scrollHeight - max.y,

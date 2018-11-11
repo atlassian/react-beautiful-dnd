@@ -1,6 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import { bindActionCreators } from 'redux';
+import invariant from 'tiny-invariant';
 import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
@@ -18,7 +19,7 @@ import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
-import type { DraggableId, State, Hooks } from '../../types';
+import type { DraggableId, State, Responders } from '../../types';
 import type { Store } from '../../state/store-types';
 import {
   storeKey,
@@ -29,15 +30,20 @@ import {
 import {
   clean,
   move,
-  publish,
+  publishWhileDragging,
   updateDroppableScroll,
   updateDroppableIsEnabled,
+  updateDroppableIsCombineEnabled,
   collectionStarting,
 } from '../../state/action-creators';
+import { getFormattedMessage } from '../../dev-warning';
+import { peerDependencies } from '../../../package.json';
+import checkReactVersion from './check-react-version';
 
 type Props = {|
-  ...Hooks,
-  children: ?Node,
+  ...Responders,
+  // we do not technically need any children for this component
+  children: Node | null,
 |};
 
 type Context = {
@@ -53,13 +59,19 @@ const printFatalDevError = (error: Error) => {
   if (process.env.NODE_ENV === 'production') {
     return;
   }
-  console.warn(`
-    An error has occurred while a drag is occurring.
-    Any existing drag will be cancelled.
+  // eslint-disable-next-line no-console
+  console.error(
+    ...getFormattedMessage(
+      `
+      An error has occurred while a drag is occurring.
+      Any existing drag will be cancelled.
 
-    Raw error:
-  `);
-  console.error(error);
+      > ${error.message}
+      `,
+    ),
+  );
+  // eslint-disable-next-line no-console
+  console.error('raw', error);
 };
 
 export default class DragDropContext extends React.Component<Props> {
@@ -74,6 +86,14 @@ export default class DragDropContext extends React.Component<Props> {
   constructor(props: Props, context: mixed) {
     super(props, context);
 
+    // A little setup check for dev
+    if (process.env.NODE_ENV !== 'production') {
+      invariant(
+        typeof props.onDragEnd === 'function',
+        'A DragDropContext requires an onDragEnd function to perform reordering logic',
+      );
+    }
+
     this.announcer = createAnnouncer();
 
     // create the style marshal
@@ -83,9 +103,9 @@ export default class DragDropContext extends React.Component<Props> {
       // Lazy reference to dimension marshal get around circular dependency
       getDimensionMarshal: (): DimensionMarshal => this.dimensionMarshal,
       styleMarshal: this.styleMarshal,
-      // This is a function as users are allowed to change their hook functions
+      // This is a function as users are allowed to change their responder functions
       // at any time
-      getHooks: (): Hooks => ({
+      getResponders: (): Responders => ({
         onBeforeDragStart: this.props.onBeforeDragStart,
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,
@@ -96,10 +116,11 @@ export default class DragDropContext extends React.Component<Props> {
     });
     const callbacks: DimensionMarshalCallbacks = bindActionCreators(
       {
-        collectionStarting,
-        publish,
+        publishWhileDragging,
         updateDroppableScroll,
         updateDroppableIsEnabled,
+        updateDroppableIsCombineEnabled,
+        collectionStarting,
       },
       this.store.dispatch,
     );
@@ -151,6 +172,10 @@ export default class DragDropContext extends React.Component<Props> {
     window.addEventListener('error', this.onWindowError);
     this.styleMarshal.mount();
     this.announcer.mount();
+
+    if (process.env.NODE_ENV !== 'production') {
+      checkReactVersion(peerDependencies.react, React.version);
+    }
   }
 
   componentDidCatch(error: Error) {

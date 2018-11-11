@@ -2,7 +2,7 @@
 import { type Position } from 'css-box-model';
 import { distance } from '../../position';
 import { isTotallyVisible } from '../../visibility/is-visible';
-import withDroppableDisplacement from '../../with-droppable-displacement';
+import withDroppableDisplacement from '../../with-scroll-change/with-droppable-displacement';
 import type {
   Viewport,
   Axis,
@@ -12,8 +12,8 @@ import type {
 
 type Args = {|
   axis: Axis,
-  viewport: Viewport,
   pageBorderBoxCenter: Position,
+  viewport: Viewport,
   // the droppable that is being moved to
   destination: DroppableDimension,
   // the droppables inside the destination
@@ -22,25 +22,22 @@ type Args = {|
 
 export default ({
   axis,
-  viewport,
   pageBorderBoxCenter,
+  viewport,
   destination,
   insideDestination,
 }: Args): ?DraggableDimension => {
-  // Empty list - bail out
-  if (!insideDestination.length) {
-    return null;
-  }
-
-  const result: DraggableDimension[] = insideDestination
-    // Remove any options that are hidden by overflow
-    // Draggable must be totally visible to move to it
+  const sorted: DraggableDimension[] = insideDestination
     .filter(
       (draggable: DraggableDimension): boolean =>
+        // Allowing movement to draggables that are not visible in the viewport
+        // but must be visible in the droppable
+        // We can improve this, but this limitation is easier for now
         isTotallyVisible({
           target: draggable.page.borderBox,
           destination,
           viewport: viewport.frame,
+          withDroppableDisplacement: true,
         }),
     )
     .sort(
@@ -71,5 +68,5 @@ export default ({
       },
     );
 
-  return result.length ? result[0] : null;
+  return sorted[0] || null;
 };

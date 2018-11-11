@@ -4,10 +4,11 @@ import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import isPositionInFrame from '../visibility/is-position-in-frame';
 import { toDroppableList } from '../dimension-structures';
+import { find } from '../../native-with-fallback';
 import type {
   DroppableDimension,
   DroppableDimensionMap,
-  DraggableLocation,
+  DroppableId,
 } from '../../types';
 
 const getScrollableDroppables = memoizeOne(
@@ -20,7 +21,7 @@ const getScrollableDroppables = memoizeOne(
         }
 
         // only want droppables that are scrollable
-        if (!droppable.viewport.closestScrollable) {
+        if (!droppable.frame) {
           return false;
         }
 
@@ -33,12 +34,11 @@ const getScrollableDroppableOver = (
   target: Position,
   droppables: DroppableDimensionMap,
 ): ?DroppableDimension => {
-  const maybe: ?DroppableDimension = getScrollableDroppables(droppables).find(
+  const maybe: ?DroppableDimension = find(
+    getScrollableDroppables(droppables),
     (droppable: DroppableDimension): boolean => {
-      invariant(droppable.viewport.closestScrollable, 'Invalid result');
-      return isPositionInFrame(
-        droppable.viewport.closestScrollable.framePageMarginBox,
-      )(target);
+      invariant(droppable.frame, 'Invalid result');
+      return isPositionInFrame(droppable.frame.pageMarginBox)(target);
     },
   );
 
@@ -47,7 +47,7 @@ const getScrollableDroppableOver = (
 
 type Api = {|
   center: Position,
-  destination: ?DraggableLocation,
+  destination: ?DroppableId,
   droppables: DroppableDimensionMap,
 |};
 
@@ -60,8 +60,8 @@ export default ({
   // placeholder buffer logic works correctly
 
   if (destination) {
-    const dimension: DroppableDimension = droppables[destination.droppableId];
-    if (!dimension.viewport.closestScrollable) {
+    const dimension: DroppableDimension = droppables[destination];
+    if (!dimension.frame) {
       return null;
     }
     return dimension;

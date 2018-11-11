@@ -5,7 +5,6 @@ export type Id = string;
 export type DraggableId = Id;
 export type DroppableId = Id;
 export type TypeId = Id;
-export type ZIndex = number | string;
 
 export type DroppableDescriptor = {|
   id: DroppableId,
@@ -50,6 +49,25 @@ export type HorizontalAxis = {|
 
 export type Axis = VerticalAxis | HorizontalAxis;
 
+export type ScrollSize = {|
+  scrollHeight: number,
+  scrollWidth: number,
+|};
+
+export type ScrollDetails = {|
+  initial: Position,
+  current: Position,
+  // the maximum allowable scroll for the frame
+  max: Position,
+  diff: {|
+    value: Position,
+    // The actual displacement as a result of a scroll is in the opposite
+    // direction to the scroll itself. When scrolling down items are displaced
+    // upwards. This value is the negated version of the 'value'
+    displacement: Position,
+  |},
+|};
+
 export type Placeholder = {|
   client: BoxModel,
   tagName: string,
@@ -64,50 +82,62 @@ export type DraggableDimension = {|
   client: BoxModel,
   // relative to the whole page
   page: BoxModel,
+  // how much displacement the draggable causes
+  // this is the size of the marginBox
+  displaceBy: Position,
 |};
 
 export type Scrollable = {|
   // This is the window through which the droppable is observed
   // It does not change during a drag
-  framePageMarginBox: Rect,
+  pageMarginBox: Rect,
+  // Used for comparision with dynamic recollecting
+  frameClient: BoxModel,
+  scrollSize: ScrollSize,
   // Whether or not we should clip the subject by the frame
   // Is controlled by the ignoreContainerClipping prop
   shouldClipSubject: boolean,
-  scroll: {|
-    initial: Position,
-    current: Position,
-    // the maximum allowable scroll for the frame
-    max: Position,
-    diff: {|
-      value: Position,
-      // The actual displacement as a result of a scroll is in the opposite
-      // direction to the scroll itself. When scrolling down items are displaced
-      // upwards. This value is the negated version of the 'value'
-      displacement: Position,
-    |},
-  |},
+  scroll: ScrollDetails,
 |};
 
-export type DroppableDimensionViewport = {|
-  // will be null if there is no closest scrollable
-  closestScrollable: ?Scrollable,
-  subjectPageMarginBox: Rect,
-  // this is the subject through the viewport of the frame (if applicable)
-  // it also takes into account any changes to the viewport scroll
-  // clipped area will be null if it is completely outside of the frame and frame clipping is on
-  clippedPageMarginBox: ?Rect,
+export type PlaceholderInSubject = {|
+  // might not actually be increased by
+  // placeholder if there is no required space
+  increasedBy: ?Position,
+  placeholderSize: Position,
+  // max scroll before placeholder added
+  // will be null if there was no frame
+  oldFrameMaxScroll: ?Position,
+|};
+
+export type DroppableSubject = {|
+  // raw, unchanging
+  page: BoxModel,
+  withPlaceholder: ?PlaceholderInSubject,
+  // The hitbox for a droppable
+  // - page margin box
+  // - with scroll changes
+  // - with any additional droppable placeholder
+  // - clipped by frame
+  // The subject will be null if the hit area is completely empty
+  active: ?Rect,
 |};
 
 export type DroppableDimension = {|
   descriptor: DroppableDescriptor,
   axis: Axis,
   isEnabled: boolean,
+  isCombineEnabled: boolean,
   // relative to the current viewport
   client: BoxModel,
   // relative to the whole page
+  isFixedOnPage: boolean,
+  // relative to the page
   page: BoxModel,
   // The container of the droppable
-  viewport: DroppableDimensionViewport,
+  frame: ?Scrollable,
+  // what is visible through the frame
+  subject: DroppableSubject,
 |};
 export type DraggableLocation = {|
   droppableId: DroppableId,
@@ -123,14 +153,40 @@ export type Displacement = {|
   shouldAnimate: boolean,
 |};
 
+export type DisplacementMap = { [key: DraggableId]: Displacement };
+
+export type DisplacedBy = {|
+  value: number,
+  point: Position,
+|};
+
 export type DragMovement = {|
   // The draggables that need to move in response to a drag.
   // Ordered by closest draggable to the *current* location of the dragging item
   displaced: Displacement[],
-  amount: Position,
-  // is moving forward relative to the starting position
-  // TODO: rename to 'shouldDisplaceForward'?
-  isBeyondStartPosition: boolean,
+  // displaced as a map
+  map: DisplacementMap,
+  willDisplaceForward: boolean,
+  displacedBy: DisplacedBy,
+|};
+
+export type VerticalUserDirection = 'up' | 'down';
+export type HorizontalUserDirection = 'left' | 'right';
+
+export type UserDirection = {|
+  vertical: VerticalUserDirection,
+  horizontal: HorizontalUserDirection,
+|};
+
+export type Combine = {|
+  draggableId: DraggableId,
+  droppableId: DroppableId,
+|};
+
+export type CombineImpact = {|
+  // This has an impact on the hitbox for a grouping action
+  whenEntered: UserDirection,
+  combine: Combine,
 |};
 
 export type DragImpact = {|
@@ -138,9 +194,10 @@ export type DragImpact = {|
   // the direction of the Droppable you are over
   direction: ?Direction,
   destination: ?DraggableLocation,
+  merge: ?CombineImpact,
 |};
 
-export type ItemPositions = {|
+export type ClientPositions = {|
   // where the user initially selected
   // This point is not used to calculate the impact of a dragging item
   // It is used to calculate the offset from the initial selection point
@@ -151,20 +208,19 @@ export type ItemPositions = {|
   offset: Position,
 |};
 
-// When dragging with a pointer such as a mouse or touch input we want to automatically
-// scroll user the under input when we get near the bottom of a Droppable or the window.
-// When Dragging with a keyboard we want to jump as required
-export type AutoScrollMode = 'FLUID' | 'JUMP';
+export type PagePositions = {|
+  selection: Position,
+  borderBoxCenter: Position,
+|};
 
-// export type Viewport = {|
-//   scroll: Position,
-//   maxScroll: Position,
-//   subject: Rect,
-// |}
+// There are two seperate modes that a drag can be in
+// FLUID: everything is done in response to highly granular input (eg mouse)
+// SNAP: items move in response to commands (eg keyboard);
+export type MovementMode = 'FLUID' | 'SNAP';
 
 export type DragPositions = {|
-  client: ItemPositions,
-  page: ItemPositions,
+  client: ClientPositions,
+  page: PagePositions,
 |};
 
 // published when a drag starts
@@ -172,12 +228,15 @@ export type DragStart = {|
   draggableId: DraggableId,
   type: TypeId,
   source: DraggableLocation,
+  mode: MovementMode,
 |};
 
 export type DragUpdate = {|
   ...DragStart,
   // may not have any destination (drag to nowhere)
   destination: ?DraggableLocation,
+  // populated when a draggable is dragging over another in combine mode
+  combine: ?Combine,
 |};
 
 export type DropReason = 'DROP' | 'CANCEL';
@@ -189,8 +248,8 @@ export type DropResult = {|
 |};
 
 export type PendingDrop = {|
-  // TODO: newHomeClientOffset
-  newHomeOffset: Position,
+  newHomeClientOffset: Position,
+  dropDuration: number,
   impact: DragImpact,
   result: DropResult,
 |};
@@ -218,17 +277,7 @@ export type Critical = {|
 export type Viewport = {|
   // live updates with the latest values
   frame: Rect,
-  scroll: {|
-    initial: Position,
-    current: Position,
-    max: Position,
-    diff: {|
-      value: Position,
-      // The actual displacement as a result of a scroll is in the opposite
-      // direction to the scroll itself.
-      displacement: Position,
-    |},
-  |},
+  scroll: ScrollDetails,
 |};
 
 export type DimensionMap = {|
@@ -236,40 +285,33 @@ export type DimensionMap = {|
   droppables: DroppableDimensionMap,
 |};
 
-export type Publish = {|
-  additions: {|
-    draggables: DraggableDimension[],
-    droppables: DroppableDimension[],
-  |},
-  // additions: DimensionMap,
-  removals: {|
-    draggables: DraggableId[],
-    droppables: DroppableId[],
-  |},
+export type Published = {|
+  additions: DraggableDimension[],
+  removals: DraggableId[],
+  modified: DroppableDimension[],
 |};
 
 export type IdleState = {|
   phase: 'IDLE',
 |};
 
-export type PreparingState = {|
-  phase: 'PREPARING',
-|};
-
 export type DraggingState = {|
   phase: 'DRAGGING',
   isDragging: true,
   critical: Critical,
-  autoScrollMode: AutoScrollMode,
+  movementMode: MovementMode,
   dimensions: DimensionMap,
   initial: DragPositions,
   current: DragPositions,
+  userDirection: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
+  // when there is a fixed list we want to opt out of this behaviour
+  isWindowScrollAllowed: boolean,
   // if we need to jump the scroll (keyboard dragging)
   scrollJumpRequest: ?Position,
   // whether or not draggable movements should be animated
-  shouldAnimate: boolean,
+  forceShouldAnimate: ?boolean,
 |};
 
 // While dragging we can enter into a bulk collection phase
@@ -303,36 +345,37 @@ export type DropAnimatingState = {|
 
 export type State =
   | IdleState
-  | PreparingState
   | DraggingState
   | CollectingState
   | DropPendingState
   | DropAnimatingState;
 
+export type StateWhenUpdatesAllowed = DraggingState | CollectingState;
+
 export type Announce = (message: string) => void;
 
-export type HookProvided = {|
+export type ResponderProvided = {|
   announce: Announce,
 |};
 
-export type OnBeforeDragStartHook = (start: DragStart) => mixed;
-export type OnDragStartHook = (
+export type OnBeforeDragStartResponder = (start: DragStart) => mixed;
+export type OnDragStartResponder = (
   start: DragStart,
-  provided: HookProvided,
+  provided: ResponderProvided,
 ) => mixed;
-export type OnDragUpdateHook = (
+export type OnDragUpdateResponder = (
   update: DragUpdate,
-  provided: HookProvided,
+  provided: ResponderProvided,
 ) => mixed;
-export type OnDragEndHook = (
+export type OnDragEndResponder = (
   result: DropResult,
-  provided: HookProvided,
+  provided: ResponderProvided,
 ) => mixed;
 
-export type Hooks = {|
-  onBeforeDragStart?: OnBeforeDragStartHook,
-  onDragStart?: OnDragStartHook,
-  onDragUpdate?: OnDragUpdateHook,
+export type Responders = {|
+  onBeforeDragStart?: OnBeforeDragStartResponder,
+  onDragStart?: OnDragStartResponder,
+  onDragUpdate?: OnDragUpdateResponder,
   // always required
-  onDragEnd: OnDragEndHook,
+  onDragEnd: OnDragEndResponder,
 |};

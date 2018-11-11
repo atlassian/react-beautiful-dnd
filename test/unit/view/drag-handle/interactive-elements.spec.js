@@ -25,6 +25,10 @@ forEach((control: Control) => {
     wrapper = getWrapper(callbacks);
   });
 
+  afterEach(() => {
+    wrapper.unmount();
+  });
+
   describe('interactive elements', () => {
     it('should not start a drag if the target is an interactive element', () => {
       mixedCase(interactiveTagNames).forEach((tagName: string) => {

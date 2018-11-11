@@ -27,9 +27,11 @@ const Wrapper = styled('div')`
   width: 250px;
 `;
 
+const scrollContainerHeight: number = 250;
+
 const DropZone = styled('div')`
   /* stop the list collapsing when empty */
-  min-height: 250px;
+  min-height: ${scrollContainerHeight}px;
 
   /*
     not relying on the items for a margin-bottom
@@ -41,7 +43,7 @@ const DropZone = styled('div')`
 const ScrollContainer = styled('div')`
   overflow-x: hidden;
   overflow-y: auto;
-  max-height: 300px;
+  max-height: ${scrollContainerHeight}px;
 `;
 
 /* stylelint-disable block-no-empty */
@@ -54,7 +56,9 @@ type Props = {|
   quotes: Quote[],
   title?: string,
   internalScroll?: boolean,
+  scrollContainerStyle?: Object,
   isDropDisabled?: boolean,
+  isCombineEnabled?: boolean,
   style?: Object,
   // may not be provided - and might be null
   ignoreContainerClipping?: boolean,
@@ -84,6 +88,7 @@ class InnerQuoteList extends React.Component<QuoteListProps> {
             key={quote.id}
             quote={quote}
             isDragging={dragSnapshot.isDragging}
+            isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
             provided={dragProvided}
           />
         )}
@@ -123,7 +128,9 @@ export default class QuoteList extends React.Component<Props> {
     const {
       ignoreContainerClipping,
       internalScroll,
+      scrollContainerStyle,
       isDropDisabled,
+      isCombineEnabled,
       listId,
       listType,
       style,
@@ -137,6 +144,7 @@ export default class QuoteList extends React.Component<Props> {
         type={listType}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
+        isCombineEnabled={isCombineEnabled}
       >
         {(
           dropProvided: DroppableProvided,
@@ -149,7 +157,7 @@ export default class QuoteList extends React.Component<Props> {
             {...dropProvided.droppableProps}
           >
             {internalScroll ? (
-              <ScrollContainer>
+              <ScrollContainer style={scrollContainerStyle}>
                 <InnerList
                   quotes={quotes}
                   title={title}

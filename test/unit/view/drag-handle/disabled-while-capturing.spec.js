@@ -13,11 +13,7 @@ const expectMidDragDisabledWarning = (fn: Function) => {
   fn();
 
   // assert
-  expect(console.warn).toHaveBeenCalledWith(
-    expect.stringContaining(
-      'You have disabled dragging on a Draggable while it was dragging',
-    ),
-  );
+  expect(console.warn).toHaveBeenCalled();
 
   // cleanup
   console.warn.mockRestore();

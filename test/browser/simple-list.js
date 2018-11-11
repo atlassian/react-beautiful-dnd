@@ -4,7 +4,7 @@ import * as attributes from '../../src/view/data-attributes';
 
 const urlSimpleList =
   'http://localhost:9002/iframe.html?selectedKind=single%20vertical%20list&selectedStory=basic';
-const errorMessage = 'It means that the cards have not beend dragged';
+const errorMessage = 'Reorder unsuccessful';
 
 /* Css selectors used */
 const singleListContainer: string = `[${attributes.droppable}]`;

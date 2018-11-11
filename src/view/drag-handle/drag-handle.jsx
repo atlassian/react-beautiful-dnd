@@ -19,6 +19,7 @@ import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-tar
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
+import { warning } from '../../dev-warning';
 
 const preventHtml5Dnd = (event: DragEvent) => {
   event.preventDefault();
@@ -92,6 +93,8 @@ export default class DragHandle extends Component<Props> {
 
   componentDidUpdate(prevProps: Props) {
     const ref: ?HTMLElement = this.props.getDraggableRef();
+
+    // 1. focus on element if required
     if (ref !== this.lastDraggableRef) {
       this.lastDraggableRef = ref;
 
@@ -99,30 +102,45 @@ export default class DragHandle extends Component<Props> {
       // When moving something into or out of a portal the element loses focus
       // https://github.com/facebook/react/issues/12454
 
-      // No need to focus
-      if (!ref || !this.isFocused) {
-        return;
+      if (ref && this.isFocused && this.props.isEnabled) {
+        getDragHandleRef(ref).focus();
       }
-
-      // No drag handle ref will be available to focus on
-      if (!this.props.isEnabled) {
-        return;
-      }
-
-      getDragHandleRef(ref).focus();
     }
+
+    // 2. should we kill the any capturing?
 
     const isCapturing: boolean = this.isAnySensorCapturing();
 
+    // not capturing was happening - so we dont need to do anything
     if (!isCapturing) {
       return;
     }
 
-    const isDragStopping: boolean =
-      prevProps.isDragging && !this.props.isDragging;
+    const isBeingDisabled: boolean =
+      prevProps.isEnabled && !this.props.isEnabled;
+
+    if (isBeingDisabled) {
+      this.sensors.forEach((sensor: Sensor) => {
+        if (!sensor.isCapturing()) {
+          return;
+        }
+        const wasDragging: boolean = sensor.isDragging();
+        sensor.kill();
+
+        // It is fine for a draggable to be disabled while a drag is pending
+        if (wasDragging) {
+          warning(
+            'You have disabled dragging on a Draggable while it was dragging. The drag has been cancelled',
+          );
+          this.props.callbacks.onCancel();
+        }
+      });
+    }
 
     // Drag has stopped due to somewhere else in the system
-    if (isDragStopping) {
+    const isDragAborted: boolean =
+      prevProps.isDragging && !this.props.isDragging;
+    if (isDragAborted) {
       // We need to unbind the handlers
       this.sensors.forEach((sensor: Sensor) => {
         if (sensor.isCapturing()) {
@@ -131,29 +149,6 @@ export default class DragHandle extends Component<Props> {
         }
       });
     }
-
-    if (this.props.isEnabled) {
-      return;
-    }
-
-    // Disabled while capturing
-    this.sensors.forEach((sensor: Sensor) => {
-      if (!sensor.isCapturing()) {
-        return;
-      }
-      const wasDragging: boolean = sensor.isDragging();
-      sensor.kill();
-
-      // It is fine for a draggable to be disabled while a drag is pending
-      if (wasDragging) {
-        if (process.env.NODE_ENV !== 'production') {
-          console.warn(
-            'You have disabled dragging on a Draggable while it was dragging. The drag has been cancelled',
-          );
-        }
-        this.props.callbacks.onCancel();
-      }
-    });
   }
 
   componentWillUnmount() {

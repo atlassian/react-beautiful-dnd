@@ -1,17 +1,24 @@
 // @flow
-import type { DragMovement, DragImpact } from '../types';
+import type { DragMovement, DragImpact, DisplacedBy } from '../types';
 import { origin } from './position';
+
+export const noDisplacedBy: DisplacedBy = {
+  point: origin,
+  value: 0,
+};
 
 export const noMovement: DragMovement = {
   displaced: [],
-  amount: origin,
-  isBeyondStartPosition: false,
+  map: {},
+  displacedBy: noDisplacedBy,
+  willDisplaceForward: false,
 };
 
 const noImpact: DragImpact = {
   movement: noMovement,
   direction: null,
   destination: null,
+  merge: null,
 };
 
 export default noImpact;

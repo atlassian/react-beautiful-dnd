@@ -6,19 +6,18 @@ import type {
   DroppableDimension,
   Axis,
 } from '../../../../src/types';
+import type { PublicResult } from '../../../../src/state/move-in-direction/move-in-direction-types';
+import moveInDirection from '../../../../src/state/move-in-direction';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import { getPreset, disableDroppable } from '../../../utils/dimension';
 import getStatePreset from '../../../utils/get-simple-state-preset';
-import moveInDirection, {
-  type Result,
-} from '../../../../src/state/move-in-direction';
 
 describe('on the vertical axis', () => {
   const preset = getPreset(vertical);
   const state = getStatePreset(vertical);
 
   it('should move forward on a MOVE_DOWN', () => {
-    const result: ?Result = moveInDirection({
+    const result: ?PublicResult = moveInDirection({
       state: state.dragging(),
       type: 'MOVE_DOWN',
     });
@@ -32,7 +31,7 @@ describe('on the vertical axis', () => {
   });
 
   it('should move backwards on a MOVE_UP', () => {
-    const result: ?Result = moveInDirection({
+    const result: ?PublicResult = moveInDirection({
       state: state.dragging(preset.inHome2.descriptor.id),
       type: 'MOVE_UP',
     });
@@ -46,7 +45,7 @@ describe('on the vertical axis', () => {
   });
 
   it('should move cross axis forwards on a MOVE_RIGHT', () => {
-    const result: ?Result = moveInDirection({
+    const result: ?PublicResult = moveInDirection({
       state: state.dragging(),
       type: 'MOVE_RIGHT',
     });
@@ -60,7 +59,7 @@ describe('on the vertical axis', () => {
   });
 
   it('should move cross axis backwards on a MOVE_LEFT', () => {
-    const result: ?Result = moveInDirection({
+    const result: ?PublicResult = moveInDirection({
       state: state.dragging(preset.inForeign1.descriptor.id),
       type: 'MOVE_LEFT',
     });
@@ -79,7 +78,7 @@ describe('on the horizontal axis', () => {
   const state = getStatePreset(horizontal);
 
   it('should move forward on a MOVE_RIGHT', () => {
-    const result: ?Result = moveInDirection({
+    const result: ?PublicResult = moveInDirection({
       state: state.dragging(),
       type: 'MOVE_RIGHT',
     });
@@ -93,7 +92,7 @@ describe('on the horizontal axis', () => {
   });
 
   it('should move backwards on a MOVE_LEFT', () => {
-    const result: ?Result = moveInDirection({
+    const result: ?PublicResult = moveInDirection({
       state: state.dragging(preset.inHome2.descriptor.id),
       type: 'MOVE_LEFT',
     });
@@ -107,7 +106,7 @@ describe('on the horizontal axis', () => {
   });
 
   it('should move cross axis forwards on a MOVE_DOWN', () => {
-    const result: ?Result = moveInDirection({
+    const result: ?PublicResult = moveInDirection({
       state: state.dragging(),
       type: 'MOVE_DOWN',
     });
@@ -121,7 +120,7 @@ describe('on the horizontal axis', () => {
   });
 
   it('should move cross axis backwards on a MOVE_UP', () => {
-    const result: ?Result = moveInDirection({
+    const result: ?PublicResult = moveInDirection({
       state: state.dragging(preset.inForeign1.descriptor.id),
       type: 'MOVE_UP',
     });
@@ -172,7 +171,7 @@ describe('on the horizontal axis', () => {
       const crossAxisForward =
         axis.direction === 'vertical' ? 'MOVE_RIGHT' : 'MOVE_DOWN';
 
-      const result: ?Result = moveInDirection({
+      const result: ?PublicResult = moveInDirection({
         state: state.dragging(),
         type: crossAxisForward,
       });

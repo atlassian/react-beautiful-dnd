@@ -17,16 +17,17 @@ export type {
   TypeId,
   DraggableId,
   DroppableId,
-  // Hooks,
+  MovementMode,
   DragStart,
   DragUpdate,
   DropResult,
-  HookProvided,
+  ResponderProvided,
   Announce,
   DraggableLocation,
-  OnDragStartHook,
-  OnDragUpdateHook,
-  OnDragEndHook,
+  OnBeforeDragStartResponder,
+  OnDragStartResponder,
+  OnDragUpdateResponder,
+  OnDragEndResponder,
 } from './types';
 
 // Droppable
@@ -40,6 +41,7 @@ export type {
 export type {
   Provided as DraggableProvided,
   StateSnapshot as DraggableStateSnapshot,
+  DropAnimation,
   DraggableProps,
   DraggableStyle,
   DraggingStyle,

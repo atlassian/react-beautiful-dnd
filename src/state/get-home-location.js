@@ -1,7 +1,7 @@
 // @flow
-import type { Critical, DraggableLocation } from '../types';
+import type { DraggableDescriptor, DraggableLocation } from '../types';
 
-export default (critical: Critical): DraggableLocation => ({
-  index: critical.draggable.index,
-  droppableId: critical.droppable.id,
+export default (descriptor: DraggableDescriptor): DraggableLocation => ({
+  index: descriptor.index,
+  droppableId: descriptor.droppableId,
 });

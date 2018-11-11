@@ -6,14 +6,18 @@ import type {
   DroppableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
+  UserDirection,
   DragImpact,
   Viewport,
 } from '../../types';
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
-import noImpact from '../no-impact';
 import inHomeList from './in-home-list';
 import inForeignList from './in-foreign-list';
+import noImpact from '../no-impact';
+import withDroppableScroll from '../with-scroll-change/with-droppable-scroll';
+import isHomeOf from '../droppable/is-home-of';
+import getCombineImpact from './get-combine-impact';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -23,6 +27,7 @@ type Args = {|
   droppables: DroppableDimensionMap,
   previousImpact: DragImpact,
   viewport: Viewport,
+  userDirection: UserDirection,
 |};
 
 export default ({
@@ -32,16 +37,11 @@ export default ({
   droppables,
   previousImpact,
   viewport,
+  userDirection,
 }: Args): DragImpact => {
-  const previousDroppableOverId: ?DroppableId =
-    previousImpact.destination && previousImpact.destination.droppableId;
-
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
-    draggable,
-    draggables,
     droppables,
-    previousDroppableOverId,
   });
 
   // not dragging over anything
@@ -51,34 +51,48 @@ export default ({
 
   const destination: DroppableDimension = droppables[destinationId];
 
-  if (!destination.isEnabled) {
-    return noImpact;
-  }
-
-  const home: DroppableDimension = droppables[draggable.descriptor.droppableId];
-  const isWithinHomeDroppable: boolean = home.descriptor.id === destinationId;
+  const isWithinHomeDroppable: boolean = isHomeOf(draggable, destination);
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
-    destination,
+    destination.descriptor.id,
     draggables,
   );
-
-  if (isWithinHomeDroppable) {
-    return inHomeList({
-      pageBorderBoxCenter,
-      draggable,
-      home,
-      insideHome: insideDestination,
-      previousImpact: previousImpact || noImpact,
-      viewport,
-    });
-  }
-
-  return inForeignList({
+  // Where the element actually is now.
+  // Need to take into account the change of scroll in the droppable
+  const pageBorderBoxCenterWithDroppableScrollChange: Position = withDroppableScroll(
+    destination,
     pageBorderBoxCenter,
+  );
+
+  const withMerge: ?DragImpact = getCombineImpact({
+    pageBorderBoxCenterWithDroppableScrollChange,
+    previousImpact,
     draggable,
     destination,
     insideDestination,
-    previousImpact: previousImpact || noImpact,
-    viewport,
+    userDirection,
   });
+
+  if (withMerge) {
+    return withMerge;
+  }
+
+  return isWithinHomeDroppable
+    ? inHomeList({
+        pageBorderBoxCenterWithDroppableScrollChange,
+        draggable,
+        home: destination,
+        insideHome: insideDestination,
+        previousImpact,
+        viewport,
+        userDirection,
+      })
+    : inForeignList({
+        pageBorderBoxCenterWithDroppableScrollChange,
+        draggable,
+        destination,
+        insideDestination,
+        previousImpact,
+        viewport,
+        userDirection,
+      });
 };

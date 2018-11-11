@@ -14,6 +14,11 @@ const getDoc = (): HTMLElement => {
   return el;
 };
 
+export const setWindowScroll = (newScroll: Position) => {
+  window.pageYOffset = newScroll.y;
+  window.pageXOffset = newScroll.x;
+};
+
 export const setViewport = (viewport: Viewport) => {
   if (viewport.scroll.current.x !== viewport.frame.left) {
     throw new Error('scroll x must match left of subject');
@@ -22,8 +27,7 @@ export const setViewport = (viewport: Viewport) => {
     throw new Error('scroll y must match top of subject');
   }
 
-  window.pageYOffset = viewport.scroll.current.y;
-  window.pageXOffset = viewport.scroll.current.x;
+  setWindowScroll(viewport.scroll.current);
 
   const doc: HTMLElement = getDoc();
   doc.clientWidth = viewport.frame.width;

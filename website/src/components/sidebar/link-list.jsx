@@ -11,6 +11,7 @@ type Props = {|
 export default class LinkList extends React.Component<Props> {
   render() {
     const { links, hoverColor } = this.props;
+    // $FlowFixMe - not sure what is going on here
     return links.map((link: NavLink) => (
       <Link
         key={link.href}

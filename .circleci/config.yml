@@ -30,7 +30,7 @@ jobs:
           name: Install Dependencies
           command: yarn
 
-      - run: 
+      - run:
           name: Update Lockfile
           command: $(yarn global bin)/greenkeeper-lockfile-update
 
@@ -101,7 +101,7 @@ jobs:
 
       - run:
           name: Jest Suite
-          command: yarn test
+          command: yarn test:ci
           environment:
             JEST_JUNIT_OUTPUT: 'test-reports/junit/js-test-results.xml'
 
@@ -110,7 +110,7 @@ jobs:
 
       - run:
           name: Browser Suite
-          command: node tools/testHarness.js yarn test:browser
+          command: node browser-test-harness.js yarn test:browser
 
       - store_test_results:
           path: test-reports/browser

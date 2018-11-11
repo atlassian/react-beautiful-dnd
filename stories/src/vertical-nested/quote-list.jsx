@@ -64,32 +64,31 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
           {...dropProvided.droppableProps}
         >
           <Title>{list.title}</Title>
-          {list.children.map(
-            (item: Quote | NestedQuoteList, index: number) =>
-              !item.children ? (
-                this.renderQuote((item: any), list.id, index)
-              ) : (
-                <Draggable
-                  draggableId={item.id}
-                  type={list.id}
-                  key={item.id}
-                  index={index}
-                >
-                  {(
-                    dragProvided: DraggableProvided,
-                    dragSnapshot: DraggableStateSnapshot,
-                  ) => (
-                    <NestedContainer
-                      innerRef={dragProvided.innerRef}
-                      isDragging={dragSnapshot.isDragging}
-                      {...dragProvided.draggableProps}
-                      {...dragProvided.dragHandleProps}
-                    >
-                      {this.renderList((item: any), level + 1)}
-                    </NestedContainer>
-                  )}
-                </Draggable>
-              ),
+          {list.children.map((item: Quote | NestedQuoteList, index: number) =>
+            !item.children ? (
+              this.renderQuote((item: any), list.id, index)
+            ) : (
+              <Draggable
+                draggableId={item.id}
+                type={list.id}
+                key={item.id}
+                index={index}
+              >
+                {(
+                  dragProvided: DraggableProvided,
+                  dragSnapshot: DraggableStateSnapshot,
+                ) => (
+                  <NestedContainer
+                    innerRef={dragProvided.innerRef}
+                    isDragging={dragSnapshot.isDragging}
+                    {...dragProvided.draggableProps}
+                    {...dragProvided.dragHandleProps}
+                  >
+                    {this.renderList((item: any), level + 1)}
+                  </NestedContainer>
+                )}
+              </Draggable>
+            ),
           )}
         </Container>
       )}

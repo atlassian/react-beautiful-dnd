@@ -1,11 +1,10 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { type Position } from 'css-box-model';
-import moveToEdge from '../../../move-to-edge';
 import getDisplacement from '../../../get-displacement';
-import withDroppableDisplacement from '../../../with-droppable-displacement';
-import type { Edge } from '../../../move-to-edge';
-import type { Result } from '../move-cross-axis-types';
+import getDisplacementMap from '../../../get-displacement-map';
+import getDisplacedBy from '../../../get-displaced-by';
+import getWillDisplaceForward from '../../../will-displace-forward';
+import getHomeImpact from '../../../get-home-impact';
 import type {
   Axis,
   Viewport,
@@ -13,12 +12,11 @@ import type {
   DragImpact,
   DraggableDimension,
   DroppableDimension,
+  DisplacedBy,
 } from '../../../../types';
 
 type Args = {|
-  amount: Position,
-  homeIndex: number,
-  movingRelativeTo: DraggableDimension,
+  moveIntoIndexOf: ?DraggableDimension,
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
   destination: DroppableDimension,
@@ -27,83 +25,42 @@ type Args = {|
 |};
 
 export default ({
-  amount,
-  homeIndex,
-  movingRelativeTo,
+  moveIntoIndexOf,
   insideDestination,
   draggable,
   destination,
   previousImpact,
   viewport,
-}: Args): Result => {
-  const axis: Axis = destination.axis;
-  const targetIndex: number = insideDestination.indexOf(movingRelativeTo);
-
-  invariant(
-    targetIndex !== -1,
-    'Unable to find target in destination droppable',
-  );
-
-  // Moving back to original index
-  // Super simple - just move it back to the original center with no impact
-  if (targetIndex === homeIndex) {
-    const newCenter: Position = draggable.page.borderBox.center;
-    const newImpact: DragImpact = {
-      movement: {
-        displaced: [],
-        amount,
-        isBeyondStartPosition: false,
-      },
-      direction: destination.axis.direction,
-      destination: {
-        droppableId: destination.descriptor.id,
-        index: homeIndex,
-      },
-    };
-
-    return {
-      pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
-      impact: newImpact,
-    };
+}: Args): ?DragImpact => {
+  // this can happen when the position is not visible
+  if (!moveIntoIndexOf) {
+    return null;
   }
 
-  // When moving *before* where the item started:
-  // We align the dragging item top of the target
-  // and move everything from the target to the original position forwards
+  const axis: Axis = destination.axis;
+  const homeIndex: number = draggable.descriptor.index;
+  const targetIndex: number = moveIntoIndexOf.descriptor.index;
 
-  // When moving *after* where the item started:
-  // We align the dragging item to the end of the target
-  // and move everything from the target to the original position backwards
+  // Moving back home
+  if (homeIndex === targetIndex) {
+    return getHomeImpact(draggable, destination);
+  }
 
-  const isMovingPastOriginalIndex = targetIndex > homeIndex;
-  const edge: Edge = isMovingPastOriginalIndex ? 'end' : 'start';
-
-  const newCenter: Position = moveToEdge({
-    source: draggable.page.borderBox,
-    sourceEdge: edge,
-    destination: isMovingPastOriginalIndex
-      ? movingRelativeTo.page.borderBox
-      : movingRelativeTo.page.marginBox,
-    destinationEdge: edge,
-    destinationAxis: axis,
+  const willDisplaceForward: boolean = getWillDisplaceForward({
+    isInHomeList: true,
+    proposedIndex: targetIndex,
+    startIndexInHome: homeIndex,
   });
 
-  const modified: DraggableDimension[] = (() => {
-    if (!isMovingPastOriginalIndex) {
-      return insideDestination.slice(targetIndex, homeIndex);
-    }
-
-    // We are aligning to the bottom of the target and moving everything
-    // back to the original index backwards
-
-    // We want everything after the original index to move
-    const from: number = homeIndex + 1;
-    // We need the target to move backwards
-    const to: number = targetIndex + 1;
-
-    // Need to ensure that the list is sorted with the closest item being first
-    return insideDestination.slice(from, to).reverse();
-  })();
+  const isMovingAfterStart: boolean = !willDisplaceForward;
+  // Which draggables will need to move?
+  // Everything between the target index and the start index
+  const modified: DraggableDimension[] = isMovingAfterStart
+    ? // we will be displacing these items backwards
+      // homeIndex + 1 so we don't include the home
+      // .reverse() so the closest displaced will be first
+      insideDestination.slice(homeIndex + 1, targetIndex + 1).reverse()
+    : insideDestination.slice(targetIndex, homeIndex);
 
   const displaced: Displacement[] = modified.map(
     (dimension: DraggableDimension): Displacement =>
@@ -115,21 +72,31 @@ export default ({
       }),
   );
 
-  const newImpact: DragImpact = {
+  invariant(
+    displaced.length,
+    'Must displace as least one thing if not moving into the home index',
+  );
+
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    destination.axis,
+    draggable.displaceBy,
+    willDisplaceForward,
+  );
+
+  const impact: DragImpact = {
     movement: {
+      displacedBy,
       displaced,
-      amount,
-      isBeyondStartPosition: isMovingPastOriginalIndex,
+      map: getDisplacementMap(displaced),
+      willDisplaceForward,
     },
     direction: axis.direction,
     destination: {
       droppableId: destination.descriptor.id,
       index: targetIndex,
     },
+    merge: null,
   };
 
-  return {
-    pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
-    impact: newImpact,
-  };
+  return impact;
 };

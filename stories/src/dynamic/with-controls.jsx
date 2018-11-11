@@ -15,25 +15,62 @@ const ControlSection = styled('div')`
   margin: ${grid * 4}px;
 `;
 
-class Controls extends React.Component<*> {
+class Controls extends React.Component<{|
+  changeBy: number,
+  isCombineEnabled: boolean,
+  onChangeByChange: (changeBy: number) => void,
+  onCombineChange: () => void,
+|}> {
   render() {
     return (
       <ControlSection>
-        <h2>Controls</h2>
+        <h2>Add or remove items</h2>
         <ul>
           <li>
-            <kbd>b</kbd>: add Draggable to <strong>start</strong> of list
+            <strong>
+              <kbd>b</kbd>
+            </strong>
+            : add to <strong>start</strong> of list
           </li>
           <li>
-            <kbd>a</kbd>: add Draggable to <strong>end</strong> of list
+            <strong>
+              <kbd>a</kbd>
+            </strong>
+            : add to <strong>end</strong> of list
           </li>
           <li>
-            <kbd>s</kbd>: remove Draggable from <strong>start</strong> of list
+            <strong>
+              <kbd>s</kbd>
+            </strong>
+            : remove from <strong>start</strong> of list
           </li>
           <li>
-            <kbd>d</kbd>: remove Draggable from <strong>end</strong> of list
+            <strong>
+              <kbd>d</kbd>
+            </strong>
+            : remove from <strong>end</strong> of list
           </li>
         </ul>
+        <br />
+        Change by:{' '}
+        <input
+          type="number"
+          min="1"
+          max="10"
+          value={this.props.changeBy}
+          onChange={(event: SyntheticInputEvent<HTMLInputElement>) =>
+            this.props.onChangeByChange(Number(event.target.value))
+          }
+        />
+        <h2>Combine items</h2>
+        <p>
+          Can items be combined?{' '}
+          <input
+            type="checkbox"
+            checked={this.props.isCombineEnabled}
+            onChange={this.props.onCombineChange}
+          />
+        </p>
       </ControlSection>
     );
   }
@@ -41,6 +78,8 @@ class Controls extends React.Component<*> {
 
 type State = {|
   quoteMap: QuoteMap,
+  changeBy: number,
+  isCombineEnabled: boolean,
 |};
 
 const Container = styled('div')`
@@ -67,10 +106,9 @@ const createQuote = (() => {
 
 export default class WithControls extends React.Component<*, State> {
   state: State = {
-    quoteMap: {
-      // simpel for now
-      BMO: initial.BMO,
-    },
+    quoteMap: initial,
+    changeBy: 2,
+    isCombineEnabled: false,
   };
 
   componentDidMount() {
@@ -94,10 +132,16 @@ export default class WithControls extends React.Component<*, State> {
 
     // Add quote to start of list ('before')
     if (event.key === 'b') {
+      // eslint-disable-next-line no-console
+      console.log(`Adding ${this.state.changeBy} to start`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {
           const quotes: Quote[] = quoteMap[key];
-          previous[key] = [createQuote(), ...quotes];
+          const additions: Quote[] = Array.from(
+            { length: this.state.changeBy },
+            () => createQuote(),
+          );
+          previous[key] = [...additions, ...quotes];
           return previous;
         },
         {},
@@ -111,10 +155,16 @@ export default class WithControls extends React.Component<*, State> {
 
     // Add quote to end of list ('after')
     if (event.key === 'a') {
+      // eslint-disable-next-line no-console
+      console.log(`Adding ${this.state.changeBy} to end`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {
           const quotes: Quote[] = quoteMap[key];
-          previous[key] = [...quotes, createQuote()];
+          const additions: Quote[] = Array.from(
+            { length: this.state.changeBy },
+            () => createQuote(),
+          );
+          previous[key] = [...quotes, ...additions];
           return previous;
         },
         {},
@@ -128,11 +178,13 @@ export default class WithControls extends React.Component<*, State> {
 
     // Remove quote from end of list
     if (event.key === 'd') {
+      // eslint-disable-next-line no-console
+      console.log(`Removing ${this.state.changeBy} from end`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {
           const quotes: Quote[] = quoteMap[key];
           previous[key] = quotes.length
-            ? quotes.slice(0, quotes.length - 1)
+            ? quotes.slice(0, quotes.length - this.state.changeBy)
             : [];
           return previous;
         },
@@ -147,10 +199,14 @@ export default class WithControls extends React.Component<*, State> {
 
     // Remove quote from start of list
     if (event.key === 's') {
+      // eslint-disable-next-line no-console
+      console.log(`Removing ${this.state.changeBy} from start`);
       const map: QuoteMap = Object.keys(quoteMap).reduce(
         (previous: QuoteMap, key: string): QuoteMap => {
           const quotes: Quote[] = quoteMap[key];
-          previous[key] = quotes.length ? quotes.slice(1, quotes.length) : [];
+          previous[key] = quotes.length
+            ? quotes.slice(this.state.changeBy, quotes.length)
+            : [];
           return previous;
         },
         {},
@@ -189,16 +245,33 @@ export default class WithControls extends React.Component<*, State> {
   };
 
   render() {
-    const { quoteMap } = this.state;
+    const { quoteMap, isCombineEnabled, changeBy } = this.state;
     return (
       <DragDropContext
         onDragEnd={this.onDragEnd}
         onDragUpdate={this.onDragUpdate}
       >
-        <Controls />
+        <Controls
+          changeBy={changeBy}
+          isCombineEnabled={isCombineEnabled}
+          onChangeByChange={(value: number) =>
+            this.setState({ changeBy: value })
+          }
+          onCombineChange={() =>
+            this.setState({ isCombineEnabled: !this.state.isCombineEnabled })
+          }
+        />
         <Container>
           {Object.keys(quoteMap).map((key: string) => (
-            <QuoteList key={key} listId={key} quotes={quoteMap[key]} />
+            <QuoteList
+              key={key}
+              listId={key}
+              quotes={quoteMap[key]}
+              style={{ border: '3px solid blue', paddingBottom: grid }}
+              scrollContainerStyle={{ height: 300, border: '3px solid green' }}
+              internalScroll
+              isCombineEnabled={isCombineEnabled}
+            />
           ))}
         </Container>
       </DragDropContext>

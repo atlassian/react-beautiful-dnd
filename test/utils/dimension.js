@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import {
   createBox,
   getRect,
@@ -12,10 +13,13 @@ import { vertical } from '../../src/state/axis';
 import { noSpacing, offsetByPosition } from '../../src/state/spacing';
 import getViewport from '../../src/view/window/get-viewport';
 import scrollViewport from '../../src/state/scroll-viewport';
-import {
-  getDroppableDimension as getDroppable,
+import getDroppable, {
   type Closest,
-} from '../../src/state/droppable-dimension';
+} from '../../src/state/droppable/get-droppable';
+import {
+  toDroppableMap,
+  toDroppableList,
+} from '../../src/state/dimension-structures';
 import type {
   Axis,
   Placeholder,
@@ -30,6 +34,7 @@ import type {
   DroppableDimensionMap,
   DimensionMap,
   DraggingState,
+  ScrollSize,
 } from '../../src/types';
 
 type GetComputedSpacingArgs = {|
@@ -40,6 +45,11 @@ type GetComputedSpacingArgs = {|
 |};
 
 const origin: Position = { x: 0, y: 0 };
+
+export const getFrame = (droppable: DroppableDimension): Scrollable => {
+  invariant(droppable.frame);
+  return droppable.frame;
+};
 
 export const getComputedSpacing = ({
   margin = noSpacing,
@@ -84,9 +94,9 @@ export const makeScrollable = (
   });
 
   // add scroll space on the main axis
-  const scrollSize = {
-    width: borderBox.width + horizontalGrowth,
-    height: borderBox.height + verticalGrowth,
+  const scrollSize: ScrollSize = {
+    scrollWidth: borderBox.width + horizontalGrowth,
+    scrollHeight: borderBox.height + verticalGrowth,
   };
 
   const newClient: BoxModel = createBox({
@@ -106,12 +116,13 @@ export const makeScrollable = (
     direction: axis.direction,
     client: newClient,
     page: newPage,
+    isCombineEnabled: droppable.isCombineEnabled,
+    isFixedOnPage: droppable.isFixedOnPage,
     closest: {
       // using old dimensions for frame
       client: droppable.client,
       page: droppable.page,
-      scrollWidth: scrollSize.width,
-      scrollHeight: scrollSize.height,
+      scrollSize,
       scroll: origin,
       shouldClipSubject: true,
     },
@@ -152,15 +163,6 @@ const getPlaceholder = (client: BoxModel): Placeholder => ({
   display: 'block',
 });
 
-export const getClosestScrollable = (
-  droppable: DroppableDimension,
-): Scrollable => {
-  if (!droppable.viewport.closestScrollable) {
-    throw new Error('Cannot get closest scrollable');
-  }
-  return droppable.viewport.closestScrollable;
-};
-
 type GetDraggableArgs = {|
   descriptor: DraggableDescriptor,
   borderBox: Spacing,
@@ -184,24 +186,28 @@ export const getDraggableDimension = ({
     padding,
     border,
   });
+  const displaceBy: Position = {
+    x: client.marginBox.width,
+    y: client.marginBox.height,
+  };
 
   const result: DraggableDimension = {
     descriptor,
     client,
     page: withScroll(client, windowScroll),
     placeholder: getPlaceholder(client),
+    displaceBy,
   };
 
   return result;
 };
 
-type ClosestSubset = {|
+type ClosestMaker = {|
   borderBox: Spacing,
   margin?: Spacing,
   border?: Spacing,
   padding?: Spacing,
-  scrollHeight: number,
-  scrollWidth: number,
+  scrollSize: ScrollSize,
   scroll: Position,
   shouldClipSubject: boolean,
 |};
@@ -214,8 +220,10 @@ type GetDroppableArgs = {|
   border?: Spacing,
   padding?: Spacing,
   windowScroll?: Position,
-  closest?: ?ClosestSubset,
+  closest?: ?ClosestMaker,
   isEnabled?: boolean,
+  isFixedOnPage?: boolean,
+  isCombineEnabled?: boolean,
 |};
 
 export const getDroppableDimension = ({
@@ -228,6 +236,8 @@ export const getDroppableDimension = ({
   closest,
   isEnabled = true,
   direction = 'vertical',
+  isFixedOnPage = false,
+  isCombineEnabled = false,
 }: GetDroppableArgs): DroppableDimension => {
   const client: BoxModel = createBox({
     borderBox,
@@ -254,8 +264,7 @@ export const getDroppableDimension = ({
     const result: Closest = {
       client: frameClient,
       page: framePage,
-      scrollHeight: closest.scrollHeight,
-      scrollWidth: closest.scrollWidth,
+      scrollSize: closest.scrollSize,
       scroll: closest.scroll,
       shouldClipSubject: closest.shouldClipSubject,
     };
@@ -270,6 +279,8 @@ export const getDroppableDimension = ({
     client,
     page,
     closest: closestScrollable,
+    isCombineEnabled,
+    isFixedOnPage,
   });
 };
 
@@ -544,8 +555,8 @@ export const getPreset = (axis?: Axis = vertical) => {
     emptyForeign,
     droppables,
     draggables,
-    inHomeList,
     dimensions,
+    inHomeList,
     inForeignList,
     windowScroll,
     viewport,
@@ -593,6 +604,7 @@ export const shiftDraggables = ({
           ...dimension.descriptor,
           index: dimension.descriptor.index + indexChange,
         },
+        displaceBy: dimension.displaceBy,
         client,
         page,
         placeholder: {
@@ -607,3 +619,15 @@ export const shiftDraggables = ({
       previous[current.descriptor.id] = current;
       return previous;
     }, {});
+
+export const enableCombining = (
+  droppables: DroppableDimensionMap,
+): DroppableDimensionMap =>
+  toDroppableMap(
+    toDroppableList(droppables).map(
+      (droppable: DroppableDimension): DroppableDimension => ({
+        ...droppable,
+        isCombineEnabled: true,
+      }),
+    ),
+  );

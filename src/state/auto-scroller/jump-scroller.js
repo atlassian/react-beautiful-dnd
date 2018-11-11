@@ -8,10 +8,10 @@ import {
   getWindowOverlap,
   getDroppableOverlap,
 } from './can-scroll';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import { type MoveArgs } from '../action-creators';
 import type {
   DroppableDimension,
-  DraggableLocation,
   Viewport,
   DraggingState,
   DroppableId,
@@ -33,9 +33,8 @@ export default ({
   scrollWindow,
 }: Args): JumpScroller => {
   const moveByOffset = (state: DraggingState, offset: Position) => {
-    // TODO: use center?
     const client: Position = add(state.current.client.selection, offset);
-    move({ client, shouldAnimate: true });
+    move({ client });
   };
 
   const scrollDroppableAsMuchAsItCan = (
@@ -64,11 +63,16 @@ export default ({
   };
 
   const scrollWindowAsMuchAsItCan = (
+    isWindowScrollAllowed: boolean,
     viewport: Viewport,
     change: Position,
   ): ?Position => {
-    // window cannot absorb any of the scroll
+    if (!isWindowScrollAllowed) {
+      return change;
+    }
+
     if (!canScrollWindow(viewport, change)) {
+      // window cannot absorb any of the scroll
       return change;
     }
 
@@ -95,8 +99,7 @@ export default ({
       return;
     }
 
-    const destination: ?DraggableLocation = state.impact.destination;
-
+    const destination: ?DroppableId = whatIsDraggedOver(state.impact);
     invariant(
       destination,
       'Cannot perform a jump scroll when there is no destination',
@@ -106,7 +109,7 @@ export default ({
     // leaving the list
 
     const droppableRemainder: ?Position = scrollDroppableAsMuchAsItCan(
-      state.dimensions.droppables[destination.droppableId],
+      state.dimensions.droppables[destination],
       request,
     );
 
@@ -117,6 +120,7 @@ export default ({
 
     const viewport: Viewport = state.viewport;
     const windowRemainder: ?Position = scrollWindowAsMuchAsItCan(
+      state.isWindowScrollAllowed,
       viewport,
       droppableRemainder,
     );

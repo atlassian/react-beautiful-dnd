@@ -3,12 +3,11 @@ import invariant from 'tiny-invariant';
 import type { DropResult, State } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
 import middleware from '../../../../src/state/middleware/drop-animation-finish';
-import dropMiddleware from '../../../../src/state/middleware/drop';
+import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
 import { add } from '../../../../src/state/position';
 import {
-  prepare,
   initialPublish,
   completeDrop,
   move,
@@ -27,7 +26,6 @@ it('should fire a complete drop action when a drop animation finish action is fi
     middleware,
   );
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
 
   expect(store.getState().phase).toBe('DRAGGING');
@@ -35,8 +33,7 @@ it('should fire a complete drop action when a drop animation finish action is fi
   // A small movement so a drop animation will be needed
   store.dispatch(
     move({
-      client: add(initialPublishArgs.client.selection, { x: 1, y: 1 }),
-      shouldAnimate: true,
+      client: add(initialPublishArgs.clientSelection, { x: 1, y: 1 }),
     }),
   );
   store.dispatch(drop({ reason: 'DROP' }));

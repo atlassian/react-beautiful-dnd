@@ -11,12 +11,18 @@ import type {
   Provided as DraggableProvided,
   StateSnapshot as DraggableStateSnapshot,
 } from '../../../../src/view/draggable/draggable-types';
+import { getComputedSpacing } from '../../../utils/dimension';
 
 type Props = {|
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
   throwFn: () => void,
 |};
+
+// Stubbing out totally - not including margins in this
+jest
+  .spyOn(window, 'getComputedStyle')
+  .mockImplementation(() => getComputedSpacing({}));
 
 class WillThrow extends React.Component<Props> {
   componentDidUpdate(previous: Props) {
@@ -79,6 +85,16 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
+const whenIdle: DraggableStateSnapshot = {
+  draggingOver: null,
+  dropAnimation: null,
+  isDropAnimating: false,
+  isDragging: false,
+  combineWith: null,
+  combineTargetFor: null,
+  mode: null,
+};
+
 it('should reset the application state and swallow the exception if an invariant exception occurs', () => {
   const wrapper: ReactWrapper = withThrow(() => invariant(false));
 
@@ -86,22 +102,14 @@ it('should reset the application state and swallow the exception if an invariant
   wrapper.find(WillThrow).simulate('keydown', { keyCode: keyCodes.space });
   // throw is swallowed
   expect(() => jest.runOnlyPendingTimers()).not.toThrow();
-  // Messages printed
-  expect(console.warn).toHaveBeenCalledWith(
-    expect.stringContaining('Any existing drag will be cancelled'),
-  );
+  // Message printed
   expect(console.error).toHaveBeenCalled();
 
   // WillThrough can still be found in the DOM
   const willThrough: ReactWrapper = wrapper.find(WillThrow);
   expect(willThrough.length).toBeTruthy();
-  const expected: DraggableStateSnapshot = {
-    draggingOver: null,
-    isDragging: false,
-    isDropAnimating: false,
-  };
   // no longer dragging
-  expect(willThrough.props().snapshot).toEqual(expected);
+  expect(willThrough.props().snapshot).toEqual(whenIdle);
 });
 
 it('should not reset the application state an exception occurs and throw it', () => {
@@ -110,22 +118,15 @@ it('should not reset the application state an exception occurs and throw it', ()
   });
 
   // Execute a lift which will throw an error
-  wrapper.find(WillThrow).simulate('keydown', { keyCode: keyCodes.space });
   // throw is NOT swallowed
-  expect(() => jest.runOnlyPendingTimers()).toThrow();
+  expect(() =>
+    wrapper.find(WillThrow).simulate('keydown', { keyCode: keyCodes.space }),
+  ).toThrow();
   // Messages printed
-  expect(console.warn).toHaveBeenCalledWith(
-    expect.stringContaining('Any existing drag will be cancelled'),
-  );
   expect(console.error).toHaveBeenCalled();
 
   const willThrough: ReactWrapper = wrapper.find(WillThrow);
   expect(willThrough.length).toBeTruthy();
-  const expected: DraggableStateSnapshot = {
-    draggingOver: null,
-    isDragging: false,
-    isDropAnimating: false,
-  };
   // no longer dragging
-  expect(willThrough.props().snapshot).toEqual(expected);
+  expect(willThrough.props().snapshot).toEqual(whenIdle);
 });

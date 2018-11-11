@@ -14,7 +14,6 @@ import {
   drop,
   completeDrop,
   collectionStarting,
-  prepare,
   initialPublish,
   moveDown,
   type InitialPublishArgs,
@@ -40,7 +39,6 @@ shouldCancel.forEach((action: Action) => {
     const scroller: AutoScroller = getScrollerStub();
     const store: Store = createStore(middleware(() => scroller));
 
-    store.dispatch(prepare());
     store.dispatch(initialPublish(initialPublishArgs));
     expect(store.getState().phase).toBe('DRAGGING');
 
@@ -54,7 +52,6 @@ it('should fire a fluid scroll when in the FLUID auto scrolling mode', () => {
   const scroller: AutoScroller = getScrollerStub();
   const store: Store = createStore(middleware(() => scroller));
 
-  store.dispatch(prepare());
   expect(scroller.fluidScroll).not.toHaveBeenCalled();
 
   store.dispatch(initialPublish(initialPublishArgs));
@@ -68,11 +65,10 @@ it('should fire a fluid scroll when in the FLUID auto scrolling mode', () => {
 it('should fire a jump scroll when in the JUMP auto scrolling mode and there is a scroll jump request', () => {
   const customInitial: InitialPublishArgs = {
     ...initialPublishArgs,
-    autoScrollMode: 'JUMP',
+    movementMode: 'SNAP',
   };
   const scroller: AutoScroller = getScrollerStub();
   const store: Store = createStore(middleware(() => scroller));
-  store.dispatch(prepare());
 
   store.dispatch(initialPublish(customInitial));
   expect(scroller.jumpScroll).not.toHaveBeenCalled();

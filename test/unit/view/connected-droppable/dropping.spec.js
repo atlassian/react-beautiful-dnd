@@ -14,7 +14,24 @@ const preset = getPreset();
 const state = getStatePreset();
 
 describe('was being dragged over', () => {
-  it('should not break memoization from the dragging phase', () => {
+  it('should not break memoization from a reorder', () => {
+    const ownProps: OwnProps = getOwnProps(preset.home);
+    const selector: Selector = makeMapStateToProps();
+
+    const whileDragging: MapProps = selector(state.dragging(), ownProps);
+    const whileDropping: MapProps = selector(state.dropAnimating(), ownProps);
+
+    const expected: MapProps = {
+      isDraggingOver: true,
+      draggingOverWith: preset.inHome1.descriptor.id,
+      placeholder: null,
+    };
+    expect(whileDragging).toEqual(expected);
+    // referential equality: memoization check
+    expect(whileDragging).toBe(whileDropping);
+  });
+
+  it('should not break memoization from a combine', () => {
     const ownProps: OwnProps = getOwnProps(preset.home);
     const selector: Selector = makeMapStateToProps();
 

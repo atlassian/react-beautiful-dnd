@@ -16,7 +16,12 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DimensionMap,
+  Viewport,
 } from '../../../../src/types';
+import { setViewport } from '../../../utils/viewport';
+
+const viewport: Viewport = preset.viewport;
+setViewport(viewport);
 
 const defaultRequest: LiftRequest = {
   draggableId: critical.draggable.id,
@@ -65,12 +70,10 @@ it('should publish the registered dimensions (simple)', () => {
   );
   marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
 
-  const result: StartPublishingResult = marshal.startPublishing(
-    defaultRequest,
-    preset.windowScroll,
-  );
+  const result: StartPublishingResult = marshal.startPublishing(defaultRequest);
   const expected: StartPublishingResult = {
     critical,
+    viewport,
     dimensions: {
       draggables: {
         [preset.inHome1.descriptor.id]: preset.inHome1,
@@ -89,14 +92,12 @@ it('should publish the registered dimensions (preset)', () => {
   const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
   populateMarshal(marshal);
 
-  const result: StartPublishingResult = marshal.startPublishing(
-    defaultRequest,
-    preset.windowScroll,
-  );
+  const result: StartPublishingResult = marshal.startPublishing(defaultRequest);
 
   expect(result).toEqual({
     critical,
     dimensions: preset.dimensions,
+    viewport,
   });
 });
 
@@ -104,15 +105,13 @@ it('should not publish dimensions that do not have the same type as the critical
   const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
   populateMarshal(marshal, withNewType);
 
-  const result: StartPublishingResult = marshal.startPublishing(
-    defaultRequest,
-    preset.windowScroll,
-  );
+  const result: StartPublishingResult = marshal.startPublishing(defaultRequest);
 
   expect(result).toEqual({
     critical,
     // dimensions with new type not gathered
     dimensions: preset.dimensions,
+    viewport,
   });
 });
 
@@ -133,18 +132,17 @@ it('should not publish dimensions that have been unregistered', () => {
     delete expectedMap.draggables[draggable.descriptor.id];
   });
 
-  const result: StartPublishingResult = marshal.startPublishing(
-    defaultRequest,
-    preset.windowScroll,
-  );
+  const result: StartPublishingResult = marshal.startPublishing(defaultRequest);
 
   expect(result).toEqual({
     critical,
     dimensions: expectedMap,
+    viewport,
   });
   expect(result).not.toEqual({
     critical,
     dimensions: preset.dimensions,
+    viewport,
   });
 });
 
@@ -165,15 +163,13 @@ it('should publish draggables that have been updated (index change)', () => {
     () => updatedInHome2,
   );
 
-  const result: StartPublishingResult = marshal.startPublishing(
-    defaultRequest,
-    preset.windowScroll,
-  );
+  const result: StartPublishingResult = marshal.startPublishing(defaultRequest);
   const expected: DimensionMap = copy(preset.dimensions);
   expected.draggables[preset.inHome2.descriptor.id] = updatedInHome2;
   expect(result).toEqual({
     critical,
     dimensions: expected,
+    viewport,
   });
 });
 
@@ -215,12 +211,10 @@ it('should publish droppables that have been updated (id change)', () => {
     expected.draggables[draggable.descriptor.id] = updated;
   });
 
-  const result: StartPublishingResult = marshal.startPublishing(
-    defaultRequest,
-    preset.windowScroll,
-  );
+  const result: StartPublishingResult = marshal.startPublishing(defaultRequest);
 
   expect(result).toEqual({
+    viewport,
     critical: {
       draggable: {
         ...critical.draggable,
@@ -234,7 +228,7 @@ it('should publish droppables that have been updated (id change)', () => {
 
 describe('subsequent calls', () => {
   const start = (marshal: DimensionMarshal) =>
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
   const stop = (marshal: DimensionMarshal) => marshal.stopPublishing();
 
   it('should return dimensions a subsequent call', () => {
@@ -245,6 +239,7 @@ describe('subsequent calls', () => {
     const expected: StartPublishingResult = {
       critical,
       dimensions: preset.dimensions,
+      viewport,
     };
 
     expect(start(marshal)).toEqual(expected);
@@ -276,6 +271,7 @@ describe('subsequent calls', () => {
     expect(result1).toEqual({
       critical,
       dimensions: preset.dimensions,
+      viewport,
     });
 
     // Update while first drag is occurring
@@ -303,6 +299,7 @@ describe('subsequent calls', () => {
     expect(result2).toEqual({
       critical,
       dimensions: expected,
+      viewport,
     });
   });
 });

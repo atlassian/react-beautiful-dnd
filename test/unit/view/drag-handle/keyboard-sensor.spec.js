@@ -82,7 +82,7 @@ describe('initiation', () => {
 
     expect(callbacks.onLift).toHaveBeenCalledWith({
       clientSelection: fakeCenter,
-      autoScrollMode: 'JUMP',
+      movementMode: 'SNAP',
     });
     // default action is prevented
     expect(event.preventDefault).toHaveBeenCalled();

@@ -30,7 +30,8 @@ module.exports = {
     'lines-between-class-members': 'off',
 
     // Allowing warning and error console logging
-    'no-console': ['error', { allow: ['warn', 'error'] }],
+    // use `invariant` and `warning`
+    'no-console': ['error'],
 
     // Opting out of prefer destructuring (nicer with flow in lots of cases)
     'prefer-destructuring': 'off',

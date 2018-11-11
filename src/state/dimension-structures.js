@@ -1,8 +1,7 @@
 // @flow
 import memoizeOne from 'memoize-one';
+import { values } from '../native-with-fallback';
 import type {
-  DroppableId,
-  DraggableId,
   DroppableDimension,
   DroppableDimensionMap,
   DraggableDimension,
@@ -27,14 +26,10 @@ export const toDraggableMap = memoizeOne(
 
 export const toDroppableList = memoizeOne(
   (droppables: DroppableDimensionMap): DroppableDimension[] =>
-    Object.keys(droppables).map(
-      (id: DroppableId): DroppableDimension => droppables[id],
-    ),
+    values(droppables),
 );
 
 export const toDraggableList = memoizeOne(
   (draggables: DraggableDimensionMap): DraggableDimension[] =>
-    Object.keys(draggables).map(
-      (id: DraggableId): DraggableDimension => draggables[id],
-    ),
+    values(draggables),
 );

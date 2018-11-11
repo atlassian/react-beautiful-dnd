@@ -9,25 +9,29 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
   // Always let the action go through first
   next(action);
 
-  if (action.type !== 'PUBLISH') {
+  if (action.type !== 'PUBLISH_WHILE_DRAGGING') {
     return;
   }
 
   // A bulk replace occurred - check if
-  // 1. there was a pending drop
+  // 1. there is a pending drop
   // 2. that the pending drop is no longer waiting
 
   const postActionState: State = store.getState();
 
+  // no pending drop after the publish
   if (postActionState.phase !== 'DROP_PENDING') {
     return;
   }
 
-  if (!postActionState.isWaiting) {
-    store.dispatch(
-      drop({
-        reason: postActionState.reason,
-      }),
-    );
+  // the pending drop is still waiting for completion
+  if (postActionState.isWaiting) {
+    return;
   }
+
+  store.dispatch(
+    drop({
+      reason: postActionState.reason,
+    }),
+  );
 };

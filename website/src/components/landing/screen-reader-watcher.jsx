@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import styled from 'react-emotion';
+import invariant from 'tiny-invariant';
 import { grid } from '../../constants';
 
 const FeedbackIcon = () => 'TODO';
@@ -65,10 +66,7 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
       '[id^=react-beautiful-dnd-announcement]',
     );
 
-    if (!target) {
-      console.error('Could not find screen reader target');
-      return;
-    }
+    invariant(target, 'Could not find screen reader target');
 
     this.observer = new MutationObserver(this.onMutation);
     this.observer.observe(target, { childList: true });
