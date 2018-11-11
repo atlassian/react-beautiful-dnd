@@ -88,6 +88,8 @@ You can check out all the features that will be landing soon [on our issue page]
 
 We have created upgrade instructions in our release notes to help you upgrade to the latest version!
 
+- [Upgrading from `9.x` to `10.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v10.0.0)
+- [Upgrading from `8.x` to `9.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v9.0.0)
 - [Upgrading from `7.x` to `8.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v8.0.0)
 - [Upgrading from `6.x` to `7.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v7.0.0)
 - [Upgrading from `5.x` to `6.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v6.0.0)
