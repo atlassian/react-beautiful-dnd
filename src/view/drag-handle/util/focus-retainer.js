@@ -1,5 +1,6 @@
 // @flow
 import getDragHandleRef from './get-drag-handle-ref';
+import { warning } from '../../../dev-warning';
 import type { DraggableId } from '../../../types';
 
 type FocusRetainer = {|
@@ -80,7 +81,7 @@ const tryRestoreFocus = (id: DraggableId, draggableRef: HTMLElement) => {
   const dragHandleRef: ?HTMLElement = getDragHandleRef(draggableRef);
 
   if (!dragHandleRef) {
-    console.warn('Could not find drag handle in the DOM to focus on it');
+    warning('Could not find drag handle in the DOM to focus on it');
     return;
   }
   dragHandleRef.focus();

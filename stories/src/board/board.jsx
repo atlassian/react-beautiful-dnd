@@ -2,21 +2,16 @@
 import React, { Component } from 'react';
 import styled from 'react-emotion';
 import { injectGlobal } from 'emotion';
-import { action } from '@storybook/addon-actions';
 import Column from './column';
 import { colors } from '../constants';
 import reorder, { reorderQuoteMap } from '../reorder';
 import { DragDropContext, Droppable } from '../../../src';
 import type {
   DropResult,
-  DragStart,
   DraggableLocation,
   DroppableProvided,
 } from '../../../src';
-import type { QuoteMap } from '../types';
-
-const publishOnDragStart = action('onDragStart');
-const publishOnDragEnd = action('onDragEnd');
+import type { QuoteMap, Quote } from '../types';
 
 const ParentContainer = styled('div')`
   height: ${({ height }) => height};
@@ -34,6 +29,8 @@ const Container = styled('div')`
 
 type Props = {|
   initial: QuoteMap,
+  withScrollableColumns?: boolean,
+  isCombineEnabled?: boolean,
   containerHeight?: string,
 |};
 
@@ -44,6 +41,9 @@ type State = {|
 
 export default class Board extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
+  static defaultProps = {
+    isCombineEnabled: false,
+  };
 
   state: State = {
     columns: this.props.initial,
@@ -63,12 +63,25 @@ export default class Board extends Component<Props, State> {
     /* stylelint-enable */
   }
 
-  onDragStart = (initial: DragStart) => {
-    publishOnDragStart(initial);
-  };
-
   onDragEnd = (result: DropResult) => {
-    publishOnDragEnd(result);
+    if (result.combine) {
+      if (result.type === 'COLUMN') {
+        const shallow: string[] = [...this.state.ordered];
+        shallow.splice(result.source.index, 1);
+        this.setState({ ordered: shallow });
+        return;
+      }
+
+      const column: Quote[] = this.state.columns[result.source.droppableId];
+      const withQuoteRemoved: Quote[] = [...column];
+      withQuoteRemoved.splice(result.source.index, 1);
+      const columns: QuoteMap = {
+        ...this.state.columns,
+        [result.source.droppableId]: withQuoteRemoved,
+      };
+      this.setState({ columns });
+      return;
+    }
 
     // dropped nowhere
     if (!result.destination) {
@@ -123,6 +136,7 @@ export default class Board extends Component<Props, State> {
         type="COLUMN"
         direction="horizontal"
         ignoreContainerClipping={Boolean(containerHeight)}
+        isCombineEnabled={this.props.isCombineEnabled}
       >
         {(provided: DroppableProvided) => (
           <Container innerRef={provided.innerRef} {...provided.droppableProps}>
@@ -132,6 +146,8 @@ export default class Board extends Component<Props, State> {
                 index={index}
                 title={key}
                 quotes={columns[key]}
+                isScrollable={this.props.withScrollableColumns}
+                isCombineEnabled={this.props.isCombineEnabled}
               />
             ))}
           </Container>
@@ -140,11 +156,8 @@ export default class Board extends Component<Props, State> {
     );
 
     return (
-      <DragDropContext
-        onDragStart={this.onDragStart}
-        onDragEnd={this.onDragEnd}
-      >
-        {this.props.containerHeight ? (
+      <DragDropContext onDragEnd={this.onDragEnd}>
+        {containerHeight ? (
           <ParentContainer height={containerHeight}>{board}</ParentContainer>
         ) : (
           board

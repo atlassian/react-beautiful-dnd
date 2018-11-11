@@ -1,7 +1,7 @@
 // @flow
 import { getRect, type Rect, type Position } from 'css-box-model';
 import getClosestDraggable from '../../../../../src/state/move-in-direction/move-cross-axis/get-closest-draggable';
-import { scrollDroppable } from '../../../../../src/state/droppable-dimension';
+import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
 import { add, distance, patch } from '../../../../../src/state/position';
 import {
   getDroppableDimension,
@@ -230,8 +230,10 @@ describe('get closest draggable', () => {
           borderBox,
           closest: {
             borderBox: expandByPosition(borderBox, patch(axis.line, 100)),
-            scrollHeight: borderBox.width + 100,
-            scrollWidth: borderBox.height + 100,
+            scrollSize: {
+              scrollHeight: borderBox.width + 100,
+              scrollWidth: borderBox.height + 100,
+            },
             scroll: { x: 0, y: 0 },
             shouldClipSubject: true,
           },

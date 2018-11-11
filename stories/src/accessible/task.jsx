@@ -1,5 +1,8 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, type Node } from 'react';
+import ReactDOM from 'react-dom';
+import memoizeOne from 'memoize-one';
+import invariant from 'tiny-invariant';
 import styled from 'react-emotion';
 import { Draggable } from '../../../src';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
@@ -22,6 +25,18 @@ const Container = styled('div')`
     isDragging ? 'box-shadow: 1px 1px 1px grey; background: lightblue' : ''};
 `;
 
+const getPortal = memoizeOne(
+  (): HTMLElement => {
+    invariant(document);
+    const body: ?HTMLBodyElement = document.body;
+    invariant(body);
+    const el: HTMLElement = document.createElement('div');
+    el.className = 'rbd-portal';
+    body.appendChild(el);
+    return el;
+  },
+);
+
 export default class Task extends Component<Props> {
   render() {
     const task: TaskType = this.props.task;
@@ -29,17 +44,25 @@ export default class Task extends Component<Props> {
 
     return (
       <Draggable draggableId={task.id} index={index}>
-        {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-          <Container
-            innerRef={provided.innerRef}
-            isDragging={snapshot.isDragging}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            aria-roledescription="Draggable task. Press space bar to lift"
-          >
-            {this.props.task.content}
-          </Container>
-        )}
+        {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
+          const child: Node = (
+            <Container
+              innerRef={provided.innerRef}
+              isDragging={snapshot.isDragging}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+              aria-roledescription="Draggable task. Press space bar to lift"
+            >
+              {this.props.task.content}
+            </Container>
+          );
+
+          if (!snapshot.isDragging) {
+            return child;
+          }
+
+          return ReactDOM.createPortal(child, getPortal());
+        }}
       </Draggable>
     );
   }

@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react';
+import invariant from 'tiny-invariant';
 import PropTypes from 'prop-types';
+import DroppableDimensionPublisher from '../droppable-dimension-publisher';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
 import type { DroppableId, TypeId } from '../../types';
-import DroppableDimensionPublisher from '../droppable-dimension-publisher';
 import Placeholder from '../placeholder';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import {
@@ -11,6 +12,7 @@ import {
   droppableTypeKey,
   styleContextKey,
 } from '../context-keys';
+import { warning } from '../../dev-warning';
 
 type Context = {
   [string]: DroppableId | TypeId,
@@ -20,7 +22,7 @@ export default class Droppable extends Component<Props> {
   /* eslint-disable react/sort-comp */
   styleContext: string;
   ref: ?HTMLElement = null;
-  isPlaceholderMounted: boolean = false;
+  placeholderRef: ?HTMLElement = null;
 
   // Need to declare childContextTypes without flow
   static contextTypes = {
@@ -31,6 +33,11 @@ export default class Droppable extends Component<Props> {
     super(props, context);
 
     this.styleContext = context[styleContextKey];
+
+    // a little check to avoid an easy to catch setup
+    if (process.env.NODE_ENV !== 'production') {
+      invariant(props.droppableId, 'A Droppable requires a droppableId prop');
+    }
   }
 
   // Need to declare childContextTypes without flow
@@ -57,6 +64,12 @@ export default class Droppable extends Component<Props> {
     this.warnIfPlaceholderNotMounted();
   }
 
+  componentWillUnmount() {
+    // allowing garbage collection
+    this.ref = null;
+    this.placeholderRef = null;
+  }
+
   warnIfPlaceholderNotMounted() {
     if (process.env.NODE_ENV === 'production') {
       return;
@@ -66,11 +79,11 @@ export default class Droppable extends Component<Props> {
       return;
     }
 
-    if (this.isPlaceholderMounted) {
+    if (this.placeholderRef) {
       return;
     }
 
-    console.warn(`
+    warning(`
       Droppable setup issue: DroppableProvided > placeholder could not be found.
       Please be sure to add the {provided.placeholder} Node as a child of your Droppable
 
@@ -80,18 +93,15 @@ export default class Droppable extends Component<Props> {
 
   /* eslint-enable */
 
-  onPlaceholderMount = () => {
-    this.isPlaceholderMounted = true;
+  setPlaceholderRef = (ref: ?HTMLElement) => {
+    this.placeholderRef = ref;
   };
 
-  onPlaceholderUnmount = () => {
-    this.isPlaceholderMounted = false;
-  };
+  getPlaceholderRef = () => this.placeholderRef;
 
   // React calls ref callback twice for every render
   // https://github.com/facebook/react/pull/8333/files
   setRef = (ref: ?HTMLElement) => {
-    // TODO: need to clear this.state.ref on unmount
     if (ref === null) {
       return;
     }
@@ -114,22 +124,24 @@ export default class Droppable extends Component<Props> {
     return (
       <Placeholder
         placeholder={this.props.placeholder}
-        onMount={this.onPlaceholderMount}
-        onUnmount={this.onPlaceholderUnmount}
+        innerRef={this.setPlaceholderRef}
       />
     );
   }
 
   render() {
     const {
+      // ownProps
       children,
       direction,
+      type,
       droppableId,
+      isDropDisabled,
+      isCombineEnabled,
+      // mapProps
       ignoreContainerClipping,
       isDraggingOver,
-      isDropDisabled,
       draggingOverWith,
-      type,
     } = this.props;
     const provided: Provided = {
       innerRef: this.setRef,
@@ -150,7 +162,9 @@ export default class Droppable extends Component<Props> {
         direction={direction}
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
+        isCombineEnabled={isCombineEnabled}
         getDroppableRef={this.getDroppableRef}
+        getPlaceholderRef={this.getPlaceholderRef}
       >
         {children(provided, snapshot)}
       </DroppableDimensionPublisher>

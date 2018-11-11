@@ -1,12 +1,12 @@
 // @flow
 import { type Position } from 'css-box-model';
 import { type Node } from 'react';
-import type { AutoScrollMode, DraggableId } from '../../types';
+import type { MovementMode, DraggableId } from '../../types';
 
 export type Callbacks = {|
   onLift: ({
     clientSelection: Position,
-    autoScrollMode: AutoScrollMode,
+    movementMode: MovementMode,
   }) => void,
   onMove: (point: Position) => mixed,
   onWindowScroll: () => mixed,

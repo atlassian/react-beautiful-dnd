@@ -18,7 +18,7 @@ import type { PixelThresholds } from '../../../../src/state/auto-scroller/fluid-
 import { add, patch, subtract } from '../../../../src/state/position';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import { createViewport } from '../../../utils/viewport';
-import noImpact, { noMovement } from '../../../../src/state/no-impact';
+import noImpact from '../../../../src/state/no-impact';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import fluidScroller, {
   getPixelThresholds,
@@ -27,15 +27,15 @@ import fluidScroller, {
 } from '../../../../src/state/auto-scroller/fluid-scroller';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import {
-  getClosestScrollable,
   getDraggableDimension,
   getDroppableDimension,
   getPreset,
   addDraggable,
   addDroppable,
+  getFrame,
 } from '../../../utils/dimension';
 import { expandByPosition } from '../../../../src/state/spacing';
-import { scrollDroppable } from '../../../../src/state/droppable-dimension';
+import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -113,8 +113,10 @@ describe('fluid auto scrolling', () => {
         },
         closest: {
           borderBox: frameClient.borderBox,
-          scrollWidth: scrollableScrollSize.scrollWidth,
-          scrollHeight: scrollableScrollSize.scrollHeight,
+          scrollSize: {
+            scrollWidth: scrollableScrollSize.scrollWidth,
+            scrollHeight: scrollableScrollSize.scrollHeight,
+          },
           scroll: origin,
           shouldClipSubject: true,
         },
@@ -929,8 +931,7 @@ describe('fluid auto scrolling', () => {
           it('should allow scrolling to the end of the droppable', () => {
             const target: Position = onEndOfFrame;
             // scrolling to max scroll point
-            const maxChange: Position = getClosestScrollable(scrollable).scroll
-              .max;
+            const maxChange: Position = getFrame(scrollable).scroll.max;
             const scrolled: DroppableDimension = scrollDroppable(
               scrollable,
               maxChange,
@@ -1064,119 +1065,27 @@ describe('fluid auto scrolling', () => {
             });
           });
 
-          describe('over home list', () => {
-            it('should not scroll if the droppable if moving past the end of the frame', () => {
-              const target: Position = add(onEndOfFrame, patch(axis.line, 1));
-              // scrolling to max scroll point
-              const maxChange: Position = getClosestScrollable(scrollable)
-                .scroll.max;
-              const scrolled: DroppableDimension = scrollDroppable(
-                scrollable,
-                maxChange,
-              );
-
-              fluidScroll(
-                addDroppable(
-                  dragTo({
-                    selection: target,
-                    viewport: unscrollableViewport,
-                  }),
-                  scrolled,
-                ),
-              );
-              requestAnimationFrame.flush();
-
-              expect(mocks.scrollDroppable).not.toHaveBeenCalled();
-            });
-          });
-
-          describe('over foreign list', () => {
-            const foreign: DroppableDimension = {
-              ...scrollable,
-              descriptor: preset.foreign.descriptor,
-            };
-            const placeholder: Position = patch(
-              axis.line,
-              preset.inHome1.placeholder.client.borderBox[axis.size],
+          it('should not scroll if the droppable if moving past the end of the frame', () => {
+            const target: Position = add(onEndOfFrame, patch(axis.line, 1));
+            // scrolling to max scroll point
+            const maxChange: Position = getFrame(scrollable).scroll.max;
+            const scrolled: DroppableDimension = scrollDroppable(
+              scrollable,
+              maxChange,
             );
-            const overForeign: DragImpact = {
-              movement: noMovement,
-              direction: foreign.axis.direction,
-              destination: {
-                index: 0,
-                droppableId: foreign.descriptor.id,
-              },
-            };
 
-            it('should allow scrolling up to the end of the frame + the size of the placeholder', () => {
-              // scrolling to just before the end of the placeholder
-              // this goes beyond the usual max scroll.
-              const scroll: Position = add(
-                // usual max scroll
-                getClosestScrollable(foreign).scroll.max,
-                // with a small bit of room towards the end of the placeholder space
-                subtract(placeholder, patch(axis.line, 1)),
-              );
-              const scrolledForeign: DroppableDimension = scrollDroppable(
-                foreign,
-                scroll,
-              );
-              const target: Position = add(onEndOfFrame, placeholder);
-              const expected: Position = patch(
-                axis.line,
-                config.maxScrollSpeed,
-              );
+            fluidScroll(
+              addDroppable(
+                dragTo({
+                  selection: target,
+                  viewport: unscrollableViewport,
+                }),
+                scrolled,
+              ),
+            );
+            requestAnimationFrame.flush();
 
-              fluidScroll(
-                addDroppable(
-                  dragTo({
-                    selection: target,
-                    impact: overForeign,
-                    viewport: unscrollableViewport,
-                  }),
-                  scrolledForeign,
-                ),
-              );
-              requestAnimationFrame.step();
-
-              expect(mocks.scrollDroppable).toHaveBeenCalledWith(
-                foreign.descriptor.id,
-                expected,
-              );
-            });
-
-            it('should not allow scrolling past the placeholder buffer', () => {
-              // already on the placeholder
-              const scroll: Position = add(
-                // usual max scroll
-                getClosestScrollable(foreign).scroll.max,
-                // with the placeholder
-                placeholder,
-              );
-              const scrolledForeign: DroppableDimension = scrollDroppable(
-                foreign,
-                scroll,
-              );
-              // targeting beyond the placeholder
-              const target: Position = add(
-                add(onEndOfFrame, placeholder),
-                patch(axis.line, 1),
-              );
-
-              fluidScroll(
-                addDroppable(
-                  dragTo({
-                    selection: target,
-                    impact: overForeign,
-                    viewport: unscrollableViewport,
-                  }),
-                  scrolledForeign,
-                ),
-              );
-              requestAnimationFrame.flush();
-
-              expect(mocks.scrollDroppable).not.toHaveBeenCalled();
-            });
+            expect(mocks.scrollDroppable).not.toHaveBeenCalled();
           });
         });
 
@@ -1405,7 +1314,7 @@ describe('fluid auto scrolling', () => {
 
           it('should not scroll if the droppable is unable to be scrolled', () => {
             const target: Position = onMaxBoundary;
-            if (!scrollable.viewport.closestScrollable) {
+            if (!scrollable.frame) {
               throw new Error('Invalid test setup');
             }
             // scrolling to max scroll point
@@ -1563,8 +1472,10 @@ describe('fluid auto scrolling', () => {
             },
             closest: {
               borderBox: customFrameClient.borderBox,
-              scrollWidth: 10000,
-              scrollHeight: 10000,
+              scrollSize: {
+                scrollWidth: 10000,
+                scrollHeight: 10000,
+              },
               scroll: origin,
               shouldClipSubject: true,
             },
@@ -1586,7 +1497,7 @@ describe('fluid auto scrolling', () => {
               endOfSubject,
             );
             // subject no longer visible
-            expect(scrolled.viewport.clippedPageMarginBox).toBe(null);
+            expect(scrolled.subject.active).toBe(null);
             const custom: DraggingState = {
               ...addDroppable(
                 dragTo({
@@ -1615,7 +1526,7 @@ describe('fluid auto scrolling', () => {
               endOfSubject,
             );
             // subject no longer visible
-            expect(scrolled.viewport.clippedPageMarginBox).toBe(null);
+            expect(scrolled.subject.active).toBe(null);
             const target: Position = add(endOfFrame, patch(axis.line, 1));
             const custom: DraggingState = {
               ...addDroppable(
@@ -1639,7 +1550,7 @@ describe('fluid auto scrolling', () => {
         // This can happen when there is a scrollbar on the cross axis
         describe('moving backwards when current scroll is greater than max', () => {
           const droppableScroll: Position = add(
-            getClosestScrollable(scrollable).scroll.max,
+            getFrame(scrollable).scroll.max,
             patch(axis.line, 10),
           );
           const scrolled: DroppableDimension = scrollDroppable(
@@ -1654,10 +1565,8 @@ describe('fluid auto scrolling', () => {
           );
 
           it('should have a current scroll greater than the current scroll (validation)', () => {
-            expect(
-              getClosestScrollable(scrolled).scroll.max[axis.line],
-            ).toBeLessThan(
-              getClosestScrollable(scrolled).scroll.current[axis.line],
+            expect(getFrame(scrolled).scroll.max[axis.line]).toBeLessThan(
+              getFrame(scrolled).scroll.current[axis.line],
             );
           });
 
@@ -1708,8 +1617,10 @@ describe('fluid auto scrolling', () => {
           },
           closest: {
             borderBox: scrollableViewport.frame,
-            scrollWidth: windowScrollSize.scrollWidth,
-            scrollHeight: windowScrollSize.scrollHeight,
+            scrollSize: {
+              scrollWidth: windowScrollSize.scrollWidth,
+              scrollHeight: windowScrollSize.scrollHeight,
+            },
             scroll: origin,
             shouldClipSubject: true,
           },

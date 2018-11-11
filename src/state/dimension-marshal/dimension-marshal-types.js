@@ -1,8 +1,9 @@
 // @flow
-import { type Position } from 'css-box-model';
-import {
-  type UpdateDroppableScrollArgs,
-  type UpdateDroppableIsEnabledArgs,
+import type { Position } from 'css-box-model';
+import type {
+  UpdateDroppableScrollArgs,
+  UpdateDroppableIsEnabledArgs,
+  UpdateDroppableIsCombineEnabledArgs,
 } from '../action-creators';
 import type {
   DraggableDescriptor,
@@ -15,7 +16,8 @@ import type {
   Critical,
   DimensionMap,
   LiftRequest,
-  Publish,
+  Published,
+  Viewport,
 } from '../../types';
 
 export type GetDraggableDimensionFn = (
@@ -28,12 +30,14 @@ export type GetDroppableDimensionFn = (
 ) => DroppableDimension;
 
 export type DroppableCallbacks = {|
+  // a drag is starting
   getDimensionAndWatchScroll: GetDroppableDimensionFn,
+  recollect: () => DroppableDimension,
   // scroll a droppable
   scroll: (change: Position) => void,
   // If the Droppable is listening for scroll events - it needs to stop!
   // Can be called on droppables that have not been asked to watch scroll
-  unwatchScroll: () => void,
+  dragStopped: () => void,
 |};
 
 export type DroppableEntry = {|
@@ -59,15 +63,10 @@ export type Entries = {|
   draggables: DraggableEntryMap,
 |};
 
-export type Collection = {|
-  scrollOptions: ScrollOptions,
-  critical: Critical,
-  initialWindowScroll: Position,
-|};
-
 export type StartPublishingResult = {|
   critical: Critical,
   dimensions: DimensionMap,
+  viewport: Viewport,
 |};
 
 export type DimensionMarshal = {|
@@ -94,20 +93,25 @@ export type DimensionMarshal = {|
   ) => void,
   // it is possible for a droppable to change whether it is enabled during a drag
   updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
+  // it is also possible to update whether combining is enabled
+  updateDroppableIsCombineEnabled: (
+    id: DroppableId,
+    isEnabled: boolean,
+  ) => void,
   updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
   scrollDroppable: (id: DroppableId, change: Position) => void,
   unregisterDroppable: (descriptor: DroppableDescriptor) => void,
   // Entry
-  startPublishing: (
-    request: LiftRequest,
-    windowScroll: Position,
-  ) => StartPublishingResult,
+  startPublishing: (request: LiftRequest) => StartPublishingResult,
   stopPublishing: () => void,
 |};
 
 export type Callbacks = {|
   collectionStarting: () => mixed,
-  publish: (args: Publish) => mixed,
+  publishWhileDragging: (args: Published) => mixed,
   updateDroppableScroll: (args: UpdateDroppableScrollArgs) => mixed,
   updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => mixed,
+  updateDroppableIsCombineEnabled: (
+    args: UpdateDroppableIsCombineEnabledArgs,
+  ) => mixed,
 |};

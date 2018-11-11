@@ -5,22 +5,20 @@ import type {
   DraggableId,
   DroppableId,
   DropResult,
-  ItemPositions,
-  AutoScrollMode,
+  MovementMode,
   Viewport,
   DimensionMap,
   DropReason,
   PendingDrop,
-  Publish,
+  Published,
 } from '../types';
 
 export type LiftArgs = {|
   // lifting with DraggableId rather than descriptor
   // as the descriptor might change after a drop is flushed
   id: DraggableId,
-  client: ItemPositions,
-  viewport: Viewport,
-  autoScrollMode: AutoScrollMode,
+  clientSelection: Position,
+  movementMode: MovementMode,
 |};
 
 export type LiftAction = {|
@@ -36,9 +34,9 @@ export const lift = (args: LiftArgs): LiftAction => ({
 export type InitialPublishArgs = {|
   critical: Critical,
   dimensions: DimensionMap,
-  client: ItemPositions,
+  clientSelection: Position,
   viewport: Viewport,
-  autoScrollMode: AutoScrollMode,
+  movementMode: MovementMode,
 |};
 
 export type InitialPublishAction = {|
@@ -53,13 +51,15 @@ export const initialPublish = (
   payload: args,
 });
 
-export type PublishAction = {|
-  type: 'PUBLISH',
-  payload: Publish,
+export type WhileDraggingPublishAction = {|
+  type: 'PUBLISH_WHILE_DRAGGING',
+  payload: Published,
 |};
 
-export const publish = (args: Publish): PublishAction => ({
-  type: 'PUBLISH',
+export const publishWhileDragging = (
+  args: Published,
+): WhileDraggingPublishAction => ({
+  type: 'PUBLISH_WHILE_DRAGGING',
   payload: args,
 });
 
@@ -107,10 +107,25 @@ export const updateDroppableIsEnabled = (
   payload: args,
 });
 
+export type UpdateDroppableIsCombineEnabledArgs = {|
+  id: DroppableId,
+  isCombineEnabled: boolean,
+|};
+
+export type UpdateDroppableIsCombineEnabledAction = {|
+  type: 'UPDATE_DROPPABLE_IS_COMBINE_ENABLED',
+  payload: UpdateDroppableIsCombineEnabledArgs,
+|};
+
+export const updateDroppableIsCombineEnabled = (
+  args: UpdateDroppableIsCombineEnabledArgs,
+): UpdateDroppableIsCombineEnabledAction => ({
+  type: 'UPDATE_DROPPABLE_IS_COMBINE_ENABLED',
+  payload: args,
+});
+
 export type MoveArgs = {|
-  // TODO: clientSelection
   client: Position,
-  shouldAnimate: boolean,
 |};
 
 export type MoveAction = {|
@@ -124,7 +139,7 @@ export const move = (args: MoveArgs): MoveAction => ({
 });
 
 type MoveByWindowScrollArgs = {|
-  scroll: Position,
+  newScroll: Position,
 |};
 
 export type MoveByWindowScrollAction = {|
@@ -139,17 +154,41 @@ export const moveByWindowScroll = (
   payload: args,
 });
 
+export type UpdateViewportMaxScrollArgs = {|
+  maxScroll: Position,
+|};
+
 type UpdateViewportMaxScrollAction = {|
   type: 'UPDATE_VIEWPORT_MAX_SCROLL',
-  payload: Position,
+  payload: UpdateViewportMaxScrollArgs,
 |};
 
 export const updateViewportMaxScroll = (
-  max: Position,
+  args: UpdateViewportMaxScrollArgs,
 ): UpdateViewportMaxScrollAction => ({
   type: 'UPDATE_VIEWPORT_MAX_SCROLL',
-  payload: max,
+  payload: args,
 });
+
+// type PostJumpScrollAction = {|
+//   type: 'POST_JUMP_SCROLL',
+//   payload: null,
+// |};
+
+// export const postJumpScroll = (): PostJumpScrollAction => ({
+//   type: 'POST_JUMP_SCROLL',
+//   payload: null,
+// });
+
+// type PostSnapDestinationChangeAction = {|
+//   type: 'POST_SNAP_DESTINATION_CHANGE',
+//   payload: null,
+// |};
+
+// export const postSnapDestinationChange = (): PostSnapDestinationChangeAction => ({
+//   type: 'POST_SNAP_DESTINATION_CHANGE',
+//   payload: null,
+// });
 
 export type MoveUpAction = {|
   type: 'MOVE_UP',
@@ -201,16 +240,6 @@ export const clean = (): CleanAction => ({
   payload: null,
 });
 
-type PrepareAction = {|
-  type: 'PREPARE',
-  payload: null,
-|};
-
-export const prepare = (): PrepareAction => ({
-  type: 'PREPARE',
-  payload: null,
-});
-
 export type DropAnimateAction = {
   type: 'DROP_ANIMATE',
   payload: PendingDrop,
@@ -245,6 +274,8 @@ export const drop = (args: DropArgs) => ({
   payload: args,
 });
 
+export const cancel = () => drop({ reason: 'CANCEL' });
+
 export type DropPendingAction = {|
   type: 'DROP_PENDING',
   payload: DropArgs,
@@ -268,12 +299,15 @@ export const dropAnimationFinished = (): DropAnimationFinishedAction => ({
 export type Action =
   | LiftAction
   | InitialPublishAction
-  | PublishAction
+  | WhileDraggingPublishAction
   | CollectionStartingAction
   | UpdateDroppableScrollAction
   | UpdateDroppableIsEnabledAction
+  | UpdateDroppableIsCombineEnabledAction
   | MoveByWindowScrollAction
   | UpdateViewportMaxScrollAction
+  // | PostJumpScrollAction
+  // | PostSnapDestinationChangeAction
   | MoveAction
   | MoveUpAction
   | MoveDownAction
@@ -284,5 +318,4 @@ export type Action =
   | DropAnimateAction
   | DropAnimationFinishedAction
   | DropCompleteAction
-  | PrepareAction
   | CleanAction;

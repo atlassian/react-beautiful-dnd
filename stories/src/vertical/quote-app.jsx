@@ -2,14 +2,15 @@
 import React, { Component } from 'react';
 import styled from 'react-emotion';
 import { action } from '@storybook/addon-actions';
+import type { Quote } from '../types';
+import type { DropResult, DragStart, DragUpdate } from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import reorder from '../reorder';
-import type { Quote } from '../types';
-import type { DropResult, DragStart } from '../../../src/types';
 
 const publishOnDragStart = action('onDragStart');
+const publishOnDragUpdate = action('onDragUpdate');
 const publishOnDragEnd = action('onDragEnd');
 
 const Root = styled('div')`
@@ -26,6 +27,7 @@ const Root = styled('div')`
 
 type Props = {|
   initial: Quote[],
+  isCombineEnabled?: boolean,
   listStyle?: Object,
 |};
 
@@ -35,6 +37,9 @@ type State = {|
 
 export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
+  static defaultProps = {
+    isCombineEnabled: false,
+  };
 
   state: State = {
     quotes: this.props.initial,
@@ -49,8 +54,21 @@ export default class QuoteApp extends Component<Props, State> {
     }
   };
 
+  onDragUpdate = (update: DragUpdate) => {
+    publishOnDragUpdate(update);
+  };
+
   onDragEnd = (result: DropResult) => {
     publishOnDragEnd(result);
+
+    // combining item
+    if (result.combine) {
+      // super simple: just removing the dragging item
+      const quotes: Quote[] = [...this.state.quotes];
+      quotes.splice(result.source.index, 1);
+      this.setState({ quotes });
+      return;
+    }
 
     // dropped outside the list
     if (!result.destination) {
@@ -78,6 +96,7 @@ export default class QuoteApp extends Component<Props, State> {
     return (
       <DragDropContext
         onDragStart={this.onDragStart}
+        onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
       >
         <Root>
@@ -85,6 +104,7 @@ export default class QuoteApp extends Component<Props, State> {
             listId="list"
             style={this.props.listStyle}
             quotes={quotes}
+            isCombineEnabled={this.props.isCombineEnabled}
           />
         </Root>
       </DragDropContext>

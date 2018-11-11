@@ -58,7 +58,7 @@ class Person extends Component<{ name: string, provided: Provided }> {
 class App extends Component<{ currentUser: string }> {
   render() {
     return (
-      <Draggable draggableId="drag-1">
+      <Draggable draggableId="drag-1" index={0}>
         {(dragProvided: Provided) => (
           <Person name={this.props.currentUser} provided={dragProvided} />
         )}

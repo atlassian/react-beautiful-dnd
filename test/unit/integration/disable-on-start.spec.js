@@ -11,7 +11,7 @@ import type {
   DragUpdate,
   DropResult,
 } from '../../../src';
-import type { Hooks } from '../../../src/types';
+import type { Responders } from '../../../src/types';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import { getComputedSpacing } from '../../utils/dimension';
 
@@ -94,19 +94,18 @@ class App extends React.Component<*, State> {
   }
 }
 
-it('should allow the disabling of a droppable in onDragStart', () => {
-  jest.useFakeTimers();
+jest.useFakeTimers();
 
-  const hooks: Hooks = {
+it('should allow the disabling of a droppable in onDragStart', () => {
+  const responders: Responders = {
     onDragStart: jest.fn(),
     onDragUpdate: jest.fn(),
     onDragEnd: jest.fn(),
   };
-  const wrapper: ReactWrapper = mount(<App {...hooks} />);
+  const wrapper: ReactWrapper = mount(<App {...responders} />);
 
   pressSpacebar(wrapper.find('.drag-handle'));
-
-  // run out prepare phase
+  // flush responder
   jest.runOnlyPendingTimers();
 
   const start: DragStart = {
@@ -116,14 +115,20 @@ it('should allow the disabling of a droppable in onDragStart', () => {
       index: 0,
     },
     type: 'DEFAULT',
+    mode: 'SNAP',
   };
-  expect(hooks.onDragStart).toHaveBeenCalledWith(start);
+  expect(responders.onDragStart).toHaveBeenCalledWith(start);
 
+  // onDragUpdate will occur after setTimeout
+  expect(responders.onDragUpdate).not.toHaveBeenCalled();
+
+  jest.runOnlyPendingTimers();
   // an update should be fired as the home location has changed
   const update: DragUpdate = {
     ...start,
     // no destination as it is now disabled
     destination: null,
+    combine: null,
   };
-  expect(hooks.onDragUpdate).toHaveBeenCalledWith(update);
+  expect(responders.onDragUpdate).toHaveBeenCalledWith(update);
 });

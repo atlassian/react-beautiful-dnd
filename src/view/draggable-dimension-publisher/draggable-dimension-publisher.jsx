@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import { Component, type Node } from 'react';
 import invariant from 'tiny-invariant';
 import { dimensionMarshalKey } from '../context-keys';
+import { origin } from '../../state/position';
 import type {
   DraggableDescriptor,
   DraggableDimension,
@@ -105,7 +106,7 @@ export default class DraggableDimensionPublisher extends Component<Props> {
     this.publishedDescriptor = null;
   };
 
-  getDimension = (windowScroll: Position): DraggableDimension => {
+  getDimension = (windowScroll?: Position = origin): DraggableDimension => {
     const targetRef: ?HTMLElement = this.props.getDraggableRef();
     const descriptor: ?DraggableDescriptor = this.publishedDescriptor;
 
@@ -119,7 +120,6 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       targetRef,
     );
     const borderBox: ClientRect = targetRef.getBoundingClientRect();
-
     const client: BoxModel = calculateBox(borderBox, computedStyles);
     const page: BoxModel = withScroll(client, windowScroll);
 
@@ -128,10 +128,15 @@ export default class DraggableDimensionPublisher extends Component<Props> {
       tagName: targetRef.tagName.toLowerCase(),
       display: computedStyles.display,
     };
+    const displaceBy: Position = {
+      x: client.marginBox.width,
+      y: client.marginBox.height,
+    };
 
     const dimension: DraggableDimension = {
       descriptor,
       placeholder,
+      displaceBy,
       client,
       page,
     };

@@ -2,6 +2,8 @@
 /* eslint-disable no-use-before-define */
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
+import type { EventBinding } from '../util/event-types';
+import type { TouchSensor, CreateSensorArgs } from './sensor-types';
 import createScheduler from '../util/create-scheduler';
 import createPostDragEventPreventer, {
   type EventPreventer,
@@ -12,8 +14,6 @@ import createEventMarshal, {
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import * as keyCodes from '../../key-codes';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
-import type { EventBinding } from '../util/event-types';
-import type { TouchSensor, CreateSensorArgs } from './sensor-types';
 
 type State = {
   isDragging: boolean,
@@ -127,7 +127,9 @@ export default ({
     const pending: ?Position = state.pending;
 
     if (!pending) {
-      kill();
+      // this should be an impossible state
+      // cannot use kill() as it will not unbind when there is no pending
+      stopPendingDrag();
       invariant(false, 'cannot start a touch drag without a pending position');
     }
 
@@ -142,7 +144,7 @@ export default ({
 
     callbacks.onLift({
       clientSelection: pending,
-      autoScrollMode: 'FLUID',
+      movementMode: 'FLUID',
     });
   };
   const stopDragging = (fn?: Function = noop) => {
@@ -194,7 +196,9 @@ export default ({
       stopPendingDrag();
       return;
     }
-    stopDragging(fn);
+    if (state.isDragging) {
+      stopDragging(fn);
+    }
   };
 
   const unmount = () => {

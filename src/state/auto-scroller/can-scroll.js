@@ -124,16 +124,16 @@ export const canScrollDroppable = (
   droppable: DroppableDimension,
   change: Position,
 ): boolean => {
-  const closest: ?Scrollable = droppable.viewport.closestScrollable;
+  const frame: ?Scrollable = droppable.frame;
 
   // Cannot scroll when there is no scrollable
-  if (!closest) {
+  if (!frame) {
     return false;
   }
 
   return canPartiallyScroll({
-    current: closest.scroll.current,
-    max: closest.scroll.max,
+    current: frame.scroll.current,
+    max: frame.scroll.max,
     change,
   });
 };
@@ -142,9 +142,9 @@ export const getDroppableOverlap = (
   droppable: DroppableDimension,
   change: Position,
 ): ?Position => {
-  const closest: ?Scrollable = droppable.viewport.closestScrollable;
+  const frame: ?Scrollable = droppable.frame;
 
-  if (!closest) {
+  if (!frame) {
     return null;
   }
 
@@ -153,8 +153,8 @@ export const getDroppableOverlap = (
   }
 
   return getOverlap({
-    current: closest.scroll.current,
-    max: closest.scroll.max,
+    current: frame.scroll.current,
+    max: frame.scroll.max,
     change,
   });
 };

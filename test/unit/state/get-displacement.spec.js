@@ -11,7 +11,10 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
+  DisplacedBy,
 } from '../../../src/types';
+import getDisplacementMap from '../../../src/state/get-displacement-map';
+import { origin } from '../../../src/state/position';
 
 const viewport: Rect = getRect({
   top: 0,
@@ -67,13 +70,78 @@ const notInViewport: DraggableDimension = getDraggableDimension({
   },
 });
 
-describe('get displacement', () => {
-  describe('fresh displacement', () => {
-    it('should set visibility to true and permit animation if draggable is visible', () => {
+describe('fresh displacement', () => {
+  it('should set visibility to true and permit animation if draggable is visible', () => {
+    const displacement: Displacement = getDisplacement({
+      draggable: inViewport,
+      destination: droppable,
+      previousImpact: noImpact,
+      viewport,
+    });
+
+    expect(displacement).toEqual({
+      draggableId: inViewport.descriptor.id,
+      isVisible: true,
+      shouldAnimate: true,
+    });
+  });
+
+  it('should set visibility to false and disable animation if draggable is not visible', () => {
+    const displacement: Displacement = getDisplacement({
+      draggable: notInViewport,
+      destination: droppable,
+      previousImpact: noImpact,
+      viewport,
+    });
+
+    expect(displacement).toEqual({
+      draggableId: notInViewport.descriptor.id,
+      isVisible: false,
+      shouldAnimate: false,
+    });
+  });
+});
+
+const getFakeImpact = (displaced: Displacement[]): DragImpact => {
+  const fakeDisplacedBy: DisplacedBy = {
+    point: origin,
+    value: 0,
+  };
+  const impact: DragImpact = {
+    direction: droppable.axis.direction,
+    movement: {
+      // faking a previous displacement
+      displaced,
+      map: getDisplacementMap(displaced),
+      // not populating correctly
+      displacedBy: fakeDisplacedBy,
+      willDisplaceForward: false,
+    },
+    // not populating correctly
+    destination: {
+      droppableId: droppable.descriptor.id,
+      index: 0,
+    },
+    merge: null,
+  };
+  return impact;
+};
+
+describe('subsequent displacements', () => {
+  describe('element is still visible', () => {
+    it('should keep the displacement visible and allow animation', () => {
+      const previousImpact: DragImpact = getFakeImpact([
+        {
+          draggableId: inViewport.descriptor.id,
+          isVisible: true,
+          shouldAnimate: true,
+        },
+      ]);
+
       const displacement: Displacement = getDisplacement({
         draggable: inViewport,
         destination: droppable,
-        previousImpact: noImpact,
+        previousImpact,
         viewport,
       });
 
@@ -83,12 +151,22 @@ describe('get displacement', () => {
         shouldAnimate: true,
       });
     });
+  });
 
-    it('should set visibility to false and disable animation if draggable is not visible', () => {
+  describe('element is still not visible', () => {
+    it('should continue to indicate that the displacement is not visible and not to be animated', () => {
+      const previousImpact: DragImpact = getFakeImpact([
+        {
+          draggableId: notInViewport.descriptor.id,
+          isVisible: false,
+          shouldAnimate: false,
+        },
+      ]);
+
       const displacement: Displacement = getDisplacement({
         draggable: notInViewport,
         destination: droppable,
-        previousImpact: noImpact,
+        previousImpact,
         viewport,
       });
 
@@ -100,174 +178,66 @@ describe('get displacement', () => {
     });
   });
 
-  describe('subsequent displacements', () => {
-    describe('element is still visible', () => {
-      it('should keep the displacement visible and allow animation', () => {
-        const previousImpact: DragImpact = {
-          direction: droppable.axis.direction,
-          movement: {
-            // faking a previous displacement
-            displaced: [
-              {
-                draggableId: inViewport.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-            ],
-            // not populating correctly
-            amount: { x: 0, y: 0 },
-            isBeyondStartPosition: false,
-          },
-          // not populating correctly
-          destination: {
-            droppableId: droppable.descriptor.id,
-            index: 0,
-          },
-        };
+  describe('element was not visible and now is', () => {
+    it('should indicate that the element is visible, but that animation is not allowed', () => {
+      const previousImpact: DragImpact = getFakeImpact([
+        {
+          draggableId: notInViewport.descriptor.id,
+          isVisible: false,
+          shouldAnimate: false,
+        },
+      ]);
+      // scrolled down 800px
+      const scrolledViewport: Rect = getRect({
+        top: 800,
+        right: 800,
+        left: 0,
+        bottom: 1200,
+      });
 
-        const displacement: Displacement = getDisplacement({
-          draggable: inViewport,
-          destination: droppable,
-          previousImpact,
-          viewport,
-        });
+      const displacement: Displacement = getDisplacement({
+        draggable: notInViewport,
+        destination: droppable,
+        previousImpact,
+        viewport: scrolledViewport,
+      });
 
-        expect(displacement).toEqual({
+      expect(displacement).toEqual({
+        draggableId: notInViewport.descriptor.id,
+        isVisible: true,
+        shouldAnimate: false,
+      });
+    });
+  });
+
+  describe('element was visible but now is not', () => {
+    it('should indicate that the draggable is not visible and that animation should not occur', () => {
+      const previousImpact: DragImpact = getFakeImpact([
+        {
           draggableId: inViewport.descriptor.id,
           isVisible: true,
           shouldAnimate: true,
-        });
+        },
+      ]);
+      // scrolled down 800px
+      const scrolledViewport: Rect = getRect({
+        top: 800,
+        right: 800,
+        left: 0,
+        bottom: 1200,
       });
-    });
 
-    describe('element is still not visible', () => {
-      it('should continue to indicate that the displacement is not visible and not to be animated', () => {
-        const previousImpact: DragImpact = {
-          direction: droppable.axis.direction,
-          movement: {
-            // faking a previous displacement
-            displaced: [
-              {
-                draggableId: notInViewport.descriptor.id,
-                isVisible: false,
-                shouldAnimate: false,
-              },
-            ],
-            // not populating correctly
-            amount: { x: 0, y: 0 },
-            isBeyondStartPosition: false,
-          },
-          // not populating correctly
-          destination: {
-            droppableId: droppable.descriptor.id,
-            index: 0,
-          },
-        };
-
-        const displacement: Displacement = getDisplacement({
-          draggable: notInViewport,
-          destination: droppable,
-          previousImpact,
-          viewport,
-        });
-
-        expect(displacement).toEqual({
-          draggableId: notInViewport.descriptor.id,
-          isVisible: false,
-          shouldAnimate: false,
-        });
+      const displacement: Displacement = getDisplacement({
+        draggable: inViewport,
+        destination: droppable,
+        previousImpact,
+        viewport: scrolledViewport,
       });
-    });
 
-    describe('element was not visible and now is', () => {
-      it('should indicate that the element is visible, but that animation is not allowed', () => {
-        const previousImpact: DragImpact = {
-          direction: droppable.axis.direction,
-          movement: {
-            // faking a previous displacement
-            displaced: [
-              {
-                draggableId: notInViewport.descriptor.id,
-                isVisible: false,
-                shouldAnimate: false,
-              },
-            ],
-            // not populating correctly
-            amount: { x: 0, y: 0 },
-            isBeyondStartPosition: false,
-          },
-          // not populating correctly
-          destination: {
-            droppableId: droppable.descriptor.id,
-            index: 0,
-          },
-        };
-        // scrolled down 800px
-        const scrolledViewport: Rect = getRect({
-          top: 800,
-          right: 800,
-          left: 0,
-          bottom: 1200,
-        });
-
-        const displacement: Displacement = getDisplacement({
-          draggable: notInViewport,
-          destination: droppable,
-          previousImpact,
-          viewport: scrolledViewport,
-        });
-
-        expect(displacement).toEqual({
-          draggableId: notInViewport.descriptor.id,
-          isVisible: true,
-          shouldAnimate: false,
-        });
-      });
-    });
-
-    describe('element was visible but now is not', () => {
-      it('should indicate that the draggable is not visible and that animation should not occur', () => {
-        const previousImpact: DragImpact = {
-          direction: droppable.axis.direction,
-          movement: {
-            // faking a previous displacement
-            displaced: [
-              {
-                draggableId: inViewport.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-            ],
-            // not populating correctly
-            amount: { x: 0, y: 0 },
-            isBeyondStartPosition: false,
-          },
-          // not populating correctly
-          destination: {
-            droppableId: droppable.descriptor.id,
-            index: 0,
-          },
-        };
-        // scrolled down 800px
-        const scrolledViewport: Rect = getRect({
-          top: 800,
-          right: 800,
-          left: 0,
-          bottom: 1200,
-        });
-
-        const displacement: Displacement = getDisplacement({
-          draggable: inViewport,
-          destination: droppable,
-          previousImpact,
-          viewport: scrolledViewport,
-        });
-
-        expect(displacement).toEqual({
-          draggableId: inViewport.descriptor.id,
-          isVisible: false,
-          shouldAnimate: false,
-        });
+      expect(displacement).toEqual({
+        draggableId: inViewport.descriptor.id,
+        isVisible: false,
+        shouldAnimate: false,
       });
     });
   });

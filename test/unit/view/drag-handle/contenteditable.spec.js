@@ -56,6 +56,8 @@ forEach((control: Control) => {
           onLift: 0,
         }),
       ).toBe(true);
+
+      wrapper.unmount();
     });
 
     it('should block the drag if originated from a child contenteditable', () => {
@@ -92,6 +94,8 @@ forEach((control: Control) => {
       control.drop(customWrapper);
 
       expect(whereAnyCallbacksCalled(customCallbacks)).toBe(false);
+
+      customWrapper.unmount();
     });
 
     it('should block the drag if originated from a child of a child contenteditable', () => {
@@ -135,6 +139,8 @@ forEach((control: Control) => {
           onLift: 0,
         }),
       ).toBe(true);
+
+      customWrapper.unmount();
     });
 
     it('should not block if contenteditable is set to false', () => {
@@ -179,6 +185,8 @@ forEach((control: Control) => {
           onDrop: 1,
         }),
       ).toBe(true);
+
+      customWrapper.unmount();
     });
   });
 
@@ -223,6 +231,8 @@ forEach((control: Control) => {
           onDrop: 1,
         }),
       ).toBe(true);
+
+      customWrapper.unmount();
     });
 
     it('should not block the drag if originated from a child contenteditable', () => {
@@ -268,6 +278,8 @@ forEach((control: Control) => {
           onDrop: 1,
         }),
       ).toBe(true);
+
+      customWrapper.unmount();
     });
   });
 });

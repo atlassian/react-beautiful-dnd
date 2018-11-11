@@ -1,12 +1,9 @@
 // @flow
 import { getRect, type Rect, type Spacing } from 'css-box-model';
 import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
-import { scrollDroppable } from '../../../../src/state/droppable-dimension';
+import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 import { offsetByPosition } from '../../../../src/state/spacing';
-import {
-  getDroppableDimension,
-  getClosestScrollable,
-} from '../../../utils/dimension';
+import { getDroppableDimension, getFrame } from '../../../utils/dimension';
 import type { DroppableDimension } from '../../../../src/types';
 
 const viewport: Rect = getRect({
@@ -62,6 +59,7 @@ describe('is partially visible', () => {
             target: notInViewport,
             viewport,
             destination: asBigAsViewport,
+            withDroppableDisplacement: true,
           }),
         ).toBe(false);
       });
@@ -72,6 +70,7 @@ describe('is partially visible', () => {
             target: viewport,
             viewport,
             destination: asBigAsViewport,
+            withDroppableDisplacement: true,
           }),
         ).toBe(true);
       });
@@ -82,6 +81,7 @@ describe('is partially visible', () => {
             target: inViewport1,
             viewport,
             destination: asBigAsViewport,
+            withDroppableDisplacement: true,
           }),
         ).toBe(true);
       });
@@ -104,6 +104,7 @@ describe('is partially visible', () => {
               target: partial,
               viewport,
               destination: asBigAsViewport,
+              withDroppableDisplacement: true,
             }),
           ).toBe(true);
         });
@@ -125,8 +126,10 @@ describe('is partially visible', () => {
         },
         closest: {
           borderBox: viewport,
-          scrollWidth: viewport.width,
-          scrollHeight: viewport.bottom + 100,
+          scrollSize: {
+            scrollWidth: viewport.width,
+            scrollHeight: viewport.bottom + 100,
+          },
           scroll: { x: 0, y: 0 },
           shouldClipSubject: true,
         },
@@ -147,6 +150,7 @@ describe('is partially visible', () => {
               target: originallyInvisible,
               destination: clippedByViewport,
               viewport,
+              withDroppableDisplacement: true,
             }),
           ).toBe(false);
 
@@ -156,6 +160,7 @@ describe('is partially visible', () => {
               target: originallyInvisible,
               destination: scrollDroppable(clippedByViewport, { x: 0, y: 100 }),
               viewport,
+              withDroppableDisplacement: true,
             }),
           ).toBe(true);
         });
@@ -176,6 +181,7 @@ describe('is partially visible', () => {
               target: originallyVisible,
               destination: clippedByViewport,
               viewport,
+              withDroppableDisplacement: true,
             }),
           ).toBe(true);
 
@@ -185,6 +191,7 @@ describe('is partially visible', () => {
               target: originallyVisible,
               destination: scrollDroppable(clippedByViewport, { x: 0, y: 100 }),
               viewport,
+              withDroppableDisplacement: true,
             }),
           ).toBe(false);
         });
@@ -214,8 +221,10 @@ describe('is partially visible', () => {
       borderBox,
       closest: {
         borderBox: frameBorderBox,
-        scrollHeight: borderBox.height,
-        scrollWidth: borderBox.width,
+        scrollSize: {
+          scrollWidth: borderBox.width,
+          scrollHeight: borderBox.height,
+        },
         scroll: { x: 0, y: 0 },
         shouldClipSubject: true,
       },
@@ -228,6 +237,7 @@ describe('is partially visible', () => {
             target: inViewport2,
             viewport,
             destination: asBigAsInViewport1,
+            withDroppableDisplacement: true,
           }),
         ).toBe(false);
       });
@@ -238,6 +248,7 @@ describe('is partially visible', () => {
             target: viewport,
             viewport,
             destination: asBigAsInViewport1,
+            withDroppableDisplacement: true,
           }),
         ).toBe(true);
       });
@@ -248,6 +259,7 @@ describe('is partially visible', () => {
             target: inViewport1,
             viewport,
             destination: asBigAsInViewport1,
+            withDroppableDisplacement: true,
           }),
         ).toBe(true);
       });
@@ -265,6 +277,7 @@ describe('is partially visible', () => {
             target: insideDroppable,
             viewport,
             destination: asBigAsInViewport1,
+            withDroppableDisplacement: true,
           }),
         ).toBe(true);
       });
@@ -287,6 +300,7 @@ describe('is partially visible', () => {
               target: partial,
               viewport,
               destination: asBigAsInViewport1,
+              withDroppableDisplacement: true,
             }),
           ).toBe(true);
         });
@@ -312,8 +326,10 @@ describe('is partially visible', () => {
           },
           closest: {
             borderBox: ourFrame,
-            scrollHeight: 600,
-            scrollWidth: ourFrame.width,
+            scrollSize: {
+              scrollHeight: 600,
+              scrollWidth: ourFrame.width,
+            },
             scroll: { x: 0, y: 0 },
             shouldClipSubject: true,
           },
@@ -328,6 +344,7 @@ describe('is partially visible', () => {
           isPartiallyVisible({
             target: inSubjectOutsideFrame,
             destination: clippedDroppable,
+            withDroppableDisplacement: true,
             viewport,
           }),
         ).toBe(false);
@@ -349,6 +366,7 @@ describe('is partially visible', () => {
             isPartiallyVisible({
               target: originallyInvisible,
               destination: scrollable,
+              withDroppableDisplacement: true,
               viewport,
             }),
           ).toBe(false);
@@ -359,6 +377,7 @@ describe('is partially visible', () => {
               target: originallyInvisible,
               destination: scrollDroppable(scrollable, { x: 0, y: 100 }),
               viewport,
+              withDroppableDisplacement: true,
             }),
           ).toBe(true);
         });
@@ -378,6 +397,7 @@ describe('is partially visible', () => {
               target: originallyVisible,
               destination: scrollable,
               viewport,
+              withDroppableDisplacement: true,
             }),
           ).toBe(true);
 
@@ -387,9 +407,53 @@ describe('is partially visible', () => {
               target: originallyVisible,
               destination: scrollDroppable(scrollable, { x: 0, y: 100 }),
               viewport,
+              withDroppableDisplacement: true,
             }),
           ).toBe(false);
         });
+      });
+
+      it('should not consider droppable scroll changes if asked to ignore them', () => {
+        const originallyInvisible: Spacing = {
+          left: frameBorderBox.left,
+          right: frameBorderBox.right,
+          top: frameBorderBox.bottom + 10,
+          bottom: frameBorderBox.bottom + 20,
+        };
+
+        // originally invisible
+        expect(
+          isPartiallyVisible({
+            target: originallyInvisible,
+            destination: scrollable,
+            withDroppableDisplacement: true,
+            viewport,
+          }),
+        ).toBe(false);
+
+        const scrolled: DroppableDimension = scrollDroppable(scrollable, {
+          x: 0,
+          y: 100,
+        });
+        // still invisible if asked not to consider scroll
+        expect(
+          isPartiallyVisible({
+            target: originallyInvisible,
+            destination: scrolled,
+            viewport,
+            // key change
+            withDroppableDisplacement: false,
+          }),
+        ).toBe(false);
+        // validation: when asked to consider scroll the target is now visible
+        expect(
+          isPartiallyVisible({
+            target: originallyInvisible,
+            destination: scrolled,
+            viewport,
+            withDroppableDisplacement: true,
+          }),
+        ).toBe(true);
       });
     });
 
@@ -414,8 +478,10 @@ describe('is partially visible', () => {
               bottom: 100,
               right: 100,
             },
-            scrollHeight: 600,
-            scrollWidth: 600,
+            scrollSize: {
+              scrollHeight: 600,
+              scrollWidth: 600,
+            },
             scroll: { x: 0, y: 0 },
             shouldClipSubject: true,
           },
@@ -433,16 +499,17 @@ describe('is partially visible', () => {
             target: originallyVisible,
             destination: droppable,
             viewport,
+            withDroppableDisplacement: true,
           }),
         ).toBe(true);
 
         // subject is now totally invisible
         const scrolled: DroppableDimension = scrollDroppable(
           droppable,
-          getClosestScrollable(droppable).scroll.max,
+          getFrame(droppable).scroll.max,
         );
         // asserting frame is not visible
-        expect(scrolled.viewport.clippedPageMarginBox).toBe(null);
+        expect(scrolled.subject.active).toBe(null);
 
         // now asserting that this check will fail
         expect(
@@ -450,6 +517,7 @@ describe('is partially visible', () => {
             target: originallyVisible,
             destination: scrolled,
             viewport,
+            withDroppableDisplacement: true,
           }),
         ).toBe(false);
       });
@@ -463,6 +531,7 @@ describe('is partially visible', () => {
           target: inViewport1,
           viewport,
           destination: asBigAsInViewport1,
+          withDroppableDisplacement: true,
         }),
       ).toBe(true);
     });
@@ -473,6 +542,7 @@ describe('is partially visible', () => {
           target: inViewport2,
           viewport,
           destination: asBigAsInViewport1,
+          withDroppableDisplacement: true,
         }),
       ).toBe(false);
     });
@@ -493,6 +563,7 @@ describe('is partially visible', () => {
           // but not visible in the viewport
           viewport,
           destination: notVisibleDroppable,
+          withDroppableDisplacement: true,
         }),
       ).toBe(false);
     });

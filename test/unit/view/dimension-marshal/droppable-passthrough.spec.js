@@ -21,7 +21,7 @@ describe('force scrolling a droppable', () => {
     const watcher: DimensionWatcher = populateMarshal(marshal);
 
     // initial lift
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
     expect(watcher.droppable.scroll).not.toHaveBeenCalled();
 
     // scroll
@@ -38,15 +38,13 @@ describe('force scrolling a droppable', () => {
     populateMarshal(marshal, justCritical);
 
     // initial lift
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
 
     // scroll
     expect(() => {
       marshal.scrollDroppable(preset.foreign.descriptor.id, { x: 10, y: 20 });
     }).toThrow(
-      `Cannot scroll Droppable ${
-        preset.foreign.descriptor.id
-      } as it is not registered`,
+      'Invariant failed: Cannot scroll Droppable foreign as it is not registered',
     );
   });
 
@@ -67,7 +65,7 @@ describe('responding to scroll changes', () => {
     const watcher: DimensionWatcher = populateMarshal(marshal);
 
     // initial lift
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
     expect(watcher.droppable.scroll).not.toHaveBeenCalled();
 
     marshal.updateDroppableScroll(critical.droppable.id, { x: 10, y: 20 });
@@ -83,7 +81,7 @@ describe('responding to scroll changes', () => {
     populateMarshal(marshal, justCritical);
 
     // initial lift
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
     expect(callbacks.updateDroppableScroll).not.toHaveBeenCalled();
 
     expect(() => {
@@ -92,9 +90,7 @@ describe('responding to scroll changes', () => {
         y: 20,
       });
     }).toThrow(
-      `Cannot update the scroll on Droppable ${
-        preset.foreign.descriptor.id
-      } as it is not registered`,
+      'Invariant failed: Cannot update the scroll on Droppable foreign as it is not registered',
     );
   });
 
@@ -115,7 +111,7 @@ describe('is enabled changes', () => {
     populateMarshal(marshal);
 
     // initial lift
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
     expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();
 
     marshal.updateDroppableIsEnabled(critical.droppable.id, false);
@@ -131,15 +127,13 @@ describe('is enabled changes', () => {
     populateMarshal(marshal, justCritical);
 
     // initial lift
-    marshal.startPublishing(defaultRequest, preset.windowScroll);
+    marshal.startPublishing(defaultRequest);
     expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();
 
     expect(() =>
       marshal.updateDroppableIsEnabled(preset.foreign.descriptor.id, false),
     ).toThrow(
-      `Cannot update the scroll on Droppable ${
-        preset.foreign.descriptor.id
-      } as it is not registered`,
+      'Invariant failed: Cannot update is enabled flag of Droppable foreign as it is not registered',
     );
   });
 

@@ -326,8 +326,10 @@ describe('get best cross axis droppable', () => {
             right: 40,
             bottom: 40,
           },
-          scrollWidth: 20,
-          scrollHeight: 80,
+          scrollSize: {
+            scrollWidth: 20,
+            scrollHeight: 80,
+          },
           scroll: { x: 0, y: 0 },
           shouldClipSubject: true,
         },
@@ -668,8 +670,10 @@ describe('get best cross axis droppable', () => {
             [axis.crossAxisEnd]: 500,
           },
           scroll: { x: 0, y: 0 },
-          scrollWidth: 100,
-          scrollHeight: 100,
+          scrollSize: {
+            scrollWidth: 100,
+            scrollHeight: 100,
+          },
           shouldClipSubject: true,
         },
       });

@@ -3,9 +3,10 @@ import { type Position } from 'css-box-model';
 import { bindActionCreators } from 'redux';
 import createDimensionMarshal from '../../src/state/dimension-marshal/dimension-marshal';
 import {
-  publish,
+  publishWhileDragging,
   updateDroppableScroll,
   updateDroppableIsEnabled,
+  updateDroppableIsCombineEnabled,
   collectionStarting,
 } from '../../src/state/action-creators';
 import { getPreset } from './dimension';
@@ -25,10 +26,11 @@ import type {
 export default (dispatch: Function): DimensionMarshal => {
   const callbacks: Callbacks = bindActionCreators(
     {
-      publish,
+      publishWhileDragging,
       collectionStarting,
       updateDroppableScroll,
       updateDroppableIsEnabled,
+      updateDroppableIsCombineEnabled,
     },
     dispatch,
   );
@@ -49,6 +51,7 @@ export const getMarshalStub = (): DimensionMarshal => ({
   unregisterDroppable: jest.fn(),
   updateDroppableScroll: jest.fn(),
   updateDroppableIsEnabled: jest.fn(),
+  updateDroppableIsCombineEnabled: jest.fn(),
   scrollDroppable: jest.fn(),
   startPublishing: jest.fn(),
   stopPublishing: jest.fn(),
@@ -58,8 +61,9 @@ export const getDroppableCallbacks = (
   dimension: DroppableDimension,
 ): DroppableCallbacks => ({
   getDimensionAndWatchScroll: jest.fn().mockReturnValue(dimension),
+  recollect: jest.fn().mockReturnValue(dimension),
   scroll: jest.fn(),
-  unwatchScroll: jest.fn(),
+  dragStopped: jest.fn(),
 });
 
 export type DimensionWatcher = {|
@@ -69,9 +73,8 @@ export type DimensionWatcher = {|
   droppable: {|
     getDimensionAndWatchScroll: Function,
     scroll: Function,
-    unwatchScroll: Function,
-    hidePlaceholder: Function,
-    showPlaceholder: Function,
+    recollect: Function,
+    dragStopped: Function,
   |},
 |};
 
@@ -94,9 +97,8 @@ export const populateMarshal = (
     droppable: {
       getDimensionAndWatchScroll: jest.fn(),
       scroll: jest.fn(),
-      unwatchScroll: jest.fn(),
-      hidePlaceholder: jest.fn(),
-      showPlaceholder: jest.fn(),
+      recollect: jest.fn(),
+      dragStopped: jest.fn(),
     },
   };
 
@@ -110,8 +112,12 @@ export const populateMarshal = (
       scroll: (change: Position) => {
         watcher.droppable.scroll(id, change);
       },
-      unwatchScroll: () => {
-        watcher.droppable.unwatchScroll(id);
+      recollect: () => {
+        watcher.droppable.recollect(id);
+        return droppable;
+      },
+      dragStopped: () => {
+        watcher.droppable.dragStopped(id);
       },
     };
 
@@ -131,8 +137,9 @@ export const populateMarshal = (
 };
 
 export const getCallbacksStub = (): Callbacks => ({
-  publish: jest.fn(),
+  publishWhileDragging: jest.fn(),
   updateDroppableScroll: jest.fn(),
   updateDroppableIsEnabled: jest.fn(),
+  updateDroppableIsCombineEnabled: jest.fn(),
   collectionStarting: jest.fn(),
 });

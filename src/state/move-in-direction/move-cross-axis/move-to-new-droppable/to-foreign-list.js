@@ -1,132 +1,120 @@
 // @flow
+import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import { type Position } from 'css-box-model';
-import moveToEdge from '../../../move-to-edge';
-import type { Result } from '../move-cross-axis-types';
-import getDisplacement from '../../../get-displacement';
-import withDroppableDisplacement from '../../../with-droppable-displacement';
 import type {
   Axis,
   DragImpact,
   DraggableDimension,
+  DraggableDimensionMap,
   DroppableDimension,
   Displacement,
   Viewport,
+  DisplacedBy,
 } from '../../../../types';
+import getDisplacedBy from '../../../get-displaced-by';
+import getDisplacement from '../../../get-displacement';
+import getDisplacementMap from '../../../get-displacement-map';
+import { noMovement } from '../../../no-impact';
+import getPageBorderBoxCenter from '../../../get-center-from-impact/get-page-border-box-center';
+import isTotallyVisibleInNewLocation from '../../move-to-next-place/is-totally-visible-in-new-location';
 
 type Args = {|
-  amount: Position,
-  pageBorderBoxCenter: Position,
-  movingRelativeTo: ?DraggableDimension,
+  previousPageBorderBoxCenter: Position,
+  moveRelativeTo: ?DraggableDimension,
   insideDestination: DraggableDimension[],
   draggable: DraggableDimension,
+  draggables: DraggableDimensionMap,
   destination: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Viewport,
 |};
 
 export default ({
-  amount,
-  pageBorderBoxCenter,
-  movingRelativeTo,
+  previousPageBorderBoxCenter,
+  moveRelativeTo,
   insideDestination,
   draggable,
+  draggables,
   destination,
   previousImpact,
   viewport,
-}: Args): Result => {
+}: Args): ?DragImpact => {
   const axis: Axis = destination.axis;
-  const isGoingBeforeTarget: boolean = Boolean(
-    movingRelativeTo &&
-      pageBorderBoxCenter[destination.axis.line] <
-        movingRelativeTo.page.borderBox.center[destination.axis.line],
-  );
 
   // Moving to an empty list
-
-  if (!movingRelativeTo) {
-    // Move to start edge of the destination
-    // based on the axis of the destination
-
-    const newCenter: Position = moveToEdge({
-      source: draggable.page.borderBox,
-      sourceEdge: 'start',
-      destination: destination.page.contentBox,
-      destinationEdge: 'start',
-      destinationAxis: axis,
-    });
-
-    const newImpact: DragImpact = {
-      movement: {
-        displaced: [],
-        amount,
-        isBeyondStartPosition: false,
-      },
+  // Could be invisible location - so need to check
+  if (!moveRelativeTo || !insideDestination.length) {
+    const proposed: DragImpact = {
+      movement: noMovement,
       direction: axis.direction,
       destination: {
         droppableId: destination.descriptor.id,
         index: 0,
       },
+      merge: null,
     };
+    const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
+      impact: proposed,
+      draggable,
+      droppable: destination,
+      draggables,
+    });
 
-    return {
-      pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
-      impact: newImpact,
-    };
+    const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
+      draggable,
+      destination,
+      newPageBorderBoxCenter: pageBorderBoxCenter,
+      viewport: viewport.frame,
+      // already taken into account by getPageBorderBoxCenter
+      withDroppableDisplacement: false,
+    });
+
+    return isVisibleInNewLocation ? proposed : null;
   }
 
   // Moving to a populated list
+  const targetIndex: number = insideDestination.indexOf(moveRelativeTo);
+  invariant(targetIndex !== -1, 'Cannot find draggable in foreign list');
 
-  const targetIndex: number = insideDestination.indexOf(movingRelativeTo);
-  invariant(
-    targetIndex !== -1,
-    'The target was not found within its droppable',
+  const isGoingBeforeTarget: boolean = Boolean(
+    previousPageBorderBoxCenter[destination.axis.line] <
+      moveRelativeTo.page.borderBox.center[destination.axis.line],
   );
 
   const proposedIndex: number = isGoingBeforeTarget
     ? targetIndex
     : targetIndex + 1;
 
-  const newCenter: Position = moveToEdge({
-    // Aligning to visible top of draggable
-    source: draggable.page.borderBox,
-    sourceEdge: 'start',
-    destination: movingRelativeTo.page.marginBox,
-    destinationEdge: isGoingBeforeTarget ? 'start' : 'end',
-    destinationAxis: axis,
-  });
+  const displaced: Displacement[] = insideDestination.slice(proposedIndex).map(
+    (dimension: DraggableDimension): Displacement =>
+      getDisplacement({
+        draggable: dimension,
+        destination,
+        viewport: viewport.frame,
+        previousImpact,
+      }),
+  );
 
-  // Can only displace forward when moving into a foreign list
-  // if going before: move everything down including the target
-  // if going after: move everything down excluding the target
+  const willDisplaceForward: boolean = true;
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    destination.axis,
+    draggable.displaceBy,
+    willDisplaceForward,
+  );
 
-  const displaced: Displacement[] = insideDestination
-    .slice(proposedIndex, insideDestination.length)
-    .map(
-      (dimension: DraggableDimension): Displacement =>
-        getDisplacement({
-          draggable: dimension,
-          destination,
-          viewport: viewport.frame,
-          previousImpact,
-        }),
-    );
-
-  const newImpact: DragImpact = {
+  const impact: DragImpact = {
     movement: {
+      displacedBy,
       displaced,
-      amount,
-      isBeyondStartPosition: false,
+      map: getDisplacementMap(displaced),
+      willDisplaceForward,
     },
     direction: axis.direction,
     destination: {
       droppableId: destination.descriptor.id,
       index: proposedIndex,
     },
+    merge: null,
   };
-
-  return {
-    pageBorderBoxCenter: withDroppableDisplacement(destination, newCenter),
-    impact: newImpact,
-  };
+  return impact;
 };

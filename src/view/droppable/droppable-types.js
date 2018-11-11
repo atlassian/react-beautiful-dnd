@@ -36,10 +36,11 @@ export type MapProps = {|
 |};
 
 export type OwnProps = {|
-  children: (Provided, StateSnapshot) => ?Node,
+  children: (Provided, StateSnapshot) => Node,
   droppableId: DroppableId,
   type: TypeId,
   isDropDisabled: boolean,
+  isCombineEnabled: boolean,
   direction: Direction,
   ignoreContainerClipping: boolean,
 |};
@@ -47,13 +48,14 @@ export type OwnProps = {|
 export type DefaultProps = {|
   type: string,
   isDropDisabled: boolean,
+  isCombineEnabled: false,
   direction: Direction,
   ignoreContainerClipping: boolean,
 |};
 
 export type Props = {|
-  ...OwnProps,
   ...MapProps,
+  ...OwnProps,
 |};
 
 // Having issues getting the correct type

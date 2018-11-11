@@ -15,4 +15,10 @@ storiesOf('board', module)
   .add('large data set', () => <Board initial={data.large} />)
   .add('long lists in a short container', () => (
     <Board initial={data.medium} containerHeight="60vh" />
+  ))
+  .add('scrollable columns', () => (
+    <Board initial={authorQuoteMap} withScrollableColumns />
+  ))
+  .add('with combine enabled', () => (
+    <Board initial={authorQuoteMap} isCombineEnabled />
   ));

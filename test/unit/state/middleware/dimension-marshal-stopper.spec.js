@@ -3,11 +3,10 @@ import type { DropResult, PendingDrop } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import middleware from '../../../../src/state/middleware/dimension-marshal-stopper';
-import dropMiddleware from '../../../../src/state/middleware/drop';
+import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
 import createStore from './util/create-store';
 import {
   clean,
-  prepare,
   initialPublish,
   drop,
   completeDrop,
@@ -34,7 +33,6 @@ it('should stop a collection if a drag is aborted', () => {
     middleware(() => getMarshal(stopPublishing)),
   );
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
 
   expect(stopPublishing).not.toHaveBeenCalled();
@@ -50,7 +48,6 @@ it('should not stop a collection if a drop is pending', () => {
     dropMiddleware,
   );
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
   store.dispatch(collectionStarting());
@@ -71,7 +68,6 @@ it('should stop a collection if a drag is complete', () => {
     dropMiddleware,
   );
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
   expect(stopPublishing).not.toHaveBeenCalled();
@@ -80,6 +76,7 @@ it('should stop a collection if a drag is complete', () => {
   const result: DropResult = {
     ...getDragStart(),
     destination: null,
+    combine: null,
     reason: 'CANCEL',
   };
   store.dispatch(completeDrop(result));
@@ -95,17 +92,18 @@ it('should stop a collection if a drop animation starts', () => {
     dropMiddleware,
   );
 
-  store.dispatch(prepare());
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
   expect(stopPublishing).not.toHaveBeenCalled();
 
   const pending: PendingDrop = {
-    newHomeOffset: { x: 0, y: 0 },
+    newHomeClientOffset: { x: 0, y: 0 },
     impact: noImpact,
+    dropDuration: 1,
     result: {
       ...getDragStart(),
       // destination cleared
+      combine: null,
       destination: null,
       reason: 'CANCEL',
     },

@@ -190,7 +190,7 @@ if (!document.body) {
 }
 document.body.appendChild(table);
 
-const IsDraggingContext = React.createContext(false);
+const IsDraggingContext = React.createContext<boolean>(false);
 
 class TableRow extends Component<TableRowProps> {
   render() {

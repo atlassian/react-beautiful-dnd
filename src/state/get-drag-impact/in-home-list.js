@@ -8,81 +8,133 @@ import type {
   Axis,
   Displacement,
   Viewport,
+  UserDirection,
+  DisplacedBy,
 } from '../../types';
-import { patch } from '../position';
 import getDisplacement from '../get-displacement';
-import withDroppableScroll from '../with-droppable-scroll';
+import getDisplacementMap from '../get-displacement-map';
+import isUserMovingForward from '../user-direction/is-user-moving-forward';
+import getDisplacedBy from '../get-displaced-by';
 
-// It is the responsibility of this function
-// to return the impact of a drag
+const getNewIndex = (
+  startIndex: number,
+  amountOfDisplaced: number,
+  isInFrontOfStart: boolean,
+): number => {
+  if (!amountOfDisplaced) {
+    return startIndex;
+  }
+
+  if (isInFrontOfStart) {
+    return startIndex + amountOfDisplaced;
+  }
+  // is moving backwards
+  return startIndex - amountOfDisplaced;
+};
 
 type Args = {|
-  pageBorderBoxCenter: Position,
+  pageBorderBoxCenterWithDroppableScrollChange: Position,
   draggable: DraggableDimension,
   home: DroppableDimension,
   insideHome: DraggableDimension[],
   previousImpact: DragImpact,
   viewport: Viewport,
+  userDirection: UserDirection,
 |};
 
 export default ({
-  pageBorderBoxCenter,
+  pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
   draggable,
   home,
   insideHome,
   previousImpact,
   viewport,
+  userDirection: currentUserDirection,
 }: Args): DragImpact => {
   const axis: Axis = home.axis;
   // The starting center position
   const originalCenter: Position = draggable.page.borderBox.center;
+  const targetCenter: number = currentCenter[axis.line];
+  const isInFrontOfStart: boolean = targetCenter > originalCenter[axis.line];
 
-  // Where the element actually is now.
-  // Need to take into account the change of scroll in the droppable
-  const currentCenter: Position = withDroppableScroll(
-    home,
-    pageBorderBoxCenter,
+  // when behind where we started we push items forward
+  // when in front of where we started we push items backwards
+  const willDisplaceForward: boolean = !isInFrontOfStart;
+
+  const isMovingForward: boolean = isUserMovingForward(
+    home.axis,
+    currentUserDirection,
   );
+  const isMovingTowardStart: boolean = isInFrontOfStart
+    ? !isMovingForward
+    : isMovingForward;
 
-  // not considering margin so that items move based on visible edges
-  const isBeyondStartPosition: boolean =
-    currentCenter[axis.line] - originalCenter[axis.line] > 0;
-
-  // TODO: if currentCenter === originalCenter can just abort
-
-  // Amount to move needs to include the margins
-  const amount: Position = patch(
-    axis.line,
-    draggable.client.marginBox[axis.size],
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    home.axis,
+    draggable.displaceBy,
+    willDisplaceForward,
   );
+  const displacement: number = displacedBy.value;
 
   const displaced: Displacement[] = insideHome
     .filter(
       (child: DraggableDimension): boolean => {
-        // do not want to move the item that is dragging
+        // do not want to displace the item that is dragging
         if (child === draggable) {
           return false;
         }
 
         const borderBox: Rect = child.page.borderBox;
+        const start: number = borderBox[axis.start];
+        const end: number = borderBox[axis.end];
 
-        if (isBeyondStartPosition) {
-          // 1. item needs to start ahead of the moving item
-          // 2. the dragging item has moved over it
-          if (borderBox.center[axis.line] < originalCenter[axis.line]) {
+        if (isInFrontOfStart) {
+          // Nothing behind start can be displaced
+          if (child.descriptor.index < draggable.descriptor.index) {
             return false;
           }
 
-          return currentCenter[axis.line] > borderBox[axis.start];
+          // Moving backwards towards the starting location
+          // Can reduce the amount of things that are displaced
+          // Need to check if the center is going over the
+          // end edge of a the target
+          // We apply the displacement to the calculation even if
+          // the item is not displaced so that it will have a consistent
+          // impact moving in a list as well as moving into it
+          if (isMovingTowardStart) {
+            const displacedEndEdge: number = end + displacement;
+            return targetCenter > displacedEndEdge;
+          }
+
+          // Moving forwards away from the starting location
+          // Need to check if the center is going over the
+          // start edge of the target
+          // Can increase the amount of things that are displaced
+          return targetCenter >= start;
         }
-        // moving backwards
-        // 1. item needs to start behind the moving item
-        // 2. the dragging item has moved over it
-        if (originalCenter[axis.line] < borderBox.center[axis.line]) {
+
+        // is behind where we started
+
+        // Nothing in front of start can be displaced
+        if (child.descriptor.index > draggable.descriptor.index) {
           return false;
         }
 
-        return currentCenter[axis.line] < borderBox[axis.end];
+        // Moving back towards the starting location
+        // Can reduce the amount of things displaced
+        // We apply the displacement to the calculation even if
+        // the item is not displaced so that it will have a consistent
+        // impact moving in a list as well as moving into it
+        // End displacement when we move onto the displaced start edge
+        if (isMovingTowardStart) {
+          const displacedStartEdge: number = start + displacement;
+          return targetCenter < displacedStartEdge;
+        }
+
+        // Continuing to move further away backwards from the start
+        // Can increase the amount of things that are displaced
+        // Shift once the center goes onto the end of the thing before it
+        return targetCenter <= end;
       },
     )
     .map(
@@ -96,37 +148,32 @@ export default ({
     );
 
   // Need to ensure that we always order by the closest impacted item
-  const ordered: Displacement[] = isBeyondStartPosition
+  // when in front of start (displacing backwards) we need to reverse
+  // the natural order of the list so that it is ordered from last to first
+  const ordered: Displacement[] = isInFrontOfStart
     ? displaced.reverse()
     : displaced;
-  const index: number = (() => {
-    // const startIndex = insideHome.indexOf(draggable);
-    const startIndex = draggable.descriptor.index;
-    const length: number = ordered.length;
-    if (!length) {
-      return startIndex;
-    }
+  const index: number = getNewIndex(
+    draggable.descriptor.index,
+    ordered.length,
+    isInFrontOfStart,
+  );
 
-    if (isBeyondStartPosition) {
-      return startIndex + length;
-    }
-    // is moving backwards
-    return startIndex - length;
-  })();
-
-  const movement: DragMovement = {
-    amount,
+  const newMovement: DragMovement = {
     displaced: ordered,
-    isBeyondStartPosition,
+    map: getDisplacementMap(ordered),
+    willDisplaceForward,
+    displacedBy,
   };
 
   const impact: DragImpact = {
-    movement,
+    movement: newMovement,
     direction: axis.direction,
     destination: {
       droppableId: home.descriptor.id,
       index,
     },
+    merge: null,
   };
 
   return impact;

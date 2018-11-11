@@ -16,6 +16,7 @@ import createEventMarshal, {
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
 import type { MouseSensor, CreateSensorArgs } from './sensor-types';
+import { warning } from '../../../dev-warning';
 
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
@@ -89,7 +90,9 @@ export default ({
       stopPendingDrag();
       return;
     }
-    stopDragging(fn);
+    if (state.isDragging) {
+      stopDragging(fn);
+    }
   };
 
   const unmount = (): void => {
@@ -123,10 +126,16 @@ export default ({
           return;
         }
 
-        // drag should be pending
+        // There should be a pending drag at this point
+
         if (!state.pending) {
-          kill();
-          invariant(false, 'Expected there to be a pending drag');
+          // this should be an impossible state
+          // we cannot use kill directly as it checks if there is a pending drag
+          stopPendingDrag();
+          invariant(
+            false,
+            'Expected there to be an active or pending drag when window mousemove event is received',
+          );
         }
 
         // threshold not yet exceeded
@@ -139,7 +148,7 @@ export default ({
         startDragging(() =>
           callbacks.onLift({
             clientSelection: point,
-            autoScrollMode: 'FLUID',
+            movementMode: 'FLUID',
           }),
         );
       },
@@ -222,11 +231,9 @@ export default ({
           event.webkitForce == null ||
           (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
         ) {
-          if (process.env.NODE_ENV !== 'production') {
-            console.warn(
-              'handling a mouse force changed event when it is not supported',
-            );
-          }
+          warning(
+            'handling a mouse force changed event when it is not supported',
+          );
           return;
         }
 

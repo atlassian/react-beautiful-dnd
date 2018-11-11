@@ -11,9 +11,7 @@ const preset = getPreset();
 export const withExpectedAdvancedUsageWarning = (fn: Function) => {
   jest.spyOn(console, 'warn').mockImplementation(() => {});
   fn();
-  expect(console.warn).toHaveBeenCalledWith(
-    expect.stringContaining('Advanced usage warning'),
-  );
+  expect(console.warn).toHaveBeenCalled();
   console.warn.mockRestore();
 };
 

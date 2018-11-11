@@ -5,8 +5,8 @@ import type {
   DraggableId,
   DroppableId,
   DraggableDimension,
-  ZIndex,
   State,
+  MovementMode,
 } from '../../types';
 import {
   lift,
@@ -28,9 +28,12 @@ export type DraggingStyle = {|
   boxSizing: 'border-box',
   width: number,
   height: number,
-  transition: 'none',
+  transition: string,
   transform: ?string,
-  zIndex: ZIndex,
+  zIndex: number,
+
+  // for combining
+  opacity: ?number,
 
   // Avoiding any processing of mouse events.
   // This is already applied by the shared styles during a drag.
@@ -60,6 +63,8 @@ export type DraggableProps = {|
   style: ?DraggableStyle,
   // used for shared global styles
   'data-react-beautiful-dnd-draggable': string,
+  // used to know when a transition ends
+  onTransitionEnd: ?() => mixed,
 |};
 
 export type Provided = {|
@@ -70,10 +75,23 @@ export type Provided = {|
   innerRef: (?HTMLElement) => void,
 |};
 
+// to easily enable patching of styles
+export type DropAnimation = {|
+  duration: number,
+  curve: string,
+  moveTo: Position,
+  opacity: ?number,
+  scale: ?number,
+|};
+
 export type StateSnapshot = {|
   isDragging: boolean,
   isDropAnimating: boolean,
+  dropAnimation: ?DropAnimation,
   draggingOver: ?DroppableId,
+  combineWith: ?DraggableId,
+  combineTargetFor: ?DraggableId,
+  mode: ?MovementMode,
 |};
 
 export type DispatchProps = {|
@@ -88,25 +106,35 @@ export type DispatchProps = {|
   dropAnimationFinished: typeof dropAnimationFinished,
 |};
 
+export type DraggingMapProps = {|
+  offset: Position,
+  mode: MovementMode,
+  dropping: ?DropAnimation,
+  dimension: DraggableDimension,
+  draggingOver: ?DroppableId,
+  combineWith: ?DraggableId,
+  forceShouldAnimate: ?boolean,
+|};
+
+export type SecondaryMapProps = {|
+  offset: Position,
+  combineTargetFor: ?DraggableId,
+  shouldAnimateDisplacement: boolean,
+|};
+
 export type MapProps = {|
-  isDragging: boolean,
-  // whether or not a drag movement should be animated
-  // used for dropping and keyboard dragging
-  shouldAnimateDragMovement: boolean,
   // when an item is being displaced by a dragging item,
   // we need to know if that movement should be animated
-  shouldAnimateDisplacement: boolean,
-  isDropAnimating: boolean,
-  offset: Position,
-  // only provided when dragging
-  dimension: ?DraggableDimension,
-  draggingOver: ?DroppableId,
+  dragging: ?DraggingMapProps,
+  secondary: ?SecondaryMapProps,
 |};
+
+export type ChildrenFn = (Provided, StateSnapshot) => Node;
 
 export type OwnProps = {|
   draggableId: DraggableId,
-  children: (Provided, StateSnapshot) => ?Node,
   index: number,
+  children: ChildrenFn,
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
 |};

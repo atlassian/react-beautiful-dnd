@@ -11,12 +11,6 @@ describe('can start drag', () => {
     expect(canStartDrag(state.idle, preset.inHome1.descriptor.id)).toBe(true);
   });
 
-  it('should not allow lifting in the PREPARING phase', () => {
-    expect(canStartDrag(state.preparing, preset.inHome1.descriptor.id)).toBe(
-      false,
-    );
-  });
-
   it('should not allow lifting in the COLLECTING phase', () => {
     expect(canStartDrag(state.collecting(), preset.inHome1.descriptor.id)).toBe(
       false,

@@ -1,0 +1,20 @@
+{
+  "processors": [
+    [
+      "stylelint-processor-styled-components",
+      {
+        "moduleName": "react-emotion"
+      }
+    ]
+  ],
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-styled-components",
+    "stylelint-config-prettier"
+  ],
+  "rules": {
+    "declaration-empty-line-before": null,
+    "comment-empty-line-before": null,
+    "block-no-empty": null
+  }
+}

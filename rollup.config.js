@@ -7,6 +7,7 @@ import replace from 'rollup-plugin-replace';
 import strip from 'rollup-plugin-strip';
 import { uglify } from 'rollup-plugin-uglify';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
+import json from 'rollup-plugin-json';
 import pkg from './package.json';
 
 const input = './src/index.js';
@@ -22,18 +23,22 @@ const getBabelOptions = ({ useESModules }) => ({
   plugins: [['@babel/transform-runtime', { corejs: 2, useESModules }]],
 });
 
-const snapshotArgs = (() => {
-  const shouldMatch = process.env.SNAPSHOT === 'match';
+const snapshotArgs =
+  process.env.SNAPSHOT === 'match'
+    ? {
+        matchSnapshot: true,
+        threshold: 1000,
+      }
+    : {};
 
-  if (!shouldMatch) {
-    return {};
-  }
-
-  return {
-    matchSnapshot: true,
-    threshold: 1000,
-  };
-})();
+const commonjsArgs = {
+  include: 'node_modules/**',
+  // needed for react-is via react-redux v5.1
+  // https://stackoverflow.com/questions/50080893/rollup-error-isvalidelementtype-is-not-exported-by-node-modules-react-is-inde/50098540
+  namedExports: {
+    'node_modules/react-is/index.js': ['isValidElementType'],
+  },
+};
 
 export default [
   // Universal module definition (UMD) build
@@ -50,9 +55,10 @@ export default [
     // Only deep dependency required is React
     external: ['react'],
     plugins: [
+      json(),
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
-      commonjs({ include: 'node_modules/**' }),
+      commonjs(commonjsArgs),
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
       sizeSnapshot(snapshotArgs),
     ],
@@ -70,9 +76,10 @@ export default [
     // Only deep dependency required is React
     external: ['react'],
     plugins: [
+      json(),
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
-      commonjs({ include: 'node_modules/**' }),
+      commonjs(commonjsArgs),
       strip({ debugger: true }),
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot(snapshotArgs),
@@ -88,6 +95,7 @@ export default [
     output: { file: pkg.main, format: 'cjs' },
     external: excludeAllExternals,
     plugins: [
+      json(),
       resolve({ extensions }),
       babel(getBabelOptions({ useESModules: false })),
     ],
@@ -101,6 +109,7 @@ export default [
     output: { file: pkg.module, format: 'esm' },
     external: excludeAllExternals,
     plugins: [
+      json(),
       resolve({ extensions }),
       babel(getBabelOptions({ useESModules: true })),
       sizeSnapshot(snapshotArgs),

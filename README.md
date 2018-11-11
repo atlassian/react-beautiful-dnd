@@ -2,10 +2,14 @@
 
 # react-beautiful-dnd
 
-Beautiful, accessible drag and drop for lists with [`React.js`](https://facebook.github.io/react/)
+Beautiful and accessible drag and drop for lists with [`React`](https://facebook.github.io/react/)
 
 [![CircleCI branch](https://img.shields.io/circleci/project/github/atlassian/react-beautiful-dnd/master.svg)](https://circleci.com/gh/atlassian/react-beautiful-dnd/tree/master)
-[![npm](https://img.shields.io/npm/v/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd) [![dependencies](https://david-dm.org/atlassian/react-beautiful-dnd.svg)](https://david-dm.org/atlassian/react-beautiful-dnd) [![Greenkeeper badge](https://badges.greenkeeper.io/atlassian/react-beautiful-dnd.svg)](https://greenkeeper.io/) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
+[![npm](https://img.shields.io/npm/v/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
+[![dependencies](https://david-dm.org/atlassian/react-beautiful-dnd.svg)](https://david-dm.org/atlassian/react-beautiful-dnd)
+[![Downloads per month](https://img.shields.io/npm/dm/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
+[![Greenkeeper badge](https://badges.greenkeeper.io/atlassian/react-beautiful-dnd.svg)](https://greenkeeper.io/)
+[![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
 ![quote application example](https://raw.githubusercontent.com/alexreardon/files/master/resources/website-board.gif?raw=true)
 
@@ -39,7 +43,7 @@ We have created some basic examples on `codesandbox` for you to play with direct
 - Plays extremely well with standard browser interactions
 - Unopinionated styling
 - No creation of additional wrapper dom nodes - flexbox and focus management friendly!
-- Accessible
+- Accessible ♿️🚀
 
 ## Get started 🤩
 
@@ -58,16 +62,19 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - Vertical lists ↕
 - Horizontal lists ↔
 - Movement between lists (▤ ↔ ▤)
+- Combining items (see [combining guide](/docs/guides/combining.md))
 - Mouse 🐭, keyboard 🎹 and touch 👉📱 (mobile, tablet and so on) support
-- Auto scrolling - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
 - [Multi drag support](/docs/patterns/multi-drag.md)
 - Incredible screen reader support - we provide an amazing experience for english screen readers out of the box 📦. We also provide complete customisation control and internationalisation support for those who need it 💖
 - Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
 - Flexible item sizes - the draggable items can have different heights (vertical lists) or widths (horizontal lists)
+- Add and remove `Draggable`s during a drag (see [changes while dragging guide](/docs/guides/changes-while-dragging.md))
 - Compatible with semantic table reordering - [table pattern](/docs/patterns/tables.md)
-- Compatible with [`React.Portal`](https://reactjs.org/docs/portals.html) - [portal pattern](/docs/patterns/using-a-portal.md)
+- Auto scrolling - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
 - Custom drag handles - you can drag a whole item by just a part of it
+- Compatible with [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html) - [portal pattern](/docs/patterns/using-a-portal.md)
+- 🌲 Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) package
 - A `Droppable` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
 - Server side rendering compatible
@@ -137,7 +144,13 @@ With things moving a lot it would be easy for the user to become distracted by t
 
 ### Dropping
 
-When you drop a dragging item its movement is based on physics (thanks [`react-motion`](https://github.com/chenglou/react-motion)). This results in the drop feeling more weighted and physical.
+We have designed a drop animation that feels weighted and physical. It is based on a [`spring`](https://developer.android.com/guide/topics/graphics/spring-animation) and uses a CSS animation with a dynamic duration to achieve the effect.
+
+![result-curve](https://user-images.githubusercontent.com/2182637/48235467-1ce34200-e412-11e8-8c69-2060a0c2f61a.png)
+
+> Animation curve used when dropping. Duration is dynamic based on distance to travel
+
+You can tweak the drop animation if you would like to. We have created a guide: [drop animation](/docs/guides/drop-animation.md)
 
 ### Moving out of the way
 
@@ -151,7 +164,7 @@ How it is composed:
 
 ![animation curve](https://raw.githubusercontent.com/alexreardon/files/master/resources/dnd-ease-in-out-small.png?raw=true)
 
-> animation curve used when moving out of the way
+> Animation curve used when moving out of the way
 
 ## Caring about the interaction details
 
@@ -203,7 +216,7 @@ This is amazing for users with visual impairments as they can correctly move ite
 
 Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library ships with support for drag and drop interactions **using only a keyboard**. This enables power users to drive their experience entirely from the keyboard. As well as opening up these experiences to users who would have been excluded previously.
 
-We provide **fantastic support for screen readers** to assist users with visual (or other) impairments. We ship with english messaging out of the box 📦. However, you are welcome to override these messages by using the `announce` function that it provided to all of the `DragDropContext > hook` functions.
+We provide **fantastic support for screen readers** to assist users with visual (or other) impairments. We ship with english messaging out of the box 📦. However, you are welcome to override these messages by using the `announce` function that it provided to all of the `DragDropContext > responder` functions.
 
 See our [screen reader guide](docs/guides/screen-reader.md) for a guide on crafting useful screen reader messaging.
 
@@ -335,121 +348,7 @@ We have created a [multi drag pattern](/docs/patterns/multi-drag.md) that you ca
 
 ## Preset styles
 
-We apply a number of non-visible styles to facilitate the dragging experience. We do this using combination of styling targets and techniques. It is a goal of the library to provide unopinioned styling. However, we do apply some reasonable `cursor` styling on drag handles by default. This is designed to make the library work as simply as possible out of the box. If you want to use your own cursors you are more than welcome to. All you need to do is override our cursor style rules by using a rule with [higher specificity](https://css-tricks.com/specifics-on-css-specificity/).
-
-Here are the styles that are applied at various points in the drag lifecycle:
-
-### In every phase
-
-#### Always: drag handle
-
-Styles applied to: **drag handle element** using the `data-react-beautiful-dnd-drag-handle` attribute.
-
-A long press on anchors usually pops a content menu that has options for the link such as 'Open in new tab'. Because long press is used to start a drag we need to opt out of this behavior
-
-```css
--webkit-touch-callout: none;
-```
-
-Webkit based browsers add a grey overlay to anchors when they are active. We remove this tap overlay as it is confusing for users. [more information](https://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/).
-
-```css
--webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-```
-
-Avoid the _pull to refresh action_ and _delayed anchor focus_ on Android Chrome
-
-```css
-touch-action: manipulation;
-```
-
-#### Always: Droppable
-
-Styles applied to: **droppable element** using the `data-react-beautiful-dnd-droppable` attribute.
-
-Opting out of the browser feature which tries to maintain the scroll position when the DOM changes above the fold. We already correctly maintain the scroll position. The automatic `overflow-anchor` behavior leads to incorrect scroll positioning post drop.
-
-```css
-overflow-anchor: none;
-```
-
-### Phase: resting
-
-#### (Phase: resting): drag handle
-
-Styles applied to: **drag handle element** using the `data-react-beautiful-dnd-drag-handle` attribute.
-
-Adding a cursor style to let the user know this element is draggable. You are welcome to override this.
-
-```css
-cursor: grab;
-```
-
-### Phase: dragging
-
-#### (Phase: dragging): drag handle element
-
-**Styles applied using the `data-react-beautiful-dnd-drag-handle` attribute**
-
-An optimisation to avoid processing `pointer-events` while dragging. Also used to allow scrolling through a drag handle with a track pad or mouse wheel.
-
-```css
-pointer-events: none;
-```
-
-#### (Phase: dragging): Draggable element
-
-**Styles applied using the `data-react-beautiful-dnd-draggable` attribute**
-
-This is what we use to control `Draggable`s that need to move out of the way of a dragging `Draggable`.
-
-```css
-transition: ${string};
-```
-
-**Styles applied using inline styles**
-
-This is described by the type [`DraggableStyle`](https://github.com/atlassian/react-beautiful-dnd#type-information-1).
-
-#### (Phase: dragging): body element
-
-We apply a cursor while dragging to give user feedback that a drag is occurring. You are welcome to override this. A good point to do this is the `onDragStart` event.
-
-```css
-cursor: grabbing;
-```
-
-To prevent the user selecting text as they drag apply this style
-
-```css
-user-select: none;
-```
-
-### Phase: dropping
-
-#### (Phase: dropping): drag handle element
-
-**Styles applied using the `data-react-beautiful-dnd-drag-handle` attribute**
-
-We apply the grab cursor to all drag handles except the drag handle for the dropping `Draggable`. At this point the user is able to drag other `Draggable`'s if they like.
-
-```css
-cursor: grab;
-```
-
-#### (Phase: dropping): draggable
-
-Same as dragging phase
-
-### Phase: user cancel
-
-> When a user explicitly cancels a drag
-
-This is the same as `Phase: dropping`. However we do not apply a `cursor: grab` to the drag handle. During a user initiated cancel we do not allow the dragging of other items until the drop animation is complete.
-
-### Preset styles are vendor prefixed
-
-All styles applied are vendor prefixed correctly to meet the requirements of our [supported browser matrix](https://confluence.atlassian.com/cloud/supported-browsers-744721663.html). This is done by hand to avoid adding to react-beautiful-dnd's size by including a css-in-js library
+We apply a number of _non-visible styles_ to facilitate the dragging experience. We have a guide describing what they are and how they are applied in the various stages of a drag interaction: [guide: preset styles](/docs/guides/preset-styles.md);
 
 ## Installation
 
@@ -513,25 +412,24 @@ In order to use drag and drop, you need to have the part of your `React` tree th
 ### Props
 
 ```js
-type Hooks = {|
+type Responders = {|
   // optional
-  onDragBeforeStart?: OnDragBeforeStartHook,
-  onDragStart?: OnDragStartHook,
-  onDragUpdate?: OnDragUpdateHook,
+  onDragBeforeStart?: OnDragBeforeStartResponder,
+  onDragStart?: OnDragStartResponder,
+  onDragUpdate?: OnDragUpdateResponder,
   // required
-  onDragEnd: OnDragEndHook,
+  onDragEnd: OnDragEndResponder,
 |};
 
-type OnBeforeDragStartHook = (start: DragStart) => mixed;
-type OnDragStartHook = (start: DragStart, provided: HookProvided) => mixed;
-type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => mixed;
-type OnDragEndHook = (result: DropResult, provided: HookProvided) => mixed;
+import type { Node } from 'react';
 
 type Props = {|
-  ...Hooks,
+  ...Responders,
   children: ?Node,
 |};
 ```
+
+> See our [type guide](/docs/guides/types.md) for more details
 
 ### Basic usage
 
@@ -539,6 +437,10 @@ type Props = {|
 import { DragDropContext } from 'react-beautiful-dnd';
 
 class App extends React.Component {
+  onBeforeDragStart = () => {
+    /*...*/
+  };
+
   onDragStart = () => {
     /*...*/
   };
@@ -552,6 +454,7 @@ class App extends React.Component {
   render() {
     return (
       <DragDropContext
+        onBeforeDragStart={this.onBeforeDragStart}
         onDragStart={this.onDragStart}
         onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
@@ -563,11 +466,13 @@ class App extends React.Component {
 }
 ```
 
-### `Hook`s
+### `Responder`s
 
-Hooks are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
+> `Responders` were previously known as `Hooks`
 
-[Please see our Hooks guide](docs/guides/hooks.md) for detailed information about hooks ❤️
+Responders are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
+
+[Please see our Responders guide](docs/guides/responders.md) for detailed information about responders ❤️
 
 ## `Droppable`
 
@@ -592,9 +497,33 @@ import { Droppable } from 'react-beautiful-dnd';
 
 ### Droppable props
 
+```js
+import type { Node } from 'react';
+
+type Props = {|
+  // required
+  droppableId: DroppableId,
+  // optional
+  type?: TypeId,
+  isDropDisabled?: boolean,
+  isCombineEnabled?: boolean,
+  direction?: Direction,
+  ignoreContainerClipping?: boolean,
+  children: (Provided, StateSnapshot) => Node,
+|};
+```
+
+#### Required props
+
+> `react-beautiful-dnd` will throw an error if a required prop is not provided
+
 - `droppableId`: A _required_ `DroppableId(string)` that uniquely identifies the droppable for the application. Please do not change this prop - especially during a drag.
-- `type`: An _optional_ `TypeId(string)` that can be used to simply accept a class of `Draggable`. For example, if you use the type `PERSON` then it will only allow `Draggable`s of type `PERSON` to be dropped on itself. `Draggable`s of type `TASK` would not be able to be dropped on a `Droppable` with type `PERSON`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of the `Draggable`s within a `Droppable` **must be** the same. This restriction might be loosened in the future if there is a valid use case.
-- `isDropDisabled`: An _optional_ flag to control whether or not dropping is currently allowed on the `Droppable`. You can use this to implement your own conditional dropping logic. It will default to `false`.
+
+#### Optional props
+
+- `type`: A `TypeId(string)` that can be used to simply accept a class of `Draggable`. For example, if you use the type `PERSON` then it will only allow `Draggable`s of type `PERSON` to be dropped on itself. `Draggable`s of type `TASK` would not be able to be dropped on a `Droppable` with type `PERSON`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of the `Draggable`s within a `Droppable` **must be** the same. This restriction might be loosened in the future if there is a valid use case.
+- `isDropDisabled`: A flag to control whether or not dropping is currently allowed on the `Droppable`. You can use this to implement your own conditional dropping logic. It will default to `false`.
+- `isCombineEnabled`: A flag to control whether or not _all_ the `Draggables` in the list will be able to be **combined** with. It will default to `false`.
 - `direction`: The direction in which items flow in this droppable. Options are `vertical` (default) and `horizontal`.
 - `ignoreContainerClipping`: When a `Droppable` is inside a scrollable container its area is constrained so that you can only drop on the part of the `Droppable` that you can see. Setting this prop opts out of this behavior, allowing you to drop anywhere on a `Droppable` even if it's visually hidden by a scrollable parent. The default behavior is suitable for most cases so odds are you'll never need to use this prop, but it can be useful if you've got very long `Draggable`s inside a short scroll container. Keep in mind that it might cause some unexpected behavior if you have multiple `Droppable`s inside scroll containers on the same page.
 
@@ -680,6 +609,18 @@ The `children` function is also provided with a small amount of state relating t
 - You can disable dropping on a `Droppable` altogether by always setting `isDropDisabled` to `true`. You can do this to create a list that is never able to be dropped on, but contains `Draggable`s.
 - Technically you do not need to use `type` and do all of your conditional drop logic with the `isDropDisabled` function. The `type` parameter is a convenient shortcut for a common use case.
 
+### Combining
+
+`react-beautiful-dnd` supports the combining of `Draggable`s 🤩
+
+![combining](https://user-images.githubusercontent.com/2182637/48045145-318dc300-e1e3-11e8-83bd-22c9bd44c442.gif)
+
+You can enable a _combining_ mode for a `Droppable` by setting `isCombineEnabled` to `true` on a `Droppable`. We have created a [combining guide](/docs/guides/combining.md) to help you implement combining in your lists.
+
+### Adding and removing `Draggable`s while dragging
+
+It is possible to change the `Draggable`s in a `Droppable` for a limited set of circumstances. We have created a comprehensive [changes while dragging guide](/docs/guides/changes-while-dragging.md)
+
 ### Scroll containers
 
 This library supports dragging within scroll containers (DOM elements that have `overflow: auto;` or `overflow: scroll;`). The **only** supported use cases are:
@@ -692,6 +633,10 @@ where a _scrollable parent_ refers to a scroll container that is not the window 
 ### Empty `Droppable`s
 
 It is recommended that you put a `min-height` on a vertical `Droppable` or a `min-width` on a horizontal `Droppable`. Otherwise when the `Droppable` is empty there may not be enough of a target for `Draggable` being dragged with touch or mouse inputs to be _over_ the `Droppable`.
+
+### Fixed `Droppable`s
+
+`react-beautiful-dnd` has partial support for `Droppable` lists that use `position: fixed`. When you start a drag and _any_ list of the same type is `position:fixed` then auto window scrolling will be disabled. This is because our virtual model assumes that when the page scroll changes the position of a `Droppable` will shift too. If a manual window scroll is detected then the scroll will be aborted. Scroll container scroll is still allowed. We could improve this support, but it would just be a big effort. Please raise an issue if you would be keen to be a part of this effort ❤️
 
 ### Recommended `Droppable` performance optimisation
 
@@ -778,8 +723,26 @@ import { Draggable } from 'react-beautiful-dnd';
 
 ### Draggable Props
 
+```js
+import type { Node } from 'react';
+
+type Props = {|
+  // required
+  draggableId: DraggableId,
+  index: number,
+  children: (DraggableProvided, DraggableStateSnapshot) => Node,
+  // optional
+  isDragDisabled: ?boolean,
+  disableInteractiveElementBlocking: ?boolean,
+|};
+```
+
+#### Required props
+
+> `react-beautiful-dnd` will throw an error if a required prop is not provided
+
 - `draggableId`: A _required_ `DraggableId(string)` that uniquely identifies the `Draggable` for the application. Please do not change this prop - especially during a drag.
-- `index`: A _required_ `number` that matches the order of the `Draggable` in the `Droppable`. It is simply the index of the `Draggable` in the list. The `index` needs to be unique within a `Droppable` but does not need to be unique between `Droppables`. Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
+- `index`: A _required_ `number` that matches the order of the `Draggable` in the `Droppable`. It is simply the index of the `Draggable` in the list. The `index` needs to be unique within a `Droppable` but does not need to be unique between `Droppables`. The `index`s in a list must start from `0` and be consecutive. `[0, 1, 2]` and not `[1, 2, 8]`. Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
 
 ```js
 {
@@ -799,12 +762,14 @@ import { Draggable } from 'react-beautiful-dnd';
 }
 ```
 
-- `isDragDisabled`: An _optional_ flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
-- `disableInteractiveElementBlocking`: An _optional_ flag to opt out of blocking a drag from interactive elements. For more information refer to the section _Interactive child elements within a `Draggable`_
+#### Optional props
 
-### Children function (render props)
+- `isDragDisabled`: A flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
+- `disableInteractiveElementBlocking`: A flag to opt out of blocking a drag from interactive elements. For more information refer to the section _Interactive child elements within a `Draggable`_
 
-The `React` children of a `Draggable` must be a function that returns a `ReactElement`.
+### Children function (render props / function as child)
+
+The `React` children of a `Draggable` must be a function that returns a `ReactNode`.
 
 ```js
 <Draggable draggableId="draggable-1" index={0}>
@@ -833,6 +798,8 @@ type DraggableProvided = {|
 |};
 ```
 
+> For more type information please see [our types guide](/docs/guies/types.md).
+
 Everything within the _provided_ object must be applied for the `Draggable` to function correctly.
 
 - `provided.innerRef (innerRef: (HTMLElement) => void)`: In order for the `Droppable` to function correctly, **you must** bind the `innerRef` function to the `ReactElement` that you want to be considered the `Draggable` node. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node.
@@ -849,7 +816,7 @@ Everything within the _provided_ object must be applied for the `Draggable` to f
 
 - `provided.draggableProps (DraggableProps)`: This is an Object that contains a `data` attribute and an inline `style`. This Object needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to `DraggableProps.style` – but please do not remove or replace any of the properties.
 
-##### `draggableProps` Type information
+##### `draggableProps` type information
 
 ```js
 // Props that can be spread onto the element directly
@@ -859,25 +826,9 @@ export type DraggableProps = {|
   // used for shared global styles
   'data-react-beautiful-dnd-draggable': string,
 |};
-
-type DraggableStyle = DraggingStyle | NotDraggingStyle;
-type DraggingStyle = {|
-  position: 'fixed',
-  width: number,
-  height: number,
-  boxSizing: 'border-box',
-  pointerEvents: 'none',
-  top: number,
-  left: number,
-  transition: 'none',
-  transform: ?string,
-  zIndex: ZIndex,
-|};
-type NotDraggingStyle = {|
-  transform: ?string,
-  transition: null | 'none',
-|};
 ```
+
+> For more type information please see [our types guide](/docs/guies/types.md).
 
 ##### `draggableProps` Example
 
@@ -934,9 +885,9 @@ If you are overriding inline styles be sure to do it after you spread the `provi
 </Draggable>
 ```
 
-##### Avoid margin collapsing between `Draggable`s
+##### Unsupported `margin` setups
 
-[margin collapsing](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing) is one of those really hard parts of CSS. For our purposes, if you have one `Draggable` with a `margin-bottom: 10px` and the next `Draggable` has a `margin-top: 12px` these margins will _collapse_ and the resulting margin will be the greater of the two: `12px`. When we do our calculations we are currently not accounting for margin collapsing. If you do want to have a margin on the siblings, wrap them both in a `div` and apply the margin to the inner `div` so they are not direct siblings.
+Avoid margin collapsing between `Draggable`s. [margin collapsing](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing) is one of those really hard parts of CSS. For our purposes, if you have one `Draggable` with a `margin-bottom: 10px` and the next `Draggable` has a `margin-top: 12px` these margins will _collapse_ and the resulting space between the elements will be the greater of the two: `12px`. When we do our calculations we are currently not accounting for margin collapsing. If you do want to have a margin on the siblings, wrap them both in a `div` and apply the margin to the inner `div` so they are not direct siblings.
 
 ##### `Draggable`s should be visible siblings
 
@@ -1020,7 +971,7 @@ type DragHandleProps = {|
 </Draggable>
 ```
 
-##### `dragHandleProps` Example: custom drag handle
+##### `dragHandleProps` example: custom drag handle
 
 Controlling a whole draggable by just a part of it
 
@@ -1077,15 +1028,28 @@ const myOnMouseDown = event => console.log('mouse down on', event.target);
 type DraggableStateSnapshot = {|
   // Set to true if a Draggable is being actively dragged, or if it is drop animating
   // Both active dragging and the drop animation are considered part of the drag
+  // *Generally this is the only property you will be using*
   isDragging: boolean,
   // Set to true if a Draggable is drop animating. Not every drag and drop interaction
   // as a drop animation. There is no drop animation when a Draggable is already in its final
   // position when dropped. This is commonly the case when dragging with a keyboard
   isDropAnimating: boolean,
+  // Information about a drop animation
+  dropAnimation: ?DropAnimation
   // What Droppable (if any) the Draggable is currently over
   draggingOver: ?DroppableId,
+  // the id of a draggable that you are combining with
+  combineWith: ?DraggableId,
+  // if something else is dragging and you are a combine target, then this is the id of the item that is dragging
+  combineTargetFor: ?DraggableId,
+  // There are two modes that a drag can be in
+  // 'FLUID': everything is done in response to highly granular input (eg mouse)
+  // 'SNAP': items snap between positions (eg keyboard);
+  mode: ?MovementMode,
 |};
 ```
+
+> See our [type guide](/docs/guides/types.md) for more details
 
 The `children` function is also provided with a small amount of state relating to the current drag state. This can be optionally used to enhance your component. A common use case is changing the appearance of a `Draggable` while it is being dragged. Note: if you want to change the cursor to something like `grab` you will need to add the style to the draggable. (See [Extending `DraggableProps.style`](#extending-draggableprops-style) above)
 
@@ -1151,127 +1115,36 @@ resetServerContext();
 renderToString(...);
 ```
 
-## Flow usage
+## Developer only warnings 👷‍
 
-`react-beautiful-dnd` is typed using [`flowtype`](https://flow.org). This greatly improves internal consistency within the codebase. We also expose a number of public types which will allow you to type your javascript if you would like to. If you are not using `flowtype` this will not inhibit you from using the library. It is just extra safety for those who want it.
+For common setup and usage issues and errors `react-beautiful-dnd` will log some information `console` for development builds (`process.env.NODE_ENV !== 'production'`). These logs are stripped from productions builds to save kbs and to keep the `console` clean.
 
-### Public flow types
+![dev only warnings](https://user-images.githubusercontent.com/2182637/46385261-98a8eb00-c6fe-11e8-9b46-0699bf3e6043.png)
 
-```js
-// id's
-type Id = string;
-type TypeId = Id;
-type DroppableId = Id;
-type DraggableId = Id;
+How to drop the developer messages from your bundles:
 
-// hooks
-type DragStart = {|
-  draggableId: DraggableId,
-  type: TypeId,
-  source: DraggableLocation,
-|};
+- [React docs](https://reactjs.org/docs/optimizing-performance.html#use-the-production-build)
+- [webpack instructions](https://webpack.js.org/guides/production/#specify-the-mode)
+- [rollup instructions](https://github.com/rollup/rollup-plugin-replace)
 
-type DragUpdate = {|
-  ...DragStart,
-  // may not have any destination (drag to nowhere)
-  destination: ?DraggableLocation,
-|};
+### Disable warnings
 
-type DropResult = {|
-  ...DragUpdate,
-  reason: DropReason,
-|};
-
-type DropReason = 'DROP' | 'CANCEL';
-
-type DraggableLocation = {|
-  droppableId: DroppableId,
-  // the position of the droppable within a droppable
-  index: number,
-|};
-
-// Droppable
-type DroppableProvided = {|
-  innerRef: (?HTMLElement) => void,
-  placeholder: ?ReactElement,
-|};
-
-type DroppableStateSnapshot = {|
-  isDraggingOver: boolean,
-  draggingOverWith: ?DraggableId,
-|};
-
-// Draggable
-type DraggableProvided = {|
-  innerRef: (?HTMLElement) => void,
-  draggableProps: DraggableProps,
-  dragHandleProps: ?DragHandleProps,
-|};
-
-type DraggableStateSnapshot = {|
-  isDragging: boolean,
-  isDropAnimating: boolean,
-  draggingOver: ?DroppableId,
-|};
-
-export type DraggableProps = {|
-  style: ?DraggableStyle,
-  'data-react-beautiful-dnd-draggable': string,
-|};
-type DraggableStyle = DraggingStyle | NotDraggingStyle;
-type DraggingStyle = {|
-  position: 'fixed',
-  width: number,
-  height: number,
-  boxSizing: 'border-box',
-  pointerEvents: 'none',
-  top: number,
-  left: number,
-  transition: 'none',
-  transform: ?string,
-  zIndex: ZIndex,
-|};
-type NotDraggingStyle = {|
-  transition: ?string,
-  transition: null | 'none',
-|};
-
-type DragHandleProps = {|
-  onFocus: () => void,
-  onBlur: () => void,
-  onMouseDown: (event: MouseEvent) => void,
-  onKeyDown: (event: KeyboardEvent) => void,
-  onTouchStart: (event: TouchEvent) => void,
-  'data-react-beautiful-dnd-drag-handle': string,
-  'aria-roledescription': string,
-  tabIndex: number,
-  draggable: boolean,
-  onDragStart: (event: DragEvent) => void,
-|};
-```
-
-### Using the flow types
-
-The types are exported as part of the module so using them is as simple as:
+If you want to disable the warnings in development, you just need to update a flag:
 
 ```js
-import type { DroppableProvided } from 'react-beautiful-dnd';
+// disable all react-beautiful-dnd development warnings
+window['__react-beautiful-dnd-disable-dev-warnings'] = true;
 ```
 
-## Typescript
+Disabling the warnings will not stop a drag from being aborted in the case of an error. It only disabling the logging about it.
 
-If you are using [TypeScript](https://www.typescriptlang.org/) you can use the community maintained [DefinitelyTyped type definitions](https://www.npmjs.com/package/@types/react-beautiful-dnd). [Installation instructions](http://definitelytyped.org/).
+## `Flow` and `TypeScript` usage
 
-Here is an [example written in typescript](https://github.com/abeaudoin2013/react-beautiful-dnd-multi-list-typescript-example).
-
-### Sample application with flow types
-
-We have created a [sample application](https://github.com/alexreardon/react-beautiful-dnd-flow-example) which exercises the flowtypes. It is a super simple `React` project based on [`react-create-app`](https://github.com/facebookincubator/create-react-app). You can use this as a reference to see how to set things up correctly.
+Please see our [types guide](/docs/guides/types.md)
 
 ## Community
 
-- [kanban-dnd](https://kanban-dnd.glitch.me) \- A Kanban style to-do list, with the ability to create custom lanes and reorder them on the fly. 
-- Simple Trello - A simple cloning version of Trello, using React ecosystem.
+- [kanban-dnd](https://kanban-dnd.glitch.me) \- A Kanban style to-do list, with the ability to create custom lanes and reorder them on the fly. - Simple Trello - A simple cloning version of Trello, using React ecosystem.
   - [Demo](https://simple-trello.netlify.com/)
   - [Source](https://github.com/ng-hai/simple-trello)
 

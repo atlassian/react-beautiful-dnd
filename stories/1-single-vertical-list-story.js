@@ -55,4 +55,7 @@ storiesOf('single vertical list', module)
       <Title>List is within a larger scroll container</Title>
       <QuoteApp initial={data.medium} />
     </ScrollContainer>
+  ))
+  .add('with combine enabled', () => (
+    <QuoteApp initial={data.small} isCombineEnabled />
   ));
