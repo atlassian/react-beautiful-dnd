@@ -38,7 +38,7 @@ const Row = styled('tr')`
     /* maintain cell width while dragging */
     display: table;
   `
-      : ''}/* stylelint-enable */;
+      : ''} /* stylelint-enable */;
 `;
 
 const Cell = styled('td')`
