@@ -468,6 +468,8 @@ class App extends React.Component {
 
 ### `Responder`s
 
+> `Responders` were previously known as `Hooks`
+
 Responders are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
 
 [Please see our Responders guide](docs/guides/responders.md) for detailed information about responders ❤️
