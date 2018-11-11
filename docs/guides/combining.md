@@ -82,7 +82,7 @@ If you are dragging a `Draggable` over another `Draggable` in combine mode then 
 
 If a `Draggable` is being dragged over in combine mode then the id of the `Draggable` being dragged will be populated in `combineTargetFor`
 
-## `DragDropContext` > `Handles`
+## `DragDropContext` > `Hooks`
 
 `onDragUpdate` and `onDragEnd` will be updated with any changes to a `combine`
 

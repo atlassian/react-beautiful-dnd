@@ -13,22 +13,22 @@ type DroppableId = Id;
 type DraggableId = Id;
 ```
 
-### Handles
+### Hooks
 
 ```js
-type Handles = {|
+type Hooks = {|
   // optional
-  onDragBeforeStart?: OnDragBeforeStartHandle,
-  onDragStart?: OnDragStartHandle,
-  onDragUpdate?: OnDragUpdateHandle,
+  onDragBeforeStart?: OnDragBeforeStartHook,
+  onDragStart?: OnDragStartHook,
+  onDragUpdate?: OnDragUpdateHook,
   // required
-  onDragEnd: OnDragEndHandle,
+  onDragEnd: OnDragEndHook,
 |};
 
-type OnBeforeDragStartHandle = (start: DragStart) => mixed;
-type OnDragStartHandle = (start: DragStart, provided: HandleProvided) => mixed;
-type OnDragUpdateHandle = (update: DragUpdate, provided: HandleProvided) => mixed;
-type OnDragEndHandle = (result: DropResult, provided: HandleProvided) => mixed;
+type OnBeforeDragStartHook = (start: DragStart) => mixed;
+type OnDragStartHook = (start: DragStart, provided: HookProvided) => mixed;
+type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => mixed;
+type OnDragEndHook = (result: DropResult, provided: HookProvided) => mixed;
 
 type DragStart = {|
   draggableId: DraggableId,

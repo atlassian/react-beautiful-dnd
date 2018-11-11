@@ -9,7 +9,7 @@ import { withKeyboard } from '../../utils/user-input-util';
 import * as keyCodes from '../../../src/view/key-codes';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
-import type { Handles } from '../../../src/types';
+import type { Hooks } from '../../../src/types';
 
 const pressSpacebar = withKeyboard(keyCodes.space);
 
@@ -46,7 +46,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
   let onBeforeDragStartTime: ?DOMHighResTimeStamp = null;
   let onDragStartTime: ?DOMHighResTimeStamp = null;
   let renderTime: ?DOMHighResTimeStamp = null;
-  const handles: Handles = {
+  const hooks: Hooks = {
     onBeforeDragStart: jest.fn().mockImplementation(() => {
       invariant(!onBeforeDragStartTime, 'onBeforeDragStartTime already set');
       onBeforeDragStartTime = performance.now();
@@ -78,7 +78,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
     .spyOn(window, 'getComputedStyle')
     .mockImplementation(() => getComputedSpacing({}));
   const wrapper: ReactWrapper = mount(
-    <DragDropContext {...handles}>
+    <DragDropContext {...hooks}>
       <Droppable droppableId="droppable">
         {(droppableProvided: DroppableProvided) => (
           <div
@@ -120,7 +120,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
   expect(renderTime).toBeLessThan(onDragStartTime);
 
   // validation
-  expect(handles.onBeforeDragStart).toHaveBeenCalledTimes(1);
-  expect(handles.onDragStart).toHaveBeenCalledTimes(1);
+  expect(hooks.onBeforeDragStart).toHaveBeenCalledTimes(1);
+  expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
   expect(onItemRender).toHaveBeenCalledTimes(1);
 });

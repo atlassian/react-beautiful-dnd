@@ -6,7 +6,7 @@ import {
   moveDown,
   updateDroppableIsCombineEnabled,
 } from '../../../../../src/state/action-creators';
-import middleware from '../../../../../src/state/middleware/handles';
+import middleware from '../../../../../src/state/middleware/hooks';
 import messagePreset from '../../../../../src/state/middleware/util/screen-reader-message-preset';
 import {
   preset,
@@ -15,20 +15,20 @@ import {
 } from '../../../../utils/preset-action-args';
 import createStore from '../util/create-store';
 import type {
-  Handles,
+  Hooks,
   Announce,
   DragUpdate,
   DropResult,
-  HandleProvided,
+  HookProvided,
 } from '../../../../../src/types';
 import type { Store, Dispatch } from '../../../../../src/state/store-types';
-import createHandles from './util/get-handles-stub';
+import createHooks from './util/get-hooks-stub';
 import getAnnounce from './util/get-announce-stub';
 
 jest.useFakeTimers();
 
 type Case = {|
-  handle: 'onDragStart' | 'onDragUpdate' | 'onDragEnd',
+  hook: 'onDragStart' | 'onDragUpdate' | 'onDragEnd',
   description?: string,
   execute: (store: Store) => void,
   defaultMessage: string,
@@ -54,13 +54,13 @@ const combineUpdate: DragUpdate = {
 
 const start = (dispatch: Dispatch) => {
   dispatch(initialPublish(initialPublishArgs));
-  // release async handle
+  // release async hook
   jest.runOnlyPendingTimers();
 };
 
 const update = (dispatch: Dispatch) => {
   dispatch(moveDown());
-  // release async handle
+  // release async hook
   jest.runOnlyPendingTimers();
 };
 
@@ -74,7 +74,7 @@ const end = (dispatch: Dispatch) => {
 
 const cases: Case[] = [
   {
-    handle: 'onDragStart',
+    hook: 'onDragStart',
     execute: (store: Store) => {
       start(store.dispatch);
     },
@@ -82,7 +82,7 @@ const cases: Case[] = [
   },
   {
     // a reorder upate
-    handle: 'onDragUpdate',
+    hook: 'onDragUpdate',
     description: 'a reorder update',
     execute: (store: Store) => {
       start(store.dispatch);
@@ -92,7 +92,7 @@ const cases: Case[] = [
   },
   {
     // a combine update
-    handle: 'onDragUpdate',
+    hook: 'onDragUpdate',
     description: 'a combine update',
     execute: (store: Store) => {
       start(store.dispatch);
@@ -107,7 +107,7 @@ const cases: Case[] = [
     defaultMessage: messagePreset.onDragUpdate(combineUpdate),
   },
   {
-    handle: 'onDragEnd',
+    hook: 'onDragEnd',
     execute: (store: Store) => {
       start(store.dispatch);
       update(store.dispatch);
@@ -121,46 +121,44 @@ const cases: Case[] = [
 ];
 
 cases.forEach((current: Case) => {
-  describe(`for handle: ${current.handle}${
+  describe(`for hook: ${current.hook}${
     current.description ? `: ${current.description}` : ''
   }`, () => {
-    let handles: Handles;
+    let hooks: Hooks;
     let announce: Announce;
     let store: Store;
 
     beforeEach(() => {
-      handles = createHandles();
+      hooks = createHooks();
       announce = getAnnounce();
-      store = createStore(middleware(() => handles, announce));
+      store = createStore(middleware(() => hooks, announce));
     });
 
-    it('should announce with the default message if no handle is provided', () => {
+    it('should announce with the default message if no hook is provided', () => {
       // This test is not relevant for onDragEnd as it must always be provided
-      if (current.handle === 'onDragEnd') {
+      if (current.hook === 'onDragEnd') {
         return;
       }
-      // unsetting handle
-      handles[current.handle] = undefined;
+      // unsetting hook
+      hooks[current.hook] = undefined;
       current.execute(store);
       expect(announce).toHaveBeenCalledWith(current.defaultMessage);
     });
 
-    it('should announce with the default message if the handle does not announce', () => {
+    it('should announce with the default message if the hook does not announce', () => {
       current.execute(store);
       expect(announce).toHaveBeenCalledWith(current.defaultMessage);
     });
 
-    it('should not announce twice if the handle makes an announcement', () => {
-      // $ExpectError - property does not exist on handle property
-      handles[current.handle] = jest.fn(
-        (data: any, provided: HandleProvided) => {
-          announce.mockReset();
-          provided.announce('hello');
-          expect(announce).toHaveBeenCalledWith('hello');
-          // asserting there was no double call
-          expect(announce).toHaveBeenCalledTimes(1);
-        },
-      );
+    it('should not announce twice if the hook makes an announcement', () => {
+      // $ExpectError - property does not exist on hook property
+      hooks[current.hook] = jest.fn((data: any, provided: HookProvided) => {
+        announce.mockReset();
+        provided.announce('hello');
+        expect(announce).toHaveBeenCalledWith('hello');
+        // asserting there was no double call
+        expect(announce).toHaveBeenCalledTimes(1);
+      });
 
       current.execute(store);
     });
@@ -168,14 +166,12 @@ cases.forEach((current: Case) => {
     it('should prevent async announcements', () => {
       jest.spyOn(console, 'warn').mockImplementation(() => {});
 
-      let provided: HandleProvided;
-      // $ExpectError - property does not exist on handle property
-      handles[current.handle] = jest.fn(
-        (data: any, supplied: HandleProvided) => {
-          announce.mockReset();
-          provided = supplied;
-        },
-      );
+      let provided: HookProvided;
+      // $ExpectError - property does not exist on hook property
+      hooks[current.hook] = jest.fn((data: any, supplied: HookProvided) => {
+        announce.mockReset();
+        provided = supplied;
+      });
 
       current.execute(store);
 
@@ -199,15 +195,13 @@ cases.forEach((current: Case) => {
     it('should prevent multiple announcement calls from a consumer', () => {
       jest.spyOn(console, 'warn').mockImplementation(() => {});
 
-      let provided: HandleProvided;
-      // $ExpectError - property does not exist on handle property
-      handles[current.handle] = jest.fn(
-        (data: any, supplied: HandleProvided) => {
-          announce.mockReset();
-          provided = supplied;
-          provided.announce('hello');
-        },
-      );
+      let provided: HookProvided;
+      // $ExpectError - property does not exist on hook property
+      hooks[current.hook] = jest.fn((data: any, supplied: HookProvided) => {
+        announce.mockReset();
+        provided = supplied;
+        provided.announce('hello');
+      });
 
       current.execute(store);
 

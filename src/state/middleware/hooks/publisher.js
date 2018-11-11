@@ -6,8 +6,8 @@ import getExpiringAnnounce from './expiring-announce';
 import getAsyncMarshal, { type AsyncMarshal } from './async-marshal';
 import type {
   DropResult,
-  Handles,
-  HandleProvided,
+  Hooks,
+  HookProvided,
   Critical,
   DragImpact,
   DraggableLocation,
@@ -16,10 +16,10 @@ import type {
   Announce,
   DragUpdate,
   MovementMode,
-  OnBeforeDragStartHandle,
-  OnDragStartHandle,
-  OnDragUpdateHandle,
-  OnDragEndHandle,
+  OnBeforeDragStartHook,
+  OnDragStartHook,
+  OnDragUpdateHook,
+  OnDragEndHook,
 } from '../../../types';
 import { isCombineEqual, isCriticalEqual, areLocationsEqual } from './is-equal';
 
@@ -39,30 +39,27 @@ const getDragStart = (critical: Critical, mode: MovementMode): DragStart => ({
   mode,
 });
 
-type AnyPrimaryHandleFn =
-  | OnDragStartHandle
-  | OnDragUpdateHandle
-  | OnDragEndHandle;
-type AnyHandleData = DragStart | DragUpdate | DropResult;
+type AnyPrimaryHookFn = OnDragStartHook | OnDragUpdateHook | OnDragEndHook;
+type AnyHookData = DragStart | DragUpdate | DropResult;
 
 const execute = (
-  handle: ?AnyPrimaryHandleFn,
-  data: AnyHandleData,
+  hook: ?AnyPrimaryHookFn,
+  data: AnyHookData,
   announce: Announce,
   getDefaultMessage: (data: any) => string,
 ) => {
-  if (!handle) {
+  if (!hook) {
     announce(getDefaultMessage(data));
     return;
   }
 
   const willExpire: Announce = getExpiringAnnounce(announce);
-  const provided: HandleProvided = {
+  const provided: HookProvided = {
     announce: willExpire,
   };
 
-  // Casting because we are not validating which data type is going into which handle
-  handle((data: any), provided);
+  // Casting because we are not validating which data type is going into which hook
+  hook((data: any), provided);
 
   if (!willExpire.wasCalled()) {
     announce(getDefaultMessage(data));
@@ -76,7 +73,7 @@ type WhileDragging = {|
   lastLocation: ?DraggableLocation,
 |};
 
-export default (getHandles: () => Handles, announce: Announce) => {
+export default (getHooks: () => Hooks, announce: Announce) => {
   const asyncMarshal: AsyncMarshal = getAsyncMarshal();
   let dragging: ?WhileDragging = null;
 
@@ -86,8 +83,8 @@ export default (getHandles: () => Handles, announce: Announce) => {
       'Cannot fire onBeforeDragStart as a drag start has already been published',
     );
     withTimings('onBeforeDragStart', () => {
-      // No use of screen reader for this handle
-      const fn: ?OnBeforeDragStartHandle = getHandles().onBeforeDragStart;
+      // No use of screen reader for this hook
+      const fn: ?OnBeforeDragStartHook = getHooks().onBeforeDragStart;
       if (fn) {
         fn(getDragStart(critical, mode));
       }
@@ -107,11 +104,11 @@ export default (getHandles: () => Handles, announce: Announce) => {
       lastCombine: null,
     };
 
-    // we will flush this frame if we receive any handle updates
+    // we will flush this frame if we receive any hook updates
     asyncMarshal.add(() => {
       withTimings('onDragStart', () =>
         execute(
-          getHandles().onDragStart,
+          getHooks().onDragStart,
           data,
           announce,
           messagePreset.onDragStart,
@@ -168,7 +165,7 @@ export default (getHandles: () => Handles, announce: Announce) => {
     asyncMarshal.add(() => {
       withTimings('onDragUpdate', () =>
         execute(
-          getHandles().onDragUpdate,
+          getHooks().onDragUpdate,
           data,
           announce,
           messagePreset.onDragUpdate,
@@ -178,7 +175,7 @@ export default (getHandles: () => Handles, announce: Announce) => {
   };
 
   const flush = () => {
-    invariant(dragging, 'Can only flush handles while dragging');
+    invariant(dragging, 'Can only flush hooks while dragging');
     asyncMarshal.flush();
   };
 
@@ -191,12 +188,7 @@ export default (getHandles: () => Handles, announce: Announce) => {
     // not adding to frame marshal - we want this to be done in the same render pass
     // we also want the consumers reorder logic to be in the same render pass
     withTimings('onDragEnd', () =>
-      execute(
-        getHandles().onDragEnd,
-        result,
-        announce,
-        messagePreset.onDragEnd,
-      ),
+      execute(getHooks().onDragEnd, result, announce, messagePreset.onDragEnd),
     );
   };
 

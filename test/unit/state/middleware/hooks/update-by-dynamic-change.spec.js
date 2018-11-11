@@ -8,7 +8,7 @@ import {
   publishWhileDragging,
   type InitialPublishArgs,
 } from '../../../../../src/state/action-creators';
-import middleware from '../../../../../src/state/middleware/handles';
+import middleware from '../../../../../src/state/middleware/hooks';
 import { getPreset, makeScrollable } from '../../../../utils/dimension';
 import {
   initialPublishWithScrollables,
@@ -16,9 +16,9 @@ import {
 } from '../../../../utils/preset-action-args';
 import createStore from '../util/create-store';
 import getAnnounce from './util/get-announce-stub';
-import createHandles from './util/get-handles-stub';
+import createHooks from './util/get-hooks-stub';
 import type {
-  Handles,
+  Hooks,
   State,
   DragUpdate,
   Published,
@@ -31,27 +31,27 @@ jest.useFakeTimers();
 const preset = getPreset();
 
 it('should not call onDragUpdate if the destination or source have not changed', () => {
-  const handles: Handles = createHandles();
-  const store: Store = createStore(middleware(() => handles, getAnnounce()));
+  const hooks: Hooks = createHooks();
+  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
   store.dispatch(initialPublish(initialPublishWithScrollables));
   jest.runOnlyPendingTimers();
-  expect(handles.onDragStart).toHaveBeenCalledTimes(1);
-  expect(handles.onDragUpdate).not.toHaveBeenCalled();
+  expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
   store.dispatch(collectionStarting());
   store.dispatch(publishWhileDragging(publishAdditionArgs));
-  // checking there are no queued handles
+  // checking there are no queued hooks
   jest.runAllTimers();
   // not called yet as position has not changed
-  expect(handles.onDragUpdate).not.toHaveBeenCalled();
+  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 });
 
 it('should call onDragUpdate if the source has changed - even if the destination has not changed', () => {
   // - dragging inHome2 with no impact
   // - inHome1 is removed
-  const handles: Handles = createHandles();
-  const store: Store = createStore(middleware(() => handles, getAnnounce()));
+  const hooks: Hooks = createHooks();
+  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
   // dragging inHome2 with no impact
   const scrollableHome: DroppableDimension = makeScrollable(preset.home);
   const customInitial: InitialPublishArgs = {
@@ -83,17 +83,17 @@ it('should call onDragUpdate if the source has changed - even if the destination
     },
     mode: 'FLUID',
   };
-  expect(handles.onDragStart).toHaveBeenCalledTimes(1);
-  expect(handles.onDragStart).toHaveBeenCalledWith(start, expect.any(Object));
+  expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+  expect(hooks.onDragStart).toHaveBeenCalledWith(start, expect.any(Object));
   jest.runOnlyPendingTimers();
-  expect(handles.onDragUpdate).not.toHaveBeenCalled();
+  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
 
-  // first move down (and release handle)
+  // first move down (and release hook)
   store.dispatch(moveDown());
   jest.runOnlyPendingTimers();
-  expect(handles.onDragUpdate).toHaveBeenCalledTimes(1);
+  expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
   // $ExpectError - unknown mock reset property
-  handles.onDragUpdate.mockReset();
+  hooks.onDragUpdate.mockReset();
 
   // move up into the original position (and release cycle)
   store.dispatch(moveUp());
@@ -119,13 +119,13 @@ it('should call onDragUpdate if the source has changed - even if the destination
     combine: null,
     mode: 'FLUID',
   };
-  expect(handles.onDragUpdate).toHaveBeenCalledWith(
+  expect(hooks.onDragUpdate).toHaveBeenCalledWith(
     lastUpdate,
     expect.any(Object),
   );
-  expect(handles.onDragUpdate).toHaveBeenCalledTimes(1);
+  expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
   // $ExpectError - unknown mock reset property
-  handles.onDragUpdate.mockReset();
+  hooks.onDragUpdate.mockReset();
 
   // removing inHome1
   const customPublish: Published = {
@@ -152,8 +152,8 @@ it('should call onDragUpdate if the source has changed - even if the destination
     combine: null,
     mode: 'FLUID',
   };
-  expect(handles.onDragUpdate).toHaveBeenCalledTimes(1);
-  expect(handles.onDragUpdate).toHaveBeenCalledWith(
+  expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+  expect(hooks.onDragUpdate).toHaveBeenCalledWith(
     postPublishUpdate,
     expect.any(Object),
   );

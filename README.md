@@ -216,7 +216,7 @@ This is amazing for users with visual impairments as they can correctly move ite
 
 Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library ships with support for drag and drop interactions **using only a keyboard**. This enables power users to drive their experience entirely from the keyboard. As well as opening up these experiences to users who would have been excluded previously.
 
-We provide **fantastic support for screen readers** to assist users with visual (or other) impairments. We ship with english messaging out of the box 📦. However, you are welcome to override these messages by using the `announce` function that it provided to all of the `DragDropContext > handle` functions.
+We provide **fantastic support for screen readers** to assist users with visual (or other) impairments. We ship with english messaging out of the box 📦. However, you are welcome to override these messages by using the `announce` function that it provided to all of the `DragDropContext > hook` functions.
 
 See our [screen reader guide](docs/guides/screen-reader.md) for a guide on crafting useful screen reader messaging.
 
@@ -412,19 +412,19 @@ In order to use drag and drop, you need to have the part of your `React` tree th
 ### Props
 
 ```js
-type Handles = {|
+type Hooks = {|
   // optional
-  onDragBeforeStart?: OnDragBeforeStartHandle,
-  onDragStart?: OnDragStartHandle,
-  onDragUpdate?: OnDragUpdateHandle,
+  onDragBeforeStart?: OnDragBeforeStartHook,
+  onDragStart?: OnDragStartHook,
+  onDragUpdate?: OnDragUpdateHook,
   // required
-  onDragEnd: OnDragEndHandle,
+  onDragEnd: OnDragEndHook,
 |};
 
 import type { Node } from 'react';
 
 type Props = {|
-  ...Handles,
+  ...Hooks,
   children: ?Node,
 |};
 ```
@@ -466,11 +466,11 @@ class App extends React.Component {
 }
 ```
 
-### `Handle`s
+### `Hook`s
 
-Handles are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
+Hooks are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
 
-[Please see our Handles guide](docs/guides/handles.md) for detailed information about handles ❤️
+[Please see our Hooks guide](docs/guides/hooks.md) for detailed information about hooks ❤️
 
 ## `Droppable`
 

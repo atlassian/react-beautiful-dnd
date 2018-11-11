@@ -19,7 +19,7 @@ import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
-import type { DraggableId, State, Handles } from '../../types';
+import type { DraggableId, State, Hooks } from '../../types';
 import type { Store } from '../../state/store-types';
 import {
   storeKey,
@@ -41,7 +41,7 @@ import { peerDependencies } from '../../../package.json';
 import checkReactVersion from './check-react-version';
 
 type Props = {|
-  ...Handles,
+  ...Hooks,
   // we do not technically need any children for this component
   children: Node | null,
 |};
@@ -103,9 +103,9 @@ export default class DragDropContext extends React.Component<Props> {
       // Lazy reference to dimension marshal get around circular dependency
       getDimensionMarshal: (): DimensionMarshal => this.dimensionMarshal,
       styleMarshal: this.styleMarshal,
-      // This is a function as users are allowed to change their handle functions
+      // This is a function as users are allowed to change their hook functions
       // at any time
-      getHandles: (): Handles => ({
+      getHooks: (): Hooks => ({
         onBeforeDragStart: this.props.onBeforeDragStart,
         onDragStart: this.props.onDragStart,
         onDragEnd: this.props.onDragEnd,

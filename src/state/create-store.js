@@ -5,7 +5,7 @@ import reducer from './reducer';
 import lift from './middleware/lift';
 import style from './middleware/style';
 import drop from './middleware/drop/drop-middleware';
-import handles from './middleware/handles/handles-middleware';
+import hooks from './middleware/hooks/hooks-middleware';
 import dropAnimationFinish from './middleware/drop-animation-finish';
 import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
 import autoScroll from './middleware/auto-scroll';
@@ -14,7 +14,7 @@ import updateViewportMaxScrollOnDestinationChange from './middleware/update-view
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
 import type { StyleMarshal } from '../view/style-marshal/style-marshal-types';
 import type { AutoScroller } from './auto-scroller/auto-scroller-types';
-import type { Handles, Announce } from '../types';
+import type { Hooks, Announce } from '../types';
 import type { Store } from './store-types';
 
 // We are checking if window is available before using it.
@@ -28,7 +28,7 @@ const composeEnhancers =
 type Args = {|
   getDimensionMarshal: () => DimensionMarshal,
   styleMarshal: StyleMarshal,
-  getHandles: () => Handles,
+  getHooks: () => Hooks,
   announce: Announce,
   getScroller: () => AutoScroller,
 |};
@@ -36,7 +36,7 @@ type Args = {|
 export default ({
   getDimensionMarshal,
   styleMarshal,
-  getHandles,
+  getHooks,
   announce,
   getScroller,
 }: Args): Store =>
@@ -59,7 +59,7 @@ export default ({
         // ## Application middleware
 
         // Style updates do not cause more actions. It is important to update styles
-        // before handles are called: specifically the onDragEnd handle. We need to clear
+        // before hooks are called: specifically the onDragEnd hook. We need to clear
         // the transition styles off the elements before a reorder to prevent strange
         // post drag animations in firefox. Even though we clear the transition off
         // a Draggable - if it is done after a reorder firefox will still apply the
@@ -68,10 +68,10 @@ export default ({
         style(styleMarshal),
         // Stop the dimension marshal collecting anything
         // when moving into a phase where collection is no longer needed.
-        // We need to stop the marshal before handles fire as handles can cause
+        // We need to stop the marshal before hooks fire as hooks can cause
         // dimension registration changes in response to reordering
         dimensionMarshalStopper(getDimensionMarshal),
-        // Fire application handles in response to drag changes
+        // Fire application hooks in response to drag changes
         lift(getDimensionMarshal),
         drop,
         // When a drop animation finishes - fire a drop complete
@@ -79,8 +79,8 @@ export default ({
         pendingDrop,
         updateViewportMaxScrollOnDestinationChange,
         autoScroll(getScroller),
-        // Fire handles for consumers (after update to store)
-        handles(getHandles, announce),
+        // Fire hooks for consumers (after update to store)
+        hooks(getHooks, announce),
       ),
     ),
   );

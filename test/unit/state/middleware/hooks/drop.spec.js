@@ -1,7 +1,7 @@
 // @flow
-import middleware from '../../../../../src/state/middleware/handles';
+import middleware from '../../../../../src/state/middleware/hooks';
 import createStore from '../util/create-store';
-import type { Handles, DropResult } from '../../../../../src/types';
+import type { Hooks, DropResult } from '../../../../../src/types';
 import {
   initialPublishArgs,
   getDragStart,
@@ -11,7 +11,7 @@ import {
   completeDrop,
 } from '../../../../../src/state/action-creators';
 import type { Store } from '../../../../../src/state/store-types';
-import getHandles from './util/get-handles-stub';
+import getHooks from './util/get-hooks-stub';
 import getAnnounce from './util/get-announce-stub';
 
 const result: DropResult = {
@@ -26,21 +26,21 @@ const result: DropResult = {
 
 jest.useFakeTimers();
 
-it('should call the onDragEnd handle when a DROP_COMPLETE action occurs', () => {
-  const handles: Handles = getHandles();
-  const store: Store = createStore(middleware(() => handles, getAnnounce()));
+it('should call the onDragEnd hook when a DROP_COMPLETE action occurs', () => {
+  const hooks: Hooks = getHooks();
+  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
   store.dispatch(initialPublish(initialPublishArgs));
   jest.runOnlyPendingTimers();
-  expect(handles.onDragStart).toHaveBeenCalledTimes(1);
+  expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
 
   store.dispatch(completeDrop(result));
-  expect(handles.onDragEnd).toHaveBeenCalledWith(result, expect.any(Object));
+  expect(hooks.onDragEnd).toHaveBeenCalledWith(result, expect.any(Object));
 });
 
 it('should throw an exception if there was no drag start published', () => {
-  const handles: Handles = getHandles();
-  const store: Store = createStore(middleware(() => handles, getAnnounce()));
+  const hooks: Hooks = getHooks();
+  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
 
   // throws when in idle
   expect(() => store.dispatch(completeDrop(result))).toThrow();
