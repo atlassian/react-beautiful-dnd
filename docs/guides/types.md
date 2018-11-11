@@ -13,22 +13,31 @@ type DroppableId = Id;
 type DraggableId = Id;
 ```
 
-### Hooks
+### Responders
 
 ```js
-type Hooks = {|
+type Responders = {|
   // optional
-  onDragBeforeStart?: OnDragBeforeStartHook,
-  onDragStart?: OnDragStartHook,
-  onDragUpdate?: OnDragUpdateHook,
+  onDragBeforeStart?: OnDragBeforeStartResponder,
+  onDragStart?: OnDragStartResponder,
+  onDragUpdate?: OnDragUpdateResponder,
   // required
-  onDragEnd: OnDragEndHook,
+  onDragEnd: OnDragEndResponder,
 |};
 
-type OnBeforeDragStartHook = (start: DragStart) => mixed;
-type OnDragStartHook = (start: DragStart, provided: HookProvided) => mixed;
-type OnDragUpdateHook = (update: DragUpdate, provided: HookProvided) => mixed;
-type OnDragEndHook = (result: DropResult, provided: HookProvided) => mixed;
+type OnBeforeDragStartResponder = (start: DragStart) => mixed;
+type OnDragStartResponder = (
+  start: DragStart,
+  provided: ResponderProvided,
+) => mixed;
+type OnDragUpdateResponder = (
+  update: DragUpdate,
+  provided: ResponderProvided,
+) => mixed;
+type OnDragEndResponder = (
+  result: DropResult,
+  provided: ResponderProvided,
+) => mixed;
 
 type DragStart = {|
   draggableId: DraggableId,

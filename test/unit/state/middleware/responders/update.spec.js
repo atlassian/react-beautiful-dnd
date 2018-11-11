@@ -6,7 +6,7 @@ import {
   moveDown,
   type MoveArgs,
 } from '../../../../../src/state/action-creators';
-import middleware from '../../../../../src/state/middleware/hooks';
+import middleware from '../../../../../src/state/middleware/responders';
 import { add } from '../../../../../src/state/position';
 import {
   getDragStart,
@@ -14,8 +14,8 @@ import {
 } from '../../../../utils/preset-action-args';
 import createStore from '../util/create-store';
 import getAnnounce from './util/get-announce-stub';
-import createHooks from './util/get-hooks-stub';
-import type { Hooks, State, DragUpdate } from '../../../../../src/types';
+import createResponders from './util/get-responders-stub';
+import type { Responders, State, DragUpdate } from '../../../../../src/types';
 import type { Store, Dispatch } from '../../../../../src/state/store-types';
 
 jest.useFakeTimers();
@@ -26,17 +26,17 @@ const start = (dispatch: Dispatch) => {
 };
 
 it('should call onDragUpdate if the position has changed on move', () => {
-  const hooks: Hooks = createHooks();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
+  const responders: Responders = createResponders();
+  const store: Store = createStore(middleware(() => responders, getAnnounce()));
 
   start(store.dispatch);
-  expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
-  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+  expect(responders.onDragStart).toHaveBeenCalledTimes(1);
+  expect(responders.onDragUpdate).not.toHaveBeenCalled();
 
   // Okay let's move it
   store.dispatch(moveDown());
   // not called until next cycle
-  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+  expect(responders.onDragUpdate).not.toHaveBeenCalled();
 
   jest.runOnlyPendingTimers();
   const update: DragUpdate = {
@@ -47,19 +47,22 @@ it('should call onDragUpdate if the position has changed on move', () => {
       index: initialPublishArgs.critical.draggable.index + 1,
     },
   };
-  expect(hooks.onDragUpdate).toHaveBeenCalledWith(update, expect.any(Object));
+  expect(responders.onDragUpdate).toHaveBeenCalledWith(
+    update,
+    expect.any(Object),
+  );
 });
 
 it('should not call onDragUpdate if there is no movement from the last update', () => {
-  const hooks: Hooks = createHooks();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
+  const responders: Responders = createResponders();
+  const store: Store = createStore(middleware(() => responders, getAnnounce()));
 
   start(store.dispatch);
-  expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+  expect(responders.onDragStart).toHaveBeenCalledTimes(1);
 
   // onDragUpdate not called yet
   jest.runOnlyPendingTimers();
-  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+  expect(responders.onDragUpdate).not.toHaveBeenCalled();
 
   // A movement to the same index is not causing an update
   const moveArgs: MoveArgs = {
@@ -70,12 +73,12 @@ it('should not call onDragUpdate if there is no movement from the last update', 
 
   // update not called after flushing
   jest.runOnlyPendingTimers();
-  expect(hooks.onDragUpdate).not.toHaveBeenCalled();
+  expect(responders.onDragUpdate).not.toHaveBeenCalled();
 
   // Triggering an actual movement
   store.dispatch(moveDown());
   jest.runOnlyPendingTimers();
-  expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+  expect(responders.onDragUpdate).toHaveBeenCalledTimes(1);
 
   const state: State = store.getState();
   invariant(
@@ -91,5 +94,5 @@ it('should not call onDragUpdate if there is no movement from the last update', 
   );
 
   jest.runOnlyPendingTimers();
-  expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+  expect(responders.onDragUpdate).toHaveBeenCalledTimes(1);
 });

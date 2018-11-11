@@ -1,34 +1,34 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { initialPublish } from '../../../../../src/state/action-creators';
-import middleware from '../../../../../src/state/middleware/hooks';
+import middleware from '../../../../../src/state/middleware/responders';
 import {
   getDragStart,
   initialPublishArgs,
 } from '../../../../utils/preset-action-args';
 import createStore from '../util/create-store';
 import passThrough from '../util/pass-through-middleware';
-import type { Hooks } from '../../../../../src/types';
+import type { Responders } from '../../../../../src/types';
 import type { Store } from '../../../../../src/state/store-types';
-import getHooksStub from './util/get-hooks-stub';
+import getRespondersStub from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
 
 jest.useFakeTimers();
 
-it('should call the onDragStart hook when a initial publish occurs', () => {
-  const hooks: Hooks = getHooksStub();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
+it('should call the onDragStart responder when a initial publish occurs', () => {
+  const responders: Responders = getRespondersStub();
+  const store: Store = createStore(middleware(() => responders, getAnnounce()));
 
-  // prepare step should not trigger hook
-  expect(hooks.onDragStart).not.toHaveBeenCalled();
+  // prepare step should not trigger responder
+  expect(responders.onDragStart).not.toHaveBeenCalled();
 
   // first initial publish
   store.dispatch(initialPublish(initialPublishArgs));
-  expect(hooks.onDragStart).not.toHaveBeenCalled();
+  expect(responders.onDragStart).not.toHaveBeenCalled();
 
   // flushing onDragStart
   jest.runOnlyPendingTimers();
-  expect(hooks.onDragStart).toHaveBeenCalledWith(
+  expect(responders.onDragStart).toHaveBeenCalledWith(
     getDragStart(),
     expect.any(Object),
   );
@@ -41,23 +41,23 @@ it('should call the onBeforeDragState and onDragStart in the correct order', () 
   const mock = jest.fn().mockImplementation(() => {
     mockCalled = performance.now();
   });
-  const hooks: Hooks = getHooksStub();
+  const responders: Responders = getRespondersStub();
   // $FlowFixMe - no property mockImplementation
-  hooks.onBeforeDragStart.mockImplementation(() => {
+  responders.onBeforeDragStart.mockImplementation(() => {
     onBeforeDragStartCalled = performance.now();
   });
   // $FlowFixMe - no property mockImplementation
-  hooks.onDragStart.mockImplementation(() => {
+  responders.onDragStart.mockImplementation(() => {
     onDragStartCalled = performance.now();
   });
   const store: Store = createStore(
-    middleware(() => hooks, getAnnounce()),
+    middleware(() => responders, getAnnounce()),
     passThrough(mock),
   );
 
   // first initial publish
   store.dispatch(initialPublish(initialPublishArgs));
-  expect(hooks.onBeforeDragStart).toHaveBeenCalledWith(getDragStart());
+  expect(responders.onBeforeDragStart).toHaveBeenCalledWith(getDragStart());
   // flushing onDragStart
   jest.runOnlyPendingTimers();
 
@@ -71,8 +71,8 @@ it('should call the onBeforeDragState and onDragStart in the correct order', () 
 });
 
 it('should throw an exception if an initial publish is called before a drag ends', () => {
-  const hooks: Hooks = getHooksStub();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
+  const responders: Responders = getRespondersStub();
+  const store: Store = createStore(middleware(() => responders, getAnnounce()));
 
   const start = () => {
     store.dispatch(initialPublish(initialPublishArgs));
@@ -80,7 +80,7 @@ it('should throw an exception if an initial publish is called before a drag ends
   };
   // first execution is all good
   start();
-  expect(hooks.onDragStart).toHaveBeenCalled();
+  expect(responders.onDragStart).toHaveBeenCalled();
 
   // should not happen
   expect(start).toThrow();

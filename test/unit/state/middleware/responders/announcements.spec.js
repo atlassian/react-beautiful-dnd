@@ -6,7 +6,7 @@ import {
   moveDown,
   updateDroppableIsCombineEnabled,
 } from '../../../../../src/state/action-creators';
-import middleware from '../../../../../src/state/middleware/hooks';
+import middleware from '../../../../../src/state/middleware/responders';
 import messagePreset from '../../../../../src/state/middleware/util/screen-reader-message-preset';
 import {
   preset,
@@ -15,20 +15,20 @@ import {
 } from '../../../../utils/preset-action-args';
 import createStore from '../util/create-store';
 import type {
-  Hooks,
+  Responders,
   Announce,
   DragUpdate,
   DropResult,
-  HookProvided,
+  ResponderProvided,
 } from '../../../../../src/types';
 import type { Store, Dispatch } from '../../../../../src/state/store-types';
-import createHooks from './util/get-hooks-stub';
+import createResponders from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
 
 jest.useFakeTimers();
 
 type Case = {|
-  hook: 'onDragStart' | 'onDragUpdate' | 'onDragEnd',
+  responder: 'onDragStart' | 'onDragUpdate' | 'onDragEnd',
   description?: string,
   execute: (store: Store) => void,
   defaultMessage: string,
@@ -54,13 +54,13 @@ const combineUpdate: DragUpdate = {
 
 const start = (dispatch: Dispatch) => {
   dispatch(initialPublish(initialPublishArgs));
-  // release async hook
+  // release async responder
   jest.runOnlyPendingTimers();
 };
 
 const update = (dispatch: Dispatch) => {
   dispatch(moveDown());
-  // release async hook
+  // release async responder
   jest.runOnlyPendingTimers();
 };
 
@@ -74,7 +74,7 @@ const end = (dispatch: Dispatch) => {
 
 const cases: Case[] = [
   {
-    hook: 'onDragStart',
+    responder: 'onDragStart',
     execute: (store: Store) => {
       start(store.dispatch);
     },
@@ -82,7 +82,7 @@ const cases: Case[] = [
   },
   {
     // a reorder upate
-    hook: 'onDragUpdate',
+    responder: 'onDragUpdate',
     description: 'a reorder update',
     execute: (store: Store) => {
       start(store.dispatch);
@@ -92,7 +92,7 @@ const cases: Case[] = [
   },
   {
     // a combine update
-    hook: 'onDragUpdate',
+    responder: 'onDragUpdate',
     description: 'a combine update',
     execute: (store: Store) => {
       start(store.dispatch);
@@ -107,7 +107,7 @@ const cases: Case[] = [
     defaultMessage: messagePreset.onDragUpdate(combineUpdate),
   },
   {
-    hook: 'onDragEnd',
+    responder: 'onDragEnd',
     execute: (store: Store) => {
       start(store.dispatch);
       update(store.dispatch);
@@ -121,44 +121,46 @@ const cases: Case[] = [
 ];
 
 cases.forEach((current: Case) => {
-  describe(`for hook: ${current.hook}${
+  describe(`for responder: ${current.responder}${
     current.description ? `: ${current.description}` : ''
   }`, () => {
-    let hooks: Hooks;
+    let responders: Responders;
     let announce: Announce;
     let store: Store;
 
     beforeEach(() => {
-      hooks = createHooks();
+      responders = createResponders();
       announce = getAnnounce();
-      store = createStore(middleware(() => hooks, announce));
+      store = createStore(middleware(() => responders, announce));
     });
 
-    it('should announce with the default message if no hook is provided', () => {
+    it('should announce with the default message if no responder is provided', () => {
       // This test is not relevant for onDragEnd as it must always be provided
-      if (current.hook === 'onDragEnd') {
+      if (current.responder === 'onDragEnd') {
         return;
       }
-      // unsetting hook
-      hooks[current.hook] = undefined;
+      // unsetting responder
+      responders[current.responder] = undefined;
       current.execute(store);
       expect(announce).toHaveBeenCalledWith(current.defaultMessage);
     });
 
-    it('should announce with the default message if the hook does not announce', () => {
+    it('should announce with the default message if the responder does not announce', () => {
       current.execute(store);
       expect(announce).toHaveBeenCalledWith(current.defaultMessage);
     });
 
-    it('should not announce twice if the hook makes an announcement', () => {
-      // $ExpectError - property does not exist on hook property
-      hooks[current.hook] = jest.fn((data: any, provided: HookProvided) => {
-        announce.mockReset();
-        provided.announce('hello');
-        expect(announce).toHaveBeenCalledWith('hello');
-        // asserting there was no double call
-        expect(announce).toHaveBeenCalledTimes(1);
-      });
+    it('should not announce twice if the responder makes an announcement', () => {
+      // $ExpectError - property does not exist on responder property
+      responders[current.responder] = jest.fn(
+        (data: any, provided: ResponderProvided) => {
+          announce.mockReset();
+          provided.announce('hello');
+          expect(announce).toHaveBeenCalledWith('hello');
+          // asserting there was no double call
+          expect(announce).toHaveBeenCalledTimes(1);
+        },
+      );
 
       current.execute(store);
     });
@@ -166,12 +168,14 @@ cases.forEach((current: Case) => {
     it('should prevent async announcements', () => {
       jest.spyOn(console, 'warn').mockImplementation(() => {});
 
-      let provided: HookProvided;
-      // $ExpectError - property does not exist on hook property
-      hooks[current.hook] = jest.fn((data: any, supplied: HookProvided) => {
-        announce.mockReset();
-        provided = supplied;
-      });
+      let provided: ResponderProvided;
+      // $ExpectError - property does not exist on responder property
+      responders[current.responder] = jest.fn(
+        (data: any, supplied: ResponderProvided) => {
+          announce.mockReset();
+          provided = supplied;
+        },
+      );
 
       current.execute(store);
 
@@ -195,13 +199,15 @@ cases.forEach((current: Case) => {
     it('should prevent multiple announcement calls from a consumer', () => {
       jest.spyOn(console, 'warn').mockImplementation(() => {});
 
-      let provided: HookProvided;
-      // $ExpectError - property does not exist on hook property
-      hooks[current.hook] = jest.fn((data: any, supplied: HookProvided) => {
-        announce.mockReset();
-        provided = supplied;
-        provided.announce('hello');
-      });
+      let provided: ResponderProvided;
+      // $ExpectError - property does not exist on responder property
+      responders[current.responder] = jest.fn(
+        (data: any, supplied: ResponderProvided) => {
+          announce.mockReset();
+          provided = supplied;
+          provided.announce('hello');
+        },
+      );
 
       current.execute(store);
 

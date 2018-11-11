@@ -11,7 +11,7 @@ import {
   mouseEvent,
 } from '../../utils/user-input-util';
 import type {
-  Hooks,
+  Responders,
   DraggableLocation,
   DraggableId,
   DroppableId,
@@ -32,8 +32,8 @@ const cancelWithKeyboard = dispatchWindowKeyDownEvent.bind(
   keyCodes.escape,
 );
 
-describe('hooks integration', () => {
-  let hooks: Hooks;
+describe('responders integration', () => {
+  let responders: Responders;
   let wrapper;
 
   const draggableId: DraggableId = 'drag-1';
@@ -60,10 +60,10 @@ describe('hooks integration', () => {
 
     return mount(
       <DragDropContext
-        onBeforeDragStart={hooks.onBeforeDragStart}
-        onDragStart={hooks.onDragStart}
-        onDragUpdate={hooks.onDragUpdate}
-        onDragEnd={hooks.onDragEnd}
+        onBeforeDragStart={responders.onBeforeDragStart}
+        onDragStart={responders.onDragStart}
+        onDragUpdate={responders.onDragUpdate}
+        onDragEnd={responders.onDragEnd}
       >
         <Droppable droppableId={droppableId}>
           {(droppableProvided: DroppableProvided) => (
@@ -93,7 +93,7 @@ describe('hooks integration', () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
-    hooks = {
+    responders = {
       onBeforeDragStart: jest.fn(),
       onDragStart: jest.fn(),
       onDragUpdate: jest.fn(),
@@ -136,7 +136,7 @@ describe('hooks integration', () => {
       // Drag does not start until mouse has moved past a certain threshold
       windowMouseMove(dragStart);
 
-      // drag start hook is scheduled with setTimeout
+      // drag start responder is scheduled with setTimeout
       jest.runOnlyPendingTimers();
     };
 
@@ -209,7 +209,7 @@ describe('hooks integration', () => {
 
   const wasOnBeforeDragCalled = (
     amountOfDrags?: number = 1,
-    provided?: Hooks = hooks,
+    provided?: Responders = responders,
   ) => {
     invariant(provided.onBeforeDragStart);
     expect(provided.onBeforeDragStart).toHaveBeenCalledTimes(amountOfDrags);
@@ -221,11 +221,11 @@ describe('hooks integration', () => {
 
   const wasDragStarted = (
     amountOfDrags?: number = 1,
-    provided?: Hooks = hooks,
+    provided?: Responders = responders,
   ) => {
     invariant(
       provided.onDragStart,
-      'cannot validate if drag was started without onDragStart hook',
+      'cannot validate if drag was started without onDragStart responder',
     );
     expect(provided.onDragStart).toHaveBeenCalledTimes(amountOfDrags);
     // $ExpectError - mock property
@@ -236,7 +236,7 @@ describe('hooks integration', () => {
 
   const wasDragCompleted = (
     amountOfDrags?: number = 1,
-    provided?: Hooks = hooks,
+    provided?: Responders = responders,
   ) => {
     expect(provided.onDragEnd).toHaveBeenCalledTimes(amountOfDrags);
     expect(provided.onDragEnd.mock.calls[amountOfDrags - 1][0]).toEqual(
@@ -245,14 +245,14 @@ describe('hooks integration', () => {
   };
 
   const wasDragCancelled = (amountOfDrags?: number = 1) => {
-    expect(hooks.onDragEnd).toHaveBeenCalledTimes(amountOfDrags);
-    expect(hooks.onDragEnd.mock.calls[amountOfDrags - 1][0]).toEqual(
+    expect(responders.onDragEnd).toHaveBeenCalledTimes(amountOfDrags);
+    expect(responders.onDragEnd.mock.calls[amountOfDrags - 1][0]).toEqual(
       expected.cancelled,
     );
   };
 
   describe('before drag start', () => {
-    it('should call the onBeforeDragStart hook just before the drag starts', () => {
+    it('should call the onBeforeDragStart responder just before the drag starts', () => {
       drag.start();
 
       wasOnBeforeDragCalled();
@@ -269,7 +269,7 @@ describe('hooks integration', () => {
       drag.move();
 
       // should not have called on drag start again
-      expect(hooks.onBeforeDragStart).toHaveBeenCalledTimes(1);
+      expect(responders.onBeforeDragStart).toHaveBeenCalledTimes(1);
 
       // cleanup
       drag.stop();
@@ -277,7 +277,7 @@ describe('hooks integration', () => {
   });
 
   describe('drag start', () => {
-    it('should call the onDragStart hook when a drag starts', () => {
+    it('should call the onDragStart responder when a drag starts', () => {
       drag.start();
 
       wasDragStarted();
@@ -294,7 +294,7 @@ describe('hooks integration', () => {
       drag.move();
 
       // should not have called on drag start again
-      expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+      expect(responders.onDragStart).toHaveBeenCalledTimes(1);
 
       // cleanup
       drag.stop();
@@ -302,13 +302,13 @@ describe('hooks integration', () => {
   });
 
   describe('drag end', () => {
-    it('should call the onDragEnd hook when a drag ends', () => {
+    it('should call the onDragEnd responder when a drag ends', () => {
       drag.perform();
 
       wasDragCompleted();
     });
 
-    it('should call the onDragEnd hook when a drag ends when instantly stopped', () => {
+    it('should call the onDragEnd responder when a drag ends when instantly stopped', () => {
       drag.start();
       drag.stop();
 
@@ -358,69 +358,69 @@ describe('hooks integration', () => {
     });
   });
 
-  describe('dynamic hooks', () => {
-    const setHooks = (provided: Hooks) => {
+  describe('dynamic responders', () => {
+    const setResponders = (provided: Responders) => {
       wrapper.setProps({
         onDragStart: provided.onDragStart,
         onDragEnd: provided.onDragEnd,
       });
     };
 
-    it('should allow you to change hooks before a drag started', () => {
-      const newHooks: Hooks = {
+    it('should allow you to change responders before a drag started', () => {
+      const newResponders: Responders = {
         onDragStart: jest.fn(),
         onDragEnd: jest.fn(),
       };
-      setHooks(newHooks);
+      setResponders(newResponders);
 
       drag.perform();
 
-      // new hooks called
-      wasDragStarted(1, newHooks);
-      wasDragCompleted(1, newHooks);
-      // original hooks not called
-      expect(hooks.onDragStart).not.toHaveBeenCalled();
-      expect(hooks.onDragEnd).not.toHaveBeenCalled();
+      // new responders called
+      wasDragStarted(1, newResponders);
+      wasDragCompleted(1, newResponders);
+      // original responders not called
+      expect(responders.onDragStart).not.toHaveBeenCalled();
+      expect(responders.onDragEnd).not.toHaveBeenCalled();
     });
 
     it('should allow you to change onDragEnd during a drag', () => {
-      const newHooks: Hooks = {
+      const newResponders: Responders = {
         onDragEnd: jest.fn(),
       };
 
       drag.start();
-      // changing the onDragEnd hook during a drag
-      setHooks(newHooks);
+      // changing the onDragEnd responder during a drag
+      setResponders(newResponders);
       drag.stop();
 
-      wasDragStarted(1, hooks);
-      // called the new hook that was changed during a drag
-      wasDragCompleted(1, newHooks);
-      // not calling original hook
-      expect(hooks.onDragEnd).not.toHaveBeenCalled();
+      wasDragStarted(1, responders);
+      // called the new responder that was changed during a drag
+      wasDragCompleted(1, newResponders);
+      // not calling original responder
+      expect(responders.onDragEnd).not.toHaveBeenCalled();
     });
 
-    it('should allow you to change hooks between drags', () => {
-      const newHooks: Hooks = {
+    it('should allow you to change responders between drags', () => {
+      const newResponders: Responders = {
         onDragStart: jest.fn(),
         onDragEnd: jest.fn(),
       };
 
       // first drag
       drag.perform();
-      wasDragStarted(1, hooks);
-      wasDragCompleted(1, hooks);
+      wasDragStarted(1, responders);
+      wasDragCompleted(1, responders);
 
       // second drag
-      setHooks(newHooks);
+      setResponders(newResponders);
       drag.perform();
 
-      // new hooks called for second drag
-      wasDragStarted(1, newHooks);
-      wasDragCompleted(1, newHooks);
-      // original hooks should not have been called again
-      wasDragStarted(1, hooks);
-      wasDragCompleted(1, hooks);
+      // new responders called for second drag
+      wasDragStarted(1, newResponders);
+      wasDragCompleted(1, newResponders);
+      // original responders should not have been called again
+      wasDragStarted(1, responders);
+      wasDragCompleted(1, responders);
     });
   });
 });

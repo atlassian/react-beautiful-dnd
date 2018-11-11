@@ -5,30 +5,34 @@ import {
   initialPublish,
   moveDown,
 } from '../../../../../src/state/action-creators';
-import middleware from '../../../../../src/state/middleware/hooks';
+import middleware from '../../../../../src/state/middleware/responders';
 import {
   getDragStart,
   initialPublishArgs,
 } from '../../../../utils/preset-action-args';
 import createStore from '../util/create-store';
-import type { Hooks, DragUpdate, DropResult } from '../../../../../src/types';
-import createHooks from './util/get-hooks-stub';
+import type {
+  Responders,
+  DragUpdate,
+  DropResult,
+} from '../../../../../src/types';
+import createResponders from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
 
 jest.useFakeTimers();
 
 it('should behave correctly across multiple drags', () => {
-  const hooks: Hooks = createHooks();
-  const store = createStore(middleware(() => hooks, getAnnounce()));
+  const responders: Responders = createResponders();
+  const store = createStore(middleware(() => responders, getAnnounce()));
   Array.from({ length: 4 }).forEach(() => {
     // start
     store.dispatch(initialPublish(initialPublishArgs));
     jest.runOnlyPendingTimers();
-    expect(hooks.onDragStart).toHaveBeenCalledWith(
+    expect(responders.onDragStart).toHaveBeenCalledWith(
       getDragStart(),
       expect.any(Object),
     );
-    expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+    expect(responders.onDragStart).toHaveBeenCalledTimes(1);
 
     // update
     const update: DragUpdate = {
@@ -40,10 +44,13 @@ it('should behave correctly across multiple drags', () => {
       combine: null,
     };
     store.dispatch(moveDown());
-    // flush hook call
+    // flush responder call
     jest.runOnlyPendingTimers();
-    expect(hooks.onDragUpdate).toHaveBeenCalledWith(update, expect.any(Object));
-    expect(hooks.onDragUpdate).toHaveBeenCalledTimes(1);
+    expect(responders.onDragUpdate).toHaveBeenCalledWith(
+      update,
+      expect.any(Object),
+    );
+    expect(responders.onDragUpdate).toHaveBeenCalledTimes(1);
 
     // drop
     const result: DropResult = {
@@ -51,16 +58,19 @@ it('should behave correctly across multiple drags', () => {
       reason: 'DROP',
     };
     store.dispatch(completeDrop(result));
-    expect(hooks.onDragEnd).toHaveBeenCalledWith(result, expect.any(Object));
-    expect(hooks.onDragEnd).toHaveBeenCalledTimes(1);
+    expect(responders.onDragEnd).toHaveBeenCalledWith(
+      result,
+      expect.any(Object),
+    );
+    expect(responders.onDragEnd).toHaveBeenCalledTimes(1);
 
     // cleanup
     store.dispatch(clean());
     // $ExpectError - unknown mock reset property
-    hooks.onDragStart.mockReset();
+    responders.onDragStart.mockReset();
     // $ExpectError - unknown mock reset property
-    hooks.onDragUpdate.mockReset();
+    responders.onDragUpdate.mockReset();
     // $ExpectError - unknown mock reset property
-    hooks.onDragEnd.mockReset();
+    responders.onDragEnd.mockReset();
   });
 });

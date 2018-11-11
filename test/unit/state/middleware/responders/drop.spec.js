@@ -1,7 +1,7 @@
 // @flow
-import middleware from '../../../../../src/state/middleware/hooks';
+import middleware from '../../../../../src/state/middleware/responders';
 import createStore from '../util/create-store';
-import type { Hooks, DropResult } from '../../../../../src/types';
+import type { Responders, DropResult } from '../../../../../src/types';
 import {
   initialPublishArgs,
   getDragStart,
@@ -11,7 +11,7 @@ import {
   completeDrop,
 } from '../../../../../src/state/action-creators';
 import type { Store } from '../../../../../src/state/store-types';
-import getHooks from './util/get-hooks-stub';
+import getResponders from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
 
 const result: DropResult = {
@@ -26,21 +26,21 @@ const result: DropResult = {
 
 jest.useFakeTimers();
 
-it('should call the onDragEnd hook when a DROP_COMPLETE action occurs', () => {
-  const hooks: Hooks = getHooks();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
+it('should call the onDragEnd responder when a DROP_COMPLETE action occurs', () => {
+  const responders: Responders = getResponders();
+  const store: Store = createStore(middleware(() => responders, getAnnounce()));
 
   store.dispatch(initialPublish(initialPublishArgs));
   jest.runOnlyPendingTimers();
-  expect(hooks.onDragStart).toHaveBeenCalledTimes(1);
+  expect(responders.onDragStart).toHaveBeenCalledTimes(1);
 
   store.dispatch(completeDrop(result));
-  expect(hooks.onDragEnd).toHaveBeenCalledWith(result, expect.any(Object));
+  expect(responders.onDragEnd).toHaveBeenCalledWith(result, expect.any(Object));
 });
 
 it('should throw an exception if there was no drag start published', () => {
-  const hooks: Hooks = getHooks();
-  const store: Store = createStore(middleware(() => hooks, getAnnounce()));
+  const responders: Responders = getResponders();
+  const store: Store = createStore(middleware(() => responders, getAnnounce()));
 
   // throws when in idle
   expect(() => store.dispatch(completeDrop(result))).toThrow();
