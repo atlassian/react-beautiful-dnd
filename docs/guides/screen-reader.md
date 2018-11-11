@@ -14,7 +14,7 @@ Choose a tone that best supports what your audience is trying to do. If you need
 
 ## How to control announcements
 
-The `announce` function is provided to each of the `DragDropContext > Handle` functions and can be used to deliver your own screen reader messages. Messages will be immediately read out. It's important to deliver messages immediately, so your users have a fast and responsive experience.
+The `announce` function is provided to each of the `DragDropContext > Responder` functions and can be used to deliver your own screen reader messages. Messages will be immediately read out. It's important to deliver messages immediately, so your users have a fast and responsive experience.
 
 If you attempt to hold onto the `announce` function and call it later, it won't work and will just print a warning to the console. If you try to call announce twice for the same event, only the first will be read by the screen reader with subsequent calls to announce being ignored and a warning printed.
 
@@ -72,10 +72,10 @@ Notice that we don't tell them that they are in position `1 of x`. This is becau
 
 **Message with more info**: "You have lifted an item in position `${startPosition}` of `${listLength}` in the `${listName}` list. Use the arrow keys to move, space bar to drop, and escape to cancel."
 
-You control the message printed to the user through the `DragDropContext` > `onDragStart` handle
+You control the message printed to the user through the `DragDropContext` > `onDragStart` responder
 
 ```js
-onDragStart = (start: DragStart, provided: HandleProvided) => {
+onDragStart = (start: DragStart, provided: ResponderProvided) => {
   provided.announce('My super cool message');
 };
 ```
@@ -84,10 +84,10 @@ onDragStart = (start: DragStart, provided: HandleProvided) => {
 
 When a user has started a drag, there are different scenarios that can spring from that, so we'll create different messaging for each scenario.
 
-We can control the announcement through the `DragDropContext` > `onDragUpdate` handle.
+We can control the announcement through the `DragDropContext` > `onDragUpdate` responder.
 
 ```js
-onDragUpdate = (update: DragUpdate, provided: HandleProvided) => {
+onDragUpdate = (update: DragUpdate, provided: ResponderProvided) => {
   provided.announce('Update message');
 };
 ```
@@ -139,14 +139,14 @@ Think about how you could make this messaging friendlier and clearer.
 
 ### Step 4: On drop
 
-There are two ways a drop can happen. Either the drag is cancelled or the user drops the dragging item. You can control the messaging for these events using the `DragDropContext > onDragEnd` handle.
+There are two ways a drop can happen. Either the drag is cancelled or the user drops the dragging item. You can control the messaging for these events using the `DragDropContext > onDragEnd` responder.
 
 #### Scenario 1. Drag cancelled
 
 A `DropResult` object has a `reason` property which can either be `DROP` or `CANCEL`. You can use this to announce your cancel message.
 
 ```js
-onDragEnd = (result: DropResult, provided: HandleProvided) => {
+onDragEnd = (result: DropResult, provided: ResponderProvided) => {
   if (result.reason === 'CANCEL') {
     provided.announce('Your cancel message');
     return;

@@ -30,7 +30,7 @@ export const withStore = () => ({
         unmount: jest.fn(),
         mount: jest.fn(),
       },
-      getHandles: () => ({
+      getResponders: () => ({
         onDragEnd: () => {},
       }),
       announce: () => {},

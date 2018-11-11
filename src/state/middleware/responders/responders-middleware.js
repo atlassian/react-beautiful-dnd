@@ -3,7 +3,7 @@ import getPublisher from './publisher';
 import type {
   State,
   DropResult,
-  Handles,
+  Responders,
   Critical,
   Announce,
 } from '../../../types';
@@ -14,9 +14,12 @@ import type {
   Dispatch,
 } from '../../store-types';
 
-export default (getHandles: () => Handles, announce: Announce): Middleware => {
+export default (
+  getResponders: () => Responders,
+  announce: Announce,
+): Middleware => {
   const publisher = getPublisher(
-    (getHandles: () => Handles),
+    (getResponders: () => Responders),
     (announce: Announce),
   );
 
@@ -34,18 +37,18 @@ export default (getHandles: () => Handles, announce: Announce): Middleware => {
     // Drag end
     if (action.type === 'DROP_COMPLETE') {
       const result: DropResult = action.payload;
-      // flushing all pending handles before snapshots are updated
+      // flushing all pending responders before snapshots are updated
       publisher.flush();
       next(action);
       publisher.drop(result);
       return;
     }
 
-    // All other handles can fire after we have updated our connected components
+    // All other responders can fire after we have updated our connected components
     next(action);
 
     // Drag state resetting - need to check if
-    // we should fire a onDragEnd handle
+    // we should fire a onDragEnd responder
     if (action.type === 'CLEAN') {
       publisher.abort();
       return;

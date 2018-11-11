@@ -6,8 +6,8 @@ import getExpiringAnnounce from './expiring-announce';
 import getAsyncMarshal, { type AsyncMarshal } from './async-marshal';
 import type {
   DropResult,
-  Handles,
-  HandleProvided,
+  Responders,
+  ResponderProvided,
   Critical,
   DragImpact,
   DraggableLocation,
@@ -16,10 +16,10 @@ import type {
   Announce,
   DragUpdate,
   MovementMode,
-  OnBeforeDragStartHandle,
-  OnDragStartHandle,
-  OnDragUpdateHandle,
-  OnDragEndHandle,
+  OnBeforeDragStartResponder,
+  OnDragStartResponder,
+  OnDragUpdateResponder,
+  OnDragEndResponder,
 } from '../../../types';
 import { isCombineEqual, isCriticalEqual, areLocationsEqual } from './is-equal';
 
@@ -39,30 +39,30 @@ const getDragStart = (critical: Critical, mode: MovementMode): DragStart => ({
   mode,
 });
 
-type AnyPrimaryHandleFn =
-  | OnDragStartHandle
-  | OnDragUpdateHandle
-  | OnDragEndHandle;
-type AnyHandleData = DragStart | DragUpdate | DropResult;
+type AnyPrimaryResponderFn =
+  | OnDragStartResponder
+  | OnDragUpdateResponder
+  | OnDragEndResponder;
+type AnyResponderData = DragStart | DragUpdate | DropResult;
 
 const execute = (
-  handle: ?AnyPrimaryHandleFn,
-  data: AnyHandleData,
+  responder: ?AnyPrimaryResponderFn,
+  data: AnyResponderData,
   announce: Announce,
   getDefaultMessage: (data: any) => string,
 ) => {
-  if (!handle) {
+  if (!responder) {
     announce(getDefaultMessage(data));
     return;
   }
 
   const willExpire: Announce = getExpiringAnnounce(announce);
-  const provided: HandleProvided = {
+  const provided: ResponderProvided = {
     announce: willExpire,
   };
 
-  // Casting because we are not validating which data type is going into which handle
-  handle((data: any), provided);
+  // Casting because we are not validating which data type is going into which responder
+  responder((data: any), provided);
 
   if (!willExpire.wasCalled()) {
     announce(getDefaultMessage(data));
@@ -76,7 +76,7 @@ type WhileDragging = {|
   lastLocation: ?DraggableLocation,
 |};
 
-export default (getHandles: () => Handles, announce: Announce) => {
+export default (getResponders: () => Responders, announce: Announce) => {
   const asyncMarshal: AsyncMarshal = getAsyncMarshal();
   let dragging: ?WhileDragging = null;
 
@@ -86,8 +86,8 @@ export default (getHandles: () => Handles, announce: Announce) => {
       'Cannot fire onBeforeDragStart as a drag start has already been published',
     );
     withTimings('onBeforeDragStart', () => {
-      // No use of screen reader for this handle
-      const fn: ?OnBeforeDragStartHandle = getHandles().onBeforeDragStart;
+      // No use of screen reader for this responder
+      const fn: ?OnBeforeDragStartResponder = getResponders().onBeforeDragStart;
       if (fn) {
         fn(getDragStart(critical, mode));
       }
@@ -107,11 +107,11 @@ export default (getHandles: () => Handles, announce: Announce) => {
       lastCombine: null,
     };
 
-    // we will flush this frame if we receive any handle updates
+    // we will flush this frame if we receive any responder updates
     asyncMarshal.add(() => {
       withTimings('onDragStart', () =>
         execute(
-          getHandles().onDragStart,
+          getResponders().onDragStart,
           data,
           announce,
           messagePreset.onDragStart,
@@ -168,7 +168,7 @@ export default (getHandles: () => Handles, announce: Announce) => {
     asyncMarshal.add(() => {
       withTimings('onDragUpdate', () =>
         execute(
-          getHandles().onDragUpdate,
+          getResponders().onDragUpdate,
           data,
           announce,
           messagePreset.onDragUpdate,
@@ -178,7 +178,7 @@ export default (getHandles: () => Handles, announce: Announce) => {
   };
 
   const flush = () => {
-    invariant(dragging, 'Can only flush handles while dragging');
+    invariant(dragging, 'Can only flush responders while dragging');
     asyncMarshal.flush();
   };
 
@@ -192,7 +192,7 @@ export default (getHandles: () => Handles, announce: Announce) => {
     // we also want the consumers reorder logic to be in the same render pass
     withTimings('onDragEnd', () =>
       execute(
-        getHandles().onDragEnd,
+        getResponders().onDragEnd,
         result,
         announce,
         messagePreset.onDragEnd,

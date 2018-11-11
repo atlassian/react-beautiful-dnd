@@ -30,7 +30,7 @@ The only thing you need to do is set `display: table` on a `Draggable` row while
 
 This strategy will work with columns that have automatic column widths based on content. It will also work with fixed layouts. **It is a more robust strategy than the first, but it is also less performant.**
 
-When we apply `position: fixed` to the dragging item it removes it from the automatic column width calculations that a table uses. So before a drag starts we _lock_ all of the cell widths using inline styles to prevent the column dimensions from changing when a drag starts. You can achieve this with the [`onBeforeDragStart` handle](docs/guides/handles.md).
+When we apply `position: fixed` to the dragging item it removes it from the automatic column width calculations that a table uses. So before a drag starts we _lock_ all of the cell widths using inline styles to prevent the column dimensions from changing when a drag starts. You can achieve this with the [`onBeforeDragStart` responder](docs/guides/responders.md).
 
 This has poor performance characteristics at scale as it requires:
 

@@ -1,7 +1,7 @@
 // @flow
-import type { Handles } from '../../../../../../src/types';
+import type { Responders } from '../../../../../../src/types';
 
-export default (): Handles => ({
+export default (): Responders => ({
   onBeforeDragStart: jest.fn(),
   onDragStart: jest.fn(),
   onDragUpdate: jest.fn(),

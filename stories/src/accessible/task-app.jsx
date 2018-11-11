@@ -12,7 +12,7 @@ import type {
   DragUpdate,
   DropResult,
   DraggableLocation,
-  HandleProvided,
+  ResponderProvided,
 } from '../../../src';
 import type { Task } from '../types';
 
@@ -58,7 +58,7 @@ export default class TaskApp extends Component<*, State> {
   };
 
   // in?
-  onDragStart = (start: DragStart, provided: HandleProvided): void =>
+  onDragStart = (start: DragStart, provided: ResponderProvided): void =>
     provided.announce(`
     You have lifted a task.
     It is in position ${start.source.index + 1} of ${
@@ -67,7 +67,7 @@ export default class TaskApp extends Component<*, State> {
     Use the arrow keys to move, space bar to drop, and escape to cancel.
   `);
 
-  onDragUpdate = (update: DragUpdate, provided: HandleProvided): void => {
+  onDragUpdate = (update: DragUpdate, provided: ResponderProvided): void => {
     const announce: Announce = provided.announce;
     if (!update.destination) {
       announce('You are currently not dragging over any droppable area');
@@ -78,7 +78,7 @@ export default class TaskApp extends Component<*, State> {
     );
   };
 
-  onDragEnd = (result: DropResult, provided: HandleProvided): void => {
+  onDragEnd = (result: DropResult, provided: ResponderProvided): void => {
     const announce: Announce = provided.announce;
     // TODO: not being called on cancel!!!
     if (result.reason === 'CANCEL') {

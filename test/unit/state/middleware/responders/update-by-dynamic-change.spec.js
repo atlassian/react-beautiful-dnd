@@ -8,7 +8,7 @@ import {
   publishWhileDragging,
   type InitialPublishArgs,
 } from '../../../../../src/state/action-creators';
-import middleware from '../../../../../src/state/middleware/handles';
+import middleware from '../../../../../src/state/middleware/responders';
 import { getPreset, makeScrollable } from '../../../../utils/dimension';
 import {
   initialPublishWithScrollables,
@@ -16,9 +16,9 @@ import {
 } from '../../../../utils/preset-action-args';
 import createStore from '../util/create-store';
 import getAnnounce from './util/get-announce-stub';
-import createHandles from './util/get-handles-stub';
+import createResponders from './util/get-responders-stub';
 import type {
-  Handles,
+  Responders,
   State,
   DragUpdate,
   Published,
@@ -31,27 +31,27 @@ jest.useFakeTimers();
 const preset = getPreset();
 
 it('should not call onDragUpdate if the destination or source have not changed', () => {
-  const handles: Handles = createHandles();
-  const store: Store = createStore(middleware(() => handles, getAnnounce()));
+  const responders: Responders = createResponders();
+  const store: Store = createStore(middleware(() => responders, getAnnounce()));
 
   store.dispatch(initialPublish(initialPublishWithScrollables));
   jest.runOnlyPendingTimers();
-  expect(handles.onDragStart).toHaveBeenCalledTimes(1);
-  expect(handles.onDragUpdate).not.toHaveBeenCalled();
+  expect(responders.onDragStart).toHaveBeenCalledTimes(1);
+  expect(responders.onDragUpdate).not.toHaveBeenCalled();
 
   store.dispatch(collectionStarting());
   store.dispatch(publishWhileDragging(publishAdditionArgs));
-  // checking there are no queued handles
+  // checking there are no queued responders
   jest.runAllTimers();
   // not called yet as position has not changed
-  expect(handles.onDragUpdate).not.toHaveBeenCalled();
+  expect(responders.onDragUpdate).not.toHaveBeenCalled();
 });
 
 it('should call onDragUpdate if the source has changed - even if the destination has not changed', () => {
   // - dragging inHome2 with no impact
   // - inHome1 is removed
-  const handles: Handles = createHandles();
-  const store: Store = createStore(middleware(() => handles, getAnnounce()));
+  const responders: Responders = createResponders();
+  const store: Store = createStore(middleware(() => responders, getAnnounce()));
   // dragging inHome2 with no impact
   const scrollableHome: DroppableDimension = makeScrollable(preset.home);
   const customInitial: InitialPublishArgs = {
@@ -83,17 +83,20 @@ it('should call onDragUpdate if the source has changed - even if the destination
     },
     mode: 'FLUID',
   };
-  expect(handles.onDragStart).toHaveBeenCalledTimes(1);
-  expect(handles.onDragStart).toHaveBeenCalledWith(start, expect.any(Object));
+  expect(responders.onDragStart).toHaveBeenCalledTimes(1);
+  expect(responders.onDragStart).toHaveBeenCalledWith(
+    start,
+    expect.any(Object),
+  );
   jest.runOnlyPendingTimers();
-  expect(handles.onDragUpdate).not.toHaveBeenCalled();
+  expect(responders.onDragUpdate).not.toHaveBeenCalled();
 
-  // first move down (and release handle)
+  // first move down (and release responder)
   store.dispatch(moveDown());
   jest.runOnlyPendingTimers();
-  expect(handles.onDragUpdate).toHaveBeenCalledTimes(1);
+  expect(responders.onDragUpdate).toHaveBeenCalledTimes(1);
   // $ExpectError - unknown mock reset property
-  handles.onDragUpdate.mockReset();
+  responders.onDragUpdate.mockReset();
 
   // move up into the original position (and release cycle)
   store.dispatch(moveUp());
@@ -119,13 +122,13 @@ it('should call onDragUpdate if the source has changed - even if the destination
     combine: null,
     mode: 'FLUID',
   };
-  expect(handles.onDragUpdate).toHaveBeenCalledWith(
+  expect(responders.onDragUpdate).toHaveBeenCalledWith(
     lastUpdate,
     expect.any(Object),
   );
-  expect(handles.onDragUpdate).toHaveBeenCalledTimes(1);
+  expect(responders.onDragUpdate).toHaveBeenCalledTimes(1);
   // $ExpectError - unknown mock reset property
-  handles.onDragUpdate.mockReset();
+  responders.onDragUpdate.mockReset();
 
   // removing inHome1
   const customPublish: Published = {
@@ -152,8 +155,8 @@ it('should call onDragUpdate if the source has changed - even if the destination
     combine: null,
     mode: 'FLUID',
   };
-  expect(handles.onDragUpdate).toHaveBeenCalledTimes(1);
-  expect(handles.onDragUpdate).toHaveBeenCalledWith(
+  expect(responders.onDragUpdate).toHaveBeenCalledTimes(1);
+  expect(responders.onDragUpdate).toHaveBeenCalledWith(
     postPublishUpdate,
     expect.any(Object),
   );

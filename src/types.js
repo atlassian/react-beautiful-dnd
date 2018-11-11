@@ -354,28 +354,28 @@ export type StateWhenUpdatesAllowed = DraggingState | CollectingState;
 
 export type Announce = (message: string) => void;
 
-export type HandleProvided = {|
+export type ResponderProvided = {|
   announce: Announce,
 |};
 
-export type OnBeforeDragStartHandle = (start: DragStart) => mixed;
-export type OnDragStartHandle = (
+export type OnBeforeDragStartResponder = (start: DragStart) => mixed;
+export type OnDragStartResponder = (
   start: DragStart,
-  provided: HandleProvided,
+  provided: ResponderProvided,
 ) => mixed;
-export type OnDragUpdateHandle = (
+export type OnDragUpdateResponder = (
   update: DragUpdate,
-  provided: HandleProvided,
+  provided: ResponderProvided,
 ) => mixed;
-export type OnDragEndHandle = (
+export type OnDragEndResponder = (
   result: DropResult,
-  provided: HandleProvided,
+  provided: ResponderProvided,
 ) => mixed;
 
-export type Handles = {|
-  onBeforeDragStart?: OnBeforeDragStartHandle,
-  onDragStart?: OnDragStartHandle,
-  onDragUpdate?: OnDragUpdateHandle,
+export type Responders = {|
+  onBeforeDragStart?: OnBeforeDragStartResponder,
+  onDragStart?: OnDragStartResponder,
+  onDragUpdate?: OnDragUpdateResponder,
   // always required
-  onDragEnd: OnDragEndHandle,
+  onDragEnd: OnDragEndResponder,
 |};

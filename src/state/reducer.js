@@ -411,7 +411,7 @@ export default (state: State = idle, action: Action): State => {
     return result;
   }
 
-  // Action will be used by handles to call consumers
+  // Action will be used by responders to call consumers
   // We can simply return to the idle state
   if (action.type === 'DROP_COMPLETE') {
     return idle;

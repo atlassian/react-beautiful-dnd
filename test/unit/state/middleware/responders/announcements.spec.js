@@ -6,7 +6,7 @@ import {
   moveDown,
   updateDroppableIsCombineEnabled,
 } from '../../../../../src/state/action-creators';
-import middleware from '../../../../../src/state/middleware/handles';
+import middleware from '../../../../../src/state/middleware/responders';
 import messagePreset from '../../../../../src/state/middleware/util/screen-reader-message-preset';
 import {
   preset,
@@ -15,20 +15,20 @@ import {
 } from '../../../../utils/preset-action-args';
 import createStore from '../util/create-store';
 import type {
-  Handles,
+  Responders,
   Announce,
   DragUpdate,
   DropResult,
-  HandleProvided,
+  ResponderProvided,
 } from '../../../../../src/types';
 import type { Store, Dispatch } from '../../../../../src/state/store-types';
-import createHandles from './util/get-handles-stub';
+import createResponders from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
 
 jest.useFakeTimers();
 
 type Case = {|
-  handle: 'onDragStart' | 'onDragUpdate' | 'onDragEnd',
+  responder: 'onDragStart' | 'onDragUpdate' | 'onDragEnd',
   description?: string,
   execute: (store: Store) => void,
   defaultMessage: string,
@@ -54,13 +54,13 @@ const combineUpdate: DragUpdate = {
 
 const start = (dispatch: Dispatch) => {
   dispatch(initialPublish(initialPublishArgs));
-  // release async handle
+  // release async responder
   jest.runOnlyPendingTimers();
 };
 
 const update = (dispatch: Dispatch) => {
   dispatch(moveDown());
-  // release async handle
+  // release async responder
   jest.runOnlyPendingTimers();
 };
 
@@ -74,7 +74,7 @@ const end = (dispatch: Dispatch) => {
 
 const cases: Case[] = [
   {
-    handle: 'onDragStart',
+    responder: 'onDragStart',
     execute: (store: Store) => {
       start(store.dispatch);
     },
@@ -82,7 +82,7 @@ const cases: Case[] = [
   },
   {
     // a reorder upate
-    handle: 'onDragUpdate',
+    responder: 'onDragUpdate',
     description: 'a reorder update',
     execute: (store: Store) => {
       start(store.dispatch);
@@ -92,7 +92,7 @@ const cases: Case[] = [
   },
   {
     // a combine update
-    handle: 'onDragUpdate',
+    responder: 'onDragUpdate',
     description: 'a combine update',
     execute: (store: Store) => {
       start(store.dispatch);
@@ -107,7 +107,7 @@ const cases: Case[] = [
     defaultMessage: messagePreset.onDragUpdate(combineUpdate),
   },
   {
-    handle: 'onDragEnd',
+    responder: 'onDragEnd',
     execute: (store: Store) => {
       start(store.dispatch);
       update(store.dispatch);
@@ -121,39 +121,39 @@ const cases: Case[] = [
 ];
 
 cases.forEach((current: Case) => {
-  describe(`for handle: ${current.handle}${
+  describe(`for responder: ${current.responder}${
     current.description ? `: ${current.description}` : ''
   }`, () => {
-    let handles: Handles;
+    let responders: Responders;
     let announce: Announce;
     let store: Store;
 
     beforeEach(() => {
-      handles = createHandles();
+      responders = createResponders();
       announce = getAnnounce();
-      store = createStore(middleware(() => handles, announce));
+      store = createStore(middleware(() => responders, announce));
     });
 
-    it('should announce with the default message if no handle is provided', () => {
+    it('should announce with the default message if no responder is provided', () => {
       // This test is not relevant for onDragEnd as it must always be provided
-      if (current.handle === 'onDragEnd') {
+      if (current.responder === 'onDragEnd') {
         return;
       }
-      // unsetting handle
-      handles[current.handle] = undefined;
+      // unsetting responder
+      responders[current.responder] = undefined;
       current.execute(store);
       expect(announce).toHaveBeenCalledWith(current.defaultMessage);
     });
 
-    it('should announce with the default message if the handle does not announce', () => {
+    it('should announce with the default message if the responder does not announce', () => {
       current.execute(store);
       expect(announce).toHaveBeenCalledWith(current.defaultMessage);
     });
 
-    it('should not announce twice if the handle makes an announcement', () => {
-      // $ExpectError - property does not exist on handle property
-      handles[current.handle] = jest.fn(
-        (data: any, provided: HandleProvided) => {
+    it('should not announce twice if the responder makes an announcement', () => {
+      // $ExpectError - property does not exist on responder property
+      responders[current.responder] = jest.fn(
+        (data: any, provided: ResponderProvided) => {
           announce.mockReset();
           provided.announce('hello');
           expect(announce).toHaveBeenCalledWith('hello');
@@ -168,10 +168,10 @@ cases.forEach((current: Case) => {
     it('should prevent async announcements', () => {
       jest.spyOn(console, 'warn').mockImplementation(() => {});
 
-      let provided: HandleProvided;
-      // $ExpectError - property does not exist on handle property
-      handles[current.handle] = jest.fn(
-        (data: any, supplied: HandleProvided) => {
+      let provided: ResponderProvided;
+      // $ExpectError - property does not exist on responder property
+      responders[current.responder] = jest.fn(
+        (data: any, supplied: ResponderProvided) => {
           announce.mockReset();
           provided = supplied;
         },
@@ -199,10 +199,10 @@ cases.forEach((current: Case) => {
     it('should prevent multiple announcement calls from a consumer', () => {
       jest.spyOn(console, 'warn').mockImplementation(() => {});
 
-      let provided: HandleProvided;
-      // $ExpectError - property does not exist on handle property
-      handles[current.handle] = jest.fn(
-        (data: any, supplied: HandleProvided) => {
+      let provided: ResponderProvided;
+      // $ExpectError - property does not exist on responder property
+      responders[current.responder] = jest.fn(
+        (data: any, supplied: ResponderProvided) => {
           announce.mockReset();
           provided = supplied;
           provided.announce('hello');
