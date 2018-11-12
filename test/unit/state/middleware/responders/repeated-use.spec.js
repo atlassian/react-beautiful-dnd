@@ -70,7 +70,6 @@ it('should behave correctly across multiple drags', () => {
     responders.onDragStart.mockReset();
     // $ExpectError - unknown mock reset property
     responders.onDragUpdate.mockReset();
-    // $ExpectError - unknown mock reset property
     responders.onDragEnd.mockReset();
   });
 });

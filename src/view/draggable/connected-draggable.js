@@ -1,6 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
-import { type Node } from 'react';
+import * as React from 'react';
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import Draggable from './draggable';
@@ -258,10 +258,22 @@ const mapDispatchToProps: DispatchProps = {
   dropAnimationFinished: dropAnimationFinishedAction,
 };
 
+const defaultProps = ({
+  isDragDisabled: false,
+  // cannot drag interactive elements by default
+  disableInteractiveElementBlocking: false,
+}: DefaultProps);
+
+/*::
+class DraggableType extends React.Component<OwnProps> {
+  static defaultProps = defaultProps;
+}
+*/
+
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Draggable`
-const ConnectedDraggable: OwnProps => Node = (connect(
+const ConnectedDraggable: typeof DraggableType = (connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
   (mapDispatchToProps: any),
@@ -282,10 +294,6 @@ const ConnectedDraggable: OwnProps => Node = (connect(
   },
 ): any)(Draggable);
 
-ConnectedDraggable.defaultProps = ({
-  isDragDisabled: false,
-  // cannot drag interactive elements by default
-  disableInteractiveElementBlocking: false,
-}: DefaultProps);
+ConnectedDraggable.defaultProps = defaultProps;
 
 export default ConnectedDraggable;

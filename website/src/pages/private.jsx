@@ -33,7 +33,6 @@ const PrivateExamplesList = ({ data }: { data: ExampleData }) => (
 export default PrivateExamplesList;
 
 /* eslint-disable no-undef */
-// $FlowFixMe
 export const query = graphql`
   query privateExampleList {
     allSitePage(filter: { path: { regex: "/^/private/.+/" } }) {

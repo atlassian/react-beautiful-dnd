@@ -73,7 +73,6 @@ export default class QuoteApp extends Component<*, State> {
         result.destination.index,
       );
 
-      // $ExpectError - using spread
       const list: NestedQuoteList = {
         ...this.state.list,
         children,
@@ -93,7 +92,6 @@ export default class QuoteApp extends Component<*, State> {
 
       invariant(nested, 'could not find nested list');
 
-      // $ExpectError - using spread
       const updated: NestedQuoteList = {
         ...nested,
         children: reorder(
@@ -108,7 +106,6 @@ export default class QuoteApp extends Component<*, State> {
       const children = Array.from(this.state.list.children);
       children[nestedIndex] = updated;
 
-      // $ExpectError - using spread
       const list: NestedQuoteList = {
         ...this.state.list,
         children,

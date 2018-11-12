@@ -1,5 +1,5 @@
 // @flow
-import { type Node } from 'react';
+import * as React from 'react';
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
 import { storeKey } from '../context-keys';
@@ -89,10 +89,24 @@ export const makeMapStateToProps = (): Selector => {
   return selector;
 };
 
+const defaultProps = ({
+  type: 'DEFAULT',
+  direction: 'vertical',
+  isDropDisabled: false,
+  isCombineEnabled: false,
+  ignoreContainerClipping: false,
+}: DefaultProps);
+
+/*::
+class DroppableType extends React.Component<OwnProps> {
+  static defaultProps = defaultProps;
+}
+*/
+
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
-const ConnectedDroppable: OwnProps => Node = (connect(
+const ConnectedDroppable: typeof DroppableType = (connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
   // no dispatch props for droppable
@@ -113,12 +127,6 @@ const ConnectedDroppable: OwnProps => Node = (connect(
   },
 ): any)(Droppable);
 
-ConnectedDroppable.defaultProps = ({
-  type: 'DEFAULT',
-  direction: 'vertical',
-  isDropDisabled: false,
-  isCombineEnabled: false,
-  ignoreContainerClipping: false,
-}: DefaultProps);
+ConnectedDroppable.defaultProps = defaultProps;
 
 export default ConnectedDroppable;
