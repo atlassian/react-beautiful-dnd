@@ -7,37 +7,62 @@ import type {
   DraggableProvided,
   DraggableStateSnapshot,
   DroppableProvided,
+  DropAnimation,
 } from '../../../../../src';
 
 const rotation: number = 10;
 
-const minorRotation = keyframes`
-  0% {
-    transform: rotate(0deg);
+const animations = {
+  rest: keyframes`
+
+
+  `,
+  shake: keyframes`
+    0% {
+      transform: rotate(0deg);
+    }
+
+    25% {
+      transform: rotate(${rotation}deg) scale(0.9);
+    }
+
+    50% {
+      transform: rotate(0deg) scale(1.2);
+    }
+
+    75% {
+      transform: rotate(-${rotation}deg) scale(0.9);
+    }
+
+    100% {
+      transform: rotate(0deg);
+    }
+  `,
+  spin: keyframes`
+    100% {
+      transform: rotate(359deg);
+    }
+  `,
+};
+
+const shake = `${animations.shake} 0.5s linear infinite`;
+const spin = (duration: number) => `${animations.spin} ${duration}s ease 1`;
+
+const getAnimation = (
+  isDragging: boolean,
+  dropAnimation: DropAnimation,
+): string => {
+  if (dropAnimation) {
+    return spin(dropAnimation.duration);
   }
-
-  25% {
-    transform: rotate(${rotation}deg);
+  if (isDragging) {
+    return shake;
   }
+  return 'none';
+};
 
-  50% {
-    transform: rotate(0deg), scale 1.2;
-  }
-
-  75% {
-    transform: rotate(-${rotation}deg);
-  }
-
-  100% {
-    transform: rotate(0deg);
-  }
-`;
-
-// eslint-disable-next-line import/prefer-default-export
-const shake = `${minorRotation} 0.5s linear infinite`;
-
-const Shaker = styled('div')`
-  animation: ${props => (props.shake ? shake : 'none')};
+const Wobble = styled('div')`
+  animation: ${props => getAnimation(props.isDragging, props.dropAnimation)};
 `;
 
 export default class DraggableLogo extends React.Component<*> {
@@ -60,11 +85,12 @@ export default class DraggableLogo extends React.Component<*> {
                     {...provided.dragHandleProps}
                     ref={provided.innerRef}
                   >
-                    <Shaker
-                      shake={snapshot.isDragging && !snapshot.isDropAnimating}
+                    <Wobble
+                      isDragging={snapshot.isDragging}
+                      dropAnimation={snapshot.dropAnimation}
                     >
                       <Logo width={90} />
-                    </Shaker>
+                    </Wobble>
                   </div>
                 )}
               </Draggable>
