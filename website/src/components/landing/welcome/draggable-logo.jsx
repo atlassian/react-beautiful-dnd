@@ -11,58 +11,89 @@ import type {
 } from '../../../../../src';
 
 const rotation: number = 10;
+const hueRotation: number = 150;
 
 const animations = {
-  rest: keyframes`
+  resting: keyframes`
+    0% {
+      filter: hue-rotate(0deg);
+    }
+    70% {
+      filter: hue-rotate(0deg);
+    }
+    85% {
+      filter: hue-rotate(${hueRotation}deg);
+    }
 
+    100% {
+      filter: hue-rotate(0deg);
+    }
 
   `,
-  shake: keyframes`
+  dragging: keyframes`
     0% {
       transform: rotate(0deg);
     }
 
     25% {
-      transform: rotate(${rotation}deg) scale(0.9);
+      transform: rotate(${rotation}deg) scale(1.1);
     }
 
     50% {
-      transform: rotate(0deg) scale(1.2);
+      transform: rotate(0deg) scale(0.9);
+      filter: hue-rotate(${hueRotation}deg);
     }
 
     75% {
-      transform: rotate(-${rotation}deg) scale(0.9);
+      transform: rotate(-${rotation}deg) scale(1.1);
     }
 
     100% {
       transform: rotate(0deg);
     }
   `,
-  spin: keyframes`
+  dropping: keyframes`
+    50% {
+      filter: hue-rotate(${hueRotation}deg);
+    }
     100% {
       transform: rotate(359deg);
     }
   `,
 };
 
-const shake = `${animations.shake} 0.5s linear infinite`;
-const spin = (duration: number) => `${animations.spin} ${duration}s ease 1`;
-
 const getAnimation = (
   isDragging: boolean,
   dropAnimation: DropAnimation,
-): string => {
+): Object => {
   if (dropAnimation) {
-    return spin(dropAnimation.duration);
+    return {
+      animationName: animations.dropping,
+      animationDuration: `${dropAnimation.duration}s`,
+      // a sharp animation curve. Finish the main rotation quickly and then ease
+      // http://cubic-bezier.com/#0,1.05,.47,1
+      animationTimingFunction: 'cubic-bezier(0,1.05,.47,1)',
+      animationIterationCount: '1',
+    };
   }
   if (isDragging) {
-    return shake;
+    return {
+      animationName: animations.dragging,
+      animationDuration: '0.5s',
+      animationTimingFunction: 'linear',
+      animationIterationCount: 'infinite',
+    };
   }
-  return 'none';
+  return {
+    animationName: animations.resting,
+    animationDuration: '10s',
+    animationTimingFunction: 'ease',
+    animationIterationCount: 'infinite',
+  };
 };
 
-const Wobble = styled('div')`
-  animation: ${props => getAnimation(props.isDragging, props.dropAnimation)};
+const Dance = styled('div')`
+  ${props => getAnimation(props.isDragging, props.dropAnimation)};
 `;
 
 export default class DraggableLogo extends React.Component<*> {
@@ -85,12 +116,12 @@ export default class DraggableLogo extends React.Component<*> {
                     {...provided.dragHandleProps}
                     ref={provided.innerRef}
                   >
-                    <Wobble
+                    <Dance
                       isDragging={snapshot.isDragging}
                       dropAnimation={snapshot.dropAnimation}
                     >
                       <Logo width={90} />
-                    </Wobble>
+                    </Dance>
                   </div>
                 )}
               </Draggable>
