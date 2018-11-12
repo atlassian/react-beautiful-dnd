@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable */
 
 import * as React from 'react';
 import { DragDropContext, Droppable, Draggable } from '../src';

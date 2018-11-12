@@ -1,5 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
+// eslint-disable-next-line
 import * as React from 'react';
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
@@ -264,6 +265,7 @@ const defaultProps = ({
   disableInteractiveElementBlocking: false,
 }: DefaultProps);
 
+// eslint-disable-next-line
 /*::
 class DraggableType extends React.Component<OwnProps> {
   static defaultProps = defaultProps;

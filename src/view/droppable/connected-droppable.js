@@ -1,4 +1,5 @@
 // @flow
+// eslint-disable-next-line
 import * as React from 'react';
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
@@ -97,6 +98,7 @@ const defaultProps = ({
   ignoreContainerClipping: false,
 }: DefaultProps);
 
+// eslint-disable-next-line
 /*::
 class DroppableType extends React.Component<OwnProps> {
   static defaultProps = defaultProps;
