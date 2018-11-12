@@ -1,6 +1,6 @@
 // @flow
 // eslint-disable-next-line
-import * as React from 'react';
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
 import { storeKey } from '../context-keys';

@@ -1,7 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
 // eslint-disable-next-line
-import * as React from 'react';
+import { Component } from 'react';
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import Draggable from './draggable';
