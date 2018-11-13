@@ -67,6 +67,7 @@ export default ({
       viewport: viewport.frame,
       // already taken into account by getPageBorderBoxCenter
       withDroppableDisplacement: false,
+      onlyOnMainAxis: true,
     });
 
     return isVisibleInNewLocation ? proposed : null;
