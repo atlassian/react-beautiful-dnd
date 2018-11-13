@@ -131,17 +131,16 @@ export type MapProps = {|
 
 export type ChildrenFn = (Provided, StateSnapshot) => Node;
 
-export type OwnProps = {|
-  draggableId: DraggableId,
-  index: number,
-  children: ChildrenFn,
+export type DefaultProps = {|
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
 |};
 
-export type DefaultProps = {|
-  isDragDisabled: boolean,
-  disableInteractiveElementBlocking: boolean,
+export type OwnProps = {|
+  ...DefaultProps,
+  draggableId: DraggableId,
+  index: number,
+  children: ChildrenFn,
 |};
 
 export type Props = {|

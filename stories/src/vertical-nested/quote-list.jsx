@@ -40,8 +40,8 @@ const NestedContainer = styled(Container)`
 `;
 
 export default class QuoteList extends Component<{ list: NestedQuoteList }> {
-  renderQuote = (quote: Quote, type: string, index: number) => (
-    <Draggable key={quote.id} draggableId={quote.id} type={type} index={index}>
+  renderQuote = (quote: Quote, index: number) => (
+    <Draggable key={quote.id} draggableId={quote.id} index={index}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
         <QuoteItem
           quote={quote}
@@ -66,14 +66,9 @@ export default class QuoteList extends Component<{ list: NestedQuoteList }> {
           <Title>{list.title}</Title>
           {list.children.map((item: Quote | NestedQuoteList, index: number) =>
             !item.children ? (
-              this.renderQuote((item: any), list.id, index)
+              this.renderQuote((item: any), index)
             ) : (
-              <Draggable
-                draggableId={item.id}
-                type={list.id}
-                key={item.id}
-                index={index}
-              >
+              <Draggable draggableId={item.id} key={item.id} index={index}>
                 {(
                   dragProvided: DraggableProvided,
                   dragSnapshot: DraggableStateSnapshot,
