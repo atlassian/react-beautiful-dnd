@@ -104,7 +104,6 @@ const getDisplacement = (draggable: DraggableDimension): Displacement => ({
         axis,
         moveRelativeTo: displacedInHome3,
         isMoving: preset.inHome1.page,
-        isOverHome: true,
       });
       expect(result).toEqual(expectedCenter);
     });
@@ -153,7 +152,6 @@ const getDisplacement = (draggable: DraggableDimension): Displacement => ({
         axis,
         moveRelativeTo: displacedInHome1,
         isMoving: preset.inHome3.page,
-        isOverHome: true,
       });
       expect(result).toEqual(expectedCenter);
     });
@@ -194,7 +192,6 @@ const getDisplacement = (draggable: DraggableDimension): Displacement => ({
         axis,
         moveRelativeTo: preset.inForeign4.page,
         isMoving: preset.inHome1.page,
-        isOverHome: false,
       });
       expect(result).toEqual(expectedCenter);
     });
