@@ -12,7 +12,6 @@ const isSVG = (el: mixed) => {
     return false;
   }
 
-  // $FlowFixMe - flow does not know about SVGElement
   return el instanceof SVGElement;
 };
 

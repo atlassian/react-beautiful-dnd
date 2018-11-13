@@ -50,7 +50,6 @@ export default ({ data, location }: Props) => (
 );
 
 /* eslint-disable no-undef */
-// $FlowFixMe
 export const query = graphql`
   query markdownQuery($slug: String!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {

@@ -67,18 +67,13 @@ export default class AuthorList extends Component<Props> {
     isCombineEnabled: false,
   };
   renderBoard = (dropProvided: DroppableProvided) => {
-    const { listType, quotes } = this.props;
+    const { quotes } = this.props;
 
     return (
       <Container>
         <DropZone innerRef={dropProvided.innerRef}>
           {quotes.map((quote: Quote, index: number) => (
-            <Draggable
-              key={quote.id}
-              draggableId={quote.id}
-              type={listType}
-              index={index}
-            >
+            <Draggable key={quote.id} draggableId={quote.id} index={index}>
               {(
                 dragProvided: DraggableProvided,
                 dragSnapshot: DraggableStateSnapshot,

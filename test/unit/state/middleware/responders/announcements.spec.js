@@ -151,7 +151,6 @@ cases.forEach((current: Case) => {
     });
 
     it('should not announce twice if the responder makes an announcement', () => {
-      // $ExpectError - property does not exist on responder property
       responders[current.responder] = jest.fn(
         (data: any, provided: ResponderProvided) => {
           announce.mockReset();
@@ -169,7 +168,6 @@ cases.forEach((current: Case) => {
       jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       let provided: ResponderProvided;
-      // $ExpectError - property does not exist on responder property
       responders[current.responder] = jest.fn(
         (data: any, supplied: ResponderProvided) => {
           announce.mockReset();
@@ -200,7 +198,6 @@ cases.forEach((current: Case) => {
       jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       let provided: ResponderProvided;
-      // $ExpectError - property does not exist on responder property
       responders[current.responder] = jest.fn(
         (data: any, supplied: ResponderProvided) => {
           announce.mockReset();

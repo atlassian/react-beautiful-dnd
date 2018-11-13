@@ -1,5 +1,6 @@
 // @flow
-import { type Node } from 'react';
+// eslint-disable-next-line
+import { Component } from 'react';
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
 import { storeKey } from '../context-keys';
@@ -89,10 +90,27 @@ export const makeMapStateToProps = (): Selector => {
   return selector;
 };
 
+const defaultProps = ({
+  type: 'DEFAULT',
+  direction: 'vertical',
+  isDropDisabled: false,
+  isCombineEnabled: false,
+  ignoreContainerClipping: false,
+}: DefaultProps);
+
+// Abstract class allows to specify props and defaults to component.
+// All other ways give any or do not let add default props.
+// eslint-disable-next-line
+/*::
+class DroppableType extends Component<OwnProps> {
+  static defaultProps = defaultProps;
+}
+*/
+
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
-const ConnectedDroppable: OwnProps => Node = (connect(
+const ConnectedDroppable: typeof DroppableType = (connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
   // no dispatch props for droppable
@@ -113,12 +131,6 @@ const ConnectedDroppable: OwnProps => Node = (connect(
   },
 ): any)(Droppable);
 
-ConnectedDroppable.defaultProps = ({
-  type: 'DEFAULT',
-  direction: 'vertical',
-  isDropDisabled: false,
-  isCombineEnabled: false,
-  ignoreContainerClipping: false,
-}: DefaultProps);
+ConnectedDroppable.defaultProps = defaultProps;
 
 export default ConnectedDroppable;
