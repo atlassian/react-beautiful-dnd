@@ -38,6 +38,10 @@ const ContentSpacing = styled('div')`
     font-weight: bold;
   }
 
+  em em {
+    font-style: normal;
+  }
+
   blockquote {
     padding: 0 ${gutter}px;
     color: ${colors.dark200};

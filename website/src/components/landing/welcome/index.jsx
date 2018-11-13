@@ -12,6 +12,7 @@ import { smallView } from '../../media';
 const Brand = styled('div')`
   display: flex;
   align-items: center;
+  line-height: 1;
 
   ${smallView.fn(`
     flex-direction: column;
