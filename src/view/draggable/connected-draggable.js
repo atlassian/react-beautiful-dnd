@@ -1,6 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
-import { type Node } from 'react';
+// eslint-disable-next-line
+import { Component } from 'react';
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import Draggable from './draggable';
@@ -258,10 +259,25 @@ const mapDispatchToProps: DispatchProps = {
   dropAnimationFinished: dropAnimationFinishedAction,
 };
 
+const defaultProps = ({
+  isDragDisabled: false,
+  // cannot drag interactive elements by default
+  disableInteractiveElementBlocking: false,
+}: DefaultProps);
+
+// Abstract class allows to specify props and defaults to component.
+// All other ways give any or do not let add default props.
+// eslint-disable-next-line
+/*::
+class DraggableType extends Component<OwnProps> {
+  static defaultProps = defaultProps;
+}
+*/
+
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Draggable`
-const ConnectedDraggable: OwnProps => Node = (connect(
+const ConnectedDraggable: typeof DraggableType = (connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
   (mapDispatchToProps: any),
@@ -282,10 +298,6 @@ const ConnectedDraggable: OwnProps => Node = (connect(
   },
 ): any)(Draggable);
 
-ConnectedDraggable.defaultProps = ({
-  isDragDisabled: false,
-  // cannot drag interactive elements by default
-  disableInteractiveElementBlocking: false,
-}: DefaultProps);
+ConnectedDraggable.defaultProps = defaultProps;
 
 export default ConnectedDraggable;

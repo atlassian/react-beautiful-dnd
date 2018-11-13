@@ -11,3 +11,4 @@
 # Example: // $ExpectError: This following line is correctly ignored by flow.
 suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
 suppress_comment= \\(.\\|\n\\)*\\$ExpectError
+include_warnings=true
