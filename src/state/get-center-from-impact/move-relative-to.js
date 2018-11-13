@@ -7,6 +7,7 @@ type Args = {|
   axis: Axis,
   moveRelativeTo: BoxModel,
   isMoving: BoxModel,
+  isOverHome: boolean,
 |};
 
 const distanceFromStartToCenter = (axis: Axis, box: BoxModel): number =>
@@ -21,24 +22,43 @@ const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
   box.padding[axis.end] +
   box.contentBox[axis.size] / 2;
 
-export const goAfter = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
+const getCrossAxisCenter = ({
+  axis,
+  moveRelativeTo,
+  isMoving,
+  isOverHome,
+}: Args): number => {
+  const target: BoxModel = isOverHome ? isMoving : moveRelativeTo;
+
+  return target.borderBox.center[axis.crossAxisLine];
+};
+
+export const goAfter = ({
+  axis,
+  moveRelativeTo,
+  isMoving,
+  isOverHome,
+}: Args): Position =>
   patch(
     axis.line,
     // start measuring from the bottom of the target
     moveRelativeTo.marginBox[axis.end] +
       distanceFromStartToCenter(axis, isMoving),
-    // align the moving item to the visual center of the target
-    moveRelativeTo.borderBox.center[axis.crossAxisLine],
+    getCrossAxisCenter({ axis, moveRelativeTo, isMoving, isOverHome }),
   );
 
-export const goBefore = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
+export const goBefore = ({
+  axis,
+  moveRelativeTo,
+  isMoving,
+  isOverHome,
+}: Args): Position =>
   patch(
     axis.line,
     // start measuring from the top of the target
     moveRelativeTo.marginBox[axis.start] -
       distanceFromEndToCenter(axis, isMoving),
-    // align the moving item to the visual center of the target
-    moveRelativeTo.borderBox.center[axis.crossAxisLine],
+    getCrossAxisCenter({ axis, moveRelativeTo, isMoving, isOverHome }),
   );
 
 type GoIntoArgs = {|

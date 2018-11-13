@@ -53,6 +53,7 @@ const isMoving: BoxModel = createBox({
       axis,
       moveRelativeTo,
       isMoving,
+      isOverHome: false,
     });
 
     const expected: Position = patch(
@@ -73,6 +74,7 @@ const isMoving: BoxModel = createBox({
       axis,
       moveRelativeTo,
       isMoving,
+      isOverHome: false,
     });
 
     const expected: Position = patch(
