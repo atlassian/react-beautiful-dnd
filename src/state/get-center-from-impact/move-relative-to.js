@@ -28,6 +28,11 @@ const getCrossAxisCenter = ({
   isMoving,
   isOverHome,
 }: Args): number => {
+  // home list: use the center from the moving item
+  // foreign list: use the center from the box we are moving relative to
+
+  // Sometimes we can be in a home list that has items of different sizes.
+  // Eg: columns in a horizontal list
   const target: BoxModel = isOverHome ? isMoving : moveRelativeTo;
 
   return target.borderBox.center[axis.crossAxisLine];
