@@ -47,6 +47,18 @@ const isMoving: BoxModel = createBox({
   padding: getAssortedSpacing(),
 });
 
+const distanceFromStartToCenter = (axis: Axis, box: BoxModel): number =>
+  box.margin[axis.start] +
+  box.border[axis.start] +
+  box.padding[axis.start] +
+  box.contentBox[axis.size] / 2;
+
+const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
+  box.margin[axis.end] +
+  box.border[axis.end] +
+  box.padding[axis.end] +
+  box.contentBox[axis.size] / 2;
+
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     it('should move into the start of the context box of the target', () => {
@@ -58,11 +70,10 @@ const isMoving: BoxModel = createBox({
 
       const expected: Position = patch(
         axis.line,
+        // start from the start of the context box of the target
         moveRelativeTo.contentBox[axis.start] +
-          isMoving.margin[axis.start] +
-          isMoving.border[axis.start] +
-          isMoving.padding[axis.start] +
-          isMoving.contentBox[axis.size] / 2,
+          // add the distance from the start to the center of the moving item
+          distanceFromStartToCenter(axis, isMoving),
         // move on the same cross axis as the list we are moving into
         moveRelativeTo.contentBox.center[axis.crossAxisLine],
       );
@@ -81,11 +92,10 @@ const isMoving: BoxModel = createBox({
 
         const expected: Position = patch(
           axis.line,
+          // start at the start of the item we are moving relative to
           moveRelativeTo.marginBox[axis.start] -
-            (isMoving.margin[axis.end] +
-              isMoving.border[axis.end] +
-              isMoving.padding[axis.end] +
-              isMoving.contentBox[axis.size] / 2),
+            // add the space from the end of the dragging item to its center
+            distanceFromEndToCenter(axis, isMoving),
           // move on the same cross axis as where the item started
           isMoving.borderBox.center[axis.crossAxisLine],
         );
@@ -103,11 +113,10 @@ const isMoving: BoxModel = createBox({
 
         const expected: Position = patch(
           axis.line,
+          // start at the end of the margin box
           moveRelativeTo.marginBox[axis.end] +
-            isMoving.margin[axis.start] +
-            isMoving.border[axis.start] +
-            isMoving.padding[axis.start] +
-            isMoving.contentBox[axis.size] / 2,
+            // add the distance to the start of the target center
+            distanceFromStartToCenter(axis, isMoving),
           // move on the same cross axis as where the item started
           isMoving.borderBox.center[axis.crossAxisLine],
         );
@@ -127,11 +136,10 @@ const isMoving: BoxModel = createBox({
 
         const expected: Position = patch(
           axis.line,
+          // start at the start of the target
           moveRelativeTo.marginBox[axis.start] -
-            (isMoving.margin[axis.end] +
-              isMoving.border[axis.end] +
-              isMoving.padding[axis.end] +
-              isMoving.contentBox[axis.size] / 2),
+            // subtract the space from end of the moving item to its center
+            distanceFromEndToCenter(axis, isMoving),
           // move on the cross axis of the target
           moveRelativeTo.borderBox.center[axis.crossAxisLine],
         );
@@ -149,11 +157,10 @@ const isMoving: BoxModel = createBox({
 
         const expected: Position = patch(
           axis.line,
+          // start at the end of the target
           moveRelativeTo.marginBox[axis.end] +
-            isMoving.margin[axis.start] +
-            isMoving.border[axis.start] +
-            isMoving.padding[axis.start] +
-            isMoving.contentBox[axis.size] / 2,
+            // add the space from the start of the moving item to its center
+            distanceFromStartToCenter(axis, isMoving),
           // move on the cross axis of the target
           moveRelativeTo.borderBox.center[axis.crossAxisLine],
         );
