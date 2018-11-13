@@ -44,7 +44,7 @@ const getCrossAxisCenter = (
 export const goAfter = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
   patch(
     axis.line,
-    // start measuring from the bottom of the target
+    // start measuring from the end of the target
     moveRelativeTo.marginBox[axis.end] +
       distanceFromStartToCenter(axis, isMoving),
     getCrossAxisCenter(axis, moveRelativeTo.marginBox, isMoving),
@@ -53,7 +53,7 @@ export const goAfter = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
 export const goBefore = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
   patch(
     axis.line,
-    // start measuring from the top of the target
+    // start measuring from the start of the target
     moveRelativeTo.marginBox[axis.start] -
       distanceFromEndToCenter(axis, isMoving),
     getCrossAxisCenter(axis, moveRelativeTo.marginBox, isMoving),
