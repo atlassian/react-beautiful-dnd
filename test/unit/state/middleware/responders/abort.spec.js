@@ -95,7 +95,6 @@ it('should not publish an onDragEnd if aborted after a drop', () => {
   };
   store.dispatch(completeDrop(result));
   expect(responders.onDragEnd).toHaveBeenCalledTimes(1);
-  // $ExpectError - unknown mock reset property
   responders.onDragEnd.mockReset();
 
   // abort

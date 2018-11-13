@@ -42,7 +42,7 @@
     "prettier:write": "yarn prettier --write $npm_package_config_prettier_target",
     "lint:eslint": "yarn eslint \"./**/*.{js,jsx}\"",
     "lint:css": "stylelint \"stories/**/*.{js,jsx}\" \"website/src/**/*.{js,jsx}\"",
-    "typecheck": "flow check",
+    "typecheck": "flow check --max-warnings=0",
     "bundle-size:check": "cross-env SNAPSHOT=match yarn bundle-size:update",
     "bundle-size:update": "yarn build:clean && yarn build:dist && yarn build:clean",
     "build": "yarn build:clean && yarn build:dist && yarn build:flow",

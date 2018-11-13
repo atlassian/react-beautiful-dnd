@@ -151,7 +151,6 @@ describe('handling drag handle events', () => {
           movementMode: 'SNAP',
         });
 
-      // $ExpectError - mock property on lift function
       expect(dispatchProps.lift).toHaveBeenCalledWith({
         id: draggable.id,
         clientSelection: origin,

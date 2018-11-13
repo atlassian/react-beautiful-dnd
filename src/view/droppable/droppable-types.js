@@ -35,9 +35,7 @@ export type MapProps = {|
   placeholder: ?Placeholder,
 |};
 
-export type OwnProps = {|
-  children: (Provided, StateSnapshot) => Node,
-  droppableId: DroppableId,
+export type DefaultProps = {|
   type: TypeId,
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
@@ -45,12 +43,10 @@ export type OwnProps = {|
   ignoreContainerClipping: boolean,
 |};
 
-export type DefaultProps = {|
-  type: string,
-  isDropDisabled: boolean,
-  isCombineEnabled: false,
-  direction: Direction,
-  ignoreContainerClipping: boolean,
+export type OwnProps = {|
+  ...DefaultProps,
+  children: (Provided, StateSnapshot) => Node,
+  droppableId: DroppableId,
 |};
 
 export type Props = {|
