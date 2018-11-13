@@ -6,7 +6,7 @@ import Board from './board';
 import CallToAction from './call-to-action';
 import SocialIcons from './social-icons';
 import DraggableLogo from './draggable-logo';
-import { grid, gutter } from '../../../constants';
+import { grid, gutter, colors } from '../../../constants';
 import { smallView } from '../../media';
 
 const Brand = styled('div')`
@@ -23,6 +23,7 @@ const Title = styled('h1')`
   font-weight: normal;
   font-size: 40px;
   margin: 0;
+  color: ${colors.dark100};
   padding-left: ${gutter.normal}px;
 
   ${smallView.fn(`

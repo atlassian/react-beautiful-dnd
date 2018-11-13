@@ -4,6 +4,7 @@ import Helmet from 'react-helmet';
 /* eslint-disable-next-line import/extensions */
 import '@atlaskit/css-reset';
 import { colors, lineHeight, fontSizeEm } from '../constants';
+import { version } from '../../../package.json';
 
 type Props = {
   children: Node,
@@ -18,6 +19,29 @@ const globalStyles = `
   }
 `;
 
+/* eslint-disable no-console */
+class EnvLogger extends React.Component<*> {
+  componentDidMount() {
+    // Doing this more complex check as console.table || console.log makes CI cry
+    const table: Function = Object.prototype.hasOwnProperty.call(
+      console,
+      'table',
+    )
+      ? console.table
+      : console.log;
+
+    console.log('environment');
+    table([
+      ['react-beautiful-dnd version', version],
+      ['react version', React.version],
+      ['process.env.NODE_ENV', process.env.NODE_ENV],
+    ]);
+  }
+  render() {
+    return null;
+  }
+}
+
 const CommonPage = ({ children }: Props) => (
   <React.Fragment>
     <Helmet>
@@ -28,6 +52,7 @@ const CommonPage = ({ children }: Props) => (
       />
       <style data-global-styles>{globalStyles}</style>
     </Helmet>
+    <EnvLogger />
     {children}
   </React.Fragment>
 );
