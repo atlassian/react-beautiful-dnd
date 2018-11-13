@@ -48,65 +48,118 @@ const isMoving: BoxModel = createBox({
 });
 
 [vertical, horizontal].forEach((axis: Axis) => {
-  it('should align before the target', () => {
-    const newCenter: Position = goBefore({
-      axis,
-      moveRelativeTo,
-      isMoving,
-      isOverHome: false,
+  describe(`on ${axis.direction} axis`, () => {
+    it('should move into the start of the context box of the target', () => {
+      const newCenter: Position = goIntoStart({
+        axis,
+        moveInto: moveRelativeTo,
+        isMoving,
+      });
+
+      const expected: Position = patch(
+        axis.line,
+        moveRelativeTo.contentBox[axis.start] +
+          isMoving.margin[axis.start] +
+          isMoving.border[axis.start] +
+          isMoving.padding[axis.start] +
+          isMoving.contentBox[axis.size] / 2,
+        // move on the same cross axis as the list we are moving into
+        moveRelativeTo.contentBox.center[axis.crossAxisLine],
+      );
+
+      expect(newCenter).toEqual(expected);
     });
 
-    const expected: Position = patch(
-      axis.line,
-      moveRelativeTo.marginBox[axis.start] -
-        (isMoving.margin[axis.end] +
-          isMoving.border[axis.end] +
-          isMoving.padding[axis.end] +
-          isMoving.contentBox[axis.size] / 2),
-      moveRelativeTo.borderBox.center[axis.crossAxisLine],
-    );
+    describe('is over home list', () => {
+      it('should align before the target', () => {
+        const newCenter: Position = goBefore({
+          axis,
+          moveRelativeTo,
+          isMoving,
+          isOverHome: true,
+        });
 
-    expect(newCenter).toEqual(expected);
-  });
+        const expected: Position = patch(
+          axis.line,
+          moveRelativeTo.marginBox[axis.start] -
+            (isMoving.margin[axis.end] +
+              isMoving.border[axis.end] +
+              isMoving.padding[axis.end] +
+              isMoving.contentBox[axis.size] / 2),
+          // move on the same cross axis as where the item started
+          isMoving.borderBox.center[axis.crossAxisLine],
+        );
 
-  it('should align after the target', () => {
-    const newCenter: Position = goAfter({
-      axis,
-      moveRelativeTo,
-      isMoving,
-      isOverHome: false,
+        expect(newCenter).toEqual(expected);
+      });
+
+      it('should align after the target', () => {
+        const newCenter: Position = goAfter({
+          axis,
+          moveRelativeTo,
+          isMoving,
+          isOverHome: true,
+        });
+
+        const expected: Position = patch(
+          axis.line,
+          moveRelativeTo.marginBox[axis.end] +
+            isMoving.margin[axis.start] +
+            isMoving.border[axis.start] +
+            isMoving.padding[axis.start] +
+            isMoving.contentBox[axis.size] / 2,
+          // move on the same cross axis as where the item started
+          isMoving.borderBox.center[axis.crossAxisLine],
+        );
+
+        expect(newCenter).toEqual(expected);
+      });
     });
 
-    const expected: Position = patch(
-      axis.line,
-      moveRelativeTo.marginBox[axis.end] +
-        isMoving.margin[axis.start] +
-        isMoving.border[axis.start] +
-        isMoving.padding[axis.start] +
-        isMoving.contentBox[axis.size] / 2,
-      moveRelativeTo.borderBox.center[axis.crossAxisLine],
-    );
+    describe('is over foreign list', () => {
+      it('should align before the target', () => {
+        const newCenter: Position = goBefore({
+          axis,
+          moveRelativeTo,
+          isMoving,
+          isOverHome: false,
+        });
 
-    expect(newCenter).toEqual(expected);
-  });
+        const expected: Position = patch(
+          axis.line,
+          moveRelativeTo.marginBox[axis.start] -
+            (isMoving.margin[axis.end] +
+              isMoving.border[axis.end] +
+              isMoving.padding[axis.end] +
+              isMoving.contentBox[axis.size] / 2),
+          // move on the cross axis of the target
+          moveRelativeTo.borderBox.center[axis.crossAxisLine],
+        );
 
-  it('should move into the start of the context box of the target', () => {
-    const newCenter: Position = goIntoStart({
-      axis,
-      moveInto: moveRelativeTo,
-      isMoving,
+        expect(newCenter).toEqual(expected);
+      });
+
+      it('should align after the target', () => {
+        const newCenter: Position = goAfter({
+          axis,
+          moveRelativeTo,
+          isMoving,
+          isOverHome: false,
+        });
+
+        const expected: Position = patch(
+          axis.line,
+          moveRelativeTo.marginBox[axis.end] +
+            isMoving.margin[axis.start] +
+            isMoving.border[axis.start] +
+            isMoving.padding[axis.start] +
+            isMoving.contentBox[axis.size] / 2,
+          // move on the cross axis of the target
+          moveRelativeTo.borderBox.center[axis.crossAxisLine],
+        );
+
+        expect(newCenter).toEqual(expected);
+      });
     });
-
-    const expected: Position = patch(
-      axis.line,
-      moveRelativeTo.contentBox[axis.start] +
-        isMoving.margin[axis.start] +
-        isMoving.border[axis.start] +
-        isMoving.padding[axis.start] +
-        isMoving.contentBox[axis.size] / 2,
-      moveRelativeTo.contentBox.center[axis.crossAxisLine],
-    );
-
-    expect(newCenter).toEqual(expected);
   });
 });
