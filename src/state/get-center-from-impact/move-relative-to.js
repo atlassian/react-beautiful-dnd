@@ -30,6 +30,9 @@ const distanceFromCrossAxisStartToCenter = (
   box.padding[axis.crossAxisStart] +
   box.contentBox[axis.crossAxisSize] / 2;
 
+// We align the moving item against the cross axis start of the target
+// We used to align the moving item cross axis center with the cross axis center of the target.
+// However, this leads to a bad experience when reordering columns
 const getCrossAxisCenter = (
   axis: Axis,
   target: Rect,
