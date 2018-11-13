@@ -4,7 +4,7 @@ import invariant from 'tiny-invariant';
 import pkg from '../../../package.json';
 
 // Regex playground: https://regexr.com/40fin
-const convention: RegExp = /^[a-z0-9\-_./]+$/;
+const convention: RegExp = /^[a-z0-9\-./]+$/;
 const isSnakeCase = (filePath: string): boolean => convention.test(filePath);
 
 const exceptions: string[] = [

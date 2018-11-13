@@ -59,8 +59,61 @@ const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
   box.padding[axis.end] +
   box.contentBox[axis.size] / 2;
 
+const distanceFromCrossAxisStartToCenter = (
+  axis: Axis,
+  box: BoxModel,
+): number =>
+  box.margin[axis.crossAxisStart] +
+  box.border[axis.crossAxisStart] +
+  box.padding[axis.crossAxisStart] +
+  box.contentBox[axis.crossAxisSize] / 2;
+
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
+    it('should align before the target', () => {
+      const newCenter: Position = goBefore({
+        axis,
+        moveRelativeTo,
+        isMoving,
+      });
+
+      const expected: Position = patch(
+        axis.line,
+        // start at the start of the item we are moving relative to
+        moveRelativeTo.marginBox[axis.start] -
+          // add the space from the end of the dragging item to its center
+          distanceFromEndToCenter(axis, isMoving),
+        // start at the cross axis start of the item we are moving relative to
+        moveRelativeTo.marginBox[axis.crossAxisStart] +
+          // add the space from the start of the dragging item to its center
+          distanceFromCrossAxisStartToCenter(axis, isMoving),
+      );
+
+      expect(newCenter).toEqual(expected);
+    });
+
+    it('should align after the target', () => {
+      const newCenter: Position = goAfter({
+        axis,
+        moveRelativeTo,
+        isMoving,
+      });
+
+      const expected: Position = patch(
+        axis.line,
+        // start at the end of the margin box
+        moveRelativeTo.marginBox[axis.end] +
+          // add the distance to the start of the target center
+          distanceFromStartToCenter(axis, isMoving),
+        // start at the cross axis start of the item we are moving relative to
+        moveRelativeTo.marginBox[axis.crossAxisStart] +
+          // add the space from the start of the dragging item to its center
+          distanceFromCrossAxisStartToCenter(axis, isMoving),
+      );
+
+      expect(newCenter).toEqual(expected);
+    });
+
     it('should move into the start of the context box of the target', () => {
       const newCenter: Position = goIntoStart({
         axis,
@@ -74,99 +127,13 @@ const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
         moveRelativeTo.contentBox[axis.start] +
           // add the distance from the start to the center of the moving item
           distanceFromStartToCenter(axis, isMoving),
-        // move on the same cross axis as the list we are moving into
-        moveRelativeTo.contentBox.center[axis.crossAxisLine],
+        // start at the cross axis start of the item we are moving relative to
+        moveRelativeTo.contentBox[axis.crossAxisStart] +
+          // add the space from the start of the dragging item to its center
+          distanceFromCrossAxisStartToCenter(axis, isMoving),
       );
 
       expect(newCenter).toEqual(expected);
-    });
-
-    describe('is over home list', () => {
-      it('should align before the target', () => {
-        const newCenter: Position = goBefore({
-          axis,
-          moveRelativeTo,
-          isMoving,
-          isOverHome: true,
-        });
-
-        const expected: Position = patch(
-          axis.line,
-          // start at the start of the item we are moving relative to
-          moveRelativeTo.marginBox[axis.start] -
-            // add the space from the end of the dragging item to its center
-            distanceFromEndToCenter(axis, isMoving),
-          // move on the same cross axis as where the item started
-          isMoving.borderBox.center[axis.crossAxisLine],
-        );
-
-        expect(newCenter).toEqual(expected);
-      });
-
-      it('should align after the target', () => {
-        const newCenter: Position = goAfter({
-          axis,
-          moveRelativeTo,
-          isMoving,
-          isOverHome: true,
-        });
-
-        const expected: Position = patch(
-          axis.line,
-          // start at the end of the margin box
-          moveRelativeTo.marginBox[axis.end] +
-            // add the distance to the start of the target center
-            distanceFromStartToCenter(axis, isMoving),
-          // move on the same cross axis as where the item started
-          isMoving.borderBox.center[axis.crossAxisLine],
-        );
-
-        expect(newCenter).toEqual(expected);
-      });
-    });
-
-    describe('is over foreign list', () => {
-      it('should align before the target', () => {
-        const newCenter: Position = goBefore({
-          axis,
-          moveRelativeTo,
-          isMoving,
-          isOverHome: false,
-        });
-
-        const expected: Position = patch(
-          axis.line,
-          // start at the start of the target
-          moveRelativeTo.marginBox[axis.start] -
-            // subtract the space from end of the moving item to its center
-            distanceFromEndToCenter(axis, isMoving),
-          // move on the cross axis of the target
-          moveRelativeTo.borderBox.center[axis.crossAxisLine],
-        );
-
-        expect(newCenter).toEqual(expected);
-      });
-
-      it('should align after the target', () => {
-        const newCenter: Position = goAfter({
-          axis,
-          moveRelativeTo,
-          isMoving,
-          isOverHome: false,
-        });
-
-        const expected: Position = patch(
-          axis.line,
-          // start at the end of the target
-          moveRelativeTo.marginBox[axis.end] +
-            // add the space from the start of the moving item to its center
-            distanceFromStartToCenter(axis, isMoving),
-          // move on the cross axis of the target
-          moveRelativeTo.borderBox.center[axis.crossAxisLine],
-        );
-
-        expect(newCenter).toEqual(expected);
-      });
     });
   });
 });

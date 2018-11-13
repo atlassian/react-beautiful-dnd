@@ -4,6 +4,7 @@
 import * as React from 'react';
 import { DragDropContext, Droppable, Draggable } from '../src';
 
+// DragDropContext
 {
   <React.Fragment>
     <DragDropContext onDragEnd={() => {}}>{null}</DragDropContext>
@@ -14,6 +15,7 @@ import { DragDropContext, Droppable, Draggable } from '../src';
   </React.Fragment>;
 }
 
+// Droppable
 {
   <React.Fragment>
     <Droppable droppableId="">{() => null}</Droppable>
@@ -24,6 +26,7 @@ import { DragDropContext, Droppable, Draggable } from '../src';
   </React.Fragment>;
 }
 
+// Draggable
 {
   <React.Fragment>
     <Draggable draggableId="" index={0}>
