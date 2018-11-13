@@ -67,6 +67,7 @@ export default ({
       axis,
       moveRelativeTo: moveRelativeTo.page,
       isMoving: draggablePage,
+      isOverHome,
     });
   }
 
@@ -78,6 +79,7 @@ export default ({
       axis,
       moveRelativeTo: displacedClosest,
       isMoving: draggablePage,
+      isOverHome,
     });
   }
 
@@ -86,5 +88,6 @@ export default ({
     axis,
     moveRelativeTo: displacedClosest,
     isMoving: draggablePage,
+    isOverHome,
   });
 };
