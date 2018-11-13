@@ -1,5 +1,5 @@
 // @flow
-import type { Position, BoxModel } from 'css-box-model';
+import type { Position, BoxModel, Rect } from 'css-box-model';
 import { patch } from '../position';
 import type { Axis } from '../../types';
 
@@ -32,10 +32,10 @@ const distanceFromCrossAxisStartToCenter = (
 
 const getCrossAxisCenter = (
   axis: Axis,
-  moveRelativeTo: BoxModel,
+  target: Rect,
   isMoving: BoxModel,
 ): number =>
-  moveRelativeTo.marginBox[axis.crossAxisStart] +
+  target[axis.crossAxisStart] +
   distanceFromCrossAxisStartToCenter(axis, isMoving);
 
 export const goAfter = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
@@ -44,7 +44,7 @@ export const goAfter = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
     // start measuring from the bottom of the target
     moveRelativeTo.marginBox[axis.end] +
       distanceFromStartToCenter(axis, isMoving),
-    getCrossAxisCenter(axis, moveRelativeTo, isMoving),
+    getCrossAxisCenter(axis, moveRelativeTo.marginBox, isMoving),
   );
 
 export const goBefore = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
@@ -53,7 +53,7 @@ export const goBefore = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
     // start measuring from the top of the target
     moveRelativeTo.marginBox[axis.start] -
       distanceFromEndToCenter(axis, isMoving),
-    getCrossAxisCenter(axis, moveRelativeTo, isMoving),
+    getCrossAxisCenter(axis, moveRelativeTo.marginBox, isMoving),
   );
 
 type GoIntoArgs = {|
@@ -71,6 +71,5 @@ export const goIntoStart = ({
   patch(
     axis.line,
     moveInto.contentBox[axis.start] + distanceFromStartToCenter(axis, isMoving),
-    moveInto.contentBox[axis.crossAxisStart] +
-      distanceFromCrossAxisStartToCenter(axis, isMoving),
+    getCrossAxisCenter(axis, moveInto.contentBox, isMoving),
   );
