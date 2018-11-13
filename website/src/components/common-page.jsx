@@ -17,6 +17,9 @@ const globalStyles = `
     line-height: ${lineHeight};
     font-size: ${fontSizeEm}em;
   }
+  h1, h2, h3, h4, h5 {
+    color: ${colors.dark100};
+  }
 `;
 
 /* eslint-disable no-console */

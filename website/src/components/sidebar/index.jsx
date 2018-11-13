@@ -7,7 +7,7 @@ import type { DocsPage, MarkdownPage, SitePage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
 import Heading from './heading';
 import type { NavLink } from './sidebar-types';
-import LinkList from './link-list';
+import LinkList from './reorderable-links';
 import spacing from './spacing';
 import { linkClassName, isActiveClassName } from './link-class-name';
 
