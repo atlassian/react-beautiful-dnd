@@ -1,5 +1,5 @@
 // @flow
-import type { Position, BoxModel } from 'css-box-model';
+import type { Position, BoxModel, Rect } from 'css-box-model';
 import { patch } from '../position';
 import type { Axis } from '../../types';
 
@@ -7,7 +7,6 @@ type Args = {|
   axis: Axis,
   moveRelativeTo: BoxModel,
   isMoving: BoxModel,
-  isOverHome: boolean,
 |};
 
 const distanceFromStartToCenter = (axis: Axis, box: BoxModel): number =>
@@ -22,51 +21,42 @@ const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
   box.padding[axis.end] +
   box.contentBox[axis.size] / 2;
 
-const getCrossAxisCenter = ({
-  axis,
-  moveRelativeTo,
-  isMoving,
-  isOverHome,
-}: Args): number => {
-  // Sometimes we can be in a home list that has items of different sizes.
-  // Eg: columns in a horizontal list
+const distanceFromCrossAxisStartToCenter = (
+  axis: Axis,
+  box: BoxModel,
+): number =>
+  box.margin[axis.crossAxisStart] +
+  box.border[axis.crossAxisStart] +
+  box.padding[axis.crossAxisStart] +
+  box.contentBox[axis.crossAxisSize] / 2;
 
-  // home list: use the center from the moving item
-  // foreign list: use the center from the box we are moving relative to
+// We align the moving item against the cross axis start of the target
+// We used to align the moving item cross axis center with the cross axis center of the target.
+// However, this leads to a bad experience when reordering columns
+const getCrossAxisCenter = (
+  axis: Axis,
+  target: Rect,
+  isMoving: BoxModel,
+): number =>
+  target[axis.crossAxisStart] +
+  distanceFromCrossAxisStartToCenter(axis, isMoving);
 
-  // TODO: what if a foreign list has items of different sizes?
-
-  const target: BoxModel = isOverHome ? isMoving : moveRelativeTo;
-
-  return target.borderBox.center[axis.crossAxisLine];
-};
-
-export const goAfter = ({
-  axis,
-  moveRelativeTo,
-  isMoving,
-  isOverHome,
-}: Args): Position =>
+export const goAfter = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
   patch(
     axis.line,
-    // start measuring from the bottom of the target
+    // start measuring from the end of the target
     moveRelativeTo.marginBox[axis.end] +
       distanceFromStartToCenter(axis, isMoving),
-    getCrossAxisCenter({ axis, moveRelativeTo, isMoving, isOverHome }),
+    getCrossAxisCenter(axis, moveRelativeTo.marginBox, isMoving),
   );
 
-export const goBefore = ({
-  axis,
-  moveRelativeTo,
-  isMoving,
-  isOverHome,
-}: Args): Position =>
+export const goBefore = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
   patch(
     axis.line,
-    // start measuring from the top of the target
+    // start measuring from the start of the target
     moveRelativeTo.marginBox[axis.start] -
       distanceFromEndToCenter(axis, isMoving),
-    getCrossAxisCenter({ axis, moveRelativeTo, isMoving, isOverHome }),
+    getCrossAxisCenter(axis, moveRelativeTo.marginBox, isMoving),
   );
 
 type GoIntoArgs = {|
@@ -84,5 +74,5 @@ export const goIntoStart = ({
   patch(
     axis.line,
     moveInto.contentBox[axis.start] + distanceFromStartToCenter(axis, isMoving),
-    moveInto.contentBox.center[axis.crossAxisLine],
+    getCrossAxisCenter(axis, moveInto.contentBox, isMoving),
   );
