@@ -33,7 +33,8 @@ const ContentSpacing = styled('div')`
   box-sizing: border-box;
   min-height: 100vh;
 
-  a {
+  a,
+  a > .language-text {
     color: ${colors.green400};
     font-weight: bold;
   }
