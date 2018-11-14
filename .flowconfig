@@ -4,6 +4,9 @@
 .*/website/public/.*
 .*/website/.cache/.*
 
+[lints]
+sketchy-null=error
+
 [options]
 
 # Provides a way to suppress flow errors in the following line.

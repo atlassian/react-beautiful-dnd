@@ -45,8 +45,16 @@ class Item extends Component<Props> {
   render() {
     return (
       <DraggableDimensionPublisher
-        draggableId={this.props.draggableId || preset.inHome1.descriptor.id}
-        index={this.props.index || preset.inHome1.descriptor.index}
+        draggableId={
+          this.props.draggableId != null
+            ? this.props.draggableId
+            : preset.inHome1.descriptor.id
+        }
+        index={
+          this.props.index != null
+            ? this.props.index
+            : preset.inHome1.descriptor.index
+        }
         droppableId={preset.inHome1.descriptor.droppableId}
         type={preset.inHome1.descriptor.type}
         getDraggableRef={this.getRef}

@@ -101,7 +101,7 @@ export default ({
 
     const destination: ?DroppableId = whatIsDraggedOver(state.impact);
     invariant(
-      destination,
+      destination != null,
       'Cannot perform a jump scroll when there is no destination',
     );
 

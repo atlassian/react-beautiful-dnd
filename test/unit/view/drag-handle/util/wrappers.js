@@ -21,7 +21,9 @@ export class Child extends React.Component<ChildProps> {
       <div
         ref={this.props.innerRef}
         {...this.props.dragHandleProps}
-        className={this.props.className || 'child'}
+        className={
+          this.props.className != null ? this.props.className : 'child'
+        }
       >
         Drag me!
         {this.props.children}

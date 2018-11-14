@@ -138,7 +138,9 @@ export default class ScreenReaderWatcher extends React.Component<*, State> {
             <FeedbackIcon label="speaker icon" size="large" />
           </TitleIcon>
         </Title>
-        <Speech>{this.state.message || defaultMessage}</Speech>
+        <Speech>
+          {this.state.message != null ? this.state.message : defaultMessage}
+        </Speech>
       </Container>
     );
   }

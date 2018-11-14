@@ -157,7 +157,7 @@ export default class Board extends Component<Props, State> {
 
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
-        {containerHeight ? (
+        {containerHeight != null ? (
           <ParentContainer height={containerHeight}>{board}</ParentContainer>
         ) : (
           board

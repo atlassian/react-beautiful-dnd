@@ -25,7 +25,7 @@ const getDroppableOver = (
   droppables: DroppableDimensionMap,
 ): ?DroppableDimension => {
   const id: ?DroppableId = whatIsDraggedOver(impact);
-  return id ? droppables[id] : null;
+  return id != null ? droppables[id] : null;
 };
 
 export default ({ state, type }: Args): ?PublicResult => {

@@ -122,7 +122,7 @@ const cases: Case[] = [
 
 cases.forEach((current: Case) => {
   describe(`for responder: ${current.responder}${
-    current.description ? `: ${current.description}` : ''
+    current.description != null ? `: ${current.description}` : ''
   }`, () => {
     let responders: Responders;
     let announce: Announce;

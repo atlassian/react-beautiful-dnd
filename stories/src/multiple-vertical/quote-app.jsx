@@ -100,7 +100,7 @@ export default class QuoteApp extends Component<Props, State> {
 
   // TODO
   getDisabledDroppable = (sourceDroppable: ?string) => {
-    if (!sourceDroppable) {
+    if (sourceDroppable == null) {
       return null;
     }
 

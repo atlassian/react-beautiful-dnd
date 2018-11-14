@@ -27,9 +27,8 @@ export default ({
 }: Args): Position => {
   const { draggables, droppables } = dimensions;
   const droppableId: ?DroppableId = whatIsDraggedOver(impact);
-  const destination: ?DroppableDimension = droppableId
-    ? droppables[droppableId]
-    : null;
+  const destination: ?DroppableDimension =
+    droppableId != null ? droppables[droppableId] : null;
   const home: DroppableDimension = droppables[draggable.descriptor.droppableId];
 
   const newClientCenter: Position = getClientBorderBoxCenter({

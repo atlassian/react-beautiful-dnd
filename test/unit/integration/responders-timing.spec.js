@@ -48,17 +48,20 @@ it('should call the onBeforeDragStart before connected components are updated, a
   let renderTime: ?DOMHighResTimeStamp = null;
   const responders: Responders = {
     onBeforeDragStart: jest.fn().mockImplementation(() => {
-      invariant(!onBeforeDragStartTime, 'onBeforeDragStartTime already set');
+      invariant(
+        onBeforeDragStartTime == null,
+        'onBeforeDragStartTime already set',
+      );
       onBeforeDragStartTime = performance.now();
     }),
     onDragStart: jest.fn().mockImplementation(() => {
-      invariant(!onDragStartTime, 'onDragStartTime already set');
+      invariant(onDragStartTime == null, 'onDragStartTime already set');
       onDragStartTime = performance.now();
     }),
     onDragEnd: jest.fn(),
   };
   const onItemRender = jest.fn().mockImplementation(() => {
-    invariant(!renderTime, 'renderTime already set');
+    invariant(renderTime == null, 'renderTime already set');
     renderTime = performance.now();
   });
   // Both list and item will have the same dimensions
@@ -108,8 +111,11 @@ it('should call the onBeforeDragStart before connected components are updated, a
   jest.runOnlyPendingTimers();
 
   // checking values are set
-  invariant(onBeforeDragStartTime, 'onBeforeDragStartTime should be set');
-  invariant(onDragStartTime, 'onDragStartTime should be set');
+  invariant(
+    onBeforeDragStartTime != null,
+    'onBeforeDragStartTime should be set',
+  );
+  invariant(onDragStartTime != null, 'onDragStartTime should be set');
   invariant(renderTime, 'renderTime should be set');
 
   // expected order

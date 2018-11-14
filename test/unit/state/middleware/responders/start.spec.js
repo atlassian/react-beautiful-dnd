@@ -62,9 +62,9 @@ it('should call the onBeforeDragState and onDragStart in the correct order', () 
   jest.runOnlyPendingTimers();
 
   // checking the order
-  invariant(onBeforeDragStartCalled);
-  invariant(mockCalled);
-  invariant(onDragStartCalled);
+  invariant(onBeforeDragStartCalled != null);
+  invariant(mockCalled != null);
+  invariant(onDragStartCalled != null);
   expect(mock).toHaveBeenCalledTimes(1);
   expect(onBeforeDragStartCalled).toBeLessThan(mockCalled);
   expect(mockCalled).toBeLessThan(onDragStartCalled);

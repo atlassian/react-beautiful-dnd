@@ -59,7 +59,7 @@ export default ({
   // We need to scroll the best droppable frame we can so that the
   // placeholder buffer logic works correctly
 
-  if (destination) {
+  if (destination != null) {
     const dimension: DroppableDimension = droppables[destination];
     if (!dimension.frame) {
       return null;

@@ -52,7 +52,7 @@ export default class TaskApp extends Component<*, State> {
     );
 
     // if dragging an item that is not selected - unselect all items
-    if (!selected) {
+    if (selected == null) {
       this.unselectAll();
     }
     this.setState({

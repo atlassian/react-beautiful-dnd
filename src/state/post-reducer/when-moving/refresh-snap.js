@@ -36,7 +36,7 @@ Args): StateWhenUpdatesAllowed => {
 
   const draggable: DraggableDimension = draggables[state.critical.draggable.id];
   const isOver: ?DroppableId = whatIsDraggedOver(needsVisibilityCheck);
-  invariant(isOver, 'Must be over a destination in SNAP movement mode');
+  invariant(isOver != null, 'Must be over a destination in SNAP movement mode');
   const destination: DroppableDimension = droppables[isOver];
 
   const impact: DragImpact = recomputeDisplacementVisibility({

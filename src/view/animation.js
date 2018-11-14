@@ -39,7 +39,7 @@ export const transforms = {
   moveTo,
   drop: (offset: Position, isCombining: boolean) => {
     const translate: ?string = moveTo(offset);
-    if (!translate) {
+    if (translate == null) {
       return null;
     }
 

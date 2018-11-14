@@ -42,7 +42,7 @@ export const finish = (key: string) => {
 
     const previous: ?number = records[key];
 
-    if (!previous) {
+    if (previous == null) {
       // eslint-disable-next-line no-console
       console.warn('cannot finish timing as no previous time found', key);
       return;

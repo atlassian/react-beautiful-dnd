@@ -110,7 +110,7 @@ export default class AuthorList extends Component<Props> {
             isDraggingOver={dropSnapshot.isDraggingOver}
             {...dropProvided.droppableProps}
           >
-            {internalScroll ? (
+            {internalScroll === true ? (
               <ScrollContainer>
                 {this.renderBoard(dropProvided)}
               </ScrollContainer>

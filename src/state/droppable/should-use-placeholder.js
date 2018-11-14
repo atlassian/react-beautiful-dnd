@@ -8,7 +8,7 @@ export default (
 ): boolean => {
   // use a placeholder when over a foreign list
   const isOver: ?DroppableId = whatIsDraggedOver(impact);
-  if (!isOver) {
+  if (isOver == null) {
     return false;
   }
   return isOver !== descriptor.droppableId;

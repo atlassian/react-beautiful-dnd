@@ -91,7 +91,7 @@ export const getHomeColumn = (entities: Entities, taskId: TaskId): Column => {
     return column.taskIds.includes(taskId);
   });
 
-  invariant(columnId, 'Count not find column for task');
+  invariant(columnId != null, 'Count not find column for task');
 
   return entities.columns[columnId];
 };

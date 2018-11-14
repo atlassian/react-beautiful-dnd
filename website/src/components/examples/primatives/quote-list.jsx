@@ -97,7 +97,8 @@ type InnerListProps = {|
 class InnerList extends Component<InnerListProps> {
   render() {
     const { quotes, dropProvided } = this.props;
-    const title = this.props.title ? <Title>{this.props.title}</Title> : null;
+    const title =
+      this.props.title != null ? <Title>{this.props.title}</Title> : null;
 
     return (
       <Container>
@@ -141,7 +142,7 @@ export default class QuoteList extends Component<Props> {
             isDropDisabled={isDropDisabled}
             {...dropProvided.droppableProps}
           >
-            {internalScroll ? (
+            {internalScroll === true ? (
               <ScrollContainer>
                 <InnerList
                   quotes={quotes}

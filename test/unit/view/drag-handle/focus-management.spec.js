@@ -168,7 +168,11 @@ describe('Focus retention moving between lists (focus retention between mounts)'
     render() {
       return (
         <DragHandle
-          draggableId={this.props.draggableId || 'draggable'}
+          draggableId={
+            this.props.draggableId != null
+              ? this.props.draggableId
+              : 'draggable'
+          }
           callbacks={getStubCallbacks()}
           isDragging={this.props.isDragging || false}
           isDropAnimating={this.props.isDropAnimating || false}

@@ -45,7 +45,7 @@ export default ({
   });
 
   // not dragging over anything
-  if (!destinationId) {
+  if (destinationId == null) {
     return noImpact;
   }
 

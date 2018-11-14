@@ -64,7 +64,7 @@ const retain = (id: DraggableId) => {
 
 const tryRestoreFocus = (id: DraggableId, draggableRef: HTMLElement) => {
   // Not needing to retain focus
-  if (!retainingFocusFor) {
+  if (retainingFocusFor == null) {
     return;
   }
   // Not needing to retain focus for this draggable

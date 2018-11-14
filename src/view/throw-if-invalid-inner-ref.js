@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 
 export default (ref: ?mixed) => {
   invariant(
-    ref && ref instanceof HTMLElement,
+    ref != null && ref instanceof HTMLElement,
     `
     provided.innerRef has not been provided with a HTMLElement.
 

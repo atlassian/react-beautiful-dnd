@@ -28,7 +28,7 @@ const clearUnusedPlaceholder = ({
   const last: ?DroppableId = whatIsDraggedOver(previousImpact);
   const now: ?DroppableId = whatIsDraggedOver(impact);
 
-  if (!last) {
+  if (last == null) {
     return dimensions;
   }
 
@@ -77,7 +77,7 @@ export default ({
   }
 
   const droppableId: ?DroppableId = whatIsDraggedOver(impact);
-  if (!droppableId) {
+  if (droppableId == null) {
     return base;
   }
   const droppable: DroppableDimension = base.droppables[droppableId];

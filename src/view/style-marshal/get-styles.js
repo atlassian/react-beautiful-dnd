@@ -29,7 +29,7 @@ const getStyles = (rules: Rule[], property: string): string =>
     .map(
       (rule: Rule): string => {
         const value: ?string = rule.styles[property];
-        if (!value) {
+        if (value == null) {
           return '';
         }
 

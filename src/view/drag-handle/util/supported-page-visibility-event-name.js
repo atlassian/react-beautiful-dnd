@@ -23,7 +23,7 @@ const supportedEventName: string = ((): string => {
     (eventName: string): boolean => `on${eventName}` in document,
   );
 
-  return supported || base;
+  return supported != null ? supported : base;
 })();
 
 export default supportedEventName;
