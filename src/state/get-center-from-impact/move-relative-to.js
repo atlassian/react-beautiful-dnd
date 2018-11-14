@@ -21,15 +21,6 @@ const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
   box.padding[axis.end] +
   box.contentBox[axis.size] / 2;
 
-const distanceFromCrossAxisStartToCenter = (
-  axis: Axis,
-  box: BoxModel,
-): number =>
-  box.margin[axis.crossAxisStart] +
-  box.border[axis.crossAxisStart] +
-  box.padding[axis.crossAxisStart] +
-  box.contentBox[axis.crossAxisSize] / 2;
-
 // We align the moving item against the cross axis start of the target
 // We used to align the moving item cross axis center with the cross axis center of the target.
 // However, this leads to a bad experience when reordering columns
@@ -38,8 +29,7 @@ const getCrossAxisCenter = (
   target: Rect,
   isMoving: BoxModel,
 ): number =>
-  target[axis.crossAxisStart] +
-  distanceFromCrossAxisStartToCenter(axis, isMoving);
+  target[axis.crossAxisStart] + isMoving.marginBox[axis.crossAxisSize] / 2;
 
 export const goAfter = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
   patch(
