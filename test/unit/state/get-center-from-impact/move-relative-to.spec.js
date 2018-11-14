@@ -48,25 +48,10 @@ const isMoving: BoxModel = createBox({
 });
 
 const distanceFromStartToCenter = (axis: Axis, box: BoxModel): number =>
-  box.margin[axis.start] +
-  box.border[axis.start] +
-  box.padding[axis.start] +
-  box.contentBox[axis.size] / 2;
+  box.margin[axis.start] + box.borderBox[axis.size] / 2;
 
 const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
-  box.margin[axis.end] +
-  box.border[axis.end] +
-  box.padding[axis.end] +
-  box.contentBox[axis.size] / 2;
-
-const distanceFromCrossAxisStartToCenter = (
-  axis: Axis,
-  box: BoxModel,
-): number =>
-  box.margin[axis.crossAxisStart] +
-  box.border[axis.crossAxisStart] +
-  box.padding[axis.crossAxisStart] +
-  box.contentBox[axis.crossAxisSize] / 2;
+  box.margin[axis.end] + box.borderBox[axis.size] / 2;
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -85,8 +70,8 @@ const distanceFromCrossAxisStartToCenter = (
           distanceFromEndToCenter(axis, isMoving),
         // start at the cross axis start of the item we are moving relative to
         moveRelativeTo.marginBox[axis.crossAxisStart] +
-          // add the space from the start of the dragging item to its center
-          distanceFromCrossAxisStartToCenter(axis, isMoving),
+          isMoving.margin[axis.crossAxisStart] +
+          isMoving.borderBox[axis.crossAxisSize] / 2,
       );
 
       expect(newCenter).toEqual(expected);
@@ -107,8 +92,8 @@ const distanceFromCrossAxisStartToCenter = (
           distanceFromStartToCenter(axis, isMoving),
         // start at the cross axis start of the item we are moving relative to
         moveRelativeTo.marginBox[axis.crossAxisStart] +
-          // add the space from the start of the dragging item to its center
-          distanceFromCrossAxisStartToCenter(axis, isMoving),
+          isMoving.margin[axis.crossAxisStart] +
+          isMoving.borderBox[axis.crossAxisSize] / 2,
       );
 
       expect(newCenter).toEqual(expected);
@@ -129,8 +114,8 @@ const distanceFromCrossAxisStartToCenter = (
           distanceFromStartToCenter(axis, isMoving),
         // start at the cross axis start of the item we are moving relative to
         moveRelativeTo.contentBox[axis.crossAxisStart] +
-          // add the space from the start of the dragging item to its center
-          distanceFromCrossAxisStartToCenter(axis, isMoving),
+          isMoving.margin[axis.crossAxisStart] +
+          isMoving.borderBox[axis.crossAxisSize] / 2,
       );
 
       expect(newCenter).toEqual(expected);
