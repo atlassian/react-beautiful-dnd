@@ -14,6 +14,11 @@ export const linkClassName = (hoverColor: string, isDragging?: boolean) => css`
 
   transition: background-color ease-out 0.1s, color ease 0.2s;
 
+  /* ellipsis */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
   :hover,
   :active,
   :focus {

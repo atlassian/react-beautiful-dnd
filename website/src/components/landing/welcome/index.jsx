@@ -85,7 +85,7 @@ export default () => (
       <SideBySide>
         <Content>
           <Brand>
-            <DraggableLogo size={90} />
+            <DraggableLogo size={90} usePortal={false} />
             <Title>react-beautiful-dnd</Title>
           </Brand>
           <Tagline>

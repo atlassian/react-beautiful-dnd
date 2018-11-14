@@ -99,6 +99,7 @@ const Dance = styled('div')`
 `;
 
 type Props = {|
+  usePortal: boolean,
   size: number,
 |};
 
@@ -111,6 +112,7 @@ type WithPortalProps = {|
   snapshot: DraggableStateSnapshot,
   provided: DraggableProvided,
   size: number,
+  usePortal: boolean,
 |};
 
 class WithPortal extends React.Component<WithPortalProps> {
@@ -133,7 +135,7 @@ class WithPortal extends React.Component<WithPortalProps> {
   };
 
   render() {
-    const { provided, snapshot, size } = this.props;
+    const { provided, snapshot, size, usePortal } = this.props;
     const child: Node = (
       <div
         {...provided.draggableProps}
@@ -153,10 +155,11 @@ class WithPortal extends React.Component<WithPortalProps> {
       </div>
     );
 
-    if (!snapshot.isDragging) {
-      return child;
+    if (usePortal && snapshot.isDragging) {
+      return ReactDOM.createPortal(child, this.getPortal());
     }
-    return ReactDOM.createPortal(child, this.getPortal());
+
+    return child;
   }
 }
 export default class DraggableLogo extends React.Component<Props> {
@@ -178,6 +181,7 @@ export default class DraggableLogo extends React.Component<Props> {
                     provided={provided}
                     snapshot={snapshot}
                     size={this.props.size}
+                    usePortal={this.props.usePortal}
                   />
                 )}
               </Draggable>

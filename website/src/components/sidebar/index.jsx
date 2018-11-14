@@ -102,7 +102,6 @@ const DocsSection = ({
         return link;
       },
     );
-  console.log('rendering section', title);
 
   return (
     <Section>

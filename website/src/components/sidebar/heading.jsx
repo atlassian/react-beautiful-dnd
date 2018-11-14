@@ -66,7 +66,7 @@ const GithubLink = styled('a')`
 export default () => (
   <Container>
     <HomeLink to="/">
-      <SmallLogo size={iconSize} />
+      <SmallLogo size={iconSize} usePortal />
       <Title>rbd</Title>
     </HomeLink>
     <GithubLink href="https://github.com/atlassian/react-beautiful-dnd">
