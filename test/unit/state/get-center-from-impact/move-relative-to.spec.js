@@ -48,16 +48,10 @@ const isMoving: BoxModel = createBox({
 });
 
 const distanceFromStartToCenter = (axis: Axis, box: BoxModel): number =>
-  box.margin[axis.start] +
-  box.border[axis.start] +
-  box.padding[axis.start] +
-  box.contentBox[axis.size] / 2;
+  box.margin[axis.start] + box.borderBox[axis.size] / 2;
 
 const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
-  box.margin[axis.end] +
-  box.border[axis.end] +
-  box.padding[axis.end] +
-  box.contentBox[axis.size] / 2;
+  box.margin[axis.end] + box.borderBox[axis.size] / 2;
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -76,7 +70,8 @@ const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
           distanceFromEndToCenter(axis, isMoving),
         // start at the cross axis start of the item we are moving relative to
         moveRelativeTo.marginBox[axis.crossAxisStart] +
-          isMoving.marginBox[axis.crossAxisSize] / 2,
+          isMoving.margin[axis.crossAxisStart] +
+          isMoving.borderBox[axis.crossAxisSize] / 2,
       );
 
       expect(newCenter).toEqual(expected);
@@ -97,7 +92,8 @@ const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
           distanceFromStartToCenter(axis, isMoving),
         // start at the cross axis start of the item we are moving relative to
         moveRelativeTo.marginBox[axis.crossAxisStart] +
-          isMoving.marginBox[axis.crossAxisSize] / 2,
+          isMoving.margin[axis.crossAxisStart] +
+          isMoving.borderBox[axis.crossAxisSize] / 2,
       );
 
       expect(newCenter).toEqual(expected);
@@ -118,7 +114,8 @@ const distanceFromEndToCenter = (axis: Axis, box: BoxModel): number =>
           distanceFromStartToCenter(axis, isMoving),
         // start at the cross axis start of the item we are moving relative to
         moveRelativeTo.contentBox[axis.crossAxisStart] +
-          isMoving.marginBox[axis.crossAxisSize] / 2,
+          isMoving.margin[axis.crossAxisStart] +
+          isMoving.borderBox[axis.crossAxisSize] / 2,
       );
 
       expect(newCenter).toEqual(expected);
