@@ -5,16 +5,18 @@ import styled from 'react-emotion';
 import GithubIcon from 'react-icons/lib/fa/github';
 import { grid, colors, gutter } from '../../constants';
 import spacing from './spacing';
-import Logo from '../logo';
+import DraggableLogo from '../draggable-logo';
 
 const iconSize: number = grid * 4;
 
 const Container = styled('div')`
   display: flex;
+  align-items: center;
 `;
 
 const Title = styled('h2')`
   margin: 0;
+  padding-left: ${grid}px;
 `;
 
 const transitionColor = `transition: color 0.2s ease`;
@@ -40,8 +42,7 @@ const HomeLink = styled(Link)`
   align-items: center;
 `;
 
-const SmallLogo = styled(Logo)`
-  height: ${iconSize}px;
+const SmallLogo = styled(DraggableLogo)`
   padding-right: ${gutter.normal}px;
   flex-grow: 0;
 `;
@@ -65,7 +66,7 @@ const GithubLink = styled('a')`
 export default () => (
   <Container>
     <HomeLink to="/">
-      <SmallLogo />
+      <SmallLogo size={iconSize} />
       <Title>rbd</Title>
     </HomeLink>
     <GithubLink href="https://github.com/atlassian/react-beautiful-dnd">

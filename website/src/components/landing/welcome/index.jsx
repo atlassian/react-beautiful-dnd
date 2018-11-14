@@ -5,7 +5,7 @@ import styled from 'react-emotion';
 import Board from './board';
 import CallToAction from './call-to-action';
 import SocialIcons from './social-icons';
-import DraggableLogo from './draggable-logo';
+import DraggableLogo from '../../draggable-logo';
 import { grid, gutter } from '../../../constants';
 import { smallView } from '../../media';
 
@@ -85,7 +85,7 @@ export default () => (
       <SideBySide>
         <Content>
           <Brand>
-            <DraggableLogo />
+            <DraggableLogo size={90} />
             <Title>react-beautiful-dnd</Title>
           </Brand>
           <Tagline>

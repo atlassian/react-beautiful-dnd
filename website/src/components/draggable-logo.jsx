@@ -1,14 +1,14 @@
 // @flow
 import React from 'react';
 import styled, { keyframes } from 'react-emotion';
-import Logo from '../../logo';
-import { DragDropContext, Droppable, Draggable } from '../../../../../src';
+import Logo from './logo';
+import { DragDropContext, Droppable, Draggable } from '../../../src';
 import type {
   DraggableProvided,
   DraggableStateSnapshot,
   DroppableProvided,
   DropAnimation,
-} from '../../../../../src';
+} from '../../../src';
 
 const rotation: number = 10;
 const hueRotation: number = 150;
@@ -96,7 +96,11 @@ const Dance = styled('div')`
   ${props => getAnimation(props.isDragging, props.dropAnimation)};
 `;
 
-export default class DraggableLogo extends React.Component<*> {
+type Props = {|
+  size: number,
+|};
+
+export default class DraggableLogo extends React.Component<Props> {
   render() {
     return (
       <DragDropContext onDragEnd={() => {}}>
@@ -119,8 +123,12 @@ export default class DraggableLogo extends React.Component<*> {
                     <Dance
                       isDragging={snapshot.isDragging}
                       dropAnimation={snapshot.dropAnimation}
+                      style={{
+                        width: this.props.size,
+                        height: this.props.size,
+                      }}
                     >
-                      <Logo width={90} />
+                      <Logo size={this.props.size} />
                     </Dance>
                   </div>
                 )}
