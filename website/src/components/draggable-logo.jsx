@@ -1,6 +1,8 @@
 // @flow
-import React from 'react';
+import React, { type Node } from 'react';
+import ReactDOM from 'react-dom';
 import styled, { keyframes } from 'react-emotion';
+import invariant from 'tiny-invariant';
 import Logo from './logo';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import type {
@@ -100,6 +102,63 @@ type Props = {|
   size: number,
 |};
 
+const getBody = (): HTMLBodyElement => {
+  invariant(document.body);
+  return document.body;
+};
+
+type WithPortalProps = {|
+  snapshot: DraggableStateSnapshot,
+  provided: DraggableProvided,
+  size: number,
+|};
+
+class WithPortal extends React.Component<WithPortalProps> {
+  portal: ?HTMLElement = null;
+
+  componentDidMount() {
+    const portal: HTMLElement = document.createElement('div');
+    getBody().appendChild(portal);
+    this.portal = portal;
+  }
+
+  componentWillUnmount() {
+    getBody().removeChild(this.getPortal());
+    this.portal = null;
+  }
+
+  getPortal = (): HTMLElement => {
+    invariant(this.portal);
+    return this.portal;
+  };
+
+  render() {
+    const { provided, snapshot, size } = this.props;
+    const child: Node = (
+      <div
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        ref={provided.innerRef}
+      >
+        <Dance
+          isDragging={snapshot.isDragging}
+          dropAnimation={snapshot.dropAnimation}
+          style={{
+            width: size,
+            height: size,
+          }}
+        >
+          <Logo size={size} />
+        </Dance>
+      </div>
+    );
+
+    if (!snapshot.isDragging) {
+      return child;
+    }
+    return ReactDOM.createPortal(child, this.getPortal());
+  }
+}
 export default class DraggableLogo extends React.Component<Props> {
   render() {
     return (
@@ -115,22 +174,11 @@ export default class DraggableLogo extends React.Component<Props> {
                   provided: DraggableProvided,
                   snapshot: DraggableStateSnapshot,
                 ) => (
-                  <div
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    ref={provided.innerRef}
-                  >
-                    <Dance
-                      isDragging={snapshot.isDragging}
-                      dropAnimation={snapshot.dropAnimation}
-                      style={{
-                        width: this.props.size,
-                        height: this.props.size,
-                      }}
-                    >
-                      <Logo size={this.props.size} />
-                    </Dance>
-                  </div>
+                  <WithPortal
+                    provided={provided}
+                    snapshot={snapshot}
+                    size={this.props.size}
+                  />
                 )}
               </Draggable>
               {droppableProvided.placeholder}

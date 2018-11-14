@@ -11,7 +11,7 @@ import LinkList from './reorderable-links';
 import spacing from './spacing';
 import { linkClassName, isActiveClassName } from './link-class-name';
 
-const Sidebar = styled('div')`
+const ScrollContainer = styled('div')`
   height: 100vh;
   width: ${sidebarWidth}px;
   box-sizing: border-box;
@@ -80,10 +80,16 @@ type Props = {
 type DocsSectionProps = {
   title: string,
   directory: string,
+  hoverColor: string,
   pages: MarkdownPage[],
 };
 
-const DocsSection = ({ title, pages, directory }: DocsSectionProps) => {
+const DocsSection = ({
+  title,
+  pages,
+  directory,
+  hoverColor,
+}: DocsSectionProps) => {
   const links: NavLink[] = pages
     .filter((page: MarkdownPage): boolean => directory === page.node.fields.dir)
     .map(
@@ -96,35 +102,43 @@ const DocsSection = ({ title, pages, directory }: DocsSectionProps) => {
         return link;
       },
     );
+  console.log('rendering section', title);
 
   return (
     <Section>
       <Title>{title}</Title>
-      <LinkList links={links} hoverColor={colors.purple300} />
+      <LinkList links={links} hoverColor={hoverColor} />
     </Section>
   );
 };
 
-export default ({ docs, examples }: Props) => (
-  <Sidebar>
-    <Heading />
-    <Section>
-      <Link
-        to="/get-started"
-        style={{ paddingLeft: 0 }}
-        className={linkClassName(colors.blue500)}
-        activeClassName={isActiveClassName(colors.blue500)}
-      >
-        <Title>Get started</Title>
-      </Link>
-    </Section>
-    <DocsSection
-      pages={docs.edges}
-      title="Core concepts"
-      directory="core-concepts"
-    />
-    <DocsSection pages={docs.edges} title="Guides" directory="guides" />
-    <DocsSection pages={docs.edges} title="API" directory="api" />
-    <ExampleSection examples={examples} title="Examples" />
-  </Sidebar>
-);
+export default class Sidebar extends React.PureComponent<Props> {
+  render() {
+    const { docs, examples } = this.props;
+    return (
+      <ScrollContainer>
+        <Heading />
+        <Section>Search goes here</Section>
+        <DocsSection
+          pages={docs.edges}
+          title="Get started"
+          directory="get-started"
+          hoverColor={colors.blue500}
+        />
+        <DocsSection
+          pages={docs.edges}
+          title="Guides"
+          directory="guides"
+          hoverColor={colors.purple500}
+        />
+        <DocsSection
+          pages={docs.edges}
+          title="API"
+          directory="api"
+          hoverColor={colors.purple500}
+        />
+        <ExampleSection examples={examples} title="Examples" />
+      </ScrollContainer>
+    );
+  }
+}

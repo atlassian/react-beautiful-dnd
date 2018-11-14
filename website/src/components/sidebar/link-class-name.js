@@ -24,5 +24,6 @@ export const linkClassName = (hoverColor: string, isDragging?: boolean) => css`
 `;
 
 export const isActiveClassName = (color: string) => css`
+  color: ${colors.dark100};
   background-color: ${color};
 `;
