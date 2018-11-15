@@ -1,5 +1,7 @@
 # How we detect scroll containers
 
+> Generally you will not need to read this guide 😊. Detection of scroll containers "should just work". However, if you are having issues with it you can dig more deeply into this guide 🕵️‍
+
 `react-beautiful-dnd` will automatically detect the scroll containers for your application when a drag is starting. It does this by looking at the computed `overflowX` and `overflowY` values of an element
 
 > Setting `overflow: value` will set the computed `overflow-x` and `overflow-y` to `value`
