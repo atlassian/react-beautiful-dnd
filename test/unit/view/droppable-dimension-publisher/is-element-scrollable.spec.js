@@ -42,6 +42,25 @@ describe('overflow hidden', () => {
     expect(getClosestScrollable(el)).toBe(null);
   });
 
+  it('should return true if overflow:scroll on one axis', () => {
+    // vertical
+    {
+      const el: HTMLElement = document.createElement('div');
+      el.style.overflowX = 'hidden';
+      el.style.overflowY = 'scroll';
+
+      expect(getClosestScrollable(el)).toBe(el);
+    }
+    // horizontal
+    {
+      const el: HTMLElement = document.createElement('div');
+      el.style.overflowX = 'scroll';
+      el.style.overflowY = 'hidden';
+
+      expect(getClosestScrollable(el)).toBe(el);
+    }
+  });
+
   it('should return true if there is overflow scroll (and log a warning)', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {});
     // vertical
