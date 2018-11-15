@@ -56,6 +56,17 @@ const isElementScrollable = (el: Element): boolean => {
     return false;
   }
 
+  // one axis is explicitly a scroll container - we know it is a scroll container
+  if (
+    isEqual(computed.overflowX, scroll) ||
+    isEqual(computed.overflowY, scroll)
+  ) {
+    return true;
+  }
+
+  // At this point, we have to try to look at some DOM api's to see if the element is scrollable
+  // This path will always log a warning
+
   const hasScrollOverflow: boolean = isCurrentlyOverflowed(el);
 
   if (process.env.NODE_ENV !== 'production') {
@@ -65,12 +76,15 @@ const isElementScrollable = (el: Element): boolean => {
   }
   warning(`
     We are attempting to figure out the scroll containers for your application.
-    We have detected an element with an overflow property set to hidden:
+    We have detected an element with only one overflow property set to hidden:
     ${JSON.stringify(computed)}
 
     We are falling back to a weaker spacing check to see if the element is scrollable
+    Fallback result: ${
+      hasScrollOverflow ? 'is a scroll container' : 'is not a scroll container'
+    }
 
-    Is a scroll container? ${hasScrollOverflow ? 'yes' : 'no'}
+    See https://github.com/atlassian/react-beautiful-dnd/docs/guides/how-we-detect-scroll-containers.md
   `);
 
   return hasScrollOverflow;
