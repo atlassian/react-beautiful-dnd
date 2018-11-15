@@ -30,7 +30,7 @@ type Node = {
   parent: any,
 }
 
-type nodeField = { node: Node,  name: string, value: string }
+type nodeField = { node: Node, name: string, value: string | number }
 
 type markdownEdge = {
   node: {
@@ -38,6 +38,7 @@ type markdownEdge = {
       slug: string,
       dir: string,
       name: string,
+      order: number,
     }
   }
 }
@@ -92,6 +93,12 @@ const capitalise = value => {
 const addMD = async ({ getNode, node, createNodeField }) => {
   const fileNode = getNode(node.parent);
   const parsedFilePath = path.parse(fileNode.relativePath);
+
+  const order: number = (() => {
+    // TODO
+    return 1;
+  })();
+
   const name = parsedFilePath.name.replace(/^\d-/, '');
 
   // Can be the empty string if no parent
@@ -133,6 +140,11 @@ const addMD = async ({ getNode, node, createNodeField }) => {
     name: 'dir',
     value: directory,
   });
+  createNodeField({
+    node,
+    name: 'order',
+    value: 1,
+  });
 };
 
 const addRaw = (node, createNodeField) => {
@@ -163,7 +175,7 @@ exports.createPages = ({ graphql, actions } /* : NodeParams */) => {
       graphql(
         `
           {
-            allMarkdownRemark {
+            allMarkdownRemark(sort: { order: DESC, fields: fileAbsolutePath }) {
               edges {
                 node {
                   fields {
