@@ -24,27 +24,27 @@ We have a hard time detecting if an element is a scroll container when:
 - `overflow-*` is set to `hidden` on only one axis
 - we detect an `auto` value on the other `overflow-*`
 
-| Case                                         | Is a scroll container? | Can safely detect? | Notes                                |
-| -------------------------------------------- | ---------------------- | ------------------ | ------------------------------------ |
-| `overflow: auto`                             | Yes                    | Yes ✅             |                                      |
-| `overflow: scroll`                           | Yes                    | Yes ✅             |                                      |
-| `overflow: hidden`                           | No                     | Yes ✅             |                                      |
-| `overflow-x: visible`, `overflow-y: visible` | No                     | Yes ✅             |                                      |
-| `overflow-x: visible`, `overflow-y: auto`    | Yes                    | Yes ✅             |                                      |
-| `overflow-x: visible`, `overflow-y: scroll`  | Yes                    | Yes ✅             |                                      |
-| `overflow-x: visible`, `overflow-y: hidden`  | Yes                    | No 🛑              |                                      |
-| `overflow-x: auto`, `overflow-y: visible`    | Yes                    | Yes ✅             |                                      |
-| `overflow-x: auto`, `overflow-y: auto`       | Yes                    | Yes ✅             |                                      |
-| `overflow-x: auto`, `overflow-y: scroll`     | Yes                    | Yes ✅             |                                      |
-| `overflow-x: auto`, `overflow-y: hidden`     | Yes                    | No 🛑              |                                      |
-| `overflow-x: scroll`, `overflow-y: visible`  | Yes                    | Yes ✅             |                                      |
-| `overflow-x: scroll`, `overflow-y: auto`     | Yes                    | Yes ✅             |                                      |
-| `overflow-x: scroll`, `overflow-y: scroll`   | Yes                    | Yes ✅             |                                      |
-| `overflow-x: scroll`, `overflow-y: hidden`   | Yes                    | Yes ✅             | `overflow-x` will remain as `scroll` |
-| `overflow-x: hidden`, `overflow-y: visible`  | No                     | No 🛑              |                                      |
-| `overflow-x: hidden`, `overflow-y: auto`     | Yes                    | No 🛑              |                                      |
-| `overflow-x: hidden`, `overflow-y: scroll`   | Yes                    | No 🛑              |                                      |
-| `overflow-x: hidden`, `overflow-y: hidden`   | No                     | Yes ✅             |                                      |
+| Case                                         | Is a scroll container? | Can safely detect? |
+| -------------------------------------------- | ---------------------- | ------------------ |
+| `overflow: auto`                             | Yes                    | Yes ✅             |
+| `overflow: scroll`                           | Yes                    | Yes ✅             |
+| `overflow: hidden`                           | No                     | Yes ✅             |
+| `overflow-x: visible`, `overflow-y: visible` | No                     | Yes ✅             |
+| `overflow-x: visible`, `overflow-y: auto`    | Yes                    | Yes ✅             |
+| `overflow-x: visible`, `overflow-y: scroll`  | Yes                    | Yes ✅             |
+| `overflow-x: visible`, `overflow-y: hidden`  | Yes                    | No 🛑              |
+| `overflow-x: auto`, `overflow-y: visible`    | Yes                    | Yes ✅             |
+| `overflow-x: auto`, `overflow-y: auto`       | Yes                    | Yes ✅             |
+| `overflow-x: auto`, `overflow-y: scroll`     | Yes                    | Yes ✅             |
+| `overflow-x: auto`, `overflow-y: hidden`     | Yes                    | No 🛑              |
+| `overflow-x: scroll`, `overflow-y: visible`  | Yes                    | Yes ✅             |
+| `overflow-x: scroll`, `overflow-y: auto`     | Yes                    | Yes ✅             |
+| `overflow-x: scroll`, `overflow-y: scroll`   | Yes                    | Yes ✅             |
+| `overflow-x: scroll`, `overflow-y: hidden`   | Yes                    | Yes ✅             |
+| `overflow-x: hidden`, `overflow-y: visible`  | No                     | No 🛑              |
+| `overflow-x: hidden`, `overflow-y: auto`     | Yes                    | No 🛑              |
+| `overflow-x: hidden`, `overflow-y: scroll`   | Yes                    | No 🛑              |
+| `overflow-x: hidden`, `overflow-y: hidden`   | No                     | Yes ✅             |
 
 ### What can you do to help?
 
