@@ -15,7 +15,7 @@ If `react-beautiful-dnd` finds an element that has a computed `overflowX` or `ov
 
 `document.body` and `document.documentElement` will not be marked as scroll containers. When they scroll they fire scroll events on the `window`. It does not matter what `overflow` related properties you set on these elements, they will not be considered.
 
-## Edge case: only one hidden overflow
+## Edge case: only `hidden` overflow on one axis
 
 If you set `overflow: hidden`, or both `overflow-x: hidden` and `overflow-y: hidden` then the element will not be marked as a scroll container. All good ✌️.
 
