@@ -54,3 +54,5 @@ So if the `scroll*` is greater than `client*` we know that there is currently ov
 const isCurrentlyOverflowed = (el: Element): boolean =>
   el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientWidth;
 ```
+
+We have created a [playground on `codepen`](https://codepen.io/alexreardon/pen/ZmyLgX?editors=1111) if you want to have a play with body overflow behaviour. It is wild!
