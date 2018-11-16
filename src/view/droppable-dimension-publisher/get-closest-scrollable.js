@@ -34,13 +34,10 @@ const isCurrentlyOverflowed = (el: Element): boolean =>
 // Special case for a body element
 // Playground: https://codepen.io/alexreardon/pen/ZmyLgX?editors=1111
 const isBodyScrollable = (el: Element): boolean => {
-  // if the body is not 'scrollable' then it won't be a scroll container
+  // 1. The `body` has `overflow-[x|y]: auto | scroll`
   if (!isElementScrollable(el)) {
     return false;
   }
-
-  // body can become a scroll container if the document.documentElement (html)
-  // element has `overflow-[x|y]` set to anything except `hidden`
 
   const html: ?Element = el.parentElement;
   invariant(
@@ -54,7 +51,7 @@ const isBodyScrollable = (el: Element): boolean => {
     overflowY: style.overflowY,
   };
 
-  // scrollbar will be on html
+  // 2. The parent of `body` (`html`) has an `overflow-[x|y]` set to anything except `visible` AND
   if (
     isEqual(parent.overflowX, visible) &&
     isEqual(parent.overflowY, visible)
@@ -62,6 +59,7 @@ const isBodyScrollable = (el: Element): boolean => {
     return false;
   }
 
+  // 3. There is a current overflow in the `body`
   return isCurrentlyOverflowed(el);
 };
 
