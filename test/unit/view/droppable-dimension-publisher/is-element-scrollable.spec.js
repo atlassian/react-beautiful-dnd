@@ -195,3 +195,85 @@ describe('overflow hidden', () => {
     console.warn.mockReset();
   });
 });
+
+type OverflowValue = 'visible' | 'scroll' | 'auto' | 'hidden';
+type Case = {|
+  overflowX: OverflowValue,
+  overflowY: OverflowValue,
+  isScrollContainer: boolean,
+  canDetectSafely: boolean,
+|};
+
+describe('conditional fallback', () => {
+  // designed to match grid in `docs/guides/how-we-detect-scroll-containers.md`
+  const No: boolean = false;
+  const Yes: boolean = true;
+  // prettier-ignore
+  const cases: Case[] = [
+    { overflowX: 'visible', overflowY: 'visible', isScrollContainer: No, canDetectSafely: Yes, },
+    { overflowX: 'visible', overflowY: 'auto', isScrollContainer: Yes, canDetectSafely: Yes, },
+    { overflowX: 'visible', overflowY: 'scroll', isScrollContainer: Yes, canDetectSafely: Yes, },
+    { overflowX: 'visible', overflowY: 'hidden', isScrollContainer: No, canDetectSafely: No, },
+    { overflowX: 'auto', overflowY: 'visible', isScrollContainer: Yes, canDetectSafely: Yes, },
+    { overflowX: 'auto', overflowY: 'auto', isScrollContainer: Yes, canDetectSafely: Yes, },
+    { overflowX: 'auto', overflowY: 'scroll', isScrollContainer: Yes, canDetectSafely: Yes, },
+    { overflowX: 'auto', overflowY: 'hidden', isScrollContainer: Yes, canDetectSafely: No, },
+    { overflowX: 'scroll', overflowY: 'visible', isScrollContainer: Yes, canDetectSafely: Yes, },
+    { overflowX: 'scroll', overflowY: 'auto', isScrollContainer: Yes, canDetectSafely: Yes, },
+    { overflowX: 'scroll', overflowY: 'scroll', isScrollContainer: Yes, canDetectSafely: Yes, },
+    { overflowX: 'scroll', overflowY: 'hidden', isScrollContainer: Yes, canDetectSafely: Yes, },
+    { overflowX: 'hidden', overflowY: 'visible', isScrollContainer: No, canDetectSafely: No, },
+    { overflowX: 'hidden', overflowY: 'auto', isScrollContainer: Yes, canDetectSafely: No, },
+    { overflowX: 'hidden', overflowY: 'scroll', isScrollContainer: Yes, canDetectSafely: Yes, },
+    { overflowX: 'hidden', overflowY: 'hidden', isScrollContainer: No, canDetectSafely: Yes, },
+  ];
+
+  beforeEach(() => {
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    console.warn.mockReset();
+  });
+
+  cases.forEach((current: Case) => {
+    it(`overflow-x:${current.overflowX} overflow-y:${
+      current.overflowY
+    }`, () => {
+      const el: HTMLElement = document.createElement('div');
+      el.style.overflowY = current.overflowY;
+      el.style.overflowX = current.overflowX;
+
+      // need to setup a scroll container for detection if needed
+      if (!current.canDetectSafely && current.isScrollContainer) {
+        // there is a scrollable area
+        Object.defineProperties(el, {
+          scrollWidth: {
+            writable: true,
+            value: 200,
+          },
+          clientWidth: {
+            writable: true,
+            value: 100,
+          },
+          scrollHeight: {
+            writable: true,
+            value: 200,
+          },
+          clientHeight: {
+            writable: true,
+            value: 100,
+          },
+        });
+      }
+
+      expect(getClosestScrollable(el)).toBe(
+        current.isScrollContainer ? el : null,
+      );
+
+      expect(console.warn).toHaveBeenCalledTimes(
+        current.canDetectSafely ? 0 : 1,
+      );
+    });
+  });
+});

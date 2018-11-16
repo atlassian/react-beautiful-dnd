@@ -1,18 +1,16 @@
 // @flow
-import { warning } from '../../dev-warning';
+import invariant from 'tiny-invariant';
+
+const visible: string = 'visible';
+const scroll: string = 'scroll';
+const auto: string = 'auto';
 
 type Overflow = {|
   overflowX: string,
   overflowY: string,
 |};
 
-const hidden: string = 'hidden';
-const scroll: string = 'scroll';
-const auto: string = 'auto';
 const isEqual = (a: string, b: string) => a === b;
-
-const isOverflowHidden = ({ overflowX, overflowY }: Overflow): boolean =>
-  isEqual(overflowX, hidden) || isEqual(overflowY, hidden);
 
 const isOverflowScrollable = ({ overflowX, overflowY }: Overflow): boolean =>
   isEqual(overflowX, scroll) ||
@@ -20,74 +18,51 @@ const isOverflowScrollable = ({ overflowX, overflowY }: Overflow): boolean =>
   isEqual(overflowX, auto) ||
   isEqual(overflowY, auto);
 
-// https://twitter.com/alexandereardon/status/1058210532824616960
-const isCurrentlyOverflowed = (el: Element): boolean =>
-  el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientWidth;
-
 const isElementScrollable = (el: Element): boolean => {
-  // body and document.documentElement cannot be a scroll container
-  // scroll on these will occur on the window / document
-  if (el === document.body || el === document.documentElement) {
-    return false;
-  }
-
   const style: CSSStyleDeclaration = window.getComputedStyle(el);
   const computed: Overflow = {
     overflowX: style.overflowX,
     overflowY: style.overflowY,
   };
 
-  // standard check
-  if (!isOverflowHidden(computed)) {
-    return isOverflowScrollable(computed);
+  return isOverflowScrollable(computed);
+};
+
+const isCurrentlyOverflowed = (el: Element): boolean =>
+  el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight;
+
+// Special case for a body element
+// Playground: https://codepen.io/alexreardon/pen/ZmyLgX?editors=1111
+const isBodyScrollable = (el: Element): boolean => {
+  // if the body is not 'scrollable' then it won't be a scroll container
+  if (!isElementScrollable(el)) {
+    return false;
   }
 
-  // We have encountered an element with overflowY or overflowX set to hidden
-  // when overflow-x: hidden or overflow-y: hidden then the opposite will be computed as 'auto'
-  // https://www.w3.org/TR/css-overflow-3/#overflow-properties
+  // body can become a scroll container if the document.documentElement (html)
+  // element has `overflow-[x|y]` set to anything except `hidden`
 
-  // So we need to try some alternative mechanisms to see if it is scrollable
+  const html: ?Element = el.parentElement;
+  invariant(
+    html && html === document.documentElement,
+    'Unexpected parent of body',
+  );
 
-  // both properties set to hidden - not a scroll container
+  const style: CSSStyleDeclaration = window.getComputedStyle(html);
+  const parent: Overflow = {
+    overflowX: style.overflowX,
+    overflowY: style.overflowY,
+  };
+
+  // scrollbar will be on html
   if (
-    isEqual(computed.overflowX, hidden) &&
-    isEqual(computed.overflowY, hidden)
+    isEqual(parent.overflowX, visible) &&
+    isEqual(parent.overflowY, visible)
   ) {
     return false;
   }
 
-  // one axis is explicitly a scroll container - we know it is a scroll container
-  if (
-    isEqual(computed.overflowX, scroll) ||
-    isEqual(computed.overflowY, scroll)
-  ) {
-    return true;
-  }
-
-  // At this point, we have to try to look at some DOM api's to see if the element is scrollable
-  // This path will always log a warning
-
-  const hasScrollOverflow: boolean = isCurrentlyOverflowed(el);
-
-  if (process.env.NODE_ENV !== 'production') {
-    // logging the raw element for easier debugging
-    // eslint-disable-next-line
-    console.warn(el);
-  }
-  warning(`
-    We are attempting to figure out the scroll containers for your application.
-    We have detected an element with only one overflow property set to hidden:
-    ${JSON.stringify(computed)}
-
-    We are falling back to a weaker spacing check to see if the element is scrollable
-    Fallback result: ${
-      hasScrollOverflow ? 'is a scroll container' : 'is not a scroll container'
-    }
-
-    See https://github.com/atlassian/react-beautiful-dnd/docs/guides/how-we-detect-scroll-containers.md
-  `);
-
-  return hasScrollOverflow;
+  return isCurrentlyOverflowed(el);
 };
 
 const getClosestScrollable = (el: ?Element): ?Element => {
@@ -95,6 +70,17 @@ const getClosestScrollable = (el: ?Element): ?Element => {
   if (el == null) {
     return null;
   }
+
+  // not allowing us to go higher then body
+  if (el === document.body) {
+    return isBodyScrollable(el) ? el : null;
+  }
+
+  // just being really clear
+  invariant(
+    el !== document.documentElement,
+    'Should not get to document.documentElement in recursion',
+  );
 
   if (!isElementScrollable(el)) {
     return getClosestScrollable(el.parentElement);
