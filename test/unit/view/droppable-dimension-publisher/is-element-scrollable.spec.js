@@ -29,7 +29,7 @@ describe('body detection', () => {
   // 3. There is a current overflow in the `body`
   const body: ?Element = document.body;
   invariant(body);
-  invariant(body instanceof HTMLElement);
+  invariant(body instanceof HTMLBodyElement);
   const html: ?Element = body.parentElement;
   invariant(html);
   invariant(html === document.documentElement);
@@ -44,6 +44,11 @@ describe('body detection', () => {
   beforeEach(() => {
     reset(body);
     reset(html);
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    console.warn.mockReset();
   });
 
   afterAll(() => {
@@ -51,65 +56,24 @@ describe('body detection', () => {
     reset(html);
   });
 
-  it('should mark he body as a scroll container if all criteria are met', () => {
+  it('should warn if the body might be a scroll container', () => {
     body.style.overflowX = 'auto';
     html.style.overflowY = 'auto';
-    // ensuring body has overflow
-    Object.defineProperties(body, {
-      scrollHeight: {
-        writable: true,
-        value: 100,
-      },
-      clientHeight: {
-        writable: true,
-        value: 50,
-      },
-      scrollWidth: {
-        writable: true,
-        value: 10,
-      },
-      clientWidth: {
-        writable: true,
-        value: 10,
-      },
-    });
-    expect(getClosestScrollable(body)).toBe(body);
+
+    expect(getClosestScrollable(body)).toBe(null);
+    expect(console.warn).toHaveBeenCalled();
   });
 
   it('should not mark the body as a scroll container if it does not have any overflow set', () => {
     body.style.overflowX = 'visible';
     expect(getClosestScrollable(body)).toBe(null);
+    expect(console.warn).not.toHaveBeenCalled();
   });
 
   it('should not mark the body as a scroll container if the html element has visible overflow', () => {
     body.style.overflowX = 'auto';
     html.style.overflowY = 'visible';
     expect(getClosestScrollable(body)).toBe(null);
-  });
-
-  it('should not mark he body as a scroll container if there is no content overflow', () => {
-    body.style.overflowX = 'auto';
-    html.style.overflowY = 'scroll';
-    // no body overflow
-    Object.defineProperties(body, {
-      scrollHeight: {
-        writable: true,
-        value: 100,
-      },
-      clientHeight: {
-        writable: true,
-        value: 100,
-      },
-      // don't care about these ones
-      scrollWidth: {
-        writable: true,
-        value: 10,
-      },
-      clientWidth: {
-        writable: true,
-        value: 10,
-      },
-    });
-    expect(getClosestScrollable(body)).toBe(null);
+    expect(console.warn).not.toHaveBeenCalled();
   });
 });
