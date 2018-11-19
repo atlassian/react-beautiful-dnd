@@ -20,7 +20,7 @@ const throwIfSVG = (el: mixed) => {
     !isSVG(el),
     `A drag handle cannot be an SVGElement: it has inconsistent focus support.
 
-    More information: https://github.com/atlassian/react-beautiful-dnd/docs/guides/dragging-svgs.md`,
+    More information: https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/dragging-svgs.md`,
   );
 };
 
