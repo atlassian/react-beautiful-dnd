@@ -14,9 +14,9 @@ The css property `overflow` (and `overflow-x`, `overflow-y`) controls what happe
 
 ### `overflow` values
 
-- `visible`: _(default)_ content will grow beyond boundary of any containing box without any clipping or scrollbars
-- `scroll`: clip overflow and always show a scrollbar, even if there is no content being overflowed
-- `auto`: clip overflow and only show scrollbar if there is any content in the overflow
+- `visible`: _(default)_ content will grow beyond boundary of any containing box without any clipping or scroll bars
+- `scroll`: clip overflow and always show a scroll bar, even if there is no content being overflowed
+- `auto`: clip overflow and only show scroll bar if there is any content in the overflow
 
 ### Shorthand
 
@@ -30,9 +30,9 @@ If only one axis has `overflow-[x|y]: hidden` and the other is `visible` _(the d
 >
 > - https://www.w3.org/TR/css-overflow-3/#overflow-properties
 
-## `document.body`
+## `<body>`
 
-`document.body` (`body`) is different from `document.documentElement` (the `html` element). Any scroll on the `html` element is considered a `window` scroll. Most of the time any scroll bar that would have appeared on the `body` will be merged with the `html` scroll bar. However, there are situations where they can have different scrollable areas.
+`document.body` (`<body>`) is different from `document.documentElement` (the `<html>` element). Any scroll on the `html` element is considered a `window` scroll. Most of the time any scroll bar that would have appeared on the `body` will be merged with the `html` scroll bar. However, there are situations where they can have different scrollable areas.
 
 ⚠️ We have not been able to find a reliable cross browser mechanism for detecting if a `body` has an independent scroll bar to the `html` element.
 
@@ -50,19 +50,9 @@ We have some playgrounds on `codepen` that can be a good start for digging into 
 - [scroll height on `body`](https://codepen.io/alexreardon/pen/RqLxPq)
 - [algorithm test](https://codepen.io/alexreardon/pen/RqLVNP?editors=1111)
 - [scroll height on a `div`](https://codepen.io/alexreardon/pen/xQXdKm?editors=1111)
-- [another `body` playground](https://codepen.io/alexreardon/pen/oQGeea?editors=1111)
+- [another `body` playground](https://codepen.io/alexreardon/pen/oQGeea?editors=1111) things get weird
+- [looking at browser apis](https://codepen.io/alexreardon/pen/dQZWpE?editors=1111)
 
 > Try changing the `overflow`, `height` and `width` properties on the `html` and `body` elements
 
-We were hoping to use this:
-
-```js
-const isCurrentlyOverflowed = (el: Element): boolean =>
-  el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientWidth;
-```
-
-Based on details of the _box model_
-
-![apis](https://user-images.githubusercontent.com/2182637/48534396-18c89000-e8fc-11e8-9ab6-90372bfa5be5.jpeg)
-
-But it looks like `Safari` reports these values on the `body` differently to other browsers
+It looks like when the `html` element has some `width` and `height` related properties set then this can impact things. However, finding a purely javascript solution for detecting this has alluded us so far
