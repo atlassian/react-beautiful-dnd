@@ -1,5 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
+import { warning } from '../../dev-warning';
 
 const visible: string = 'visible';
 const scroll: string = 'scroll';
@@ -11,12 +12,13 @@ type Overflow = {|
 |};
 
 const isEqual = (a: string, b: string) => a === b;
+const isEither = (overflow: Overflow, value: string) =>
+  isEqual(overflow.overflowX, value) || isEqual(overflow.overflowY, value);
+const isBoth = (overflow: Overflow, value: string) =>
+  isEqual(overflow.overflowX, value) && isEqual(overflow.overflowY, value);
 
-const isOverflowScrollable = ({ overflowX, overflowY }: Overflow): boolean =>
-  isEqual(overflowX, scroll) ||
-  isEqual(overflowY, scroll) ||
-  isEqual(overflowX, auto) ||
-  isEqual(overflowY, auto);
+const isOverflowScrollable = (overflow: Overflow): boolean =>
+  isEither(overflow, scroll) || isEither(overflow, auto);
 
 const isElementScrollable = (el: Element): boolean => {
   const style: CSSStyleDeclaration = window.getComputedStyle(el);
@@ -28,39 +30,36 @@ const isElementScrollable = (el: Element): boolean => {
   return isOverflowScrollable(computed);
 };
 
-const isCurrentlyOverflowed = (el: Element): boolean =>
-  el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight;
-
 // Special case for a body element
 // Playground: https://codepen.io/alexreardon/pen/ZmyLgX?editors=1111
-const isBodyScrollable = (el: Element): boolean => {
-  // 1. The `body` has `overflow-[x|y]: auto | scroll`
-  if (!isElementScrollable(el)) {
+const isBodyScrollable = (): boolean => {
+  // Because we always return false for now, we can skip any actual processing in production
+  if (process.env.NODE_ENV === 'production') {
     return false;
   }
 
-  const html: ?Element = el.parentElement;
-  invariant(
-    html && html === document.documentElement,
-    'Unexpected parent of body',
-  );
+  const body: ?HTMLBodyElement = document.body;
+  const html: ?HTMLElement = document.documentElement;
+  invariant(body);
+  invariant(html);
 
-  const style: CSSStyleDeclaration = window.getComputedStyle(html);
-  const parent: Overflow = {
-    overflowX: style.overflowX,
-    overflowY: style.overflowY,
+  // 1. The `body` has `overflow-[x|y]: auto | scroll`
+  if (!isElementScrollable(body)) {
+    return false;
+  }
+
+  const htmlStyle: CSSStyleDeclaration = window.getComputedStyle(html);
+  const htmlOverflow: Overflow = {
+    overflowX: htmlStyle.overflowX,
+    overflowY: htmlStyle.overflowY,
   };
 
-  // 2. The parent of `body` (`html`) has an `overflow-[x|y]` set to anything except `visible` AND
-  if (
-    isEqual(parent.overflowX, visible) &&
-    isEqual(parent.overflowY, visible)
-  ) {
+  if (isBoth(htmlOverflow, visible)) {
     return false;
   }
 
-  // 3. There is a current overflow in the `body`
-  return isCurrentlyOverflowed(el);
+  // TODO: warning
+  return false;
 };
 
 const getClosestScrollable = (el: ?Element): ?Element => {
@@ -71,14 +70,8 @@ const getClosestScrollable = (el: ?Element): ?Element => {
 
   // not allowing us to go higher then body
   if (el === document.body) {
-    return isBodyScrollable(el) ? el : null;
+    return isBodyScrollable() ? el : null;
   }
-
-  // just being really clear
-  invariant(
-    el !== document.documentElement,
-    'Should not get to document.documentElement in recursion',
-  );
 
   if (!isElementScrollable(el)) {
     return getClosestScrollable(el.parentElement);
