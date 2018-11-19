@@ -2,32 +2,28 @@
 import invariant from 'tiny-invariant';
 import { warning } from '../../dev-warning';
 
-const visible: string = 'visible';
-const scroll: string = 'scroll';
-const auto: string = 'auto';
-
 type Overflow = {|
   overflowX: string,
   overflowY: string,
 |};
 
-const isEqual = (a: string, b: string) => a === b;
-const isEither = (overflow: Overflow, value: string) =>
-  isEqual(overflow.overflowX, value) || isEqual(overflow.overflowY, value);
-const isBoth = (overflow: Overflow, value: string) =>
-  isEqual(overflow.overflowX, value) && isEqual(overflow.overflowY, value);
-
-const isOverflowScrollable = (overflow: Overflow): boolean =>
-  isEither(overflow, scroll) || isEither(overflow, auto);
+const isEqual = (base: string) => (value: string): boolean => base === value;
+const isScroll = isEqual('scroll');
+const isAuto = isEqual('auto');
+const isVisible = isEqual('visible');
+const isEither = (overflow: Overflow, fn: (value: string) => boolean) =>
+  fn(overflow.overflowX) || fn(overflow.overflowY);
+const isBoth = (overflow: Overflow, fn: (value: string) => boolean) =>
+  fn(overflow.overflowX) && fn(overflow.overflowY);
 
 const isElementScrollable = (el: Element): boolean => {
   const style: CSSStyleDeclaration = window.getComputedStyle(el);
-  const computed: Overflow = {
+  const overflow: Overflow = {
     overflowX: style.overflowX,
     overflowY: style.overflowY,
   };
 
-  return isOverflowScrollable(computed);
+  return isEither(overflow, isScroll) || isEither(overflow, isAuto);
 };
 
 // Special case for a body element
@@ -39,8 +35,8 @@ const isBodyScrollable = (): boolean => {
   }
 
   const body: ?HTMLBodyElement = document.body;
-  const html: ?HTMLElement = document.documentElement;
   invariant(body);
+  const html: ?HTMLElement = document.documentElement;
   invariant(html);
 
   // 1. The `body` has `overflow-[x|y]: auto | scroll`
@@ -54,15 +50,17 @@ const isBodyScrollable = (): boolean => {
     overflowY: htmlStyle.overflowY,
   };
 
-  if (isBoth(htmlOverflow, visible)) {
+  if (isBoth(htmlOverflow, isVisible)) {
     return false;
   }
 
   // TODO: warning
+  warning('TODO');
   return false;
 };
 
 const getClosestScrollable = (el: ?Element): ?Element => {
+  console.log('checking', el);
   // cannot do anything else!
   if (el == null) {
     return null;
@@ -70,15 +68,23 @@ const getClosestScrollable = (el: ?Element): ?Element => {
 
   // not allowing us to go higher then body
   if (el === document.body) {
+    console.log('hit body');
     return isBodyScrollable() ? el : null;
   }
 
-  if (!isElementScrollable(el)) {
-    return getClosestScrollable(el.parentElement);
+  // Should never get here, but just being safe
+  if (el === document.documentElement) {
+    console.log('hit document.documentElement');
+    return null;
   }
 
-  // success!
-  return el;
+  if (isElementScrollable(el)) {
+    // success!
+    return el;
+  }
+
+  // keep recursing
+  return getClosestScrollable(el.parentElement);
 };
 
 export default getClosestScrollable;

@@ -1,45 +1,31 @@
 // @flow
+import getClosestScrollable from './get-closest-scrollable';
 
 export type Env = {|
   closestScrollable: ?Element,
   isFixedOnPage: boolean,
 |};
 
-const isScrollable = (style: CSSStyleDeclaration): boolean =>
-  [style.overflow, style.overflowY, style.overflowX].some(
-    (value: string) => value === 'auto' || value === 'scroll',
-  );
-
-const isFixed = (style: CSSStyleDeclaration) => style.position === 'fixed';
-
-const find = (
-  el: ?Element,
-  closestScrollable: ?Element,
-  isFixedOnPage: boolean = false,
-): Env => {
-  // both values populated - can return
-  if (closestScrollable && isFixedOnPage) {
-    return {
-      closestScrollable,
-      isFixedOnPage,
-    };
+// TODO: do this check at the same time as the closest scrollable
+// in order to avoid double calling getComputedStyle
+// Do this when we move to multiple scroll containers
+const getIsFixed = (el: ?Element): boolean => {
+  if (!el) {
+    return false;
   }
-
-  // cannot go any higher - return what we have
-  if (el == null) {
-    return {
-      closestScrollable,
-      isFixedOnPage,
-    };
-  }
-
   const style: CSSStyleDeclaration = window.getComputedStyle(el);
-
-  const closest: ?Element =
-    closestScrollable || (isScrollable(style) ? el : null);
-  const fixed: boolean = isFixedOnPage || isFixed(style);
-
-  return find(el.parentElement, closest, fixed);
+  if (style.position === 'fixed') {
+    return true;
+  }
+  return getIsFixed(el.parentElement);
 };
 
-export default (start: Element): Env => find(start);
+export default (start: Element): Env => {
+  const closestScrollable: ?Element = getClosestScrollable(start);
+  const isFixedOnPage: boolean = getIsFixed(start);
+
+  return {
+    closestScrollable,
+    isFixedOnPage,
+  };
+};
