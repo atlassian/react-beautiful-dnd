@@ -117,7 +117,8 @@ export class ScrollableItem extends React.Component<ScrollableItemProps> {
             height: bigClient.borderBox.height,
             width: bigClient.borderBox.width,
             ...withSpacing,
-            overflow: this.props.isScrollable ? 'scroll' : 'visible',
+            overflowX: this.props.isScrollable ? 'scroll' : 'visible',
+            overflowY: this.props.isScrollable ? 'scroll' : 'visible',
           }}
           ref={this.setRef}
         >
