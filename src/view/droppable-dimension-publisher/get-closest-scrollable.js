@@ -54,13 +54,20 @@ const isBodyScrollable = (): boolean => {
     return false;
   }
 
-  // TODO: warning
-  warning('TODO');
+  warning(`
+    We have detected that your <body> element might be a scroll container.
+    We have found no reliable way of detecting whether the <body> element is a scroll container.
+    Under most circumstances a <body> scroll bar will be on the <html> element (document.documentElement)
+
+    Because we cannot determine if the <body> is a scroll container, and generally it is not one,
+    we will be treating the <body> as *not* a scroll container
+
+    More information: https://github.com/atlassian/react-beautiful-dnd/docs/guides/how-we-detect-scroll-containers.md
+  `);
   return false;
 };
 
 const getClosestScrollable = (el: ?Element): ?Element => {
-  console.log('checking', el);
   // cannot do anything else!
   if (el == null) {
     return null;
@@ -68,23 +75,21 @@ const getClosestScrollable = (el: ?Element): ?Element => {
 
   // not allowing us to go higher then body
   if (el === document.body) {
-    console.log('hit body');
     return isBodyScrollable() ? el : null;
   }
 
   // Should never get here, but just being safe
   if (el === document.documentElement) {
-    console.log('hit document.documentElement');
     return null;
   }
 
-  if (isElementScrollable(el)) {
-    // success!
-    return el;
+  if (!isElementScrollable(el)) {
+    // keep recursing
+    return getClosestScrollable(el.parentElement);
   }
 
-  // keep recursing
-  return getClosestScrollable(el.parentElement);
+  // success!
+  return el;
 };
 
 export default getClosestScrollable;
