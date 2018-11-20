@@ -250,7 +250,6 @@ const willDisplaceForward: boolean = true;
             borderBox: {
               [axis.crossAxisStart]: crossAxisStart,
               [axis.crossAxisEnd]: crossAxisStart,
-              // // no room on main axis
               [axis.start]: 0,
               [axis.end]: 0,
             },
