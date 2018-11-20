@@ -71,8 +71,7 @@ export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
         Advanced usage warning: you are adding or removing a dimension during a drag
         This an advanced feature.
 
-        Please check out: https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/changes-while-dragging.md
-        For more information
+        More information: https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/changes-while-dragging.md
       `);
     };
   })();
