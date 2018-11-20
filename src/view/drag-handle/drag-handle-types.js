@@ -19,7 +19,7 @@ export type Callbacks = {|
 |};
 
 export type DragHandleProps = {|
-  // If a consumer is using a portal then the item will loose focus
+  // If a consumer is using a portal then the item will lose focus
   // when moving to the portal. This breaks keyboard dragging.
   // To get around this we manually apply focus if needed when mounting
   onFocus: () => void,
