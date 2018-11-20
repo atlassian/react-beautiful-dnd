@@ -6,7 +6,7 @@
 ## Get started
 If you are new to `react-beautiful-dnd` we recommend taking at look at our getting started course: https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd
 
-It will give you a good base understanding of how everything fits together. This can often be the best help in overcomming your issue.
+It will give you a good base understanding of how everything fits together. This can often be the best help in overcoming your issue.
 
 ## Duplicates
 
@@ -31,7 +31,13 @@ https://github.com/atlassian/react-beautiful-dnd#driving-philosophy-physicality
 All features need to have a clear and generally applicable keyboard interaction pattern in order for us to deliver on our core goal of being highly accessible.
 -->
 
-<!-- ## Bug -->
+<!-- ## Bug
+
+## Check your console
+
+In development builds we log warnings to the console for common setup issues. Please have a look to see if it can give you information in overcoming your issue
+
+-->
 
 ### Expected behavior
 
@@ -75,5 +81,5 @@ Issues without demo's may not be investigated
 
 <!--
 Note: stale issues will be removed
-When a maintainer asks a question about an issue and it is not responded to within a reasonable timeframe then the issue will be closed. We don't want this to happen - but we also do not want to accumulate stale issues
+When a maintainer asks a question about an issue and it is not responded to within a reasonable time frame then the issue will be closed. We don't want this to happen - but we also do not want to accumulate stale issues
 --->

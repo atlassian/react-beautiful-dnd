@@ -1144,11 +1144,14 @@ Disabling the warnings will not stop a drag from being aborted in the case of an
 
 Please see our [types guide](/docs/guides/types.md)
 
-## Community
+## Community ❤️👋
 
 - [kanban-dnd](https://kanban-dnd.glitch.me) \- A Kanban style to-do list, with the ability to create custom lanes and reorder them on the fly. - Simple Trello - A simple cloning version of Trello, using React ecosystem.
   - [Demo](https://simple-trello.netlify.com/)
   - [Source](https://github.com/ng-hai/simple-trello)
+- 🎮 A drag'n'drop Checkers game
+  - [Demo](https://checkers-game.netlify.com/)
+  - [Source](https://github.com/emanuellarini/checkers)
 
 ## Addons
 
@@ -1181,13 +1184,13 @@ Great care has been taken to keep the library as light as possible. It is curren
 
 This library supports the standard [Atlassian supported browsers](https://confluence.atlassian.com/cloud/supported-browsers-744721663.html) for desktop:
 
-| Desktop                              | Version                                                                                                                                                      |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Microsoft Internet Explorer(Windows) | Version 11 (Need to [polyfill `Array.prototype.find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find#Polyfill)) |
-| Microsoft Edge                       | Latest stable version supported                                                                                                                              |
-| Mozilla Firefox (all platforms)      | Latest stable version supported                                                                                                                              |
-| Google Chrome (Windows and Mac)      | Latest stable version supported                                                                                                                              |
-| Safari (Mac)                         | Latest stable version on latest OS release supported                                                                                                         |
+| Desktop                              | Version                                              |
+| ------------------------------------ | ---------------------------------------------------- |
+| Microsoft Internet Explorer(Windows) | Version 11                                           |
+| Microsoft Edge                       | Latest stable version supported                      |
+| Mozilla Firefox (all platforms)      | Latest stable version supported                      |
+| Google Chrome (Windows and Mac)      | Latest stable version supported                      |
+| Safari (Mac)                         | Latest stable version on latest OS release supported |
 
 | Mobile                   | Version                                                   |
 | ------------------------ | --------------------------------------------------------- |

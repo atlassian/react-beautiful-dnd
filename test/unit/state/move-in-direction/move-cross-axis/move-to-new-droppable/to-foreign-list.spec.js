@@ -74,7 +74,7 @@ const willDisplaceForward: boolean = true;
         expect(result).toEqual(expected);
       });
 
-      describe('do not move if first position is not visible', () => {
+      describe('only move into first position if it is visible', () => {
         const distanceToContentBoxStart = (box: BoxModel): number =>
           box.margin[axis.start] +
           box.border[axis.start] +
@@ -236,6 +236,39 @@ const willDisplaceForward: boolean = true;
 
             expect(result).toBe(null);
           }
+        });
+
+        it('should allow a big item to move into a smaller list', () => {
+          const crossAxisStart: number =
+            preset.home.client.marginBox[axis.crossAxisEnd] + 1;
+          const smallDroppable: DroppableDimension = getDroppableDimension({
+            descriptor: {
+              id: 'small',
+              type: preset.home.descriptor.type,
+            },
+            // currently no room in the box
+            borderBox: {
+              [axis.crossAxisStart]: crossAxisStart,
+              [axis.crossAxisEnd]: crossAxisStart,
+              [axis.start]: 0,
+              [axis.end]: 0,
+            },
+            direction: axis.direction,
+            windowScroll: preset.windowScroll,
+          });
+
+          const result: ?DragImpact = moveToNewDroppable({
+            previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
+            draggable: preset.inHome1,
+            draggables: preset.draggables,
+            moveRelativeTo: null,
+            destination: smallDroppable,
+            insideDestination: [],
+            previousImpact: getHomeImpact(preset.inHome1, preset.home),
+            viewport,
+          });
+
+          expect(result).toBeTruthy();
         });
       });
     });
