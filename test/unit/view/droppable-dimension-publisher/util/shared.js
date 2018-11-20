@@ -117,7 +117,8 @@ export class ScrollableItem extends React.Component<ScrollableItemProps> {
             height: bigClient.borderBox.height,
             width: bigClient.borderBox.width,
             ...withSpacing,
-            overflow: this.props.isScrollable ? 'scroll' : 'visible',
+            overflowX: this.props.isScrollable ? 'scroll' : 'visible',
+            overflowY: this.props.isScrollable ? 'scroll' : 'visible',
           }}
           ref={this.setRef}
         >
@@ -172,7 +173,9 @@ export class App extends Component<AppProps> {
           height: smallFrameClient.borderBox.height,
           width: smallFrameClient.borderBox.width,
           ...withSpacing,
-          overflow: parentIsScrollable ? 'scroll' : 'visible',
+          // setting both manually. This will be done automatically if setting overflow: scroll
+          overflowX: parentIsScrollable ? 'scroll' : 'visible',
+          overflowY: parentIsScrollable ? 'scroll' : 'visible',
         }}
       >
         <div>
@@ -184,7 +187,9 @@ export class App extends Component<AppProps> {
               height: bigClient.borderBox.height,
               width: bigClient.borderBox.width,
               ...withSpacing,
-              overflow: droppableIsScrollable ? 'scroll' : 'visible',
+              // setting both manually. This will be done automatically if setting overflow: scroll
+              overflowX: droppableIsScrollable ? 'scroll' : 'visible',
+              overflowY: droppableIsScrollable ? 'scroll' : 'visible',
             }}
           >
             <DroppableDimensionPublisher
