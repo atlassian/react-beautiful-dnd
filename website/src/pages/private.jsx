@@ -14,21 +14,27 @@ type ExampleData = {
   },
 };
 
-const PrivateExamplesList = ({ data }: { data: ExampleData }) => (
-  <div>
-    <h1>Internal Examples</h1>
-    <h2>These examples are for development and not documentation</h2>
-    <ul>
-      {data.allSitePage.edges.map(({ node }) => (
-        <ul key={node.path}>
-          <Link to={node.path} href={node.path}>
-            {node.path.replace('/private/', '').replace(/\/$/, '')}
-          </Link>
-        </ul>
-      ))}
-    </ul>
-  </div>
-);
+const PrivateExamplesList = ({ data }: { data: ExampleData }) => {
+  const pages = data.allSitePage ? (
+    data.allSitePage.edges.map(({ node }) => (
+      <li key={node.path}>
+        <Link to={node.path} href={node.path}>
+          {node.path.replace('/private/', '').replace(/\/$/, '')}
+        </Link>
+      </li>
+    ))
+  ) : (
+    <li>No private examples</li>
+  );
+
+  return (
+    <div>
+      <h1>Internal Examples</h1>
+      <h2>These examples are for development and not documentation</h2>
+      <ul>{pages}</ul>
+    </div>
+  );
+};
 
 export default PrivateExamplesList;
 

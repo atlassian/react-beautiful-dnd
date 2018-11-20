@@ -1,15 +1,71 @@
 // @flow
-import React from 'react';
+import React, { type Node } from 'react';
+import ReactDOM from 'react-dom';
 import { Link } from 'gatsby';
+import invariant from 'tiny-invariant';
 import reorder from '../reorder';
 import type { NavLink } from './sidebar-types';
 import { Draggable, Droppable, DragDropContext } from '../../../../src';
 import { linkClassName, isActiveClassName } from './link-class-name';
 import type {
   DraggableProvided,
+  DraggableStateSnapshot,
   DroppableProvided,
   DropResult,
 } from '../../../../src';
+
+const getBody = (): HTMLBodyElement => {
+  invariant(document.body);
+  return document.body;
+};
+
+type PortalAwareItemProps = {|
+  link: NavLink,
+  hoverColor: string,
+  provided: DraggableProvided,
+  snapshot: DraggableStateSnapshot,
+|};
+
+class PortalAwareLink extends React.Component<PortalAwareItemProps> {
+  // eslint-disable-next-line react/sort-comp
+  portal: ?HTMLElement;
+
+  componentDidMount() {
+    const portal: HTMLElement = document.createElement('div');
+    this.portal = portal;
+    getBody().appendChild(portal);
+  }
+  componentWillUnmount() {
+    getBody().removeChild(this.getPortal());
+    this.portal = null;
+  }
+
+  getPortal = (): HTMLElement => {
+    invariant(this.portal);
+    return this.portal;
+  };
+
+  render() {
+    const { snapshot, provided, hoverColor, link } = this.props;
+    const child: Node = (
+      <Link
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        innerRef={provided.innerRef}
+        to={link.href}
+        className={linkClassName(hoverColor, snapshot.isDragging)}
+        activeClassName={isActiveClassName(hoverColor)}
+      >
+        {link.title}
+      </Link>
+    );
+    if (!snapshot.isDragging) {
+      return child;
+    }
+
+    return ReactDOM.createPortal(child, this.getPortal());
+  }
+}
 
 type NavLinkItemProps = {|
   link: NavLink,
@@ -20,19 +76,16 @@ type NavLinkItemProps = {|
 class NavLinkItem extends React.PureComponent<NavLinkItemProps> {
   render() {
     const { link, index, hoverColor } = this.props;
+
     return (
       <Draggable draggableId={link.href} index={index}>
-        {(provided: DraggableProvided) => (
-          <Link
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            innerRef={provided.innerRef}
-            to={link.href}
-            className={linkClassName(hoverColor)}
-            activeClassName={isActiveClassName(hoverColor)}
-          >
-            {link.title}
-          </Link>
+        {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+          <PortalAwareLink
+            link={link}
+            provided={provided}
+            snapshot={snapshot}
+            hoverColor={hoverColor}
+          />
         )}
       </Draggable>
     );

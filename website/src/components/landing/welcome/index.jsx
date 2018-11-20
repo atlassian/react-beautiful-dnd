@@ -5,13 +5,14 @@ import styled from 'react-emotion';
 import Board from './board';
 import CallToAction from './call-to-action';
 import SocialIcons from './social-icons';
-import DraggableLogo from './draggable-logo';
+import DraggableLogo from '../../draggable-logo';
 import { grid, gutter } from '../../../constants';
 import { smallView } from '../../media';
 
 const Brand = styled('div')`
   display: flex;
   align-items: center;
+  line-height: 1;
 
   ${smallView.fn(`
     flex-direction: column;
@@ -84,7 +85,7 @@ export default () => (
       <SideBySide>
         <Content>
           <Brand>
-            <DraggableLogo />
+            <DraggableLogo size={90} usePortal={false} />
             <Title>react-beautiful-dnd</Title>
           </Brand>
           <Tagline>

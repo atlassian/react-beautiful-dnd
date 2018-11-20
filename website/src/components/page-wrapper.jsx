@@ -33,9 +33,21 @@ const ContentSpacing = styled('div')`
   box-sizing: border-box;
   min-height: 100vh;
 
-  a {
+  /* inline code */
+  .language-text {
+    display: inline-block;
+    padding: 0 ${grid / 2}px;
+    margin: 0 ${grid / 2}px;
+  }
+
+  a,
+  a > .language-text {
     color: ${colors.green400};
     font-weight: bold;
+  }
+
+  em em {
+    font-style: normal;
   }
 
   blockquote {
@@ -54,12 +66,6 @@ const ContentSpacing = styled('div')`
     margin: ${sectionGap}px 0;
   }
 
-  /* inline code */
-  .language-text {
-    display: inline-block;
-    padding: 0 ${grid / 2}px;
-    margin: 0 ${grid / 2}px;
-  }
   img {
     max-width: 100%;
     margin: ${sectionGap}px 0;
