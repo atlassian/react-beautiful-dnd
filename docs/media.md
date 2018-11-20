@@ -1,6 +1,6 @@
 # Media
 
-This page contains a list of all of the articles, blogs and newsletters that `react-beautiful-dnd` has appeared in.
+This page contains a list of articles, blogs and newsletters that `react-beautiful-dnd` has appeared in.
 
 ## Blogs by the `react-beautiful-dnd` team
 
@@ -16,6 +16,10 @@ This page contains a list of all of the articles, blogs and newsletters that `re
 - [Performance optimisations for React applications: Round 2](https://medium.com/@alexandereardon/performance-optimisations-for-react-applications-round-2-2042e5c9af97)
 - [Dragging React performance forward](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33)
 - [Grabbing the flame 🔥](https://medium.com/@alexandereardon/grabbing-the-flame-290c794fe852)
+
+## Podcasts
+
+- [React podcast: Fast, Accessible, and Beautiful Drag and Drop with Alex Reardon](https://reactpodcast.simplecast.fm/17)
 
 ## Newsletters
 
@@ -57,13 +61,9 @@ This page contains a list of all of the articles, blogs and newsletters that `re
 ## Articles and blogs
 
 - [Want To Recruit Better Engineers? Open Source Your Code](https://angel.co/blog/want-to-recruit-better-engineers-open-source-your-code)
-
 - [How To Implement Better Drag and Drop in your React App](https://blog.bitsrc.io/implement-better-drag-and-drop-in-your-react-app-beafc4451599)
-
+- [Beautiful drag and drop with React — The beginner’s guide](https://medium.com/@AlejandroSobko/7798e3928290)
 - 15 Awesome React Components [Article](https://tutorialzine.com/2017/11/15-awesome-react-components)
-
 - 15 Interesting JavaScript and CSS Libraries for September 2017 [September edition](https://tutorialzine.com/2017/09/15-interesting-javascript-and-css-libraries-for-september-2017)
-
 - Mybridge React.JS Top 10 Articles For the Past Month [v.Sep 2017](https://medium.mybridge.co/react-js-top-10-articles-for-the-past-month-v-sep-2017-1894c4d91e0c)
-
 - Inside Dev [Sep 3rd, 2017](https://inside.com/campaigns/inside-dev-2017-09-03-3154/sections/dive-deeper-arcore-17345)
