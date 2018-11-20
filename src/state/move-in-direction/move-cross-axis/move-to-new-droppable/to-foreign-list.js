@@ -17,6 +17,7 @@ import getDisplacementMap from '../../../get-displacement-map';
 import { noMovement } from '../../../no-impact';
 import getPageBorderBoxCenter from '../../../get-center-from-impact/get-page-border-box-center';
 import isTotallyVisibleInNewLocation from '../../move-to-next-place/is-totally-visible-in-new-location';
+import { addPlaceholder } from '../../../droppable/with-placeholder';
 
 type Args = {|
   previousPageBorderBoxCenter: Position,
@@ -60,9 +61,16 @@ export default ({
       draggables,
     });
 
+    // need to check as if room was already added
+    const withPlaceholder: DroppableDimension = addPlaceholder(
+      destination,
+      draggable.displaceBy,
+      draggables,
+    );
+
     const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
       draggable,
-      destination,
+      destination: withPlaceholder,
       newPageBorderBoxCenter: pageBorderBoxCenter,
       viewport: viewport.frame,
       // already taken into account by getPageBorderBoxCenter
