@@ -1,6 +1,5 @@
 // @flow
 import React from 'react';
-import { Link } from 'gatsby';
 import styled from 'react-emotion';
 import { grid, sidebarWidth, colors } from '../../constants';
 import type { DocsPage, MarkdownPage, SitePage } from '../types';
@@ -9,7 +8,6 @@ import Heading from './heading';
 import type { NavLink } from './sidebar-types';
 import LinkList from './reorderable-links';
 import spacing from './spacing';
-import { linkClassName, isActiveClassName } from './link-class-name';
 
 const ScrollContainer = styled('div')`
   height: 100vh;

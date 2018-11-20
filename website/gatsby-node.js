@@ -94,11 +94,6 @@ const addMD = async ({ getNode, node, createNodeField }) => {
   const fileNode = getNode(node.parent);
   const parsedFilePath = path.parse(fileNode.relativePath);
 
-  const order: number = (() => {
-    // TODO
-    return 1;
-  })();
-
   const name = parsedFilePath.name.replace(/^\d-/, '');
 
   // Can be the empty string if no parent
@@ -143,6 +138,7 @@ const addMD = async ({ getNode, node, createNodeField }) => {
   createNodeField({
     node,
     name: 'order',
+    // TODO
     value: 1,
   });
 };
