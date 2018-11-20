@@ -7,7 +7,7 @@ import type {
 } from '../../../../src/view/draggable/draggable-types';
 import mount from './util/mount';
 import { whileDragging, atRestMapProps } from './util/get-props';
-import looseFocus from './util/loose-focus';
+import loseFocus from './util/lose-focus';
 
 // This is covered in focus-management.spec
 // But I have included in here also to ensure that the entire
@@ -108,7 +108,7 @@ it('should keep focus if moving to a portal', () => {
   expect(latest).not.toBe(wrapper.find(WithPortal).instance().portal);
 
   // cleanup
-  looseFocus(wrapper);
+  loseFocus(wrapper);
   wrapper.unmount();
 });
 
