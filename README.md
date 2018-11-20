@@ -43,13 +43,15 @@ We have created some basic examples on `codesandbox` for you to play with direct
 - Plays extremely well with standard browser interactions
 - Unopinionated styling
 - No creation of additional wrapper dom nodes - flexbox and focus management friendly!
-- Accessible ♿️🚀
+- Accessible: powerful keyboard and screen reader support ♿️🚀
 
 ## Get started 🤩
 
 We have created [a free course on `egghead.io`](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help people get started with `react-beautiful-dnd` as quickly as possible
 
 ![Course logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)
+
+[@alexandereardon](https://twitter.com/alexandereardon) has spoken on [React podcast](https://reactpodcast.simplecast.fm/17) about the foundational ideas and goals of `react-beautiful-dnd`
 
 ## Read this in other languages
 
@@ -1204,14 +1206,11 @@ This library supports the standard [Atlassian supported browsers](https://conflu
 
 ## Author
 
-Alex Reardon - [@alexandereardon](https://twitter.com/alexandereardon)
-
-## Maintainers
-
-Jared Crowe - [@jaredjcrowe](https://twitter.com/jaredjcrowe)
+Alex Reardon [@alexandereardon](https://twitter.com/alexandereardon)
 
 ## Collaborators
 
-Bogdan Chadkin - [@IAmTrySound](https://twitter.com/IAmTrySound)
-Luke Batchelor - [@alukebatchelor](https://twitter.com/alukebatchelor)
-Many other [@Atlassian](https://twitter.com/Atlassian)'s!
+- Bogdan Chadkin [@IAmTrySound](https://twitter.com/IAmTrySound)
+- Luke Batchelor [@alukebatchelor](https://twitter.com/alukebatchelor)
+- Jared Crowe [@jaredjcrowe](https://twitter.com/jaredjcrowe)
+- Many other [@Atlassian](https://twitter.com/Atlassian)'s!
