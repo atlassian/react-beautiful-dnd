@@ -1,6 +1,6 @@
 // @flow
 import rafSchd from 'raf-schd';
-import { getRect, type Rect, type Position, type Spacing } from 'css-box-model';
+import { type Rect, type Position, type Spacing } from 'css-box-model';
 import type {
   Axis,
   DraggingState,
@@ -31,8 +31,8 @@ export const config = {
   // percentage is between 0 and 1
   // result must be between 0 and 1
   ease: (percentage: number) => Math.pow(percentage, 2),
-  // how long to dampen the speed of an auto scroll from the start of a drag
-  slowWhenDurationLessThanMs: 1500,
+  // ms: how long to dampen the speed of an auto scroll from the start of a drag
+  slowWhenDurationLessThan: 1500,
 };
 
 // will replace -0 and replace with +0
@@ -88,26 +88,17 @@ const getSpeedFromDistance = (
   return speed;
 };
 
-// const hasMovedEnoughToNotBeSlowedByDuration = (
-//   distanceFromStart: Position,
-//   thresholds: PixelThresholds
-// ): boolean => {
-//   if(distanceFromStart)
-//   const distanceToReachMaxSpeed: number =
-//   return distanceFromStart[axis.line] > threshold;
-// };
-
 const slowSpeedByDragDuration = (
   proposedSpeed: number,
   dragStartTime: number,
 ): number => {
   const duration: number = Date.now() - dragStartTime;
-  if (duration > config.slowWhenDurationLessThanMs) {
+  if (duration > config.slowWhenDurationLessThan) {
     return proposedSpeed;
   }
 
   // dampen the speed based on the amount of time that has passed
-  const percentage: number = duration / config.slowWhenDurationLessThanMs;
+  const percentage: number = duration / config.slowWhenDurationLessThan;
   const transformed: number = config.ease(percentage);
 
   const speed: number = minScrollPx + proposedSpeed * transformed;
@@ -119,14 +110,14 @@ type GetSpeedArgs = {|
   distanceToEdge: number,
   thresholds: PixelThresholds,
   dragStartTime: number,
-  clientDistanceFromStartOnAxis: number,
+  clientOffsetOnAxis: number,
 |};
 
 const getSpeed = ({
   distanceToEdge,
   thresholds,
   dragStartTime,
-  clientDistanceFromStartOnAxis,
+  clientOffsetOnAxis,
 }: GetSpeedArgs): number => {
   const speed: number = getSpeedFromDistance(distanceToEdge, thresholds);
   // Would not have triggered a scroll event
@@ -134,16 +125,9 @@ const getSpeed = ({
     return 0;
   }
 
-  console.log('max speed at', thresholds.maxSpeedAt);
-  console.log('clientDistanceFromStartOnAxis', clientDistanceFromStartOnAxis);
-  if (clientDistanceFromStartOnAxis > thresholds.maxSpeedAt) {
-    console.log('moved past maxSpeedAt, not dampening by duration');
+  if (clientOffsetOnAxis > thresholds.maxSpeedAt) {
     return speed;
   }
-
-  // if (hasMovedEnoughToNotBeSlowedByDuration(distanceFromStart, subject, axis)) {
-  //   return speed;
-  // }
 
   return slowSpeedByDragDuration(speed, dragStartTime);
 };
@@ -184,14 +168,14 @@ type GetOnAxisArgs = {|
   container: Rect,
   distanceToEdges: Spacing,
   dragStartTime: number,
-  clientDistanceFromStart: Position,
+  clientOffset: Position,
 |};
 
 const getY = ({
   container,
   distanceToEdges,
   dragStartTime,
-  clientDistanceFromStart,
+  clientOffset,
 }: GetOnAxisArgs): number => {
   const thresholds: PixelThresholds = getPixelThresholds(container, vertical);
   const isCloserToBottom: boolean =
@@ -200,7 +184,7 @@ const getY = ({
   if (isCloserToBottom) {
     return getSpeed({
       distanceToEdge: distanceToEdges.bottom,
-      clientDistanceFromStartOnAxis: clientDistanceFromStart[vertical.line],
+      clientOffsetOnAxis: clientOffset[vertical.line],
       thresholds,
       dragStartTime,
     });
@@ -211,7 +195,7 @@ const getY = ({
     -1 *
     getSpeed({
       distanceToEdge: distanceToEdges.top,
-      clientDistanceFromStartOnAxis: clientDistanceFromStart[vertical.line],
+      clientOffsetOnAxis: clientOffset[vertical.line],
       thresholds,
       dragStartTime,
     })
@@ -222,7 +206,7 @@ const getX = ({
   container,
   distanceToEdges,
   dragStartTime,
-  clientDistanceFromStart,
+  clientOffset,
 }: GetOnAxisArgs): number => {
   const thresholds: PixelThresholds = getPixelThresholds(container, horizontal);
   const isCloserToRight: boolean = distanceToEdges.right < distanceToEdges.left;
@@ -230,7 +214,7 @@ const getX = ({
   if (isCloserToRight) {
     return getSpeed({
       distanceToEdge: distanceToEdges.right,
-      clientDistanceFromStartOnAxis: clientDistanceFromStart[horizontal.line],
+      clientOffsetOnAxis: clientOffset[horizontal.line],
       thresholds,
       dragStartTime,
     });
@@ -240,7 +224,7 @@ const getX = ({
     -1 *
     getSpeed({
       distanceToEdge: distanceToEdges.left,
-      clientDistanceFromStartOnAxis: clientDistanceFromStart[horizontal.line],
+      clientOffsetOnAxis: clientOffset[horizontal.line],
       thresholds,
       dragStartTime,
     })
@@ -252,7 +236,7 @@ type GetRequiredScrollArgs = {|
   container: Rect,
   subject: Rect,
   center: Position,
-  clientDistanceFromStart: Position,
+  clientOffset: Position,
 |};
 
 // returns null if no scroll is required
@@ -261,7 +245,7 @@ const getRequiredScroll = ({
   container,
   subject,
   center,
-  clientDistanceFromStart,
+  clientOffset,
 }: GetRequiredScrollArgs): ?Position => {
   // get distance to each edge
   const distanceToEdges: Spacing = {
@@ -283,13 +267,13 @@ const getRequiredScroll = ({
   const y: number = getY({
     container,
     distanceToEdges,
-    clientDistanceFromStart,
+    clientOffset,
     dragStartTime,
   });
   const x: number = getX({
     container,
     distanceToEdges,
-    clientDistanceFromStart,
+    clientOffset,
     dragStartTime,
   });
 
@@ -331,7 +315,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
   const scroller = (state: DraggingState): void => {
     const center: Position = state.current.page.borderBoxCenter;
     const dragStartTime: number = state.startTime;
-    const clientDistanceFromStart: Position = state.current.client.offset;
+    const clientOffset: Position = state.current.client.offset;
 
     const draggable: DraggableDimension =
       state.dimensions.draggables[state.critical.draggable.id];
@@ -345,7 +329,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
         container: viewport.frame,
         subject,
         center,
-        clientDistanceFromStart,
+        clientOffset,
       });
 
       if (
@@ -382,7 +366,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
       container: frame.pageMarginBox,
       subject,
       center,
-      clientDistanceFromStart,
+      clientOffset,
     });
 
     if (!requiredFrameScroll) {
