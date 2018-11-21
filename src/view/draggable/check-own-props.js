@@ -9,5 +9,8 @@ export default (props: Props) => {
     'Draggable requires an integer index prop',
   );
   invariant(props.draggableId, 'Draggable requires a draggableId');
-  invariant(props.isDragDisabled !== null, 'isDragDisabled cannot be null');
+  invariant(
+    typeof props.isDragDisabled === 'boolean',
+    'isDragDisabled must be a boolean',
+  );
 };
