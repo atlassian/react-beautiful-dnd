@@ -28,6 +28,8 @@ export const config = {
   // percentage is between 0 and 1
   // result must be between 0 and 1
   ease: (percentage: number) => Math.pow(percentage, 2),
+  // how long to dampen the speed of an auto scroll from the start of a drag
+  dampenDurationMs: 1000,
 };
 
 // will replace -0 and replace with +0
@@ -57,7 +59,10 @@ export const getPixelThresholds = (
   return thresholds;
 };
 
-const getSpeed = (distance: number, thresholds: PixelThresholds): number => {
+const getSpeedFromDistance = (
+  distance: number,
+  thresholds: PixelThresholds,
+): number => {
   // Not close enough to the edge
   if (distance >= thresholds.startFrom) {
     return 0;
@@ -76,6 +81,33 @@ const getSpeed = (distance: number, thresholds: PixelThresholds): number => {
   const transformed: number = config.ease(percentage);
 
   const speed: number = config.maxScrollSpeed * transformed;
+
+  return speed;
+};
+
+const getSpeed = (
+  distance: number,
+  thresholds: PixelThresholds,
+  dragStartTime: number,
+): number => {
+  const fromDistance: number = getSpeedFromDistance(distance, thresholds);
+  if (fromDistance === 0) {
+    return 0;
+  }
+
+  // How long has the drag been going for?
+
+  const duration: number = Date.now() - dragStartTime;
+  if (duration > config.dampenDurationMs) {
+    return fromDistance;
+  }
+
+  // dampen the speed based on the amount of time that has passed
+  const percentage: number = duration / config.dampenDurationMs;
+  const transformed: number = config.ease(percentage);
+
+  // needs to be at least 1px to trigger a scroll event
+  const speed: number = Math.max(fromDistance * transformed, 1);
 
   return speed;
 };
@@ -112,31 +144,40 @@ const adjustForSizeLimits = ({
   };
 };
 
-const getY = (container: Rect, distance: Spacing): number => {
+const getY = (
+  container: Rect,
+  distance: Spacing,
+  dragStartTime: number,
+): number => {
   const thresholds: PixelThresholds = getPixelThresholds(container, vertical);
   const isCloserToBottom: boolean = distance.bottom < distance.top;
 
   if (isCloserToBottom) {
-    return getSpeed(distance.bottom, thresholds);
+    return getSpeed(distance.bottom, thresholds, dragStartTime);
   }
 
   // closer to top
-  return -1 * getSpeed(distance.top, thresholds);
+  return -1 * getSpeed(distance.top, thresholds, dragStartTime);
 };
 
-const getX = (container: Rect, distance: Spacing): number => {
+const getX = (
+  container: Rect,
+  distance: Spacing,
+  dragStartTime: number,
+): number => {
   const thresholds: PixelThresholds = getPixelThresholds(container, horizontal);
   const isCloserToRight: boolean = distance.right < distance.left;
 
   if (isCloserToRight) {
-    return getSpeed(distance.right, thresholds);
+    return getSpeed(distance.right, thresholds, dragStartTime);
   }
 
   // closer to left
-  return -1 * getSpeed(distance.left, thresholds);
+  return -1 * getSpeed(distance.left, thresholds, dragStartTime);
 };
 
 type GetRequiredScrollArgs = {|
+  dragStartTime: number,
   container: Rect,
   subject: Rect,
   center: Position,
@@ -144,6 +185,7 @@ type GetRequiredScrollArgs = {|
 
 // returns null if no scroll is required
 const getRequiredScroll = ({
+  dragStartTime,
   container,
   subject,
   center,
@@ -165,8 +207,8 @@ const getRequiredScroll = ({
   // Maximum speed value should be hit before the distance is 0
   // Negative values to not continue to increase the speed
 
-  const y: number = getY(container, distance);
-  const x: number = getX(container, distance);
+  const y: number = getY(container, distance, dragStartTime);
+  const x: number = getX(container, distance, dragStartTime);
 
   const required: Position = clean({ x, y });
 
@@ -205,6 +247,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
 
   const scroller = (state: DraggingState): void => {
     const center: Position = state.current.page.borderBoxCenter;
+    const dragStartTime: number = state.startTime;
 
     const draggable: DraggableDimension =
       state.dimensions.draggables[state.critical.draggable.id];
@@ -214,6 +257,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
     if (state.isWindowScrollAllowed) {
       const viewport: Viewport = state.viewport;
       const requiredWindowScroll: ?Position = getRequiredScroll({
+        dragStartTime,
         container: viewport.frame,
         subject,
         center,
@@ -249,6 +293,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
     }
 
     const requiredFrameScroll: ?Position = getRequiredScroll({
+      dragStartTime,
       container: frame.pageMarginBox,
       subject,
       center,
