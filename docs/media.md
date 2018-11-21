@@ -26,36 +26,26 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - Ponyfoo [issue 78](https://ponyfoo.com/weekly/78/javascript-and-css-engines-pwa-drag-and-drop-web-components-and-http-2)
 - PonyFoo [issue 99](https://ponyfoo.com/weekly/99/react-across-the-universe-typography-load-balancing-and-javascript-frameworks)
 - PonyFoo [issue 141](https://ponyfoo.com/weekly/141/http-3-bgp-leaks-react-as-native-dom-typescript-tensorflow-and-all-things-performance)
-
 - JavaScript Weekly [issue 369](http://javascriptweekly.com/issues/369)
+- JavasScript Weekly [issue 369](https://javascriptweekly.com/issues/369)
 - JavaScript Weekly [issue 412](https://javascriptweekly.com/issues/412)
-
 - Weekend JavaScript [issue 125](https://www.weekendjs.com/issues/125-webassembly-null-vs-undefined-the-ultimage-guide-to-js-frameworks-and-more)
-
 - React Newsletter [issue 81](http://reactjsnewsletter.com/issues/81?m=web#X4GMoSn)
 - React Newsletter [issue 93](http://reactjsnewsletter.com/issues/93?m=web#PIERdu)
 - React Newsletter [issue 102](http://reactjsnewsletter.com/issues/102?#start)
+- React Newsletter [issue 124](http://reactjsnewsletter.com/issues/124?#start)
 - React Newsletter [issue 139](http://reactjsnewsletter.com/issues/139?m=web&#5nGfyf)
-
 - React Status [issue 49](https://react.statuscode.com/issues/49)
 - React Status [issue 63](https://react.statuscode.com/issues/63)
 - React Status [issue 71](https://react.statuscode.com/issues/71)
 - React Status [issue 114](https://react.statuscode.com/issues/114)
-
 - Fullstack React [issue 72](http://newsletter.fullstackreact.com/issues/72)
-
 - HashBang Weekly [issue 52](http://hashbangweekly.okgrow.com/2018/01/22/issue-52)
-
 - CSS Animation Weekly [issue 60](http://weekly.cssanimation.rocks/issues/css-animation-weekly-60-working-with-animations-skeleton-screens-and-rethinking-drag-and-drop-73446)
-
 - Codrops [collective 340](https://tympanus.net/codrops/collective/collective-340/)
-
 - Product Design Weekly [issue 139](http://us12.campaign-archive2.com/?u=aa09d0e5a44742b7c1c444765&id=8cf1802ab9&e=95b47a038c)
-
 - Web Design Weekly [issue 288](http://email.jakebresnehan.com/t/ViewEmail/r/54BEACFB4B9F50C82540EF23F30FEDED/05178437DEDE86556B5BE456C00C2519)
-
 - sidebar.io - [28/8/16](https://sidebar.io/?after=2017-08-21&before=2017-08-21)
-
 - Best of JS [issue 25](https://weekly.bestofjs.org/issues/25/)
 
 ## Articles and blogs
