@@ -12,7 +12,7 @@ import {
   styleContextKey,
 } from '../context-keys';
 import { warning } from '../../dev-warning';
-import checkOwnProps from '../draggable/check-own-props';
+import checkOwnProps from './check-own-props';
 
 type Context = {
   [string]: DroppableId | TypeId,
