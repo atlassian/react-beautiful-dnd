@@ -8,6 +8,6 @@ export default (props: Props) => {
     Number.isInteger(props.index),
     'Draggable requires an integer index prop',
   );
-
   invariant(props.draggableId, 'Draggable requires a draggableId');
+  invariant(props.isDragDisabled !== null, 'isDragDisabled cannot be null');
 };

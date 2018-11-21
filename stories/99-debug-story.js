@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-// import { Draggable, Droppable, DragDropContext } from '../../src';
+// import { Draggable, Droppable, DragDropContext } from '../src';
 
 class App extends React.Component<*> {
   render() {

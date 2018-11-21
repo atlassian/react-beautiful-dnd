@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import invariant from 'tiny-invariant';
 import PropTypes from 'prop-types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
@@ -13,6 +12,7 @@ import {
   styleContextKey,
 } from '../context-keys';
 import { warning } from '../../dev-warning';
+import checkOwnProps from '../draggable/check-own-props';
 
 type Context = {
   [string]: DroppableId | TypeId,
@@ -34,9 +34,9 @@ export default class Droppable extends Component<Props> {
 
     this.styleContext = context[styleContextKey];
 
-    // a little check to avoid an easy to catch setup
+    // a little run time check to avoid an easy to catch setup issues
     if (process.env.NODE_ENV !== 'production') {
-      invariant(props.droppableId, 'A Droppable requires a droppableId prop');
+      checkOwnProps(props);
     }
   }
 
