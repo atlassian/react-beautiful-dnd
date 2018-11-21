@@ -215,17 +215,19 @@ Because this library does not control your state, it is up to you to _synchronou
 
 If you need to persist a reorder to a remote data store - update the list synchronously on the client (such as through `this.setState()`) and fire off a request in the background to persist the change. If the remote save fails it is up to you how to communicate that to the user and update, or not update, the list.
 
-## Block updates during a drag
+## No dimension changes during a drag
+
+`react-beautiful-dnd` does not support the changing of the size of any `Draggable` or `Droppable` after a drag has started. We build a virtual model of every `Draggable` and `Droppable` when a drag starts. We do not recollect these during a drag. So if you change the size of something: the user will see the updated size, but our virtual model will remain unchanged.
+
+### Block updates during a drag
 
 It is **highly** recommended that while a user is dragging that you block any state updates that might impact the amount of `Draggable`s and `Droppable`s, or their dimensions. Please listen to `onDragStart` and block updates to the `Draggable`s and `Droppable`s until you receive at `onDragEnd`.
-
-When the user starts dragging we take a snapshot of all of the dimensions of the applicable `Draggable` and `Droppable` nodes. If these change during a drag we will not know about it.
 
 ### How do you block updates?
 
 Update blocking will look different depending on how you manage your data. It is probably best to explain by example:
 
-Let's say you are using React component state to manage the state of your application. Your application state is tied to a REST endpoint that you poll every thirty seconds for data updates. During a drag you should not apply any server updates that could effect what is visible.
+Let's say you are using `React` component state to manage the state of your application. Your application state is tied to a REST endpoint that you poll every thirty seconds for data updates. During a drag you _should not_ apply any server updates that could effect what is visible.
 
 This could mean:
 

@@ -648,6 +648,8 @@ It is recommended that you put a `min-height` on a vertical `Droppable` or a `mi
 
 ### Recommended `Droppable` performance optimisation
 
+> 📺 This optimisation is covered in a [free lesson of our getting started course](https://egghead.io/lessons/react-optimize-performance-in-react-beautiful-dnd-with-shouldcomponentupdate-and-purecomponent)
+
 When a user drags over, or stops dragging over, a `Droppable` we re-render the `Droppable` with an updated `DroppableStateSnapshot > isDraggingOver` value. This is useful for styling the `Droppable`. However, by default this will cause a render of all of the children of the `Droppable` - which might be 100's of `Draggable`s! This can result in a noticeable frame rate drop. To avoid this problem we recommend that you create a component that is the child of a `Droppable` who's responsibility it is to avoid rendering children if it is not required.
 
 Here is an example of how you could do this:
@@ -1181,10 +1183,11 @@ This codebase is designed to be **extremely performant** - it is part of its DNA
 
 - [Rethinking drag and drop](https://medium.com/@alexandereardon/rethinking-drag-and-drop-d9f5770b4e6b)
 - [Dragging React performance forward](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33)
+- [Grabbing the flame 🔥](https://medium.com/@alexandereardon/grabbing-the-flame-290c794fe852)
 
 ## Size
 
-Great care has been taken to keep the library as light as possible. It is currently **~38kb (gzip)** in size. There could be a smaller net cost if you where already using one of the underlying dependencies.
+Great care has been taken to keep the library as light as possible. It is currently **~31kb (gzip)** in size. There could be a smaller net cost if you where already using one of the underlying dependencies.
 
 ## Supported browsers
 
