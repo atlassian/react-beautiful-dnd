@@ -383,6 +383,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
 
     const requiredFrameScroll: ?Position = getRequiredScroll({
       dragStartTime,
+      // TODO: padding box given that it is the scrollable area?
       container: frame.pageMarginBox,
       subject,
       center,
