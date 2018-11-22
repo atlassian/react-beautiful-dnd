@@ -11,10 +11,11 @@ import type {
   DroppableId,
 } from '../../types';
 import { horizontal, vertical } from '../axis';
-import { apply, isEqual, origin, subtract } from '../position';
+import { apply, isEqual, origin } from '../position';
 import { canPartiallyScroll, canScrollWindow } from './can-scroll';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
+import getFrame from '../get-frame';
 
 // Need to have at least 1px of scroll to trigger a scroll listener
 const minScrollPx: number = 1;
@@ -26,13 +27,13 @@ export const config = {
   maxSpeedAt: 0.05,
   // pixels per frame
   maxScrollSpeed: 28,
+  // ms: how long to dampen the speed of an auto scroll from the start of a drag
+  slowWhenDurationLessThan: 1500,
   // A function used to ease the distance been the startFrom and maxSpeedAt values
   // A simple linear function would be: (percentage) => percentage;
   // percentage is between 0 and 1
   // result must be between 0 and 1
   ease: (percentage: number) => Math.pow(percentage, 2),
-  // ms: how long to dampen the speed of an auto scroll from the start of a drag
-  slowWhenDurationLessThan: 1500,
 };
 
 // will replace -0 and replace with +0
@@ -41,7 +42,6 @@ const clean = apply((value: number) => (value === 0 ? 0 : value));
 export type PixelThresholds = {|
   startFrom: number,
   maxSpeedAt: number,
-  accelerationPlane: number,
 |};
 
 // converts the percentages in the config into actual pixel values
@@ -51,58 +51,74 @@ export const getPixelThresholds = (
 ): PixelThresholds => {
   const startFrom: number = container[axis.size] * config.startFrom;
   const maxSpeedAt: number = container[axis.size] * config.maxSpeedAt;
-  const accelerationPlane: number = startFrom - maxSpeedAt;
 
   const thresholds: PixelThresholds = {
     startFrom,
     maxSpeedAt,
-    accelerationPlane,
   };
 
   return thresholds;
+};
+
+const getEasedPercentage = (
+  startOfRange: number,
+  endOfRange: number,
+  current: number,
+): number => {
+  if (current <= startOfRange) {
+    return 0;
+  }
+
+  if (current >= endOfRange) {
+    return 1;
+  }
+  const range: number = endOfRange - startOfRange;
+  const currentInRange: number = current - startOfRange;
+  const percentage: number = currentInRange / range;
+  return config.ease(percentage);
 };
 
 const getSpeedFromDistance = (
   distanceToEdge: number,
   thresholds: PixelThresholds,
 ): number => {
-  // Not close enough to the edge
-  if (distanceToEdge >= thresholds.startFrom) {
-    return 0;
-  }
+  const startOfRange: number = thresholds.maxSpeedAt;
+  const endOfRange: number = thresholds.startFrom;
+  const current: number = thresholds.startFrom - distanceToEdge;
 
-  // Already past the maxSpeedAt point
+  const percentage: number = getEasedPercentage(
+    startOfRange,
+    endOfRange,
+    current,
+  );
 
-  if (distanceToEdge <= thresholds.maxSpeedAt) {
-    return config.maxScrollSpeed;
-  }
-
-  // We need to perform a scroll as a percentage of the max scroll speed
-
-  const distancePastStart: number = thresholds.startFrom - distanceToEdge;
-  const percentage: number = distancePastStart / thresholds.accelerationPlane;
-  const transformed: number = config.ease(percentage);
-
-  const speed: number = config.maxScrollSpeed * transformed;
+  const speed: number = config.maxScrollSpeed * percentage;
 
   return speed;
 };
 
-const slowSpeedByDragDuration = (
+const slowByDragDuration = (
   proposedSpeed: number,
   dragStartTime: number,
 ): number => {
-  const duration: number = Date.now() - dragStartTime;
-  if (duration > config.slowWhenDurationLessThan) {
+  const startOfRange: number = dragStartTime;
+  const endOfRange: number = dragStartTime + config.slowWhenDurationLessThan;
+  const current: number = Date.now();
+
+  const percentage: number = getEasedPercentage(
+    startOfRange,
+    endOfRange,
+    current,
+  );
+
+  if (percentage >= 1) {
     return proposedSpeed;
   }
 
-  // dampen the speed based on the amount of time that has passed
-  const percentage: number = duration / config.slowWhenDurationLessThan;
-  const transformed: number = config.ease(percentage);
+  // Need to allow some scroll otherwise scroll listeners won't fire
+  const speed: number = minScrollPx + proposedSpeed * percentage;
 
-  const speed: number = minScrollPx + proposedSpeed * transformed;
-
+  // Making sure we do not go over the maxScrollSpeed due to the + mixScrollPx
   return Math.min(speed, config.maxScrollSpeed);
 };
 
@@ -110,26 +126,31 @@ type GetSpeedArgs = {|
   distanceToEdge: number,
   thresholds: PixelThresholds,
   dragStartTime: number,
-  clientOffsetOnAxis: number,
+  clientOffset: Position,
+  axis: Axis,
 |};
 
 const getSpeed = ({
   distanceToEdge,
   thresholds,
   dragStartTime,
-  clientOffsetOnAxis,
+  clientOffset,
+  axis,
 }: GetSpeedArgs): number => {
   const speed: number = getSpeedFromDistance(distanceToEdge, thresholds);
+
   // Would not have triggered a scroll event
   if (speed < minScrollPx) {
     return 0;
   }
 
-  if (clientOffsetOnAxis > thresholds.maxSpeedAt) {
+  // too much client movement to consider drag duration
+  // TODO: a bit strange if moving backwards?
+  if (Math.abs(clientOffset[axis.line]) > thresholds.maxSpeedAt) {
     return speed;
   }
 
-  return slowSpeedByDragDuration(speed, dragStartTime);
+  return slowByDragDuration(speed, dragStartTime);
 };
 
 type AdjustForSizeLimitsArgs = {|
@@ -184,9 +205,10 @@ const getY = ({
   if (isCloserToBottom) {
     return getSpeed({
       distanceToEdge: distanceToEdges.bottom,
-      clientOffsetOnAxis: clientOffset[vertical.line],
+      clientOffset,
       thresholds,
       dragStartTime,
+      axis: vertical,
     });
   }
 
@@ -195,9 +217,10 @@ const getY = ({
     -1 *
     getSpeed({
       distanceToEdge: distanceToEdges.top,
-      clientOffsetOnAxis: clientOffset[vertical.line],
+      clientOffset,
       thresholds,
       dragStartTime,
+      axis: vertical,
     })
   );
 };
@@ -214,9 +237,10 @@ const getX = ({
   if (isCloserToRight) {
     return getSpeed({
       distanceToEdge: distanceToEdges.right,
-      clientOffsetOnAxis: clientOffset[horizontal.line],
+      clientOffset,
       thresholds,
       dragStartTime,
+      axis: horizontal,
     });
   }
 
@@ -224,9 +248,10 @@ const getX = ({
     -1 *
     getSpeed({
       distanceToEdge: distanceToEdges.left,
-      clientOffsetOnAxis: clientOffset[horizontal.line],
+      clientOffset,
       thresholds,
       dragStartTime,
+      axis: horizontal,
     })
   );
 };
@@ -354,12 +379,7 @@ export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
     }
 
     // We know this has a closestScrollable
-    const frame: ?Scrollable = droppable.frame;
-
-    // this should never happen - just being safe
-    if (!frame) {
-      return;
-    }
+    const frame: Scrollable = getFrame(droppable);
 
     const requiredFrameScroll: ?Position = getRequiredScroll({
       dragStartTime,
