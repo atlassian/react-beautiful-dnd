@@ -190,53 +190,23 @@ type GetOnAxisArgs = {|
   distanceToEdges: Spacing,
   dragStartTime: number,
   clientOffset: Position,
+  axis: Axis,
 |};
 
-const getY = ({
+const getOnAxis = ({
   container,
   distanceToEdges,
   dragStartTime,
   clientOffset,
+  axis,
 }: GetOnAxisArgs): number => {
-  const thresholds: PixelThresholds = getPixelThresholds(container, vertical);
-  const isCloserToBottom: boolean =
-    distanceToEdges.bottom < distanceToEdges.top;
+  const thresholds: PixelThresholds = getPixelThresholds(container, axis);
+  const isCloserToEnd: boolean =
+    distanceToEdges[axis.end] < distanceToEdges[axis.start];
 
-  if (isCloserToBottom) {
+  if (isCloserToEnd) {
     return getSpeed({
-      distanceToEdge: distanceToEdges.bottom,
-      clientOffset,
-      thresholds,
-      dragStartTime,
-      axis: vertical,
-    });
-  }
-
-  // closer to top
-  return (
-    -1 *
-    getSpeed({
-      distanceToEdge: distanceToEdges.top,
-      clientOffset,
-      thresholds,
-      dragStartTime,
-      axis: vertical,
-    })
-  );
-};
-
-const getX = ({
-  container,
-  distanceToEdges,
-  dragStartTime,
-  clientOffset,
-}: GetOnAxisArgs): number => {
-  const thresholds: PixelThresholds = getPixelThresholds(container, horizontal);
-  const isCloserToRight: boolean = distanceToEdges.right < distanceToEdges.left;
-
-  if (isCloserToRight) {
-    return getSpeed({
-      distanceToEdge: distanceToEdges.right,
+      distanceToEdge: distanceToEdges[axis.end],
       clientOffset,
       thresholds,
       dragStartTime,
@@ -247,7 +217,7 @@ const getX = ({
   return (
     -1 *
     getSpeed({
-      distanceToEdge: distanceToEdges.left,
+      distanceToEdge: distanceToEdges[axis.start],
       clientOffset,
       thresholds,
       dragStartTime,
@@ -289,17 +259,19 @@ const getRequiredScroll = ({
   // Maximum speed value should be hit before the distance is 0
   // Negative values to not continue to increase the speed
 
-  const y: number = getY({
+  const y: number = getOnAxis({
     container,
     distanceToEdges,
     clientOffset,
     dragStartTime,
+    axis: vertical,
   });
-  const x: number = getX({
+  const x: number = getOnAxis({
     container,
     distanceToEdges,
     clientOffset,
     dragStartTime,
+    axis: horizontal,
   });
 
   const required: Position = clean({ x, y });
