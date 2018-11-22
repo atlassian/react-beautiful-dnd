@@ -122,6 +122,15 @@ const slowByDragDuration = (
   return Math.min(speed, config.maxScrollSpeed);
 };
 
+const shouldCheckDuration = (
+  clientOffset: Position,
+  thresholds: PixelThresholds,
+  axis: Axis,
+): boolean => {
+  const range: number = thresholds.startFrom - thresholds.maxSpeedAt;
+  return Math.abs(clientOffset[axis.line]) < range;
+};
+
 type GetSpeedArgs = {|
   distanceToEdge: number,
   thresholds: PixelThresholds,
@@ -145,8 +154,7 @@ const getSpeed = ({
   }
 
   // too much client movement to consider drag duration
-  // TODO: a bit strange if moving backwards?
-  if (Math.abs(clientOffset[axis.line]) > thresholds.maxSpeedAt) {
+  if (!shouldCheckDuration(clientOffset, thresholds, axis)) {
     return speed;
   }
 
@@ -210,7 +218,7 @@ const getOnAxis = ({
       clientOffset,
       thresholds,
       dragStartTime,
-      axis: horizontal,
+      axis,
     });
   }
 
@@ -221,7 +229,7 @@ const getOnAxis = ({
       clientOffset,
       thresholds,
       dragStartTime,
-      axis: horizontal,
+      axis,
     })
   );
 };

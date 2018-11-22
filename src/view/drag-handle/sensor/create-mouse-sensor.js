@@ -210,6 +210,7 @@ export default ({
       // Scroll events on elements do not bubble, but they go through the capture phase
       // https://twitter.com/alexandereardon/status/985994224867819520
       // Using capture: false here as we want to avoid intercepting droppable scroll requests
+      // TODO: can result in awkward drop position
       options: { passive: true, capture: false },
       fn: () => {
         // stop a pending drag
