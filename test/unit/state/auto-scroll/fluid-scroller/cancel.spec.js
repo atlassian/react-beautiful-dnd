@@ -1,5 +1,18 @@
 // @flow
-describe('cancel', () => {
+import type { Position } from 'css-box-model';
+import forEach, { type BlockFnArgs } from './util/for-each';
+import type { DraggingState } from '../../../../../src/types';
+import { scrollableViewport } from './util/viewport';
+import dragTo from './util/drag-to';
+import {
+  getPixelThresholds,
+  type PixelThresholds,
+} from '../../../../../src/state/auto-scroller/fluid-scroller';
+import getDroppable from './util/get-droppable';
+import { patch } from '../../../../../src/state/position';
+import { addDroppable } from '../../../../utils/dimension';
+
+forEach(({ axis, scroller, state, mocks, preset }: BlockFnArgs) => {
   it('should cancel any pending window scroll', () => {
     const thresholds: PixelThresholds = getPixelThresholds(
       scrollableViewport.frame,
@@ -11,8 +24,9 @@ describe('cancel', () => {
       scrollableViewport.frame.center[axis.crossAxisLine],
     );
 
-    fluidScroll(
+    scroller(
       dragTo({
+        state,
         selection: onMaxBoundary,
         viewport: scrollableViewport,
       }),
@@ -21,13 +35,14 @@ describe('cancel', () => {
     // frame not cleared
     expect(mocks.scrollWindow).not.toHaveBeenCalled();
 
-    fluidScroll.cancel();
+    scroller.cancel();
     requestAnimationFrame.flush();
 
     expect(mocks.scrollWindow).not.toHaveBeenCalled();
   });
 
   it('should cancel any pending droppable scroll', () => {
+    const { scrollable, frameClient } = getDroppable(preset);
     const thresholds: PixelThresholds = getPixelThresholds(
       frameClient.borderBox,
       axis,
@@ -39,19 +54,20 @@ describe('cancel', () => {
     );
     const drag: DraggingState = addDroppable(
       dragTo({
+        state,
         selection: onMaxBoundary,
         viewport: scrollableViewport,
       }),
       scrollable,
     );
 
-    fluidScroll(drag);
+    scroller(drag);
 
     // frame not cleared
     expect(mocks.scrollDroppable).not.toHaveBeenCalled();
 
     // should cancel the next frame
-    fluidScroll.cancel();
+    scroller.cancel();
     requestAnimationFrame.flush();
 
     expect(mocks.scrollDroppable).not.toHaveBeenCalled();

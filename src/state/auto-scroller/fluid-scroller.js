@@ -303,7 +303,7 @@ const getRequiredScroll = ({
   return isEqual(limited, origin) ? null : limited;
 };
 
-type Api = {|
+export type PublicArgs = {|
   scrollWindow: (change: Position) => void,
   scrollDroppable: (id: DroppableId, change: Position) => void,
 |};
@@ -313,7 +313,10 @@ type ResultCancel = { cancel: () => void };
 
 export type FluidScroller = ResultFn & ResultCancel;
 
-export default ({ scrollWindow, scrollDroppable }: Api): FluidScroller => {
+export default ({
+  scrollWindow,
+  scrollDroppable,
+}: PublicArgs): FluidScroller => {
   const scheduleWindowScroll = rafSchd(scrollWindow);
   const scheduleDroppableScroll = rafSchd(scrollDroppable);
 
