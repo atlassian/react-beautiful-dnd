@@ -1,19 +1,32 @@
 // @flow
 import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
-import type { State } from '../../types';
 import type { Action, Dispatch, MiddlewareStore } from '../store-types';
 
+const shouldStart = (action: Action): boolean => action.type === 'LIFT';
+
+const shouldEnd = (action: Action): boolean =>
+  action.type === 'DROP' || action.type === 'CLEAN';
+
 const shouldCancel = (action: Action): boolean =>
-  action.type === 'DROP_ANIMATE' ||
-  action.type === 'DROP' ||
-  action.type === 'DROP_COMPLETE' ||
-  action.type === 'COLLECTION_STARTING';
+  shouldEnd(action) || action.type === 'COLLECTION_STARTING';
 
 export default (getScroller: () => AutoScroller) => (
   store: MiddlewareStore,
 ) => (next: Dispatch) => (action: Action): any => {
   if (shouldCancel(action)) {
-    getScroller().cancel();
+    getScroller().cancelPending();
+    next(action);
+    return;
+  }
+
+  if (shouldStart(action)) {
+    getScroller().start();
+    next(action);
+    return;
+  }
+
+  if (shouldEnd(action)) {
+    getScroller().stop();
     next(action);
     return;
   }
@@ -21,22 +34,5 @@ export default (getScroller: () => AutoScroller) => (
   // auto scroll happens in response to state changes
   // releasing all actions to the reducer first
   next(action);
-
-  const state: State = store.getState();
-
-  // Only allowing auto scrolling in the DRAGGING phase
-  if (state.phase !== 'DRAGGING') {
-    return;
-  }
-
-  if (state.movementMode === 'FLUID') {
-    getScroller().fluidScroll(state);
-    return;
-  }
-
-  if (!state.scrollJumpRequest) {
-    return;
-  }
-
-  getScroller().jumpScroll(state);
+  getScroller().scroll(store.getState());
 };
