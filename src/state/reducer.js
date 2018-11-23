@@ -115,7 +115,6 @@ export default (state: State = idle, action: Action): State => {
       userDirection: forward,
       scrollJumpRequest: null,
       forceShouldAnimate: null,
-      startTime: Date.now(),
     };
 
     return result;

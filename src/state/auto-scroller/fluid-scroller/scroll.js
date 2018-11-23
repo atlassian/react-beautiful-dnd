@@ -14,6 +14,7 @@ import getDroppableScrollChange from './get-droppable-scroll-change';
 
 type Args = {|
   state: DraggingState,
+  dragStartTime: number,
   shouldUseTimeDampening: boolean,
   scrollWindow: (scroll: Position) => void,
   scrollDroppable: (id: DroppableId, scroll: Position) => void,
@@ -21,12 +22,12 @@ type Args = {|
 
 export default ({
   state,
+  dragStartTime,
   shouldUseTimeDampening,
   scrollWindow,
   scrollDroppable,
 }: Args): void => {
   const center: Position = state.current.page.borderBoxCenter;
-  const dragStartTime: number = state.startTime;
   const draggable: DraggableDimension =
     state.dimensions.draggables[state.critical.draggable.id];
   const subject: Rect = draggable.page.marginBox;

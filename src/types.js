@@ -312,8 +312,6 @@ export type DraggingState = {|
   scrollJumpRequest: ?Position,
   // whether or not draggable movements should be animated
   forceShouldAnimate: ?boolean,
-  // the time a drag started - used for fluid scrolling
-  startTime: number,
 |};
 
 // While dragging we can enter into a bulk collection phase

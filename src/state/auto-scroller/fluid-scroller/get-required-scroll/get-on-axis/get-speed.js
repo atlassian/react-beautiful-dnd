@@ -10,7 +10,8 @@ type Args = {|
   shouldUseTimeDampening: boolean,
 |};
 
-const withMinSpeed = (proposed: number) => Math.max(proposed, 1);
+const minSpeed: number = 1;
+const withMinSpeed = (proposed: number) => Math.max(proposed, minSpeed);
 
 export default ({
   distanceToEdge,
@@ -20,8 +21,12 @@ export default ({
 }: Args): number => {
   const proposed: number = getSpeedFromDistance(distanceToEdge, thresholds);
 
+  if (proposed < minSpeed) {
+    return 0;
+  }
+
   if (!shouldUseTimeDampening) {
-    return withMinSpeed(proposed);
+    return proposed;
   }
 
   return withMinSpeed(dampenByDuration(proposed, dragStartTime));

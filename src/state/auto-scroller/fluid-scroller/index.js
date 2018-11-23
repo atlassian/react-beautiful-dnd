@@ -32,12 +32,14 @@ export default ({
 
   const tryScroll = (state: DraggingState): void => {
     invariant(dragging, 'Cannot fluid scroll if not dragging');
+    const { shouldUseTimeDampening, dragStartTime } = dragging;
 
     scroll({
       state,
       scrollWindow: scheduleWindowScroll,
       scrollDroppable: scheduleDroppableScroll,
-      shouldUseTimeDampening: dragging.shouldUseTimeDampening,
+      dragStartTime,
+      shouldUseTimeDampening,
     });
   };
 
@@ -58,6 +60,7 @@ export default ({
       };
       scroll({
         state,
+        dragStartTime: 0,
         shouldUseTimeDampening: false,
         scrollWindow: listener,
         scrollDroppable: listener,
@@ -66,6 +69,8 @@ export default ({
       return wasScrollNeeded;
     })();
 
+    console.warn('shouldUseTimeDampening', shouldUseTimeDampening);
+
     dragging = {
       dragStartTime,
       shouldUseTimeDampening,
@@ -73,7 +78,10 @@ export default ({
   };
 
   const stop = () => {
-    invariant(dragging, 'Cannot stop auto scrolling when not started');
+    // can be called defensively
+    if (!dragging) {
+      return;
+    }
     cancelPending();
     dragging = null;
   };
