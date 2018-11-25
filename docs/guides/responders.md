@@ -4,7 +4,7 @@
 
 Responders are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
 
-> For more information about controlling the screen reader see our [screen reader guide](docs/guides/screen-reader.md)
+> For more information about controlling the screen reader see our [screen reader guide](/docs/guides/screen-reader.md)
 
 ## What responders are available?
 
@@ -18,7 +18,7 @@ Responders are top level application events that you can use to perform your own
 
 > Generally you will not need to use `onBeforeDragStart`, and it has a slightly different function signature to the rest of the responders
 
-- `onBeforeDragStart`: Called just before `onDragStart`. It is called immediately before any `snapshot` values are updated. It can be useful to do dimension locking for [table reordering](docs/patterns/tables.md).
+- `onBeforeDragStart`: Called just before `onDragStart`. It is called immediately before any `snapshot` values are updated. It can be useful to do dimension locking for [table reordering](/docs/patterns/tables.md).
 
 ## The second argument to responders: `provided: ResponderProvided`
 
@@ -30,7 +30,7 @@ type ResponderProvided = {|
 type Announce = (message: string) => void;
 ```
 
-All responders (except for `onBeforeDragStart`) are provided with a second argument: `ResponderProvided`. This object has one property: `announce`. This function is used to synchronously announce a message to screen readers. If you do not use this function we will announce a default english message. We have created a [guide for screen reader usage](docs/guides/screen-reader.md) which we recommend using if you are interested in controlling the screen reader messages for yourself and to support internationalisation. If you are using `announce` it must be called synchronously.
+All responders (except for `onBeforeDragStart`) are provided with a second argument: `ResponderProvided`. This object has one property: `announce`. This function is used to synchronously announce a message to screen readers. If you do not use this function we will announce a default english message. We have created a [guide for screen reader usage](/docs/guides/screen-reader.md) which we recommend using if you are interested in controlling the screen reader messages for yourself and to support internationalisation. If you are using `announce` it must be called synchronously.
 
 ## `onDragStart` (optional)
 
@@ -155,7 +155,7 @@ type DropReason = 'DROP' | 'CANCEL';
 
 > The use cases for this responder is super limited
 
-Once we have all of the information we need to start a drag we call the `onBeforeDragStart` function. This is called just before we update the `snapshot` values for the `Draggable` and `Droppable` components. At this point the application is not in a dragging state and so changing of props such as `isDropDisabled` will fail. The `onBeforeDragStart` responder is a good opportunity to do any dimension locking required for [table reordering](docs/patterns/tables.md).
+Once we have all of the information we need to start a drag we call the `onBeforeDragStart` function. This is called just before we update the `snapshot` values for the `Draggable` and `Droppable` components. At this point the application is not in a dragging state and so changing of props such as `isDropDisabled` will fail. The `onBeforeDragStart` responder is a good opportunity to do any dimension locking required for [table reordering](/docs/patterns/tables.md).
 
 - ✅ Can apply modifications to existing components to lock their sizes
 - ❌ Cannot remove or add any `Draggable` or `Droppable`
