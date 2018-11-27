@@ -114,7 +114,7 @@
     "rollup-plugin-size-snapshot": "^0.7.0",
     "rollup-plugin-strip": "^1.2.0",
     "rollup-plugin-uglify": "^6.0.0",
-    "stylelint": "9.8.0",
+    "stylelint": "9.9.0",
     "stylelint-config-prettier": "^4.0.0",
     "stylelint-config-recommended": "^2.1.0",
     "stylelint-config-standard": "^18.2.0",
