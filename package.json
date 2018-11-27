@@ -81,7 +81,7 @@
     "babel-jest": "^23.6.0",
     "babel-plugin-dev-expression": "^0.2.1",
     "cross-env": "^5.2.0",
-    "emotion": "^9.2.12",
+    "emotion": "^10.0.0",
     "enzyme": "^3.7.0",
     "enzyme-adapter-react-16": "^1.6.0",
     "eslint": "^5.9.0",
