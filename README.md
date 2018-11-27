@@ -222,7 +222,7 @@ Traditionally drag and drop interactions have been exclusively a mouse or touch 
 
 We provide **fantastic support for screen readers** to assist users with visual (or other) impairments. We ship with english messaging out of the box 📦. However, you are welcome to override these messages by using the `announce` function that it provided to all of the `DragDropContext > responder` functions.
 
-See our [screen reader guide](docs/guides/screen-reader.md) for a guide on crafting useful screen reader messaging.
+See our [screen reader guide](/docs/guides/screen-reader.md) for a guide on crafting useful screen reader messaging.
 
 #### Example screen reader behaviour
 
@@ -238,7 +238,7 @@ This allows consumers to wrap interactive elements such as an anchor and have it
 
 (🐱🎁 is a [schrodinger's cat](https://www.youtube.com/watch?v=IOYyCHGWJq4) joke)
 
-> To see more in depth information about how we impact standard browser events see our [how we use DOM events guide](docs/guides/how-we-use-dom-events.md)
+> To see more in depth information about how we impact standard browser events see our [how we use DOM events guide](/docs/guides/how-we-use-dom-events.md)
 
 ### Keyboard shortcuts: mouse dragging
 
@@ -259,7 +259,7 @@ Other than these explicitly prevented keyboard events all standard keyboard even
 
 `react-beautiful-dnd` supports dragging with only a keyboard. We have audited how our keyboard shortcuts interact with standard browser keyboard interactions. When the user is not dragging they can use their keyboard as they normally would. While dragging we override and disable certain browser shortcuts (such as `tab`) to ensure a fluid experience for the user.
 
-> To see more indepth information about how we impact standard browser events see our [how we use DOM events guide](docs/guides/how-we-use-dom-events.md)
+> To see more indepth information about how we impact standard browser events see our [how we use DOM events guide](/docs/guides/how-we-use-dom-events.md)
 
 ### Keyboard shortcuts: keyboard dragging
 
@@ -303,7 +303,7 @@ During a drag the following standard keyboard events have their default behaviou
 
 When a user presses their finger (or other input) on a `Draggable` we are not sure if they where intending to _tap_, _force press_, _scroll the container_ or _drag_. **As much as possible `react-beautiful-dnd` aims to ensure that a users default interaction experience remains unaffected**.
 
-> To see more indepth information about how we impact standard browser events see our [how we use DOM events guide](docs/guides/how-we-use-dom-events.md)
+> To see more indepth information about how we impact standard browser events see our [how we use DOM events guide](/docs/guides/how-we-use-dom-events.md)
 
 ### Starting a drag: long press
 
@@ -476,7 +476,7 @@ class App extends React.Component {
 
 Responders are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
 
-[Please see our Responders guide](docs/guides/responders.md) for detailed information about responders ❤️
+[Please see our Responders guide](/docs/guides/responders.md) for detailed information about responders ❤️
 
 ## `Droppable`
 
@@ -525,7 +525,7 @@ type Props = {|
 
 #### Optional props
 
-- `type`: A `TypeId(string)` that can be used to simply accept a class of `Draggable`. For example, if you use the type `PERSON` then it will only allow `Draggable`s of type `PERSON` to be dropped on itself. `Draggable`s of type `TASK` would not be able to be dropped on a `Droppable` with type `PERSON`. If no `type` is provided, it will be set to `'DEFAULT'`. Currently the `type` of the `Draggable`s within a `Droppable` **must be** the same. This restriction might be loosened in the future if there is a valid use case.
+- `type`: A `TypeId(string)` that can be used to simply accept only the specified class of `Draggable`. `Draggable`s always inherit type from the `Droppable` they are defined in. For example, if you use the type `PERSON` then it will only allow `Draggable`s of type `PERSON` to be dropped on itself. `Draggable`s of type `TASK` would not be able to be dropped on a `Droppable` with type `PERSON`. If no `type` is provided, it will be set to `'DEFAULT'`.
 - `isDropDisabled`: A flag to control whether or not dropping is currently allowed on the `Droppable`. You can use this to implement your own conditional dropping logic. It will default to `false`.
 - `isCombineEnabled`: A flag to control whether or not _all_ the `Draggables` in the list will be able to be **combined** with. It will default to `false`.
 - `direction`: The direction in which items flow in this droppable. Options are `vertical` (default) and `horizontal`.
