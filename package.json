@@ -102,7 +102,7 @@
     "raf-stub": "^2.0.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
-    "react-emotion": "^9.2.12",
+    "react-emotion": "^10.0.0",
     "react-test-renderer": "^16.6.1",
     "rimraf": "^2.6.2",
     "rollup": "^0.67.1",
