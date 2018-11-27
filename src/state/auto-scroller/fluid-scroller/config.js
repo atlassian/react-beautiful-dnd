@@ -8,7 +8,7 @@ const config = {
   // pixels per frame
   maxScrollSpeed: 28,
   // ms: how long to dampen the speed of an auto scroll from the start of a drag
-  slowWhenDurationLessThan: 1500,
+  dampenForDuration: 1200,
   // A function used to ease the distance been the startFrom and maxSpeedAt values
   // A simple linear function would be: (percentage) => percentage;
   // percentage is between 0 and 1

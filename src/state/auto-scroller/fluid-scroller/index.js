@@ -53,6 +53,7 @@ export default ({
     invariant(!dragging, 'Cannot start auto scrolling when already started');
     const dragStartTime: number = Date.now();
 
+    // TODO: should this be directional?
     const shouldUseTimeDampening: boolean = (() => {
       let wasScrollNeeded: boolean = false;
       const listener = () => {

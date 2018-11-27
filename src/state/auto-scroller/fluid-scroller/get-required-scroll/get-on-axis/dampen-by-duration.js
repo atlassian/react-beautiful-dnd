@@ -4,7 +4,7 @@ import config from '../../config';
 
 export default (proposedSpeed: number, dragStartTime: number): number => {
   const startOfRange: number = dragStartTime;
-  const endOfRange: number = dragStartTime + config.slowWhenDurationLessThan;
+  const endOfRange: number = dragStartTime + config.dampenForDuration;
   const current: number = Date.now();
 
   const percentage: number = getEasedPercentage(
