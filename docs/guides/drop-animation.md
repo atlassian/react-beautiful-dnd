@@ -33,11 +33,10 @@ You can use the `DraggableDroppingState` to build up your own `transform` and `t
 
 ```js
 const getStyle = (style, snapshot):  => {
-  const dropping = snapshot.dropping;
-  if (!dropping) {
+  if (!snapshot.isDropAnimating) {
     return style;
   }
-  const {moveTo, curve, duration} = dropping;
+  const {moveTo, curve, duration} = snapshot.dropAnimation;
   // move to the right spot
   const translate = `translate(${moveTo.x}px, ${moveTo.y}px)`;
   // add a bit of turn for fun
@@ -62,7 +61,7 @@ class TaskItem extends React.Component {
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            isDragging={snapshot.isDragging && !snapshot.dropping}
+            isDragging={snapshot.isDragging && !snapshot.isDropAnimating}
             style={getStyle(provided.draggableProps.style, snapshot)}
           >
             {task.content}
@@ -86,7 +85,7 @@ Do not make the `transition-duration` actually `0s`. It should be set at a near 
 
 ```js
 const getStyle = (style, snapshot): ?Object => {
-  if (!snapshot.dropping) {
+  if (!snapshot.isDropAnimating) {
     return style;
   }
   return {
