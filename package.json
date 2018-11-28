@@ -93,7 +93,7 @@
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-react": "^7.11.1",
-    "flow-bin": "0.86.0",
+    "flow-bin": "0.87.0",
     "globby": "^8.0.1",
     "jest": "^23.6.0",
     "jest-junit": "^5.2.0",
