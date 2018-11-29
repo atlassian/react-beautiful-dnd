@@ -23,10 +23,12 @@ describe('get droppable over', () => {
       x: 100000,
       y: 100000,
     };
+    const draggable: DraggableDimension = preset.inHome1;
 
     const result: ?DroppableId = getDroppableOver({
       target,
       droppables: preset.droppables,
+      draggable,
     });
 
     expect(result).toBe(null);
@@ -39,6 +41,7 @@ describe('get droppable over', () => {
       const result: ?DroppableId = getDroppableOver({
         target: draggable.page.borderBox.center,
         droppables: preset.droppables,
+        draggable,
       });
 
       expect(result).toBe(draggable.descriptor.droppableId);
@@ -55,10 +58,12 @@ describe('get droppable over', () => {
     const whileEnabled: ?DroppableId = getDroppableOver({
       target,
       droppables: preset.droppables,
+      draggable: preset.inHome1,
     });
     const whileDisabled: ?DroppableId = getDroppableOver({
       target,
       droppables: withDisabled,
+      draggable: preset.inHome1,
     });
 
     expect(whileEnabled).toBe(preset.home.descriptor.id);
@@ -98,6 +103,7 @@ describe('get droppable over', () => {
       // over the hidden part of the droppable subject
       target: { x: 60, y: 50 },
       droppables: { [droppable.descriptor.id]: droppable },
+      draggable: preset.inHome1,
     });
 
     expect(result).toBe(null);
@@ -138,6 +144,7 @@ describe('get droppable over', () => {
     const result: ?DroppableId = getDroppableOver({
       target: { x: 50, y: 50 },
       droppables: { [droppable.descriptor.id]: droppable },
+      draggable: preset.inHome1,
     });
 
     expect(result).toBe(null);

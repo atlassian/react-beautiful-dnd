@@ -42,6 +42,7 @@ export default ({
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
     droppables,
+    draggable,
   });
 
   // not dragging over anything
