@@ -808,7 +808,7 @@ type DraggableProvided = {|
 |};
 ```
 
-> For more type information please see [our types guide](/docs/guies/types.md).
+> For more type information please see [our types guide](/docs/guides/types.md).
 
 Everything within the _provided_ object must be applied for the `Draggable` to function correctly.
 
@@ -838,7 +838,7 @@ export type DraggableProps = {|
 |};
 ```
 
-> For more type information please see [our types guide](/docs/guies/types.md).
+> For more type information please see [our types guide](/docs/guides/types.md).
 
 ##### `draggableProps` Example
 
