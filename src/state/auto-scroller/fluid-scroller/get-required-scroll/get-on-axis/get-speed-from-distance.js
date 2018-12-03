@@ -1,6 +1,6 @@
 // @flow
 import { type PixelThresholds } from './get-pixel-thresholds';
-import getEasedPercentage from './get-eased-percentage';
+import getPercentage from '../../get-percentage';
 import config from '../../config';
 
 export default (
@@ -11,11 +11,12 @@ export default (
   const endOfRange: number = thresholds.startFrom;
   const current: number = thresholds.startFrom - distanceToEdge;
 
-  const percentage: number = getEasedPercentage(
-    startOfRange,
-    endOfRange,
-    current,
-    config.ease,
+  const percentage: number = config.ease(
+    getPercentage({
+      startOfRange,
+      endOfRange,
+      current,
+    }),
   );
 
   const speed: number = config.maxScrollSpeed * percentage;

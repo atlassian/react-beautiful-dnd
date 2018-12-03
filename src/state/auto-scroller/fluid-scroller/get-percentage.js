@@ -1,10 +1,12 @@
 // @flow
-export default (
+
+type Args = {|
   startOfRange: number,
   endOfRange: number,
   current: number,
-  ease: (value: number) => number,
-): number => {
+|};
+
+export default ({ startOfRange, endOfRange, current }: Args): number => {
   if (current <= startOfRange) {
     return 0;
   }
@@ -15,5 +17,5 @@ export default (
   const range: number = endOfRange - startOfRange;
   const currentInRange: number = current - startOfRange;
   const percentage: number = currentInRange / range;
-  return ease(percentage);
+  return percentage;
 };
