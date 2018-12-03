@@ -117,7 +117,7 @@ export default ({
 
     return {
       client: frameClient,
-      page: withScroll(frameClient),
+      page: withScroll(frameClient, windowScroll),
       scroll: getScroll(closestScrollable),
       scrollSize,
       shouldClipSubject,
