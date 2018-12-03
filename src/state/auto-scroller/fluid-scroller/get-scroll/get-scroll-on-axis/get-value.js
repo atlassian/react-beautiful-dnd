@@ -1,7 +1,7 @@
 // @flow
 import { type PixelThresholds } from './get-pixel-thresholds';
-import getSpeedFromDistance from './get-speed-from-distance';
-import dampenByDuration from './dampen-speed-by-duration';
+import getSpeedFromDistance from './get-value-from-distance';
+import dampenSpeedByTime from './dampen-value-by-time';
 
 type Args = {|
   distanceToEdge: number,
@@ -19,22 +19,22 @@ export default ({
   dragStartTime,
   shouldUseTimeDampening,
 }: Args): number => {
-  const proposed: number = getSpeedFromDistance(distanceToEdge, thresholds);
+  const speed: number = getSpeedFromDistance(distanceToEdge, thresholds);
 
   // not enough distance to trigger a minimum scroll
   // we can bail here
-  if (proposed < minSpeed) {
+  if (speed < minSpeed) {
     return 0;
   }
 
   // Dampen an auto scroll speed based on duration of drag
 
   if (!shouldUseTimeDampening) {
-    return proposed;
+    return speed;
   }
 
   // Once we know an auto scroll should occur based on distance,
   // we must let at least 1px through to trigger a scroll event an
   // another auto scroll call
-  return Math.max(dampenByDuration(proposed, dragStartTime), minSpeed);
+  return Math.max(dampenSpeedByTime(speed, dragStartTime), minSpeed);
 };

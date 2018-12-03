@@ -1,7 +1,7 @@
 // @flow
 import type { Position, Rect, Spacing } from 'css-box-model';
 import { apply, isEqual, origin } from '../../../position';
-import getOnAxis from './get-on-axis';
+import getScrollOnAxis from './get-scroll-on-axis';
 import adjustForSizeLimits from './adjust-for-size-limits';
 import { horizontal, vertical } from '../../../axis';
 
@@ -39,14 +39,14 @@ export default ({
   // The lower distance value the faster the scroll should be.
   // Maximum speed value should be hit before the distance is 0
   // Negative values to not continue to increase the speed
-  const y: number = getOnAxis({
+  const y: number = getScrollOnAxis({
     container,
     distanceToEdges,
     dragStartTime,
     axis: vertical,
     shouldUseTimeDampening,
   });
-  const x: number = getOnAxis({
+  const x: number = getScrollOnAxis({
     container,
     distanceToEdges,
     dragStartTime,

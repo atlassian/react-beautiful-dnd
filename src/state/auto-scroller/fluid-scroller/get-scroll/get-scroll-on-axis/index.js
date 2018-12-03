@@ -4,7 +4,7 @@ import getPixelThresholds, {
   type PixelThresholds,
 } from './get-pixel-thresholds';
 import type { Axis } from '../../../../../types';
-import getSpeed from './get-speed';
+import getValue from './get-value';
 
 type GetOnAxisArgs = {|
   container: Rect,
@@ -26,7 +26,7 @@ export default ({
     distanceToEdges[axis.end] < distanceToEdges[axis.start];
 
   if (isCloserToEnd) {
-    return getSpeed({
+    return getValue({
       distanceToEdge: distanceToEdges[axis.end],
       thresholds,
       dragStartTime,
@@ -36,7 +36,7 @@ export default ({
 
   return (
     -1 *
-    getSpeed({
+    getValue({
       distanceToEdge: distanceToEdges[axis.start],
       thresholds,
       dragStartTime,
