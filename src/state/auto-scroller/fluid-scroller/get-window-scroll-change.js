@@ -1,7 +1,7 @@
 // @flow
 import type { Position, Rect } from 'css-box-model';
 import type { Viewport } from '../../../types';
-import getRequiredScroll from './get-required-scroll';
+import getScroll from './get-scroll';
 import { canScrollWindow } from '../can-scroll';
 
 type Args = {|
@@ -19,7 +19,7 @@ export default ({
   dragStartTime,
   shouldUseTimeDampening,
 }: Args): ?Position => {
-  const scroll: ?Position = getRequiredScroll({
+  const scroll: ?Position = getScroll({
     dragStartTime,
     container: viewport.frame,
     subject,

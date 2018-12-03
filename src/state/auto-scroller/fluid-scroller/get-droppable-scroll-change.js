@@ -1,7 +1,7 @@
 // @flow
 import type { Position, Rect } from 'css-box-model';
 import type { Scrollable, DroppableDimension } from '../../../types';
-import getRequiredScroll from './get-required-scroll';
+import getScroll from './get-scroll';
 import { canScrollDroppable } from '../can-scroll';
 
 type Args = {|
@@ -27,7 +27,7 @@ export default ({
     return null;
   }
 
-  const scroll: ?Position = getRequiredScroll({
+  const scroll: ?Position = getScroll({
     dragStartTime,
     container: frame.pageMarginBox,
     subject,

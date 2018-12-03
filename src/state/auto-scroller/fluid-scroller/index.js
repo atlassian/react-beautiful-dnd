@@ -69,8 +69,6 @@ export default ({
       return wasScrollNeeded;
     })();
 
-    console.warn('shouldUseTimeDampening', shouldUseTimeDampening);
-
     dragging = {
       dragStartTime,
       shouldUseTimeDampening,
