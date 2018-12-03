@@ -11,6 +11,7 @@ export default (proposedSpeed: number, dragStartTime: number): number => {
     startOfRange,
     endOfRange,
     current,
+    config.dampeningEase,
   );
 
   if (percentage >= 1) {

@@ -14,6 +14,16 @@ const config = {
   // percentage is between 0 and 1
   // result must be between 0 and 1
   ease: (percentage: number) => Math.pow(percentage, 2),
+
+  dampeningEase: (percentage: number) => {
+    const breakpoint = 0.3;
+    // super slow up to 30%
+    if (percentage < breakpoint) {
+      return percentage / 10;
+    }
+    const value = Math.pow((percentage - breakpoint) / (1 - breakpoint), 3);
+    return value * 0.97 + 0.03;
+  },
 };
 
 export default config;

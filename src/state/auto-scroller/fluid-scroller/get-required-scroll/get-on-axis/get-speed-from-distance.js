@@ -15,6 +15,7 @@ export default (
     startOfRange,
     endOfRange,
     current,
+    config.ease,
   );
 
   const speed: number = config.maxScrollSpeed * percentage;

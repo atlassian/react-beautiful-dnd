@@ -1,10 +1,9 @@
 // @flow
-import config from '../../config';
-
 export default (
   startOfRange: number,
   endOfRange: number,
   current: number,
+  ease: (value: number) => number,
 ): number => {
   if (current <= startOfRange) {
     return 0;
@@ -16,5 +15,5 @@ export default (
   const range: number = endOfRange - startOfRange;
   const currentInRange: number = current - startOfRange;
   const percentage: number = currentInRange / range;
-  return config.ease(percentage);
+  return ease(percentage);
 };
