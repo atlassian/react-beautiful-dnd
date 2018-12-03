@@ -10,8 +10,6 @@ import getSimpleStatePreset from '../../../../../utils/get-simple-state-preset';
 
 export type BlockFnArgs = {|
   axis: Axis,
-  scroller: FluidScroller,
-  mocks: PublicArgs,
   preset: Object,
   state: Object,
 |};
@@ -19,17 +17,16 @@ export type BlockFnArgs = {|
 type BlockFn = (args: BlockFnArgs) => void;
 
 export default (block: BlockFn) => {
-  const mocks: PublicArgs = {
-    scrollWindow: jest.fn(),
-    scrollDroppable: jest.fn(),
-  };
-  const scroller: FluidScroller = fluidScroller(mocks);
-
   [vertical, horizontal].forEach((axis: Axis) => {
     describe(`on the ${axis.direction} axis`, () => {
       beforeEach(() => {
         requestAnimationFrame.reset();
+        jest.useFakeTimers();
       });
+      afterEach(() => {
+        jest.useRealTimers();
+      });
+
       afterAll(() => {
         requestAnimationFrame.reset();
       });
@@ -37,7 +34,7 @@ export default (block: BlockFn) => {
       const preset = getPreset(axis);
       const state = getSimpleStatePreset(axis);
 
-      block({ axis, scroller, mocks, preset, state });
+      block({ axis, preset, state });
     });
   });
 };
