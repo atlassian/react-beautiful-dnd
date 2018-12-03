@@ -1,11 +1,11 @@
 // @flow
-import { type PixelThresholds } from './get-pixel-thresholds';
+import { type DistanceThresholds } from './get-distance-thresholds';
 import getPercentage from '../../get-percentage';
 import config from '../../config';
 
 export default (
   distanceToEdge: number,
-  thresholds: PixelThresholds,
+  thresholds: DistanceThresholds,
 ): number => {
   const startOfRange: number = thresholds.maxSpeedAt;
   const endOfRange: number = thresholds.startFrom;
@@ -19,7 +19,7 @@ export default (
     }),
   );
 
-  const speed: number = config.maxScrollSpeed * percentage;
+  const scroll: number = config.maxScrollSpeed * percentage;
 
-  return speed;
+  return scroll;
 };

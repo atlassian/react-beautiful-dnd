@@ -1,8 +1,8 @@
 // @flow
 import type { Rect, Spacing } from 'css-box-model';
-import getPixelThresholds, {
-  type PixelThresholds,
-} from './get-pixel-thresholds';
+import getDistanceThresholds, {
+  type DistanceThresholds,
+} from './get-distance-thresholds';
 import type { Axis } from '../../../../../types';
 import getValue from './get-value';
 
@@ -21,7 +21,7 @@ export default ({
   axis,
   shouldUseTimeDampening,
 }: GetOnAxisArgs): number => {
-  const thresholds: PixelThresholds = getPixelThresholds(container, axis);
+  const thresholds: DistanceThresholds = getDistanceThresholds(container, axis);
   const isCloserToEnd: boolean =
     distanceToEdges[axis.end] < distanceToEdges[axis.start];
 
