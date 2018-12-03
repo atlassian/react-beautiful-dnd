@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should support rendering to a string 1`] = `"<div data-react-beautiful-dnd-droppable=\\"0\\" data-reactroot=\\"\\"><div data-react-beautiful-dnd-draggable=\\"0\\" tabindex=\\"0\\" data-react-beautiful-dnd-drag-handle=\\"0\\" aria-roledescription=\\"Draggable item. Press space bar to lift\\" draggable=\\"false\\">Drag me!</div></div>"`;
+
+exports[`should support rendering to static markup 1`] = `"<div data-react-beautiful-dnd-droppable=\\"0\\"><div data-react-beautiful-dnd-draggable=\\"0\\" tabindex=\\"0\\" data-react-beautiful-dnd-drag-handle=\\"0\\" aria-roledescription=\\"Draggable item. Press space bar to lift\\" draggable=\\"false\\">Drag me!</div></div>"`;
