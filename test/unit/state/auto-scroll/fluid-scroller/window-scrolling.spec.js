@@ -23,12 +23,12 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
   const onStartBoundary: Position = patch(
     axis.line,
     // to the boundary is not enough to start
-    scrollableViewport.frame[axis.size] - thresholds.startFrom,
+    scrollableViewport.frame[axis.size] - thresholds.startScrollingFrom,
     scrollableViewport.frame.center[axis.crossAxisLine],
   );
   const onMaxBoundary: Position = patch(
     axis.line,
-    scrollableViewport.frame[axis.size] - thresholds.maxScrollAt,
+    scrollableViewport.frame[axis.size] - thresholds.maxScrollValueAt,
     scrollableViewport.frame.center[axis.crossAxisLine],
   );
 
@@ -50,7 +50,7 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       expect(mocks.scrollWindow).not.toHaveBeenCalled();
     });
 
-    it('should scroll if on the start threshold', () => {
+    it.only('should scroll if on the start threshold', () => {
       const mocks: PublicArgs = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
 
