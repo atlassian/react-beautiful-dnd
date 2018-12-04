@@ -50,7 +50,7 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       expect(mocks.scrollWindow).not.toHaveBeenCalled();
     });
 
-    it.only('should scroll if on the start threshold', () => {
+    it('should scroll if on the start threshold', () => {
       const mocks: PublicArgs = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
 

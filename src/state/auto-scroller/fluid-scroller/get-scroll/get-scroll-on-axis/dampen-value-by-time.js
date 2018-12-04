@@ -35,5 +35,7 @@ export default (proposedScroll: number, dragStartTime: number): number => {
     current: percentageThroughDampeningPeriod,
   });
 
-  return proposedScroll * config.ease(percentageThroughPhase2);
+  const scroll: number = proposedScroll * config.ease(percentageThroughPhase2);
+
+  return Math.ceil(scroll);
 };

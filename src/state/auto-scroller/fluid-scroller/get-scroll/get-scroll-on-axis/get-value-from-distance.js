@@ -2,45 +2,60 @@
 import { type DistanceThresholds } from './get-distance-thresholds';
 import getPercentage from '../../get-percentage';
 import config from '../../config';
+import minScroll from './min-scroll';
 
 export default (
   distanceToEdge: number,
   thresholds: DistanceThresholds,
 ): number => {
-  // very close to edge - use maximum scroll
-  if (distanceToEdge <= thresholds.maxScrollValueAt) {
-    return config.maxPixelScroll;
-  }
+  /*
+  // This function only looks at the distance to one edge
+  // Example: looking at bottom edge
+  |----------------------------------|
+  |                                  |
+  |                                  |
+  |                                  |
+  |                                  |
+  |                                  | => no scroll in this range
+  |                                  |
+  |                                  |
+  |  startScrollingFrom (eg 100px)   |
+  |                                  |
+  |                                  | => increased scroll value the closer to maxScrollValueAt
+  |  maxScrollValueAt (eg 10px)      |
+  |                                  | => max scroll value in this range
+  |----------------------------------|
+  */
 
-  // too far away to scroll
+  // too far away to auto scroll
   if (distanceToEdge > thresholds.startScrollingFrom) {
     return 0;
   }
 
-  // eg maxScrollValueAt: 10px
-  // eg startScrollingFrom: 100px
-  // everything below maxScrollValueAt goes at the max scroll
-  // everything above startScrollingFrom does not scroll
-  const percentage: number =
-    1 -
-    getPercentage({
-      startOfRange: thresholds.maxScrollValueAt,
-      endOfRange: thresholds.startScrollingFrom,
-      current: distanceToEdge,
-    });
-
-  console.log('thresholds', thresholds);
-  console.log('distanceToEdge', distanceToEdge);
-  console.log('percentage', percentage);
-
-  // out of bounds, return no scroll
-  if (percentage < 0) {
-    return 0;
+  // use max speed when on or over boundary
+  if (distanceToEdge <= thresholds.maxScrollValueAt) {
+    return config.maxPixelScroll;
   }
 
-  const scroll: number = config.maxPixelScroll * config.ease(percentage);
+  // when just going on the boundary return the minimum integer
+  if (distanceToEdge === thresholds.startScrollingFrom) {
+    return minScroll;
+  }
 
-  console.log('scroll', scroll);
+  // to get the % past startScrollingFrom we will calculate
+  // the % the value is from maxScrollValueAt and then invert it
+  const percentageFromMaxScrollValueAt: number = getPercentage({
+    startOfRange: thresholds.maxScrollValueAt,
+    endOfRange: thresholds.startScrollingFrom,
+    current: distanceToEdge,
+  });
 
-  return scroll;
+  const percentageFromStartScrollingFrom: number =
+    1 - percentageFromMaxScrollValueAt;
+
+  const scroll: number =
+    config.maxPixelScroll * config.ease(percentageFromStartScrollingFrom);
+
+  // scroll will always be a positive integer
+  return Math.ceil(scroll);
 };
