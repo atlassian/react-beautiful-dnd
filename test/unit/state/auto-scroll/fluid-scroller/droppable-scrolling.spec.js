@@ -58,6 +58,7 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       );
       requestAnimationFrame.step();
     };
+
     it('should not scroll if before the start threshold', () => {
       const mocks: PublicArgs = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);

@@ -2,15 +2,16 @@
 import type { Position } from 'css-box-model';
 import forEach, { type BlockFnArgs } from './util/for-each';
 import getMocks from './util/get-args-mock';
-import { scrollableViewport } from './util/viewport';
+import { scrollableViewport, unscrollableViewport } from './util/viewport';
 import dragTo from './util/drag-to';
 import getScroller, {
   type PublicArgs,
   type FluidScroller,
 } from '../../../../../src/state/auto-scroller/fluid-scroller';
 import { patch } from '../../../../../src/state/position';
+import getDroppable from './util/get-droppable';
 
-forEach(({ axis, state }: BlockFnArgs) => {
+forEach(({ axis, state, preset }: BlockFnArgs) => {
   it('should cancel any pending window scroll', () => {
     const wouldScroll: Position = patch(
       axis.line,
@@ -59,6 +60,51 @@ forEach(({ axis, state }: BlockFnArgs) => {
   });
 
   it('should cancel any pending droppable scroll', () => {
-    throw new Error('TODO');
+    const { scrollable, frameClient } = getDroppable(preset);
+    const wouldScroll: Position = patch(
+      axis.line,
+      frameClient.borderBox[axis.end],
+    );
+
+    {
+      const mocks: PublicArgs = getMocks();
+      const scroller: FluidScroller = getScroller(mocks);
+
+      scroller.start(
+        dragTo({
+          selection: wouldScroll,
+          viewport: unscrollableViewport,
+          state,
+          droppable: scrollable,
+        }),
+      );
+
+      // not flushing frame
+      expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+
+      scroller.cancelPending();
+
+      requestAnimationFrame.flush();
+      expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+    }
+
+    // validation (no cancel)
+    {
+      const mocks: PublicArgs = getMocks();
+      const scroller: FluidScroller = getScroller(mocks);
+
+      scroller.start(
+        dragTo({
+          selection: wouldScroll,
+          viewport: unscrollableViewport,
+          state,
+          droppable: scrollable,
+        }),
+      );
+
+      expect(mocks.scrollDroppable).not.toHaveBeenCalled();
+      requestAnimationFrame.step();
+      expect(mocks.scrollDroppable).toHaveBeenCalled();
+    }
   });
 });
