@@ -2,10 +2,9 @@
 
 import type { Position } from 'css-box-model';
 import forEach, { type BlockFnArgs } from './util/for-each';
-import type { DraggingState, Viewport } from '../../../../../src/types';
+import type { DroppableDimension } from '../../../../../src/types';
 import { unscrollableViewport } from './util/viewport';
 import getDroppable from './util/get-droppable';
-import scrollViewport from '../../../../../src/state/scroll-viewport';
 import dragTo from './util/drag-to';
 import getScroller, {
   type PublicArgs,
@@ -22,6 +21,7 @@ import {
 } from '../../../../../src/state/position';
 import getArgsMock from './util/get-args-mock';
 import config from '../../../../../src/state/auto-scroller/fluid-scroller/config';
+import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
 
 forEach(({ axis, state, preset }: BlockFnArgs) => {
   const { scrollable, frameClient, scrollableScrollSize } = getDroppable(
@@ -32,7 +32,7 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
     axis,
   );
 
-  describe.only('moving forward to end of droppable', () => {
+  describe('moving forward to end of droppable', () => {
     const onStartBoundary: Position = patch(
       axis.line,
       // to the boundary is not enough to start
@@ -241,23 +241,23 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
     });
   });
 
-  describe('moving backward to start of window', () => {
-    const windowScroll: Position = patch(axis.line, 10);
-    const scrolledViewport: Viewport = scrollViewport(
-      unscrollableViewport,
-      windowScroll,
+  describe('moving backward to start of droppable', () => {
+    const droppableScroll: Position = patch(axis.line, 10);
+    const scrolled: DroppableDimension = scrollDroppable(
+      scrollable,
+      droppableScroll,
     );
 
     const onStartBoundary: Position = patch(
       axis.line,
       // at the boundary is not enough to start
-      windowScroll[axis.line] + thresholds.startScrollingFrom,
-      scrolledViewport.frame.center[axis.crossAxisLine],
+      frameClient.borderBox[axis.start] + thresholds.startScrollingFrom,
+      frameClient.borderBox.center[axis.crossAxisLine],
     );
     const onMaxBoundary: Position = patch(
       axis.line,
-      windowScroll[axis.line] + thresholds.maxScrollValueAt,
-      scrolledViewport.frame.center[axis.crossAxisLine],
+      frameClient.borderBox[axis.start] + thresholds.maxScrollValueAt,
+      frameClient.borderBox.center[axis.crossAxisLine],
     );
     const noScrollTarget: Position = add(onStartBoundary, patch(axis.line, 1));
 
@@ -266,7 +266,7 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
         dragTo({
           selection: noScrollTarget,
           viewport: unscrollableViewport,
-          droppable: scrollable,
+          droppable: scrolled,
           state,
         }),
       );
@@ -281,7 +281,8 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       scroller.start(
         dragTo({
           selection: target,
-          viewport: scrolledViewport,
+          viewport: unscrollableViewport,
+          droppable: scrolled,
           state,
         }),
       );
@@ -297,7 +298,8 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       scroller.start(
         dragTo({
           selection: onStartBoundary,
-          viewport: scrolledViewport,
+          viewport: unscrollableViewport,
+          droppable: scrolled,
           state,
         }),
       );
@@ -315,7 +317,8 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       scroller.start(
         dragTo({
           selection: target,
-          viewport: scrolledViewport,
+          viewport: unscrollableViewport,
+          droppable: scrolled,
           state,
         }),
       );
@@ -344,7 +347,8 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       scroller.scroll(
         dragTo({
           selection: atStartOfRange,
-          viewport: scrolledViewport,
+          viewport: unscrollableViewport,
+          droppable: scrolled,
           state,
         }),
       );
@@ -355,13 +359,14 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       scroller.scroll(
         dragTo({
           selection: atEndOfRange,
-          viewport: scrolledViewport,
+          viewport: unscrollableViewport,
+          droppable: scrolled,
           state,
         }),
       );
       requestAnimationFrame.step();
       expect(mocks.scrollDroppable).toHaveBeenCalledTimes(2);
-      const scroll2: Position = (mocks.scrollDroppable.mock.calls[1][0]: any);
+      const scroll2: Position = (mocks.scrollDroppable.mock.calls[1][1]: any);
 
       expect(scroll1[axis.line]).toBeGreaterThan(scroll2[axis.line]);
 
@@ -378,12 +383,14 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       scroller.scroll(
         dragTo({
           selection: onMaxBoundary,
-          viewport: scrolledViewport,
+          viewport: unscrollableViewport,
+          droppable: scrolled,
           state,
         }),
       );
       requestAnimationFrame.step();
       expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+        scrolled.descriptor.id,
         negate(patch(axis.line, config.maxPixelScroll)),
       );
     });
@@ -397,12 +404,14 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       scroller.scroll(
         dragTo({
           selection: target,
-          viewport: scrolledViewport,
+          viewport: unscrollableViewport,
+          droppable: scrolled,
           state,
         }),
       );
       requestAnimationFrame.step();
       expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+        scrolled.descriptor.id,
         negate(patch(axis.line, config.maxPixelScroll)),
       );
     });
@@ -417,14 +426,16 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       scroller.scroll(
         dragTo({
           selection: target1,
-          viewport: scrolledViewport,
+          viewport: unscrollableViewport,
+          droppable: scrolled,
           state,
         }),
       );
       scroller.scroll(
         dragTo({
           selection: target2,
-          viewport: scrolledViewport,
+          viewport: unscrollableViewport,
+          droppable: scrolled,
           state,
         }),
       );
@@ -432,6 +443,7 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       requestAnimationFrame.step();
       expect(mocks.scrollDroppable).toHaveBeenCalledTimes(1);
       expect(mocks.scrollDroppable).toHaveBeenCalledWith(
+        scrolled.descriptor.id,
         negate(patch(axis.line, config.maxPixelScroll)),
       );
     });
