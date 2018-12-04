@@ -89,5 +89,13 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       const request: Position = mocks.scrollWindow.mock.calls[0][0];
       expect(request[axis.line]).toBeGreaterThan(0);
     });
+
+    it('should get faster the closer to the max speed point', () => {});
+
+    it('should have the top speed at the max speed point', () => {});
+
+    it('should have the top speed when moving beyond the max speed point', () => {});
+
+    it('should throttle multiple scrolls into a single animation frame', () => {});
   });
 });
