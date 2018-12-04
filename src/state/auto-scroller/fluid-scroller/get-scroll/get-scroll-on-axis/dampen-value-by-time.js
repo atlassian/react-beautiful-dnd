@@ -2,9 +2,10 @@
 import getPercentage from '../../get-percentage';
 import config from '../../config';
 
-const startPhase2From: number = config.durationDampening.accelerateFrom;
+const startPhase2FromPercentage: number =
+  config.durationDampening.accelerateFromPercentage;
 
-export default (proposedSpeed: number, dragStartTime: number): number => {
+export default (proposedScroll: number, dragStartTime: number): number => {
   const startOfRange: number = dragStartTime;
   const endOfRange: number = dragStartTime + config.durationDampening.duration;
   const current: number = Date.now();
@@ -16,22 +17,23 @@ export default (proposedSpeed: number, dragStartTime: number): number => {
   });
 
   // no dampening required
-  if (percentageThroughDampeningPeriod >= 1) {
-    return proposedSpeed;
+  if (
+    percentageThroughDampeningPeriod <= 0 ||
+    percentageThroughDampeningPeriod >= 1
+  ) {
+    return proposedScroll;
   }
 
   // phase 1: up to 30% we delegate to the min scroll speed
-  if (percentageThroughDampeningPeriod < startPhase2From) {
+  if (percentageThroughDampeningPeriod < startPhase2FromPercentage) {
     return 0;
   }
 
-  const percentageThroughPhase2: number = config.ease(
-    getPercentage({
-      startOfRange: startPhase2From,
-      endOfRange: 1,
-      current: percentageThroughDampeningPeriod,
-    }),
-  );
+  const percentageThroughPhase2: number = getPercentage({
+    startOfRange: startPhase2FromPercentage,
+    endOfRange: 1,
+    current: percentageThroughDampeningPeriod,
+  });
 
-  return proposedSpeed * percentageThroughPhase2;
+  return proposedScroll * config.ease(percentageThroughPhase2);
 };

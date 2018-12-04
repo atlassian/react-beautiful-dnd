@@ -7,19 +7,32 @@ export default (
   distanceToEdge: number,
   thresholds: DistanceThresholds,
 ): number => {
-  const startOfRange: number = thresholds.maxSpeedAt;
-  const endOfRange: number = thresholds.startFrom;
-  const current: number = thresholds.startFrom - distanceToEdge;
+  // very close to edge - use maximum scroll
+  if (distanceToEdge <= thresholds.maxScrollValueAt) {
+    return config.maxPixelScroll;
+  }
 
-  const percentage: number = config.ease(
-    getPercentage({
-      startOfRange,
-      endOfRange,
-      current,
-    }),
-  );
+  // too far away to scroll
+  if (distanceToEdge > thresholds.startScrollingFrom) {
+    return 0;
+  }
 
-  const scroll: number = config.maxScrollSpeed * percentage;
+  // eg startScrollingFrom: 100px
+  // eg maxScrollValueAt: 10px
+  // everything below maxScrollValueAt goes at the max scroll
+  // everything above startScrollingFrom does not scroll
+  const percentage: number = getPercentage({
+    startOfRange: thresholds.maxScrollValueAt,
+    endOfRange: thresholds.startScrollingFrom,
+    current: thresholds.startScrollingFrom - distanceToEdge,
+  });
+
+  // out of bounds, return no scroll
+  if (percentage <= 0) {
+    return 0;
+  }
+
+  const scroll: number = config.maxPixelScroll * config.ease(percentage);
 
   return scroll;
 };

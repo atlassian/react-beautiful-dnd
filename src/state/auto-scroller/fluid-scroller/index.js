@@ -53,26 +53,27 @@ export default ({
     invariant(!dragging, 'Cannot start auto scrolling when already started');
     const dragStartTime: number = Date.now();
 
-    const shouldUseTimeDampening: boolean = (() => {
-      let wasScrollNeeded: boolean = false;
-      const fakeScrollCallback = () => {
-        wasScrollNeeded = true;
-      };
-      scroll({
-        state,
-        dragStartTime: 0,
-        shouldUseTimeDampening: false,
-        scrollWindow: fakeScrollCallback,
-        scrollDroppable: fakeScrollCallback,
-      });
-
-      return wasScrollNeeded;
-    })();
+    let wasScrollNeeded: boolean = false;
+    const fakeScrollCallback = () => {
+      wasScrollNeeded = true;
+    };
+    scroll({
+      state,
+      dragStartTime: 0,
+      shouldUseTimeDampening: false,
+      scrollWindow: fakeScrollCallback,
+      scrollDroppable: fakeScrollCallback,
+    });
 
     dragging = {
       dragStartTime,
-      shouldUseTimeDampening,
+      shouldUseTimeDampening: wasScrollNeeded,
     };
+
+    // we know an auto scroll is needed - let's do it!
+    if (wasScrollNeeded) {
+      tryScroll(state);
+    }
   };
 
   const stop = () => {
