@@ -24,9 +24,7 @@ import config from '../../../../../src/state/auto-scroller/fluid-scroller/config
 import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
 
 forEach(({ axis, state, preset }: BlockFnArgs) => {
-  const { scrollable, frameClient, scrollableScrollSize } = getDroppable(
-    preset,
-  );
+  const { scrollable, frameClient } = getDroppable(preset);
   const thresholds: DistanceThresholds = getDistanceThresholds(
     frameClient.borderBox,
     axis,
