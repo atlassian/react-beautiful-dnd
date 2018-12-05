@@ -85,7 +85,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
       );
 
       expect(mocks.scrollWindow).not.toHaveBeenCalled();
-      requestAnimationFrame.flush();
+      requestAnimationFrame.step();
       expect(mocks.scrollWindow).toHaveBeenCalled();
     });
 
