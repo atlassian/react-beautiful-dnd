@@ -1,9 +1,5 @@
 // @flow
 import { vertical, horizontal } from '../../../../../../src/state/axis';
-import fluidScroller, {
-  type FluidScroller,
-  type PublicArgs,
-} from '../../../../../../src/state/auto-scroller/fluid-scroller';
 import type { Axis } from '../../../../../../src/types';
 import { getPreset } from '../../../../../utils/dimension';
 import getSimpleStatePreset from '../../../../../utils/get-simple-state-preset';
