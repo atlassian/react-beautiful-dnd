@@ -41,7 +41,6 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
       scrollableViewport.frame,
       axis === vertical ? horizontal : vertical,
     );
-
     const onMaxBoundaryOfBoth: Position = patch(
       axis.line,
       scrollableViewport.frame[axis.size] - thresholds.maxScrollValueAt,
