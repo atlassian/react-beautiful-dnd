@@ -10704,10 +10704,10 @@ testcafe-reporter-xunit@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/testcafe-reporter-xunit/-/testcafe-reporter-xunit-2.1.0.tgz#e6d66c572ce15af266706af0fd610b2a841dd443"
 
-testcafe@^0.23.1:
-  version "0.23.2"
-  resolved "https://registry.yarnpkg.com/testcafe/-/testcafe-0.23.2.tgz#0d0ad449f9d2c2aae63dfaf3f2fe1dff25a2a16a"
-  integrity sha512-zviKTmRnC/RAuh3QpE4qlvIU2sLItg0opBCAllAX8lVFv9LwBU8vnoVCJ83yKCs8/j7KQn1VJyIa0m8JCJFr5A==
+testcafe@0.23.1:
+  version "0.23.1"
+  resolved "https://registry.yarnpkg.com/testcafe/-/testcafe-0.23.1.tgz#d730f7e94fbd9db2bdad849cb43a5d8aa98921a3"
+  integrity sha512-6XeDFRC28CPgeZ0nmZpABWlXC9GnqddO1PZESYWJt/IYIWqYv5nsz6wId6ggWB0YHloRAXWI8yktPIRp6Kg4Bg==
   dependencies:
     async-exit-hook "^1.1.2"
     babel-core "^6.22.1"
@@ -10736,11 +10736,9 @@ testcafe@^0.23.1:
     globby "^3.0.1"
     graceful-fs "^4.1.11"
     gulp-data "^1.3.1"
-    import-lazy "^3.1.0"
     indent-string "^1.2.2"
     is-ci "^1.0.10"
     is-glob "^2.0.1"
-    is-stream "^1.1.0"
     lodash "^4.17.10"
     log-update-async-hook "^2.0.2"
     make-dir "^1.3.0"
