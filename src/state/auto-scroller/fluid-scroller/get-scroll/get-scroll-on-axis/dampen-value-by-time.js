@@ -12,10 +12,6 @@ export default (proposedScroll: number, dragStartTime: number): number => {
   const now: number = Date.now();
   const runTime: number = now - startOfRange;
 
-  console.log('run time', runTime);
-  console.log('accelerateAt', accelerateAt);
-  console.log('stopAt', stopAt);
-
   // we have finished the time dampening period
   if (runTime >= stopAt) {
     return proposedScroll;

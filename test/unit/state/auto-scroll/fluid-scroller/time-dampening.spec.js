@@ -1,9 +1,7 @@
 // @flow
 import type { Position } from 'css-box-model';
 import forEach, { type BlockFnArgs } from './util/for-each';
-import type { Viewport } from '../../../../../src/types';
 import { scrollableViewport } from './util/viewport';
-import scrollViewport from '../../../../../src/state/scroll-viewport';
 import dragTo from './util/drag-to';
 import getScroller, {
   type PublicArgs,
@@ -12,12 +10,7 @@ import getScroller, {
 import getDistanceThresholds, {
   type DistanceThresholds,
 } from '../../../../../src/state/auto-scroller/fluid-scroller/get-scroll/get-scroll-on-axis/get-distance-thresholds';
-import {
-  patch,
-  add,
-  subtract,
-  negate,
-} from '../../../../../src/state/position';
+import { patch } from '../../../../../src/state/position';
 import getArgsMock from './util/get-args-mock';
 import config from '../../../../../src/state/auto-scroller/fluid-scroller/config';
 import minScroll from '../../../../../src/state/auto-scroller/fluid-scroller/get-scroll/get-scroll-on-axis/min-scroll';
@@ -48,11 +41,13 @@ forEach(({ state, axis }: BlockFnArgs) => {
 
   beforeEach(() => {
     mockNow = jest.fn().mockReturnValue(0);
+    // $FlowFixMe - overriding global
     Date.now = mockNow;
   });
 
   afterEach(() => {
     mockNow.mockClear();
+    // $FlowFixMe - overriding global
     Date.now = originalNow;
   });
 
