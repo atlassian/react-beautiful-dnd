@@ -1,41 +1,41 @@
 // @flow
 import getPercentage from '../../get-percentage';
 import config from '../../config';
+import minScroll from './min-scroll';
 
-const startPhase2FromPercentage: number =
-  config.durationDampening.accelerateFromPercentage;
+const accelerateAt: number = config.durationDampening.accelerateAt;
+const stopAt: number = config.durationDampening.stopDampeningAt;
 
 export default (proposedScroll: number, dragStartTime: number): number => {
   const startOfRange: number = dragStartTime;
-  const endOfRange: number = dragStartTime + config.durationDampening.duration;
-  const current: number = Date.now();
+  const endOfRange: number = stopAt;
+  const now: number = Date.now();
+  const runTime: number = now - startOfRange;
 
-  const percentageThroughDampeningPeriod: number = getPercentage({
-    startOfRange,
-    endOfRange,
-    current,
-  });
+  console.log('run time', runTime);
+  console.log('accelerateAt', accelerateAt);
+  console.log('stopAt', stopAt);
 
-  // no dampening required
-  if (
-    percentageThroughDampeningPeriod <= 0 ||
-    percentageThroughDampeningPeriod >= 1
-  ) {
+  // we have finished the time dampening period
+  if (runTime >= stopAt) {
     return proposedScroll;
   }
 
-  // phase 1: up to 30% we delegate to the min scroll speed
-  if (percentageThroughDampeningPeriod < startPhase2FromPercentage) {
-    return 0;
+  // Up to this point we know there is a proposed scroll
+  // but we have not reached our accelerate point
+  // Return the minimum amount of scroll
+  if (runTime < accelerateAt) {
+    return minScroll;
   }
 
-  const percentageThroughPhase2: number = getPercentage({
-    startOfRange: startPhase2FromPercentage,
-    endOfRange: 1,
-    current: percentageThroughDampeningPeriod,
+  const betweenAccelerateAtAndStopAtPercentage: number = getPercentage({
+    startOfRange: accelerateAt,
+    endOfRange,
+    current: runTime,
   });
 
-  const scroll: number = proposedScroll * config.ease(percentageThroughPhase2);
+  const scroll: number =
+    proposedScroll * config.ease(betweenAccelerateAtAndStopAtPercentage);
 
   return Math.ceil(scroll);
 };

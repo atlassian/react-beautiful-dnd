@@ -16,9 +16,9 @@ const config = {
 
   durationDampening: {
     // ms: how long to dampen the speed of an auto scroll from the start of a drag
-    duration: 1200,
-    // % to start accelerating the reduction of duration dampening
-    accelerateFromPercentage: 0.3,
+    stopDampeningAt: 1200,
+    // ms: when to start accelerating the reduction of duration dampening
+    accelerateAt: 360,
   },
 };
 
