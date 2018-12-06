@@ -15,15 +15,8 @@ import getScroller, {
 import getDistanceThresholds, {
   type DistanceThresholds,
 } from '../../../../../src/state/auto-scroller/fluid-scroller/get-scroll/get-scroll-on-axis/get-distance-thresholds';
-import {
-  patch,
-  add,
-  subtract,
-  negate,
-} from '../../../../../src/state/position';
+import { patch } from '../../../../../src/state/position';
 import getArgsMock from './util/get-args-mock';
-import config from '../../../../../src/state/auto-scroller/fluid-scroller/config';
-import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
 import { vertical, horizontal } from '../../../../../src/state/axis';
 import { expandByPosition } from '../../../../../src/state/spacing';
 import {
