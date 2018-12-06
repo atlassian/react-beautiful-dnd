@@ -9,8 +9,8 @@ const shouldEnd = (action: Action): boolean =>
   action.type === 'DROP_ANIMATE' ||
   action.type === 'CLEAN';
 
-const shouldCancel = (action: Action): boolean =>
-  shouldEnd(action) || action.type === 'COLLECTION_STARTING';
+const shouldCancelPending = (action: Action): boolean =>
+  action.type === 'COLLECTION_STARTING';
 
 export default (getScroller: () => AutoScroller) => (
   store: MiddlewareStore,
@@ -21,7 +21,7 @@ export default (getScroller: () => AutoScroller) => (
     return;
   }
 
-  if (shouldCancel(action)) {
+  if (shouldCancelPending(action)) {
     getScroller().cancelPending();
     next(action);
     return;
