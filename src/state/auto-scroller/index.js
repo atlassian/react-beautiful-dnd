@@ -3,7 +3,7 @@ import { type Position } from 'css-box-model';
 import createFluidScroller, { type FluidScroller } from './fluid-scroller';
 import createJumpScroller, { type JumpScroller } from './jump-scroller';
 import type { AutoScroller } from './auto-scroller-types';
-import type { DroppableId } from '../../types';
+import type { DroppableId, State } from '../../types';
 import type { MoveArgs } from '../action-creators';
 
 type Args = {|
@@ -17,7 +17,7 @@ export default ({
   scrollWindow,
   move,
 }: Args): AutoScroller => {
-  const fluidScroll: FluidScroller = createFluidScroller({
+  const fluidScroller: FluidScroller = createFluidScroller({
     scrollWindow,
     scrollDroppable,
   });
@@ -28,11 +28,30 @@ export default ({
     scrollDroppable,
   });
 
-  const marshal: AutoScroller = {
-    cancel: fluidScroll.cancel,
-    fluidScroll,
-    jumpScroll,
+  const scroll = (state: State) => {
+    // Only allowing auto scrolling in the DRAGGING phase
+    if (state.phase !== 'DRAGGING') {
+      return;
+    }
+
+    if (state.movementMode === 'FLUID') {
+      fluidScroller.scroll(state);
+      return;
+    }
+
+    if (!state.scrollJumpRequest) {
+      return;
+    }
+
+    jumpScroll(state);
   };
 
-  return marshal;
+  const scroller: AutoScroller = {
+    scroll,
+    cancelPending: fluidScroller.cancelPending,
+    start: fluidScroller.start,
+    stop: fluidScroller.stop,
+  };
+
+  return scroller;
 };

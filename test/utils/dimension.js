@@ -36,6 +36,7 @@ import type {
   DraggingState,
   ScrollSize,
 } from '../../src/types';
+import patchDroppableMap from '../../src/state/patch-droppable-map';
 
 type GetComputedSpacingArgs = {|
   margin?: Spacing,
@@ -134,13 +135,7 @@ export const addDroppable = (
   droppable: DroppableDimension,
 ): DraggingState => ({
   ...base,
-  dimensions: {
-    ...base.dimensions,
-    droppables: {
-      ...base.dimensions.droppables,
-      [droppable.descriptor.id]: droppable,
-    },
-  },
+  dimensions: patchDroppableMap(base.dimensions, droppable),
 });
 
 export const addDraggable = (
