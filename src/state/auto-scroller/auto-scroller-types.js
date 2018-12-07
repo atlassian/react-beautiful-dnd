@@ -1,8 +1,9 @@
 // @flow
-import type { DraggingState } from '../../types';
+import type { State, DraggingState } from '../../types';
 
 export type AutoScroller = {|
-  cancel: () => void,
-  jumpScroll: (state: DraggingState) => void,
-  fluidScroll: (state: DraggingState) => void,
+  start: (state: DraggingState) => void,
+  stop: () => void,
+  cancelPending: () => void,
+  scroll: (state: State) => void,
 |};

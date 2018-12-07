@@ -2,14 +2,14 @@
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
-import isPositionInFrame from '../visibility/is-position-in-frame';
-import { toDroppableList } from '../dimension-structures';
-import { find } from '../../native-with-fallback';
 import type {
   DroppableDimension,
   DroppableDimensionMap,
   DroppableId,
-} from '../../types';
+} from '../../../types';
+import isPositionInFrame from '../../visibility/is-position-in-frame';
+import { toDroppableList } from '../../dimension-structures';
+import { find } from '../../../native-with-fallback';
 
 const getScrollableDroppables = memoizeOne(
   (droppables: DroppableDimensionMap): DroppableDimension[] =>

@@ -20,6 +20,7 @@ import type {
 import { isEqual } from '../spacing';
 import scrollDroppable from '../droppable/scroll-droppable';
 import { removePlaceholder } from '../droppable/with-placeholder';
+import getFrame from '../get-frame';
 
 const throwIfSpacingChange = (old: BoxModel, fresh: BoxModel) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -39,15 +40,6 @@ const adjustBorderBoxSize = (axis: Axis, old: Rect, fresh: Rect): Spacing => ({
   right: old.left + fresh.width,
   bottom: old.top + fresh.height,
 });
-
-const getFrame = (droppable: DroppableDimension): Scrollable => {
-  const frame: ?Scrollable = droppable.frame;
-  invariant(
-    frame,
-    'Droppable must be a scroll container to allow dynamic changes',
-  );
-  return frame;
-};
 
 type Args = {|
   modified: DroppableDimension[],

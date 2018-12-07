@@ -35,9 +35,10 @@ export const withStore = () => ({
       }),
       announce: () => {},
       getScroller: (): AutoScroller => ({
-        cancel: jest.fn(),
-        jumpScroll: jest.fn(),
-        fluidScroll: jest.fn(),
+        start: jest.fn(),
+        stop: jest.fn(),
+        cancelPending: jest.fn(),
+        scroll: jest.fn(),
       }),
     }),
   },
