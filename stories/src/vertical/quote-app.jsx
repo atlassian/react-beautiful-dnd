@@ -1,17 +1,12 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'react-emotion';
-import { action } from '@storybook/addon-actions';
 import type { Quote } from '../types';
-import type { DropResult, DragStart, DragUpdate } from '../../../src/types';
+import type { DropResult } from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import reorder from '../reorder';
-
-const publishOnDragStart = action('onDragStart');
-const publishOnDragUpdate = action('onDragUpdate');
-const publishOnDragEnd = action('onDragEnd');
 
 const Root = styled('div')`
   background-color: ${colors.blue.deep};
@@ -45,8 +40,7 @@ export default class QuoteApp extends Component<Props, State> {
     quotes: this.props.initial,
   };
 
-  onDragStart = (initial: DragStart) => {
-    publishOnDragStart(initial);
+  onDragStart = () => {
     // Add a little vibration if the browser supports it.
     // Add's a nice little physical feedback
     if (window.navigator.vibrate) {
@@ -54,13 +48,7 @@ export default class QuoteApp extends Component<Props, State> {
     }
   };
 
-  onDragUpdate = (update: DragUpdate) => {
-    publishOnDragUpdate(update);
-  };
-
   onDragEnd = (result: DropResult) => {
-    publishOnDragEnd(result);
-
     // combining item
     if (result.combine) {
       // super simple: just removing the dragging item
@@ -96,7 +84,6 @@ export default class QuoteApp extends Component<Props, State> {
     return (
       <DragDropContext
         onDragStart={this.onDragStart}
-        onDragUpdate={this.onDragUpdate}
         onDragEnd={this.onDragEnd}
       >
         <Root>

@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import styled from 'react-emotion';
 import invariant from 'tiny-invariant';
-import { action } from '@storybook/addon-actions';
 import { DragDropContext } from '../../../src';
 import { colors, grid } from '../constants';
 import QuoteList from './quote-list';
@@ -10,7 +9,7 @@ import reorder from '../reorder';
 import { getQuotes } from '../data';
 import type { Quote } from '../types';
 import type { NestedQuoteList } from './types';
-import type { DropResult, DragStart } from '../../../src/types';
+import type { DropResult } from '../../../src/types';
 
 const quotes: Quote[] = getQuotes(10);
 
@@ -27,9 +26,6 @@ const initialList: NestedQuoteList = {
     ...quotes.slice(6, 9),
   ],
 };
-
-const publishOnDragStart = action('onDragStart');
-const publishOnDragEnd = action('onDragEnd');
 
 const Root = styled('div')`
   background-color: ${colors.blue.deep};
@@ -54,13 +50,7 @@ export default class QuoteApp extends Component<*, State> {
   };
   /* eslint-enable */
 
-  onDragStart = (initial: DragStart) => {
-    publishOnDragStart(initial);
-  };
-
   onDragEnd = (result: DropResult) => {
-    publishOnDragEnd(result);
-
     // dropped outside the list
     if (!result.destination) {
       return;
@@ -121,10 +111,7 @@ export default class QuoteApp extends Component<*, State> {
     const { list } = this.state;
 
     return (
-      <DragDropContext
-        onDragStart={this.onDragStart}
-        onDragEnd={this.onDragEnd}
-      >
+      <DragDropContext onDragEnd={this.onDragEnd}>
         <Root>
           <QuoteList list={list} />
         </Root>
