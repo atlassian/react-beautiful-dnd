@@ -6,10 +6,10 @@ import type { AutoScroller } from './auto-scroller-types';
 import type { DroppableId, State } from '../../types';
 import type { MoveArgs } from '../action-creators';
 
-type Args = {|
+export type Args = {|
+  scrollWindow: (offset: Position) => void,
   scrollDroppable: (id: DroppableId, change: Position) => void,
   move: (args: MoveArgs) => mixed,
-  scrollWindow: (offset: Position) => void,
 |};
 
 export default ({
