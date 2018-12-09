@@ -6,7 +6,7 @@ import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
 import { reorderQuoteMap } from '../reorder';
 import type { QuoteMap } from '../types';
-import type { DropResult, DragStart } from '../../../src/types';
+import type { DropResult } from '../../../src/types';
 
 const Root = styled('div')`
   background: ${colors.blue.deep};

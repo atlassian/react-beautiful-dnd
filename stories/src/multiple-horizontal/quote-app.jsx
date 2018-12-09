@@ -7,7 +7,7 @@ import { colors, grid } from '../constants';
 import { reorderQuoteMap } from '../reorder';
 import type { ReorderQuoteMapResult } from '../reorder';
 import type { QuoteMap } from '../types';
-import type { DropResult, DragStart } from '../../../src/types';
+import type { DropResult } from '../../../src/types';
 
 const Root = styled('div')`
   background-color: ${colors.blue.deep};

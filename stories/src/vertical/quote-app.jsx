@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import styled from 'react-emotion';
 import type { Quote } from '../types';
-import type { DropResult, DragStart, DragUpdate } from '../../../src/types';
+import type { DropResult } from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
