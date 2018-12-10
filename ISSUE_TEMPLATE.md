@@ -33,6 +33,12 @@ All features need to have a clear and generally applicable keyboard interaction 
 
 <!-- ## Bug
 
+## Common issues setup guide
+
+We have created a common setup issues guide to help you troubleshoot common setup problems:
+
+https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/common-setup-issues.md
+
 ## Check your console
 
 In development builds we log warnings to the console for common setup issues. Please have a look to see if it can give you information in overcoming your issue
@@ -49,7 +55,7 @@ In development builds we log warnings to the console for common setup issues. Pl
 
 <!--
   Take a look at your package.json
-  Ensure that it satifies our peer dependency version - see our package.json. (Currently it is "^16.3.1")
+  Ensure that it satisfies our peer dependency version - see our package.json. (Currently it is "^16.3.1")
 -->
 
 ### What version of `react-beautiful-dnd` are you running?
