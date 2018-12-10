@@ -521,7 +521,7 @@ type Props = {|
 
 > `react-beautiful-dnd` will throw an error if a required prop is not provided
 
-- `droppableId`: A _required_ `DroppableId(string)` that uniquely identifies the droppable for the application. Please do not change this prop - especially during a drag.
+- `droppableId`: A _required_ `DroppableId(string)`. See our [identifiers guide](/docs/guides/identifiers.md) for more information.
 
 #### Optional props
 
@@ -751,7 +751,7 @@ type Props = {|
 
 > `react-beautiful-dnd` will throw an error if a required prop is not provided
 
-- `draggableId`: A _required_ `DraggableId(string)` that uniquely identifies the `Draggable` for the application. Please do not change this prop - especially during a drag.
+- `draggableId`: A _required_ `DraggableId(string)`. See our [identifiers guide](/docs/guides/identifiers.md) for more information.
 - `index`: A _required_ `number` that matches the order of the `Draggable` in the `Droppable`. It is simply the index of the `Draggable` in the list. The `index` needs to be unique within a `Droppable` but does not need to be unique between `Droppables`. The `index`s in a list must start from `0` and be consecutive. `[0, 1, 2]` and not `[1, 2, 8]`. Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
 
 ```js
