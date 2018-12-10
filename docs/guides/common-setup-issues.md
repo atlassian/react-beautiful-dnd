@@ -6,6 +6,14 @@ This is a little guide to help you with some common setup issues
 
 For detectable setup issues we try to log information in the `console` for `development` builds of `react-beautiful-dnd`. If things are not working, first thing to do is check your `console`.
 
+## React version
+
+Please ensure that you meet our peer dependency version of `React`. Your React version needs to be greater than or equal to `16.3.1`.
+
+If you want to know what React version you are on take a look at your [`package.json`](https://docs.npmjs.com/files/package.json) or use `console.log(React.version)`.
+
+If you are not sure if your `package.json` version satisfies `16.3.1` have a read of [npm: about semantic versioning](https://docs.npmjs.com/about-semantic-versioning) and try out the [npm sermver calculator](https://semver.npmjs.com/)
+
 ## No duplicate ids
 
 `draggableId` and `droppableId` values must be unique for the whole `DragDropContext` and not just a list.
