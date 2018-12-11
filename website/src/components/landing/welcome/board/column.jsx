@@ -95,7 +95,7 @@ export default class Column extends React.Component<Props> {
           draggableSnapshot: DraggableStateSnapshot,
         ) => (
           <Container
-            innerRef={draggableProvided.innerRef}
+            ref={draggableProvided.innerRef}
             {...draggableProvided.draggableProps}
             isDragging={draggableSnapshot.isDragging}
           >
@@ -109,7 +109,7 @@ export default class Column extends React.Component<Props> {
                 droppableSnapshot: DroppableStateSnapshot,
               ) => (
                 <List
-                  innerRef={droppableProvided.innerRef}
+                  ref={droppableProvided.innerRef}
                   {...droppableProvided.droppableProps}
                   isDraggingOver={droppableSnapshot.isDraggingOver}
                 >

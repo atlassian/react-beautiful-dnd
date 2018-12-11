@@ -95,7 +95,8 @@ const getAnimation = (
 };
 
 const Dance = styled.div`
-  ${props => getAnimation(props.isDragging, props.dropAnimation)};
+  /* TODO: rework for styled-components v4 */
+  /* ${props => getAnimation(props.isDragging, props.dropAnimation)}; */
 `;
 
 type Props = {|

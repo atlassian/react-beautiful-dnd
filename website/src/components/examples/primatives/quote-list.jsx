@@ -102,7 +102,7 @@ class InnerList extends Component<InnerListProps> {
     return (
       <Container>
         {title}
-        <DropZone innerRef={dropProvided.innerRef}>
+        <DropZone ref={dropProvided.innerRef}>
           <InnerQuoteList quotes={quotes} />
           {dropProvided.placeholder}
         </DropZone>

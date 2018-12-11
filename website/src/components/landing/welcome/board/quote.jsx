@@ -81,7 +81,7 @@ export default class Item extends React.Component<Props> {
       <Draggable draggableId={quote.id} index={index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
           <Container
-            innerRef={provided.innerRef}
+            ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             author={author}

@@ -156,10 +156,7 @@ export default class CallToAction extends React.Component<Props, State> {
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Droppable droppableId="droppable" direction={direction}>
           {(provided: DroppableProvided) => (
-            <ActionBox
-              {...provided.droppableProps}
-              innerRef={provided.innerRef}
-            >
+            <ActionBox {...provided.droppableProps} ref={provided.innerRef}>
               {this.state.entries.map((entry: Entry, index: number) => (
                 <EntryItem key={entry.id} entry={entry} index={index} />
               ))}

@@ -80,15 +80,12 @@ export default class SocialIcons extends React.Component<*, State> {
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Droppable droppableId="droppable" direction="horizontal">
           {(provided: DroppableProvided) => (
-            <Container
-              {...provided.droppableProps}
-              innerRef={provided.innerRef}
-            >
+            <Container {...provided.droppableProps} ref={provided.innerRef}>
               {this.state.links.map((link: SocialLink, index: number) => (
                 <Draggable draggableId={link.id} key={link.id} index={index}>
                   {(draggableProvided: DraggableProvided) => (
                     <ExternalLink
-                      innerRef={draggableProvided.innerRef}
+                      ref={draggableProvided.innerRef}
                       {...draggableProvided.draggableProps}
                       {...draggableProvided.dragHandleProps}
                       href={link.href}

@@ -61,7 +61,7 @@ export default class AuthorList extends Component<Props> {
 
     return (
       <Container>
-        <DropZone innerRef={dropProvided.innerRef}>
+        <DropZone ref={dropProvided.innerRef}>
           {quotes.map((quote: Quote, index: number) => (
             <Draggable key={quote.id} draggableId={quote.id} index={index}>
               {(
