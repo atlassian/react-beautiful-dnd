@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { grid, sidebarWidth, colors } from '../../constants';
 import type { DocsPage, MarkdownPage, SitePage } from '../types';
 import { getTitleFromExamplePath } from '../../utils';
@@ -9,7 +9,7 @@ import type { NavLink } from './sidebar-types';
 import LinkList from './reorderable-links';
 import spacing from './spacing';
 
-const ScrollContainer = styled('div')`
+const ScrollContainer = styled.div`
   height: 100vh;
   width: ${sidebarWidth}px;
   box-sizing: border-box;
@@ -33,13 +33,13 @@ const ScrollContainer = styled('div')`
   }
 `;
 
-const Section = styled('div')`
+const Section = styled.div`
   margin-top: ${spacing.top}px;
   display: flex;
   flex-direction: column;
 `;
 
-const Title = styled('h3')`
+const Title = styled.h3`
   color: ${colors.dark100};
   font-size: 20px;
   padding: ${grid}px ${spacing.side}px;

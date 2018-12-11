@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import Layout from '../components/layouts';
 import { grid } from '../constants';
 import Logo from '../components/egghead-logo';
@@ -8,7 +8,7 @@ import Logo from '../components/egghead-logo';
 const courseUrl =
   'https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd';
 
-const Aye = styled('a')`
+const Aye = styled.a`
   margin: auto;
   display: block;
   width: 424px;

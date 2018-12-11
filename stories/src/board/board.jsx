@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'react-emotion';
-import { injectGlobal } from 'emotion';
+import styled, { createGlobalStyle } from 'styled-components';
 import Column from './column';
 import { colors } from '../constants';
 import reorder, { reorderQuoteMap } from '../reorder';
@@ -13,13 +12,13 @@ import type {
 } from '../../../src';
 import type { QuoteMap, Quote } from '../types';
 
-const ParentContainer = styled('div')`
+const ParentContainer = styled.div`
   height: ${({ height }) => height};
   overflow-x: hidden;
   overflow-y: auto;
 `;
 
-const Container = styled('div')`
+const Container = styled.div`
   min-height: 100vh;
 
   /* like display:flex but will allow bleeding over the window width */
@@ -39,6 +38,12 @@ type State = {|
   ordered: string[],
 |};
 
+const GlobalStyle = createGlobalStyle`
+  body {
+    background: ${colors.blue.deep};
+  }
+`;
+
 export default class Board extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
   static defaultProps = {
@@ -51,17 +56,6 @@ export default class Board extends Component<Props, State> {
   };
 
   boardRef: ?HTMLElement;
-
-  componentDidMount() {
-    /* stylelint-disable max-empty-lines */
-    // eslint-disable-next-line no-unused-expressions
-    injectGlobal`
-      body {
-        background: ${colors.blue.deep};
-      }
-    `;
-    /* stylelint-enable */
-  }
 
   onDragEnd = (result: DropResult) => {
     if (result.combine) {
@@ -139,7 +133,7 @@ export default class Board extends Component<Props, State> {
         isCombineEnabled={this.props.isCombineEnabled}
       >
         {(provided: DroppableProvided) => (
-          <Container innerRef={provided.innerRef} {...provided.droppableProps}>
+          <Container ref={provided.innerRef} {...provided.droppableProps}>
             {ordered.map((key: string, index: number) => (
               <Column
                 key={key}
@@ -156,13 +150,16 @@ export default class Board extends Component<Props, State> {
     );
 
     return (
-      <DragDropContext onDragEnd={this.onDragEnd}>
-        {containerHeight ? (
-          <ParentContainer height={containerHeight}>{board}</ParentContainer>
-        ) : (
-          board
-        )}
-      </DragDropContext>
+      <React.Fragment>
+        <DragDropContext onDragEnd={this.onDragEnd}>
+          {containerHeight ? (
+            <ParentContainer height={containerHeight}>{board}</ParentContainer>
+          ) : (
+            board
+          )}
+        </DragDropContext>
+        <GlobalStyle />
+      </React.Fragment>
     );
   }
 }

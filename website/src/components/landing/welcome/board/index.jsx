@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { DragDropContext, Droppable } from '../../../../../../src';
 import Column from './column';
 import initial from './entities';
@@ -22,7 +22,7 @@ type Props = {|
   numberOfColumns: 1 | 2,
 |};
 
-const Container = styled('div')`
+const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;

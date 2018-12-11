@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import { colors, grid } from '../constants';
@@ -8,12 +8,12 @@ import { reorderQuoteMap } from '../reorder';
 import type { QuoteMap } from '../types';
 import type { DropResult } from '../../../src/types';
 
-const Root = styled('div')`
+const Root = styled.div`
   background: ${colors.blue.deep};
   display: flex;
 `;
 
-const Column = styled('div')`
+const Column = styled.div`
   background-color: ${colors.blue.light};
 
   /* make the column a scroll container */
@@ -25,11 +25,11 @@ const Column = styled('div')`
   flex-direction: column;
 `;
 
-const Group = styled('div')`
+const Group = styled.div`
   margin-top: ${grid * 2}px;
 `;
 
-const Title = styled('h4')`
+const Title = styled.h4`
   margin: ${grid}px;
 `;
 

@@ -1,6 +1,6 @@
 // @flow
 import React, { type Node } from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import GithubIcon from 'react-icons/lib/fa/github';
 import TwitterIcon from 'react-icons/lib/fa/twitter';
 import { grid, colors } from '../../../constants';
@@ -14,11 +14,11 @@ import {
   type DropResult,
 } from '../../../../../src';
 
-const Container = styled('div')`
+const Container = styled.div`
   display: flex;
 `;
 
-const ExternalLink = styled('a')`
+const ExternalLink = styled.a`
   color: ${colors.dark100};
   transition: color 0.2s ease;
   margin-right: ${grid}px;

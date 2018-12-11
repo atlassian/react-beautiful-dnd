@@ -1,10 +1,10 @@
 // @flow
 import React from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import HeartIcon from 'react-icons/lib/go/heart';
 import { grid } from '../../../../constants';
 
-const LoveContainer = styled('div')`
+const LoveContainer = styled.div`
   display: flex;
   align-items: center;
 `;

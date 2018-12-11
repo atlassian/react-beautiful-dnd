@@ -1,13 +1,13 @@
 // @flow
 import React from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import CommonPage from '../common-page';
 import { colors } from '../../constants';
 import Welcome from './welcome';
 import Beautiful from './beautiful';
 import Accessible from './accessible';
 
-const FullPageSection = styled('section')`
+const FullPageSection = styled.section`
   min-height: 100vh;
   background-color: ${colors.dark500};
 `;

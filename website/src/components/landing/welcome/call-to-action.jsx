@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { Link } from 'gatsby';
-import styled, { css } from 'react-emotion';
+import styled, { css } from 'styled-components';
 import { grid, colors } from '../../../constants';
 import { smallView } from '../../media';
 import reorder from '../../reorder';
@@ -12,7 +12,7 @@ import type {
   DropResult,
 } from '../../../../../src';
 
-const ActionBox = styled('div')`
+const ActionBox = styled.div`
   display: flex;
   align-items: center;
 

@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { Droppable, Draggable } from '../../../src';
 import QuoteItem from './quote-item';
 import { grid, colors } from '../constants';
@@ -13,7 +13,7 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
-const Wrapper = styled('div')`
+const Wrapper = styled.div`
   background-color: ${({ isDraggingOver }) =>
     isDraggingOver ? colors.blue.lighter : colors.blue.light};
   display: flex;
@@ -29,7 +29,7 @@ const Wrapper = styled('div')`
 
 const scrollContainerHeight: number = 250;
 
-const DropZone = styled('div')`
+const DropZone = styled.div`
   /* stop the list collapsing when empty */
   min-height: ${scrollContainerHeight}px;
 
@@ -40,14 +40,14 @@ const DropZone = styled('div')`
   margin-bottom: ${grid}px;
 `;
 
-const ScrollContainer = styled('div')`
+const ScrollContainer = styled.div`
   overflow-x: hidden;
   overflow-y: auto;
   max-height: ${scrollContainerHeight}px;
 `;
 
 /* stylelint-disable block-no-empty */
-const Container = styled('div')``;
+const Container = styled.div``;
 /* stylelint-enable */
 
 type Props = {|
@@ -111,7 +111,7 @@ class InnerList extends React.Component<InnerListProps> {
     return (
       <Container>
         {title}
-        <DropZone innerRef={dropProvided.innerRef}>
+        <DropZone ref={dropProvided.innerRef}>
           <InnerQuoteList quotes={quotes} />
           {dropProvided.placeholder}
         </DropZone>

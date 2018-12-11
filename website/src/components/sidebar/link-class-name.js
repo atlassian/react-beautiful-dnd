@@ -1,5 +1,5 @@
 // @flow
-import { css } from 'react-emotion';
+import { css } from 'styled-components';
 import { colors, grid } from '../../constants';
 
 const getBackgroundColor = (isDragging?: boolean) =>

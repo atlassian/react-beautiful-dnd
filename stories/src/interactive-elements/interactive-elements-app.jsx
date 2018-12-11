@@ -1,6 +1,6 @@
 // @flow
 import React, { type Node } from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import { grid, colors } from '../constants';
 import reorder from '../reorder';
@@ -133,13 +133,13 @@ const initial: ItemType[] = [
   },
 ];
 
-const List = styled('div')`
+const List = styled.div`
   width: 250px;
   background-color: ${colors.blue.deep};
   padding: ${grid * 2}px;
 `;
 
-const Item = styled('div')`
+const Item = styled.div`
   min-height: 80px;
   background-color: ${colors.white};
   border: 1px solid ${colors.grey.dark};
@@ -147,16 +147,16 @@ const Item = styled('div')`
   margin-bottom: ${grid}px;
 `;
 
-const Container = styled('div')`
+const Container = styled.div`
   display: flex;
 `;
 
-const Controls = styled('div')`
+const Controls = styled.div`
   padding: ${grid * 2}px;
   width: 250px;
 `;
 
-const Status = styled('strong')`
+const Status = styled.strong`
   color: ${({ isEnabled }) => (isEnabled ? colors.blue.deep : colors.purple)};
 `;
 
@@ -206,7 +206,7 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
           <Droppable droppableId="droppable">
             {(droppableProvided: DroppableProvided) => (
               <List
-                innerRef={droppableProvided.innerRef}
+                ref={droppableProvided.innerRef}
                 {...droppableProvided.droppableProps}
               >
                 {this.state.items.map((item: ItemType, index: number) => (
@@ -220,7 +220,7 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
                   >
                     {(draggableProvided: DraggableProvided) => (
                       <Item
-                        innerRef={draggableProvided.innerRef}
+                        ref={draggableProvided.innerRef}
                         {...draggableProvided.draggableProps}
                         {...draggableProvided.dragHandleProps}
                       >

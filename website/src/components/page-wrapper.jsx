@@ -1,6 +1,6 @@
 // @flow
 import React, { type Node } from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import Media from 'react-media';
 import MenuIcon from 'react-icons/lib/go/three-bars';
 import Sidebar from './sidebar';
@@ -12,7 +12,7 @@ require('prism-themes/themes/prism-a11y-dark.css');
 
 const sectionGap: number = gutter.large;
 
-const Content = styled('div')`
+const Content = styled.div`
   background: ${colors.dark400};
   margin-left: ${sidebarWidth + gutter.normal}px;
   margin-right: ${gutter.normal}px;
@@ -25,7 +25,7 @@ const Content = styled('div')`
   `)};
 `;
 
-const ContentSpacing = styled('div')`
+const ContentSpacing = styled.div`
   max-width: ${contentWidth}px;
   padding: ${sectionGap}px;
   padding-top: ${sectionGap}px;
@@ -76,7 +76,7 @@ const ContentSpacing = styled('div')`
   }
 `;
 
-const StyledButton = styled('button')`
+const StyledButton = styled.button`
   border: none;
   background: ${colors.dark100};
   border-radius: 2px;

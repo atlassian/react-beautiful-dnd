@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { Droppable } from '../../../src';
 import Task from './task';
 import type { DroppableProvided } from '../../../src';
@@ -12,18 +12,18 @@ type Props = {|
   title: string,
 |};
 
-const Container = styled('div')`
+const Container = styled.div`
   width: 300px;
   background-color: ${colors.grey.dark};
   border-radius: ${borderRadius}px;
 `;
 
-const Title = styled('h3')`
+const Title = styled.h3`
   font-weight: bold;
   padding: ${grid}px;
 `;
 
-const List = styled('div')`
+const List = styled.div`
   padding: ${grid}px;
   padding-bottom: 0;
   display: flex;
@@ -35,7 +35,7 @@ export default class TaskList extends Component<Props> {
     return (
       <Droppable droppableId="list">
         {(provided: DroppableProvided) => (
-          <Container innerRef={provided.innerRef} {...provided.droppableProps}>
+          <Container ref={provided.innerRef} {...provided.droppableProps}>
             <Title>{this.props.title}</Title>
             <List>
               {this.props.tasks.map((task: TaskType, index: number) => (
