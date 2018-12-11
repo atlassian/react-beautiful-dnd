@@ -57,9 +57,9 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@babel/runtime-corejs2": "^7.1.5",
+    "@babel/runtime-corejs2": "^7.2.0",
     "css-box-model": "^1.1.1",
-    "memoize-one": "^4.0.3",
+    "memoize-one": "^4.1.0",
     "prop-types": "^15.6.1",
     "raf-schd": "^4.0.0",
     "react-redux": "^5.0.7",
@@ -81,7 +81,7 @@
     "babel-jest": "^23.6.0",
     "babel-loader": "^8.0.4",
     "babel-plugin-dev-expression": "^0.2.1",
-    "babel-plugin-styled-components": "^1.9.3",
+    "babel-plugin-styled-components": "^1.9.4",
     "cross-env": "^5.2.0",
     "enzyme": "^3.8.0",
     "enzyme-adapter-react-16": "^1.7.1",
