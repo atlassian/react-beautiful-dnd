@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { Draggable } from '../../../../../../src';
 import { grid } from '../../../../constants';
 import type {
@@ -14,7 +14,7 @@ type Props = {|
   index: number,
 |};
 
-const Container = styled('div')`
+const Container = styled.div`
   background-color: ${props =>
     props.isDragging ? props.author.colors.soft : 'red'};
   box-shadow: ${props => (props.isDragging ? `1px 1px 1px red` : 'none')};
@@ -34,7 +34,7 @@ const Container = styled('div')`
   }
 `;
 
-const Avatar = styled('img')`
+const Avatar = styled.img`
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -43,13 +43,13 @@ const Avatar = styled('img')`
   flex-grow: 0;
 `;
 
-const Content = styled('div')`
+const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 `;
 
-const BlockQuote = styled('div')`
+const BlockQuote = styled.div`
   &::before {
     content: open-quote;
   }
@@ -59,7 +59,7 @@ const BlockQuote = styled('div')`
   }
 `;
 
-const Attribution = styled('small')`
+const Attribution = styled.small`
   margin: 0;
   margin-top: ${grid}px;
   text-align: right;
@@ -81,7 +81,7 @@ export default class Item extends React.Component<Props> {
       <Draggable draggableId={quote.id} index={index}>
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
           <Container
-            innerRef={provided.innerRef}
+            ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             author={author}

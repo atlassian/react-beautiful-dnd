@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import invariant from 'tiny-invariant';
 import { DragDropContext } from '../../../src';
 import { colors, grid } from '../constants';
@@ -27,7 +27,7 @@ const initialList: NestedQuoteList = {
   ],
 };
 
-const Root = styled('div')`
+const Root = styled.div`
   background-color: ${colors.blue.deep};
   box-sizing: border-box;
   padding: ${grid * 2}px;

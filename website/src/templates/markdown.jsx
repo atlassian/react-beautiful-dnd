@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { graphql } from 'gatsby';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import EditIcon from 'react-icons/lib/fa/pencil';
 import Layout from '../components/layouts';
 import { colors, grid, gutter } from '../constants';
@@ -23,7 +23,7 @@ type Props = {
   },
 };
 
-const EditLink = styled('a')`
+const EditLink = styled.a`
   float: right;
   display: flex;
   align-items: center;
@@ -34,7 +34,7 @@ const EditLink = styled('a')`
   `)};
 `;
 
-const EditText = styled('span')`
+const EditText = styled.span`
   padding-left: ${grid}px;
 `;
 

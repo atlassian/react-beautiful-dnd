@@ -56,7 +56,6 @@ export const whereAnyCallbacksCalled = (callbacks: Callbacks) =>
 // useful debug function
 // eslint-disable-next-line no-unused-vars
 export const getCallbackCalls = (callbacks: Callbacks) =>
-  // $ExpectError - hacking things big time
   Object.keys(callbacks).reduce(
     (previous: Object, key: string) => ({
       ...previous,

@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import memoizeOne from 'memoize-one';
 import { Droppable } from '../../../src';
 import { grid, colors, borderRadius } from '../constants';
@@ -20,7 +20,7 @@ type Props = {|
   multiSelectTo: (taskId: Id) => void,
 |};
 
-const Container = styled('div')`
+const Container = styled.div`
   width: 300px;
   margin: ${grid}px;
   border-radius: ${borderRadius}px;
@@ -32,12 +32,12 @@ const Container = styled('div')`
   flex-direction: column;
 `;
 
-const Title = styled('h3')`
+const Title = styled.h3`
   font-weight: bold;
   padding: ${grid}px;
 `;
 
-const TaskList = styled('div')`
+const TaskList = styled.div`
   padding: ${grid}px;
   min-height: 200px;
   flex-grow: 1;
@@ -69,7 +69,7 @@ export default class Column extends Component<Props> {
         <Droppable droppableId={column.id}>
           {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
             <TaskList
-              innerRef={provided.innerRef}
+              ref={provided.innerRef}
               isDraggingOver={snapshot.isDraggingOver}
               {...provided.droppableProps}
             >

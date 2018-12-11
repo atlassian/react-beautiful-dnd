@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import Media from 'react-media';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import Board from './board';
 import CallToAction from './call-to-action';
 import SocialIcons from './social-icons';
@@ -9,7 +9,7 @@ import DraggableLogo from '../../draggable-logo';
 import { grid, gutter } from '../../../constants';
 import { smallView } from '../../media';
 
-const Brand = styled('div')`
+const Brand = styled.div`
   display: flex;
   align-items: center;
   line-height: 1;
@@ -20,7 +20,7 @@ const Brand = styled('div')`
   `)};
 `;
 
-const Title = styled('h1')`
+const Title = styled.h1`
   font-weight: normal;
   font-size: 40px;
   margin: 0;
@@ -32,12 +32,12 @@ const Title = styled('h1')`
   `)};
 `;
 
-const Tagline = styled('p')`
+const Tagline = styled.p`
   font-size: 20px;
   ${smallView.fn(`text-align: center`)};
 `;
 
-const SideBySide = styled('div')`
+const SideBySide = styled.div`
   padding-top: ${grid * 10}px;
   padding-left: ${grid * 6}px;
   padding-right: ${grid * 6}px;
@@ -57,11 +57,11 @@ const SideBySide = styled('div')`
 
 const verticalSpacing = `margin-top: ${gutter.large}px;`;
 
-const VerticalRhythm = styled('div')`
+const VerticalRhythm = styled.div`
   ${verticalSpacing};
 `;
 
-const Content = styled('div')`
+const Content = styled.div`
   margin-top: ${grid * 8}px;
   flex-grow: 1;
 
@@ -73,7 +73,7 @@ const Content = styled('div')`
   `)};
 `;
 
-const Example = styled('div')`
+const Example = styled.div`
   flex-grow: 0;
 
   ${smallView.fn(`${verticalSpacing}`)};

@@ -1,7 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import ReactDOM from 'react-dom';
-import styled, { keyframes } from 'react-emotion';
+import styled, { keyframes } from 'styled-components';
 import invariant from 'tiny-invariant';
 import Logo from './logo';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
@@ -94,8 +94,9 @@ const getAnimation = (
   };
 };
 
-const Dance = styled('div')`
-  ${props => getAnimation(props.isDragging, props.dropAnimation)};
+const Dance = styled.div`
+  /* TODO: rework for styled-components v4 */
+  /* ${props => getAnimation(props.isDragging, props.dropAnimation)}; */
 `;
 
 type Props = {|

@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { Link } from 'gatsby';
-import styled, { css } from 'react-emotion';
+import styled, { css } from 'styled-components';
 import { grid, colors } from '../../../constants';
 import { smallView } from '../../media';
 import reorder from '../../reorder';
@@ -12,7 +12,7 @@ import type {
   DropResult,
 } from '../../../../../src';
 
-const ActionBox = styled('div')`
+const ActionBox = styled.div`
   display: flex;
   align-items: center;
 
@@ -156,10 +156,7 @@ export default class CallToAction extends React.Component<Props, State> {
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Droppable droppableId="droppable" direction={direction}>
           {(provided: DroppableProvided) => (
-            <ActionBox
-              {...provided.droppableProps}
-              innerRef={provided.innerRef}
-            >
+            <ActionBox {...provided.droppableProps} ref={provided.innerRef}>
               {this.state.entries.map((entry: Entry, index: number) => (
                 <EntryItem key={entry.id} entry={entry} index={index} />
               ))}

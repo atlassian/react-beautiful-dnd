@@ -48,7 +48,7 @@ module.exports = {
         ],
       },
     },
-    'gatsby-plugin-emotion',
+    'gatsby-plugin-styled-components',
     'gatsby-plugin-flow',
   ],
 };

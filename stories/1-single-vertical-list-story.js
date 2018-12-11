@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import QuoteApp from './src/vertical/quote-app';
 import { quotes, getQuotes } from './src/data';
 import { grid } from './src/constants';
@@ -12,7 +12,7 @@ const data = {
   large: getQuotes(500),
 };
 
-const ScrollContainer = styled('div')`
+const ScrollContainer = styled.div`
   box-sizing: border-box;
   background: lightgrey;
   padding: ${grid * 2}px;
@@ -22,7 +22,7 @@ const ScrollContainer = styled('div')`
   position: relative;
 `;
 
-const Title = styled('h4')`
+const Title = styled.h4`
   text-align: center;
   margin-bottom: ${grid}px;
 `;

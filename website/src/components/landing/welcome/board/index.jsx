@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { DragDropContext, Droppable } from '../../../../../../src';
 import Column from './column';
 import initial from './entities';
@@ -22,7 +22,7 @@ type Props = {|
   numberOfColumns: 1 | 2,
 |};
 
-const Container = styled('div')`
+const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -142,10 +142,7 @@ export default class Board extends React.Component<Props, State> {
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Droppable droppableId="board" type="column" direction="horizontal">
           {(provided: DroppableProvided) => (
-            <Container
-              innerRef={provided.innerRef}
-              {...provided.droppableProps}
-            >
+            <Container ref={provided.innerRef} {...provided.droppableProps}>
               {entities.columnOrder
                 .slice(0, numberOfColumns)
                 .map((columnId: Id, index: number) => {

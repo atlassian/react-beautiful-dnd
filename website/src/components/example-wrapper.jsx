@@ -1,7 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import Codesandboxer from 'react-codesandboxer';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import pkg from '../../../package.json';
 import { grid } from '../constants';
 
@@ -23,7 +23,7 @@ const importReplacements = [
   ['src/', 'react-beautiful-dnd'],
 ];
 
-const ActionLink = styled('button')`
+const ActionLink = styled.button`
   border: 2px solid grey;
   margin: 0 ${grid}px;
   padding: ${grid * 1}px ${grid * 2}px;
@@ -56,11 +56,11 @@ const ActionLink = styled('button')`
   }
 `;
 
-const Title = styled('h2')`
+const Title = styled.h2`
   display: inline-block;
 `;
 
-const Wrapper = styled('div')`
+const Wrapper = styled.div`
   display: flex;
   margin-bottom: 20px;
 `;
