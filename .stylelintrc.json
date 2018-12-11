@@ -1,12 +1,5 @@
 {
-  "processors": [
-    [
-      "stylelint-processor-styled-components",
-      {
-        "moduleName": "react-emotion"
-      }
-    ]
-  ],
+  "processors": ["stylelint-processor-styled-components"],
   "extends": [
     "stylelint-config-standard",
     "stylelint-config-styled-components",

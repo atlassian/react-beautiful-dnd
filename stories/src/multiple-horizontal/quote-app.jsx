@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { DragDropContext } from '../../../src';
 import AuthorList from '../primatives/author-list';
 import { colors, grid } from '../constants';
@@ -9,7 +9,7 @@ import type { ReorderQuoteMapResult } from '../reorder';
 import type { QuoteMap } from '../types';
 import type { DropResult } from '../../../src/types';
 
-const Root = styled('div')`
+const Root = styled.div`
   background-color: ${colors.blue.deep};
   box-sizing: border-box;
   padding: ${grid * 2}px;

@@ -202,13 +202,15 @@ declare interface TestCafe$SelectorAPI {
 }
 
 declare interface TestCafe$SelectorPromise
-  extends TestCafe$SelectorAPI, Promise<TestCafe$NodeSnapshot> {}
+  extends TestCafe$SelectorAPI,
+    Promise<TestCafe$NodeSnapshot> {}
 
 declare interface TestCafe$CustomMethodsSelectorPromiseI<T>
-  extends TestCafe$SelectorAPI, Promise<
-    TestCafe$NodeSnapshot &
-      $ObjMap<T, TestCafe$CustomMethodsSelectorTypeTransform>,
-  > {}
+  extends TestCafe$SelectorAPI,
+    Promise<
+      TestCafe$NodeSnapshot &
+        $ObjMap<T, TestCafe$CustomMethodsSelectorTypeTransform>,
+    > {}
 
 declare type TestCafe$CustomMethodsSelectorPromise<
   T,
@@ -216,10 +218,11 @@ declare type TestCafe$CustomMethodsSelectorPromise<
   $ObjMap<T, TestCafe$CustomMethodsSelectorTypeTransform>;
 
 declare interface TestCafe$CustomPropsSelectorPromiseI<T>
-  extends TestCafe$SelectorAPI, Promise<
-    TestCafe$NodeSnapshot &
-      $ObjMap<T, TestCafe$CustomPropsSnapshotTypeTransform>,
-  > {}
+  extends TestCafe$SelectorAPI,
+    Promise<
+      TestCafe$NodeSnapshot &
+        $ObjMap<T, TestCafe$CustomPropsSnapshotTypeTransform>,
+    > {}
 
 declare type TestCafe$CustomPropsSelectorPromise<
   T,
@@ -492,7 +495,8 @@ declare interface TestCafe$TestController {
 }
 
 declare interface TestCafe$TestControllerPromise
-  extends TestCafe$TestController, Promise<any> {}
+  extends TestCafe$TestController,
+    Promise<any> {}
 
 declare interface TestCafe$AssertionOptions {
   timeout?: number;
@@ -684,8 +688,8 @@ declare interface TestCafe$FixtureFn {
   (name: string | string[]): TestCafe$FixtureFn;
   page(url: string | string[]): TestCafe$FixtureFn;
   httpAuth(credentials: TestCafe$HTTPAuthCredentials): TestCafe$FixtureFn;
-  before(fn: (ctx: { [key: string]: any }) => Promise<any>): TestCafe$FixtureFn;
-  after(fn: (ctx: { [key: string]: any }) => Promise<any>): TestCafe$FixtureFn;
+  before(fn: (ctx: { [key: string]: any }) => Promise<any>): any;
+  after(fn: (ctx: { [key: string]: any }) => Promise<any>): any;
   beforeEach(
     fn: (t: TestCafe$TestController) => Promise<any>,
   ): TestCafe$FixtureFn;
@@ -844,10 +848,8 @@ declare module 'testcafe' {
 
     Role: TestCafe$RoleFn,
 
-    // RequestMock: TestCafe$RequestMockFn,
-    RequestMock: any,
-    // RequestLogger: TestCafe$RequestLoggerFn,
-    RequestLogger: any,
+    RequestMock: any, //TestCafe$RequestMockFn,
+    RequestLogger: any, //TestCafe$RequestLoggerFn,
     RequestHook: Class<TestCafe$RequestHookClass>,
 
     t: TestCafe$TestController,

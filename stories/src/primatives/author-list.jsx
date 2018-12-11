@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { Droppable, Draggable } from '../../../src';
 import Author from './author-item';
 import { grid, colors } from '../constants';
@@ -12,7 +12,7 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
-const Wrapper = styled('div')`
+const Wrapper = styled.div`
   background-color: ${({ isDraggingOver }) =>
     isDraggingOver ? colors.blue.lighter : colors.blue.light};
   display: flex;
@@ -23,7 +23,7 @@ const Wrapper = styled('div')`
   margin: ${grid}px 0;
 `;
 
-const DropZone = styled('div')`
+const DropZone = styled.div`
   display: flex;
 
   /*
@@ -39,11 +39,11 @@ const DropZone = styled('div')`
   min-height: 60px;
 `;
 
-const ScrollContainer = styled('div')`
+const ScrollContainer = styled.div`
   overflow: auto;
 `;
 
-const Container = styled('div')`
+const Container = styled.div`
   /* flex child */
   flex-grow: 1;
 
@@ -71,7 +71,7 @@ export default class AuthorList extends Component<Props> {
 
     return (
       <Container>
-        <DropZone innerRef={dropProvided.innerRef}>
+        <DropZone ref={dropProvided.innerRef}>
           {quotes.map((quote: Quote, index: number) => (
             <Draggable key={quote.id} draggableId={quote.id} index={index}>
               {(

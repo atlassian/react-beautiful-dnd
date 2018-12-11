@@ -3,7 +3,7 @@ import React, { Component, type Node } from 'react';
 import ReactDOM from 'react-dom';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { Draggable } from '../../../src';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Task as TaskType } from '../types';
@@ -14,7 +14,7 @@ type Props = {|
   index: number,
 |};
 
-const Container = styled('div')`
+const Container = styled.div`
   border-bottom: 1px solid #ccc;
   background: ${colors.white};
   padding: ${grid}px;
@@ -47,7 +47,7 @@ export default class Task extends Component<Props> {
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
           const child: Node = (
             <Container
-              innerRef={provided.innerRef}
+              ref={provided.innerRef}
               isDragging={snapshot.isDragging}
               {...provided.draggableProps}
               {...provided.dragHandleProps}

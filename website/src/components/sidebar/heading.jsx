@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { Link } from 'gatsby';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import GithubIcon from 'react-icons/lib/fa/github';
 import { grid, colors, gutter } from '../../constants';
 import spacing from './spacing';
@@ -9,12 +9,12 @@ import DraggableLogo from '../draggable-logo';
 
 const iconSize: number = grid * 4;
 
-const Container = styled('div')`
+const Container = styled.div`
   display: flex;
   align-items: center;
 `;
 
-const Title = styled('h2')`
+const Title = styled.h2`
   margin: 0;
   padding-left: ${grid}px;
 `;
@@ -47,7 +47,7 @@ const SmallLogo = styled(DraggableLogo)`
   flex-grow: 0;
 `;
 
-const GithubLink = styled('a')`
+const GithubLink = styled.a`
   display: block;
   color: ${colors.dark100};
   padding: ${gutter.normal}px;

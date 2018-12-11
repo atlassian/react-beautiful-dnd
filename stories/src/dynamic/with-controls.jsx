@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import QuoteList from '../primatives/quote-list';
 import { DragDropContext } from '../../../src';
 import { generateQuoteMap, authors } from '../data';
@@ -11,7 +11,7 @@ import type { DropResult, DragUpdate } from '../../../src/types';
 
 const initial: QuoteMap = generateQuoteMap(0);
 
-const ControlSection = styled('div')`
+const ControlSection = styled.div`
   margin: ${grid * 4}px;
 `;
 
@@ -82,7 +82,7 @@ type State = {|
   isCombineEnabled: boolean,
 |};
 
-const Container = styled('div')`
+const Container = styled.div`
   display: flex;
   align-items: flex-start;
 `;

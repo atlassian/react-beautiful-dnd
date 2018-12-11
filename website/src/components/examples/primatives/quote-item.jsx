@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { borderRadius, grid } from '../../../constants';
 import type { Quote } from '../types';
 import type { DraggableProvided } from '../../../../../src';
@@ -11,7 +11,7 @@ type Props = {
   provided: DraggableProvided,
 };
 
-const Container = styled('a')`
+const Container = styled.a`
   border-radius: ${borderRadius}px;
   border: 1px solid grey;
   background-color: ${({ isDragging }) => (isDragging ? 'green' : 'white')};
@@ -41,7 +41,7 @@ const Container = styled('a')`
   align-items: center;
 `;
 
-const Avatar = styled('img')`
+const Avatar = styled.img`
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -50,7 +50,7 @@ const Avatar = styled('img')`
   flex-grow: 0;
 `;
 
-const Content = styled('div')`
+const Content = styled.div`
   /* flex child */
   flex-grow: 1;
 
@@ -63,7 +63,7 @@ const Content = styled('div')`
   flex-direction: column;
 `;
 
-const BlockQuote = styled('div')`
+const BlockQuote = styled.div`
   &::before {
     content: open-quote;
   }
@@ -73,17 +73,17 @@ const BlockQuote = styled('div')`
   }
 `;
 
-const Footer = styled('div')`
+const Footer = styled.div`
   display: flex;
   margin-top: ${grid}px;
 `;
 
-const QuoteId = styled('small')`
+const QuoteId = styled.small`
   flex-grow: 0;
   margin: 0;
 `;
 
-const Attribution = styled('small')`
+const Attribution = styled.small`
   margin: 0;
   margin-left: ${grid}px;
   text-align: right;
@@ -105,7 +105,7 @@ export default class QuoteItem extends React.PureComponent<Props> {
       <Container
         href={quote.author.url}
         isDragging={isDragging}
-        innerRef={provided.innerRef}
+        ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
       >

@@ -1,7 +1,7 @@
 // @flow
 import React, { Component, type Node } from 'react';
 import ReactDOM from 'react-dom';
-import styled from 'react-emotion';
+import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import reorder from '../reorder';
 import { grid, colors } from '../constants';
@@ -28,7 +28,7 @@ if (!document.body) {
 
 document.body.appendChild(portal);
 
-const SimpleQuote = styled('div')`
+const SimpleQuote = styled.div`
   padding: ${grid}px;
   margin-bottom: ${grid}px;
   background-color: ${colors.blue.light};
@@ -64,7 +64,7 @@ class PortalAwareItem extends Component<ItemProps> {
 
     const child: Node = (
       <SimpleQuote
-        innerRef={provided.innerRef}
+        ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
         inPortal={usePortal}
@@ -90,7 +90,7 @@ type AppState = {|
   quotes: Quote[],
 |};
 
-const Container = styled('div')`
+const Container = styled.div`
   margin: 0 auto;
   width: 300px;
 `;
@@ -131,7 +131,7 @@ export default class PortalApp extends Component<AppProps, AppState> {
         <Droppable droppableId="droppable">
           {(droppableProvided: DroppableProvided) => (
             <Container
-              innerRef={droppableProvided.innerRef}
+              ref={droppableProvided.innerRef}
               {...droppableProvided.droppableProps}
             >
               {this.state.quotes.map((quote: Quote, index: number) => (
