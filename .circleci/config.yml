@@ -57,8 +57,8 @@ jobs:
             - website/node_modules
           key: v1-website-dependencies-{{ checksum "website/yarn.lock" }}
   validate:
-    docker:
-      - image: circleci/node:8.11.3-browsers
+    # docker:
+    #  - image: circleci/node:8.11.3-browsers
     # Recommended by circle-ci support to overcome flow running out of memory
     # https://circleci.com/docs/2.0/executor-types/#using-machine
     machine: true
