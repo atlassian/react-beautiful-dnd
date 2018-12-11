@@ -81,7 +81,7 @@
     "babel-jest": "^23.6.0",
     "babel-loader": "^8.0.4",
     "babel-plugin-dev-expression": "^0.2.1",
-    "babel-plugin-styled-components": "^1.9.3",
+    "babel-plugin-styled-components": "^1.9.4",
     "cross-env": "^5.2.0",
     "enzyme": "^3.8.0",
     "enzyme-adapter-react-16": "^1.7.1",
