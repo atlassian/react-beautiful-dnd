@@ -13,6 +13,7 @@ import {
 } from '../context-keys';
 import { warning } from '../../dev-warning';
 import checkOwnProps from './check-own-props';
+import AnimateMount from '../animate-mount/animate-mount';
 
 type Context = {
   [string]: DroppableId | TypeId,
@@ -117,15 +118,20 @@ export default class Droppable extends Component<Props> {
   getDroppableRef = (): ?HTMLElement => this.ref;
 
   getPlaceholder() {
-    if (!this.props.placeholder) {
-      return null;
-    }
+    const placeholder: PlaceholderType = this.props.placeholder;
 
     return (
-      <Placeholder
-        placeholder={this.props.placeholder}
-        innerRef={this.setPlaceholderRef}
-      />
+      <AnimateMount show={placeholder}>
+        {({ isVisible, onClose, data }: AnimateProvided) =>
+          isVisible && (
+            <Placeholder
+              placeholder={data}
+              onClose={onClose}
+              innerRef={this.setPlaceholderRef}
+            />
+          )
+        }
+      </AnimateMount>
     );
   }
 
@@ -143,6 +149,7 @@ export default class Droppable extends Component<Props> {
       isDraggingOver,
       draggingOverWith,
     } = this.props;
+
     const provided: Provided = {
       innerRef: this.setRef,
       placeholder: this.getPlaceholder(),
