@@ -13,8 +13,8 @@ export const resetStyleContext = () => {
   count = 0;
 };
 
-const getHead = (): HTMLHeadElement => {
-  const head: ?HTMLHeadElement = document.querySelector('head');
+const getHead = (): HTMLElement => {
+  const head: ?HTMLElement = document.head;
   invariant(head, 'Cannot find the head to append a style to');
   return head;
 };

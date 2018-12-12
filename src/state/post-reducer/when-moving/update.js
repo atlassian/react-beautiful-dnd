@@ -78,6 +78,7 @@ export default ({
       // adding phase to appease flow (even though it will be overwritten by spread)
       phase: 'COLLECTING',
       ...state,
+      isFirstRender: false,
       dimensions,
       viewport,
       current,
@@ -112,6 +113,7 @@ export default ({
     ...state,
     current,
     userDirection,
+    isFirstRender: false,
     dimensions: withUpdatedPlaceholders,
     impact: newImpact,
     viewport,

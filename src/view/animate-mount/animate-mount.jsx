@@ -31,7 +31,6 @@ export default class AnimateMount extends React.Component<Props, State> {
   };
 
   static getDerivedStateFromProps(props: Props, state: State): State {
-    console.log('get derrived state');
     if (!props.isAnimationEnabled) {
       return {
         isVisible: props.show,

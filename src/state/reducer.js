@@ -104,6 +104,7 @@ export default (state: State = idle, action: Action): State => {
     const result: DraggingState = {
       phase: 'DRAGGING',
       isDragging: true,
+      isFirstRender: true,
       critical,
       movementMode,
       dimensions,

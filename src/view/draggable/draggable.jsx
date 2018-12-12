@@ -35,6 +35,7 @@ import type {
   SecondaryMapProps,
   DraggingMapProps,
   ChildrenFn,
+  PlaceholderDetails,
 } from './draggable-types';
 import getWindowScroll from '../window/get-window-scroll';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
@@ -302,12 +303,13 @@ export default class Draggable extends Component<Props> {
         this.getDraggingSnapshot(dragging),
       );
 
-      console.warn('draggable: show placeholder', dragging.showPlaceholder);
+      const details: PlaceholderDetails = dragging.placeholderDetails;
+
       const animatedPlaceholder: Node = (
         <AnimateMount
-          show={dragging.showPlaceholder}
-          data={dragging.dimension.placeholder}
-          isAnimationEnabled={dragging.animatePlaceholder}
+          show={details.placeholder != null}
+          data={details.placeholder}
+          isAnimationEnabled={details.shouldAnimate}
         >
           {({ isVisible, data, onClose, animate }) =>
             isVisible && (

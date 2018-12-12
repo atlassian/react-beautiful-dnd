@@ -291,8 +291,6 @@ export type Published = {|
   modified: DroppableDimension[],
 |};
 
-export type MountAnimationMode = 'none' | 'open' | 'close';
-
 export type IdleState = {|
   phase: 'IDLE',
 |};
@@ -300,6 +298,7 @@ export type IdleState = {|
 export type DraggingState = {|
   phase: 'DRAGGING',
   isDragging: true,
+  isFirstRender: boolean,
   critical: Critical,
   movementMode: MovementMode,
   dimensions: DimensionMap,
