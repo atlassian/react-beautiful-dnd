@@ -1,16 +1,29 @@
 // @flow
 import React, { PureComponent } from 'react';
-import type { Placeholder as PlaceholderType } from '../../types';
+import type {
+  Placeholder as PlaceholderType,
+  MountAnimationMode,
+} from '../../types';
 import type { PlaceholderStyle } from './placeholder-types';
 
 type Props = {|
   placeholder: PlaceholderType,
+  animate: MountAnimationMode,
+  onClose: () => void,
   innerRef?: () => ?HTMLElement,
 |};
 
 export default class Placeholder extends PureComponent<Props> {
+  onTransitionEnd = () => {
+    if (this.props.animate === 'close') {
+      this.props.onClose();
+    }
+  };
+
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
+    const animate: MountAnimationMode = this.props.animate;
+    console.log('rendering placeholder. animate:', animate);
     const { client, display, tagName } = placeholder;
 
     // The goal of the placeholder is to take up the same amount of space
@@ -41,6 +54,9 @@ export default class Placeholder extends PureComponent<Props> {
       // Just a little performance optimisation: avoiding the browser needing
       // to worry about pointer events for this element
       pointerEvents: 'none',
+
+      animation: 'none',
+      // animation: getAnimation(animate),
     };
 
     return React.createElement(tagName, { style, ref: this.props.innerRef });

@@ -49,6 +49,12 @@ const getCombineWith = (impact: DragImpact): ?DraggableId => {
   return impact.merge.combine.draggableId;
 };
 
+const shouldShowPlaceholder = (
+  draggable: DraggableDimension,
+  draggingOver: ?DroppableId,
+): boolean =>
+  draggingOver === draggable.descriptor.droppableId || draggingOver === null;
+
 const defaultMapProps: MapProps = {
   secondary: {
     offset: origin,
@@ -89,6 +95,7 @@ export const makeMapStateToProps = (): Selector => {
       draggingOver: ?DroppableId,
       // the id of a draggable you are grouping with
       combineWith: ?DraggableId,
+      showPlaceholder: boolean,
       forceShouldAnimate: ?boolean,
     ): MapProps => ({
       dragging: {
@@ -98,6 +105,9 @@ export const makeMapStateToProps = (): Selector => {
         dimension,
         draggingOver,
         combineWith,
+        showPlaceholder,
+        // TODO: correct value
+        animatePlaceholder: true,
         forceShouldAnimate,
       },
       secondary: null,
@@ -166,6 +176,7 @@ export const makeMapStateToProps = (): Selector => {
         dimension,
         draggingOver,
         combineWith,
+        shouldShowPlaceholder(dimension, draggingOver),
         forceShouldAnimate,
       );
     }
@@ -177,6 +188,8 @@ export const makeMapStateToProps = (): Selector => {
         return null;
       }
 
+      const dimension: DraggableDimension =
+        state.dimensions.draggables[ownProps.draggableId];
       const draggingOver: ?DroppableId = whatIsDraggedOver(pending.impact);
       const combineWith: ?DraggableId = getCombineWith(pending.impact);
       const duration: number = pending.dropDuration;
@@ -186,8 +199,10 @@ export const makeMapStateToProps = (): Selector => {
       return {
         dragging: {
           offset: pending.newHomeClientOffset,
-          // still need to provide the dimension for the placeholder
-          dimension: state.dimensions.draggables[ownProps.draggableId],
+          dimension,
+          showPlaceholder: shouldShowPlaceholder(dimension, draggingOver),
+          // TODO: correct value
+          animatePlaceholder: true,
           draggingOver,
           combineWith,
           mode,

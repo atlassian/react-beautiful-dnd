@@ -111,6 +111,8 @@ export type DraggingMapProps = {|
   mode: MovementMode,
   dropping: ?DropAnimation,
   dimension: DraggableDimension,
+  showPlaceholder: boolean,
+  animatePlaceholder: boolean,
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
   forceShouldAnimate: ?boolean,

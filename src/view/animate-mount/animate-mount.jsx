@@ -1,12 +1,11 @@
 // @flow
 import React, { type Node } from 'react';
-
-export type AnimationMode = 'none' | 'open' | 'close';
+import type { MountAnimationMode } from '../../types';
 
 export type AnimateProvided = {|
   isVisible: boolean,
   onClose: () => void,
-  animate: AnimationMode,
+  animate: MountAnimationMode,
   data: mixed,
 |};
 
@@ -20,7 +19,7 @@ type Props = {|
 type State = {|
   data: mixed,
   isVisible: boolean,
-  animate: AnimationMode,
+  animate: MountAnimationMode,
 |};
 
 export default class AnimateMount extends React.Component<Props, State> {
@@ -32,6 +31,7 @@ export default class AnimateMount extends React.Component<Props, State> {
   };
 
   static getDerivedStateFromProps(props: Props, state: State): State {
+    console.log('get derrived state');
     if (!props.isAnimationEnabled) {
       return {
         isVisible: props.show,
@@ -49,7 +49,7 @@ export default class AnimateMount extends React.Component<Props, State> {
     }
 
     // need to animate out
-
+    console.log('animate out?');
     return {
       isVisible: state.isVisible,
       data: state.data,

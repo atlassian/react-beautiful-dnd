@@ -291,6 +291,8 @@ export type Published = {|
   modified: DroppableDimension[],
 |};
 
+export type MountAnimationMode = 'none' | 'open' | 'close';
+
 export type IdleState = {|
   phase: 'IDLE',
 |};

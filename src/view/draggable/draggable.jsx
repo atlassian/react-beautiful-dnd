@@ -39,6 +39,7 @@ import type {
 import getWindowScroll from '../window/get-window-scroll';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import checkOwnProps from './check-own-props';
+import AnimateMount from '../animate-mount';
 
 export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
@@ -301,14 +302,29 @@ export default class Draggable extends Component<Props> {
         this.getDraggingSnapshot(dragging),
       );
 
-      const placeholder: Node = (
-        <Placeholder placeholder={dragging.dimension.placeholder} />
+      console.warn('draggable: show placeholder', dragging.showPlaceholder);
+      const animatedPlaceholder: Node = (
+        <AnimateMount
+          show={dragging.showPlaceholder}
+          data={dragging.dimension.placeholder}
+          isAnimationEnabled={dragging.animatePlaceholder}
+        >
+          {({ isVisible, data, onClose, animate }) =>
+            isVisible && (
+              <Placeholder
+                animate={animate}
+                placeholder={(data: any)}
+                onClose={onClose}
+              />
+            )
+          }
+        </AnimateMount>
       );
 
       return (
         <Fragment>
           {child}
-          {placeholder}
+          {animatedPlaceholder}
         </Fragment>
       );
     }
