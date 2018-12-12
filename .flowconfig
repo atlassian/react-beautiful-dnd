@@ -12,4 +12,6 @@
 suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
 suppress_comment= \\(.\\|\n\\)*\\$ExpectError
 include_warnings=true
+# Fixing issue with CircleCI where flow would hang
+# I suspect this is caused by incorrect advertisement of virtual cores
 server.max_workers=1
