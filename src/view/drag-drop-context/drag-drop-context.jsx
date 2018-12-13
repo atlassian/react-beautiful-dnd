@@ -6,15 +6,15 @@ import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal, {
-  resetStyleContext,
-} from '../style-marshal/style-marshal';
+  type StyleMarshal,
+} from '../dom-nodes/style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../window/scroll-window';
-import createAnnouncer from '../announcer/announcer';
+import createAnnouncer, {
+  type Announcer,
+} from '../dom-nodes/announcer/announcer';
 import createAutoScroller from '../../state/auto-scroller';
-import type { Announcer } from '../announcer/announcer-types';
 import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
-import type { StyleMarshal } from '../style-marshal/style-marshal-types';
 import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
@@ -50,9 +50,11 @@ type Context = {
   [string]: Store,
 };
 
+let uniqueIdCount: number = 0;
+
 // Reset any context that gets persisted across server side renders
 export const resetServerContext = () => {
-  resetStyleContext();
+  uniqueIdCount = 0;
 };
 
 const printFatalDevError = (error: Error) => {
@@ -82,9 +84,12 @@ export default class DragDropContext extends React.Component<Props> {
   autoScroller: AutoScroller;
   announcer: Announcer;
   unsubscribe: Function;
+  uniqueId: string;
 
   constructor(props: Props, context: mixed) {
     super(props, context);
+
+    this.uniqueId = `${++uniqueIdCount}`;
 
     // A little setup check for dev
     if (process.env.NODE_ENV !== 'production') {
@@ -94,10 +99,10 @@ export default class DragDropContext extends React.Component<Props> {
       );
     }
 
-    this.announcer = createAnnouncer();
+    this.announcer = createAnnouncer(this.uniqueId);
 
     // create the style marshal
-    this.styleMarshal = createStyleMarshal();
+    this.styleMarshal = createStyleMarshal(this.uniqueId);
 
     this.store = createStore({
       // Lazy reference to dimension marshal get around circular dependency
@@ -154,7 +159,7 @@ export default class DragDropContext extends React.Component<Props> {
     return {
       [storeKey]: this.store,
       [dimensionMarshalKey]: this.dimensionMarshal,
-      [styleContextKey]: this.styleMarshal.styleContext,
+      [styleContextKey]: this.uniqueId,
       [canLiftContextKey]: this.canLift,
     };
   }

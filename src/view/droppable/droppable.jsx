@@ -17,9 +17,9 @@ import {
 } from '../context-keys';
 import { warning } from '../../dev-warning';
 import checkOwnProps from './check-own-props';
-import AnimateMount, {
+import AnimateInOut, {
   type AnimateProvided,
-} from '../animate-mount/animate-mount';
+} from '../animate-in-out/animate-in-out';
 
 type Context = {
   [string]: DroppableId | TypeId,
@@ -126,8 +126,9 @@ export default class Droppable extends Component<Props> {
   getPlaceholder() {
     const raw: ?PlaceholderType = this.props.placeholder;
 
+    console.log('render droppable placeholder?');
     return (
-      <AnimateMount show={Boolean(raw)} data={raw} isAnimationEnabled>
+      <AnimateInOut on={raw} shouldAnimate>
         {({ isVisible, onClose, data, animate }: AnimateProvided) =>
           isVisible && (
             <Placeholder
@@ -138,7 +139,7 @@ export default class Droppable extends Component<Props> {
             />
           )
         }
-      </AnimateMount>
+      </AnimateInOut>
     );
   }
 

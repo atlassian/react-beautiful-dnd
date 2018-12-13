@@ -1,6 +1,6 @@
 // @flow
-import { transitions } from '../animation';
-import * as attributes from '../data-attributes';
+import { transitions } from '../../animation';
+import * as attributes from '../../data-attributes';
 
 export type Styles = {|
   always: string,

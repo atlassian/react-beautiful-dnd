@@ -14,7 +14,7 @@ type Props = {|
 |};
 
 export default class Placeholder extends PureComponent<Props> {
-  onTransitionEnd = () => {
+  onAnimationEnd = () => {
     if (this.props.animate === 'close') {
       this.props.onClose();
     }

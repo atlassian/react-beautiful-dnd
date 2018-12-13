@@ -40,7 +40,7 @@ import type {
 import getWindowScroll from '../window/get-window-scroll';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import checkOwnProps from './check-own-props';
-import AnimateMount from '../animate-mount';
+import AnimateInOut from '../animate-in-out';
 
 export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
@@ -305,11 +305,11 @@ export default class Draggable extends Component<Props> {
 
       const details: PlaceholderDetails = dragging.placeholderDetails;
 
-      const animatedPlaceholder: Node = (
-        <AnimateMount
-          show={details.placeholder != null}
-          data={details.placeholder}
-          isAnimationEnabled={details.shouldAnimate}
+      console.log('render draggable placeholder?');
+      const sibling: Node = (
+        <AnimateInOut
+          on={details.placeholder}
+          shouldAnimate={details.shouldAnimate}
         >
           {({ isVisible, data, onClose, animate }) =>
             isVisible && (
@@ -320,13 +320,13 @@ export default class Draggable extends Component<Props> {
               />
             )
           }
-        </AnimateMount>
+        </AnimateInOut>
       );
 
       return (
         <Fragment>
           {child}
-          {animatedPlaceholder}
+          {sibling}
         </Fragment>
       );
     }

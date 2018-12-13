@@ -10,9 +10,8 @@ export type AnimateProvided = {|
 |};
 
 type Props = {|
-  show: boolean,
-  data: mixed,
-  isAnimationEnabled: boolean,
+  on: mixed,
+  shouldAnimate: boolean,
   children: (provided: AnimateProvided) => Node | null,
 |};
 
@@ -24,33 +23,34 @@ type State = {|
 
 export default class AnimateMount extends React.Component<Props, State> {
   state: State = {
-    isVisible: this.props.show,
-    data: this.props.data,
+    isVisible: Boolean(this.props.on),
+    data: this.props.on,
     // not allowing 'close' when mounting
-    animate: this.props.isAnimationEnabled ? 'open' : 'none',
+    animate: this.props.shouldAnimate ? 'open' : 'none',
   };
 
   static getDerivedStateFromProps(props: Props, state: State): State {
-    if (!props.isAnimationEnabled) {
+    if (!props.shouldAnimate) {
       return {
-        isVisible: props.show,
-        data: props.data,
+        isVisible: Boolean(props.on),
+        data: props.on,
         animate: 'none',
       };
     }
     // need to animate in
-    if (props.show) {
+    if (props.on) {
       return {
         isVisible: true,
-        data: props.data,
+        // have new data to animate in with
+        data: props.on,
         animate: 'open',
       };
     }
 
-    // need to animate out
-    console.log('animate out?');
+    // need to animate out if there was data
     return {
       isVisible: state.isVisible,
+      // use old data for animating out
       data: state.data,
       animate: 'close',
     };

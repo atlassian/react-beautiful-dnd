@@ -1,36 +1,21 @@
 // @flow
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
+import type { DropReason } from '../../../types';
 import getStyles, { type Styles } from './get-styles';
-import { prefix } from '../data-attributes';
-import type { StyleMarshal } from './style-marshal-types';
-import type { DropReason } from '../../types';
+import { prefix } from '../../data-attributes';
+import createStyleElement from '../create-style-element';
+import getHead from '../get-head';
 
-let count: number = 0;
+export type StyleMarshal = {|
+  dragging: () => void,
+  dropping: (reason: DropReason) => void,
+  resting: () => void,
+  unmount: () => void,
+  mount: () => void,
+|};
 
-// Required for server side rendering as count is persisted across requests
-export const resetStyleContext = () => {
-  count = 0;
-};
-
-const getHead = (): HTMLElement => {
-  const head: ?HTMLElement = document.head;
-  invariant(head, 'Cannot find the head to append a style to');
-  return head;
-};
-
-const createStyleEl = (): HTMLStyleElement => {
-  const el: HTMLStyleElement = document.createElement('style');
-  el.type = 'text/css';
-  return el;
-};
-
-export default () => {
-  const context: string = `${count++}`;
-  const styles: Styles = getStyles(context);
-  let always: ?HTMLStyleElement = null;
-  let dynamic: ?HTMLStyleElement = null;
-
+export default (styleContext: string): StyleMarshal => {
   // using memoizeOne as a way of not updating the innerHTML
   // unless there is a new value required
   const setStyle = memoizeOne((el: ?HTMLStyleElement, proposed: string) => {
@@ -40,16 +25,16 @@ export default () => {
     el.innerHTML = proposed;
   });
 
-  // exposing this as a seperate step so that it works nicely with
-  // server side rendering
-  const mount = () => {
-    invariant(!always && !dynamic, 'Style marshal already mounted');
+  const styles: Styles = getStyles(styleContext);
+  let always: ?HTMLStyleElement = null;
+  let dynamic: ?HTMLStyleElement = null;
 
-    always = createStyleEl();
-    dynamic = createStyleEl();
-    // for easy identification
-    always.setAttribute(`${prefix}-always`, context);
-    dynamic.setAttribute(`${prefix}-dynamic`, context);
+  const mount = () => {
+    invariant(!always && !dynamic);
+    always = createStyleElement();
+    dynamic = createStyleElement();
+    always.setAttribute(`${prefix}-always`, styleContext);
+    dynamic.setAttribute(`${prefix}-dynamic`, styleContext);
 
     // add style tags to head
     getHead().appendChild(always);
@@ -79,7 +64,7 @@ export default () => {
     // Remove from head
     getHead().removeChild(always);
     getHead().removeChild(dynamic);
-    // Unset
+    // Unset for cleanup
     always = null;
     dynamic = null;
   };
@@ -88,7 +73,6 @@ export default () => {
     dragging,
     dropping,
     resting,
-    styleContext: context,
     mount,
     unmount,
   };

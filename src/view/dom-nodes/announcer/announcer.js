@@ -1,10 +1,13 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { Announce } from '../../types';
-import type { Announcer } from './announcer-types';
-import { warning } from '../../dev-warning';
+import type { Announce } from '../../../types';
+import { warning } from '../../../dev-warning';
 
-let count: number = 0;
+export type Announcer = {|
+  announce: Announce,
+  mount: () => void,
+  unmount: () => void,
+|};
 
 // https://allyjs.io/tutorials/hiding-elements.html
 // Element is visually hidden but is readable by screen readers
@@ -26,8 +29,8 @@ const getBody = (): HTMLBodyElement => {
   return document.body;
 };
 
-export default (): Announcer => {
-  const id: string = `react-beautiful-dnd-announcement-${count++}`;
+export default (uniqueId: string): Announcer => {
+  const id: string = `react-beautiful-dnd-announcement-${uniqueId}`;
   let el: ?HTMLElement = null;
 
   const announce: Announce = (message: string): void => {
@@ -81,7 +84,6 @@ export default (): Announcer => {
 
   const announcer: Announcer = {
     announce,
-    id,
     mount,
     unmount,
   };
