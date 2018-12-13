@@ -48,6 +48,7 @@ export default class AnimateInOut extends React.Component<Props, State> {
     }
 
     // need to animate out if there was data
+
     return {
       isVisible: state.isVisible,
       // use old data for animating out

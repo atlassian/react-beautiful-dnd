@@ -19,6 +19,9 @@ import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
+import createAnimationMarshal, {
+  type AnimationMarshal,
+} from '../dom-nodes/animation-marshal/animation-marshal';
 import type { DraggableId, State, Responders } from '../../types';
 import type { Store } from '../../state/store-types';
 import {
@@ -81,6 +84,7 @@ export default class DragDropContext extends React.Component<Props> {
   store: Store;
   dimensionMarshal: DimensionMarshal;
   styleMarshal: StyleMarshal;
+  animationMarshal: AnimationMarshal;
   autoScroller: AutoScroller;
   announcer: Announcer;
   unsubscribe: Function;
@@ -99,15 +103,15 @@ export default class DragDropContext extends React.Component<Props> {
       );
     }
 
-    this.announcer = createAnnouncer(this.uniqueId);
-
-    // create the style marshal
     this.styleMarshal = createStyleMarshal(this.uniqueId);
+    this.animationMarshal = createAnimationMarshal(this.uniqueId);
+    this.announcer = createAnnouncer(this.uniqueId);
 
     this.store = createStore({
       // Lazy reference to dimension marshal get around circular dependency
       getDimensionMarshal: (): DimensionMarshal => this.dimensionMarshal,
       styleMarshal: this.styleMarshal,
+      animationMarshal: this.animationMarshal,
       // This is a function as users are allowed to change their responder functions
       // at any time
       getResponders: (): Responders => ({
@@ -176,6 +180,7 @@ export default class DragDropContext extends React.Component<Props> {
   componentDidMount() {
     window.addEventListener('error', this.onWindowError);
     this.styleMarshal.mount();
+    this.animationMarshal.mount();
     this.announcer.mount();
 
     if (process.env.NODE_ENV !== 'production') {
@@ -205,6 +210,7 @@ export default class DragDropContext extends React.Component<Props> {
     }
 
     this.styleMarshal.unmount();
+    this.animationMarshal.unmount();
     this.announcer.unmount();
   }
 

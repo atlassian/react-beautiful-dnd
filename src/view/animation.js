@@ -1,5 +1,6 @@
 // @flow
 import type { Position } from 'css-box-model';
+import type { InOutAnimationMode } from '../types';
 import { isEqual, origin } from '../state/position';
 
 export const curves = {
@@ -51,4 +52,17 @@ export const transforms = {
     // when dropping while combining we also update the scale
     return `${translate} scale(${combine.scale.drop})`;
   },
+};
+
+export const getPlaceholderAnimation = (
+  animate: InOutAnimationMode,
+): string => {
+  if (animate === 'none') {
+    return 'none';
+  }
+
+  if (animate === 'open') {
+    return `placeholder-in ${outOfTheWayTiming}`;
+  }
+  return `placeholder-in ${outOfTheWayTiming} backwards`;
 };

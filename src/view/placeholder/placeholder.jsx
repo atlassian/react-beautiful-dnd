@@ -5,6 +5,7 @@ import type {
   InOutAnimationMode,
 } from '../../types';
 import type { PlaceholderStyle } from './placeholder-types';
+import { getPlaceholderAnimation } from '../animation';
 
 type Props = {|
   placeholder: PlaceholderType,
@@ -54,8 +55,7 @@ export default class Placeholder extends PureComponent<Props> {
       // to worry about pointer events for this element
       pointerEvents: 'none',
 
-      animation: 'none',
-      // animation: getAnimation(animate),
+      animation: getPlaceholderAnimation(animate),
     };
 
     return React.createElement(tagName, { style, ref: this.props.innerRef });

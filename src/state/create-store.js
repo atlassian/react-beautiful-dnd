@@ -1,9 +1,16 @@
 // @flow
 /* eslint-disable no-underscore-dangle */
 import { applyMiddleware, createStore, compose } from 'redux';
+import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
+import type { StyleMarshal } from '../view/dom-nodes/style-marshal/style-marshal';
+import type { AnimationMarshal } from '../view/dom-nodes/animation-marshal/animation-marshal';
+import type { AutoScroller } from './auto-scroller/auto-scroller-types';
+import type { Responders, Announce } from '../types';
+import type { Store } from './store-types';
 import reducer from './reducer';
 import lift from './middleware/lift';
 import style from './middleware/style';
+import animation from './middleware/animation';
 import drop from './middleware/drop/drop-middleware';
 import responders from './middleware/responders/responders-middleware';
 import dropAnimationFinish from './middleware/drop-animation-finish';
@@ -11,11 +18,6 @@ import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
 import autoScroll from './middleware/auto-scroll';
 import pendingDrop from './middleware/pending-drop';
 import updateViewportMaxScrollOnDestinationChange from './middleware/update-viewport-max-scroll-on-destination-change';
-import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
-import type { StyleMarshal } from '../view/style-marshal/style-marshal-types';
-import type { AutoScroller } from './auto-scroller/auto-scroller-types';
-import type { Responders, Announce } from '../types';
-import type { Store } from './store-types';
 
 // We are checking if window is available before using it.
 // This is needed for universal apps that render the component server side.
@@ -28,6 +30,7 @@ const composeEnhancers =
 type Args = {|
   getDimensionMarshal: () => DimensionMarshal,
   styleMarshal: StyleMarshal,
+  animationMarshal: AnimationMarshal,
   getResponders: () => Responders,
   announce: Announce,
   getScroller: () => AutoScroller,
@@ -36,6 +39,7 @@ type Args = {|
 export default ({
   getDimensionMarshal,
   styleMarshal,
+  animationMarshal,
   getResponders,
   announce,
   getScroller,
@@ -66,6 +70,7 @@ export default ({
         // transition.
         // Must be called before dimension marshal for lifting to apply collecting styles
         style(styleMarshal),
+        animation(animationMarshal),
         // Stop the dimension marshal collecting anything
         // when moving into a phase where collection is no longer needed.
         // We need to stop the marshal before responders fire as responders can cause
