@@ -1,11 +1,12 @@
 // @flow
 import React, { type Node } from 'react';
-import type { MountAnimationMode } from '../../types';
+
+export type AnimationMode = 'none' | 'open' | 'close';
 
 export type AnimateProvided = {|
   isVisible: boolean,
   onClose: () => void,
-  animate: MountAnimationMode,
+  animate: AnimationMode,
   data: mixed,
 |};
 
@@ -18,7 +19,7 @@ type Props = {|
 type State = {|
   data: mixed,
   isVisible: boolean,
-  animate: MountAnimationMode,
+  animate: AnimationMode,
 |};
 
 export default class AnimateMount extends React.Component<Props, State> {

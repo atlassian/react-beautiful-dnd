@@ -1,14 +1,12 @@
 // @flow
 import React, { PureComponent } from 'react';
-import type {
-  Placeholder as PlaceholderType,
-  MountAnimationMode,
-} from '../../types';
+import type { Placeholder as PlaceholderType } from '../../types';
 import type { PlaceholderStyle } from './placeholder-types';
+import type { AnimationMode } from '../animate-in-out/animate-in-out';
 
 type Props = {|
   placeholder: PlaceholderType,
-  animate: MountAnimationMode,
+  animate: AnimationMode,
   onClose: () => void,
   innerRef?: () => ?HTMLElement,
 |};
@@ -22,7 +20,7 @@ export default class Placeholder extends PureComponent<Props> {
 
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
-    const animate: MountAnimationMode = this.props.animate;
+    const animate: AnimationMode = this.props.animate;
     console.log('rendering placeholder. animate:', animate);
     const { client, display, tagName } = placeholder;
 
