@@ -1,12 +1,14 @@
 // @flow
 import React, { PureComponent } from 'react';
-import type { Placeholder as PlaceholderType } from '../../types';
+import type {
+  Placeholder as PlaceholderType,
+  InOutAnimationMode,
+} from '../../types';
 import type { PlaceholderStyle } from './placeholder-types';
-import type { AnimationMode } from '../animate-in-out/animate-in-out';
 
 type Props = {|
   placeholder: PlaceholderType,
-  animate: AnimationMode,
+  animate: InOutAnimationMode,
   onClose: () => void,
   innerRef?: () => ?HTMLElement,
 |};
@@ -20,8 +22,7 @@ export default class Placeholder extends PureComponent<Props> {
 
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
-    const animate: AnimationMode = this.props.animate;
-    console.log('rendering placeholder. animate:', animate);
+    const animate: InOutAnimationMode = this.props.animate;
     const { client, display, tagName } = placeholder;
 
     // The goal of the placeholder is to take up the same amount of space

@@ -1,12 +1,11 @@
 // @flow
 import React, { type Node } from 'react';
-
-export type AnimationMode = 'none' | 'open' | 'close';
+import type { InOutAnimationMode } from '../../types';
 
 export type AnimateProvided = {|
   isVisible: boolean,
   onClose: () => void,
-  animate: AnimationMode,
+  animate: InOutAnimationMode,
   data: mixed,
 |};
 
@@ -19,10 +18,10 @@ type Props = {|
 type State = {|
   data: mixed,
   isVisible: boolean,
-  animate: AnimationMode,
+  animate: InOutAnimationMode,
 |};
 
-export default class AnimateMount extends React.Component<Props, State> {
+export default class AnimateInOut extends React.Component<Props, State> {
   state: State = {
     isVisible: Boolean(this.props.on),
     data: this.props.on,

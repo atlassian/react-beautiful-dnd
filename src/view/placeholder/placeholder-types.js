@@ -12,4 +12,6 @@ export type PlaceholderStyle = {|
   flexShrink: '0',
   flexGrow: '0',
   pointerEvents: 'none',
+  // used to control the animated mount / unmount of the placeholder
+  animation: string,
 |};

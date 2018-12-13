@@ -126,7 +126,6 @@ export default class Droppable extends Component<Props> {
   getPlaceholder() {
     const raw: ?PlaceholderType = this.props.placeholder;
 
-    console.log('render droppable placeholder?');
     return (
       <AnimateInOut on={raw} shouldAnimate>
         {({ isVisible, onClose, data, animate }: AnimateProvided) =>

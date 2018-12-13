@@ -305,7 +305,6 @@ export default class Draggable extends Component<Props> {
 
       const details: PlaceholderDetails = dragging.placeholderDetails;
 
-      console.log('render draggable placeholder?');
       const sibling: Node = (
         <AnimateInOut
           on={details.placeholder}

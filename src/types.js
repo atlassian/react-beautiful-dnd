@@ -87,6 +87,8 @@ export type DraggableDimension = {|
   displaceBy: Position,
 |};
 
+export type InOutAnimationMode = 'none' | 'open' | 'close';
+
 export type Scrollable = {|
   // This is the window through which the droppable is observed
   // It does not change during a drag
