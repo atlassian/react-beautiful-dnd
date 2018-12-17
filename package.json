@@ -75,7 +75,7 @@
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
-    "@emotion/core": "^10.0.5",
+    "@emotion/core": "0.x",
     "@storybook/react": "^4.1.2",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
