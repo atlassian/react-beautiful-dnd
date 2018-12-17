@@ -58,6 +58,10 @@ export default class Placeholder extends PureComponent<Props> {
       animation: getPlaceholderAnimation(animate),
     };
 
-    return React.createElement(tagName, { style, ref: this.props.innerRef });
+    return React.createElement(tagName, {
+      style,
+      ref: this.props.innerRef,
+      onAnimationEnd: this.onAnimationEnd,
+    });
   }
 }
