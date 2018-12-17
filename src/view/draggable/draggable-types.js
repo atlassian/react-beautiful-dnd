@@ -107,17 +107,12 @@ export type DispatchProps = {|
   dropAnimationFinished: typeof dropAnimationFinished,
 |};
 
-export type PlaceholderDetails = {|
-  placeholder: ?Placeholder,
-  shouldAnimate: boolean,
-|};
-
 export type DraggingMapProps = {|
   offset: Position,
   mode: MovementMode,
   dropping: ?DropAnimation,
   dimension: DraggableDimension,
-  placeholderDetails: PlaceholderDetails,
+  placeholder: ?Placeholder,
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
   forceShouldAnimate: ?boolean,

@@ -309,6 +309,7 @@ export type DraggingState = {|
   userDirection: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
+  shouldAnimateHomePlaceholder: boolean,
   // when there is a fixed list we want to opt out of this behaviour
   isWindowScrollAllowed: boolean,
   // if we need to jump the scroll (keyboard dragging)

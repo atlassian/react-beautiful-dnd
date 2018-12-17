@@ -22,6 +22,7 @@ import {
   droppableIdKey,
   styleContextKey,
   droppableTypeKey,
+  shouldAnimatePlaceholderContextKey,
 } from '../context-keys';
 import * as timings from '../../debug/timings';
 import type {
@@ -35,7 +36,6 @@ import type {
   SecondaryMapProps,
   DraggingMapProps,
   ChildrenFn,
-  PlaceholderDetails,
 } from './draggable-types';
 import getWindowScroll from '../window/get-window-scroll';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
@@ -91,6 +91,7 @@ export default class Draggable extends Component<Props> {
     [droppableIdKey]: PropTypes.string.isRequired,
     [droppableTypeKey]: PropTypes.string.isRequired,
     [styleContextKey]: PropTypes.string.isRequired,
+    [shouldAnimatePlaceholderContextKey]: PropTypes.func.isRequired,
   };
 
   constructor(props: Props, context: Object) {
@@ -295,6 +296,7 @@ export default class Draggable extends Component<Props> {
   renderChildren = (dragHandleProps: ?DragHandleProps): Node => {
     const dragging: ?DraggingMapProps = this.props.dragging;
     const secondary: ?SecondaryMapProps = this.props.secondary;
+    const droppableId: DroppableId = this.context[droppableTypeKey];
     const children: ChildrenFn = this.props.children;
 
     if (dragging) {
@@ -303,13 +305,13 @@ export default class Draggable extends Component<Props> {
         this.getDraggingSnapshot(dragging),
       );
 
-      const details: PlaceholderDetails = dragging.placeholderDetails;
+      const placeholder: ?Placeholder = dragging.placeholder;
+      const shouldAnimate: boolean = this.context[
+        shouldAnimatePlaceholderContextKey
+      ](droppableId);
 
       const sibling: Node = (
-        <AnimateInOut
-          on={details.placeholder}
-          shouldAnimate={details.shouldAnimate}
-        >
+        <AnimateInOut on={placeholder} shouldAnimate={shouldAnimate}>
           {({ isVisible, data, onClose, animate }) =>
             isVisible && (
               <Placeholder

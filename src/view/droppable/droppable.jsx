@@ -14,6 +14,7 @@ import {
   droppableIdKey,
   droppableTypeKey,
   styleContextKey,
+  shouldAnimatePlaceholderContextKey,
 } from '../context-keys';
 import { warning } from '../../dev-warning';
 import checkOwnProps from './check-own-props';
@@ -34,6 +35,7 @@ export default class Droppable extends Component<Props> {
   // Need to declare childContextTypes without flow
   static contextTypes = {
     [styleContextKey]: PropTypes.string.isRequired,
+    [shouldAnimatePlaceholderContextKey]: PropTypes.func.isRequired,
   };
 
   constructor(props: Props, context: Object) {
@@ -124,10 +126,13 @@ export default class Droppable extends Component<Props> {
   getDroppableRef = (): ?HTMLElement => this.ref;
 
   getPlaceholder() {
-    const raw: ?PlaceholderType = this.props.placeholder;
+    const placeholder: ?PlaceholderType = this.props.placeholder;
+    const shouldAnimate: boolean = this.context[
+      shouldAnimatePlaceholderContextKey
+    ](this.props.droppableId);
 
     return (
-      <AnimateInOut on={raw} shouldAnimate>
+      <AnimateInOut on={placeholder} shouldAnimate={shouldAnimate}>
         {({ isVisible, onClose, data, animate }: AnimateProvided) =>
           isVisible && (
             <Placeholder

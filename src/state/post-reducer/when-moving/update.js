@@ -3,6 +3,7 @@ import type { Position } from 'css-box-model';
 import getDragImpact from '../../get-drag-impact';
 import { add, subtract } from '../../position';
 import getDimensionMapWithPlaceholder from '../../get-dimension-map-with-placeholder';
+import getShouldAnimateHomePlaceholder from '../../should-animate-placeholder/should-animate-home-placeholder';
 import getUserDirection from '../../user-direction/get-user-direction';
 import type {
   DraggableDimension,
@@ -78,7 +79,6 @@ export default ({
       // adding phase to appease flow (even though it will be overwritten by spread)
       phase: 'COLLECTING',
       ...state,
-      isFirstRender: false,
       dimensions,
       viewport,
       current,
@@ -101,6 +101,12 @@ export default ({
       userDirection,
     });
 
+  const shouldAnimateHomePlaceholder = getShouldAnimateHomePlaceholder(
+    state.shouldAnimateHomePlaceholder,
+    state.critical.draggable.id,
+    newImpact,
+  );
+
   const withUpdatedPlaceholders: DimensionMap = getDimensionMapWithPlaceholder({
     draggable,
     impact: newImpact,
@@ -113,7 +119,7 @@ export default ({
     ...state,
     current,
     userDirection,
-    isFirstRender: false,
+    shouldAnimateHomePlaceholder,
     dimensions: withUpdatedPlaceholders,
     impact: newImpact,
     viewport,

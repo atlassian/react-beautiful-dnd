@@ -39,7 +39,6 @@ import type {
   DefaultProps,
   DispatchProps,
   Selector,
-  PlaceholderDetails,
 } from './draggable-types';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 
@@ -59,29 +58,21 @@ const defaultMapProps: MapProps = {
   dragging: null,
 };
 
+const getPlaceholder = (
+  draggable: DraggableDimension,
+  draggingOver: ?DroppableId,
+): ?Placeholder => {
+  const shouldShow: boolean =
+    draggingOver === draggable.descriptor.droppableId || draggingOver === null;
+
+  return shouldShow ? draggable.placeholder : null;
+};
+
 // Returning a function to ensure each
 // Draggable gets its own selector
 export const makeMapStateToProps = (): Selector => {
   const memoizedOffset = memoizeOne(
     (x: number, y: number): Position => ({ x, y }),
-  );
-
-  const getPlaceholderDetails = memoizeOne(
-    (
-      draggable: DraggableDimension,
-      draggingOver: ?DroppableId,
-      isFirstRender: boolean,
-    ): PlaceholderDetails => {
-      const shouldShow: boolean =
-        draggingOver === draggable.descriptor.droppableId ||
-        draggingOver === null;
-      const shouldAnimate: boolean = !isFirstRender;
-
-      return {
-        placeholder: shouldShow ? draggable.placeholder : null,
-        shouldAnimate,
-      };
-    },
   );
 
   const getSecondaryProps = memoizeOne(
@@ -187,7 +178,7 @@ export const makeMapStateToProps = (): Selector => {
         dimension,
         draggingOver,
         combineWith,
-        getPlaceholderDetails(dimension, draggingOver, state.isFirstRender),
+        getPlaceholder(dimension, draggingOver),
         forceShouldAnimate,
       );
     }
@@ -205,7 +196,7 @@ export const makeMapStateToProps = (): Selector => {
       const combineWith: ?DraggableId = getCombineWith(pending.impact);
       const duration: number = pending.dropDuration;
       const mode: MovementMode = pending.result.mode;
-      const placeholderDetails: PlaceholderDetails = getPlaceholderDetails(
+      const placeholderDetails: PlaceholderDetails = getPlaceholder(
         dimension,
         draggingOver,
         false,

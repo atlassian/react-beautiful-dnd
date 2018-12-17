@@ -9,6 +9,7 @@ import createStyleMarshal, {
   type StyleMarshal,
 } from '../dom-nodes/style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
+import canAnimatePlaceholder from '../../state/should-animate-placeholder';
 import scrollWindow from '../window/scroll-window';
 import createAnnouncer, {
   type Announcer,
@@ -29,6 +30,7 @@ import {
   dimensionMarshalKey,
   styleContextKey,
   canLiftContextKey,
+  shouldAnimatePlaceholderContextKey,
 } from '../context-keys';
 import {
   clean,
@@ -157,6 +159,7 @@ export default class DragDropContext extends React.Component<Props> {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
     [styleContextKey]: PropTypes.string.isRequired,
     [canLiftContextKey]: PropTypes.func.isRequired,
+    [shouldAnimatePlaceholderContextKey]: PropTypes.func.isRequired,
   };
 
   getChildContext(): Context {
@@ -165,6 +168,7 @@ export default class DragDropContext extends React.Component<Props> {
       [dimensionMarshalKey]: this.dimensionMarshal,
       [styleContextKey]: this.uniqueId,
       [canLiftContextKey]: this.canLift,
+      [shouldAnimatePlaceholderContextKey]: this.canAnimatePlaceholder,
     };
   }
 
@@ -176,6 +180,9 @@ export default class DragDropContext extends React.Component<Props> {
   // on drag start which is too expensive.
   // This is useful when the user
   canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
+
+  shouldAnimatePlaceholder = (id: DroppableId) =>
+    canAnimatePlaceholder(this.store.getState(), id);
 
   componentDidMount() {
     window.addEventListener('error', this.onWindowError);
