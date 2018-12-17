@@ -6,7 +6,7 @@ import { version } from '../package.json';
 
 // dynamically load in all the stories in the /stories directory
 // https://github.com/storybooks/storybook/issues/125#issuecomment-212404756
-const req = require.context('../stories/', true, /story\.js$/);
+const req = require.context('../stories/', true, /.stories.js$/);
 
 function loadStories() {
   req.keys().forEach(req);
