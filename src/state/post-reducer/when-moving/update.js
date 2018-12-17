@@ -103,7 +103,7 @@ export default ({
 
   const shouldAnimateHomePlaceholder = getShouldAnimateHomePlaceholder(
     state.shouldAnimateHomePlaceholder,
-    state.critical.draggable.id,
+    state.critical.droppable.id,
     newImpact,
   );
 

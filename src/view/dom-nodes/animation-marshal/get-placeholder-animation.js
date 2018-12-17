@@ -1,4 +1,5 @@
 // @flow
+import type { BoxModel } from 'css-box-model';
 import type { Placeholder } from '../../../types';
 
 // https://css-tricks.com/snippets/css/keyframe-animation-syntax/
@@ -14,28 +15,50 @@ const getPrefixed = (animationName: string, rule: string): string =>
     .map((prefix: string) => `${prefix} ${animationName} { ${rule} }`)
     .join(' ');
 
+const empty: string = `
+  width: 0px;
+  height: 0px;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+`;
+
+const fill = (box: BoxModel): string => `
+  width: ${box.borderBox.width}px;
+  height: ${box.borderBox.height}px;
+  margin-top: ${box.margin.top}px;
+  margin-right: ${box.margin.right}px;
+  margin-bottom: ${box.margin.bottom}px;
+  margin-left: ${box.margin.left}px;
+`;
+
 export default (styleContext: string, placeholder: Placeholder): string => {
   const { client } = placeholder;
-  const rule: string = `
+  const inAnimation: string = `
     from {
-      width: 0px;
-      height: 0px;
-      margin-top: 0px;
-      margin-right: 0px;
-      margin-bottom: 0px;
-      margin-left: 0px;
+      ${empty}
     }
 
     to {
-      width: ${client.borderBox.width}px;
-      height: ${client.borderBox.height}px;
-      margin-top: ${client.margin.top}px;
-      margin-right: ${client.margin.right}px;
-      margin-bottom: ${client.margin.bottom}px;
-      margin-left: ${client.margin.left}px;
+      ${fill(client)}
+    }
+  `;
+
+  const outAnimation: string = `
+    from {
+      ${fill(client)}
+    }
+
+    to {
+      ${empty}
     }
   `;
 
   // TODO: generate better animation name
-  return getPrefixed('placeholder-in', rule);
+  // TODO: don't need seperate animation - can have one in reverse
+  return `
+    ${getPrefixed('placeholder-in', inAnimation)}
+    ${getPrefixed('placeholder-out', outAnimation)}
+  `;
 };

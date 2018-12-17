@@ -4,7 +4,7 @@ import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 
 export default (
   previous: boolean,
-  home: DroppableId,
+  homeId: DroppableId,
   impact: DragImpact,
 ): boolean => {
   // once it has been animated once, then it will be for the rest of the drag
@@ -14,8 +14,15 @@ export default (
 
   const isOver: ?DroppableId = whatIsDraggedOver(impact);
 
-  // animate if over a foreign
-  const shouldAnimate: boolean = isOver !== home && isOver == null;
+  // do not animate we over home
+  if (isOver === homeId) {
+    return false;
+  }
 
-  return shouldAnimate;
+  // over nothing - keep the placeholder and don't animate it
+  if (isOver == null) {
+    return false;
+  }
+
+  return true;
 };

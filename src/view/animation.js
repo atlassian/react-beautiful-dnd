@@ -61,8 +61,10 @@ export const getPlaceholderAnimation = (
     return 'none';
   }
 
+  // TODO: use a single animation and reverse it
+  // TODO: import animation name
   if (animate === 'open') {
     return `placeholder-in ${outOfTheWayTiming}`;
   }
-  return `placeholder-in ${outOfTheWayTiming} backwards`;
+  return `placeholder-out ${outOfTheWayTiming}`;
 };
