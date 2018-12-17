@@ -10,6 +10,7 @@ import type {
   DroppableId,
   MovementMode,
   TypeId,
+  Placeholder as PlaceholderType,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher';
 import DragHandle from '../drag-handle';
@@ -305,7 +306,7 @@ export default class Draggable extends Component<Props> {
         this.getDraggingSnapshot(dragging),
       );
 
-      const placeholder: ?Placeholder = dragging.placeholder;
+      const placeholder: ?PlaceholderType = dragging.placeholder;
       const shouldAnimate: boolean = this.context[
         shouldAnimatePlaceholderContextKey
       ](droppableId);

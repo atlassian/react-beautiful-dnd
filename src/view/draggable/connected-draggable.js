@@ -32,6 +32,7 @@ import type {
   DragImpact,
   DisplacementMap,
   MovementMode,
+  Placeholder,
 } from '../../types';
 import type {
   MapProps,
@@ -99,7 +100,7 @@ export const makeMapStateToProps = (): Selector => {
       draggingOver: ?DroppableId,
       // the id of a draggable you are grouping with
       combineWith: ?DraggableId,
-      placeholderDetails: PlaceholderDetails,
+      placeholder: ?Placeholder,
       forceShouldAnimate: ?boolean,
     ): MapProps => ({
       dragging: {
@@ -109,7 +110,7 @@ export const makeMapStateToProps = (): Selector => {
         dimension,
         draggingOver,
         combineWith,
-        placeholderDetails,
+        placeholder,
         forceShouldAnimate,
       },
       secondary: null,
@@ -196,18 +197,14 @@ export const makeMapStateToProps = (): Selector => {
       const combineWith: ?DraggableId = getCombineWith(pending.impact);
       const duration: number = pending.dropDuration;
       const mode: MovementMode = pending.result.mode;
-      const placeholderDetails: PlaceholderDetails = getPlaceholder(
-        dimension,
-        draggingOver,
-        false,
-      );
+      const placeholder: ?Placeholder = getPlaceholder(dimension, draggingOver);
 
       // not memoized as it is the only execution
       return {
         dragging: {
           offset: pending.newHomeClientOffset,
           dimension,
-          placeholderDetails,
+          placeholder,
           draggingOver,
           combineWith,
           mode,

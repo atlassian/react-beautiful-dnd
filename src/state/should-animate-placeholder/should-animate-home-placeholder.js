@@ -1,4 +1,5 @@
 // @flow
+import type { DroppableId, DragImpact } from '../../types';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 
 export default (

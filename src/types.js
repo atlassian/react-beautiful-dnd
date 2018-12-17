@@ -300,7 +300,6 @@ export type IdleState = {|
 export type DraggingState = {|
   phase: 'DRAGGING',
   isDragging: true,
-  isFirstRender: boolean,
   critical: Critical,
   movementMode: MovementMode,
   dimensions: DimensionMap,
@@ -345,6 +344,7 @@ export type DropAnimatingState = {|
   pending: PendingDrop,
   // We still need to render placeholders and fix the dimensions of the dragging item
   dimensions: DimensionMap,
+  shouldAnimateHomePlaceholder: boolean,
 |};
 
 export type State =

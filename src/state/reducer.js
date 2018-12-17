@@ -407,6 +407,7 @@ export default (state: State = idle, action: Action): State => {
       phase: 'DROP_ANIMATING',
       pending,
       dimensions: state.dimensions,
+      shouldAnimateHomePlaceholder: state.shouldAnimateHomePlaceholder,
     };
 
     return result;

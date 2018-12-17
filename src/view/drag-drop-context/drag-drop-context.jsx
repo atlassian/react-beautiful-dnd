@@ -9,7 +9,6 @@ import createStyleMarshal, {
   type StyleMarshal,
 } from '../dom-nodes/style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
-import canAnimatePlaceholder from '../../state/should-animate-placeholder';
 import scrollWindow from '../window/scroll-window';
 import createAnnouncer, {
   type Announcer,
@@ -23,7 +22,7 @@ import type {
 import createAnimationMarshal, {
   type AnimationMarshal,
 } from '../dom-nodes/animation-marshal/animation-marshal';
-import type { DraggableId, State, Responders } from '../../types';
+import type { DraggableId, State, Responders, DroppableId } from '../../types';
 import type { Store } from '../../state/store-types';
 import {
   storeKey,
@@ -44,6 +43,7 @@ import {
 import { getFormattedMessage } from '../../dev-warning';
 import { peerDependencies } from '../../../package.json';
 import checkReactVersion from './check-react-version';
+import shouldAnimatePlaceholder from '../../state/should-animate-placeholder/should-animate-placeholder';
 
 type Props = {|
   ...Responders,
@@ -181,8 +181,8 @@ export default class DragDropContext extends React.Component<Props> {
   // This is useful when the user
   canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
 
-  shouldAnimatePlaceholder = (id: DroppableId) =>
-    canAnimatePlaceholder(this.store.getState(), id);
+  canAnimatePlaceholder = (id: DroppableId) =>
+    shouldAnimatePlaceholder(this.store.getState(), id);
 
   componentDidMount() {
     window.addEventListener('error', this.onWindowError);
