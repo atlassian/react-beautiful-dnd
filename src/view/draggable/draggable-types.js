@@ -141,7 +141,7 @@ export type OwnProps = {|
   draggableId: DraggableId,
   index: number,
   children: ChildrenFn,
-  canCancelDragWithForceTouch: boolean,
+  canCancelDragWithForceTouch?: boolean,
 |};
 
 export type Props = {|
