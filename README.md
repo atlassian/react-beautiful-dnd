@@ -1091,7 +1091,7 @@ When dragging a `Draggable` we leave behind a _placeholder_ `React.Element` to m
 
 ### Adding an `onClick` handler to a `Draggable` or a _drag handle_
 
-You are welcome to add your own `onClick` handler to a `Draggable` or a _drag handle_ (which might be the same element). `onClick` events handlers will always be called if a click occurred. If we are preventing the click then we the `event.defaultPrevented` property will be set to `true`. We prevent click events from occurring when the user was dragging an item. See [sloppy clicks and click prevention](#sloppy-clicks-and-click-prevention-) for more information.
+You are welcome to add your own `onClick` handler to a `Draggable` or a _drag handle_ (which might be the same element). `onClick` events handlers will always be called if a click occurred. If we are preventing the click, then the `event.defaultPrevented` property will be set to `true`. We prevent click events from occurring when the user was dragging an item. See [sloppy clicks and click prevention](#sloppy-clicks-and-click-prevention-) for more information.
 
 ### Interactive child elements within a `Draggable`
 
