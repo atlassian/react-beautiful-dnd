@@ -16,12 +16,12 @@ const getPrefixed = (animationName: string, rule: string): string =>
     .join(' ');
 
 const empty: string = `
-  width: 0px;
-  height: 0px;
-  margin-top: 0px;
-  margin-right: 0px;
-  margin-bottom: 0px;
-  margin-left: 0px;
+  width: 0;
+  height: 0;
+  margin-top: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: 0;
 `;
 
 const fill = (box: BoxModel): string => `
