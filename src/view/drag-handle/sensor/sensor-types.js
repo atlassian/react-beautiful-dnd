@@ -18,6 +18,7 @@ export type CreateSensorArgs = {|
   getDraggableRef: () => ?HTMLElement,
   getWindow: () => HTMLElement,
   canStartCapturing: (event: Event) => boolean,
+  canCancelDragWithForceTouch: boolean,
 |};
 
 export type MouseSensor = {|

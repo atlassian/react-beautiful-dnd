@@ -106,6 +106,7 @@ export default ({
   callbacks,
   getWindow,
   canStartCapturing,
+  canCancelDragWithForceTouch,
 }: CreateSensorArgs): TouchSensor => {
   let state: State = initial;
 
@@ -357,7 +358,7 @@ export default ({
 
         const touch: TouchWithForce = (event.touches[0]: any);
 
-        if (touch.force >= forcePressThreshold) {
+        if (canCancelDragWithForceTouch && touch.force >= forcePressThreshold) {
           // this is an indirect cancel so we do not preventDefault
           // we also want to allow the force press to occur
           cancel();

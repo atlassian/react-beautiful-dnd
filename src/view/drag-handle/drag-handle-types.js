@@ -58,4 +58,6 @@ export type Props = {|
   // whether interactive elements should be permitted to start a drag
   canDragInteractiveElements: boolean,
   children: (?DragHandleProps) => Node,
+  // whether force touch events will cancel a drag
+  canCancelDragWithForceTouch: boolean,
 |};

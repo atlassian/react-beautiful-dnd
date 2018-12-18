@@ -56,6 +56,7 @@ export default class DragHandle extends Component<Props> {
       getDraggableRef: this.props.getDraggableRef,
       getWindow,
       canStartCapturing: this.canStartCapturing,
+      canCancelDragWithForceTouch: this.props.canCancelDragWithForceTouch,
     };
 
     this.mouseSensor = createMouseSensor(args);

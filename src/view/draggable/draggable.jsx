@@ -91,6 +91,10 @@ export default class Draggable extends Component<Props> {
     [styleContextKey]: PropTypes.string.isRequired,
   };
 
+  static defaultProps = {
+    canCancelDragWithForceTouch: true,
+  };
+
   constructor(props: Props, context: Object) {
     super(props, context);
 
@@ -334,6 +338,7 @@ export default class Draggable extends Component<Props> {
       dragging,
       isDragDisabled,
       disableInteractiveElementBlocking,
+      canCancelDragWithForceTouch,
     } = this.props;
     const droppableId: DroppableId = this.context[droppableIdKey];
     const type: TypeId = this.context[droppableTypeKey];
@@ -358,6 +363,7 @@ export default class Draggable extends Component<Props> {
           getDraggableRef={this.getDraggableRef}
           // by default we do not allow dragging on interactive elements
           canDragInteractiveElements={disableInteractiveElementBlocking}
+          canCancelDragWithForceTouch={canCancelDragWithForceTouch}
         >
           {this.renderChildren}
         </DragHandle>
