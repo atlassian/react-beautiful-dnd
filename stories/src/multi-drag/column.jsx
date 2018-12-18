@@ -13,7 +13,6 @@ type Props = {|
   column: ColumnType,
   tasks: TaskType[],
   selectedTaskIds: Id[],
-  multiSelectTo: (taskId: Id) => void,
   draggingTaskId: ?Id,
   toggleSelection: (taskId: Id) => void,
   toggleSelectionInGroup: (taskId: Id) => void,
