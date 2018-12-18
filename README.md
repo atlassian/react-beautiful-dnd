@@ -776,6 +776,7 @@ type Props = {|
 
 - `isDragDisabled`: A flag to control whether or not the `Draggable` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
 - `disableInteractiveElementBlocking`: A flag to opt out of blocking a drag from interactive elements. For more information refer to the section _Interactive child elements within a `Draggable`_
+- `canCancelDragWithForceTouch`: A flag to opt out of allowing force touch events to cancel dragging. It defaults to `true`.
 
 ### Children function (render props / function as child)
 
