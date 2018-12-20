@@ -103,7 +103,7 @@
     "prettier": "^1.15.3",
     "raf-stub": "^2.0.2",
     "react": "16.7.0",
-    "react-dom": "16.4.2",
+    "react-dom": "16.7.0",
     "react-test-renderer": "16.4.2",
     "rimraf": "^2.6.2",
     "rollup": "^0.68.0",
