@@ -21,7 +21,7 @@ const getHead = (): HTMLHeadElement => {
 
 const createStyleEl = (nonce?: string): HTMLStyleElement => {
   const el: HTMLStyleElement = document.createElement('style');
-  if (nonce) el.setAttribute("nonce", nonce);
+  if (nonce) el.setAttribute('nonce', nonce);
   el.type = 'text/css';
   return el;
 };
