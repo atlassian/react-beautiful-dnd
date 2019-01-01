@@ -19,13 +19,14 @@ const getHead = (): HTMLHeadElement => {
   return head;
 };
 
-const createStyleEl = (): HTMLStyleElement => {
+const createStyleEl = (nonce?: string): HTMLStyleElement => {
   const el: HTMLStyleElement = document.createElement('style');
+  if (nonce) el.setAttribute("nonce", nonce);
   el.type = 'text/css';
   return el;
 };
 
-export default () => {
+export default (nonce?: string) => {
   const context: string = `${count++}`;
   const styles: Styles = getStyles(context);
   let always: ?HTMLStyleElement = null;
@@ -45,8 +46,8 @@ export default () => {
   const mount = () => {
     invariant(!always && !dynamic, 'Style marshal already mounted');
 
-    always = createStyleEl();
-    dynamic = createStyleEl();
+    always = createStyleEl(nonce);
+    dynamic = createStyleEl(nonce);
     // for easy identification
     always.setAttribute(`${prefix}-always`, context);
     dynamic.setAttribute(`${prefix}-dynamic`, context);

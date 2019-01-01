@@ -42,6 +42,7 @@ import checkReactVersion from './check-react-version';
 
 type Props = {|
   ...Responders,
+  nonce?: string,
   // we do not technically need any children for this component
   children: Node | null,
 |};
@@ -97,7 +98,7 @@ export default class DragDropContext extends React.Component<Props> {
     this.announcer = createAnnouncer();
 
     // create the style marshal
-    this.styleMarshal = createStyleMarshal();
+    this.styleMarshal = createStyleMarshal(props.nonce);
 
     this.store = createStore({
       // Lazy reference to dimension marshal get around circular dependency
