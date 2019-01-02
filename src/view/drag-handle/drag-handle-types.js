@@ -26,6 +26,7 @@ export type DragHandleProps = {|
   onBlur: () => void,
 
   // Used to initiate dragging
+  onPointerDown: (event: PointerEvent) => void,
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,

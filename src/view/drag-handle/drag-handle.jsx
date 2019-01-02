@@ -10,6 +10,7 @@ import type {
   MouseSensor,
   KeyboardSensor,
   TouchSensor,
+  PointerSensor,
   CreateSensorArgs,
 } from './sensor/sensor-types';
 import type { DraggableId } from '../../types';
@@ -19,19 +20,21 @@ import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-tar
 import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
+import createPointerSensor from './sensor/create-pointer-sensor';
 import { warning } from '../../dev-warning';
 
 const preventHtml5Dnd = (event: DragEvent) => {
   event.preventDefault();
 };
 
-type Sensor = MouseSensor | KeyboardSensor | TouchSensor;
+type Sensor = MouseSensor | KeyboardSensor | TouchSensor | PointerSensor;
 
 export default class DragHandle extends Component<Props> {
   /* eslint-disable react/sort-comp */
   mouseSensor: MouseSensor;
   keyboardSensor: KeyboardSensor;
   touchSensor: TouchSensor;
+  pointerSensor: PointerSensor;
   sensors: Sensor[];
   styleContext: string;
   canLift: (id: DraggableId) => boolean;
@@ -61,7 +64,8 @@ export default class DragHandle extends Component<Props> {
     this.mouseSensor = createMouseSensor(args);
     this.keyboardSensor = createKeyboardSensor(args);
     this.touchSensor = createTouchSensor(args);
-    this.sensors = [this.mouseSensor, this.keyboardSensor, this.touchSensor];
+    this.pointerSensor = createPointerSensor(args);
+    this.sensors = [this.mouseSensor, this.keyboardSensor, this.touchSensor, this.pointerSensor];
     this.styleContext = context[styleContextKey];
 
     // The canLift function is read directly off the context
@@ -192,7 +196,7 @@ export default class DragHandle extends Component<Props> {
 
   onKeyDown = (event: KeyboardEvent) => {
     // let the other sensors deal with it
-    if (this.mouseSensor.isCapturing() || this.touchSensor.isCapturing()) {
+    if (this.mouseSensor.isCapturing() || this.touchSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
 
@@ -201,7 +205,7 @@ export default class DragHandle extends Component<Props> {
 
   onMouseDown = (event: MouseEvent) => {
     // let the other sensors deal with it
-    if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing()) {
+    if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
 
@@ -210,11 +214,20 @@ export default class DragHandle extends Component<Props> {
 
   onTouchStart = (event: TouchEvent) => {
     // let the keyboard sensor deal with it
-    if (this.mouseSensor.isCapturing() || this.keyboardSensor.isCapturing()) {
+    if (this.mouseSensor.isCapturing() || this.keyboardSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
 
     this.touchSensor.onTouchStart(event);
+  };
+
+  onPointerStart = (event: PointerEvent) => {
+    // let the keyboard sensor deal with it
+    if (this.mouseSensor.isCapturing() || this.keyboardSensor.isCapturing() || this.touchSensor.isCapturing()) {
+      return;
+    }
+
+    this.pointerSensor.onPointerStart(event);
   };
 
   canStartCapturing = (event: Event) => {
