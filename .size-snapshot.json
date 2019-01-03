@@ -1,13 +1,13 @@
 {
   "dist/react-beautiful-dnd.js": {
-    "bundled": 346369,
-    "minified": 133739,
-    "gzipped": 39606
+    "bundled": 350711,
+    "minified": 135661,
+    "gzipped": 39780
   },
   "dist/react-beautiful-dnd.min.js": {
-    "bundled": 294843,
-    "minified": 109530,
-    "gzipped": 31895
+    "bundled": 298968,
+    "minified": 111465,
+    "gzipped": 32184
   },
   "dist/react-beautiful-dnd.esm.js": {
     "bundled": 228168,

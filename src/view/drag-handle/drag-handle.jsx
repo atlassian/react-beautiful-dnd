@@ -29,6 +29,13 @@ const preventHtml5Dnd = (event: DragEvent) => {
 
 type Sensor = MouseSensor | KeyboardSensor | TouchSensor | PointerSensor;
 
+let IS_TOUCH_COMPATIBLE: boolean = false;
+
+window.addEventListener('touchstart', function onFirstTouch() {
+  IS_TOUCH_COMPATIBLE = true;
+  window.removeEventListener('touchstart', onFirstTouch);
+});
+
 export default class DragHandle extends Component<Props> {
   /* eslint-disable react/sort-comp */
   mouseSensor: MouseSensor;
@@ -199,7 +206,7 @@ export default class DragHandle extends Component<Props> {
     if (this.mouseSensor.isCapturing() || this.touchSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
-
+    console.log('keyboard sensor is in use');
     this.keyboardSensor.onKeyDown(event);
   };
 
@@ -208,26 +215,32 @@ export default class DragHandle extends Component<Props> {
     if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
-
+    console.log('mouse sensor is in use');
     this.mouseSensor.onMouseDown(event);
   };
 
   onTouchStart = (event: TouchEvent) => {
     // let the keyboard sensor deal with it
-    if (this.mouseSensor.isCapturing() || this.keyboardSensor.isCapturing() || this.pointerSensor.isCapturing()) {
+    if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
-
+    console.log('touch sensor is in use');
     this.touchSensor.onTouchStart(event);
   };
 
-  onPointerStart = (event: PointerEvent) => {
-    // let the keyboard sensor deal with it
-    if (this.mouseSensor.isCapturing() || this.keyboardSensor.isCapturing() || this.touchSensor.isCapturing()) {
+  onPointerDown = (event: PointerEvent) => {
+    if (event.pointerType == 'mouse') {
+      return;
+    } else if (event.pointerType == 'touch' && IS_TOUCH_COMPATIBLE) {
       return;
     }
 
-    this.pointerSensor.onPointerStart(event);
+    if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing() || this.touchSensor.isCapturing()) {
+      return;
+    }
+
+    console.log('pointer sensor is in use');
+    this.pointerSensor.onPointerDown(event);
   };
 
   canStartCapturing = (event: Event) => {
@@ -258,6 +271,7 @@ export default class DragHandle extends Component<Props> {
         onMouseDown: this.onMouseDown,
         onKeyDown: this.onKeyDown,
         onTouchStart: this.onTouchStart,
+        onPointerDown: this.onPointerDown,
         onFocus: this.onFocus,
         onBlur: this.onBlur,
         tabIndex: 0,

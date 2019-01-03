@@ -37,5 +37,5 @@ export type TouchSensor = {|
 
 export type PointerSensor = {|
   ...SensorBase,
-  onTouchStart: (event: PointerEvent) => void,
+  onPointerDown: (event: PointerEvent) => void,
 |};

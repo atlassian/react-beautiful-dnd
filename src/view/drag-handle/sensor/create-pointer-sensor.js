@@ -109,9 +109,9 @@ export default ({
       eventName: 'pointermove',
       fn: (event: PointerEvent) => {
         const { button, clientX, clientY } = event;
-        if (button !== primaryButton) {
-          return;
-        }
+        // if (button !== primaryButton) {
+        //   return;
+        // }
 
         const point: Position = {
           x: clientX,
@@ -178,78 +178,6 @@ export default ({
         stopDragging(callbacks.onCancel);
       },
     },
-    {
-      eventName: 'keydown',
-      fn: (event: KeyboardEvent) => {
-        // firing a keyboard event before the drag has started
-        // treat this as an indirect cancel
-        if (!state.isDragging) {
-          cancel();
-          return;
-        }
-
-        // cancelling a drag
-        if (event.keyCode === keyCodes.escape) {
-          event.preventDefault();
-          cancel();
-          return;
-        }
-
-        preventStandardKeyEvents(event);
-      },
-    },
-    {
-      eventName: 'resize',
-      fn: cancel,
-    },
-    {
-      eventName: 'scroll',
-      // ## Passive: true
-      // Eventual consistency is fine because we use position: fixed on the item
-      // ## Capture: false
-      // Scroll events on elements do not bubble, but they go through the capture phase
-      // https://twitter.com/alexandereardon/status/985994224867819520
-      // Using capture: false here as we want to avoid intercepting droppable scroll requests
-      // TODO: can result in awkward drop position
-      options: { passive: true, capture: false },
-      fn: () => {
-        // stop a pending drag
-        if (state.pending) {
-          stopPendingDrag();
-          return;
-        }
-        // callbacks.onWindowScroll();
-        schedule.windowScrollMove();
-      },
-    },
-    // Need to opt out of dragging if the user is a force press
-    // Only for safari which has decided to introduce its own custom way of doing things
-    // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
-    {
-      eventName: 'webkitmouseforcechanged',
-      fn: (event: MouseForceChangedEvent) => {
-        if (
-          event.webkitForce == null ||
-          (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
-        ) {
-          warning(
-            'handling a mouse force changed event when it is not supported',
-          );
-          return;
-        }
-
-        const forcePressThreshold: number = (MouseEvent: any)
-          .WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
-        const isForcePressing: boolean =
-          event.webkitForce >= forcePressThreshold;
-
-        if (isForcePressing) {
-          // it is considered a indirect cancel so we do not
-          // prevent default in any situation.
-          cancel();
-        }
-      },
-    },
     // Cancel on page visibility change
     {
       eventName: supportedPageVisibilityEventName,
@@ -272,27 +200,27 @@ export default ({
       return;
     }
 
-    invariant(
-      !isCapturing(),
-      'Should not be able to perform a mouse down while a drag or pending drag is occurring',
-    );
+    // invariant(
+    //   !isCapturing(),
+    //   'Should not be able to perform a mouse down while a drag or pending drag is occurring',
+    // );
 
     // We do not need to prevent the event on a dropping draggable as
     // the mouse down event will not fire due to pointer-events: none
     // https://codesandbox.io/s/oxo0o775rz
-    if (!canStartCapturing(event)) {
-      return;
-    }
+    // if (!canStartCapturing(event)) {
+    //   return;
+    // }
 
     // only starting a drag if dragging with the primary mouse button
-    if (event.button !== primaryButton) {
-      return;
-    }
+    // if (event.button !== primaryButton) {
+    //   return;
+    // }
 
     // Do not start a drag if any modifier key is pressed
-    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
-      return;
-    }
+    // if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+    //   return;
+    // }
 
     // Registering that this event has been handled.
     // This is to prevent parent draggables using this event
