@@ -18,18 +18,11 @@ import type { EventBinding } from '../util/event-types';
 import type { PointerSensor, CreateSensorArgs } from './sensor-types';
 import { warning } from '../../../dev-warning';
 
-// Custom event format for force press inputs
-type MouseForceChangedEvent = PointerEvent & {
-  webkitForce?: number,
-};
-
 type State = {|
   isDragging: boolean,
   pending: ?Position,
 |};
 
-// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-const primaryButton: number = 0;
 const noop = () => {};
 
 // shared management of mousedown without needing to call preventDefault()
@@ -108,10 +101,12 @@ export default ({
     {
       eventName: 'pointermove',
       fn: (event: PointerEvent) => {
-        const { button, clientX, clientY } = event;
-        // if (button !== primaryButton) {
-        //   return;
-        // }
+        console.log('pointermove');
+
+        // preventing default as we are using this event
+        event.preventDefault();
+        const clientX = event.clientX;
+        const clientY = event.clientY;
 
         const point: Position = {
           x: clientX,
@@ -138,13 +133,6 @@ export default ({
           );
         }
 
-        // threshold not yet exceeded
-        if (!isSloppyClickThresholdExceeded(state.pending, point)) {
-          return;
-        }
-
-        // preventing default as we are using this event
-        event.preventDefault();
         startDragging(() =>
           callbacks.onLift({
             clientSelection: point,
@@ -156,6 +144,7 @@ export default ({
     {
       eventName: 'pointerup',
       fn: (event: PointerEvent) => {
+        console.log('pointerup');
         if (state.pending) {
           stopPendingDrag();
           return;
@@ -169,13 +158,107 @@ export default ({
     {
       eventName: 'pointerdown',
       fn: (event: PointerEvent) => {
+        console.log('pointerdown');
         // this can happen during a drag when the user clicks a button
         // other than the primary mouse button
-        if (state.isDragging) {
+        // if (state.isDragging) {
           event.preventDefault();
+        // }
+        stopDragging(callbacks.onCancel);
+      },
+    },
+    {
+      eventName: 'scroll',
+      // ## Passive: true
+      // Eventual consistency is fine because we use position: fixed on the item
+      // ## Capture: false
+      // Scroll events on elements do not bubble, but they go through the capture phase
+      // https://twitter.com/alexandereardon/status/985994224867819520
+      // Using capture: false here as we want to avoid intercepting droppable scroll requests
+      // TODO: can result in awkward drop position
+      options: { passive: true, capture: false },
+      fn: () => {
+        // stop a pending drag
+        if (state.pending) {
+          stopPendingDrag();
+          return;
+        }
+        // callbacks.onWindowScroll();
+        schedule.windowScrollMove();
+      },
+    },
+    {
+      eventName: 'pointercancel',
+      fn: (event: Event) => {
+        console.log('pointercancel');
+
+        // preventing default as we are using this event
+        event.preventDefault();
+        const clientX = event.clientX;
+        const clientY = event.clientY;
+
+        const point: Position = {
+          x: clientX,
+          y: clientY,
+        };
+
+        // Already dragging
+        if (state.isDragging) {
+          // preventing default as we are using this event
+          event.preventDefault();
+          schedule.move(point);
+          return;
         }
 
-        stopDragging(callbacks.onCancel);
+        // There should be a pending drag at this point
+
+        if (!state.pending) {
+          // this should be an impossible state
+          // we cannot use kill directly as it checks if there is a pending drag
+          stopPendingDrag();
+          invariant(
+            false,
+            'Expected there to be an active or pending drag when window pointermove event is received',
+          );
+        }
+
+        startDragging(() =>
+          callbacks.onLift({
+            clientSelection: point,
+            movementMode: 'FLUID',
+          }),
+        );
+      },
+    },
+    {
+      eventName: 'ondragstart',
+      fn: (event: Event) => {
+        console.log('ondragstart');
+        event.preventDefault();
+      },
+    },
+    {
+      eventName: 'dragstart',
+      fn: (event: Event) => {
+        console.log('dragstart');
+        event.preventDefault();
+        event.stopPropagation();
+      },
+    },
+    {
+      eventName: 'mousemove',
+      fn: (event: Event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      },
+    },
+    {
+      eventName: 'lostpointercapture',
+      fn: (event: Event) => {
+        console.log('lostpointercapture');
+
+        event.preventDefault();
+        event.stopPropagation();
       },
     },
     // Cancel on page visibility change
@@ -200,27 +283,17 @@ export default ({
       return;
     }
 
-    // invariant(
-    //   !isCapturing(),
-    //   'Should not be able to perform a mouse down while a drag or pending drag is occurring',
-    // );
+    invariant(
+      !isCapturing(),
+      'Should not be able to perform a mouse down while a drag or pending drag is occurring',
+    );
 
     // We do not need to prevent the event on a dropping draggable as
     // the mouse down event will not fire due to pointer-events: none
     // https://codesandbox.io/s/oxo0o775rz
-    // if (!canStartCapturing(event)) {
-    //   return;
-    // }
-
-    // only starting a drag if dragging with the primary mouse button
-    // if (event.button !== primaryButton) {
-    //   return;
-    // }
-
-    // Do not start a drag if any modifier key is pressed
-    // if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
-    //   return;
-    // }
+    if (!canStartCapturing(event)) {
+      return;
+    }
 
     // Registering that this event has been handled.
     // This is to prevent parent draggables using this event
