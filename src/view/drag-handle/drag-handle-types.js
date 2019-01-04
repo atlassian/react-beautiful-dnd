@@ -26,9 +26,10 @@ export type DragHandleProps = {|
   onBlur: () => void,
 
   // Used to initiate dragging
-  onMouseDown: (event: MouseEvent) => void,
+  // onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
+  onPointerDown: (event: PointerEvent) => void,
 
   // Control styling from style marshal
   'data-react-beautiful-dnd-drag-handle': string,

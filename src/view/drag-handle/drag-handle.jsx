@@ -7,31 +7,43 @@ import getWindowFromRef from '../get-window-from-ref';
 import getDragHandleRef from './util/get-drag-handle-ref';
 import type { Props, DragHandleProps } from './drag-handle-types';
 import type {
-  MouseSensor,
+  // MouseSensor,
   KeyboardSensor,
   TouchSensor,
+  PointerSensor,
   CreateSensorArgs,
 } from './sensor/sensor-types';
 import type { DraggableId } from '../../types';
 import { styleContextKey, canLiftContextKey } from '../context-keys';
 import focusRetainer from './util/focus-retainer';
 import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
-import createMouseSensor from './sensor/create-mouse-sensor';
+// import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
+import createPointerSensor from './sensor/create-pointer-sensor';
 import { warning } from '../../dev-warning';
 
 const preventHtml5Dnd = (event: DragEvent) => {
   event.preventDefault();
 };
 
-type Sensor = MouseSensor | KeyboardSensor | TouchSensor;
+type Sensor = KeyboardSensor | TouchSensor | PointerSensor;
+// type Sensor = MouseSensor | KeyboardSensor | TouchSensor | PointerSensor;
+
+
+let IS_TOUCH_COMPATIBLE: boolean = false;
+
+window.addEventListener('touchstart', function onFirstTouch() {
+  IS_TOUCH_COMPATIBLE = true;
+  window.removeEventListener('touchstart', onFirstTouch);
+});
 
 export default class DragHandle extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  mouseSensor: MouseSensor;
+  // mouseSensor: MouseSensor;
   keyboardSensor: KeyboardSensor;
   touchSensor: TouchSensor;
+  pointerSensor: PointerSensor;
   sensors: Sensor[];
   styleContext: string;
   canLift: (id: DraggableId) => boolean;
@@ -58,10 +70,11 @@ export default class DragHandle extends Component<Props> {
       canStartCapturing: this.canStartCapturing,
     };
 
-    this.mouseSensor = createMouseSensor(args);
+    // this.mouseSensor = createMouseSensor(args);
     this.keyboardSensor = createKeyboardSensor(args);
     this.touchSensor = createTouchSensor(args);
-    this.sensors = [this.mouseSensor, this.keyboardSensor, this.touchSensor];
+    this.pointerSensor = createPointerSensor(args);
+    this.sensors = [this.keyboardSensor, this.touchSensor, this.pointerSensor];
     this.styleContext = context[styleContextKey];
 
     // The canLift function is read directly off the context
@@ -192,29 +205,39 @@ export default class DragHandle extends Component<Props> {
 
   onKeyDown = (event: KeyboardEvent) => {
     // let the other sensors deal with it
-    if (this.mouseSensor.isCapturing() || this.touchSensor.isCapturing()) {
+    if (this.touchSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
-
     this.keyboardSensor.onKeyDown(event);
   };
 
-  onMouseDown = (event: MouseEvent) => {
-    // let the other sensors deal with it
-    if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing()) {
-      return;
-    }
-
-    this.mouseSensor.onMouseDown(event);
-  };
+  // onMouseDown = (event: MouseEvent) => {
+  //   // let the other sensors deal with it
+  //   if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing() || this.pointerSensor.isCapturing()) {
+  //     return;
+  //   }
+  //   console.log('mouse sensor is in use');
+  //   this.mouseSensor.onMouseDown(event);
+  // };
 
   onTouchStart = (event: TouchEvent) => {
     // let the keyboard sensor deal with it
-    if (this.mouseSensor.isCapturing() || this.keyboardSensor.isCapturing()) {
+    if (this.keyboardSensor.isCapturing() || this.pointerSensor.isCapturing()) {
+      return;
+    }
+    this.touchSensor.onTouchStart(event);
+  };
+
+  onPointerDown = (event: PointerEvent) => {
+    if (event.pointerType == 'touch' && IS_TOUCH_COMPATIBLE) {
       return;
     }
 
-    this.touchSensor.onTouchStart(event);
+    if (this.keyboardSensor.isCapturing() || this.touchSensor.isCapturing()) {
+      return;
+    }
+
+    this.pointerSensor.onPointerDown(event);
   };
 
   canStartCapturing = (event: Event) => {
@@ -242,9 +265,10 @@ export default class DragHandle extends Component<Props> {
       }
 
       const provided: DragHandleProps = {
-        onMouseDown: this.onMouseDown,
+        // onMouseDown: this.onMouseDown,
         onKeyDown: this.onKeyDown,
         onTouchStart: this.onTouchStart,
+        onPointerDown: this.onPointerDown,
         onFocus: this.onFocus,
         onBlur: this.onBlur,
         tabIndex: 0,
