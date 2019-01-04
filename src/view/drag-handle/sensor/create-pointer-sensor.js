@@ -159,12 +159,7 @@ export default ({
       eventName: 'pointerdown',
       fn: (event: PointerEvent) => {
         console.log('pointerdown');
-        // this can happen during a drag when the user clicks a button
-        // other than the primary mouse button
-        // if (state.isDragging) {
-          event.preventDefault();
-        // }
-        stopDragging(callbacks.onCancel);
+        event.preventDefault();
       },
     },
     {
