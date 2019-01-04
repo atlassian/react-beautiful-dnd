@@ -28,8 +28,6 @@ const preventHtml5Dnd = (event: DragEvent) => {
 };
 
 type Sensor = KeyboardSensor | TouchSensor | PointerSensor;
-// type Sensor = MouseSensor | KeyboardSensor | TouchSensor | PointerSensor;
-
 
 let IS_TOUCH_COMPATIBLE: boolean = false;
 
@@ -70,7 +68,6 @@ export default class DragHandle extends Component<Props> {
       canStartCapturing: this.canStartCapturing,
     };
 
-    // this.mouseSensor = createMouseSensor(args);
     this.keyboardSensor = createKeyboardSensor(args);
     this.touchSensor = createTouchSensor(args);
     this.pointerSensor = createPointerSensor(args);
@@ -204,24 +201,13 @@ export default class DragHandle extends Component<Props> {
   };
 
   onKeyDown = (event: KeyboardEvent) => {
-    // let the other sensors deal with it
     if (this.touchSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
     this.keyboardSensor.onKeyDown(event);
   };
 
-  // onMouseDown = (event: MouseEvent) => {
-  //   // let the other sensors deal with it
-  //   if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing() || this.pointerSensor.isCapturing()) {
-  //     return;
-  //   }
-  //   console.log('mouse sensor is in use');
-  //   this.mouseSensor.onMouseDown(event);
-  // };
-
   onTouchStart = (event: TouchEvent) => {
-    // let the keyboard sensor deal with it
     if (this.keyboardSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
@@ -265,7 +251,6 @@ export default class DragHandle extends Component<Props> {
       }
 
       const provided: DragHandleProps = {
-        // onMouseDown: this.onMouseDown,
         onKeyDown: this.onKeyDown,
         onTouchStart: this.onTouchStart,
         onPointerDown: this.onPointerDown,
