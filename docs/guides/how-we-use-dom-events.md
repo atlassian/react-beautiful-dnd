@@ -51,7 +51,7 @@ window.addEventListener('click', (event: MouseEvent) => {
 
 ### Direct and indirect actions
 
-Some user events have a direct impact on a drag: such as a `mousemove` when dragging with a mouse or the **up arrow** <kbd>↑</kbd> `keydown` event while dragging with a keyboard. These direct events will have `event.preventDefault()` called on them to prevent their default browser behaviours. Some events indirectly impact a drag such as a `resize` event which cancels a drag. For events that indirectly impact a drag we do not call `event.preventDefault()` on them. Generally indirect events that impact are drag are events that cancel a drag such as `reize` or `orientationchange` events.
+Some user events have a direct impact on a drag: such as a `mousemove` when dragging with a mouse or the **up arrow** <kbd>↑</kbd> `keydown` event while dragging with a keyboard. These direct events will have `event.preventDefault()` called on them to prevent their default browser behaviours. Some events indirectly impact a drag such as a `resize` event which cancels a drag. For events that indirectly impact a drag we do not call `event.preventDefault()` on them. Generally indirect events that impact drag are events that cancel a drag such as `resize` or `orientationchange` events.
 
 ## Mouse dragging 🐭
 
