@@ -123,10 +123,16 @@ export default (styleContext: string): Styles => {
   // This does not work well with reordering DOM nodes.
   // When we drop a Draggable it already has the correct scroll applied.
 
+  // touch-action: none
+  // Avoid the behavior where pointerup doesn't propogate when pointerType is 'touch'
+
   const droppable: Rule = {
     selector: getSelector(attributes.droppable),
     styles: {
-      always: `overflow-anchor: none;`,
+      always: `
+        overflow-anchor: none;
+        touch-action: none;
+      `,
       // need pointer events on the droppable to allow manual scrolling
     },
   };
