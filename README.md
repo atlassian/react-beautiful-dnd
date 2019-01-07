@@ -418,7 +418,7 @@ In order to use drag and drop, you need to have the part of your `React` tree th
 ```js
 type Responders = {|
   // optional
-  onDragBeforeStart?: OnDragBeforeStartResponder,
+  onBeforeDragStart?: OnBeforeDragStartResponder,
   onDragStart?: OnDragStartResponder,
   onDragUpdate?: OnDragUpdateResponder,
   // required
