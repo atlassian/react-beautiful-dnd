@@ -23,7 +23,7 @@ export type CreateSensorArgs = {|
 export type MouseSensor = {|
   ...SensorBase,
   onMouseDown: (event: MouseEvent) => void,
-|}
+|};
 
 export type KeyboardSensor = {|
   ...SensorBase,
