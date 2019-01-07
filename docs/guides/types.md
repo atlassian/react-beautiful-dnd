@@ -138,9 +138,9 @@ type NotDraggingStyle = {|
 type DragHandleProps = {|
   onFocus: () => void,
   onBlur: () => void,
-  onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
+  onPointerDown: (event: PointerEvent) => void,
   'data-react-beautiful-dnd-drag-handle': string,
   'aria-roledescription': string,
   tabIndex: number,
