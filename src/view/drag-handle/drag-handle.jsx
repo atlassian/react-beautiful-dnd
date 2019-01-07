@@ -206,7 +206,7 @@ export default class DragHandle extends Component<Props> {
   };
 
   onTouchStart = (event: TouchEvent) => {
-    // let the keyboard sensor deal with it
+    // let the other sensors deal with it
     if (this.keyboardSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
@@ -214,7 +214,7 @@ export default class DragHandle extends Component<Props> {
   };
 
   onPointerDown = (event: PointerEvent) => {
-    // opt for the touch sensor if it's what the brower supports
+    // opt for the touch sensor if it's what the browser supports
     if (event.pointerType == 'touch' && IS_TOUCH_COMPATIBLE) {
       return;
     }
