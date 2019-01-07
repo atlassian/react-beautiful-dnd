@@ -20,6 +20,11 @@ export type CreateSensorArgs = {|
   canStartCapturing: (event: Event) => boolean,
 |};
 
+export type MouseSensor = {|
+  ...SensorBase,
+  onMouseDown: (event: MouseEvent) => void,
+|}
+
 export type KeyboardSensor = {|
   ...SensorBase,
   onKeyDown: (event: KeyboardEvent) => void,
