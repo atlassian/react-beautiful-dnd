@@ -954,9 +954,9 @@ It is an assumption that `Draggable`s are _visible siblings_ of one another. The
 type DragHandleProps = {|
   onFocus: () => void,
   onBlur: () => void,
-  onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
+  onPointerDown: (event: PointerEvent) => void,
   'data-react-beautiful-dnd-drag-handle': string,
   'aria-roledescription': string,
   tabIndex: number,
@@ -1001,20 +1001,20 @@ Controlling a whole draggable by just a part of it
 You can override some of the `dragHandleProps` props with your own behavior if you need to.
 
 ```js
-const myOnMouseDown = event => console.log('mouse down on', event.target);
+const myOnPointerDown = event => console.log('pointer down on', event.target);
 
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => {
-    const onMouseDown = (() => {
+    const onPointerDown = (() => {
       // dragHandleProps might be null
       if (!provided.dragHandleProps) {
-        return onMouseDown;
+        return onPointerDown;
       }
 
-      // creating a new onMouseDown function that calls myOnMouseDown as well as the drag handle one.
+      // creating a new onPointerDown function that calls myOnPointerDown as well as the drag handle one.
       return event => {
-        provided.dragHandleProps.onMouseDown(event);
-        myOnMouseDown(event);
+        provided.dragHandleProps.onPointerDown(event);
+        myOnPointerDown(event);
       };
     })();
 
@@ -1023,7 +1023,7 @@ const myOnMouseDown = event => console.log('mouse down on', event.target);
         ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
-        onMouseDown={onMouseDown}
+        onPointerDown={onPointerDown}
       >
         Drag me!
       </div>

@@ -7,7 +7,6 @@ import getWindowFromRef from '../get-window-from-ref';
 import getDragHandleRef from './util/get-drag-handle-ref';
 import type { Props, DragHandleProps } from './drag-handle-types';
 import type {
-  // MouseSensor,
   KeyboardSensor,
   TouchSensor,
   PointerSensor,
@@ -17,7 +16,6 @@ import type { DraggableId } from '../../types';
 import { styleContextKey, canLiftContextKey } from '../context-keys';
 import focusRetainer from './util/focus-retainer';
 import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
-// import createMouseSensor from './sensor/create-mouse-sensor';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
 import createPointerSensor from './sensor/create-pointer-sensor';
@@ -38,7 +36,6 @@ window.addEventListener('touchstart', function onFirstTouch() {
 
 export default class DragHandle extends Component<Props> {
   /* eslint-disable react/sort-comp */
-  // mouseSensor: MouseSensor;
   keyboardSensor: KeyboardSensor;
   touchSensor: TouchSensor;
   pointerSensor: PointerSensor;
@@ -201,6 +198,7 @@ export default class DragHandle extends Component<Props> {
   };
 
   onKeyDown = (event: KeyboardEvent) => {
+    // let the other sensors deal with it
     if (this.touchSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
@@ -208,6 +206,7 @@ export default class DragHandle extends Component<Props> {
   };
 
   onTouchStart = (event: TouchEvent) => {
+    // let the keyboard sensor deal with it
     if (this.keyboardSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
@@ -215,10 +214,12 @@ export default class DragHandle extends Component<Props> {
   };
 
   onPointerDown = (event: PointerEvent) => {
+    // opt for the touch sensor if it's what the brower supports
     if (event.pointerType == 'touch' && IS_TOUCH_COMPATIBLE) {
       return;
     }
 
+    // let the other sensors deal with it
     if (this.keyboardSensor.isCapturing() || this.touchSensor.isCapturing()) {
       return;
     }
