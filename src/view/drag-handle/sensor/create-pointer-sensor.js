@@ -3,9 +3,6 @@
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import createScheduler from '../util/create-scheduler';
-import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
-import * as keyCodes from '../../key-codes';
-import preventStandardKeyEvents from '../util/prevent-standard-key-events';
 import createPostDragEventPreventer, {
   type EventPreventer,
 } from '../util/create-post-drag-event-preventer';
@@ -16,7 +13,6 @@ import createEventMarshal, {
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import type { EventBinding } from '../util/event-types';
 import type { PointerSensor, CreateSensorArgs } from './sensor-types';
-import { warning } from '../../../dev-warning';
 
 type State = {|
   isDragging: boolean,
@@ -25,8 +21,8 @@ type State = {|
 
 const noop = () => {};
 
-// shared management of mousedown without needing to call preventDefault()
-const mouseDownMarshal: EventMarshal = createEventMarshal();
+// shared management of pointerdown without needing to call preventDefault()
+const pointerDownMarshal: EventMarshal = createEventMarshal();
 
 export default ({
   callbacks,
@@ -60,7 +56,7 @@ export default ({
   ) => {
     schedule.cancel();
     unbindWindowEvents();
-    mouseDownMarshal.reset();
+    pointerDownMarshal.reset();
     if (shouldBlockClick) {
       postDragEventPreventer.preventNext();
     }
@@ -144,7 +140,6 @@ export default ({
     {
       eventName: 'pointerup',
       fn: (event: PointerEvent) => {
-        console.log('pointerup');
         if (state.pending) {
           stopPendingDrag();
           return;
@@ -160,22 +155,6 @@ export default ({
       fn: (event: PointerEvent) => {
         console.log('pointerdown');
         event.preventDefault();
-      },
-    },
-    {
-      eventName: 'mousemove',
-      fn: (event: Event) => {
-        event.preventDefault();
-        event.stopPropagation();
-      },
-    },
-    {
-      eventName: 'lostpointercapture',
-      fn: (event: Event) => {
-        console.log('lostpointercapture');
-
-        event.preventDefault();
-        event.stopPropagation();
       },
     },
     // Cancel on page visibility change
@@ -196,18 +175,17 @@ export default ({
   };
 
   const onPointerDown = (event: PointerEvent): void => {
-    if (mouseDownMarshal.isHandled()) {
+    if (pointerDownMarshal.isHandled()) {
       return;
     }
 
     invariant(
       !isCapturing(),
-      'Should not be able to perform a mouse down while a drag or pending drag is occurring',
+      'Should not be able to perform a pointer down while a drag or pending drag is occurring',
     );
 
     // We do not need to prevent the event on a dropping draggable as
-    // the mouse down event will not fire due to pointer-events: none
-    // https://codesandbox.io/s/oxo0o775rz
+    // the pointer down event will not fire due to pointer-events: none
     if (!canStartCapturing(event)) {
       return;
     }
@@ -216,11 +194,11 @@ export default ({
     // This is to prevent parent draggables using this event
     // to start also.
     // Ideally we would not use preventDefault() as we are not sure
-    // if this mouse down is part of a drag interaction
+    // if this pointer down is part of a drag interaction
     // Unfortunately we do to prevent the element obtaining focus (see below).
-    mouseDownMarshal.handle();
+    pointerDownMarshal.handle();
 
-    // Unfortunately we do need to prevent the drag handle from getting focus on mousedown.
+    // Unfortunately we do need to prevent the drag handle from getting focus on pointerdown.
     // This goes against our policy on not blocking events before a drag has started.
     // See [How we use dom events](/docs/guides/how-we-use-dom-events.md).
     event.preventDefault();
