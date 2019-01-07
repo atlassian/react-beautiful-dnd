@@ -97,8 +97,6 @@ export default ({
     {
       eventName: 'pointermove',
       fn: (event: PointerEvent) => {
-        console.log('pointermove');
-
         // preventing default as we are using this event
         event.preventDefault();
         const clientX = event.clientX;
@@ -153,7 +151,6 @@ export default ({
     {
       eventName: 'pointerdown',
       fn: (event: PointerEvent) => {
-        console.log('pointerdown');
         event.preventDefault();
       },
     },

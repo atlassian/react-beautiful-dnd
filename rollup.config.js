@@ -27,7 +27,7 @@ const snapshotArgs =
   process.env.SNAPSHOT === 'match'
     ? {
         matchSnapshot: true,
-        threshold: 10000,
+        threshold: 1000,
       }
     : {};
 
