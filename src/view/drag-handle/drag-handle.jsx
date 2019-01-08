@@ -31,11 +31,6 @@ type Sensor = MouseSensor | KeyboardSensor | TouchSensor | PointerSensor;
 
 let IS_TOUCH_COMPATIBLE: boolean = false;
 
-window.addEventListener('touchstart', function onFirstTouch() {
-  IS_TOUCH_COMPATIBLE = true;
-  window.removeEventListener('touchstart', onFirstTouch);
-});
-
 export default class DragHandle extends Component<Props> {
   /* eslint-disable react/sort-comp */
   mouseSensor: MouseSensor;
@@ -227,6 +222,14 @@ export default class DragHandle extends Component<Props> {
   };
 
   onPointerDown = (event: PointerEvent) => {
+
+    if (!IS_TOUCH_COMPATIBLE) {
+      window.addEventListener('touchstart', function onFirstTouch() {
+        IS_TOUCH_COMPATIBLE = true;
+        window.removeEventListener('touchstart', onFirstTouch);
+      });
+    }
+    
     // opt for the touch sensor if it's what the browser supports
     if (event.pointerType == 'touch' && IS_TOUCH_COMPATIBLE) {
       return;
