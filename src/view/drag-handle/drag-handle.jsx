@@ -70,9 +70,9 @@ export default class DragHandle extends Component<Props> {
     this.pointerSensor = createPointerSensor(args);
     this.sensors = [
       this.mouseSensor,
-      this.keyboardSensor, 
+      this.keyboardSensor,
       this.touchSensor,
-      this.pointerSensor
+      this.pointerSensor,
     ];
     this.styleContext = context[styleContextKey];
 
@@ -208,7 +208,7 @@ export default class DragHandle extends Component<Props> {
       this.mouseSensor.isCapturing() ||
       this.touchSensor.isCapturing() ||
       this.pointerSensor.isCapturing()
-      ) {
+    ) {
       return;
     }
 
@@ -221,7 +221,7 @@ export default class DragHandle extends Component<Props> {
       this.keyboardSensor.isCapturing() ||
       this.touchSensor.isCapturing() ||
       this.pointerSensor.isCapturing()
-      ) {
+    ) {
       return;
     }
 
@@ -234,7 +234,7 @@ export default class DragHandle extends Component<Props> {
       this.keyboardSensor.isCapturing() ||
       this.mouseSensor.isCapturing() ||
       this.pointerSensor.isCapturing()
-      ) {
+    ) {
       return;
     }
 
@@ -265,7 +265,7 @@ export default class DragHandle extends Component<Props> {
       this.keyboardSensor.isCapturing() ||
       this.mouseSensor.isCapturing() ||
       this.touchSensor.isCapturing()
-      ) {
+    ) {
       return;
     }
 
