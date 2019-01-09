@@ -324,4 +324,4 @@ export default ({
   };
 
   return sensor;
-};
+}; 

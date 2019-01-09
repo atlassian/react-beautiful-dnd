@@ -30,6 +30,7 @@ const preventHtml5Dnd = (event: DragEvent) => {
 type Sensor = MouseSensor | KeyboardSensor | TouchSensor | PointerSensor;
 
 let IS_TOUCH_COMPATIBLE: boolean = false;
+let TOUCH_CHECK_WAS_ATTEMPTED: boolean = false;
 
 export default class DragHandle extends Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -222,14 +223,14 @@ export default class DragHandle extends Component<Props> {
   };
 
   onPointerDown = (event: PointerEvent) => {
-
-    if (!IS_TOUCH_COMPATIBLE) {
+    if (!IS_TOUCH_COMPATIBLE && !TOUCH_CHECK_WAS_ATTEMPTED) {
       window.addEventListener('touchstart', function onFirstTouch() {
         IS_TOUCH_COMPATIBLE = true;
         window.removeEventListener('touchstart', onFirstTouch);
       });
+      TOUCH_CHECK_WAS_ATTEMPTED = true;
     }
-    
+
     // opt for the touch sensor if it's what the browser supports
     if (event.pointerType == 'touch' && IS_TOUCH_COMPATIBLE) {
       return;
