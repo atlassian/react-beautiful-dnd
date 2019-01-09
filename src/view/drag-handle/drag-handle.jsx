@@ -68,7 +68,12 @@ export default class DragHandle extends Component<Props> {
     this.keyboardSensor = createKeyboardSensor(args);
     this.touchSensor = createTouchSensor(args);
     this.pointerSensor = createPointerSensor(args);
-    this.sensors = [this.mouseSensor, this.keyboardSensor, this.touchSensor, this.pointerSensor];
+    this.sensors = [
+      this.mouseSensor,
+      this.keyboardSensor, 
+      this.touchSensor,
+      this.pointerSensor
+    ];
     this.styleContext = context[styleContextKey];
 
     // The canLift function is read directly off the context
@@ -199,7 +204,11 @@ export default class DragHandle extends Component<Props> {
 
   onKeyDown = (event: KeyboardEvent) => {
     // let the other sensors deal with it
-    if (this.mouseSensor.isCapturing() || this.touchSensor.isCapturing() || this.pointerSensor.isCapturing()) {
+    if (
+      this.mouseSensor.isCapturing() ||
+      this.touchSensor.isCapturing() ||
+      this.pointerSensor.isCapturing()
+      ) {
       return;
     }
 
@@ -208,7 +217,11 @@ export default class DragHandle extends Component<Props> {
 
   onMouseDown = (event: MouseEvent) => {
     // let the other sensors deal with it
-    if (this.keyboardSensor.isCapturing() || this.touchSensor.isCapturing() || this.pointerSensor.isCapturing()) {
+    if (
+      this.keyboardSensor.isCapturing() ||
+      this.touchSensor.isCapturing() ||
+      this.pointerSensor.isCapturing()
+      ) {
       return;
     }
 
@@ -217,7 +230,11 @@ export default class DragHandle extends Component<Props> {
 
   onTouchStart = (event: TouchEvent) => {
     // let the other sensors deal with it
-    if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing() || this.pointerSensor.isCapturing()) {
+    if (
+      this.keyboardSensor.isCapturing() ||
+      this.mouseSensor.isCapturing() ||
+      this.pointerSensor.isCapturing()
+      ) {
       return;
     }
 
@@ -234,17 +251,21 @@ export default class DragHandle extends Component<Props> {
     }
 
     // opt for the touch sensor if it's what the browser supports
-    if (event.pointerType == 'touch' && IS_TOUCH_COMPATIBLE) {
+    if (event.pointerType === 'touch' && IS_TOUCH_COMPATIBLE) {
       return;
     }
 
     // if the type is mouse, return so that the mouse sensor can get used
-    if (event.pointerType == 'mouse') {
+    if (event.pointerType === 'mouse') {
       return;
     }
 
     // let the other sensors deal with it
-    if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing() || this.touchSensor.isCapturing()) {
+    if (
+      this.keyboardSensor.isCapturing() ||
+      this.mouseSensor.isCapturing() ||
+      this.touchSensor.isCapturing()
+      ) {
       return;
     }
 
