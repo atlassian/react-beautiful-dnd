@@ -220,7 +220,7 @@ export default class DragHandle extends Component<Props> {
     if (this.keyboardSensor.isCapturing() || this.mouseSensor.isCapturing() || this.pointerSensor.isCapturing()) {
       return;
     }
-    
+
     this.touchSensor.onTouchStart(event);
   };
 
