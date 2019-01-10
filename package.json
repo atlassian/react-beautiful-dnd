@@ -98,7 +98,7 @@
     "flow-bin": "0.89.0",
     "globby": "^8.0.1",
     "jest": "^23.6.0",
-    "jest-junit": "^5.2.0",
+    "jest-junit": "^6.0.0",
     "jest-watch-typeahead": "^0.2.0",
     "prettier": "^1.15.3",
     "raf-stub": "^2.0.2",
