@@ -812,7 +812,7 @@ type DraggableProvided = {|
 
 Everything within the _provided_ object must be applied for the `Draggable` to function correctly.
 
-- `provided.innerRef (innerRef: (HTMLElement) => void)`: In order for the `Droppable` to function correctly, **you must** bind the `innerRef` function to the `ReactElement` that you want to be considered the `Draggable` node. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node.
+- `provided.innerRef (innerRef: (HTMLElement) => void)`: In order for the `Draggable` to function correctly, **you must** bind the `innerRef` function to the `ReactElement` that you want to be considered the `Draggable` node. We do this in order to avoid needing to use `ReactDOM` to look up your DOM node.
 
 > For more information on using `innerRef` see our [using `innerRef` guide](/docs/guides/using-inner-ref.md)
 
