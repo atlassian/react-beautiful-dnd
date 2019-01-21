@@ -23,6 +23,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 
 ## Newsletters
 
+- Smashing magazine [issue 221](https://www.smashingmagazine.com/the-smashing-newsletter/smashing-newsletter-issue-221/#a9)
 - Ponyfoo [issue 78](https://ponyfoo.com/weekly/78/javascript-and-css-engines-pwa-drag-and-drop-web-components-and-http-2)
 - PonyFoo [issue 99](https://ponyfoo.com/weekly/99/react-across-the-universe-typography-load-balancing-and-javascript-frameworks)
 - PonyFoo [issue 141](https://ponyfoo.com/weekly/141/http-3-bgp-leaks-react-as-native-dom-typescript-tensorflow-and-all-things-performance)
@@ -50,6 +51,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 
 ## Articles and blogs
 
+- [2018 JavaScript Rising Stars](https://risingstars.js.org/2018/en/#section-react)
 - [Want To Recruit Better Engineers? Open Source Your Code](https://angel.co/blog/want-to-recruit-better-engineers-open-source-your-code)
 - [How To Implement Better Drag and Drop in your React App](https://blog.bitsrc.io/implement-better-drag-and-drop-in-your-react-app-beafc4451599)
 - [Beautiful drag and drop with React — The beginner’s guide](https://medium.com/@AlejandroSobko/7798e3928290)

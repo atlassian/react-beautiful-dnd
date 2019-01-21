@@ -21,16 +21,18 @@ export const combine = {
 };
 
 const outOfTheWayTime: number = 0.2;
-const outOfTheWayTiming = `${outOfTheWayTime}s ${curves.outOfTheWay}`;
+const outOfTheWayDurationAndTimingFn = `${outOfTheWayTime}s ${
+  curves.outOfTheWay
+}`;
 
 export const transitions = {
-  fluid: `opacity ${outOfTheWayTiming}`,
-  snap: `transform ${outOfTheWayTiming}, opacity ${outOfTheWayTiming}`,
+  fluid: `opacity ${outOfTheWayDurationAndTimingFn}`,
+  snap: `transform ${outOfTheWayDurationAndTimingFn}, opacity ${outOfTheWayDurationAndTimingFn}`,
   drop: (duration: number): string => {
     const timing: string = `${duration}s ${curves.drop}`;
     return `transform ${timing}, opacity ${timing}`;
   },
-  outOfTheWay: `transform ${outOfTheWayTiming}`,
+  outOfTheWay: `transform ${outOfTheWayDurationAndTimingFn}`,
 };
 
 const moveTo = (offset: Position): ?string =>
@@ -64,7 +66,7 @@ export const getPlaceholderAnimation = (
   // TODO: use a single animation and reverse it
   // TODO: import animation name
   if (animate === 'open') {
-    return `placeholder-in ${outOfTheWayTiming}`;
+    return `placeholder-in ${outOfTheWayDurationAndTimingFn}`;
   }
-  return `placeholder-out ${outOfTheWayTiming}`;
+  return `placeholder-out ${outOfTheWayDurationAndTimingFn}`;
 };
