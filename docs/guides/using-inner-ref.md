@@ -140,7 +140,7 @@ You can then correctly supply the DOM node to a `Draggable` or `Droppable`
       {...provided.dragHandleProps}
     >
       <h4>My draggable</h4>
-    </div>
+    </Person>
   )}
 </Draggable>
 ```
