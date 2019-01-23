@@ -1,5 +1,5 @@
-// flow-typed signature: 741a238d71e60f17f794be252b94a324
-// flow-typed version: ff97018d54/enzyme_v3.x.x/flow_>=v0.53.x
+// flow-typed signature: 8bfb6d6a1f5b5fe7a50440d49e500f2f
+// flow-typed version: 2bcb80d5bf/enzyme_v3.x.x/flow_>=v0.53.x
 
 import * as React from "react";
 
@@ -39,6 +39,7 @@ declare module "enzyme" {
     parent(): this,
     closest(selector: EnzymeSelector): this,
     render(): CheerioWrapper,
+    renderProp(propName: string): (...args: Array<any>) => this,
     unmount(): this,
     text(): string,
     html(): string,

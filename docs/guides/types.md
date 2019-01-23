@@ -18,7 +18,7 @@ type DraggableId = Id;
 ```js
 type Responders = {|
   // optional
-  onDragBeforeStart?: OnDragBeforeStartResponder,
+  onBeforeDragStart?: OnBeforeDragStartResponder,
   onDragStart?: OnDragStartResponder,
   onDragUpdate?: OnDragUpdateResponder,
   // required
