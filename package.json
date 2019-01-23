@@ -34,7 +34,7 @@
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "test:ci": "jest test --maxWorkers=2",
-    "test:browser": "testcafe 'chrome:headless,chrome:headless:emulation:device=iphone 6;touch=true,firefox:headless' ./test/browser/*  -r spec,xunit:./test-reports/browser/test-results.xml",
+    "test:browser": "testcafe 'chrome:headless,chrome:headless:emulation:device=iphone 6;touch=true' ./test/browser/*  -r spec,xunit:./test-reports/browser/test-results.xml",
     "test:browser:local": "testcafe 'chrome' ./test/browser/*",
     "test:coverage": "yarn test --coverage --coveragePathIgnorePatterns=/debug",
     "validate": "yarn prettier:check && yarn lint:eslint && yarn lint:css && yarn typecheck",
