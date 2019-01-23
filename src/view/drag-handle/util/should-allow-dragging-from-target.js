@@ -1,5 +1,6 @@
 // @flow
 import type { Props } from '../drag-handle-types';
+import isElement from '../../is-type-of-element/is-element';
 
 export type TagNameMap = {
   [tagName: string]: true,
@@ -64,7 +65,7 @@ export default (event: Event, props: Props): boolean => {
   const { target, currentTarget } = event;
 
   // Technically target and currentTarget are EventTarget's and do not have to be elements
-  if (!(target instanceof Element) || !(currentTarget instanceof Element)) {
+  if (!isElement(target) || !isElement(currentTarget)) {
     return true;
   }
 
