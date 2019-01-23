@@ -1,3 +1,3 @@
 // @flow
-export default (el: ?HTMLElement): typeof window =>
+export default (el: ?Element): typeof window =>
   el && el.ownerDocument ? el.ownerDocument.defaultView : window;

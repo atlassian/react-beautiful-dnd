@@ -1,5 +1,5 @@
 // @flow
-import getWindowForEl from '../get-window-for-el';
+import getWindowFromEl from '../window/get-window-from-el';
 
 export default (el: Object): boolean => {
   // Some test runners are not aware of the SVGElement constructor
@@ -9,5 +9,5 @@ export default (el: Object): boolean => {
     return false;
   }
 
-  return el instanceof getWindowForEl(el).SVGElement;
+  return el instanceof getWindowFromEl(el).SVGElement;
 };
