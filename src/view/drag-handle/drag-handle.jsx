@@ -3,7 +3,7 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import getWindowFromRef from '../get-window-from-ref';
+import getWindowFromEl from '../window/get-window-from-el';
 import getDragHandleRef from './util/get-drag-handle-ref';
 import type { Props, DragHandleProps } from './drag-handle-types';
 import type {
@@ -49,7 +49,7 @@ export default class DragHandle extends Component<Props> {
     super(props, context);
 
     const getWindow = (): HTMLElement =>
-      getWindowFromRef(this.props.getDraggableRef());
+      getWindowFromEl(this.props.getDraggableRef());
 
     const args: CreateSensorArgs = {
       callbacks: this.props.callbacks,

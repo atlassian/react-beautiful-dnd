@@ -1,23 +1,14 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { dragHandle } from '../../data-attributes';
+import isSvgElement from '../../is-type-of-element/is-svg-element';
+import isHtmlElement from '../../is-type-of-element/is-html-element';
 
 const selector: string = `[${dragHandle}]`;
 
-const isSVG = (el: mixed) => {
-  // Some test runners are not aware of the SVGElement constructor
-  // We opt out of this check for those environments
-  // $FlowFixMe - flow does not know about SVGElement
-  if (typeof SVGElement === 'undefined') {
-    return false;
-  }
-
-  return el instanceof SVGElement;
-};
-
 const throwIfSVG = (el: mixed) => {
   invariant(
-    !isSVG(el),
+    !isSvgElement(el),
     `A drag handle cannot be an SVGElement: it has inconsistent focus support.
 
     More information: https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/dragging-svgs.md`,
@@ -50,7 +41,7 @@ const getDragHandleRef = (draggableRef: HTMLElement): HTMLElement => {
     `,
   );
 
-  invariant(el instanceof HTMLElement, 'A drag handle must be a HTMLElement');
+  invariant(isHtmlElement(el), 'A drag handle must be a HTMLElement');
 
   return el;
 };
