@@ -1,13 +1,11 @@
 // @flow
 import { JSDOM } from 'jsdom';
 import isSvgElement from '../../../../src/view/is-type-of-element/is-svg-element';
-
-// $FlowFixMe - flow does not know what a SVGElement is
-const getSVG = (doc: HTMLDocument): SVGElement =>
-  doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
+import getSvg from './util/get-svg';
 
 it('should allow svg elements through', () => {
-  const svg: SVGElement = getSVG(document);
+  // $FlowFixMe - does not know what SVGElement is
+  const svg: SVGElement = getSvg(document);
 
   expect(svg instanceof SVGElement).toBe(true);
   expect(isSvgElement(svg)).toBe(true);
@@ -21,10 +19,11 @@ it('should not allow html elements through', () => {
 
 it('should allow svg elements from another window', () => {
   const other = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
-  const svg: HTMLElement = getSVG(other.window.document);
+  const svg: HTMLElement = getSvg(other.window.document);
 
   expect(isSvgElement(svg)).toBe(true);
   // validation
+  // $FlowFixMe - does not know what SVGElement is
   expect(svg instanceof SVGElement).toBe(false);
   expect(svg instanceof other.window.SVGElement).toBe(true);
 });
