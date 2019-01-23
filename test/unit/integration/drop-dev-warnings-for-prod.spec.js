@@ -6,6 +6,7 @@ import replace from 'rollup-plugin-replace';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import { uglify } from 'rollup-plugin-uglify';
+import invariant from 'tiny-invariant';
 
 // 60 second timeout
 jest.setTimeout(60 * 1000);
@@ -47,8 +48,9 @@ const getCode = async ({ mode }): Promise<string> => {
     globals: { react: 'React' },
   };
   const bundle = await rollup(inputOptions);
-  const { code } = await bundle.generate(outputOptions);
-  return code;
+  const result = await bundle.generate(outputOptions);
+  invariant(result.output.length, 'Failed to generate code');
+  return result.output[0].code;
 };
 
 it('should contain warnings in development', async () => {
