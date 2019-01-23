@@ -3,7 +3,7 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import getWindowFromRef from '../get-window-from-ref';
+import getWindowFromRef from '../get-window-for-el';
 import getDragHandleRef from './util/get-drag-handle-ref';
 import type { Props, DragHandleProps } from './drag-handle-types';
 import type {

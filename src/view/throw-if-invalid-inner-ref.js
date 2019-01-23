@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import isHtmlElement from './duck-typing/is-html-element';
+import isHtmlElement from './is-type-of-element/is-html-element';
 
 export default (ref: ?mixed) => {
   invariant(

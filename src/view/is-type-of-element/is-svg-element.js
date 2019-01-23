@@ -1,5 +1,5 @@
 // @flow
-import isElement from './is-element';
+import getWindowForEl from '../get-window-for-el';
 
 export default (el: Object): boolean => {
   // Some test runners are not aware of the SVGElement constructor
@@ -9,11 +9,5 @@ export default (el: Object): boolean => {
     return false;
   }
 
-  // duck typing not needed
-  if (el instanceof SVGElement) {
-    return true;
-  }
-
-  // duck typing
-  return isElement(el) && el.nodeName.toLowerCase() === 'svg';
+  return el instanceof getWindowForEl(el).SVGElement;
 };

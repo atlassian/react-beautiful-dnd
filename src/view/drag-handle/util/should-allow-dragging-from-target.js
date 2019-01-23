@@ -1,6 +1,6 @@
 // @flow
 import type { Props } from '../drag-handle-types';
-import isElement from '../../duck-typing/is-element';
+import isElement from '../../is-type-of-element/is-element';
 
 export type TagNameMap = {
   [tagName: string]: true,
@@ -69,5 +69,5 @@ export default (event: Event, props: Props): boolean => {
     return true;
   }
 
-  return !isAnInteractiveElement(currentTarget, target);
+  return !isAnInteractiveElement((currentTarget: any), (target: any));
 };

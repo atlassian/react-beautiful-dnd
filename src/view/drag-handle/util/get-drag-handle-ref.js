@@ -1,8 +1,8 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { dragHandle } from '../../data-attributes';
-import isSvgElement from '../../duck-typing/is-svg-element';
-import isHtmlElement from '../../duck-typing/is-html-element';
+import isSvgElement from '../../is-type-of-element/is-svg-element';
+import isHtmlElement from '../../is-type-of-element/is-html-element';
 
 const selector: string = `[${dragHandle}]`;
 
