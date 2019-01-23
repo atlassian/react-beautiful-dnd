@@ -69,5 +69,5 @@ export default (event: Event, props: Props): boolean => {
     return true;
   }
 
-  return !isAnInteractiveElement((currentTarget: any), (target: any));
+  return !isAnInteractiveElement(currentTarget, target);
 };
