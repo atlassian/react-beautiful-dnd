@@ -1,6 +1,6 @@
 // @flow
-import typeimport isElement from '../../duck-typing/is-element';
- { Props } from '../drag-handle-types';
+import type { Props } from '../drag-handle-types';
+import isElement from '../../duck-typing/is-element';
 
 export type TagNameMap = {
   [tagName: string]: true,
