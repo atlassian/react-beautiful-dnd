@@ -43,6 +43,3 @@ export function find<T>(list: Array<T>, predicate: PredicateFn<T>): ?T {
   // Array.prototype.find returns undefined when nothing is found
   return undefined;
 }
-
-export const hasOwnProperty = (object: Object, property: string): boolean =>
-  Object.prototype.hasOwnProperty.call(object, property);
