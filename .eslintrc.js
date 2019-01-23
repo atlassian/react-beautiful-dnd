@@ -80,6 +80,9 @@ module.exports = {
     // Adding 'skipShapeProps' as the rule has issues with correctly handling PropTypes.shape
     'react/no-unused-prop-types': ['error', { skipShapeProps: true }],
 
+    // Having issues with this rule not working correctly
+    'react/default-props-match-prop-types': 'off',
+
     // Require // @flow at the top of files
     'flowtype/require-valid-file-annotation': [
       'error',
