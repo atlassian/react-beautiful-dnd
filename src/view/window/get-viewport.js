@@ -4,15 +4,15 @@ import type { Viewport } from '../../types';
 import { origin } from '../../state/position';
 import getWindowScroll from './get-window-scroll';
 import getMaxWindowScroll from './get-max-window-scroll';
+import getBody from '../get-body';
 
 export default (): Viewport => {
+  const body: HTMLBodyElement = getBody();
   const scroll: Position = getWindowScroll();
   const maxScroll: Position = getMaxWindowScroll();
 
   const top: number = scroll.y;
   const left: number = scroll.x;
-
-  const body: HTMLBodyElement = document.body;
 
   // Using these values as they do not consider scrollbars
   // padding box, without scrollbar
