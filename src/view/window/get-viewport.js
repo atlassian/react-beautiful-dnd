@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { getRect, type Rect, type Position } from 'css-box-model';
 import type { Viewport } from '../../types';
 import { origin } from '../../state/position';
@@ -13,13 +12,12 @@ export default (): Viewport => {
   const top: number = scroll.y;
   const left: number = scroll.x;
 
-  const doc: ?HTMLElement = document.documentElement;
-  invariant(doc, 'Could not find document.documentElement');
+  const body: HTMLBodyElement = document.body;
 
   // Using these values as they do not consider scrollbars
   // padding box, without scrollbar
-  const width: number = doc.clientWidth;
-  const height: number = doc.clientHeight;
+  const width: number = body.clientWidth;
+  const height: number = body.clientHeight;
 
   // Computed
   const right: number = left + width;

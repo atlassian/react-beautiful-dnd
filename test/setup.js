@@ -9,22 +9,22 @@ if (typeof window !== 'undefined') {
 
   // overriding these properties in jsdom to allow them to be controlled
 
-  Object.defineProperties(document.documentElement, {
+  Object.defineProperties(document.body, {
     clientWidth: {
       writable: true,
-      value: document.documentElement.clientWidth,
+      value: document.body.clientWidth,
     },
     clientHeight: {
       writable: true,
-      value: document.documentElement.clientHeight,
+      value: document.body.clientHeight,
     },
     scrollWidth: {
       writable: true,
-      value: document.documentElement.scrollWidth,
+      value: document.body.scrollWidth,
     },
     scrollHeight: {
       writable: true,
-      value: document.documentElement.scrollHeight,
+      value: document.body.scrollHeight,
     },
   });
 }
@@ -32,8 +32,8 @@ if (typeof window !== 'undefined') {
 // Setting initial viewport
 // Need to set clientWidth and clientHeight as jsdom does not set these properties
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
-  document.documentElement.clientWidth = window.innerWidth;
-  document.documentElement.clientHeight = window.innerHeight;
+  document.body.clientWidth = window.innerWidth;
+  document.body.clientHeight = window.innerHeight;
 }
 // setting up global enzyme
 const Enzyme = require('enzyme');

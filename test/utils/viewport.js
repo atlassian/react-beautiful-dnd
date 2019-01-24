@@ -3,16 +3,7 @@ import { type Rect, type Position } from 'css-box-model';
 import type { Viewport } from '../../src/types';
 import getViewport from '../../src/view/window/get-viewport';
 import getMaxScroll from '../../src/state/get-max-scroll';
-
-const getDoc = (): HTMLElement => {
-  const el: ?HTMLElement = document.documentElement;
-
-  if (!el) {
-    throw new Error('Unable to get document.documentElement');
-  }
-
-  return el;
-};
+import getBody from '../../src/view/get-body';
 
 export const setWindowScroll = (newScroll: Position) => {
   window.pageYOffset = newScroll.y;
@@ -29,16 +20,16 @@ export const setViewport = (viewport: Viewport) => {
 
   setWindowScroll(viewport.scroll.current);
 
-  const doc: HTMLElement = getDoc();
-  doc.clientWidth = viewport.frame.width;
-  doc.clientHeight = viewport.frame.height;
+  const body: HTMLBodyElement = getBody();
+  body.clientWidth = viewport.frame.width;
+  body.clientHeight = viewport.frame.height;
 
   // reverse engineering these values
   const scrollHeight: number = viewport.scroll.max.y + viewport.frame.height;
   const scrollWidth: number = viewport.scroll.max.x + viewport.frame.width;
 
-  doc.scrollHeight = scrollHeight;
-  doc.scrollWidth = scrollWidth;
+  body.scrollHeight = scrollHeight;
+  body.scrollWidth = scrollWidth;
 };
 
 export const getCurrent = (): Viewport => getViewport();
