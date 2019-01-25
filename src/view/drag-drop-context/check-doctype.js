@@ -2,7 +2,8 @@
 import { warning } from '../../dev-warning';
 
 const suffix: string = `
-  We expect a html5 doctype
+  We expect a html5 doctype: <!doctype html>
+  This is to ensure consistent browser layout and measurement
   More information:
 `;
 
@@ -11,7 +12,7 @@ export default (doc: Document) => {
 
   if (!doctype) {
     warning(`
-      No doctype found.
+      No <!doctype html> found.
 
       ${suffix}
     `);
@@ -20,7 +21,7 @@ export default (doc: Document) => {
 
   if (doctype.name.toLowerCase() !== 'html') {
     warning(`
-      Unexpected doctype found: (${doctype.name})
+      Unexpected <!doctype> found: (${doctype.name})
 
       ${suffix}
     `);
@@ -28,7 +29,7 @@ export default (doc: Document) => {
 
   if (doctype.publicId !== '') {
     warning(`
-      Unexpected publicId found: (${doctype.publicId})
+      Unexpected <!doctype> publicId found: (${doctype.publicId})
       A html5 doctype does not have a publicId
 
       ${suffix}
