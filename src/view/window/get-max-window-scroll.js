@@ -1,18 +1,18 @@
 // @flow
 import type { Position } from 'css-box-model';
-import getBody from '../get-body';
 import getMaxScroll from '../../state/get-max-scroll';
+import getDocument from '../get-document';
 
 export default (): Position => {
-  const body: HTMLBodyElement = getBody();
+  const doc: HTMLDocument = getDocument();
 
   const maxScroll: Position = getMaxScroll({
     // unclipped padding box, with scrollbar
-    scrollHeight: body.scrollHeight,
-    scrollWidth: body.scrollWidth,
+    scrollHeight: doc.scrollHeight,
+    scrollWidth: doc.scrollWidth,
     // clipped padding box, without scrollbar
-    width: body.clientWidth,
-    height: body.clientHeight,
+    width: doc.clientWidth,
+    height: doc.clientHeight,
   });
 
   return maxScroll;

@@ -3,6 +3,7 @@ import invariant from 'tiny-invariant';
 import type { Announce } from '../../types';
 import type { Announcer } from './announcer-types';
 import { warning } from '../../dev-warning';
+import getBody from '../get-body';
 
 let count: number = 0;
 
@@ -19,11 +20,6 @@ const visuallyHidden: Object = {
   clip: 'rect(0 0 0 0)',
   // for if 'clip' is ever removed
   'clip-path': 'inset(100%)',
-};
-
-const getBody = (): HTMLBodyElement => {
-  invariant(document.body, 'Announcer cannot find document.body');
-  return document.body;
 };
 
 export default (): Announcer => {
