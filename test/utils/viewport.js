@@ -20,7 +20,7 @@ export const setViewport = (viewport: Viewport) => {
 
   setWindowScroll(viewport.scroll.current);
 
-  const doc: HTMLDocument = getDocument();
+  const doc: HTMLElement = getDocument();
   doc.clientWidth = viewport.frame.width;
   doc.clientHeight = viewport.frame.height;
 

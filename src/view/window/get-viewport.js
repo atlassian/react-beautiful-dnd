@@ -7,7 +7,7 @@ import getMaxWindowScroll from './get-max-window-scroll';
 import getDocument from '../get-document';
 
 export default (): Viewport => {
-  const doc: HTMLDocument = getDocument();
+  const doc: HTMLElement = getDocument();
   const scroll: Position = getWindowScroll();
   const maxScroll: Position = getMaxWindowScroll();
 

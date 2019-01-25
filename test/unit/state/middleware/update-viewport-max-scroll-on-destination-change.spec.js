@@ -27,12 +27,12 @@ import getDocument from '../../../../src/view/get-document';
 
 // using viewport from initial publish args
 const viewport: Viewport = initialPublishArgs.viewport;
-const body: HTMLDocument = getDocument();
+const doc: HTMLElement = getDocument();
 
 const scrollHeight: number = viewport.frame.height;
 const scrollWidth: number = viewport.frame.width;
-body.scrollHeight = scrollHeight;
-body.scrollWidth = scrollWidth;
+doc.scrollHeight = scrollHeight;
+doc.scrollWidth = scrollWidth;
 
 beforeEach(() => {
   setViewport(viewport);
@@ -43,8 +43,8 @@ describe('not dragging', () => {
     const mock = jest.fn();
     const store: Store = createStore(middleware, passThrough(mock));
 
-    body.scrollHeight = scrollHeight + 10;
-    body.scrollWidth = scrollWidth + 10;
+    doc.scrollHeight = scrollHeight + 10;
+    doc.scrollWidth = scrollWidth + 10;
 
     store.dispatch(clean());
 
@@ -67,8 +67,8 @@ it('should update if the max scroll position has changed and the destination has
   mock.mockClear();
 
   // change in scroll size
-  body.scrollHeight = scrollHeight + 10;
-  body.scrollWidth = scrollWidth + 10;
+  doc.scrollHeight = scrollHeight + 10;
+  doc.scrollWidth = scrollWidth + 10;
 
   const newMax: Position = getMaxScroll({
     height: viewport.frame.height,
@@ -120,8 +120,8 @@ it('should not update if the destination has not changed (even if the scroll siz
   mock.mockClear();
 
   // change in scroll size
-  body.scrollHeight = scrollHeight + 10;
-  body.scrollWidth = scrollWidth + 10;
+  doc.scrollHeight = scrollHeight + 10;
+  doc.scrollWidth = scrollWidth + 10;
 
   // not changing droppable
   store.dispatch(moveDown());
@@ -153,8 +153,8 @@ it('should not update if moving from a reorder to combine in the same list', () 
   mock.mockClear();
 
   // change in scroll size - checking that this is not recorded
-  body.scrollHeight = scrollHeight + 10;
-  body.scrollWidth = scrollWidth + 10;
+  doc.scrollHeight = scrollHeight + 10;
+  doc.scrollWidth = scrollWidth + 10;
 
   // not changing droppable
   store.dispatch(moveDown());
@@ -187,8 +187,8 @@ it('should change if moving from combine to another list', () => {
 
   // change in scroll size - checking that this is not recorded
   // (we would want this recorded, but this is just to show that we did not read from the DOM)
-  body.scrollHeight = scrollHeight + 10;
-  body.scrollWidth = scrollWidth + 10;
+  doc.scrollHeight = scrollHeight + 10;
+  doc.scrollWidth = scrollWidth + 10;
 
   // moving to a combine
   store.dispatch(moveDown());
@@ -203,8 +203,8 @@ it('should change if moving from combine to another list', () => {
   }
 
   // change in max scroll
-  body.scrollHeight = scrollHeight + 20;
-  body.scrollWidth = scrollWidth + 20;
+  doc.scrollHeight = scrollHeight + 20;
+  doc.scrollWidth = scrollWidth + 20;
 
   const newMax: Position = getMaxScroll({
     height: viewport.frame.height,
