@@ -7,13 +7,15 @@ import getMaxWindowScroll from './get-max-window-scroll';
 import getDocument from '../get-document';
 
 export default (): Viewport => {
-  const doc: HTMLElement = getDocument();
   const scroll: Position = getWindowScroll();
   const maxScroll: Position = getMaxWindowScroll();
 
   const top: number = scroll.y;
   const left: number = scroll.x;
 
+  // window.innerHeight: includes scrollbars (not what we want)
+  // document.clientHeight gives us the correct value when using the html5 doctype
+  const doc: HTMLElement = getDocument();
   // Using these values as they do not consider scrollbars
   // padding box, without scrollbar
   const width: number = doc.clientWidth;
