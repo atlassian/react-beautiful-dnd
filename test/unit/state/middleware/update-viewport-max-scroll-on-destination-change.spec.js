@@ -23,11 +23,11 @@ import type {
 import getMaxScroll from '../../../../src/state/get-max-scroll';
 import { setViewport } from '../../../utils/viewport';
 import { initialPublishArgs, preset } from '../../../utils/preset-action-args';
+import getDocumentElement from '../../../../src/view/get-document-element';
 
 // using viewport from initial publish args
 const viewport: Viewport = initialPublishArgs.viewport;
-const doc: ?HTMLElement = document.documentElement;
-invariant(doc, 'Cannot find document');
+const doc: HTMLElement = getDocumentElement();
 
 const scrollHeight: number = viewport.frame.height;
 const scrollWidth: number = viewport.frame.width;

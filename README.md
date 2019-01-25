@@ -1125,6 +1125,16 @@ resetServerContext();
 renderToString(...);
 ```
 
+## Use the html5 `doctype`
+
+Be sure that you have specified the html5 `doctype` (Document Type Definition - DTD) for your `html` page:
+
+```html
+<!DOCTYPE html>
+```
+
+A `doctype` impacts browser layout and measurement apis. Not specifying a `doctype` is a world of pain. Browsers will use some other `doctype` such as ["Quirks mode"](https://en.wikipedia.org/wiki/Quirks_mode) which can drastically change layout and measurement ([more information](https://www.w3.org/QA/Tips/Doctype)). The html5 `doctype` is our only supported `doctype`.
+
 ## Developer only warnings 👷‍
 
 For common setup and usage issues and errors `react-beautiful-dnd` will log some information `console` for development builds (`process.env.NODE_ENV !== 'production'`). These logs are stripped from productions builds to save kbs and to keep the `console` clean.

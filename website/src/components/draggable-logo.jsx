@@ -104,7 +104,7 @@ type Props = {|
   size: number,
 |};
 
-const getBody = (): HTMLBodyElement => {
+const getBodyElement = (): HTMLBodyElement => {
   invariant(document.body);
   return document.body;
 };
@@ -121,12 +121,12 @@ class WithPortal extends React.Component<WithPortalProps> {
 
   componentDidMount() {
     const portal: HTMLElement = document.createElement('div');
-    getBody().appendChild(portal);
+    getBodyElement().appendChild(portal);
     this.portal = portal;
   }
 
   componentWillUnmount() {
-    getBody().removeChild(this.getPortal());
+    getBodyElement().removeChild(this.getPortal());
     this.portal = null;
   }
 

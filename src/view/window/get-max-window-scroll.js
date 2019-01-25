@@ -1,11 +1,10 @@
 // @flow
 import type { Position } from 'css-box-model';
-import invariant from 'tiny-invariant';
 import getMaxScroll from '../../state/get-max-scroll';
+import getDocumentElement from '../get-document-element';
 
 export default (): Position => {
-  const doc: ?HTMLElement = document.documentElement;
-  invariant(doc, 'Cannot get max scroll without a document');
+  const doc: HTMLElement = getDocumentElement();
 
   const maxScroll: Position = getMaxScroll({
     // unclipped padding box, with scrollbar
