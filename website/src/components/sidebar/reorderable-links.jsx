@@ -14,7 +14,7 @@ import type {
   DropResult,
 } from '../../../../src';
 
-const getBody = (): HTMLBodyElement => {
+const getBodyElement = (): HTMLBodyElement => {
   invariant(document.body);
   return document.body;
 };
@@ -33,10 +33,10 @@ class PortalAwareLink extends React.Component<PortalAwareItemProps> {
   componentDidMount() {
     const portal: HTMLElement = document.createElement('div');
     this.portal = portal;
-    getBody().appendChild(portal);
+    getBodyElement().appendChild(portal);
   }
   componentWillUnmount() {
-    getBody().removeChild(this.getPortal());
+    getBodyElement().removeChild(this.getPortal());
     this.portal = null;
   }
 

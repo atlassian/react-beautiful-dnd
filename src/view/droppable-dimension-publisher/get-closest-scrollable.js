@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { warning } from '../../dev-warning';
-import getBody from '../get-body';
+import getBodyElement from '../get-body-element';
 
 type Overflow = {|
   overflowX: string,
@@ -35,7 +35,7 @@ const isBodyScrollable = (): boolean => {
     return false;
   }
 
-  const body: HTMLBodyElement = getBody();
+  const body: HTMLBodyElement = getBodyElement();
   const html: ?HTMLElement = document.documentElement;
   invariant(html);
 

@@ -3,7 +3,7 @@ import { type Rect, type Position } from 'css-box-model';
 import type { Viewport } from '../../src/types';
 import getViewport from '../../src/view/window/get-viewport';
 import getMaxScroll from '../../src/state/get-max-scroll';
-import getDocument from '../../src/view/get-document';
+import getDocumentElement from '../../src/view/get-document-element';
 
 export const setWindowScroll = (newScroll: Position) => {
   window.pageYOffset = newScroll.y;
@@ -20,7 +20,7 @@ export const setViewport = (viewport: Viewport) => {
 
   setWindowScroll(viewport.scroll.current);
 
-  const doc: HTMLElement = getDocument();
+  const doc: HTMLElement = getDocumentElement();
   doc.clientWidth = viewport.frame.width;
   doc.clientHeight = viewport.frame.height;
 
