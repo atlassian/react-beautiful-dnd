@@ -1133,7 +1133,7 @@ Be sure that you have specified the html5 `doctype` (Document Type Definition - 
 <!DOCTYPE html>
 ```
 
-Changes in the `doctype` impact how particular browser measurement apis work. You will generally want to specify a `doctype` to avoid browsers running in a [quirks mode](https://en.wikipedia.org/wiki/Quirks_mode) or some other mode ([more information](https://www.w3.org/QA/Tips/Doctype))
+`doctype` impacts browser layout and measurement apis. You will generally want to specify a `doctype` to avoid browsers running in a [quirks mode](https://en.wikipedia.org/wiki/Quirks_mode) or some other mode ([more information](https://www.w3.org/QA/Tips/Doctype)). The html5 `doctype` is our only supported `doctype`.
 
 ## Developer only warnings 👷‍
 
