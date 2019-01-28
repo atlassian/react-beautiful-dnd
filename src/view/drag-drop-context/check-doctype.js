@@ -4,7 +4,8 @@ import { warning } from '../../dev-warning';
 const suffix: string = `
   We expect a html5 doctype: <!doctype html>
   This is to ensure consistent browser layout and measurement
-  More information:
+
+  More information: https://github.com/atlassian/react-beautiful-dnd#use-the-html5-doctype
 `;
 
 export default (doc: Document) => {
