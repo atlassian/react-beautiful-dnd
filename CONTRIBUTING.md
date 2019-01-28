@@ -52,12 +52,6 @@ This project uses `redux` for its state management. If you have not used `redux`
 - [`react-redux`](https://github.com/reactjs/react-redux): `react` bindings for `redux`
 - [`reselect`](https://github.com/reactjs/reselect): we use `reselect` heavily to ensure that state selectors are as fast as they can be. Please have a read of its main page, especially the [sharing Selectors with Props Across Multiple Components](https://github.com/reactjs/reselect#sharing-selectors-with-props-across-multiple-components) section.
 
-#### `React Motion`
-
-This library uses `react-motion` for some of the animations. If you are working in that space it is worth getting familiar with the api.
-
-- [`react-motion`](https://github.com/chenglou/react-motion)
-
 #### Testing
 
 We test our application very thoroughly. Changes will not be accepted without tests
