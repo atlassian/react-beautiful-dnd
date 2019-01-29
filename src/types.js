@@ -306,6 +306,7 @@ export type DraggingState = {|
   userDirection: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
+  shouldAnimateDraggablePlaceholder: boolean,
   // when there is a fixed list we want to opt out of this behaviour
   isWindowScrollAllowed: boolean,
   // if we need to jump the scroll (keyboard dragging)
@@ -338,6 +339,7 @@ export type DropPendingState = {|
 // An optional phase for animating the drop / cancel if it is needed
 export type DropAnimatingState = {|
   phase: 'DROP_ANIMATING',
+  shouldAnimateDraggablePlaceholder: boolean,
   pending: PendingDrop,
   // We still need to render placeholders and fix the dimensions of the dragging item
   dimensions: DimensionMap,

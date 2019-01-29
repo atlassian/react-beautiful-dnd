@@ -10,6 +10,7 @@ import type {
   DroppableId,
   MovementMode,
   TypeId,
+  Placeholder as PlaceholderType,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher';
 import DragHandle from '../drag-handle';
@@ -22,7 +23,6 @@ import {
   droppableIdKey,
   styleContextKey,
   droppableTypeKey,
-  shouldAnimatePlaceholderContextKey,
 } from '../context-keys';
 import * as timings from '../../debug/timings';
 import type {
@@ -295,7 +295,6 @@ export default class Draggable extends Component<Props> {
   renderChildren = (dragHandleProps: ?DragHandleProps): Node => {
     const dragging: ?DraggingMapProps = this.props.dragging;
     const secondary: ?SecondaryMapProps = this.props.secondary;
-    const droppableId: DroppableId = this.context[droppableIdKey];
     const children: ChildrenFn = this.props.children;
 
     if (dragging) {
@@ -305,9 +304,8 @@ export default class Draggable extends Component<Props> {
       );
 
       const placeholder: ?PlaceholderType = dragging.placeholder;
-      const shouldAnimate: boolean = this.context[
-        shouldAnimatePlaceholderContextKey
-      ](droppableId);
+      const shouldAnimate: boolean = dragging.shouldAnimatePlaceholder;
+      console.log('should animate draggable placeholder?', shouldAnimate);
 
       const sibling: Node = (
         <AnimateInOut on={placeholder} shouldAnimate={shouldAnimate}>

@@ -111,6 +111,8 @@ export default (state: State = idle, action: Action): State => {
       current: initial,
       isWindowScrollAllowed,
       impact: getHomeImpact(draggable, home),
+      // only will animate draggable placeholder after a foreign list has been dragged over
+      shouldAnimateDraggablePlaceholder: false,
       viewport,
       userDirection: forward,
       scrollJumpRequest: null,
@@ -405,6 +407,8 @@ export default (state: State = idle, action: Action): State => {
     const result: DropAnimatingState = {
       phase: 'DROP_ANIMATING',
       pending,
+      shouldAnimateDraggablePlaceholder:
+        state.shouldAnimateDraggablePlaceholder,
       dimensions: state.dimensions,
     };
 

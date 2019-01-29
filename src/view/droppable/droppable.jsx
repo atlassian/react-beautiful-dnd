@@ -3,7 +3,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
-import type { DroppableId, TypeId } from '../../types';
+import type {
+  DroppableId,
+  TypeId,
+  Placeholder as PlaceholderType,
+} from '../../types';
 import Placeholder from '../placeholder';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import {
@@ -13,6 +17,9 @@ import {
 } from '../context-keys';
 import { warning } from '../../dev-warning';
 import checkOwnProps from './check-own-props';
+import AnimateInOut, {
+  type AnimateProvided,
+} from '../animate-in-out/animate-in-out';
 
 type Context = {
   [string]: DroppableId | TypeId,
@@ -117,15 +124,22 @@ export default class Droppable extends Component<Props> {
   getDroppableRef = (): ?HTMLElement => this.ref;
 
   getPlaceholder() {
-    if (!this.props.placeholder) {
-      return null;
-    }
+    const placeholder: ?PlaceholderType = this.props.placeholder;
 
+    // always animate placeholder in droppable
     return (
-      <Placeholder
-        placeholder={this.props.placeholder}
-        innerRef={this.setPlaceholderRef}
-      />
+      <AnimateInOut on={placeholder} shouldAnimate>
+        {({ isVisible, onClose, data, animate }: AnimateProvided) =>
+          isVisible && (
+            <Placeholder
+              placeholder={(data: any)}
+              onClose={onClose}
+              innerRef={this.setPlaceholderRef}
+              animate={animate}
+            />
+          )
+        }
+      </AnimateInOut>
     );
   }
 

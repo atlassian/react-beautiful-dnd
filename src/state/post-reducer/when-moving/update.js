@@ -16,6 +16,7 @@ import type {
   UserDirection,
   StateWhenUpdatesAllowed,
 } from '../../../types';
+import getShouldAnimateDraggablePlaceholder from '../../should-animate-draggable-placeholder';
 
 type Args = {|
   state: StateWhenUpdatesAllowed,
@@ -72,12 +73,19 @@ export default ({
     current.page.borderBoxCenter,
   );
 
+  const shouldAnimateDraggablePlaceholder = getShouldAnimateDraggablePlaceholder(
+    state.shouldAnimateDraggablePlaceholder,
+    state.critical.draggable,
+    state.impact,
+  );
+
   // Not updating impact while bulk collecting
   if (state.phase === 'COLLECTING') {
     return {
       // adding phase to appease flow (even though it will be overwritten by spread)
       phase: 'COLLECTING',
       ...state,
+      shouldAnimateDraggablePlaceholder,
       dimensions,
       viewport,
       current,
@@ -115,6 +123,7 @@ export default ({
     dimensions: withUpdatedPlaceholders,
     impact: newImpact,
     viewport,
+    shouldAnimateDraggablePlaceholder,
     scrollJumpRequest: scrollJumpRequest || null,
     // client updates can be applied as a part of a jump scroll
     // this can be to immediately reverse movement to allow for a nice animation

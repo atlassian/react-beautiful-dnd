@@ -19,7 +19,8 @@ export const combine = {
   },
 };
 
-const outOfTheWayTime: number = 0.2;
+const outOfTheWayTime: number = 4;
+// const outOfTheWayTime: number = 0.2;
 const outOfTheWayTiming = `${outOfTheWayTime}s ${curves.outOfTheWay}`;
 
 export const transitions = {
