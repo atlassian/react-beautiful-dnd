@@ -15,13 +15,6 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - restore_cache:
-          keys:
-            # Restore cached website node_modules
-            - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-website-dependencies-
-
       - run:
           name: Add CI global modules
           command: yarn global add greenkeeper-lockfile@1
@@ -51,11 +44,6 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "yarn.lock" }}
-
-      - save_cache:
-          paths:
-            - website/node_modules
-          key: v1-website-dependencies-{{ checksum "website/yarn.lock" }}
   validate:
     docker:
       - image: circleci/node:8.11.3-browsers
@@ -66,10 +54,6 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "yarn.lock" }}
-
-      - restore_cache:
-          keys:
-            - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
 
       - run:
           # PR's from forks cannot use the dependency cache for performance reasons
@@ -89,10 +73,6 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "yarn.lock" }}
-
-      - restore_cache:
-          keys:
-            - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
 
       - run:
           # PR's from forks cannot use the dependency cache for performance reasons
@@ -128,10 +108,6 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "yarn.lock" }}
-
-      - restore_cache:
-          keys:
-            - v1-website-dependencies-{{ checksum "website/yarn.lock" }}
 
       - run:
           # PR's from forks cannot use the dependency cache for performance reasons
