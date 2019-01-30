@@ -6,13 +6,17 @@ type Props = {
   children: Node,
 };
 
-const Button = styled.button`
+const ButtonBox = styled.div`
+  display: flex;
   position: fixed;
   left: 0;
   bottom: 0;
+  margin: 8px;
+`;
+
+const Button = styled.button`
   padding: 8px;
   font-size: 16px;
-  margin: 8px;
 
   :hover {
     cursor: pointer;
@@ -47,38 +51,56 @@ const canPopIntoIframe: boolean = (() => {
   }
 })();
 
+const canPop: boolean = canPopIntoIframe || canPopOutOfIframe;
+
 type State = {|
   isLoading: boolean,
+  isHidden: boolean,
 |};
 
 class PopIframe extends React.Component<Props, State> {
   state: State = {
     isLoading: false,
+    isHidden: false,
   };
 
-  getButton = () => {
-    if (canPopOutOfIframe) {
-      return (
-        <Button onClick={this.pop} disabled={this.state.isLoading}>
-          Pop out of <code>{'<iframe/>'}</code> -{' '}
-          <strong>it's faster 🔥</strong>
-        </Button>
-      );
+  getButton = (): ?Node => {
+    if (this.state.isHidden) {
+      return null;
     }
 
-    if (canPopIntoIframe) {
-      return (
-        <Button onClick={this.pop} disabled={this.state.isLoading}>
-          Pop into <code>{'<iframe/>'}</code> - <strong>it's slower 🐢</strong>
-        </Button>
-      );
+    if (!canPop) {
+      return null;
     }
 
-    return null;
+    const action: Node = canPopOutOfIframe ? (
+      <Button onClick={this.pop} disabled={this.state.isLoading}>
+        Pop out of <code>{'<iframe/>'}</code> - <strong>it's faster 🔥</strong>
+      </Button>
+    ) : (
+      <Button onClick={this.pop} disabled={this.state.isLoading}>
+        Pop into <code>{'<iframe/>'}</code> - <strong>it's slower 🐢</strong>
+      </Button>
+    );
+
+    return (
+      <ButtonBox>
+        {action}
+        <Button onClick={this.hide} css={{ marginLeft: 8 }}>
+          hide
+        </Button>
+      </ButtonBox>
+    );
+  };
+
+  hide = () => {
+    this.setState({
+      isHidden: true,
+    });
   };
 
   pop = () => {
-    if (!canPopOutOfIframe && !canPopIntoIframe) {
+    if (!canPop) {
       return;
     }
 
