@@ -6,13 +6,17 @@ type Props = {
   children: Node,
 };
 
-const Button = styled.button`
+const ButtonBox = styled.div`
+  display: flex;
   position: fixed;
   left: 0;
   bottom: 0;
+  margin: 8px;
+`;
+
+const Button = styled.button`
   padding: 8px;
   font-size: 16px;
-  margin: 8px;
 
   :hover {
     cursor: pointer;
@@ -20,7 +24,8 @@ const Button = styled.button`
 `;
 
 const isSSR: boolean = typeof window === 'undefined';
-const isInIframe: boolean = (() => {
+
+const canPopOutOfIframe: boolean = (() => {
   if (isSSR) {
     return false;
   }
@@ -28,36 +33,81 @@ const isInIframe: boolean = (() => {
     // this can violate a same origin policy if on a different domain
     return window.self !== window.top;
   } catch (e) {
-    return true;
+    // cannot pop out as it would violate the same origin policy
+    return false;
   }
 })();
 
-const canPopOutOfIframe: boolean = !isSSR && isInIframe;
-const canPopIntoIframe: boolean = !isSSR && !isInIframe;
+const canPopIntoIframe: boolean = (() => {
+  if (isSSR || canPopOutOfIframe) {
+    return false;
+  }
+  // already the top level
+  try {
+    return window.self === window.top;
+  } catch (e) {
+    // would have been in an iframe that we cannot leave - this codepath should never be hit
+    return false;
+  }
+})();
 
-class PopIframe extends React.Component<Props> {
-  getButton = () => {
-    if (canPopOutOfIframe) {
-      return (
-        <Button onClick={this.pop}>
-          Pop out of <code>{'<iframe/>'}</code> -{' '}
-          <strong>it's faster 🔥</strong>
-        </Button>
-      );
+const canPop: boolean = canPopIntoIframe || canPopOutOfIframe;
+
+type State = {|
+  isLoading: boolean,
+  isHidden: boolean,
+|};
+
+class PopIframe extends React.Component<Props, State> {
+  state: State = {
+    isLoading: false,
+    isHidden: false,
+  };
+
+  getButton = (): ?Node => {
+    if (this.state.isHidden) {
+      return null;
     }
 
-    if (canPopIntoIframe) {
-      return (
-        <Button onClick={this.pop}>
-          Pop into <code>{'<iframe/>'}</code> - <strong>it's slower 🐢</strong>
-        </Button>
-      );
+    if (!canPop) {
+      return null;
     }
 
-    return null;
+    const action: Node = canPopOutOfIframe ? (
+      <Button onClick={this.pop} disabled={this.state.isLoading}>
+        Pop out of <code>{'<iframe/>'}</code> - <strong>it's faster 🔥</strong>
+      </Button>
+    ) : (
+      <Button onClick={this.pop} disabled={this.state.isLoading}>
+        Pop into <code>{'<iframe/>'}</code> - <strong>it's slower 🐢</strong>
+      </Button>
+    );
+
+    return (
+      <ButtonBox>
+        {action}
+        <Button onClick={this.hide} css={{ marginLeft: 8 }}>
+          hide
+        </Button>
+      </ButtonBox>
+    );
+  };
+
+  hide = () => {
+    this.setState({
+      isHidden: true,
+    });
   };
 
   pop = () => {
+    if (!canPop) {
+      return;
+    }
+
+    this.setState({
+      isLoading: true,
+    });
+
     if (canPopOutOfIframe) {
       const top: typeof window = window.top;
       top.location.href = window.location.href;
