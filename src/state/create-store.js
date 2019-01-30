@@ -20,10 +20,8 @@ import type { Store } from './store-types';
 // We are checking if window is available before using it.
 // This is needed for universal apps that render the component server side.
 // Details: https://github.com/zalmoxisus/redux-devtools-extension#12-advanced-store-setup
-const isDevelopment: boolean = process.env.NODE_ENV === 'development';
-
 const composeEnhancers =
-  isDevelopment &&
+  process.env.NODE_ENV !== 'production' &&
   typeof window !== 'undefined' &&
   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
