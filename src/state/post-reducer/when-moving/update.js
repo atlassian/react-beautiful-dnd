@@ -73,19 +73,12 @@ export default ({
     current.page.borderBoxCenter,
   );
 
-  const shouldAnimateDraggablePlaceholder = getShouldAnimateDraggablePlaceholder(
-    state.shouldAnimateDraggablePlaceholder,
-    state.critical.draggable,
-    state.impact,
-  );
-
   // Not updating impact while bulk collecting
   if (state.phase === 'COLLECTING') {
     return {
       // adding phase to appease flow (even though it will be overwritten by spread)
       phase: 'COLLECTING',
       ...state,
-      shouldAnimateDraggablePlaceholder,
       dimensions,
       viewport,
       current,
@@ -114,6 +107,12 @@ export default ({
     previousImpact: state.impact,
     dimensions,
   });
+
+  const shouldAnimateDraggablePlaceholder: booealn = getShouldAnimateDraggablePlaceholder(
+    state.shouldAnimateDraggablePlaceholder,
+    state.critical.draggable,
+    newImpact,
+  );
 
   // dragging!
   const result: DraggingState = {

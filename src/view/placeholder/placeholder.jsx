@@ -25,6 +25,7 @@ type State = {|
   size: Size,
 |};
 
+// TODO: does this exist elsewhere?
 const noSpacing: Spacing = {
   top: 0,
   left: 0,
@@ -45,31 +46,65 @@ const getSize = (placeholder: PlaceholderType): Size => ({
 });
 
 export default class Placeholder extends PureComponent<Props, State> {
-  state: State = {
-    size:
-      this.props.animate === 'show' ? empty : getSize(this.props.placeholder),
-  };
+  mountFrameId: ?AnimationFrameID = null;
 
-  // updates after initial mount
-  static getDerivedStateFromProps(props: Props): State {
+  constructor(props: Props, context: mixed) {
+    super(props, context);
+
+    const state: State = {
+      size:
+        this.props.animate === 'open' ? empty : getSize(this.props.placeholder),
+    };
+
+    console.log('PLACEHOLDER: mount.', props.placeholderId, state);
+
+    this.state = state;
+  }
+
+  // called before render() on initial mount and updates
+  static getDerivedStateFromProps(props: Props, state: State): State {
     if (props.animate === 'close') {
-      return empty;
+      console.info('PLACEHOLDER: animating closed');
+      return {
+        size: empty,
+      };
     }
 
-    return getSize(props.placeholder);
+    if(props.)
+
+    return state;
   }
 
   componentDidMount() {
-    if (this.props.animate === 'show') {
-      this.setState({
-        size: getSize(this.props.placeholder),
-      });
+    if (this.props.animate !== 'open') {
+      return;
     }
+
+    // Ensuring there is one browser update with an empty size
+    // .setState in componentDidMount will cause two react renders
+    // but only a single browser update
+    // https://reactjs.org/docs/react-component.html#componentdidmount
+    this.mountFrameId = requestAnimationFrame(() => {
+      this.mountFrameId = null;
+      if (this.props.animate === 'open') {
+        this.setState({
+          size: getSize(this.props.placeholder),
+        });
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    if (!this.mountFrameId) {
+      return;
+    }
+    cancelAnimationFrame(this.mountFrameId);
+    this.mountFrameId = null;
   }
 
   onTransitionEnd = () => {
-    console.warn('ON TRANSITION END');
     if (this.props.animate === 'close') {
+      console.log('CLOSING');
       this.props.onClose();
     }
   };
@@ -77,6 +112,12 @@ export default class Placeholder extends PureComponent<Props, State> {
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
     const size: Size = this.state.size;
+    console.error(
+      'Placeholder: render',
+      this.props.placeholderId,
+      size,
+      this.props.animate,
+    );
     const { display, tagName } = placeholder;
 
     // The goal of the placeholder is to take up the same amount of space
@@ -108,7 +149,7 @@ export default class Placeholder extends PureComponent<Props, State> {
       // to worry about pointer events for this element
       pointerEvents: 'none',
 
-      transition: 'margin height 4s ease',
+      transition: 'height 2s ease, margin 2s ease',
     };
 
     return React.createElement(tagName, {

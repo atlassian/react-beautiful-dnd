@@ -305,13 +305,14 @@ export default class Draggable extends Component<Props> {
 
       const placeholder: ?PlaceholderType = dragging.placeholder;
       const shouldAnimate: boolean = dragging.shouldAnimatePlaceholder;
-      console.log('should animate draggable placeholder?', shouldAnimate);
+      console.info('DRAGGABLE: render placeholder');
 
       const sibling: Node = (
         <AnimateInOut on={placeholder} shouldAnimate={shouldAnimate}>
           {({ isVisible, data, onClose, animate }) =>
             isVisible && (
               <Placeholder
+                placeholderId={this.props.draggableId}
                 animate={animate}
                 placeholder={(data: any)}
                 onClose={onClose}

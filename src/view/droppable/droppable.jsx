@@ -132,6 +132,7 @@ export default class Droppable extends Component<Props> {
         {({ isVisible, onClose, data, animate }: AnimateProvided) =>
           isVisible && (
             <Placeholder
+              placeholderId="DROPPABLE"
               placeholder={(data: any)}
               onClose={onClose}
               innerRef={this.setPlaceholderRef}
