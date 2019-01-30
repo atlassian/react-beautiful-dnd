@@ -8,6 +8,7 @@ Beautiful and accessible drag and drop for lists with [`React`](https://facebook
 [![npm](https://img.shields.io/npm/v/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
 [![dependencies](https://david-dm.org/atlassian/react-beautiful-dnd.svg)](https://david-dm.org/atlassian/react-beautiful-dnd)
 [![Downloads per month](https://img.shields.io/npm/dm/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
+[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/react-beautiful-dnd)
 [![Greenkeeper badge](https://badges.greenkeeper.io/atlassian/react-beautiful-dnd.svg)](https://greenkeeper.io/)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
