@@ -23,7 +23,9 @@ import type { Store } from './store-types';
 const isDevelopment: boolean = process.env.NODE_ENV === 'development';
 
 const composeEnhancers =
-  isDevelopment && typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+  isDevelopment &&
+  typeof window !== 'undefined' &&
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     : compose;
 
