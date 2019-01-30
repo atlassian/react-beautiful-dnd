@@ -19,11 +19,7 @@ import type {
   Callbacks as DragHandleCallbacks,
 } from '../drag-handle/drag-handle-types';
 import Placeholder from '../placeholder';
-import {
-  droppableIdKey,
-  styleContextKey,
-  droppableTypeKey,
-} from '../context-keys';
+import { droppableIdKey, styleKey, droppableTypeKey } from '../context-keys';
 import * as timings from '../../debug/timings';
 import type {
   Props,
@@ -90,7 +86,7 @@ export default class Draggable extends Component<Props> {
   static contextTypes = {
     [droppableIdKey]: PropTypes.string.isRequired,
     [droppableTypeKey]: PropTypes.string.isRequired,
-    [styleContextKey]: PropTypes.string.isRequired,
+    [styleKey]: PropTypes.string.isRequired,
   };
 
   constructor(props: Props, context: Object) {
@@ -113,7 +109,7 @@ export default class Draggable extends Component<Props> {
     };
 
     this.callbacks = callbacks;
-    this.styleContext = context[styleContextKey];
+    this.styleContext = context[styleKey];
 
     // Only running this check on creation.
     // Could run it on updates, but I don't think that would be needed

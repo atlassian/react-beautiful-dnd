@@ -6,9 +6,8 @@ export const storeKey: string = prefix('store');
 export const droppableIdKey: string = prefix('droppable-id');
 export const droppableTypeKey: string = prefix('droppable-type');
 export const dimensionMarshalKey: string = prefix('dimension-marshal');
-export const styleContextKey: string = prefix('style-context');
-export const canLiftContextKey: string = prefix('can-lift');
-export const shouldAnimate: string = prefix('can-lift');
+export const styleKey: string = prefix('style');
+export const canLiftKey: string = prefix('can-lift');
 export const isDraggingOrDroppingKey: string = prefix(
   'is-dragging-or-dropping',
 );

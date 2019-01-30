@@ -7,7 +7,7 @@ import { Provider, connect } from 'react-redux';
 import { createStore } from 'redux';
 import { Droppable, Draggable, DragDropContext } from '../../../../src';
 import type { DraggableProvided, DroppableProvided } from '../../../../src';
-import { storeKey, canLiftContextKey } from '../../../../src/view/context-keys';
+import { storeKey, canLiftKey } from '../../../../src/view/context-keys';
 import App from './app';
 // Imported as wildcard so we can mock `resetStyleContext` using spyOn
 
@@ -49,7 +49,7 @@ describe('can start drag', () => {
       throw new Error('Invalid test setup');
     }
 
-    expect(app.context[canLiftContextKey]).toBeInstanceOf(Function);
+    expect(app.context[canLiftKey]).toBeInstanceOf(Function);
   });
 });
 

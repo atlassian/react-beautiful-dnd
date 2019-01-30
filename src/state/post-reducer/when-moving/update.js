@@ -108,7 +108,7 @@ export default ({
     dimensions,
   });
 
-  const shouldAnimateDraggablePlaceholder: booealn = getShouldAnimateDraggablePlaceholder(
+  const shouldAnimateDraggablePlaceholder: boolean = getShouldAnimateDraggablePlaceholder(
     state.shouldAnimateDraggablePlaceholder,
     state.critical.draggable,
     newImpact,

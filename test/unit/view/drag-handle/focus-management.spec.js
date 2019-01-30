@@ -5,21 +5,18 @@ import PropTypes from 'prop-types';
 import { mount } from 'enzyme';
 import type { ReactWrapper } from 'enzyme';
 import DragHandle from '../../../../src/view/drag-handle';
-import {
-  styleContextKey,
-  canLiftContextKey,
-} from '../../../../src/view/context-keys';
+import { styleKey, canLiftKey } from '../../../../src/view/context-keys';
 import type { DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
 import { getStubCallbacks } from './util/callbacks';
 
 const options = {
   context: {
-    [styleContextKey]: 'hello',
-    [canLiftContextKey]: () => true,
+    [styleKey]: 'hello',
+    [canLiftKey]: () => true,
   },
   childContextTypes: {
-    [styleContextKey]: PropTypes.string.isRequired,
-    [canLiftContextKey]: PropTypes.func.isRequired,
+    [styleKey]: PropTypes.string.isRequired,
+    [canLiftKey]: PropTypes.func.isRequired,
   },
 };
 

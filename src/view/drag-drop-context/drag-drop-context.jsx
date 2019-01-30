@@ -24,8 +24,8 @@ import type { Store } from '../../state/store-types';
 import {
   storeKey,
   dimensionMarshalKey,
-  styleContextKey,
-  canLiftContextKey,
+  styleKey,
+  canLiftKey,
   isDraggingOrDroppingKey,
 } from '../context-keys';
 import {
@@ -149,8 +149,8 @@ export default class DragDropContext extends React.Component<Props> {
       getState: PropTypes.func.isRequired,
     }).isRequired,
     [dimensionMarshalKey]: PropTypes.object.isRequired,
-    [styleContextKey]: PropTypes.string.isRequired,
-    [canLiftContextKey]: PropTypes.func.isRequired,
+    [styleKey]: PropTypes.string.isRequired,
+    [canLiftKey]: PropTypes.func.isRequired,
     [isDraggingOrDroppingKey]: PropTypes.func.isRequired,
   };
 
@@ -158,8 +158,8 @@ export default class DragDropContext extends React.Component<Props> {
     return {
       [storeKey]: this.store,
       [dimensionMarshalKey]: this.dimensionMarshal,
-      [styleContextKey]: this.styleMarshal.styleContext,
-      [canLiftContextKey]: this.canLift,
+      [styleKey]: this.styleMarshal.styleContext,
+      [canLiftKey]: this.canLift,
       [isDraggingOrDroppingKey]: this.isDraggingOrDropping,
     };
   }

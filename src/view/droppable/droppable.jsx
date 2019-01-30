@@ -13,7 +13,7 @@ import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import {
   droppableIdKey,
   droppableTypeKey,
-  styleContextKey,
+  styleKey,
   isDraggingOrDroppingKey,
 } from '../context-keys';
 import { warning } from '../../dev-warning';
@@ -34,14 +34,14 @@ export default class Droppable extends Component<Props> {
 
   // Need to declare childContextTypes without flow
   static contextTypes = {
-    [styleContextKey]: PropTypes.string.isRequired,
+    [styleKey]: PropTypes.string.isRequired,
     [isDraggingOrDroppingKey]: PropTypes.func.isRequired,
   };
 
   constructor(props: Props, context: Object) {
     super(props, context);
 
-    this.styleContext = context[styleContextKey];
+    this.styleContext = context[styleKey];
 
     // a little run time check to avoid an easy to catch setup issues
     if (process.env.NODE_ENV !== 'production') {
