@@ -14,6 +14,7 @@ import {
   droppableIdKey,
   droppableTypeKey,
   styleContextKey,
+  isDraggingOrDroppingKey,
 } from '../context-keys';
 import { warning } from '../../dev-warning';
 import checkOwnProps from './check-own-props';
@@ -34,6 +35,7 @@ export default class Droppable extends Component<Props> {
   // Need to declare childContextTypes without flow
   static contextTypes = {
     [styleContextKey]: PropTypes.string.isRequired,
+    [isDraggingOrDroppingKey]: PropTypes.func.isRequired,
   };
 
   constructor(props: Props, context: Object) {
@@ -125,10 +127,13 @@ export default class Droppable extends Component<Props> {
 
   getPlaceholder() {
     const placeholder: ?PlaceholderType = this.props.placeholder;
+    const isDraggingOrDropping: boolean = this.context[
+      isDraggingOrDroppingKey
+    ]();
 
     // TODO: animate droppable placeholder except when drag is finished
     return (
-      <AnimateInOut on={placeholder} shouldAnimate={false}>
+      <AnimateInOut on={placeholder} shouldAnimate={isDraggingOrDropping}>
         {({ isVisible, onClose, data, animate }: AnimateProvided) =>
           isVisible && (
             <Placeholder

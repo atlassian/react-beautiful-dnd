@@ -26,6 +26,7 @@ import {
   dimensionMarshalKey,
   styleContextKey,
   canLiftContextKey,
+  isDraggingOrDroppingKey,
 } from '../context-keys';
 import {
   clean,
@@ -40,6 +41,7 @@ import { getFormattedMessage } from '../../dev-warning';
 import { peerDependencies } from '../../../package.json';
 import checkReactVersion from './check-react-version';
 import checkDoctype from './check-doctype';
+import getIsDraggingOrDropping from '../../state/is-dragging-or-dropping';
 
 type Props = {|
   ...Responders,
@@ -149,6 +151,7 @@ export default class DragDropContext extends React.Component<Props> {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
     [styleContextKey]: PropTypes.string.isRequired,
     [canLiftContextKey]: PropTypes.func.isRequired,
+    [isDraggingOrDroppingKey]: PropTypes.func.isRequired,
   };
 
   getChildContext(): Context {
@@ -157,6 +160,7 @@ export default class DragDropContext extends React.Component<Props> {
       [dimensionMarshalKey]: this.dimensionMarshal,
       [styleContextKey]: this.styleMarshal.styleContext,
       [canLiftContextKey]: this.canLift,
+      [isDraggingOrDroppingKey]: this.isDraggingOrDropping,
     };
   }
 
@@ -168,6 +172,8 @@ export default class DragDropContext extends React.Component<Props> {
   // on drag start which is too expensive.
   // This is useful when the user
   canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
+
+  isDraggingOrDropping = () => getIsDraggingOrDropping(this.store.getState());
 
   componentDidMount() {
     window.addEventListener('error', this.onWindowError);
