@@ -21,7 +21,9 @@ import type { Store } from './store-types';
 // This is needed for universal apps that render the component server side.
 // Details: https://github.com/zalmoxisus/redux-devtools-extension#12-advanced-store-setup
 const composeEnhancers =
-  typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+  process.env.NODE_ENV !== 'production' &&
+  typeof window !== 'undefined' &&
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     : compose;
 
