@@ -47,11 +47,19 @@ const canPopIntoIframe: boolean = (() => {
   }
 })();
 
-class PopIframe extends React.Component<Props> {
+type State = {|
+  isLoading: boolean,
+|};
+
+class PopIframe extends React.Component<Props, State> {
+  state: State = {
+    isLoading: false,
+  };
+
   getButton = () => {
     if (canPopOutOfIframe) {
       return (
-        <Button onClick={this.pop}>
+        <Button onClick={this.pop} disabled={this.state.isLoading}>
           Pop out of <code>{'<iframe/>'}</code> -{' '}
           <strong>it's faster 🔥</strong>
         </Button>
@@ -60,7 +68,7 @@ class PopIframe extends React.Component<Props> {
 
     if (canPopIntoIframe) {
       return (
-        <Button onClick={this.pop}>
+        <Button onClick={this.pop} disabled={this.state.isLoading}>
           Pop into <code>{'<iframe/>'}</code> - <strong>it's slower 🐢</strong>
         </Button>
       );
@@ -70,6 +78,14 @@ class PopIframe extends React.Component<Props> {
   };
 
   pop = () => {
+    if (!canPopOutOfIframe && !canPopIntoIframe) {
+      return;
+    }
+
+    this.setState({
+      isLoading: true,
+    });
+
     if (canPopOutOfIframe) {
       const top: typeof window = window.top;
       top.location.href = window.location.href;
