@@ -22,7 +22,8 @@ type Size = {|
 |};
 
 type State = {|
-  size: Size,
+  shouldMountEmptyAndOpen: boolean,
+  useEmpty: boolean,
 |};
 
 // TODO: does this exist elsewhere?
@@ -48,35 +49,32 @@ const getSize = (placeholder: PlaceholderType): Size => ({
 export default class Placeholder extends PureComponent<Props, State> {
   mountFrameId: ?AnimationFrameID = null;
 
-  constructor(props: Props, context: mixed) {
-    super(props, context);
-
-    const state: State = {
-      size:
-        this.props.animate === 'open' ? empty : getSize(this.props.placeholder),
-    };
-
-    console.log('PLACEHOLDER: mount.', props.placeholderId, state);
-
-    this.state = state;
-  }
+  state: State = {
+    shouldMountEmptyAndOpen: this.props.animate === 'open',
+    useEmpty: this.props.animate === 'open',
+  };
 
   // called before render() on initial mount and updates
   static getDerivedStateFromProps(props: Props, state: State): State {
+    if (state.shouldMountEmptyAndOpen) {
+      return state;
+    }
+
     if (props.animate === 'close') {
-      console.info('PLACEHOLDER: animating closed');
       return {
-        size: empty,
+        shouldMountEmptyAndOpen: false,
+        useEmpty: true,
       };
     }
 
-    if(props.)
-
-    return state;
+    return {
+      shouldMountEmptyAndOpen: false,
+      useEmpty: false,
+    };
   }
 
   componentDidMount() {
-    if (this.props.animate !== 'open') {
+    if (!this.state.shouldMountEmptyAndOpen) {
       return;
     }
 
@@ -86,9 +84,10 @@ export default class Placeholder extends PureComponent<Props, State> {
     // https://reactjs.org/docs/react-component.html#componentdidmount
     this.mountFrameId = requestAnimationFrame(() => {
       this.mountFrameId = null;
-      if (this.props.animate === 'open') {
+      if (this.state.shouldMountEmptyAndOpen) {
         this.setState({
-          size: getSize(this.props.placeholder),
+          shouldMountEmptyAndOpen: false,
+          useEmpty: false,
         });
       }
     });
@@ -104,20 +103,14 @@ export default class Placeholder extends PureComponent<Props, State> {
 
   onTransitionEnd = () => {
     if (this.props.animate === 'close') {
-      console.log('CLOSING');
+      console.log('CLOSED');
       this.props.onClose();
     }
   };
 
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
-    const size: Size = this.state.size;
-    console.error(
-      'Placeholder: render',
-      this.props.placeholderId,
-      size,
-      this.props.animate,
-    );
+    const size: Size = this.state.useEmpty ? empty : getSize(placeholder);
     const { display, tagName } = placeholder;
 
     // The goal of the placeholder is to take up the same amount of space
