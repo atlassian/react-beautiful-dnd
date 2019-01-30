@@ -19,32 +19,66 @@ const Button = styled.button`
   }
 `;
 
+const isSSR: boolean = typeof window === 'undefined';
 const isInIframe: boolean = (() => {
-  if (typeof window === 'undefined') {
+  if (isSSR) {
     return false;
   }
-
   try {
+    // this can violate a same origin policy if on a different domain
     return window.self !== window.top;
   } catch (e) {
     return true;
   }
 })();
 
+const canPopOutOfIframe: boolean = !isSSR && isInIframe;
+const canPopIntoIframe: boolean = !isSSR && !isInIframe;
+
 class PopIframe extends React.Component<Props> {
+  getButton = () => {
+    if (canPopOutOfIframe) {
+      return (
+        <Button onClick={this.pop}>
+          Pop out of <code>{'<iframe/>'}</code> -{' '}
+          <strong>it's faster 🔥</strong>
+        </Button>
+      );
+    }
+
+    if (canPopIntoIframe) {
+      return (
+        <Button onClick={this.pop}>
+          Pop into <code>{'<iframe/>'}</code> - <strong>it's slower 🐢</strong>
+        </Button>
+      );
+    }
+
+    return null;
+  };
+
   pop = () => {
-    const top: typeof window = window.top;
-    top.location.href = window.location.href;
+    if (canPopOutOfIframe) {
+      const top: typeof window = window.top;
+      top.location.href = window.location.href;
+      return;
+    }
+
+    if (canPopIntoIframe) {
+      const protocol: string = window.location.protocol; // http:
+      const host: string = window.location.host; // react-beautiful-dnd.com
+      const pathname: string = window.location.pathname; // iframe.html
+      const search: string = window.location.search; // ?s=query
+
+      const noPathname: string = `${protocol}//${host}/${search}`;
+
+      window.location.href = noPathname;
+    }
   };
   render() {
-    const action: ?Node = isInIframe ? (
-      <Button onClick={this.pop}>
-        Pop out of <code>{'<iframe/>'}</code> - <strong>it's faster 🔥</strong>
-      </Button>
-    ) : null;
     return (
       <React.Fragment>
-        {action}
+        {this.getButton()}
         {this.props.children}
       </React.Fragment>
     );
