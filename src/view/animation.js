@@ -19,8 +19,7 @@ export const combine = {
   },
 };
 
-const outOfTheWayTime: number = 2;
-// const outOfTheWayTime: number = 0.2;
+const outOfTheWayTime: number = 0.2;
 const outOfTheWayTiming = `${outOfTheWayTime}s ${curves.outOfTheWay}`;
 
 export const transitions = {
@@ -31,6 +30,7 @@ export const transitions = {
     return `transform ${timing}, opacity ${timing}`;
   },
   outOfTheWay: `transform ${outOfTheWayTiming}`,
+  placeholder: `height ${outOfTheWayTiming}, width ${outOfTheWayTiming}, margin ${outOfTheWayTiming}`,
 };
 
 const moveTo = (offset: Position): ?string =>

@@ -6,6 +6,7 @@ import type {
   InOutAnimationMode,
 } from '../../types';
 import type { PlaceholderStyle } from './placeholder-types';
+import { transitions } from '../animation';
 
 type Props = {|
   placeholder: PlaceholderType,
@@ -142,7 +143,7 @@ export default class Placeholder extends PureComponent<Props, State> {
       // to worry about pointer events for this element
       pointerEvents: 'none',
 
-      transition: 'height 2s ease, margin 2s ease',
+      transition: transitions.placeholder,
     };
 
     return React.createElement(tagName, {
