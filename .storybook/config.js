@@ -10,7 +10,6 @@ addDecorator(
   withOptions({
     name: 'react-beautiful-dnd',
     url: 'https://github.com/atlassian/react-beautiful-dnd',
-    showAddonPanel: false,
   }),
 );
 

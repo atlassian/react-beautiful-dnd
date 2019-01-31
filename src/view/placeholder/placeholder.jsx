@@ -104,6 +104,7 @@ export default class Placeholder extends PureComponent<Props, State> {
   }
 
   onTransitionEnd = () => {
+    console.log('PLACEHOLDER ANIMATION FINISHED');
     if (this.props.animate === 'close') {
       console.log('CLOSED');
       this.props.onClose();

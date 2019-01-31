@@ -19,6 +19,11 @@ export const combine = {
   },
 };
 
+export const timings = {
+  outOfTheWay: 0.2,
+  placeholderTransitionDelay: 0.1,
+};
+
 const outOfTheWayTime: number = 0.2;
 const outOfTheWayTiming: string = `${outOfTheWayTime}s ${curves.outOfTheWay}`;
 export const placeholderTransitionDelayTime: number = 0.1;

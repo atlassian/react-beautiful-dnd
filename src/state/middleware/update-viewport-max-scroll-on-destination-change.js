@@ -7,6 +7,7 @@ import { updateViewportMaxScroll } from '../action-creators';
 import isMovementAllowed from '../is-movement-allowed';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import getMaxWindowScroll from '../../view/window/get-max-window-scroll';
+import { timings } from '../../view/animation';
 
 const shouldCheckOnAction = (action: Action): boolean =>
   action.type === 'MOVE' ||
@@ -50,24 +51,56 @@ const getUpdatedViewportMax = (viewport: Viewport): ?Position => {
   return maxScroll;
 };
 
-export default (store: MiddlewareStore) => (next: Dispatch) => (
-  action: Action,
-): any => {
-  const previous: State = store.getState();
-  next(action);
-  const current: State = store.getState();
+const delay: number =
+  timings.outOfTheWay * 1000 + timings.placeholderTransitionDelay * 1000 + 20;
 
-  if (!current.isDragging) {
-    return;
-  }
+export default (store: MiddlewareStore) => {
+  let timeoutId: ?TimeoutID = null;
 
-  if (!wasDestinationChange(previous, current, action)) {
-    return;
-  }
+  const clearUpdateTimeout = () => {
+    if (!timeoutId) {
+      return;
+    }
+    clearTimeout(timeoutId);
+    timeoutId = null;
+  };
 
-  const maxScroll: ?Position = getUpdatedViewportMax(current.viewport);
+  return (next: Dispatch) => (action: Action): any => {
+    const previous: State = store.getState();
+    next(action);
+    const current: State = store.getState();
 
-  if (maxScroll) {
-    next(updateViewportMaxScroll({ maxScroll }));
-  }
+    if (!current.isDragging) {
+      clearUpdateTimeout();
+      return;
+    }
+
+    if (!wasDestinationChange(previous, current, action)) {
+      return;
+    }
+
+    // abort any pending timeouts
+    clearUpdateTimeout();
+
+    console.log('waiting for max viewport scroll change');
+    setTimeout(() => {
+      timeoutId = null;
+
+      const latest: State = store.getState();
+      if (!latest.isDragging) {
+        return;
+      }
+
+      const maxScroll: ?Position = getUpdatedViewportMax(latest.viewport);
+
+      if (maxScroll) {
+        console.log(
+          'updating max viewport scroll',
+          latest.viewport.scroll.max,
+          maxScroll,
+        );
+        next(updateViewportMaxScroll({ maxScroll }));
+      }
+    }, delay);
+  };
 };
