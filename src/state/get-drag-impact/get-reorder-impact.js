@@ -1,4 +1,5 @@
 // @flow
+import memoizeOne from 'memoize-one';
 import { type Position, type Spacing } from 'css-box-model';
 import type {
   DragMovement,
@@ -10,7 +11,7 @@ import type {
   Viewport,
   UserDirection,
   DisplacedBy,
-  DisplacementMap,
+  DraggableIdMap,
 } from '../../types';
 import getDisplacement from '../get-displacement';
 import getDisplacementMap from '../get-displacement-map';
@@ -27,8 +28,18 @@ type Args = {|
   previousImpact: DragImpact,
   viewport: Viewport,
   userDirection: UserDirection,
-  displacedToBeInOriginalSpot: DisplacementMap,
+  wasDisplacedOnLift: DraggableIdMap,
 |};
+
+const removeDraggable = memoizeOne(
+  (
+    remove: DraggableDimension,
+    list: DraggableDimension[],
+  ): DraggableDimension[] =>
+    list.filter(
+      (item: DraggableDimension) => item.descriptor.id !== remove.descriptor.id,
+    ),
+);
 
 export default ({
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
@@ -38,7 +49,7 @@ export default ({
   previousImpact,
   viewport,
   userDirection,
-  displacedToBeInOriginalSpot,
+  wasDisplacedOnLift,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const isMovingForward: boolean = isUserMovingForward(
@@ -51,20 +62,14 @@ export default ({
   );
   const targetCenter: number = currentCenter[axis.line];
   const displacement: number = displacedBy.value;
+  const withoutDraggable = removeDraggable(draggable, insideDestination);
 
-  const displaced: Displacement[] = insideDestination
+  const displaced: Displacement[] = withoutDraggable
     .filter(
       (child: DraggableDimension): boolean => {
-        // return true to displace the item
-
-        // when in home list there is no point displacing yourself
-        if (child.descriptor.id === draggable.descriptor.id) {
-          return false;
-        }
-
         // did this item start displaced when the drag started?
         const didStartDisplaced: boolean = Boolean(
-          displacedToBeInOriginalSpot[child.descriptor.id],
+          wasDisplacedOnLift[child.descriptor.id],
         );
 
         const borderBox: Spacing = didStartDisplaced
@@ -94,15 +99,7 @@ export default ({
         }),
     );
 
-  const newIndex: number = (() => {
-    const base: number = insideDestination.length - displaced.length;
-
-    const isInHome: boolean =
-      draggable.descriptor.droppableId === destination.descriptor.id;
-
-    return isInHome ? base - 1 : base;
-  })();
-  console.log('NEW INDEX', newIndex);
+  const newIndex: number = withoutDraggable.length - displaced.length;
 
   const movement: DragMovement = {
     displacedBy,

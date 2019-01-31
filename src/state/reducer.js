@@ -17,6 +17,8 @@ import type {
   DropPendingState,
   Viewport,
   DropReason,
+  Displacement,
+  DraggableIdMap,
   DragImpact,
 } from '../types';
 import type { Action } from './store-types';
@@ -109,6 +111,16 @@ export default (state: State = idle, action: Action): State => {
       viewport,
     });
 
+    // TODO: we already compute this in getHomeImpact.
+    // Perhaps that function should return it?
+    const wasDisplacedOnLift: DraggableIdMap = impact.movement.displaced.reduce(
+      (previous: DraggableIdMap, item: Displacement): DraggableIdMap => {
+        previous[item.draggableId] = true;
+        return previous;
+      },
+      {},
+    );
+
     const result: DraggingState = {
       phase: 'DRAGGING',
       isDragging: true,
@@ -119,7 +131,8 @@ export default (state: State = idle, action: Action): State => {
       current: initial,
       isWindowScrollAllowed,
       impact,
-      displacedToBeInOriginalSpot: impact.movement.map,
+      // TODO: explaination
+      wasDisplacedOnLift,
       originalImpact: impact,
       // only will animate home placeholder after
       // a foreign list has been dragged over

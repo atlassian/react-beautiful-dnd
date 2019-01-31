@@ -294,6 +294,16 @@ export type IdleState = {|
   phase: 'IDLE',
 |};
 
+export type DraggableIdMap = {
+  [id: DraggableId]: true,
+};
+
+type OnLift = {|
+  impact: DragImpact,
+  displaced: DraggableIdMap,
+  displacedBy: DisplacedBy,
+|};
+
 export type DraggingState = {|
   phase: 'DRAGGING',
   isDragging: true,
@@ -308,7 +318,7 @@ export type DraggingState = {|
   shouldAnimateHomePlaceholder: boolean,
   // These are the items that are immediately displaced as the drag starts
   // to account for the collapsing of the draggable
-  displacedToBeInOriginalSpot: DisplacementMap,
+  wasDisplacedOnLift: DraggableIdMap,
   originalImpact: DragImpact,
   // when there is a fixed list we want to opt out of this behaviour
   isWindowScrollAllowed: boolean,

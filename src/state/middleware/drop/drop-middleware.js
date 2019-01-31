@@ -101,7 +101,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     draggable,
     dimensions,
     viewport: state.viewport,
-    displacedToBeInOriginalSpot: state.displacedToBeInOriginalSpot,
+    wasDisplacedOnLift: state.wasDisplacedOnLift,
   });
 
   // Do not animate if you do not need to.

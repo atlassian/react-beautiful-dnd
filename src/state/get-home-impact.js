@@ -9,6 +9,7 @@ import type {
   DisplacedBy,
   Viewport,
   DragMovement,
+  DraggableIdMap,
 } from '../types';
 import noImpact from './no-impact';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
@@ -39,20 +40,32 @@ export default ({
     draggables,
   );
 
-  const displaced: Displacement[] = insideHome
-    .slice(draggable.descriptor.index + 1)
-    .map(
-      (dimension: DraggableDimension): Displacement =>
-        getDisplacement({
-          draggable: dimension,
-          destination: home,
-          previousImpact: noImpact,
-          viewport: viewport.frame,
-          forceShouldAnimate: false,
-        }),
-    );
+  const originallyDisplaced: DraggableDimension[] = insideHome.slice(
+    draggable.descriptor.index + 1,
+  );
+  const wasDisplacedOnLift: DraggableIdMap = originallyDisplaced.reduce(
+    (previous: DraggableIdMap, item: DraggableDimension): DraggableIdMap => {
+      previous[item.descriptor.id] = true;
+      return previous;
+    },
+    {},
+  );
 
-  console.log('displaced', displaced);
+  const displaced: Displacement[] = originallyDisplaced.map(
+    (dimension: DraggableDimension): Displacement =>
+      getDisplacement({
+        draggable: dimension,
+        destination: home,
+        previousImpact: noImpact,
+        viewport: viewport.frame,
+        // originally we do not want any animation as we want
+        // everything to be fixed in the same position that
+        // it started in
+        forceShouldAnimate: false,
+        wasDisplacedOnLift,
+        displacedByOnLift: displacedBy,
+      }),
+  );
 
   const movement: DragMovement = {
     displaced,
