@@ -6,13 +6,14 @@ import type {
   InOutAnimationMode,
 } from '../../types';
 import type { PlaceholderStyle } from './placeholder-types';
-import { transitions } from '../animation';
+import { transitions, placeholderTransitionDelayTime } from '../animation';
 
 type Props = {|
   placeholder: PlaceholderType,
   animate: InOutAnimationMode,
   onClose: () => void,
   innerRef?: () => ?HTMLElement,
+  shouldDelayTransition: boolean,
 |};
 
 type Size = {|
@@ -111,6 +112,7 @@ export default class Placeholder extends PureComponent<Props, State> {
 
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
+    const shouldDelayTransition: boolean = this.props.shouldDelayTransition;
     const size: Size = this.state.useEmpty ? empty : getSize(placeholder);
     const { display, tagName } = placeholder;
 
@@ -143,7 +145,15 @@ export default class Placeholder extends PureComponent<Props, State> {
       // to worry about pointer events for this element
       pointerEvents: 'none',
 
+      // Animate the placeholder size and margin
       transition: transitions.placeholder,
+
+      // Conditionally put a delay on any transition
+      // This is used on the Draggable placeholder so that it does not flicker
+      // when quickly moving between drop targets
+      transitionDelay: shouldDelayTransition
+        ? `${placeholderTransitionDelayTime}s`
+        : '0s',
     };
 
     return React.createElement(tagName, {

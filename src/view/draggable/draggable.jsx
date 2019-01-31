@@ -308,7 +308,7 @@ export default class Draggable extends Component<Props> {
           {({ isVisible, data, onClose, animate }) =>
             isVisible && (
               <Placeholder
-                placeholderId={this.props.draggableId}
+                shouldDelayTransition
                 animate={animate}
                 placeholder={(data: any)}
                 onClose={onClose}

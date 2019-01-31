@@ -20,7 +20,8 @@ export const combine = {
 };
 
 const outOfTheWayTime: number = 0.2;
-const outOfTheWayTiming = `${outOfTheWayTime}s ${curves.outOfTheWay}`;
+const outOfTheWayTiming: string = `${outOfTheWayTime}s ${curves.outOfTheWay}`;
+export const placeholderTransitionDelayTime: number = 0.1;
 
 export const transitions = {
   fluid: `opacity ${outOfTheWayTiming}`,
