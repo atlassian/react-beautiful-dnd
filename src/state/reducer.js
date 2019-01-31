@@ -28,13 +28,14 @@ import publishWhileDragging from './publish-while-dragging';
 // import moveInDirection from './move-in-direction';
 import { add, isEqual, origin } from './position';
 import scrollViewport from './scroll-viewport';
-import getHomeImpact from './get-home-impact';
+import getHomeImpact from './get-home-impact.old';
 import isMovementAllowed from './is-movement-allowed';
 import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
 import update from './post-reducer/when-moving/update';
 import refreshSnap from './post-reducer/when-moving/refresh-snap';
 import patchDroppableMap from './patch-droppable-map';
+import getHomeOnLift from './get-home-on-lift';
 
 const isSnapping = (state: StateWhenUpdatesAllowed): boolean =>
   state.movementMode === 'SNAP';
@@ -104,22 +105,12 @@ export default (state: State = idle, action: Action): State => {
       dimensions.droppables,
     ).every((item: DroppableDimension) => !item.isFixedOnPage);
 
-    const impact: DragImpact = getHomeImpact({
+    const { impact, onLift } = getHomeOnLift({
       draggable,
       home,
       draggables: dimensions.draggables,
       viewport,
     });
-
-    // TODO: we already compute this in getHomeImpact.
-    // Perhaps that function should return it?
-    const wasDisplacedOnLift: DraggableIdMap = impact.movement.displaced.reduce(
-      (previous: DraggableIdMap, item: Displacement): DraggableIdMap => {
-        previous[item.draggableId] = true;
-        return previous;
-      },
-      {},
-    );
 
     const result: DraggingState = {
       phase: 'DRAGGING',
@@ -131,9 +122,9 @@ export default (state: State = idle, action: Action): State => {
       current: initial,
       isWindowScrollAllowed,
       impact,
-      // TODO: explaination
-      wasDisplacedOnLift,
-      originalImpact: impact,
+      onLift,
+      // TODO: do we really need this?
+      onLiftImpact: impact,
       // only will animate home placeholder after
       // a foreign list has been dragged over
       // TODO: can this be a one time flag that is swapped after first render?

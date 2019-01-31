@@ -298,9 +298,8 @@ export type DraggableIdMap = {
   [id: DraggableId]: true,
 };
 
-type OnLift = {|
-  impact: DragImpact,
-  displaced: DraggableIdMap,
+export type OnLift = {|
+  wasDisplaced: DraggableIdMap,
   displacedBy: DisplacedBy,
 |};
 
@@ -316,10 +315,8 @@ export type DraggingState = {|
   impact: DragImpact,
   viewport: Viewport,
   shouldAnimateHomePlaceholder: boolean,
-  // These are the items that are immediately displaced as the drag starts
-  // to account for the collapsing of the draggable
-  wasDisplacedOnLift: DraggableIdMap,
-  originalImpact: DragImpact,
+  onLift: OnLift,
+  onLiftImpact: DragImpact,
   // when there is a fixed list we want to opt out of this behaviour
   isWindowScrollAllowed: boolean,
   // if we need to jump the scroll (keyboard dragging)

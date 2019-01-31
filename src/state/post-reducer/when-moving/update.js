@@ -99,7 +99,7 @@ export default ({
       previousImpact: state.impact,
       viewport,
       userDirection,
-      wasDisplacedOnLift: state.wasDisplacedOnLift,
+      onLift: state.onLift,
     });
 
   const withUpdatedPlaceholders: DimensionMap = getDimensionMapWithPlaceholder({

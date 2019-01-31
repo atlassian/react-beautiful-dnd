@@ -65,7 +65,8 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   const impact: DragImpact = getDropImpact({
     reason,
     lastImpact: state.impact,
-    originalImpact: state.originalImpact,
+    onLift: state.onLift,
+    onLiftImpact: state.onLiftImpact,
     home: state.dimensions.droppables[state.critical.droppable.id],
     viewport: state.viewport,
     draggables: state.dimensions.draggables,
@@ -101,7 +102,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     draggable,
     dimensions,
     viewport: state.viewport,
-    wasDisplacedOnLift: state.wasDisplacedOnLift,
+    onLift: state.onLift,
   });
 
   // Do not animate if you do not need to.

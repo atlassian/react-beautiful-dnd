@@ -11,7 +11,7 @@ import type {
   Viewport,
   UserDirection,
   DisplacedBy,
-  DraggableIdMap,
+  OnLift,
 } from '../../types';
 import getDisplacement from '../get-displacement';
 import getDisplacementMap from '../get-displacement-map';
@@ -28,7 +28,7 @@ type Args = {|
   previousImpact: DragImpact,
   viewport: Viewport,
   userDirection: UserDirection,
-  wasDisplacedOnLift: DraggableIdMap,
+  onLift: OnLift,
 |};
 
 const removeDraggable = memoizeOne(
@@ -49,7 +49,7 @@ export default ({
   previousImpact,
   viewport,
   userDirection,
-  wasDisplacedOnLift,
+  onLift,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const isMovingForward: boolean = isUserMovingForward(
@@ -69,12 +69,15 @@ export default ({
       (child: DraggableDimension): boolean => {
         // did this item start displaced when the drag started?
         const didStartDisplaced: boolean = Boolean(
-          wasDisplacedOnLift[child.descriptor.id],
+          onLift.wasDisplaced[child.descriptor.id],
         );
 
         const borderBox: Spacing = didStartDisplaced
           ? // shift an item that started displaced to be as if it where not displaced
-            offsetByPosition(child.page.borderBox, negate(displacedBy.point))
+            offsetByPosition(
+              child.page.borderBox,
+              negate(onLift.displacedBy.point),
+            )
           : child.page.borderBox;
         const start: number = borderBox[axis.start];
         const end: number = borderBox[axis.end];
@@ -96,6 +99,7 @@ export default ({
           destination,
           previousImpact,
           viewport: viewport.frame,
+          onLift,
         }),
     );
 

@@ -6,9 +6,8 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DragImpact,
-  DraggableIdMap,
   DisplacementMap,
-  DisplacedBy,
+  OnLift,
 } from '../types';
 import { isPartiallyVisible } from './visibility/is-visible';
 import { offsetByPosition } from './spacing';
@@ -19,8 +18,7 @@ type Args = {|
   destination: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Rect,
-  wasDisplacedOnLift: DraggableIdMap,
-  displacedByOnLift: DisplacedBy,
+  onLift: OnLift,
   forceShouldAnimate?: boolean,
 |};
 
@@ -54,21 +52,17 @@ const getShouldAnimate = (
 // items when they are not longer visible.
 // This prevents a lot of .render() calls when leaving / entering a list
 
-const getTarget = (
-  draggable: DraggableDimension,
-  displacedByOnLift: DisplacedBy,
-  wasDisplacedOnLift: DraggableIdMap,
-): Rect => {
+const getTarget = (draggable: DraggableDimension, onLift: OnLift): Rect => {
   const marginBox: Rect = draggable.page.marginBox;
   const didStartDisplaced: boolean = Boolean(
-    wasDisplacedOnLift[draggable.descriptor.id],
+    onLift.wasDisplaced[draggable.descriptor.id],
   );
 
   if (!didStartDisplaced) {
     return marginBox;
   }
 
-  return getRect(offsetByPosition(marginBox, negate(displacedByOnLift.point)));
+  return getRect(offsetByPosition(marginBox, negate(onLift.displacedBy.point)));
 };
 
 export default ({
@@ -76,17 +70,12 @@ export default ({
   destination,
   previousImpact,
   viewport,
-  displacedByOnLift,
-  wasDisplacedOnLift,
+  onLift,
   forceShouldAnimate,
 }: Args): Displacement => {
   const id: DraggableId = draggable.descriptor.id;
   const map: DisplacementMap = previousImpact.movement.map;
-  const target: Rect = getTarget(
-    draggable,
-    displacedByOnLift,
-    wasDisplacedOnLift,
-  );
+  const target: Rect = getTarget(draggable, onLift);
 
   // We need to account for items that are not in their resting
   // position without original displacement

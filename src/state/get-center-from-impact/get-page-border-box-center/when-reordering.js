@@ -6,7 +6,7 @@ import type {
   DraggableDimensionMap,
   DragMovement,
   DroppableDimension,
-  DraggableIdMap,
+  OnLift,
 } from '../../../types';
 import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
@@ -17,7 +17,7 @@ type NewHomeArgs = {|
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
   droppable: DroppableDimension,
-  wasDisplacedOnLift: DraggableIdMap,
+  onLift: OnLift,
 |};
 
 // Returns the client offset required to move an item from its
@@ -27,7 +27,7 @@ export default ({
   draggable,
   draggables,
   droppable,
-  wasDisplacedOnLift,
+  onLift,
 }: NewHomeArgs): Position => {
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable.descriptor.id,
@@ -56,7 +56,7 @@ export default ({
     // want to go before where it would be with the displacement
 
     const didStartDisplaced: boolean = Boolean(
-      wasDisplacedOnLift[closestAfter.descriptor.id],
+      onLift.wasDisplaced[closestAfter.descriptor.id],
     );
 
     // target already in resting spot
@@ -92,7 +92,7 @@ export default ({
   // we need to go after the closest before
 
   const didStartDisplaced: boolean = Boolean(
-    wasDisplacedOnLift[closestBefore.descriptor.id],
+    onLift.wasDisplaced[closestBefore.descriptor.id],
   );
 
   if (didStartDisplaced) {
@@ -100,7 +100,7 @@ export default ({
     // we need to remove the displacement to get the target to its original spot
     const page: BoxModel = offset(
       closestBefore.page,
-      negate(displacedBy.point),
+      negate(onLift.displacedBy.point),
     );
     return goAfter({
       axis,
