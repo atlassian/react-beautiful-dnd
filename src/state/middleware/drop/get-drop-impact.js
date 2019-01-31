@@ -33,11 +33,14 @@ export default ({
     return lastImpact;
   }
 
+  // Need to recompute the visibility of the original impact
+  // What is visible can be different to when  the drag started
   return recompute({
     impact: originalImpact,
     destination: home,
     viewport,
     draggables,
+    // We need the draggables to animate back to their positions
     forceShouldAnimate: true,
   });
 };
