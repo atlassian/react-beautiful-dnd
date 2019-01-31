@@ -19,6 +19,7 @@ import {
   drop as dropAction,
   dropAnimationFinished as dropAnimationFinishedAction,
   moveByWindowScroll as moveByWindowScrollAction,
+  updateViewportMaxScroll as updateViewportMaxScrollAction,
 } from '../../state/action-creators';
 import type {
   State,
@@ -284,6 +285,7 @@ const mapDispatchToProps: DispatchProps = {
   moveByWindowScroll: moveByWindowScrollAction,
   drop: dropAction,
   dropAnimationFinished: dropAnimationFinishedAction,
+  updateViewportMaxScroll: updateViewportMaxScrollAction,
 };
 
 const defaultProps = ({
@@ -307,7 +309,7 @@ class DraggableType extends Component<OwnProps> {
 const ConnectedDraggable: typeof DraggableType = (connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
-  (mapDispatchToProps: any),
+  mapDispatchToProps,
   // mergeProps: use default
   null,
   // options
@@ -321,7 +323,6 @@ const ConnectedDraggable: typeof DraggableType = (connect(
     // When pure, compares the result of mapStateToProps to its previous value.
     // Default value: shallowEqual
     // Switching to a strictEqual as we return a memoized object on changes
-    // $FlowFixMe - incorrect type signature
     areStatePropsEqual: isStrictEqual,
   },
 ): any)(Draggable);

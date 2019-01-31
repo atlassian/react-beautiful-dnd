@@ -21,6 +21,7 @@ import checkOwnProps from './check-own-props';
 import AnimateInOut, {
   type AnimateProvided,
 } from '../animate-in-out/animate-in-out';
+import getMaxWindowScroll from '../window/get-max-window-scroll';
 
 type Context = {
   [string]: DroppableId | TypeId,
@@ -125,6 +126,11 @@ export default class Droppable extends Component<Props> {
 
   getDroppableRef = (): ?HTMLElement => this.ref;
 
+  onPlaceholderTransitionEnd = () => {
+    // A placeholder change can impact the window's max scroll
+    this.props.updateViewportMaxScroll({ maxScroll: getMaxWindowScroll() });
+  };
+
   getPlaceholder() {
     const placeholder: ?PlaceholderType = this.props.placeholder;
     const isDraggingOrDropping: boolean = this.context[
@@ -142,6 +148,7 @@ export default class Droppable extends Component<Props> {
               onClose={onClose}
               innerRef={this.setPlaceholderRef}
               animate={animate}
+              onTransitionEnd={this.onPlaceholderTransitionEnd}
             />
           )
         }

@@ -8,6 +8,7 @@ import type {
   Placeholder,
   State,
 } from '../../types';
+import { updateViewportMaxScroll } from '../../state/action-creators';
 
 export type DroppableProps = {|
   // used for shared global styles
@@ -43,6 +44,10 @@ export type DefaultProps = {|
   ignoreContainerClipping: boolean,
 |};
 
+export type DispatchProps = {|
+  updateViewportMaxScroll: typeof updateViewportMaxScroll,
+|};
+
 export type OwnProps = {|
   ...DefaultProps,
   children: (Provided, StateSnapshot) => Node,
@@ -51,6 +56,7 @@ export type OwnProps = {|
 
 export type Props = {|
   ...MapProps,
+  ...DispatchProps,
   ...OwnProps,
 |};
 

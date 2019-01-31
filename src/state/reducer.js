@@ -321,12 +321,18 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'UPDATE_VIEWPORT_MAX_SCROLL') {
-    invariant(
-      isMovementAllowed(state),
-      `Cannot update viewport scroll in phase ${state.phase}`,
-    );
+    // Could occur if a transitionEnd occurs after a drag ends
+    if (!isMovementAllowed(state)) {
+      console.warn('TODO: remove this - dropping max window scroll update');
+      return state;
+    }
 
     const maxScroll: Position = action.payload.maxScroll;
+
+    if (isEqual(maxScroll, state.viewport.scroll.max)) {
+      return state;
+    }
+
     const withMaxScroll: Viewport = {
       ...state.viewport,
       scroll: {

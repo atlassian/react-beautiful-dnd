@@ -19,6 +19,7 @@ import {
   moveLeft,
   drop,
   dropAnimationFinished,
+  updateViewportMaxScroll,
 } from '../../state/action-creators';
 import type { DragHandleProps } from '../drag-handle/drag-handle-types';
 
@@ -105,6 +106,7 @@ export type DispatchProps = {|
   moveLeft: typeof moveLeft,
   drop: typeof drop,
   dropAnimationFinished: typeof dropAnimationFinished,
+  updateViewportMaxScroll: typeof updateViewportMaxScroll,
 |};
 
 export type DraggingMapProps = {|

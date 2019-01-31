@@ -37,6 +37,7 @@ import getWindowScroll from '../window/get-window-scroll';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import checkOwnProps from './check-own-props';
 import AnimateInOut from '../animate-in-out/animate-in-out';
+import getMaxWindowScroll from '../window/get-max-window-scroll';
 
 export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
@@ -288,6 +289,11 @@ export default class Draggable extends Component<Props> {
     }),
   );
 
+  onPlaceholderTransitionEnd = () => {
+    // A placeholder change can impact the window's max scroll
+    this.props.updateViewportMaxScroll({ maxScroll: getMaxWindowScroll() });
+  };
+
   renderChildren = (dragHandleProps: ?DragHandleProps): Node => {
     const dragging: ?DraggingMapProps = this.props.dragging;
     const secondary: ?SecondaryMapProps = this.props.secondary;
@@ -312,6 +318,7 @@ export default class Draggable extends Component<Props> {
                 animate={animate}
                 placeholder={(data: any)}
                 onClose={onClose}
+                onTransitionEnd={this.onPlaceholderTransitionEnd}
               />
             )
           }

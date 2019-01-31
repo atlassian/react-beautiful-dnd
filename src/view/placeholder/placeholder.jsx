@@ -14,6 +14,7 @@ type Props = {|
   onClose: () => void,
   innerRef?: () => ?HTMLElement,
   shouldDelayTransition: boolean,
+  onTransitionEnd: () => void,
 |};
 
 type Size = {|
@@ -105,6 +106,8 @@ export default class Placeholder extends PureComponent<Props, State> {
 
   onTransitionEnd = () => {
     console.log('PLACEHOLDER ANIMATION FINISHED');
+    this.props.onTransitionEnd();
+
     if (this.props.animate === 'close') {
       console.log('CLOSED');
       this.props.onClose();

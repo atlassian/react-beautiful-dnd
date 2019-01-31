@@ -3,11 +3,6 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
-import { storeKey } from '../context-keys';
-import Droppable from './droppable';
-import isStrictEqual from '../is-strict-equal';
-import shouldUsePlaceholder from '../../state/droppable/should-use-placeholder';
-import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import type {
   State,
   DroppableId,
@@ -21,7 +16,14 @@ import type {
   OwnProps,
   DefaultProps,
   Selector,
+  DispatchProps,
 } from './droppable-types';
+import { storeKey } from '../context-keys';
+import Droppable from './droppable';
+import isStrictEqual from '../is-strict-equal';
+import shouldUsePlaceholder from '../../state/droppable/should-use-placeholder';
+import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
+import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../state/action-creators';
 
 const defaultMapProps: MapProps = {
   isDraggingOver: false,
@@ -90,6 +92,10 @@ export const makeMapStateToProps = (): Selector => {
   return selector;
 };
 
+const mapDispatchToProps: DispatchProps = {
+  updateViewportMaxScroll: updateViewportMaxScrollAction,
+};
+
 const defaultProps = ({
   type: 'DEFAULT',
   direction: 'vertical',
@@ -114,7 +120,7 @@ const ConnectedDroppable: typeof DroppableType = (connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
   // no dispatch props for droppable
-  null,
+  mapDispatchToProps,
   // mergeProps - using default
   null,
   {
@@ -127,7 +133,6 @@ const ConnectedDroppable: typeof DroppableType = (connect(
     // When pure, compares the result of mapStateToProps to its previous value.
     // Default value: shallowEqual
     // Switching to a strictEqual as we return a memoized object on changes
-    // $FlowFixMe - incorrect type signature
     areStatePropsEqual: isStrictEqual,
   },
 ): any)(Droppable);
