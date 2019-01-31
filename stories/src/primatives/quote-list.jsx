@@ -37,7 +37,7 @@ const DropZone = styled.div`
     not relying on the items for a margin-bottom
     as it will collapse when the list is empty
   */
-  margin-bottom: ${grid}px;
+  padding-bottom: ${grid}px;
 `;
 
 const ScrollContainer = styled.div`

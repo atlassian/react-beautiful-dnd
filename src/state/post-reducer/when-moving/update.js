@@ -99,7 +99,10 @@ export default ({
       previousImpact: state.impact,
       viewport,
       userDirection,
+      startingDisplacementMap: state.startingDisplacementMap,
     });
+
+  console.log('displaced', newImpact.movement.displaced);
 
   const withUpdatedPlaceholders: DimensionMap = getDimensionMapWithPlaceholder({
     draggable,

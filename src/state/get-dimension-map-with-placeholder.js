@@ -3,7 +3,6 @@ import {
   addPlaceholder,
   removePlaceholder,
 } from './droppable/with-placeholder';
-import shouldUsePlaceholder from './droppable/should-use-placeholder';
 import whatIsDraggedOver from './droppable/what-is-dragged-over';
 import type {
   DroppableDimension,
@@ -67,10 +66,8 @@ export default ({
     dimensions,
   });
 
-  const usePlaceholder: boolean = shouldUsePlaceholder(
-    draggable.descriptor,
-    impact,
-  );
+  const usePlaceholder: boolean =
+    whatIsDraggedOver(impact) === draggable.descriptor.droppableId;
 
   if (!usePlaceholder) {
     return base;

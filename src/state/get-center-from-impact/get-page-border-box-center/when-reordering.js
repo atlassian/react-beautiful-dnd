@@ -6,16 +6,17 @@ import type {
   DraggableDimensionMap,
   DragMovement,
   DroppableDimension,
+  DisplacementMap,
 } from '../../../types';
 import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
-import isHomeOf from '../../droppable/is-home-of';
 
 type NewHomeArgs = {|
   movement: DragMovement,
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
   droppable: DroppableDimension,
+  startingDisplacementMap: DisplacementMap,
 |};
 
 // Returns the client offset required to move an item from its
@@ -25,6 +26,7 @@ export default ({
   draggable,
   draggables,
   droppable,
+  startingDisplacementMap,
 }: NewHomeArgs): Position => {
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable.descriptor.id,
@@ -45,24 +47,17 @@ export default ({
 
   const { displaced, displacedBy } = movement;
 
-  const isOverHome: boolean = isHomeOf(draggable, droppable);
-
   // there can be no displaced if:
-  // - you are in the home index or
-  // - in the last position of a foreign droppable
+  // - in the last position of a droppable
   const closest: ?DraggableDimension = displaced.length
     ? draggables[displaced[0].draggableId]
     : null;
 
   if (!closest) {
-    // moving back into home index
-    if (isOverHome) {
-      return draggable.page.borderBox.center;
-    }
-
-    // this can happen when moving into the last spot of a foreign list
+    // this can happen when moving into the last spot of a list
     const moveRelativeTo: DraggableDimension =
       insideDestination[insideDestination.length - 1];
+    console.log('moveRelativeTo', moveRelativeTo.descriptor.id);
     return goAfter({
       axis,
       moveRelativeTo: moveRelativeTo.page,
@@ -74,6 +69,7 @@ export default ({
 
   // go before and item that is displaced forward
   // if (willDisplaceForward) {
+  console.log('droppable before', closest.descriptor.id);
   return goBefore({
     axis,
     moveRelativeTo: displacedClosest,

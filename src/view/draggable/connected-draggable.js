@@ -19,7 +19,6 @@ import {
   drop as dropAction,
   dropAnimationFinished as dropAnimationFinishedAction,
   moveByWindowScroll as moveByWindowScrollAction,
-  updateViewportMaxScroll as updateViewportMaxScrollAction,
 } from '../../state/action-creators';
 import type {
   State,
@@ -258,7 +257,6 @@ const mapDispatchToProps: DispatchProps = {
   moveByWindowScroll: moveByWindowScrollAction,
   drop: dropAction,
   dropAnimationFinished: dropAnimationFinishedAction,
-  updateViewportMaxScroll: updateViewportMaxScrollAction,
 };
 
 const defaultProps = ({

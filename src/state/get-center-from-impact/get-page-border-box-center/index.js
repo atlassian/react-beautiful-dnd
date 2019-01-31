@@ -7,6 +7,7 @@ import type {
   DraggableDimensionMap,
   CombineImpact,
   DraggableLocation,
+  DisplacementMap,
 } from '../../../types';
 import whenCombining from './when-combining';
 import whenReordering from './when-reordering';
@@ -14,6 +15,7 @@ import withDroppableDisplacement from '../../with-scroll-change/with-droppable-d
 
 type Args = {|
   impact: DragImpact,
+  startingDisplacementMap: DisplacementMap,
   draggable: DraggableDimension,
   droppable: ?DroppableDimension,
   draggables: DraggableDimensionMap,
@@ -24,6 +26,7 @@ const getResultWithoutDroppableDisplacement = ({
   draggable,
   droppable,
   draggables,
+  startingDisplacementMap,
 }: Args): Position => {
   const merge: ?CombineImpact = impact.merge;
   const destination: ?DraggableLocation = impact.destination;
@@ -40,6 +43,7 @@ const getResultWithoutDroppableDisplacement = ({
       draggable,
       draggables,
       droppable,
+      startingDisplacementMap,
     });
   }
 

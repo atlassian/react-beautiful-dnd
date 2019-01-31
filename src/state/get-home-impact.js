@@ -40,7 +40,7 @@ export default ({
   );
 
   const displaced: Displacement[] = insideHome
-    .slice(draggable.descriptor.index)
+    .slice(draggable.descriptor.index + 1)
     .map(
       (dimension: DraggableDimension): Displacement =>
         getDisplacement({
@@ -52,6 +52,8 @@ export default ({
           isAnimationEnabled: false,
         }),
     );
+
+  console.log('displaced', displaced);
 
   const movement: DragMovement = {
     displaced,

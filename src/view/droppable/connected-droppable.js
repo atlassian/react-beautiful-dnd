@@ -21,7 +21,6 @@ import type {
 import { storeKey } from '../context-keys';
 import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
-import shouldUsePlaceholder from '../../state/droppable/should-use-placeholder';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../state/action-creators';
 
@@ -34,37 +33,28 @@ const defaultMapProps: MapProps = {
 // Returning a function to ensure each
 // Droppable gets its own selector
 export const makeMapStateToProps = (): Selector => {
-  const getMapProps = memoizeOne(
-    (
-      isDraggingOver: boolean,
-      draggingOverWith: ?DraggableId,
-      placeholder: ?Placeholder,
-    ): MapProps => ({
-      isDraggingOver,
+  const getDraggingOverMapProps = memoizeOne(
+    (draggingOverWith: ?DraggableId, placeholder: ?Placeholder): MapProps => ({
+      isDraggingOver: true,
       draggingOverWith,
       placeholder,
     }),
   );
 
-  const getDraggingOverProps = (
+  const getMapProps = (
     id: DroppableId,
     draggable: DraggableDimension,
     impact: DragImpact,
-  ) => {
+  ): MapProps => {
     const isOver: boolean = whatIsDraggedOver(impact) === id;
     if (!isOver) {
       return defaultMapProps;
     }
 
-    const usePlaceholder: boolean = shouldUsePlaceholder(
-      draggable.descriptor,
-      impact,
+    return getDraggingOverMapProps(
+      draggable.descriptor.id,
+      draggable.placeholder,
     );
-    const placeholder: ?Placeholder = usePlaceholder
-      ? draggable.placeholder
-      : null;
-
-    return getMapProps(true, draggable.descriptor.id, placeholder);
   };
 
   const selector = (state: State, ownProps: OwnProps): MapProps => {
@@ -77,13 +67,13 @@ export const makeMapStateToProps = (): Selector => {
     if (state.isDragging) {
       const draggable: DraggableDimension =
         state.dimensions.draggables[state.critical.draggable.id];
-      return getDraggingOverProps(id, draggable, state.impact);
+      return getMapProps(id, draggable, state.impact);
     }
 
     if (state.phase === 'DROP_ANIMATING') {
       const draggable: DraggableDimension =
         state.dimensions.draggables[state.pending.result.draggableId];
-      return getDraggingOverProps(id, draggable, state.pending.impact);
+      return getMapProps(id, draggable, state.pending.impact);
     }
 
     return defaultMapProps;
