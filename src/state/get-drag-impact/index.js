@@ -18,6 +18,7 @@ import noImpact from '../no-impact';
 import withDroppableScroll from '../with-scroll-change/with-droppable-scroll';
 import isHomeOf from '../droppable/is-home-of';
 import getCombineImpact from './get-combine-impact';
+import getReorderImpact from './get-reorder-impact';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -50,8 +51,6 @@ export default ({
   }
 
   const destination: DroppableDimension = droppables[destinationId];
-
-  const isWithinHomeDroppable: boolean = isHomeOf(draggable, destination);
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     destination.descriptor.id,
     draggables,
@@ -76,23 +75,13 @@ export default ({
     return withMerge;
   }
 
-  return isWithinHomeDroppable
-    ? inHomeList({
-        pageBorderBoxCenterWithDroppableScrollChange,
-        draggable,
-        home: destination,
-        insideHome: insideDestination,
-        previousImpact,
-        viewport,
-        userDirection,
-      })
-    : inForeignList({
-        pageBorderBoxCenterWithDroppableScrollChange,
-        draggable,
-        destination,
-        insideDestination,
-        previousImpact,
-        viewport,
-        userDirection,
-      });
+  return getReorderImpact({
+    pageBorderBoxCenterWithDroppableScrollChange,
+    draggable,
+    destination,
+    insideDestination,
+    previousImpact,
+    viewport,
+    userDirection,
+  });
 };

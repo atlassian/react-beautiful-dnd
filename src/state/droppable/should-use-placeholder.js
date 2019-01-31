@@ -11,5 +11,6 @@ export default (
   if (!isOver) {
     return false;
   }
-  return isOver !== descriptor.droppableId;
+  return true;
+  // return isOver !== descriptor.droppableId;
 };

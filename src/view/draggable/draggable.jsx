@@ -1,5 +1,5 @@
 // @flow
-import React, { Component, Fragment, type Node } from 'react';
+import React, { type Node } from 'react';
 import { type Position, type BoxModel } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
@@ -10,7 +10,6 @@ import type {
   DroppableId,
   MovementMode,
   TypeId,
-  Placeholder as PlaceholderType,
 } from '../../types';
 import DraggableDimensionPublisher from '../draggable-dimension-publisher';
 import DragHandle from '../drag-handle';
@@ -18,7 +17,6 @@ import type {
   DragHandleProps,
   Callbacks as DragHandleCallbacks,
 } from '../drag-handle/drag-handle-types';
-import Placeholder from '../placeholder';
 import { droppableIdKey, styleKey, droppableTypeKey } from '../context-keys';
 import * as timings from '../../debug/timings';
 import type {
@@ -36,8 +34,6 @@ import type {
 import getWindowScroll from '../window/get-window-scroll';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import checkOwnProps from './check-own-props';
-import AnimateInOut from '../animate-in-out/animate-in-out';
-import getMaxWindowScroll from '../window/get-max-window-scroll';
 
 export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
@@ -76,7 +72,7 @@ const getShouldDraggingAnimate = (dragging: DraggingMapProps): boolean => {
   return dragging.mode === 'SNAP';
 };
 
-export default class Draggable extends Component<Props> {
+export default class Draggable extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks;
   styleContext: string;
@@ -289,47 +285,15 @@ export default class Draggable extends Component<Props> {
     }),
   );
 
-  onPlaceholderTransitionEnd = () => {
-    // A placeholder change can impact the window's max scroll
-    this.props.updateViewportMaxScroll({ maxScroll: getMaxWindowScroll() });
-  };
-
-  renderChildren = (dragHandleProps: ?DragHandleProps): Node => {
+  renderChildren = (dragHandleProps: ?DragHandleProps): Node | null => {
     const dragging: ?DraggingMapProps = this.props.dragging;
     const secondary: ?SecondaryMapProps = this.props.secondary;
     const children: ChildrenFn = this.props.children;
 
     if (dragging) {
-      const child: ?Node = children(
+      return children(
         this.getDraggingProvided(dragging, dragHandleProps),
         this.getDraggingSnapshot(dragging),
-      );
-
-      const placeholder: ?PlaceholderType = dragging.placeholder;
-      const shouldAnimate: boolean = dragging.shouldAnimatePlaceholder;
-      console.info('DRAGGABLE: render placeholder');
-
-      const sibling: Node = (
-        <AnimateInOut on={placeholder} shouldAnimate={shouldAnimate}>
-          {({ isVisible, data, onClose, animate }) =>
-            isVisible && (
-              <Placeholder
-                shouldDelayTransition
-                animate={animate}
-                placeholder={(data: any)}
-                onClose={onClose}
-                onTransitionEnd={this.onPlaceholderTransitionEnd}
-              />
-            )
-          }
-        </AnimateInOut>
-      );
-
-      return (
-        <Fragment>
-          {child}
-          {sibling}
-        </Fragment>
       );
     }
 
@@ -338,13 +302,10 @@ export default class Draggable extends Component<Props> {
       'If no DraggingMapProps are provided, then SecondaryMapProps are required',
     );
 
-    const child: ?Node = children(
+    return children(
       this.getSecondaryProvided(secondary, dragHandleProps),
       this.getSecondarySnapshot(secondary),
     );
-
-    // still wrapping in fragment to avoid reparenting
-    return <Fragment>{child}</Fragment>;
   };
 
   render() {

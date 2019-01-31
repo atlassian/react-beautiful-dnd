@@ -43,7 +43,7 @@ export default ({
     });
   }
 
-  const { displaced, willDisplaceForward, displacedBy } = movement;
+  const { displaced, displacedBy } = movement;
 
   const isOverHome: boolean = isHomeOf(draggable, droppable);
 
@@ -73,18 +73,18 @@ export default ({
   const displacedClosest: BoxModel = offset(closest.page, displacedBy.point);
 
   // go before and item that is displaced forward
-  if (willDisplaceForward) {
-    return goBefore({
-      axis,
-      moveRelativeTo: displacedClosest,
-      isMoving: draggablePage,
-    });
-  }
-
-  // go after an item that is displaced backwards
-  return goAfter({
+  // if (willDisplaceForward) {
+  return goBefore({
     axis,
     moveRelativeTo: displacedClosest,
     isMoving: draggablePage,
   });
+  // }
+
+  // go after an item that is displaced backwards
+  // return goAfter({
+  //   axis,
+  //   moveRelativeTo: displacedClosest,
+  //   isMoving: draggablePage,
+  // });
 };

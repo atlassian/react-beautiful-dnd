@@ -7,7 +7,6 @@ import type {
   DraggableDimension,
   State,
   MovementMode,
-  Placeholder,
 } from '../../types';
 import {
   lift,
@@ -112,8 +111,6 @@ export type DispatchProps = {|
 export type DraggingMapProps = {|
   offset: Position,
   mode: MovementMode,
-  placeholder: ?Placeholder,
-  shouldAnimatePlaceholder: boolean,
   dropping: ?DropAnimation,
   dimension: DraggableDimension,
   draggingOver: ?DroppableId,
@@ -134,7 +131,7 @@ export type MapProps = {|
   secondary: ?SecondaryMapProps,
 |};
 
-export type ChildrenFn = (Provided, StateSnapshot) => Node;
+export type ChildrenFn = (Provided, StateSnapshot) => Node | null;
 
 export type DefaultProps = {|
   isDragDisabled: boolean,

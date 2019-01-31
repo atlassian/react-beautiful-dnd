@@ -17,12 +17,13 @@ import type {
   DropPendingState,
   Viewport,
   DropReason,
+  DragImpact,
 } from '../types';
 import type { Action } from './store-types';
 import type { PublicResult as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
 import scrollDroppable from './droppable/scroll-droppable';
 import publishWhileDragging from './publish-while-dragging';
-import moveInDirection from './move-in-direction';
+// import moveInDirection from './move-in-direction';
 import { add, isEqual, origin } from './position';
 import scrollViewport from './scroll-viewport';
 import getHomeImpact from './get-home-impact';
@@ -101,6 +102,13 @@ export default (state: State = idle, action: Action): State => {
       dimensions.droppables,
     ).every((item: DroppableDimension) => !item.isFixedOnPage);
 
+    const impact: DragImpact = getHomeImpact({
+      draggable,
+      home,
+      draggables: dimensions.draggables,
+      viewport,
+    });
+
     const result: DraggingState = {
       phase: 'DRAGGING',
       isDragging: true,
@@ -110,9 +118,11 @@ export default (state: State = idle, action: Action): State => {
       initial,
       current: initial,
       isWindowScrollAllowed,
-      impact: getHomeImpact(draggable, home),
-      // only will animate draggable placeholder after a foreign list has been dragged over
-      shouldAnimateDraggablePlaceholder: false,
+      impact,
+      // only will animate home placeholder after
+      // a foreign list has been dragged over
+      // TODO: can this be a one time flag that is swapped after first render?
+      shouldAnimateHomePlaceholder: false,
       viewport,
       userDirection: forward,
       scrollJumpRequest: null,
@@ -413,8 +423,7 @@ export default (state: State = idle, action: Action): State => {
     const result: DropAnimatingState = {
       phase: 'DROP_ANIMATING',
       pending,
-      shouldAnimateDraggablePlaceholder:
-        state.shouldAnimateDraggablePlaceholder,
+      shouldAnimateHomePlaceholder: state.shouldAnimateHomePlaceholder,
       dimensions: state.dimensions,
     };
 

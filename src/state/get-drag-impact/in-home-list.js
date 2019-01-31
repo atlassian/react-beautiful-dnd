@@ -72,7 +72,6 @@ export default ({
   const displacedBy: DisplacedBy = getDisplacedBy(
     home.axis,
     draggable.displaceBy,
-    willDisplaceForward,
   );
   const displacement: number = displacedBy.value;
 

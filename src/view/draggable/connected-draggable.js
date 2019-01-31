@@ -33,7 +33,6 @@ import type {
   DragImpact,
   DisplacementMap,
   MovementMode,
-  Placeholder,
 } from '../../types';
 import type {
   MapProps,
@@ -58,19 +57,6 @@ const defaultMapProps: MapProps = {
     shouldAnimateDisplacement: true,
   },
   dragging: null,
-};
-
-const getPlaceholder = (
-  draggable: DraggableDimension,
-  draggingOver: ?DroppableId,
-): ?Placeholder => {
-  // Show the Draggable placeholder when:
-  // 1. over the home droppable OR
-  // 2. when not over any droppable
-  const shouldShow: boolean =
-    draggingOver === draggable.descriptor.droppableId || draggingOver === null;
-
-  return shouldShow ? draggable.placeholder : null;
 };
 
 // Returning a function to ensure each
@@ -104,8 +90,6 @@ export const makeMapStateToProps = (): Selector => {
       draggingOver: ?DroppableId,
       // the id of a draggable you are grouping with
       combineWith: ?DraggableId,
-      placeholder: ?Placeholder,
-      shouldAnimatePlaceholder: boolean,
       forceShouldAnimate: ?boolean,
     ): MapProps => ({
       dragging: {
@@ -115,8 +99,6 @@ export const makeMapStateToProps = (): Selector => {
         dimension,
         draggingOver,
         combineWith,
-        placeholder,
-        shouldAnimatePlaceholder,
         forceShouldAnimate,
       },
       secondary: null,
@@ -176,8 +158,6 @@ export const makeMapStateToProps = (): Selector => {
       const mode: MovementMode = state.movementMode;
       const draggingOver: ?DroppableId = whatIsDraggedOver(state.impact);
       const combineWith: ?DraggableId = getCombineWith(state.impact);
-      const shouldAnimatePlaceholder: boolean =
-        state.shouldAnimateDraggablePlaceholder;
       const forceShouldAnimate: ?boolean = state.forceShouldAnimate;
 
       return getDraggingProps(
@@ -186,8 +166,6 @@ export const makeMapStateToProps = (): Selector => {
         dimension,
         draggingOver,
         combineWith,
-        getPlaceholder(dimension, draggingOver),
-        shouldAnimatePlaceholder,
         forceShouldAnimate,
       );
     }
@@ -205,20 +183,15 @@ export const makeMapStateToProps = (): Selector => {
       const combineWith: ?DraggableId = getCombineWith(pending.impact);
       const duration: number = pending.dropDuration;
       const mode: MovementMode = pending.result.mode;
-      const placeholder: ?Placeholder = getPlaceholder(dimension, draggingOver);
-      const shouldAnimatePlaceholder: boolean =
-        state.shouldAnimateDraggablePlaceholder;
 
       // not memoized as it is the only execution
       return {
         dragging: {
           offset: pending.newHomeClientOffset,
           dimension,
-          placeholder,
           draggingOver,
           combineWith,
           mode,
-          shouldAnimatePlaceholder,
           forceShouldAnimate: null,
           dropping: {
             duration,
