@@ -119,7 +119,8 @@ export default (state: State = idle, action: Action): State => {
       current: initial,
       isWindowScrollAllowed,
       impact,
-      startingDisplacementMap: impact.movement.map,
+      displacedToBeInOriginalSpot: impact.movement.map,
+      originalImpact: impact,
       // only will animate home placeholder after
       // a foreign list has been dragged over
       // TODO: can this be a one time flag that is swapped after first render?

@@ -10,13 +10,14 @@ import type {
 } from '../../../types';
 import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
+import { negate } from '../../position';
 
 type NewHomeArgs = {|
   movement: DragMovement,
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
   droppable: DroppableDimension,
-  startingDisplacementMap: DisplacementMap,
+  displacedToBeInOriginalSpot: DisplacementMap,
 |};
 
 // Returns the client offset required to move an item from its
@@ -26,7 +27,7 @@ export default ({
   draggable,
   draggables,
   droppable,
-  startingDisplacementMap,
+  displacedToBeInOriginalSpot,
 }: NewHomeArgs): Position => {
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable.descriptor.id,
@@ -47,40 +48,71 @@ export default ({
 
   const { displaced, displacedBy } = movement;
 
-  // there can be no displaced if:
-  // - in the last position of a droppable
-  const closest: ?DraggableDimension = displaced.length
-    ? draggables[displaced[0].draggableId]
-    : null;
+  // go before the first displaced item
+  // items can only be displaced forwards
+  if (displaced.length) {
+    const closestAfter: DraggableDimension =
+      draggables[displaced[0].draggableId];
+    // want to go before where it would be with the displacement
 
-  if (!closest) {
-    // this can happen when moving into the last spot of a list
-    const moveRelativeTo: DraggableDimension =
-      insideDestination[insideDestination.length - 1];
-    console.log('moveRelativeTo', moveRelativeTo.descriptor.id);
-    return goAfter({
+    const didStartDisplaced: boolean = Boolean(
+      displacedToBeInOriginalSpot[closestAfter.descriptor.id],
+    );
+
+    // target already in resting spot
+    if (didStartDisplaced) {
+      return goBefore({
+        axis,
+        moveRelativeTo: closestAfter.page,
+        isMoving: draggablePage,
+      });
+    }
+
+    const withDisplacement: BoxModel = offset(
+      closestAfter.page,
+      displacedBy.point,
+    );
+
+    return goBefore({
       axis,
-      moveRelativeTo: moveRelativeTo.page,
+      moveRelativeTo: withDisplacement,
       isMoving: draggablePage,
     });
   }
 
-  const displacedClosest: BoxModel = offset(closest.page, displacedBy.point);
+  // The closest before is not displaced. We want to go after it
+  const closestBefore: DraggableDimension =
+    insideDestination[insideDestination.length - 1];
 
-  // go before and item that is displaced forward
-  // if (willDisplaceForward) {
-  console.log('droppable before', closest.descriptor.id);
-  return goBefore({
+  // we can just go into our original position
+  if (closestBefore.descriptor.id === draggable.descriptor.id) {
+    return draggablePage.borderBox.center;
+  }
+
+  // we need to go after the closest before
+
+  const didStartDisplaced: boolean = Boolean(
+    displacedToBeInOriginalSpot[closestBefore.descriptor.id],
+  );
+
+  if (didStartDisplaced) {
+    // now the item is not displaced, it will not be sitting in it's original spot
+    // we need to remove the displacement to get the target to its original spot
+    const page: BoxModel = offset(
+      closestBefore.page,
+      negate(displacedBy.point),
+    );
+    return goAfter({
+      axis,
+      moveRelativeTo: page,
+      isMoving: draggablePage,
+    });
+  }
+
+  // item is in its resting spot. we can go straight after it
+  return goAfter({
     axis,
-    moveRelativeTo: displacedClosest,
+    moveRelativeTo: closestBefore.page,
     isMoving: draggablePage,
   });
-  // }
-
-  // go after an item that is displaced backwards
-  // return goAfter({
-  //   axis,
-  //   moveRelativeTo: displacedClosest,
-  //   isMoving: draggablePage,
-  // });
 };

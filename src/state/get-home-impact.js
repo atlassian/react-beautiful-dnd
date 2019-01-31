@@ -48,8 +48,7 @@ export default ({
           destination: home,
           previousImpact: noImpact,
           viewport: viewport.frame,
-          // disabling animation of secondary items on initial lift
-          isAnimationEnabled: false,
+          forceShouldAnimate: false,
         }),
     );
 

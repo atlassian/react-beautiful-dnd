@@ -14,6 +14,7 @@ type RecomputeArgs = {|
   destination: DroppableDimension,
   viewport: Viewport,
   draggables: DraggableDimensionMap,
+  forceShouldAnimate?: boolean,
 |};
 
 export default ({
@@ -21,6 +22,7 @@ export default ({
   viewport,
   destination,
   draggables,
+  forceShouldAnimate,
 }: RecomputeArgs): DragImpact => {
   const updated: Displacement[] = impact.movement.displaced.map(
     (entry: Displacement) =>
@@ -29,6 +31,7 @@ export default ({
         destination,
         previousImpact: impact,
         viewport: viewport.frame,
+        forceShouldAnimate,
       }),
   );
 

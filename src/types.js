@@ -306,7 +306,10 @@ export type DraggingState = {|
   impact: DragImpact,
   viewport: Viewport,
   shouldAnimateHomePlaceholder: boolean,
-  startingDisplacementMap: DisplacementMap,
+  // These are the items that are immediately displaced as the drag starts
+  // to account for the collapsing of the draggable
+  displacedToBeInOriginalSpot: DisplacementMap,
+  originalImpact: DragImpact,
   // when there is a fixed list we want to opt out of this behaviour
   isWindowScrollAllowed: boolean,
   // if we need to jump the scroll (keyboard dragging)

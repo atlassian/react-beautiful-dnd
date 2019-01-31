@@ -1,11 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import { animateDrop, completeDrop, dropPending } from '../../action-creators';
-import noImpact from '../../no-impact';
-import { isEqual } from '../../position';
-import getDropDuration from './get-drop-duration';
-import getNewHomeClientOffset from './get-new-home-client-offset';
 import type {
   State,
   DropReason,
@@ -19,6 +14,11 @@ import type {
   DraggableDimension,
 } from '../../../types';
 import type { MiddlewareStore, Dispatch, Action } from '../../store-types';
+import { animateDrop, completeDrop, dropPending } from '../../action-creators';
+import { isEqual } from '../../position';
+import getDropDuration from './get-drop-duration';
+import getNewHomeClientOffset from './get-new-home-client-offset';
+import getDropImpact from './get-drop-impact';
 
 export default ({ getState, dispatch }: MiddlewareStore) => (
   next: Dispatch,
@@ -62,7 +62,17 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   const dimensions: DimensionMap = state.dimensions;
   // Only keeping impact when doing a user drop - otherwise we are cancelling
 
-  const impact: DragImpact = reason === 'DROP' ? state.impact : noImpact;
+  const impact: DragImpact = getDropImpact({
+    reason,
+    lastImpact: state.impact,
+    originalImpact: state.originalImpact,
+    home: state.dimensions.droppables[state.critical.droppable.id],
+    viewport: state.viewport,
+    draggables: state.dimensions.draggables,
+  });
+
+  console.log('impact', impact);
+
   const draggable: DraggableDimension =
     dimensions.draggables[state.critical.draggable.id];
   const destination: ?DraggableLocation = impact ? impact.destination : null;
@@ -73,6 +83,8 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     index: critical.draggable.index,
     droppableId: critical.droppable.id,
   };
+
+  console.warn('source', source);
 
   const result: DropResult = {
     draggableId: draggable.descriptor.id,
@@ -89,6 +101,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     draggable,
     dimensions,
     viewport: state.viewport,
+    displacedToBeInOriginalSpot: state.displacedToBeInOriginalSpot,
   });
 
   // Do not animate if you do not need to.

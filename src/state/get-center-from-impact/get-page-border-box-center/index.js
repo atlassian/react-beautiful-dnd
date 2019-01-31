@@ -15,7 +15,7 @@ import withDroppableDisplacement from '../../with-scroll-change/with-droppable-d
 
 type Args = {|
   impact: DragImpact,
-  startingDisplacementMap: DisplacementMap,
+  displacedToBeInOriginalSpot: DisplacementMap,
   draggable: DraggableDimension,
   droppable: ?DroppableDimension,
   draggables: DraggableDimensionMap,
@@ -26,7 +26,7 @@ const getResultWithoutDroppableDisplacement = ({
   draggable,
   droppable,
   draggables,
-  startingDisplacementMap,
+  displacedToBeInOriginalSpot,
 }: Args): Position => {
   const merge: ?CombineImpact = impact.merge;
   const destination: ?DraggableLocation = impact.destination;
@@ -43,7 +43,7 @@ const getResultWithoutDroppableDisplacement = ({
       draggable,
       draggables,
       droppable,
-      startingDisplacementMap,
+      displacedToBeInOriginalSpot,
     });
   }
 

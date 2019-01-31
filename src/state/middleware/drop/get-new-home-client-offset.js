@@ -7,6 +7,7 @@ import type {
   DimensionMap,
   DraggableDimension,
   DroppableId,
+  DisplacementMap,
 } from '../../../types';
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import { subtract } from '../../position';
@@ -17,6 +18,7 @@ type Args = {|
   draggable: DraggableDimension,
   dimensions: DimensionMap,
   viewport: Viewport,
+  displacedToBeInOriginalSpot: DisplacementMap,
 |};
 
 export default ({
@@ -24,6 +26,7 @@ export default ({
   draggable,
   dimensions,
   viewport,
+  displacedToBeInOriginalSpot,
 }: Args): Position => {
   const { draggables, droppables } = dimensions;
   const droppableId: ?DroppableId = whatIsDraggedOver(impact);
@@ -37,6 +40,7 @@ export default ({
     draggable,
     draggables,
     // if there is no destination, then we will be dropping back into the home
+    displacedToBeInOriginalSpot,
     droppable: destination || home,
     viewport,
   });

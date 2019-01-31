@@ -99,7 +99,7 @@ export default ({
       previousImpact: state.impact,
       viewport,
       userDirection,
-      startingDisplacementMap: state.startingDisplacementMap,
+      displacedToBeInOriginalSpot: state.displacedToBeInOriginalSpot,
     });
 
   console.log('displaced', newImpact.movement.displaced);

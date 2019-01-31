@@ -15,17 +15,17 @@ type Args = {|
   destination: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Rect,
-  isAnimationEnabled?: boolean,
+  forceShouldAnimate?: boolean,
 |};
 
 const getShouldAnimate = (
-  isAnimationEnabled: boolean,
+  forceShouldAnimate: ?boolean,
   isVisible: boolean,
   previous: ?Displacement,
 ) => {
-  // animation is not enabled
-  if (!isAnimationEnabled) {
-    return false;
+  // Use a forced value if provided
+  if (typeof forceShouldAnimate === 'boolean') {
+    return forceShouldAnimate;
   }
 
   // if should be displaced and not visible
@@ -53,7 +53,7 @@ export default ({
   destination,
   previousImpact,
   viewport,
-  isAnimationEnabled = true,
+  forceShouldAnimate,
 }: Args): Displacement => {
   const id: DraggableId = draggable.descriptor.id;
   const map: DisplacementMap = previousImpact.movement.map;
@@ -68,7 +68,7 @@ export default ({
   });
 
   const shouldAnimate: boolean = getShouldAnimate(
-    isAnimationEnabled,
+    forceShouldAnimate,
     isVisible,
     map[id],
   );

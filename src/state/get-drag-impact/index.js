@@ -27,7 +27,7 @@ type Args = {|
   previousImpact: DragImpact,
   viewport: Viewport,
   userDirection: UserDirection,
-  startingDisplacementMap: DisplacementMap,
+  displacedToBeInOriginalSpot: DisplacementMap,
 |};
 
 export default ({
@@ -38,7 +38,7 @@ export default ({
   previousImpact,
   viewport,
   userDirection,
-  startingDisplacementMap,
+  displacedToBeInOriginalSpot,
 }: Args): DragImpact => {
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
@@ -83,6 +83,6 @@ export default ({
     previousImpact,
     viewport,
     userDirection,
-    startingDisplacementMap,
+    displacedToBeInOriginalSpot,
   });
 };

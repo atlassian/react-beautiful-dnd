@@ -27,7 +27,7 @@ type Args = {|
   previousImpact: DragImpact,
   viewport: Viewport,
   userDirection: UserDirection,
-  startingDisplacementMap: DisplacementMap,
+  displacedToBeInOriginalSpot: DisplacementMap,
 |};
 
 export default ({
@@ -38,7 +38,7 @@ export default ({
   previousImpact,
   viewport,
   userDirection,
-  startingDisplacementMap,
+  displacedToBeInOriginalSpot,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const isMovingForward: boolean = isUserMovingForward(
@@ -64,7 +64,7 @@ export default ({
 
         // did this item start displaced when the drag started?
         const didStartDisplaced: boolean = Boolean(
-          startingDisplacementMap[child.descriptor.id],
+          displacedToBeInOriginalSpot[child.descriptor.id],
         );
 
         const borderBox: Spacing = didStartDisplaced
@@ -94,7 +94,15 @@ export default ({
         }),
     );
 
-  const newIndex: number = insideDestination.length - displaced.length;
+  const newIndex: number = (() => {
+    const base: number = insideDestination.length - displaced.length;
+
+    const isInHome: boolean =
+      draggable.descriptor.droppableId === destination.descriptor.id;
+
+    return isInHome ? base - 1 : base;
+  })();
+  console.log('NEW INDEX', newIndex);
 
   const movement: DragMovement = {
     displacedBy,
