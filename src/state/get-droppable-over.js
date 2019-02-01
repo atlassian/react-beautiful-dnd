@@ -24,6 +24,8 @@ export default ({ target, droppables }: Args): ?DroppableId => {
       }
 
       const active: ?Rect = droppable.subject.active;
+      console.log('active', active);
+      console.log('target', target);
 
       if (!active) {
         return false;

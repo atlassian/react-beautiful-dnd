@@ -66,18 +66,19 @@ export default ({
     dimensions,
   });
 
-  const usePlaceholder: boolean =
-    whatIsDraggedOver(impact) === draggable.descriptor.droppableId;
+  const isOver: ?DroppableId = whatIsDraggedOver(impact);
 
-  if (!usePlaceholder) {
+  if (!isOver) {
     return base;
   }
 
-  const droppableId: ?DroppableId = whatIsDraggedOver(impact);
-  if (!droppableId) {
+  // no need to add additional space to home droppable
+  if (isOver === draggable.descriptor.droppableId) {
+    // TODO: need to actually remove placeholder space!?
     return base;
   }
-  const droppable: DroppableDimension = base.droppables[droppableId];
+
+  const droppable: DroppableDimension = base.droppables[isOver];
 
   // already have a placeholder - nothing to do here!
   if (droppable.subject.withPlaceholder) {

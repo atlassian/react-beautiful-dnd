@@ -1,25 +1,25 @@
 {
   "dist/react-beautiful-dnd.js": {
-    "bundled": 347275,
-    "minified": 134225,
-    "gzipped": 39798
+    "bundled": 338693,
+    "minified": 131633,
+    "gzipped": 39280
   },
   "dist/react-beautiful-dnd.min.js": {
-    "bundled": 295057,
-    "minified": 109593,
-    "gzipped": 31944
+    "bundled": 286382,
+    "minified": 106934,
+    "gzipped": 31449
   },
   "dist/react-beautiful-dnd.esm.js": {
-    "bundled": 228983,
-    "minified": 120746,
-    "gzipped": 30051,
+    "bundled": 220362,
+    "minified": 117337,
+    "gzipped": 29577,
     "treeshaked": {
       "rollup": {
-        "code": 81922,
-        "import_statements": 846
+        "code": 79406,
+        "import_statements": 832
       },
       "webpack": {
-        "code": 84599
+        "code": 82083
       }
     }
   }
