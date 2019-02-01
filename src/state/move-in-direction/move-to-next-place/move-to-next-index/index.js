@@ -14,32 +14,7 @@ import { addClosest, removeClosest } from '../update-displacement';
 import getDisplacedBy from '../../../get-displaced-by';
 import fromReorder from './from-reorder';
 import fromCombine from './from-combine';
-
-type IsIncreasingDisplacementArgs = {|
-  isInHomeList: boolean,
-  isMovingForward: boolean,
-  proposedIndex: number,
-  startIndexInHome: number,
-|};
-
-const getIsIncreasingDisplacement = ({
-  isInHomeList,
-  isMovingForward,
-  proposedIndex,
-  startIndexInHome,
-}: IsIncreasingDisplacementArgs): boolean => {
-  // in foreign list moving forward will reduce the amount displaced
-  if (!isInHomeList) {
-    return !isMovingForward;
-  }
-
-  // increase displacement if moving forward past start
-  if (isMovingForward) {
-    return proposedIndex > startIndexInHome;
-  }
-  // increase displacement if moving backwards away from start
-  return proposedIndex < startIndexInHome;
-};
+import removeDraggableFromList from '../../../remove-draggable-from-list';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -97,31 +72,27 @@ export default ({
     draggable.displaceBy,
   );
 
-  const atProposedIndex: DraggableDimension = insideDestination[proposedIndex];
-  console.group('Proposed');
-  console.log('proposed index', proposedIndex);
-  console.log('at proposed index [id:', atProposedIndex.descriptor.id, ']');
-
   const displaced: Displacement[] = (() => {
+    const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
+
     if (!modifyDisplacement) {
-      return previousImpact.movement.displaced;
+      return lastDisplaced;
     }
 
-    const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
-    console.log('last displaced', lastDisplaced.map(d => d.draggableId));
+    if (isMovingForward) {
+      return removeClosest(lastDisplaced);
+    }
 
-    // moving forward will increase displacement
-    console.log(
-      isMovingForward
-        ? 'REMOVE CLOSEST'
-        : `ADD CLOSEST: ${atProposedIndex.descriptor.id}`,
+    // moving backwards - will increase the amount of displaced items
+
+    const withoutDraggable: DraggableDimension[] = removeDraggableFromList(
+      draggable,
+      insideDestination,
     );
-    return isMovingForward
-      ? removeClosest(lastDisplaced)
-      : addClosest(atProposedIndex, lastDisplaced);
-  })();
 
-  console.log('displaced', displaced.map(d => d.draggableId));
+    const atProposedIndex: DraggableDimension = withoutDraggable[proposedIndex];
+    return addClosest(atProposedIndex, lastDisplaced);
+  })();
 
   return {
     movement: {
