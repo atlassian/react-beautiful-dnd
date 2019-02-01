@@ -46,7 +46,11 @@ export default ({
   });
 
   // not dragging over anything
+
   if (!destinationId) {
+    // A big design decision was made here to collapse the home list
+    // when not over any list. This yielded the most consistently beautiful experience.
+
     return noImpact;
   }
 
