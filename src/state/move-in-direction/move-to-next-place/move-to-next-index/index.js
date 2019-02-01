@@ -11,7 +11,6 @@ import type {
 import type { Instruction } from './move-to-next-index-types';
 import getDisplacementMap from '../../../get-displacement-map';
 import { addClosest, removeClosest } from '../update-displacement';
-import getWillDisplaceForward from '../../../will-displace-forward';
 import getDisplacedBy from '../../../get-displaced-by';
 import fromReorder from './from-reorder';
 import fromCombine from './from-combine';
@@ -93,42 +92,40 @@ export default ({
   }
 
   const { proposedIndex, modifyDisplacement } = instruction;
-  const startIndexInHome: number = draggable.descriptor.index;
-  const willDisplaceForward: boolean = getWillDisplaceForward({
-    isInHomeList,
-    proposedIndex,
-    startIndexInHome,
-  });
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
-    willDisplaceForward,
   );
 
   const atProposedIndex: DraggableDimension = insideDestination[proposedIndex];
+  console.group('Proposed');
+  console.log('proposed index', proposedIndex);
+  console.log('at proposed index [id:', atProposedIndex.descriptor.id, ']');
 
   const displaced: Displacement[] = (() => {
     if (!modifyDisplacement) {
       return previousImpact.movement.displaced;
     }
 
-    const isIncreasingDisplacement: boolean = getIsIncreasingDisplacement({
-      isInHomeList,
-      isMovingForward,
-      proposedIndex,
-      startIndexInHome,
-    });
-
     const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
-    return isIncreasingDisplacement
-      ? addClosest(atProposedIndex, lastDisplaced)
-      : removeClosest(lastDisplaced);
+    console.log('last displaced', lastDisplaced.map(d => d.draggableId));
+
+    // moving forward will increase displacement
+    console.log(
+      isMovingForward
+        ? 'REMOVE CLOSEST'
+        : `ADD CLOSEST: ${atProposedIndex.descriptor.id}`,
+    );
+    return isMovingForward
+      ? removeClosest(lastDisplaced)
+      : addClosest(atProposedIndex, lastDisplaced);
   })();
+
+  console.log('displaced', displaced.map(d => d.draggableId));
 
   return {
     movement: {
       displacedBy,
-      willDisplaceForward,
       displaced,
       map: getDisplacementMap(displaced),
     },

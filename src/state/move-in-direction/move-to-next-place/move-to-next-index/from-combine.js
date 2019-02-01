@@ -1,5 +1,4 @@
 // @flow
-import getWillDisplaceForward from '../../../will-displace-forward';
 import type {
   DroppableDimension,
   DragImpact,
@@ -43,11 +42,8 @@ export default ({
   // moving from an item that is not displaced
   if (!isCombineDisplaced) {
     // Need to know if targeting the combined item would normally displace forward
-    const willDisplaceForward: boolean = getWillDisplaceForward({
-      isInHomeList,
-      proposedIndex: combineIndex,
-      startIndexInHome: draggable.descriptor.index,
-    });
+    // TODO: remove
+    const willDisplaceForward: boolean = true;
 
     if (willDisplaceForward) {
       // will displace forwards (eg home list moving backward from start)
@@ -87,10 +83,9 @@ export default ({
   }
 
   // moving from an item that is already displaced
-  const isDisplacedForward: boolean = movement.willDisplaceForward;
-  const visualIndex: number = isDisplacedForward
-    ? combineIndex + 1
-    : combineIndex - 1;
+  // TODO: remove
+  const isDisplacedForward: boolean = true;
+  const visualIndex: number = combineIndex + 1;
 
   if (isDisplacedForward) {
     // if displaced forward, then moving forward will undo the displacement

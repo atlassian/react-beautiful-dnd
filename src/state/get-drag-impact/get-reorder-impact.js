@@ -19,6 +19,7 @@ import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import { offsetByPosition } from '../spacing';
 import { negate } from '../position';
+import removeDraggableFromList from '../remove-draggable-from-list';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
@@ -30,16 +31,6 @@ type Args = {|
   userDirection: UserDirection,
   onLift: OnLift,
 |};
-
-const removeDraggable = memoizeOne(
-  (
-    remove: DraggableDimension,
-    list: DraggableDimension[],
-  ): DraggableDimension[] =>
-    list.filter(
-      (item: DraggableDimension) => item.descriptor.id !== remove.descriptor.id,
-    ),
-);
 
 export default ({
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
@@ -62,7 +53,10 @@ export default ({
   );
   const targetCenter: number = currentCenter[axis.line];
   const displacement: number = displacedBy.value;
-  const withoutDraggable = removeDraggable(draggable, insideDestination);
+  const withoutDraggable = removeDraggableFromList(
+    draggable,
+    insideDestination,
+  );
 
   const displaced: Displacement[] = withoutDraggable
     .filter(

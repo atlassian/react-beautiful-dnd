@@ -1,6 +1,6 @@
 // @flow
 import type { Position } from 'css-box-model';
-import moveCrossAxis from './move-cross-axis';
+// import moveCrossAxis from './move-cross-axis';
 import moveToNextPlace from './move-to-next-place';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import type { PublicResult } from './move-in-direction-types';
@@ -61,25 +61,42 @@ export default ({ state, type }: Args): ?PublicResult => {
   const { draggables, droppables } = state.dimensions;
   const viewport: Viewport = state.viewport;
 
-  return isMovingOnMainAxis
-    ? moveToNextPlace({
-        isMovingForward,
-        draggable,
-        destination: isOver,
-        draggables,
-        viewport,
-        previousPageBorderBoxCenter,
-        previousClientSelection: state.current.client.selection,
-        previousImpact: state.impact,
-      })
-    : moveCrossAxis({
-        isMovingForward,
-        previousPageBorderBoxCenter,
-        draggable,
-        isOver,
-        draggables,
-        droppables,
-        previousImpact: state.impact,
-        viewport,
-      });
+  if (isMovingOnMainAxis) {
+    return moveToNextPlace({
+      isMovingForward,
+      draggable,
+      destination: isOver,
+      draggables,
+      viewport,
+      previousPageBorderBoxCenter,
+      previousClientSelection: state.current.client.selection,
+      previousImpact: state.impact,
+      onLift: state.onLift,
+    });
+  }
+
+  return null;
+
+  // return isMovingOnMainAxis
+  //   ? moveToNextPlace({
+  //       isMovingForward,
+  //       draggable,
+  //       destination: isOver,
+  //       draggables,
+  //       viewport,
+  //       previousPageBorderBoxCenter,
+  //       previousClientSelection: state.current.client.selection,
+  //       previousImpact: state.impact,
+  //       onLift: state.onLift,
+  //     })
+  //   : moveCrossAxis({
+  //       isMovingForward,
+  //       previousPageBorderBoxCenter,
+  //       draggable,
+  //       isOver,
+  //       draggables,
+  //       droppables,
+  //       previousImpact: state.impact,
+  //       viewport,
+  //     });
 };
