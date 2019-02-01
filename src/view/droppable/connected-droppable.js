@@ -53,6 +53,7 @@ export const makeMapStateToProps = (): Selector => {
     id: DroppableId,
     draggable: DraggableDimension,
     impact: DragImpact,
+    isDropAnimating: boolean,
   ): MapProps => {
     const isOver: boolean = whatIsDraggedOver(impact) === id;
 
@@ -65,7 +66,12 @@ export const makeMapStateToProps = (): Selector => {
 
     const isHome: boolean = draggable.descriptor.droppableId === id;
 
-    if (isHome) {
+    // showing a placeholder in the home list during a drag to prevent
+    // other lists from being shifted on the page.
+    // we animate the placeholder closed during a drop animation
+    // TODO: if there is no drop animation what do we do!?
+    // TODO: like when there is a keyboard drop...? Accept the snap?
+    if (isHome && !isDropAnimating) {
       return getHomeNotDraggedOverMapProps(draggable.placeholder);
     }
 
@@ -82,13 +88,13 @@ export const makeMapStateToProps = (): Selector => {
     if (state.isDragging) {
       const draggable: DraggableDimension =
         state.dimensions.draggables[state.critical.draggable.id];
-      return getMapProps(id, draggable, state.impact);
+      return getMapProps(id, draggable, state.impact, false);
     }
 
     if (state.phase === 'DROP_ANIMATING') {
       const draggable: DraggableDimension =
         state.dimensions.draggables[state.pending.result.draggableId];
-      return getMapProps(id, draggable, state.pending.impact);
+      return getMapProps(id, draggable, state.pending.impact, true);
     }
 
     return defaultMapProps;
