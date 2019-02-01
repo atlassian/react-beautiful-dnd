@@ -100,6 +100,7 @@ export default ({
       viewport,
       userDirection,
       onLift: state.onLift,
+      onLiftImpact: state.onLiftImpact,
     });
 
   const withUpdatedPlaceholders: DimensionMap = getDimensionMapWithPlaceholder({

@@ -29,6 +29,7 @@ export default ({
   onLiftImpact,
   onLift,
 }: Args): DragImpact => {
+  console.warn('REMOVE DROP IMPACT??');
   const canUseLast: boolean =
     reason === 'DROP' && Boolean(whatIsDraggedOver(lastImpact));
 
