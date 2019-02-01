@@ -34,9 +34,17 @@ const defaultMapProps: MapProps = {
 // Droppable gets its own selector
 export const makeMapStateToProps = (): Selector => {
   const getDraggingOverMapProps = memoizeOne(
-    (draggingOverWith: ?DraggableId, placeholder: ?Placeholder): MapProps => ({
+    (draggingOverWith: DraggableId, placeholder: Placeholder): MapProps => ({
       isDraggingOver: true,
       draggingOverWith,
+      placeholder,
+    }),
+  );
+
+  const getHomeNotDraggedOverMapProps = memoizeOne(
+    (placeholder: Placeholder): MapProps => ({
+      isDraggingOver: false,
+      draggingOverWith: null,
       placeholder,
     }),
   );
@@ -47,14 +55,21 @@ export const makeMapStateToProps = (): Selector => {
     impact: DragImpact,
   ): MapProps => {
     const isOver: boolean = whatIsDraggedOver(impact) === id;
-    if (!isOver) {
-      return defaultMapProps;
+
+    if (isOver) {
+      return getDraggingOverMapProps(
+        draggable.descriptor.id,
+        draggable.placeholder,
+      );
     }
 
-    return getDraggingOverMapProps(
-      draggable.descriptor.id,
-      draggable.placeholder,
-    );
+    const isHome: boolean = draggable.descriptor.droppableId === id;
+
+    if (isHome) {
+      return getHomeNotDraggedOverMapProps(draggable.placeholder);
+    }
+
+    return defaultMapProps;
   };
 
   const selector = (state: State, ownProps: OwnProps): MapProps => {
