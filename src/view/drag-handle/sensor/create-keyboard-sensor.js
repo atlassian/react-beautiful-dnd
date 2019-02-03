@@ -192,7 +192,16 @@ export default ({
       // https://twitter.com/alexandereardon/status/985994224867819520
       // Using capture: false here as we want to avoid intercepting droppable scroll requests
       options: { capture: false },
-      fn: callbacks.onWindowScroll,
+      fn: (event: UIEvent) => {
+        // IE11 fix:
+        // scrollable events still bubble up and are caught by this handler
+        // we can ignore this event
+        if (event.srcElement !== event.currentTarget) {
+          return;
+        }
+
+        callbacks.onWindowScroll();
+      },
     },
     // Cancel on page visibility change
     {
