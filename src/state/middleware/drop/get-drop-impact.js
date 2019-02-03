@@ -38,6 +38,7 @@ export default ({
 
   // Need to recompute the visibility of the original impact
   // What is visible can be different to when  the drag started
+  // TODO: need to clear destination / merge for responder but keep it for isOver
   return recompute({
     impact: onLiftImpact,
     destination: home,
