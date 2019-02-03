@@ -208,11 +208,11 @@ describe('progress', () => {
     // start the lift
     pressSpacebar(wrapper);
 
-    // trigger a ie11 style event
+    // trigger scroll event
     const scrollable: HTMLElement = document.createElement('div');
     const fakeEvent: Event = new Event('scroll');
     Object.defineProperties(fakeEvent, {
-      target: {
+      currentTarget: {
         writable: true,
         value: scrollable,
       },
