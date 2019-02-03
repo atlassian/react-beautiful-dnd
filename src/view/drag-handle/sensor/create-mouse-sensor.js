@@ -212,7 +212,14 @@ export default ({
       // Using capture: false here as we want to avoid intercepting droppable scroll requests
       // TODO: can result in awkward drop position
       options: { passive: true, capture: false },
-      fn: () => {
+      fn: (event: UIEvent) => {
+        // IE11 fix:
+        // Scrollable events still bubble up and are caught by this handler in ie11.
+        // We can ignore this event
+        if (event.currentTarget !== getWindow()) {
+          return;
+        }
+
         // stop a pending drag
         if (state.pending) {
           stopPendingDrag();
