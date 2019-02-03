@@ -551,12 +551,21 @@ describe('window scroll during drag', () => {
       x: 100,
       y: 200,
     });
-    // no animation frame to release diff
 
+    // no animation frame to release diff
     expect(
       callbacksCalled(callbacks)({
         onLift: 1,
         onWindowScroll: 0,
+      }),
+    ).toBe(true);
+
+    // releasing a frame
+    requestAnimationFrame.step();
+    expect(
+      callbacksCalled(callbacks)({
+        onLift: 1,
+        onWindowScroll: 1,
       }),
     ).toBe(true);
   });
@@ -590,6 +599,28 @@ describe('window scroll during drag', () => {
         onWindowScroll: 0,
       }),
     ).toBe(true);
+  });
+
+  it('should not fire an onWindowScroll if it is not the window scrolling (ie11 bug)', () => {
+    // start the lift
+    mouseDown(wrapper);
+    windowMouseMove({ x: 0, y: sloppyClickThreshold });
+    expect(callbacks.onLift).toHaveBeenCalled();
+
+    // trigger scroll event
+    const scrollable: HTMLElement = document.createElement('div');
+    const fakeEvent: Event = new Event('scroll');
+    Object.defineProperties(fakeEvent, {
+      currentTarget: {
+        writable: true,
+        value: scrollable,
+      },
+    });
+    window.dispatchEvent(fakeEvent);
+    // ensuring any events would be published
+    requestAnimationFrame.flush();
+
+    expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
   });
 });
 
