@@ -204,6 +204,24 @@ describe('progress', () => {
     expect(event.defaultPrevented).toBe(false);
   });
 
+  it('should not fire an onWindowScroll if it is not the window scrolling (ie11 bug)', () => {
+    // start the lift
+    pressSpacebar(wrapper);
+
+    // trigger a ie11 style event
+    const scrollable: HTMLElement = document.createElement('div');
+    const fakeEvent: Event = new Event('scroll');
+    Object.defineProperties(fakeEvent, {
+      target: {
+        writable: true,
+        value: scrollable,
+      },
+    });
+    window.dispatchEvent(fakeEvent);
+
+    expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
+  });
+
   it('should prevent using keyboard keys that modify scroll', () => {
     const keys: number[] = [
       keyCodes.pageUp,

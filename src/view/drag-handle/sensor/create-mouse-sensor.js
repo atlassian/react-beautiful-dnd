@@ -216,7 +216,7 @@ export default ({
         // IE11 fix:
         // scrollable events still bubble up and are caught by this handler
         // we can ignore this event
-        if (event.srcElement !== event.currentTarget) {
+        if (event.target !== event.currentTarget) {
           return;
         }
 
