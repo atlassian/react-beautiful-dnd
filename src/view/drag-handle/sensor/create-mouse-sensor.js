@@ -214,9 +214,9 @@ export default ({
       options: { passive: true, capture: false },
       fn: (event: UIEvent) => {
         // IE11 fix:
-        // scrollable events still bubble up and are caught by this handler
-        // we can ignore this event
-        if (event.target !== event.currentTarget) {
+        // Scrollable events still bubble up and are caught by this handler in ie11.
+        // We can ignore this event
+        if (event.currentTarget !== getWindow()) {
           return;
         }
 
