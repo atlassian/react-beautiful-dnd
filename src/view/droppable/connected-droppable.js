@@ -27,6 +27,7 @@ import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../
 const defaultMapProps: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
+  draggingFromList: null,
   placeholder: null,
   // we return `true` as the default.
   // if we used `false` we would need to re-render the Droppable when a drag ends
@@ -39,10 +40,12 @@ export const makeMapStateToProps = (): Selector => {
   const getDraggingOverMapProps = memoizeOne(
     (
       draggingOverWith: DraggableId,
+      draggingFromList: ?DraggableId,
       placeholder: Placeholder,
       shouldAnimatePlaceholder: boolean,
     ): MapProps => ({
       isDraggingOver: true,
+      draggingFromList,
       draggingOverWith,
       placeholder,
       shouldAnimatePlaceholder,
@@ -50,8 +53,10 @@ export const makeMapStateToProps = (): Selector => {
   );
 
   const getHomeNotDraggedOverMapProps = memoizeOne(
-    (placeholder: Placeholder): MapProps => ({
+    (draggingFromList: DraggableId, placeholder: Placeholder): MapProps => ({
       isDraggingOver: false,
+      // this is the home list so we need to provide the dragging id
+      draggingFromList,
       draggingOverWith: null,
       placeholder,
       shouldAnimatePlaceholder: true,
@@ -66,12 +71,17 @@ export const makeMapStateToProps = (): Selector => {
     shouldAnimatePlaceholder: boolean,
   ): MapProps => {
     const isOver: boolean = whatIsDraggedOver(impact) === id;
+    const isHome: boolean = draggable.descriptor.droppableId === id;
 
     if (isOver) {
+      const draggingFromList: ?DraggableId = isHome
+        ? draggable.descriptor.id
+        : null;
       // When dropping over a list
       if (impact.merge && isDropAnimating) {
         return {
           isDraggingOver: true,
+          draggingFromList,
           draggingOverWith: draggable.descriptor.id,
           placeholder: null,
           shouldAnimatePlaceholder: true,
@@ -80,14 +90,13 @@ export const makeMapStateToProps = (): Selector => {
 
       return getDraggingOverMapProps(
         draggable.descriptor.id,
+        draggingFromList,
         draggable.placeholder,
         shouldAnimatePlaceholder,
       );
     }
 
     // not over the list
-
-    const isHome: boolean = draggable.descriptor.droppableId === id;
 
     if (!isHome) {
       return defaultMapProps;
@@ -99,7 +108,11 @@ export const makeMapStateToProps = (): Selector => {
     if (isDropAnimating) {
       return defaultMapProps;
     }
-    return getHomeNotDraggedOverMapProps(draggable.placeholder);
+    return getHomeNotDraggedOverMapProps(
+      // this is the home list so we can use the draggable
+      draggable.descriptor.id,
+      draggable.placeholder,
+    );
   };
 
   const selector = (state: State, ownProps: OwnProps): MapProps => {

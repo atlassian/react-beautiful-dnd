@@ -13,16 +13,29 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
+const getBackgroundColor = (
+  isDraggingOver: boolean,
+  isDraggingFrom: boolean,
+): string => {
+  if (isDraggingOver) {
+    return colors.blue.lighter;
+  }
+  if (isDraggingFrom) {
+    return 'honeydew';
+  }
+  return colors.blue.light;
+};
+
 const Wrapper = styled.div`
-  background-color: ${({ isDraggingOver }) =>
-    isDraggingOver ? colors.blue.lighter : colors.blue.light};
+  background-color: ${props =>
+    getBackgroundColor(props.isDraggingOver, props.isDraggingFrom)};
   display: flex;
   flex-direction: column;
   opacity: ${({ isDropDisabled }) => (isDropDisabled ? 0.5 : 'inherit')};
   padding: ${grid}px;
   border: ${grid}px;
   padding-bottom: 0;
-  transition: background-color 0.1s ease, opacity 0.1s ease;
+  transition: background-color 0.2s ease, opacity 0.1s ease;
   user-select: none;
   width: 250px;
 `;
@@ -154,6 +167,7 @@ export default class QuoteList extends React.Component<Props> {
             style={style}
             isDraggingOver={dropSnapshot.isDraggingOver}
             isDropDisabled={isDropDisabled}
+            isDraggingFrom={Boolean(dropSnapshot.draggingFromList)}
             {...dropProvided.droppableProps}
           >
             {internalScroll ? (

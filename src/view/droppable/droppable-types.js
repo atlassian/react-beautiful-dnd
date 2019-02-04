@@ -24,6 +24,7 @@ export type Provided = {|
 export type StateSnapshot = {|
   isDraggingOver: boolean,
   draggingOverWith: ?DraggableId,
+  draggingFromList: ?DraggableId,
 |};
 
 export type MapProps = {|
@@ -35,6 +36,8 @@ export type MapProps = {|
   // is not the source list
   placeholder: ?Placeholder,
   shouldAnimatePlaceholder: boolean,
+  // when dragging from a home list this will be populated even when not over the list
+  draggingFromList: ?DraggableId,
 |};
 
 export type DefaultProps = {|
