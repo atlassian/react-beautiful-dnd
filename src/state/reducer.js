@@ -17,9 +17,6 @@ import type {
   DropPendingState,
   Viewport,
   DropReason,
-  Displacement,
-  DraggableIdMap,
-  DragImpact,
 } from '../types';
 import type { Action } from './store-types';
 import type { PublicResult as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
@@ -123,10 +120,8 @@ export default (state: State = idle, action: Action): State => {
       impact,
       onLift,
       onLiftImpact: impact,
-      // only will animate home placeholder after
-      // a foreign list has been dragged over
-      // TODO: can this be a one time flag that is swapped after first render?
-      shouldAnimateHomePlaceholder: false,
+      // On initial render we do not animate the adding of the placeholder
+      shouldAnimatePlaceholder: false,
       viewport,
       userDirection: forward,
       scrollJumpRequest: null,
@@ -427,7 +422,6 @@ export default (state: State = idle, action: Action): State => {
     const result: DropAnimatingState = {
       phase: 'DROP_ANIMATING',
       pending,
-      shouldAnimateHomePlaceholder: state.shouldAnimateHomePlaceholder,
       dimensions: state.dimensions,
       critical: state.critical,
     };

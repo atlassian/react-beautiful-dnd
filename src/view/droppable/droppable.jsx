@@ -134,22 +134,20 @@ export default class Droppable extends Component<Props> {
 
   getPlaceholder() {
     const placeholder: ?PlaceholderType = this.props.placeholder;
-    console.group(`droppable type: ${this.props.type}`);
-    console.log('droppable placeholder', placeholder);
+    const shouldAnimatePlaceholder: boolean = this.props
+      .shouldAnimatePlaceholder;
     const isDraggingOrDropping: boolean = this.context[isDraggingOrDroppingKey](
       this.props.type,
     );
-
-    console.log('isDraggingOrDropping', isDraggingOrDropping);
-    console.groupEnd();
+    const shouldAnimate: boolean =
+      isDraggingOrDropping && shouldAnimatePlaceholder;
 
     // TODO: animate droppable placeholder except when drag is finished
     return (
-      <AnimateInOut on={placeholder} shouldAnimate={isDraggingOrDropping}>
+      <AnimateInOut on={placeholder} shouldAnimate={shouldAnimate}>
         {({ isVisible, onClose, data, animate }: AnimateProvided) =>
           isVisible && (
             <Placeholder
-              shouldDelayTransition={false}
               placeholder={(data: any)}
               onClose={onClose}
               innerRef={this.setPlaceholderRef}

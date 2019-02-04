@@ -6,14 +6,14 @@ import type {
   InOutAnimationMode,
 } from '../../types';
 import type { PlaceholderStyle } from './placeholder-types';
-import { transitions, placeholderTransitionDelayTime } from '../animation';
+import { transitions } from '../animation';
+import { noSpacing } from '../../state/spacing';
 
 type Props = {|
   placeholder: PlaceholderType,
   animate: InOutAnimationMode,
   onClose: () => void,
   innerRef?: () => ?HTMLElement,
-  shouldDelayTransition: boolean,
   onTransitionEnd: () => void,
 |};
 
@@ -29,14 +29,6 @@ type State = {|
   useEmpty: boolean,
 |};
 
-// TODO: does this exist elsewhere?
-const noSpacing: Spacing = {
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-};
-
 const empty: Size = {
   width: 0,
   height: 0,
@@ -50,7 +42,7 @@ const getSize = (placeholder: PlaceholderType): Size => ({
 });
 
 export default class Placeholder extends PureComponent<Props, State> {
-  mountFrameId: ?AnimationFrameID = null;
+  mountTimerId: ?TimeoutID = null;
 
   state: State = {
     shouldMountEmptyAndOpen: this.props.animate === 'open',
@@ -77,6 +69,7 @@ export default class Placeholder extends PureComponent<Props, State> {
   }
 
   componentDidMount() {
+    console.log('state', this.state);
     if (!this.state.shouldMountEmptyAndOpen) {
       return;
     }
@@ -85,8 +78,8 @@ export default class Placeholder extends PureComponent<Props, State> {
     // .setState in componentDidMount will cause two react renders
     // but only a single browser update
     // https://reactjs.org/docs/react-component.html#componentdidmount
-    this.mountFrameId = requestAnimationFrame(() => {
-      this.mountFrameId = null;
+    this.mountTimerId = setTimeout(() => {
+      this.mountTimerId = null;
       if (this.state.shouldMountEmptyAndOpen) {
         this.setState({
           shouldMountEmptyAndOpen: false,
@@ -97,14 +90,22 @@ export default class Placeholder extends PureComponent<Props, State> {
   }
 
   componentWillUnmount() {
-    if (!this.mountFrameId) {
+    if (!this.mountTimerId) {
       return;
     }
-    cancelAnimationFrame(this.mountFrameId);
-    this.mountFrameId = null;
+    clearTimeout(this.mountTimerId);
+    this.mountTimerId = null;
   }
 
-  onTransitionEnd = () => {
+  onTransitionEnd = (event: TransitionEvent) => {
+    // We transition height, width and margin
+    // each of those transitions will independently call this callback
+    // Because they all have the same duration we can just respond to one of them
+    // 'height' was chosen for no particular reason :D
+    if (event.propertyName !== 'height') {
+      return;
+    }
+
     console.log('PLACEHOLDER ANIMATION FINISHED');
     this.props.onTransitionEnd();
 
@@ -115,9 +116,10 @@ export default class Placeholder extends PureComponent<Props, State> {
   };
 
   render() {
+    console.log('animate?', this.props.animate);
     const placeholder: PlaceholderType = this.props.placeholder;
-    const shouldDelayTransition: boolean = this.props.shouldDelayTransition;
     const size: Size = this.state.useEmpty ? empty : getSize(placeholder);
+    console.log('size', size);
     const { display, tagName } = placeholder;
 
     // The goal of the placeholder is to take up the same amount of space
@@ -152,13 +154,6 @@ export default class Placeholder extends PureComponent<Props, State> {
 
       // Animate the placeholder size and margin
       transition: transitions.placeholder,
-
-      // Conditionally put a delay on any transition
-      // This is used on the Draggable placeholder so that it does not flicker
-      // when quickly moving between drop targets
-      transitionDelay: shouldDelayTransition
-        ? `${placeholderTransitionDelayTime}s`
-        : '0s',
     };
 
     return React.createElement(tagName, {

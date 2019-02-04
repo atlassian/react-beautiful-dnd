@@ -13,5 +13,4 @@ export type PlaceholderStyle = {|
   flexGrow: '0',
   pointerEvents: 'none',
   transition: string,
-  transitionDelay: string,
 |};

@@ -34,6 +34,7 @@ export type MapProps = {|
   // not the user is dragging over a list that
   // is not the source list
   placeholder: ?Placeholder,
+  shouldAnimatePlaceholder: boolean,
 |};
 
 export type DefaultProps = {|

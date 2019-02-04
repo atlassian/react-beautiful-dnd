@@ -16,7 +16,6 @@ import type {
   UserDirection,
   StateWhenUpdatesAllowed,
 } from '../../../types';
-import getshouldAnimateHomePlaceholder from '../../should-animate-draggable-placeholder';
 
 type Args = {|
   state: StateWhenUpdatesAllowed,
@@ -108,13 +107,6 @@ export default ({
     previousImpact: state.impact,
     dimensions,
   });
-
-  const shouldAnimateHomePlaceholder: boolean = getshouldAnimateHomePlaceholder(
-    state.shouldAnimateHomePlaceholder,
-    state.critical.draggable,
-    newImpact,
-  );
-
   // dragging!
   const result: DraggingState = {
     ...state,
@@ -123,7 +115,8 @@ export default ({
     dimensions: withUpdatedPlaceholders,
     impact: newImpact,
     viewport,
-    shouldAnimateHomePlaceholder,
+    // after initial render all droppable placeholders are animated
+    shouldAnimatePlaceholder: true,
     scrollJumpRequest: scrollJumpRequest || null,
     // client updates can be applied as a part of a jump scroll
     // this can be to immediately reverse movement to allow for a nice animation

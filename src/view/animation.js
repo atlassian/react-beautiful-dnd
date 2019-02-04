@@ -37,7 +37,6 @@ export const transitions = {
   },
   outOfTheWay: `transform ${outOfTheWayTiming}`,
   placeholder: `height ${outOfTheWayTiming}, width ${outOfTheWayTiming}, margin ${outOfTheWayTiming}`,
-  // placeholder: `height ${outOfTheWayTiming}, width ${outOfTheWayTiming}`,
 };
 
 const moveTo = (offset: Position): ?string =>
