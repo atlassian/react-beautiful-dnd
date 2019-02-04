@@ -8,6 +8,7 @@ import type {
   DraggableDimension,
   DroppableId,
   OnLift,
+  CombineImpact,
 } from '../../../types';
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import { subtract } from '../../position';
@@ -50,5 +51,21 @@ export default ({
     draggable.client.borderBox.center,
   );
 
-  return offset;
+  const merge: ?CombineImpact = impact.merge;
+
+  if (!merge) {
+    return offset;
+  }
+
+  // When dropping with a merge we want to drop the dragging item
+  // into the new home location of the target.
+  // The target will move as a result of a drop if it started displaced
+
+  const didStartDisplaced: boolean = Boolean(
+    onLift.wasDisplaced[merge.combine.draggableId],
+  );
+
+  return didStartDisplaced
+    ? subtract(offset, onLift.displacedBy.point)
+    : offset;
 };
