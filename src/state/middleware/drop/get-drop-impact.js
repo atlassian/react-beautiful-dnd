@@ -20,6 +20,11 @@ type Args = {|
   onLift: OnLift,
 |};
 
+export type Result = {|
+  impact: DragImpact,
+  didDropInsideDroppable: boolean,
+|};
+
 export default ({
   reason,
   lastImpact,
@@ -28,18 +33,21 @@ export default ({
   draggables,
   onLiftImpact,
   onLift,
-}: Args): DragImpact => {
-  const canUseLast: boolean =
+}: Args): Result => {
+  const didDropInsideDroppable: boolean =
     reason === 'DROP' && Boolean(whatIsDraggedOver(lastImpact));
 
-  if (canUseLast) {
-    return lastImpact;
+  if (didDropInsideDroppable) {
+    return {
+      impact: lastImpact,
+      didDropInsideDroppable,
+    };
   }
 
+  // Going to use the on lift impact
   // Need to recompute the visibility of the original impact
   // What is visible can be different to when  the drag started
-  // TODO: need to clear destination / merge for responder but keep it for isOver
-  return recompute({
+  const impact: DragImpact = recompute({
     impact: onLiftImpact,
     destination: home,
     viewport,
@@ -48,4 +56,9 @@ export default ({
     // We need the draggables to animate back to their positions
     forceShouldAnimate: true,
   });
+
+  return {
+    impact,
+    didDropInsideDroppable,
+  };
 };

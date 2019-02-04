@@ -17,6 +17,7 @@ import withDroppableScroll from '../with-scroll-change/with-droppable-scroll';
 import getCombineImpact from './get-combine-impact';
 import getReorderImpact from './get-reorder-impact';
 import noImpact from '../no-impact';
+import removeDraggableFromList from '../remove-draggable-from-list';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -58,6 +59,10 @@ export default ({
     destination.descriptor.id,
     draggables,
   );
+  const insideDestinationWithoutDraggable: DraggableDimension[] = removeDraggableFromList(
+    draggable,
+    insideDestination,
+  );
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
   const pageBorderBoxCenterWithDroppableScrollChange: Position = withDroppableScroll(
@@ -68,21 +73,23 @@ export default ({
   const withMerge: ?DragImpact = getCombineImpact({
     pageBorderBoxCenterWithDroppableScrollChange,
     previousImpact,
-    draggable,
     destination,
-    insideDestination,
+    insideDestinationWithoutDraggable,
     userDirection,
+    onLift,
   });
 
   if (withMerge) {
+    console.log('returning merge', withMerge);
     return withMerge;
   }
 
+  console.log('returning reorder');
   return getReorderImpact({
     pageBorderBoxCenterWithDroppableScrollChange,
-    draggable,
     destination,
-    insideDestination,
+    draggable,
+    insideDestinationWithoutDraggable,
     previousImpact,
     viewport,
     userDirection,

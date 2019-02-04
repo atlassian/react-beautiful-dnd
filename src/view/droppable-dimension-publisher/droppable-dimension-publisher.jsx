@@ -322,7 +322,6 @@ export default class DroppableDimensionPublisher extends React.Component<Props> 
       isCombineEnabled: this.props.isCombineEnabled,
       shouldClipSubject: !this.props.ignoreContainerClipping,
     });
-    console.log('dimension', dimension.subject.active);
 
     if (env.closestScrollable) {
       // bind scroll listener

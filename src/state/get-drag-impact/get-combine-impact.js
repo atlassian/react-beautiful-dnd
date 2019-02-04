@@ -9,6 +9,7 @@ import type {
   CombineImpact,
   DragImpact,
   DisplacementMap,
+  OnLift,
 } from '../../types';
 import isWithin from '../is-within';
 import { find } from '../../native-with-fallback';
@@ -71,18 +72,18 @@ const isCombiningWith = ({
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
   previousImpact: DragImpact,
-  draggable: DraggableDimension,
   destination: DroppableDimension,
-  insideDestination: DraggableDimension[],
+  insideDestinationWithoutDraggable: DraggableDimension[],
   userDirection: UserDirection,
+  onLift: OnLift,
 |};
 export default ({
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
   previousImpact,
-  draggable,
   destination,
-  insideDestination,
+  insideDestinationWithoutDraggable,
   userDirection,
+  onLift,
 }: Args): ?DragImpact => {
   if (!destination.isCombineEnabled) {
     return null;
@@ -94,16 +95,15 @@ export default ({
   const oldMerge: ?CombineImpact = previousImpact.merge;
 
   const target: ?DraggableDimension = find(
-    insideDestination,
+    insideDestinationWithoutDraggable,
     (child: DraggableDimension): boolean => {
-      // Cannot group with yourself
       const id: DraggableId = child.descriptor.id;
-      if (id === draggable.descriptor.id) {
-        return false;
-      }
-
       const isDisplaced: boolean = Boolean(map[id]);
-      const displacedBy: number = isDisplaced ? canBeDisplacedBy : 0;
+
+      // TODO: consolidate with when-combining.js
+      const didStartDisplaced: boolean = Boolean(onLift.wasDisplaced[id]);
+      const shouldAddDisplacement: boolean = !didStartDisplaced && isDisplaced;
+      const displacedBy: number = shouldAddDisplacement ? canBeDisplacedBy : 0;
 
       return isCombiningWith({
         id,
@@ -120,6 +120,9 @@ export default ({
   if (!target) {
     return null;
   }
+
+  console.log('combining with ', target.descriptor.id);
+  console.log('previous impact', previousImpact);
 
   const merge: CombineImpact = {
     whenEntered: getWhenEntered(target.descriptor.id, userDirection, oldMerge),

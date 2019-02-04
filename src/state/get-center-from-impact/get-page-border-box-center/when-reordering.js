@@ -59,7 +59,7 @@ export default ({
       onLift.wasDisplaced[closestAfter.descriptor.id],
     );
 
-    // target already in resting spot
+    // target is displaced and is already in it's starting position
     if (didStartDisplaced) {
       return goBefore({
         axis,
@@ -68,6 +68,8 @@ export default ({
       });
     }
 
+    // target has been displaced during the drag and it is not in its starting position
+    // we need to account for the displacement
     const withDisplacement: BoxModel = offset(
       closestAfter.page,
       displacedBy.point,

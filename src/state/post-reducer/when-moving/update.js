@@ -102,6 +102,8 @@ export default ({
       onLift: state.onLift,
     });
 
+  console.log('new displaced', newImpact.movement.map);
+
   const withUpdatedPlaceholders: DimensionMap = getDimensionMapWithPlaceholder({
     draggable,
     impact: newImpact,

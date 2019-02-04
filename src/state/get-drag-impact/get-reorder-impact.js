@@ -1,5 +1,4 @@
 // @flow
-import memoizeOne from 'memoize-one';
 import { type Position, type Spacing } from 'css-box-model';
 import type {
   DragMovement,
@@ -19,13 +18,12 @@ import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import { offsetByPosition } from '../spacing';
 import { negate } from '../position';
-import removeDraggableFromList from '../remove-draggable-from-list';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
   draggable: DraggableDimension,
   destination: DroppableDimension,
-  insideDestination: DraggableDimension[],
+  insideDestinationWithoutDraggable: DraggableDimension[],
   previousImpact: DragImpact,
   viewport: Viewport,
   userDirection: UserDirection,
@@ -36,7 +34,7 @@ export default ({
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
   draggable,
   destination,
-  insideDestination,
+  insideDestinationWithoutDraggable,
   previousImpact,
   viewport,
   userDirection,
@@ -53,12 +51,8 @@ export default ({
   );
   const targetCenter: number = currentCenter[axis.line];
   const displacement: number = displacedBy.value;
-  const withoutDraggable = removeDraggableFromList(
-    draggable,
-    insideDestination,
-  );
 
-  const displaced: Displacement[] = withoutDraggable
+  const displaced: Displacement[] = insideDestinationWithoutDraggable
     .filter(
       (child: DraggableDimension): boolean => {
         // did this item start displaced when the drag started?
@@ -97,7 +91,8 @@ export default ({
         }),
     );
 
-  const newIndex: number = withoutDraggable.length - displaced.length;
+  const newIndex: number =
+    insideDestinationWithoutDraggable.length - displaced.length;
 
   const movement: DragMovement = {
     displacedBy,

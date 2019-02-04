@@ -18,7 +18,7 @@ import { animateDrop, completeDrop, dropPending } from '../../action-creators';
 import { isEqual } from '../../position';
 import getDropDuration from './get-drop-duration';
 import getNewHomeClientOffset from './get-new-home-client-offset';
-import getDropImpact from './get-drop-impact';
+import getDropImpact, { type Result } from './get-drop-impact';
 
 export default ({ getState, dispatch }: MiddlewareStore) => (
   next: Dispatch,
@@ -62,7 +62,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   const dimensions: DimensionMap = state.dimensions;
   // Only keeping impact when doing a user drop - otherwise we are cancelling
 
-  const impact: DragImpact = getDropImpact({
+  const { impact, didDropInsideDroppable }: Result = getDropImpact({
     reason,
     lastImpact: state.impact,
     onLift: state.onLift,
@@ -72,29 +72,31 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     draggables: state.dimensions.draggables,
   });
 
-  console.log('impact', impact);
-
   const draggable: DraggableDimension =
     dimensions.draggables[state.critical.draggable.id];
-  const destination: ?DraggableLocation = impact ? impact.destination : null;
+
+  // only populating destination / combine if 'didDropInsideDroppable' is true
+  const destination: ?DraggableLocation =
+    didDropInsideDroppable && impact ? impact.destination : null;
   const combine: ?Combine =
-    impact && impact.merge ? impact.merge.combine : null;
+    didDropInsideDroppable && impact && impact.merge
+      ? impact.merge.combine
+      : null;
 
   const source: DraggableLocation = {
     index: critical.draggable.index,
     droppableId: critical.droppable.id,
   };
 
-  console.warn('source', source);
-
   const result: DropResult = {
     draggableId: draggable.descriptor.id,
     type: draggable.descriptor.type,
     source,
+    reason,
     mode: state.movementMode,
+    // destination / combine will be null if didDropInsideDroppable is true
     destination,
     combine,
-    reason,
   };
 
   const newHomeClientOffset: Position = getNewHomeClientOffset({
