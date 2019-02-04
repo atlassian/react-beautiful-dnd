@@ -10,10 +10,12 @@ import type {
   DragImpact,
   DisplacementMap,
   OnLift,
+  DisplacedBy,
 } from '../../types';
 import isWithin from '../is-within';
 import { find } from '../../native-with-fallback';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
+import getCombinedItemDisplacement from '../get-combined-item-displacement';
 
 const getWhenEntered = (
   id: DraggableId,
@@ -34,7 +36,7 @@ type IsCombiningWithArgs = {|
   currentCenter: Position,
   axis: Axis,
   borderBox: Rect,
-  displacedBy: number,
+  displaceBy: Position,
   currentUserDirection: UserDirection,
   oldMerge: ?CombineImpact,
 |};
@@ -44,12 +46,12 @@ const isCombiningWith = ({
   currentCenter,
   axis,
   borderBox,
-  displacedBy,
+  displaceBy,
   currentUserDirection,
   oldMerge,
 }: IsCombiningWithArgs): boolean => {
-  const start: number = borderBox[axis.start] + displacedBy;
-  const end: number = borderBox[axis.end] + displacedBy;
+  const start: number = borderBox[axis.start] + displaceBy[axis.line];
+  const end: number = borderBox[axis.end] + displaceBy[axis.line];
   const size: number = borderBox[axis.size];
   const twoThirdsOfSize: number = size * 0.666;
 
@@ -91,26 +93,27 @@ export default ({
 
   const axis: Axis = destination.axis;
   const map: DisplacementMap = previousImpact.movement.map;
-  const canBeDisplacedBy: number = previousImpact.movement.displacedBy.value;
+  const canBeDisplacedBy: DisplacedBy = previousImpact.movement.displacedBy;
   const oldMerge: ?CombineImpact = previousImpact.merge;
 
   const target: ?DraggableDimension = find(
     insideDestinationWithoutDraggable,
     (child: DraggableDimension): boolean => {
       const id: DraggableId = child.descriptor.id;
-      const isDisplaced: boolean = Boolean(map[id]);
 
-      // TODO: consolidate with when-combining.js
-      const didStartDisplaced: boolean = Boolean(onLift.wasDisplaced[id]);
-      const shouldAddDisplacement: boolean = !didStartDisplaced && isDisplaced;
-      const displacedBy: number = shouldAddDisplacement ? canBeDisplacedBy : 0;
+      const displaceBy: Position = getCombinedItemDisplacement({
+        displaced: map,
+        onLift,
+        combineWith: id,
+        displacedBy: canBeDisplacedBy,
+      });
 
       return isCombiningWith({
         id,
         currentCenter,
         axis,
         borderBox: child.page.borderBox,
-        displacedBy,
+        displaceBy,
         currentUserDirection: userDirection,
         oldMerge,
       });
@@ -120,9 +123,6 @@ export default ({
   if (!target) {
     return null;
   }
-
-  console.log('combining with ', target.descriptor.id);
-  console.log('previous impact', previousImpact);
 
   const merge: CombineImpact = {
     whenEntered: getWhenEntered(target.descriptor.id, userDirection, oldMerge),

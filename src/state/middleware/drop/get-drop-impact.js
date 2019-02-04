@@ -9,6 +9,7 @@ import type {
 } from '../../../types';
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import recompute from '../../update-displacement-visibility/recompute';
+import { noMovement } from '../../no-impact';
 
 type Args = {|
   reason: DropReason,
@@ -38,11 +39,27 @@ export default ({
     reason === 'DROP' && Boolean(whatIsDraggedOver(lastImpact));
 
   if (didDropInsideDroppable) {
+    if (lastImpact.destination) {
+      return {
+        impact: lastImpact,
+        didDropInsideDroppable,
+      };
+    }
+
+    // When merging we remove the movement so that everything
+    // will animate closed
+    const withoutMovement: DragImpact = {
+      ...lastImpact,
+      movement: noMovement,
+    };
+
     return {
-      impact: lastImpact,
+      impact: withoutMovement,
       didDropInsideDroppable,
     };
   }
+
+  // Dropping outside of a list or the drag was cancelled
 
   // Going to use the on lift impact
   // Need to recompute the visibility of the original impact

@@ -8,6 +8,7 @@ import type {
   OnLift,
 } from '../../../types';
 import { add } from '../../position';
+import getCombinedItemDisplacement from '../../get-combined-item-displacement';
 
 type Args = {|
   movement: DragMovement,
@@ -20,16 +21,15 @@ type Args = {|
 // Returns the client offset required to move an item from its
 // original client position to its final resting position
 export default ({ combine, onLift, movement, draggables }: Args): Position => {
-  const groupingWith: DraggableId = combine.draggableId;
-  const center: Position = draggables[groupingWith].page.borderBox.center;
+  const combineWith: DraggableId = combine.draggableId;
+  const center: Position = draggables[combineWith].page.borderBox.center;
 
-  // should we take displacement into account?
-  // TODO: consolidate with get-combine-impact.js
-  const didStartDisplaced: boolean = Boolean(onLift.wasDisplaced[groupingWith]);
-  const isDisplaced: boolean = Boolean(movement.map[groupingWith]);
-  const shouldAddDisplacement: boolean = !didStartDisplaced && isDisplaced;
+  const displaceBy: Position = getCombinedItemDisplacement({
+    displaced: movement.map,
+    onLift,
+    combineWith,
+    displacedBy: movement.displacedBy,
+  });
 
-  return shouldAddDisplacement
-    ? add(center, movement.displacedBy.point)
-    : center;
+  return add(center, displaceBy);
 };
