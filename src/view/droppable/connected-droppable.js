@@ -28,6 +28,8 @@ const defaultMapProps: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
   placeholder: null,
+  // we return `true` as the default.
+  // if we used `false` we would need to re-render the Droppable when a drag ends
   shouldAnimatePlaceholder: true,
 };
 

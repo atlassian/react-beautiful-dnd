@@ -132,15 +132,18 @@ export default class Droppable extends Component<Props> {
     this.props.updateViewportMaxScroll({ maxScroll: getMaxWindowScroll() });
   };
 
+  isDraggingOrDropping(): boolean {
+    return this.context[isDraggingOrDroppingKey](this.props.type);
+  }
+
   getPlaceholder() {
     const placeholder: ?PlaceholderType = this.props.placeholder;
     const shouldAnimatePlaceholder: boolean = this.props
       .shouldAnimatePlaceholder;
-    const isDraggingOrDropping: boolean = this.context[isDraggingOrDroppingKey](
-      this.props.type,
-    );
+
+    // Need to be dragging or dropping for droppable animation to occur
     const shouldAnimate: boolean =
-      isDraggingOrDropping && shouldAnimatePlaceholder;
+      this.isDraggingOrDropping() && shouldAnimatePlaceholder;
 
     // TODO: animate droppable placeholder except when drag is finished
     return (
