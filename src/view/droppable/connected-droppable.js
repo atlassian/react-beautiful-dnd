@@ -121,7 +121,7 @@ export const makeMapStateToProps = (): Selector => {
 
     if (state.phase === 'DROP_ANIMATING') {
       const draggable: DraggableDimension =
-        state.dimensions.draggables[state.pending.result.draggableId];
+        state.dimensions.draggables[state.critical.draggable.id];
       return getMapProps(id, draggable, state.pending.impact, true, true);
     }
 
