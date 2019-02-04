@@ -144,6 +144,7 @@ export default class Board extends Component<Props, State> {
                 isCombineEnabled={this.props.isCombineEnabled}
               />
             ))}
+            {provided.placeholder}
           </Container>
         )}
       </Droppable>

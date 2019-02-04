@@ -429,6 +429,7 @@ export default (state: State = idle, action: Action): State => {
       pending,
       shouldAnimateHomePlaceholder: state.shouldAnimateHomePlaceholder,
       dimensions: state.dimensions,
+      critical: state.critical,
     };
 
     return result;

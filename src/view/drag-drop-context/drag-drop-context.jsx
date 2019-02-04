@@ -19,7 +19,7 @@ import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
-import type { DraggableId, State, Responders } from '../../types';
+import type { DraggableId, State, Responders, TypeId } from '../../types';
 import type { Store } from '../../state/store-types';
 import {
   storeKey,
@@ -173,7 +173,8 @@ export default class DragDropContext extends React.Component<Props> {
   // This is useful when the user
   canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
 
-  isDraggingOrDropping = () => getIsDraggingOrDropping(this.store.getState());
+  isDraggingOrDropping = (type: TypeId) =>
+    getIsDraggingOrDropping(type, this.store.getState());
 
   componentDidMount() {
     window.addEventListener('error', this.onWindowError);

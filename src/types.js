@@ -353,6 +353,7 @@ export type DropAnimatingState = {|
   pending: PendingDrop,
   // We still need to render placeholders and fix the dimensions of the dragging item
   dimensions: DimensionMap,
+  critical: Critical,
 |};
 
 export type State =

@@ -94,9 +94,10 @@ export default class Droppable extends Component<Props> {
     }
 
     warning(`
-      Droppable setup issue: DroppableProvided > placeholder could not be found.
-      Please be sure to add the {provided.placeholder} Node as a child of your Droppable
+      Droppable setup issue [droppableId: "${this.props.droppableId}"]:
+      DroppableProvided > placeholder could not be found.
 
+      Please be sure to add the {provided.placeholder} React Node as a child of your Droppable.
       More information: https://github.com/atlassian/react-beautiful-dnd#1-provided-droppableprovided
     `);
   }
@@ -133,9 +134,14 @@ export default class Droppable extends Component<Props> {
 
   getPlaceholder() {
     const placeholder: ?PlaceholderType = this.props.placeholder;
-    const isDraggingOrDropping: boolean = this.context[
-      isDraggingOrDroppingKey
-    ]();
+    console.group(`droppable type: ${this.props.type}`);
+    console.log('droppable placeholder', placeholder);
+    const isDraggingOrDropping: boolean = this.context[isDraggingOrDroppingKey](
+      this.props.type,
+    );
+
+    console.log('isDraggingOrDropping', isDraggingOrDropping);
+    console.groupEnd();
 
     // TODO: animate droppable placeholder except when drag is finished
     return (

@@ -1,6 +1,10 @@
 // @flow
-import type { State } from '../types';
+import type { State, TypeId } from '../types';
 
-export default function isDraggingOrDropping(state: State): boolean %checks {
-  return state.isDragging || state.phase === 'DROP_ANIMATING';
-}
+export default (type: TypeId, state: State): boolean => {
+  if (state.isDragging || state.phase === 'DROP_ANIMATING') {
+    return state.critical.droppable.type === type;
+  }
+
+  return false;
+};
