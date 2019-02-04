@@ -80,11 +80,9 @@ export default ({
   });
 
   if (withMerge) {
-    console.log('returning merge', withMerge);
     return withMerge;
   }
 
-  console.log('returning reorder');
   return getReorderImpact({
     pageBorderBoxCenterWithDroppableScrollChange,
     destination,

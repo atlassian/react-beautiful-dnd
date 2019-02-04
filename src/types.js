@@ -350,7 +350,6 @@ export type DropPendingState = {|
 // An optional phase for animating the drop / cancel if it is needed
 export type DropAnimatingState = {|
   phase: 'DROP_ANIMATING',
-  shouldAnimateHomePlaceholder: boolean,
   pending: PendingDrop,
   // We still need to render placeholders and fix the dimensions of the dragging item
   dimensions: DimensionMap,

@@ -69,7 +69,6 @@ export default class Placeholder extends PureComponent<Props, State> {
   }
 
   componentDidMount() {
-    console.log('state', this.state);
     if (!this.state.shouldMountEmptyAndOpen) {
       return;
     }
@@ -106,20 +105,16 @@ export default class Placeholder extends PureComponent<Props, State> {
       return;
     }
 
-    console.log('PLACEHOLDER ANIMATION FINISHED');
     this.props.onTransitionEnd();
 
     if (this.props.animate === 'close') {
-      console.log('CLOSED');
       this.props.onClose();
     }
   };
 
   render() {
-    console.log('animate?', this.props.animate);
     const placeholder: PlaceholderType = this.props.placeholder;
     const size: Size = this.state.useEmpty ? empty : getSize(placeholder);
-    console.log('size', size);
     const { display, tagName } = placeholder;
 
     // The goal of the placeholder is to take up the same amount of space

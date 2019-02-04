@@ -6,6 +6,7 @@ import type {
   DragImpact,
   Displacement,
   Viewport,
+  OnLift,
 } from '../../types';
 import scrollViewport from '../scroll-viewport';
 import scrollDroppable from '../droppable/scroll-droppable';
@@ -19,6 +20,7 @@ type SpeculativeArgs = {|
   viewport: Viewport,
   draggables: DraggableDimensionMap,
   maxScrollChange: Position,
+  onLift: OnLift,
 |};
 
 export default ({
@@ -27,6 +29,7 @@ export default ({
   destination,
   draggables,
   maxScrollChange,
+  onLift,
 }: SpeculativeArgs): DragImpact => {
   const displaced: Displacement[] = impact.movement.displaced;
 
@@ -51,6 +54,7 @@ export default ({
       destination: scrolledDroppable,
       previousImpact: impact,
       viewport: scrolledViewport.frame,
+      onLift,
     });
 
     if (!result.isVisible) {

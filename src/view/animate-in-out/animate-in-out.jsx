@@ -37,6 +37,7 @@ export default class AnimateInOut extends React.Component<Props, State> {
         animate: 'none',
       };
     }
+
     // need to animate in
     if (props.on) {
       return {

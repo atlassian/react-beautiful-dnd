@@ -121,6 +121,7 @@ export default ({
     destination,
     draggables,
     maxScrollChange: distance,
+    onLift,
   });
 
   return {
