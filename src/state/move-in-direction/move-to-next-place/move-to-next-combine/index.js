@@ -11,6 +11,7 @@ import {
   forward,
   backward,
 } from '../../../user-direction/user-direction-preset';
+import removeDraggableFromList from '../../../remove-draggable-from-list';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -46,8 +47,8 @@ export default ({
 
   const currentIndex: number = location.index;
 
-  // update the insideDestination list to reflect the current
-  // list order
+  // update the insideDestination list to reflect the current list order
+  // TODO: cleanup
   const currentInsideDestination: DraggableDimension[] = (() => {
     const shallow = originalInsideDestination.slice();
 
@@ -75,7 +76,11 @@ export default ({
     return null;
   }
 
+  // TODO: what if target is original!?
   const target: DraggableDimension = currentInsideDestination[targetIndex];
+  if (target === draggable) {
+    console.warn('target === draggable!!!');
+  }
 
   const merge: CombineImpact = {
     whenEntered: isMovingForward ? forward : backward,

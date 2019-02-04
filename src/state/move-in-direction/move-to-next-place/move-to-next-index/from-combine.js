@@ -7,6 +7,7 @@ import type {
   DraggableDimensionMap,
   DraggableId,
   DragMovement,
+  OnLift,
 } from '../../../../types';
 import type { Instruction } from './move-to-next-index-types';
 
@@ -18,6 +19,7 @@ type Args = {|
   previousImpact: DragImpact,
   draggables: DraggableDimensionMap,
   merge: CombineImpact,
+  onLift: OnLift,
 |};
 
 export default ({
@@ -28,6 +30,7 @@ export default ({
   previousImpact,
   draggables,
   merge,
+  onLift,
 }: Args): ?Instruction => {
   if (!destination.isCombineEnabled) {
     return null;
@@ -38,87 +41,55 @@ export default ({
   const combine: DraggableDimension = draggables[combineId];
   const combineIndex: number = combine.descriptor.index;
   const isCombineDisplaced: boolean = Boolean(movement.map[combineId]);
+  const wasDisplacedAtStart: boolean = Boolean(onLift.wasDisplaced[combineId]);
+  const hasDisplacedFromStart: boolean =
+    (isCombineDisplaced && !wasDisplacedAtStart) ||
+    (!isCombineDisplaced && wasDisplacedAtStart);
+  console.group('from combine.js');
+  // console.log('isCombineDisplaced', isCombineDisplaced);
+  // console.log('wasDisplacedAtStart', wasDisplacedAtStart);
+  // console.warn('hasDisplacedFromStart', hasDisplacedFromStart);
 
-  // moving from an item that is not displaced
-  if (!isCombineDisplaced) {
-    // Need to know if targeting the combined item would normally displace forward
-    // TODO: remove
-    const willDisplaceForward: boolean = true;
-
-    if (willDisplaceForward) {
-      // will displace forwards (eg home list moving backward from start)
-      // moving forward will decrease displacement
-      // moving backward will increase displacement
-
-      if (isMovingForward) {
-        // we skip displacement when we move past a displaced item
-        return {
-          proposedIndex: combineIndex + 1,
-          modifyDisplacement: false,
-        };
-      }
-      return {
-        proposedIndex: combineIndex,
-        modifyDisplacement: true,
-      };
-    }
-
-    // will displace backwards (eg home list moving forward from start)
-    // moving forward will increase displacement
-    // moving backward will decrease displacement
-
-    if (isMovingForward) {
-      // we are moving into the visual spot of the combine item
-      // and pushing it backwards
-      return {
-        proposedIndex: combineIndex,
-        modifyDisplacement: true,
-      };
-    }
-    // we are moving behind the displaced item and leaving it in place
-    return {
-      proposedIndex: combineIndex - 1,
-      modifyDisplacement: false,
-    };
-  }
-
-  // moving from an item that is already displaced
-  // TODO: remove
-  const isDisplacedForward: boolean = true;
   const visualIndex: number = combineIndex + 1;
 
-  if (isDisplacedForward) {
-    // if displaced forward, then moving forward will undo the displacement
+  // moving away from target that has been displaced after the start of a drag
+  if (hasDisplacedFromStart) {
     if (isMovingForward) {
+      console.log('🛑: moving forward from displaced');
+      console.groupEnd();
       return {
-        proposedIndex: visualIndex,
+        proposedIndex: combineIndex + 1,
         modifyDisplacement: true,
       };
     }
     // if moving backwards, will move in front of the displaced item
     // want to leave the displaced item in place
+    console.log('✅: move backwards from displaced');
+    console.groupEnd();
     return {
-      proposedIndex: visualIndex - 1,
-      modifyDisplacement: false,
+      proposedIndex: combineIndex - 1,
+      modifyDisplacement: true,
     };
   }
 
-  // is displaced backwards
-  // moving forward will increase the displacement
-  // moving backward will decrease the displacement
+  // moving off target that has not been displaced after the start of a drag
 
   if (isMovingForward) {
-    // we are moving forwards off the backwards displaced item, leaving it displaced
+    // this will increase the amount of displacement
+    // this will displace the item backwards
+    // we are moving into the items position
+    console.log('✅ move forwards from non-displaced');
+    console.groupEnd();
     return {
-      proposedIndex: visualIndex + 1,
-      modifyDisplacement: false,
+      proposedIndex: combineIndex,
+      modifyDisplacement: true,
     };
   }
-
-  // we are moving backwards into the visual spot that the displaced item is occupying
-  // this will undo the displacement of the item
+  // this will in
+  console.log('✅: move backwards from non-displaced');
+  console.groupEnd();
   return {
-    proposedIndex: visualIndex,
+    proposedIndex: combineIndex - 1,
     modifyDisplacement: true,
   };
 };

@@ -7,6 +7,7 @@ import type {
   DragImpact,
   DisplacedBy,
   Displacement,
+  OnLift,
 } from '../../../../types';
 import type { Instruction } from './move-to-next-index-types';
 import getDisplacementMap from '../../../get-displacement-map';
@@ -24,6 +25,7 @@ export type Args = {|
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
+  onLift: OnLift,
 |};
 
 export default ({
@@ -34,32 +36,36 @@ export default ({
   destination,
   insideDestination,
   previousImpact,
+  onLift,
 }: Args): ?DragImpact => {
   const instruction: ?Instruction = (() => {
+    // moving from reorder
     if (previousImpact.destination) {
       return fromReorder({
         isMovingForward,
         isInHomeList,
         draggable,
-        previousImpact,
+        location: previousImpact.destination,
         insideDestination,
       });
     }
 
-    invariant(
-      previousImpact.merge,
-      'Cannot move to next spot without a destination or merge',
-    );
+    // moving from merge
+    if (previousImpact.merge) {
+      return fromCombine({
+        isInHomeList,
+        isMovingForward,
+        draggable,
+        destination,
+        previousImpact,
+        draggables,
+        merge: previousImpact.merge,
+        onLift,
+      });
+    }
 
-    return fromCombine({
-      isInHomeList,
-      isMovingForward,
-      draggable,
-      destination,
-      previousImpact,
-      draggables,
-      merge: previousImpact.merge,
-    });
+    invariant('Cannot move to next spot without a destination or merge');
+    return null;
   })();
 
   if (instruction == null) {
@@ -93,6 +99,11 @@ export default ({
     const atProposedIndex: DraggableDimension = withoutDraggable[proposedIndex];
     return addClosest(atProposedIndex, lastDisplaced);
   })();
+
+  console.group('result');
+  console.log('displaced:', displaced.map(d => d.draggableId));
+  console.log('new index', proposedIndex);
+  console.groupEnd();
 
   return {
     movement: {

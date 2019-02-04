@@ -69,6 +69,7 @@ export default ({
       destination,
       insideDestination,
       previousImpact,
+      onLift,
     });
 
   if (!impact) {
