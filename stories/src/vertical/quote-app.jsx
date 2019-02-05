@@ -1,16 +1,16 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { colors } from '@atlaskit/theme';
 import type { Quote } from '../types';
 import type { DropResult } from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
-import { grid } from '../constants';
 import reorder from '../reorder';
+import { grid } from '../constants';
 
 const Root = styled.div`
   /* flexbox */
+  padding-top: ${grid * 2}px;
   display: flex;
   justify-content: center;
   align-items: flex-start;

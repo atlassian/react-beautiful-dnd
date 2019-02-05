@@ -124,9 +124,8 @@ export const getQuotes = (count: number): Quote[] =>
     const random: Quote = quotes[Math.floor(Math.random() * quotes.length)];
 
     const custom: Quote = {
-      id: `quote-${idCount++}`,
-      content: random.content,
-      author: random.author,
+      ...random,
+      id: `${idCount++}`,
     };
 
     return custom;
@@ -137,10 +136,8 @@ export const getAuthors = (count: number): Author[] =>
     const random: Author = authors[Math.floor(Math.random() * authors.length)];
 
     const custom: Author = {
+      ...random,
       id: `author-${idCount++}`,
-      name: random.name,
-      avatarUrl: random.avatarUrl,
-      url: random.url,
     };
 
     return custom;

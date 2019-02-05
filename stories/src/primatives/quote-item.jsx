@@ -55,13 +55,13 @@ const Container = styled.a`
   }
 
   &:focus {
-    outline: 2px solid ${colors.purple};
+    outline: none;
+    border-color: ${props => props.colors.hard};
     box-shadow: none;
   }
 
   /* flexbox */
   display: flex;
-  align-items: center;
 `;
 
 const Avatar = styled.img`
@@ -101,6 +101,7 @@ const BlockQuote = styled.div`
 const Footer = styled.div`
   display: flex;
   margin-top: ${grid}px;
+  align-items: center;
 `;
 
 const Author = styled.small`
@@ -108,15 +109,16 @@ const Author = styled.small`
   margin: 0;
   background-color: ${props => props.colors.soft};
   font-weight: normal;
-  color: ${colors.black};
   padding: ${grid / 2}px;
 `;
 
-const Attribution = styled.small`
-  margin: 0;
-  margin-left: ${grid}px;
-  text-align: right;
+const QuoteId = styled.small`
   flex-grow: 1;
+  flex-shrink: 1;
+  margin: 0;
+  font-weight: normal;
+  text-overflow: ellipsis;
+  text-align: right;
 `;
 
 // Previously this extended React.Component
@@ -145,7 +147,7 @@ export default class QuoteItem extends React.PureComponent<Props> {
           <BlockQuote>{quote.content}</BlockQuote>
           <Footer>
             <Author colors={quote.author.colors}>{quote.author.name}</Author>
-            {/* <Attribution>({quote.id})</Attribution> */}
+            <QuoteId>id:{quote.id}</QuoteId>
           </Footer>
         </Content>
       </Container>

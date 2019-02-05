@@ -6,9 +6,8 @@ import { grid } from '../../stories/src/constants';
 
 const GlobalStyles = styled.div`
   background-color: ${colors.N0};
-  box-sizing: border-box;
-  padding: ${grid * 2}px;
   min-height: 100vh;
+  color: ${colors.N900};
 `;
 
 const GlobalStylesDecorator = (storyFn: Function) => (
