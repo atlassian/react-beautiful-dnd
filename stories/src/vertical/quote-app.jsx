@@ -10,11 +10,6 @@ import { grid } from '../constants';
 import reorder from '../reorder';
 
 const Root = styled.div`
-  background-color: ${colors.B200};
-  box-sizing: border-box;
-  padding: ${grid * 2}px;
-  min-height: 100vh;
-
   /* flexbox */
   display: flex;
   justify-content: center;

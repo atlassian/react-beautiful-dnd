@@ -19,8 +19,6 @@ const ParentContainer = styled.div`
 `;
 
 const Container = styled.div`
-  min-height: 100vh;
-
   /* like display:flex but will allow bleeding over the window width */
   min-width: 100vw;
   display: inline-flex;

@@ -2,6 +2,7 @@ import React from 'react';
 import { configure, addDecorator } from '@storybook/react';
 import { withOptions } from '@storybook/addon-options';
 import PopIframeDecorator from './decorator/pop-iframe';
+import GlobalStylesDecorator from './decorator/global-styles';
 // adding css reset - storybook includes a css loader
 import '@atlaskit/css-reset';
 import { version } from '../package.json';
@@ -13,6 +14,7 @@ addDecorator(
   }),
 );
 
+addDecorator(GlobalStylesDecorator);
 addDecorator(PopIframeDecorator);
 
 // automatically import all files ending in *.stories.js
