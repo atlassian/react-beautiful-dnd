@@ -44,14 +44,12 @@ export default ({
 
     if (hasDisplacedFromStart) {
       if (isMovingForward) {
-        console.warn('✅ ❤️ case 1');
         return {
           proposedIndex: combineIndex,
           modifyDisplacement: false,
         };
       }
 
-      console.warn('✅ ❤️ case 2');
       return {
         proposedIndex: combineIndex - 1,
         modifyDisplacement: true,
@@ -60,14 +58,12 @@ export default ({
 
     // move into position of combine
     if (isMovingForward) {
-      console.warn('✅ ❤️ case 3');
       return {
         proposedIndex: combineIndex,
         modifyDisplacement: true,
       };
     }
 
-    console.warn('✅ ❤️ case 4');
     return {
       proposedIndex: combineIndex - 1,
       modifyDisplacement: false,
@@ -78,13 +74,11 @@ export default ({
 
   if (isDisplaced) {
     if (isMovingForward) {
-      console.warn('✅ ❤️ case 5');
       return {
         proposedIndex: combineIndex + 1,
         modifyDisplacement: true,
       };
     }
-    console.warn('✅ ❤️ case 6');
     return {
       proposedIndex: combineIndex,
       modifyDisplacement: false,
@@ -92,14 +86,12 @@ export default ({
   }
 
   if (isMovingForward) {
-    console.warn('✅ ❤️ case 7');
     return {
       proposedIndex: combineIndex + 1,
       modifyDisplacement: false,
     };
   }
 
-  console.warn('✅ ❤️ case 8');
   return {
     proposedIndex: combineIndex,
     modifyDisplacement: true,

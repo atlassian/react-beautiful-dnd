@@ -105,11 +105,6 @@ export default ({
     viewport,
   });
 
-  console.group('cross axis');
-  console.log('new index', impact.destination.index);
-  console.log('displaced', impact.movement.displaced.map(d => d.draggableId));
-  console.groupEnd();
-
   return {
     clientSelection,
     impact,
