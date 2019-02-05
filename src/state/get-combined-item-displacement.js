@@ -7,6 +7,7 @@ import type {
   DisplacedBy,
 } from '../types';
 import { origin, negate } from './position';
+import didStartDisplaced from './starting-displaced/did-start-displaced';
 
 type Args = {|
   displaced: DisplacementMap,
@@ -21,10 +22,9 @@ export default ({
   combineWith,
   displacedBy,
 }: Args): Position => {
-  const didStartDisplaced: boolean = Boolean(onLift.wasDisplaced[combineWith]);
   const isDisplaced: boolean = Boolean(displaced[combineWith]);
 
-  if (didStartDisplaced) {
+  if (didStartDisplaced(combineWith, onLift)) {
     return isDisplaced ? origin : negate(displacedBy.point);
   }
 

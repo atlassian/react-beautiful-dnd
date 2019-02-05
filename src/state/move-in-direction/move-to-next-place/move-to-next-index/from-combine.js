@@ -10,6 +10,7 @@ import type {
   OnLift,
 } from '../../../../types';
 import type { Instruction } from './move-to-next-index-types';
+import didStartDisplaced from '../../../starting-displaced/did-start-displaced';
 
 type Args = {|
   isMovingForward: boolean,
@@ -36,7 +37,7 @@ export default ({
   const combineId: DraggableId = merge.combine.draggableId;
   const combine: DraggableDimension = draggables[combineId];
   const combineIndex: number = combine.descriptor.index;
-  const wasDisplacedAtStart: boolean = Boolean(onLift.wasDisplaced[combineId]);
+  const wasDisplacedAtStart: boolean = didStartDisplaced(combineId, onLift);
 
   if (wasDisplacedAtStart) {
     const hasDisplacedFromStart: boolean = !movement.map[combineId];

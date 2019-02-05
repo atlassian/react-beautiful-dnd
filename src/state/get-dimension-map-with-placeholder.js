@@ -12,6 +12,7 @@ import type {
   DroppableId,
 } from '../types';
 import patchDroppableMap from './patch-droppable-map';
+import isHomeOf from './droppable/is-home-of';
 
 type ClearArgs = {|
   previousImpact: DragImpact,
@@ -72,13 +73,12 @@ export default ({
     return base;
   }
 
+  const droppable: DroppableDimension = base.droppables[isOver];
+
   // no need to add additional space to home droppable
-  if (isOver === draggable.descriptor.droppableId) {
-    // TODO: need to actually remove placeholder space!?
+  if (isHomeOf(draggable, droppable)) {
     return base;
   }
-
-  const droppable: DroppableDimension = base.droppables[isOver];
 
   // already have a placeholder - nothing to do here!
   if (droppable.subject.withPlaceholder) {
@@ -88,7 +88,7 @@ export default ({
   // Need to patch the existing droppable
   const patched: DroppableDimension = addPlaceholder(
     droppable,
-    draggable.displaceBy,
+    draggable,
     base.draggables,
   );
 

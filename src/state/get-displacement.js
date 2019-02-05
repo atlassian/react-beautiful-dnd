@@ -12,6 +12,7 @@ import type {
 import { isPartiallyVisible } from './visibility/is-visible';
 import { offsetByPosition } from './spacing';
 import { negate } from './position';
+import didStartDisplaced from './starting-displaced/did-start-displaced';
 
 type Args = {|
   draggable: DraggableDimension,
@@ -54,11 +55,8 @@ const getShouldAnimate = (
 
 const getTarget = (draggable: DraggableDimension, onLift: OnLift): Rect => {
   const marginBox: Rect = draggable.page.marginBox;
-  const didStartDisplaced: boolean = Boolean(
-    onLift.wasDisplaced[draggable.descriptor.id],
-  );
 
-  if (!didStartDisplaced) {
+  if (!didStartDisplaced(draggable.descriptor.id, onLift)) {
     return marginBox;
   }
 

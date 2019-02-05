@@ -10,14 +10,16 @@ import type {
   Displacement,
   Viewport,
   DisplacedBy,
-} from '../../../../types';
-import getDisplacedBy from '../../../get-displaced-by';
-import getDisplacement from '../../../get-displacement';
-import getDisplacementMap from '../../../get-displacement-map';
-import { noMovement } from '../../../no-impact';
-import getPageBorderBoxCenter from '../../../get-center-from-impact/get-page-border-box-center';
-import isTotallyVisibleInNewLocation from '../../move-to-next-place/is-totally-visible-in-new-location';
-import { addPlaceholder } from '../../../droppable/with-placeholder';
+  OnLift,
+} from '../../../types';
+import getDisplacedBy from '../../get-displaced-by';
+import getDisplacement from '../../get-displacement';
+import getDisplacementMap from '../../get-displacement-map';
+import { noMovement } from '../../no-impact';
+import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border-box-center';
+import isTotallyVisibleInNewLocation from '../move-to-next-place/is-totally-visible-in-new-location';
+import { addPlaceholder } from '../../droppable/with-placeholder';
+import removeDraggableFromList from '../../remove-draggable-from-list';
 
 type Args = {|
   previousPageBorderBoxCenter: Position,
@@ -28,6 +30,7 @@ type Args = {|
   destination: DroppableDimension,
   previousImpact: DragImpact,
   viewport: Viewport,
+  onLift: OnLift,
 |};
 
 export default ({
@@ -39,12 +42,17 @@ export default ({
   destination,
   previousImpact,
   viewport,
+  onLift,
 }: Args): ?DragImpact => {
   const axis: Axis = destination.axis;
 
-  // Moving to an empty list
-  // Could be invisible location - so need to check
-  if (!moveRelativeTo || !insideDestination.length) {
+  if (!moveRelativeTo) {
+    // Draggables available, but none are candidates for movement
+    if (insideDestination.length) {
+      return null;
+    }
+
+    // Try move to top of empty list if it is visible
     const proposed: DragImpact = {
       movement: noMovement,
       direction: axis.direction,
@@ -59,12 +67,14 @@ export default ({
       draggable,
       droppable: destination,
       draggables,
+      onLift,
     });
 
     // need to check as if room was already added
+    // note: will not add placeholder space to home
     const withPlaceholder: DroppableDimension = addPlaceholder(
       destination,
-      draggable.displaceBy,
+      draggable,
       draggables,
     );
 
@@ -81,34 +91,47 @@ export default ({
     return isVisibleInNewLocation ? proposed : null;
   }
 
-  // Moving to a populated list
-  const targetIndex: number = insideDestination.indexOf(moveRelativeTo);
-  invariant(targetIndex !== -1, 'Cannot find draggable in foreign list');
-
   const isGoingBeforeTarget: boolean = Boolean(
     previousPageBorderBoxCenter[destination.axis.line] <
       moveRelativeTo.page.borderBox.center[destination.axis.line],
   );
 
-  const proposedIndex: number = isGoingBeforeTarget
-    ? targetIndex
-    : targetIndex + 1;
+  // Moving to a populated list
+  const targetIndex: number = insideDestination.indexOf(moveRelativeTo);
+  invariant(targetIndex !== -1, 'Cannot find target in list');
 
-  const displaced: Displacement[] = insideDestination.slice(proposedIndex).map(
-    (dimension: DraggableDimension): Displacement =>
-      getDisplacement({
-        draggable: dimension,
-        destination,
-        viewport: viewport.frame,
-        previousImpact,
-      }),
-  );
+  const proposedIndex: number = (() => {
+    // TODO: is this logic correct?
+    if (moveRelativeTo.descriptor.id === draggable.descriptor.id) {
+      return targetIndex;
+    }
 
-  const willDisplaceForward: boolean = true;
+    if (isGoingBeforeTarget) {
+      return targetIndex;
+    }
+
+    return targetIndex + 1;
+  })();
+
+  const displaced: Displacement[] = removeDraggableFromList(
+    draggable,
+    insideDestination,
+  )
+    .slice(proposedIndex)
+    .map(
+      (dimension: DraggableDimension): Displacement =>
+        getDisplacement({
+          draggable: dimension,
+          destination,
+          viewport: viewport.frame,
+          previousImpact,
+          onLift,
+        }),
+    );
+
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
-    willDisplaceForward,
   );
 
   const impact: DragImpact = {
@@ -116,7 +139,6 @@ export default ({
       displacedBy,
       displaced,
       map: getDisplacementMap(displaced),
-      willDisplaceForward,
     },
     direction: axis.direction,
     destination: {

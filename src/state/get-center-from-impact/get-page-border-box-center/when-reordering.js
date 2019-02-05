@@ -11,6 +11,7 @@ import type {
 import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import { negate } from '../../position';
+import didStartDisplaced from '../../starting-displaced/did-start-displaced';
 
 type NewHomeArgs = {|
   movement: DragMovement,
@@ -55,12 +56,8 @@ export default ({
       draggables[displaced[0].draggableId];
     // want to go before where it would be with the displacement
 
-    const didStartDisplaced: boolean = Boolean(
-      onLift.wasDisplaced[closestAfter.descriptor.id],
-    );
-
     // target is displaced and is already in it's starting position
-    if (didStartDisplaced) {
+    if (didStartDisplaced(closestAfter.descriptor.id, onLift)) {
       return goBefore({
         axis,
         moveRelativeTo: closestAfter.page,
@@ -93,11 +90,7 @@ export default ({
 
   // we need to go after the closest before
 
-  const didStartDisplaced: boolean = Boolean(
-    onLift.wasDisplaced[closestBefore.descriptor.id],
-  );
-
-  if (didStartDisplaced) {
+  if (didStartDisplaced(closestBefore.descriptor.id, onLift)) {
     // now the item is not displaced, it will not be sitting in it's original spot
     // we need to remove the displacement to get the target to its original spot
     const page: BoxModel = offset(

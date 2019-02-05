@@ -13,6 +13,7 @@ import type {
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import { subtract } from '../../position';
 import getClientBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center';
+import didStartDisplaced from '../../starting-displaced/did-start-displaced';
 
 type Args = {|
   impact: DragImpact,
@@ -61,11 +62,7 @@ export default ({
   // into the new home location of the target.
   // The target will move as a result of a drop if it started displaced
 
-  const didStartDisplaced: boolean = Boolean(
-    onLift.wasDisplaced[merge.combine.draggableId],
-  );
-
-  return didStartDisplaced
+  return didStartDisplaced(merge.combine.draggableId, onLift)
     ? subtract(offset, onLift.displacedBy.point)
     : offset;
 };

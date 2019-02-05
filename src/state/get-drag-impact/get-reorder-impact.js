@@ -18,6 +18,7 @@ import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import { offsetByPosition } from '../spacing';
 import { negate } from '../position';
+import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
@@ -56,8 +57,9 @@ export default ({
     .filter(
       (child: DraggableDimension): boolean => {
         // did this item start displaced when the drag started?
-        const didStartDisplaced: boolean = Boolean(
-          onLift.wasDisplaced[child.descriptor.id],
+        const didStartDisplaced: boolean = getDidStartDisplaced(
+          child.descriptor.id,
+          onLift,
         );
 
         const borderBox: Spacing = didStartDisplaced
