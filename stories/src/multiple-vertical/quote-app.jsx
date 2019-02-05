@@ -1,16 +1,17 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { colors } from '@atlaskit/theme';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
-import { colors, grid } from '../constants';
+import { grid } from '../constants';
 import { reorderQuoteMap } from '../reorder';
 import type { ReorderQuoteMapResult } from '../reorder';
 import type { QuoteMap } from '../types';
 import type { DropResult, DraggableLocation } from '../../../src/types';
 
 const Root = styled.div`
-  background-color: ${colors.blue.deep};
+  background-color: ${colors.B200};
   box-sizing: border-box;
   padding: ${grid * 2}px;
   min-height: 100vh;

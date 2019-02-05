@@ -19,6 +19,15 @@
     "@babel/runtime" "^7.0.0"
     prop-types "^15.5.10"
 
+"@atlaskit/theme@^7.0.4":
+  version "7.0.4"
+  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-7.0.4.tgz#4f9a7568633a7e18bdcc121627e32916ee9ada66"
+  integrity sha512-Pk7x8gwVyeEc7y7hhjeKfu26ykXl1CJfFSoLuxCIrELzNnx4LFxfAFmcoHgr09c8/nsT57vtxmcnmKkZkEJtJA==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    exenv "^1.2.2"
+    prop-types "^15.5.10"
+
 "@babel/code-frame@7.0.0", "@babel/code-frame@^7.0.0":
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.0.0.tgz#06e2ab19bdb535385559aabb5ba59729482800f8"
@@ -5327,7 +5336,7 @@ execall@^1.0.0:
   dependencies:
     clone-regexp "^1.0.0"
 
-exenv@^1.2.0:
+exenv@^1.2.0, exenv@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/exenv/-/exenv-1.2.2.tgz#2ae78e85d9894158670b03d47bec1f03bd91bb9d"
 

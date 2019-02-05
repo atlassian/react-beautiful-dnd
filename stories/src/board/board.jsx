@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
+import { colors } from '@atlaskit/theme';
 import Column from './column';
-import { colors } from '../constants';
 import reorder, { reorderQuoteMap } from '../reorder';
 import { DragDropContext, Droppable } from '../../../src';
 import type {
@@ -40,7 +40,7 @@ type State = {|
 
 const GlobalStyle = createGlobalStyle`
   body {
-    background: ${colors.blue.deep};
+    background: ${colors.B200};
   }
 `;
 

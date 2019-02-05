@@ -1,11 +1,12 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { colors } from '@atlaskit/theme';
 import { Droppable } from '../../../src';
 import Task from './task';
 import type { DroppableProvided } from '../../../src';
 import type { Task as TaskType } from '../types';
-import { colors, grid, borderRadius } from '../constants';
+import { grid, borderRadius } from '../constants';
 
 type Props = {|
   tasks: TaskType[],
@@ -14,7 +15,7 @@ type Props = {|
 
 const Container = styled.div`
   width: 300px;
-  background-color: ${colors.grey.dark};
+  background-color: ${colors.N100};
   border-radius: ${borderRadius}px;
 `;
 

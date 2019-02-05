@@ -4,10 +4,11 @@ import ReactDOM from 'react-dom';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import styled from 'styled-components';
+import { colors } from '@atlaskit/theme';
 import { Draggable } from '../../../src';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Task as TaskType } from '../types';
-import { colors, grid, borderRadius } from '../constants';
+import { grid, borderRadius } from '../constants';
 
 type Props = {|
   task: TaskType,
@@ -16,7 +17,7 @@ type Props = {|
 
 const Container = styled.div`
   border-bottom: 1px solid #ccc;
-  background: ${colors.white};
+  background: ${colors.N0};
   padding: ${grid}px;
   margin-bottom: ${grid}px;
   border-radius: ${borderRadius}px;

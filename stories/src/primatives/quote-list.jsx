@@ -1,9 +1,10 @@
 // @flow
 import React from 'react';
 import styled from 'styled-components';
+import { colors } from '@atlaskit/theme';
 import { Droppable, Draggable } from '../../../src';
 import QuoteItem from './quote-item';
-import { grid, colors } from '../constants';
+import { grid } from '../constants';
 import Title from './title';
 import type { Quote } from '../types';
 import type {
@@ -18,12 +19,12 @@ const getBackgroundColor = (
   isDraggingFrom: boolean,
 ): string => {
   if (isDraggingOver) {
-    return colors.blue.lighter;
+    return colors.R50;
   }
   if (isDraggingFrom) {
-    return 'honeydew';
+    return colors.T50;
   }
-  return colors.blue.light;
+  return colors.N30;
 };
 
 const Wrapper = styled.div`

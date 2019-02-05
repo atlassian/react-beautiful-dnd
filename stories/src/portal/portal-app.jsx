@@ -2,9 +2,10 @@
 import React, { Component, type Node } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
+import { colors } from '@atlaskit/theme';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import reorder from '../reorder';
-import { grid, colors } from '../constants';
+import { grid } from '../constants';
 import type { Quote } from '../types';
 import type {
   DropResult,
@@ -31,8 +32,8 @@ document.body.appendChild(portal);
 const SimpleQuote = styled.div`
   padding: ${grid}px;
   margin-bottom: ${grid}px;
-  background-color: ${colors.blue.light};
-  border: 1px solid ${colors.blue.deep};
+  background-color: ${colors.B50};
+  border: 1px solid ${colors.B200};
 
   /* used for positioning the after content */
   position: relative;
