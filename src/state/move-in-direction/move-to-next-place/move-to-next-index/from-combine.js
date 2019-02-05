@@ -37,7 +37,6 @@ export default ({
   const combine: DraggableDimension = draggables[combineId];
   const combineIndex: number = combine.descriptor.index;
   const wasDisplacedAtStart: boolean = Boolean(onLift.wasDisplaced[combineId]);
-  console.log('combine index', combineIndex);
 
   if (wasDisplacedAtStart) {
     const hasDisplacedFromStart: boolean = !movement.map[combineId];
