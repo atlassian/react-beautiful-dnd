@@ -117,7 +117,8 @@ export const quotes: Quote[] = [
   },
 ];
 
-let idCount: number = 0;
+// So we do not have any clashes with our hardcoded ones
+let idCount: number = quotes.length + 1;
 
 export const getQuotes = (count: number): Quote[] =>
   Array.from({ length: count }, (v, k) => k).map(() => {
@@ -125,7 +126,7 @@ export const getQuotes = (count: number): Quote[] =>
 
     const custom: Quote = {
       ...random,
-      id: `${idCount++}`,
+      id: `G${idCount++}`,
     };
 
     return custom;
