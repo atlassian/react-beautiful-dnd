@@ -25,8 +25,8 @@ export default class AnimateInOut extends React.Component<Props, State> {
   state: State = {
     isVisible: Boolean(this.props.on),
     data: this.props.on,
-    // not allowing 'close' when mounting
-    animate: this.props.shouldAnimate ? 'open' : 'none',
+    // not allowing to animate close on mount
+    animate: this.props.shouldAnimate && this.props.on ? 'open' : 'none',
   };
 
   static getDerivedStateFromProps(props: Props, state: State): State {
@@ -50,11 +50,20 @@ export default class AnimateInOut extends React.Component<Props, State> {
 
     // need to animate out if there was data
 
+    if (state.isVisible) {
+      return {
+        isVisible: true,
+        // use old data for animating out
+        data: state.data,
+        animate: 'close',
+      };
+    }
+
+    // close animation no longer visible
     return {
-      isVisible: state.isVisible,
-      // use old data for animating out
-      data: state.data,
+      isVisible: false,
       animate: 'close',
+      data: null,
     };
   }
 
@@ -75,6 +84,6 @@ export default class AnimateInOut extends React.Component<Props, State> {
       data: this.state.data,
       animate: this.state.animate,
     };
-    return this.props.children(provided);
+    return this.props.children(provided) || null;
   }
 }

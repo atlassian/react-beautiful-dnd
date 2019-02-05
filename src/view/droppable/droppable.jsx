@@ -149,7 +149,7 @@ export default class Droppable extends Component<Props> {
     return (
       <AnimateInOut on={placeholder} shouldAnimate={shouldAnimate}>
         {({ isVisible, onClose, data, animate }: AnimateProvided) =>
-          isVisible && (
+          isVisible ? (
             <Placeholder
               placeholder={(data: any)}
               onClose={onClose}
@@ -157,7 +157,7 @@ export default class Droppable extends Component<Props> {
               animate={animate}
               onTransitionEnd={this.onPlaceholderTransitionEnd}
             />
-          )
+          ) : null
         }
       </AnimateInOut>
     );
