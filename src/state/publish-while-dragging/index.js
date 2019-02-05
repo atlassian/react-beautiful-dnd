@@ -125,6 +125,7 @@ export default ({
   console.group('new impact');
   console.log('index', impact.destination ? impact.destination.index : null);
   console.log('displaced', impact.movement.displaced.map(d => d.draggableId));
+  console.log('onLift', onLift.wasDisplaced);
   console.groupEnd();
 
   const isOrphaned: boolean = Boolean(

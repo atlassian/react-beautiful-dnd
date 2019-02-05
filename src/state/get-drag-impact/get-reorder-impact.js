@@ -111,5 +111,10 @@ export default ({
     merge: null,
   };
 
+  console.group('new impact');
+  console.log('index', impact.destination ? impact.destination.index : null);
+  console.log('displaced', impact.movement.displaced.map(d => d.draggableId));
+  console.groupEnd();
+
   return impact;
 };
