@@ -1,20 +1,21 @@
 // @flow
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { colors } from '@atlaskit/theme';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
-import { colors, grid } from '../constants';
+import { grid } from '../constants';
 import { reorderQuoteMap } from '../reorder';
 import type { QuoteMap } from '../types';
 import type { DropResult } from '../../../src/types';
 
 const Root = styled.div`
-  background: ${colors.blue.deep};
+  background: ${colors.B200};
   display: flex;
 `;
 
 const Column = styled.div`
-  background-color: ${colors.blue.light};
+  background-color: ${colors.B50};
 
   /* make the column a scroll container */
   height: 100vh;

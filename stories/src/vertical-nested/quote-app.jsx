@@ -2,8 +2,9 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import invariant from 'tiny-invariant';
+import { colors } from '@atlaskit/theme';
 import { DragDropContext } from '../../../src';
-import { colors, grid } from '../constants';
+import { grid } from '../constants';
 import QuoteList from './quote-list';
 import reorder from '../reorder';
 import { getQuotes } from '../data';
@@ -28,7 +29,7 @@ const initialList: NestedQuoteList = {
 };
 
 const Root = styled.div`
-  background-color: ${colors.blue.deep};
+  background-color: ${colors.B200};
   box-sizing: border-box;
   padding: ${grid * 2}px;
   min-height: 100vh;
