@@ -53,9 +53,7 @@ export default ({
     // moving from merge
     if (previousImpact.merge) {
       return fromCombine({
-        isInHomeList,
         isMovingForward,
-        draggable,
         destination,
         previousImpact,
         draggables,
