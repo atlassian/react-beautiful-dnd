@@ -6,7 +6,7 @@ import AnimateInOut, {
 } from '../../../../src/view/animate-in-out/animate-in-out';
 
 it('should allow children not to be rendered (no animation allowed)', () => {
-  const child = jest.fn();
+  const child = jest.fn().mockReturnValue(<div>hi</div>);
 
   const wrapper: ReactWrapper = mount(
     <AnimateInOut on={null} shouldAnimate={false}>
@@ -14,19 +14,12 @@ it('should allow children not to be rendered (no animation allowed)', () => {
     </AnimateInOut>,
   );
 
-  const expected: AnimateProvided = {
-    data: null,
-    isVisible: false,
-    animate: 'none',
-    // $ExpectError - wrong type
-    onClose: expect.any(Function),
-  };
-  expect(child).toHaveBeenCalledWith(expected);
-  wrapper.unmount();
+  expect(wrapper.children()).toHaveLength(0);
+  expect(child).not.toHaveBeenCalled();
 });
 
 it('should allow children not to be rendered (even when animation is allowed)', () => {
-  const child = jest.fn();
+  const child = jest.fn().mockReturnValue(<div>hi</div>);
 
   const wrapper: ReactWrapper = mount(
     <AnimateInOut on={null} shouldAnimate>
@@ -34,19 +27,12 @@ it('should allow children not to be rendered (even when animation is allowed)', 
     </AnimateInOut>,
   );
 
-  const expected: AnimateProvided = {
-    data: null,
-    isVisible: false,
-    animate: 'close',
-    // $ExpectError - wrong type
-    onClose: expect.any(Function),
-  };
-  expect(child).toHaveBeenCalledWith(expected);
-  wrapper.unmount();
+  expect(wrapper.children()).toHaveLength(0);
+  expect(child).not.toHaveBeenCalled();
 });
 
 it('should pass data through to children', () => {
-  const child = jest.fn();
+  const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
   const wrapper: ReactWrapper = mount(
@@ -57,7 +43,6 @@ it('should pass data through to children', () => {
 
   const expected: AnimateProvided = {
     data,
-    isVisible: true,
     animate: 'none',
     // $ExpectError - wrong type
     onClose: expect.any(Function),
@@ -68,7 +53,7 @@ it('should pass data through to children', () => {
 });
 
 it('should open instantly if required', () => {
-  const child = jest.fn();
+  const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
   const wrapper: ReactWrapper = mount(
@@ -79,7 +64,6 @@ it('should open instantly if required', () => {
 
   const expected: AnimateProvided = {
     data,
-    isVisible: true,
     animate: 'none',
     // $ExpectError - wrong type
     onClose: expect.any(Function),
@@ -90,7 +74,7 @@ it('should open instantly if required', () => {
 });
 
 it('should animate open if requested', () => {
-  const child = jest.fn();
+  const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
   const wrapper: ReactWrapper = mount(
@@ -101,7 +85,6 @@ it('should animate open if requested', () => {
 
   const expected: AnimateProvided = {
     data,
-    isVisible: true,
     animate: 'open',
     // $ExpectError - wrong type
     onClose: expect.any(Function),
@@ -112,7 +95,7 @@ it('should animate open if requested', () => {
 });
 
 it('should close instantly if required', () => {
-  const child = jest.fn();
+  const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
   const wrapper: ReactWrapper = mount(
@@ -123,7 +106,6 @@ it('should close instantly if required', () => {
 
   const initial: AnimateProvided = {
     data,
-    isVisible: true,
     animate: 'none',
     // $ExpectError - wrong type
     onClose: expect.any(Function),
@@ -136,18 +118,12 @@ it('should close instantly if required', () => {
     // data is gone! this should trigger a close
     on: null,
   });
-  const expected: AnimateProvided = {
-    data: null,
-    isVisible: false,
-    animate: 'none',
-    // $ExpectError - wrong type
-    onClose: expect.any(Function),
-  };
-  expect(child).toHaveBeenCalledWith(expected);
+  expect(wrapper.children()).toHaveLength(0);
+  expect(child).not.toHaveBeenCalled();
 });
 
 it('should animate closed if required', () => {
-  const child = jest.fn();
+  const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
   const wrapper: ReactWrapper = mount(
@@ -158,7 +134,6 @@ it('should animate closed if required', () => {
 
   const initial: AnimateProvided = {
     data,
-    isVisible: true,
     animate: 'none',
     // $ExpectError - wrong type
     onClose: expect.any(Function),
@@ -177,7 +152,6 @@ it('should animate closed if required', () => {
     // data is still provided to child for final render
     data,
     // still visible while animating
-    isVisible: true,
     animate: 'close',
     // $ExpectError - wrong type
     onClose: expect.any(Function),
@@ -187,16 +161,11 @@ it('should animate closed if required', () => {
   // telling AnimateInOut that the animation is finished
   const provided: AnimateProvided = child.mock.calls[0][0];
   child.mockClear();
+  // this will trigger a setState that will stop rendering the child
   provided.onClose();
+  // tell enzyme to reconcile the react tree due to the setState
+  wrapper.update();
 
-  const third: AnimateProvided = {
-    // data no longer provided
-    data: null,
-    // no longer visible
-    isVisible: false,
-    animate: 'close',
-    // $ExpectError - wrong type
-    onClose: expect.any(Function),
-  };
-  expect(child).toHaveBeenCalledWith(third);
+  expect(wrapper.children()).toHaveLength(0);
+  expect(child).not.toHaveBeenCalled();
 });

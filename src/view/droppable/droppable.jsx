@@ -147,19 +147,19 @@ export default class Droppable extends Component<Props> {
     const shouldAnimate: boolean =
       this.isDraggingOrDropping() && shouldAnimatePlaceholder;
 
+    // Placeholder > onClose / onTransitionEnd
+    // might not fire in the case of very fast toggling
     return (
       <AnimateInOut on={placeholder} shouldAnimate={shouldAnimate}>
-        {({ isVisible, onClose, data, animate }: AnimateProvided) =>
-          isVisible ? (
-            <Placeholder
-              placeholder={(data: any)}
-              onClose={onClose}
-              innerRef={this.setPlaceholderRef}
-              animate={animate}
-              onTransitionEnd={this.onPlaceholderTransitionEnd}
-            />
-          ) : null
-        }
+        {({ onClose, data, animate }: AnimateProvided) => (
+          <Placeholder
+            placeholder={(data: any)}
+            onClose={onClose}
+            innerRef={this.setPlaceholderRef}
+            animate={animate}
+            onTransitionEnd={this.onPlaceholderTransitionEnd}
+          />
+        )}
       </AnimateInOut>
     );
   }

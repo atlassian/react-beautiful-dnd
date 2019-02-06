@@ -3,7 +3,6 @@ import React, { type Node } from 'react';
 import type { InOutAnimationMode } from '../../types';
 
 export type AnimateProvided = {|
-  isVisible: boolean,
   onClose: () => void,
   animate: InOutAnimationMode,
   data: mixed,
@@ -12,7 +11,7 @@ export type AnimateProvided = {|
 type Props = {|
   on: mixed,
   shouldAnimate: boolean,
-  children: (provided: AnimateProvided) => Node | null,
+  children: (provided: AnimateProvided) => Node,
 |};
 
 type State = {|
@@ -78,12 +77,15 @@ export default class AnimateInOut extends React.PureComponent<Props, State> {
   };
 
   render() {
+    if (!this.state.isVisible) {
+      return null;
+    }
+
     const provided: AnimateProvided = {
-      isVisible: this.state.isVisible,
       onClose: this.onClose,
       data: this.state.data,
       animate: this.state.animate,
     };
-    return this.props.children(provided) || null;
+    return this.props.children(provided);
   }
 }

@@ -48,12 +48,6 @@ const empty: Size = {
   margin: noSpacing,
 };
 
-// const getSize = (placeholder: PlaceholderType): Size => ({
-//   height: placeholder.client.borderBox.height,
-//   width: placeholder.client.borderBox.width,
-//   margin: placeholder.client.margin,
-// });
-
 export default class Placeholder extends PureComponent<Props, State> {
   mountTimerId: ?TimeoutID = null;
 
@@ -63,9 +57,7 @@ export default class Placeholder extends PureComponent<Props, State> {
 
   // called before render() on initial mount and updates
   static getDerivedStateFromProps(props: Props, state: State): State {
-    // an animated open is no longer relevant.
-    // There is a risk that a onTransitionEnd will not fire for a 'close'
-    // as it *might* not have started animating yet
+    // An animated open is no longer relevant.
     if (state.isAnimatingOpenOnMount && props.animate !== 'open') {
       return {
         isAnimatingOpenOnMount: false,
@@ -112,6 +104,7 @@ export default class Placeholder extends PureComponent<Props, State> {
       return;
     }
 
+    console.log('on transition end');
     this.props.onTransitionEnd();
 
     if (this.props.animate === 'close') {
@@ -123,6 +116,7 @@ export default class Placeholder extends PureComponent<Props, State> {
     if (this.state.isAnimatingOpenOnMount) {
       return empty;
     }
+
     if (this.props.animate === 'close') {
       return empty;
     }
@@ -139,6 +133,7 @@ export default class Placeholder extends PureComponent<Props, State> {
     const placeholder: PlaceholderType = this.props.placeholder;
     const size: Size = this.getSize();
     const { display, tagName } = placeholder;
+    console.log('animate', this.props.animate);
 
     // The goal of the placeholder is to take up the same amount of space
     // as the original draggable

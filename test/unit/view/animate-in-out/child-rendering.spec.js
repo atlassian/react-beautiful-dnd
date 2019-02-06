@@ -19,9 +19,7 @@ class Child extends React.Component<ChildProps> {
 it('should render children', () => {
   const wrapper: ReactWrapper = mount(
     <AnimateInOut on="hey" shouldAnimate={false}>
-      {(provided: AnimateProvided) =>
-        provided.isVisible && <Child provided={provided} />
-      }
+      {(provided: AnimateProvided) => <Child provided={provided} />}
     </AnimateInOut>,
   );
 
@@ -33,9 +31,7 @@ it('should allow children not to be rendered', () => {
   {
     const wrapper: ReactWrapper = mount(
       <AnimateInOut on={null} shouldAnimate={false}>
-        {(provided: AnimateProvided) =>
-          provided.isVisible && <Child provided={provided} />
-        }
+        {(provided: AnimateProvided) => <Child provided={provided} />}
       </AnimateInOut>,
     );
 
@@ -46,9 +42,7 @@ it('should allow children not to be rendered', () => {
   {
     const wrapper: ReactWrapper = mount(
       <AnimateInOut on={null} shouldAnimate>
-        {(provided: AnimateProvided) =>
-          provided.isVisible && <Child provided={provided} />
-        }
+        {(provided: AnimateProvided) => <Child provided={provided} />}
       </AnimateInOut>,
     );
 
@@ -60,9 +54,7 @@ it('should allow children not to be rendered', () => {
 it('should allow children not to be rendered after a close animation', () => {
   const wrapper: ReactWrapper = mount(
     <AnimateInOut on="hey" shouldAnimate>
-      {(provided: AnimateProvided) =>
-        provided.isVisible && <Child provided={provided} />
-      }
+      {(provided: AnimateProvided) => <Child provided={provided} />}
     </AnimateInOut>,
   );
   expect(wrapper.find(Child)).toHaveLength(1);
