@@ -57,7 +57,7 @@ it('should allow children not to be rendered', () => {
   }
 });
 
-it.only('should allow children not to be rendered after a close animation', () => {
+it('should allow children not to be rendered after a close animation', () => {
   const wrapper: ReactWrapper = mount(
     <AnimateInOut on="hey" shouldAnimate>
       {(provided: AnimateProvided) =>
@@ -79,9 +79,9 @@ it.only('should allow children not to be rendered after a close animation', () =
     .props()
     .provided.onClose();
 
-  // enzyme is being lame here and is still returning a Child
-  // even though it has been unmounted
-  forceUpdate(wrapper);
+  // let enzyme know that the react tree has changed
+  wrapper.update();
 
   expect(wrapper.find(Child)).toHaveLength(0);
+  wrapper.unmount();
 });

@@ -5,10 +5,23 @@ import type {
   Placeholder as PlaceholderType,
   InOutAnimationMode,
 } from '../../types';
-import type { PlaceholderStyle } from './placeholder-types';
 import { transitions } from '../animation';
 import { noSpacing } from '../../state/spacing';
 
+export type PlaceholderStyle = {|
+  display: string,
+  boxSizing: 'border-box',
+  width: number,
+  height: number,
+  marginTop: number,
+  marginRight: number,
+  marginBottom: number,
+  marginLeft: number,
+  flexShrink: '0',
+  flexGrow: '0',
+  pointerEvents: 'none',
+  transition: string,
+|};
 type Props = {|
   placeholder: PlaceholderType,
   animate: InOutAnimationMode,
@@ -72,12 +85,14 @@ export default class Placeholder extends PureComponent<Props, State> {
     if (!this.state.shouldMountEmptyAndOpen) {
       return;
     }
+    console.log('queuing timer');
 
     // Ensuring there is one browser update with an empty size
     // .setState in componentDidMount will cause two react renders
     // but only a single browser update
     // https://reactjs.org/docs/react-component.html#componentdidmount
     this.mountTimerId = setTimeout(() => {
+      console.log('timer finished');
       this.mountTimerId = null;
       if (this.state.shouldMountEmptyAndOpen) {
         this.setState({
@@ -116,6 +131,7 @@ export default class Placeholder extends PureComponent<Props, State> {
     const placeholder: PlaceholderType = this.props.placeholder;
     const size: Size = this.state.useEmpty ? empty : getSize(placeholder);
     const { display, tagName } = placeholder;
+    console.log('render');
 
     // The goal of the placeholder is to take up the same amount of space
     // as the original draggable
@@ -126,7 +142,7 @@ export default class Placeholder extends PureComponent<Props, State> {
       // this is to maintain any margin collapsing behaviour
 
       // creating borderBox
-      background: 'green',
+      // background: 'green',
       boxSizing: 'border-box',
       width: size.width,
       height: size.height,
