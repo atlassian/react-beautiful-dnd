@@ -1,5 +1,4 @@
 // @flow
-import type { ReactWrapper } from 'enzyme';
 import { type Position } from 'css-box-model';
 import type {
   MapProps,
@@ -18,7 +17,6 @@ import {
   whileDropping,
   droppable,
 } from './util/get-props';
-import Placeholder from '../../../../src/view/placeholder';
 import getLastCall from './util/get-last-call';
 import { zIndexOptions } from '../../../../src/view/draggable/draggable';
 import {
@@ -27,20 +25,6 @@ import {
   combine,
   transforms,
 } from '../../../../src/view/animation';
-
-it('should render a placeholder', () => {
-  const myMock = jest.fn();
-
-  const wrapper: ReactWrapper = mount({
-    mapProps: whileDragging,
-    WrappedComponent: getStubber(myMock),
-  });
-
-  expect(wrapper.find(Placeholder).exists()).toBe(true);
-  expect(wrapper.find(Placeholder).props().placeholder).toBe(
-    preset.inHome1.placeholder,
-  );
-});
 
 it('should animate a drop to a provided offset', () => {
   const myMock = jest.fn();
