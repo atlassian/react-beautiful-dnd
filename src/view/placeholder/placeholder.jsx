@@ -104,7 +104,6 @@ export default class Placeholder extends PureComponent<Props, State> {
       return;
     }
 
-    console.log('on transition end');
     this.props.onTransitionEnd();
 
     if (this.props.animate === 'close') {
@@ -133,7 +132,6 @@ export default class Placeholder extends PureComponent<Props, State> {
     const placeholder: PlaceholderType = this.props.placeholder;
     const size: Size = this.getSize();
     const { display, tagName } = placeholder;
-    console.log('animate', this.props.animate);
 
     // The goal of the placeholder is to take up the same amount of space
     // as the original draggable
@@ -144,7 +142,6 @@ export default class Placeholder extends PureComponent<Props, State> {
       // this is to maintain any margin collapsing behaviour
 
       // creating borderBox
-      background: 'green',
       boxSizing: 'border-box',
       width: size.width,
       height: size.height,

@@ -91,6 +91,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
                 <Item onRender={onItemRender} provided={draggableProvided} />
               )}
             </Draggable>
+            {droppableProvided.placeholder}
           </div>
         )}
       </Droppable>
