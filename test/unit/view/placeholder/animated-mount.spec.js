@@ -52,6 +52,8 @@ it('should animate a mount', () => {
 });
 
 it('should not animate a mount if interrupted', () => {
+  jest.spyOn(Placeholder.prototype, 'render');
+
   const wrapper: ReactWrapper = mount(
     <Placeholder
       animate="open"
@@ -62,15 +64,49 @@ it('should not animate a mount if interrupted', () => {
   );
   const onMount: PlaceholderStyle = getStyle(wrapper);
   expectIsEmpty(onMount);
+  expect(Placeholder.prototype.render).toHaveBeenCalledTimes(1);
 
+  // interrupting animation
   wrapper.setProps({
     animate: 'none',
   });
+  expect(Placeholder.prototype.render).toHaveBeenCalledTimes(2);
 
-  jest.runOnlyPendingTimers();
+  // no timers are run
   // let enzyme know that the react tree has changed due to the set state
   wrapper.update();
 
   const postMount: PlaceholderStyle = getStyle(wrapper);
   expectIsFull(postMount);
+
+  // validation - no further updates
+  Placeholder.prototype.render.mockClear();
+  jest.runOnlyPendingTimers();
+  wrapper.update();
+  expectIsFull(getStyle(wrapper));
+  expect(Placeholder.prototype.render).not.toHaveBeenCalled();
+
+  Placeholder.prototype.render.mockRestore();
+});
+
+it('should not animate in if unmounted', () => {
+  jest.spyOn(console, 'error');
+
+  const wrapper: ReactWrapper = mount(
+    <Placeholder
+      animate="open"
+      placeholder={placeholder}
+      onClose={jest.fn()}
+      onTransitionEnd={jest.fn()}
+    />,
+  );
+  expectIsEmpty(getStyle(wrapper));
+
+  wrapper.unmount();
+  jest.runOnlyPendingTimers();
+
+  // an internal setState would be triggered the timer was
+  // not cleared when unmounting
+  expect(console.error).not.toHaveBeenCalled();
+  console.error.mockRestore();
 });

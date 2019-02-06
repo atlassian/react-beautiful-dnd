@@ -38,8 +38,8 @@ type Size = {|
 |};
 
 type State = {|
-  shouldMountEmptyAndOpen: boolean,
-  useEmpty: boolean,
+  isAnimatingOpenOnMount: boolean,
+  // useEmpty: boolean,
 |};
 
 const empty: Size = {
@@ -48,56 +48,48 @@ const empty: Size = {
   margin: noSpacing,
 };
 
-const getSize = (placeholder: PlaceholderType): Size => ({
-  height: placeholder.client.borderBox.height,
-  width: placeholder.client.borderBox.width,
-  margin: placeholder.client.margin,
-});
+// const getSize = (placeholder: PlaceholderType): Size => ({
+//   height: placeholder.client.borderBox.height,
+//   width: placeholder.client.borderBox.width,
+//   margin: placeholder.client.margin,
+// });
 
 export default class Placeholder extends PureComponent<Props, State> {
   mountTimerId: ?TimeoutID = null;
 
   state: State = {
-    shouldMountEmptyAndOpen: this.props.animate === 'open',
-    useEmpty: this.props.animate === 'open',
+    isAnimatingOpenOnMount: this.props.animate === 'open',
   };
 
   // called before render() on initial mount and updates
   static getDerivedStateFromProps(props: Props, state: State): State {
-    if (state.shouldMountEmptyAndOpen) {
-      return state;
-    }
-
-    if (props.animate === 'close') {
+    // an animated open is no longer relevant.
+    // There is a risk that a onTransitionEnd will not fire for a 'close'
+    // as it *might* not have started animating yet
+    if (state.isAnimatingOpenOnMount && props.animate !== 'open') {
       return {
-        shouldMountEmptyAndOpen: false,
-        useEmpty: true,
+        isAnimatingOpenOnMount: false,
       };
     }
 
-    return {
-      shouldMountEmptyAndOpen: false,
-      useEmpty: false,
-    };
+    return state;
   }
 
   componentDidMount() {
-    if (!this.state.shouldMountEmptyAndOpen) {
+    if (!this.state.isAnimatingOpenOnMount) {
       return;
     }
-    console.log('queuing timer');
 
     // Ensuring there is one browser update with an empty size
     // .setState in componentDidMount will cause two react renders
     // but only a single browser update
     // https://reactjs.org/docs/react-component.html#componentdidmount
     this.mountTimerId = setTimeout(() => {
-      console.log('timer finished');
       this.mountTimerId = null;
-      if (this.state.shouldMountEmptyAndOpen) {
+
+      if (this.state.isAnimatingOpenOnMount) {
         this.setState({
-          shouldMountEmptyAndOpen: false,
-          useEmpty: false,
+          isAnimatingOpenOnMount: false,
         });
       }
     });
@@ -127,11 +119,26 @@ export default class Placeholder extends PureComponent<Props, State> {
     }
   };
 
+  getSize(): Size {
+    if (this.state.isAnimatingOpenOnMount) {
+      return empty;
+    }
+    if (this.props.animate === 'close') {
+      return empty;
+    }
+
+    const placeholder: PlaceholderType = this.props.placeholder;
+    return {
+      height: placeholder.client.borderBox.height,
+      width: placeholder.client.borderBox.width,
+      margin: placeholder.client.margin,
+    };
+  }
+
   render() {
     const placeholder: PlaceholderType = this.props.placeholder;
-    const size: Size = this.state.useEmpty ? empty : getSize(placeholder);
+    const size: Size = this.getSize();
     const { display, tagName } = placeholder;
-    console.log('render');
 
     // The goal of the placeholder is to take up the same amount of space
     // as the original draggable
@@ -142,7 +149,7 @@ export default class Placeholder extends PureComponent<Props, State> {
       // this is to maintain any margin collapsing behaviour
 
       // creating borderBox
-      // background: 'green',
+      background: 'green',
       boxSizing: 'border-box',
       width: size.width,
       height: size.height,
