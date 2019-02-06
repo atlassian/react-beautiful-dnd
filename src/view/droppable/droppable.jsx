@@ -129,7 +129,9 @@ export default class Droppable extends Component<Props> {
 
   onPlaceholderTransitionEnd = () => {
     // A placeholder change can impact the window's max scroll
-    this.props.updateViewportMaxScroll({ maxScroll: getMaxWindowScroll() });
+    if (this.isDraggingOrDropping()) {
+      this.props.updateViewportMaxScroll({ maxScroll: getMaxWindowScroll() });
+    }
   };
 
   isDraggingOrDropping(): boolean {
@@ -145,7 +147,6 @@ export default class Droppable extends Component<Props> {
     const shouldAnimate: boolean =
       this.isDraggingOrDropping() && shouldAnimatePlaceholder;
 
-    // TODO: animate droppable placeholder except when drag is finished
     return (
       <AnimateInOut on={placeholder} shouldAnimate={shouldAnimate}>
         {({ isVisible, onClose, data, animate }: AnimateProvided) =>

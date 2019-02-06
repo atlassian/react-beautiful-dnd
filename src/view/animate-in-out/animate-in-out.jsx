@@ -21,7 +21,7 @@ type State = {|
   animate: InOutAnimationMode,
 |};
 
-export default class AnimateInOut extends React.Component<Props, State> {
+export default class AnimateInOut extends React.PureComponent<Props, State> {
   state: State = {
     isVisible: Boolean(this.props.on),
     data: this.props.on,
