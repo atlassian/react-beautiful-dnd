@@ -1715,6 +1715,11 @@
   version "9.6.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.0.tgz#d3480ee666df9784b1001a1872a2f6ccefb6c2d7"
 
+"@types/node@^10.12.19":
+  version "10.12.21"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.21.tgz#7e8a0c34cf29f4e17a36e9bd0ea72d45ba03908e"
+  integrity sha512-CBgLNk4o3XMnqMc0rhb6lc77IwShMEglz05deDcn2lQxyXEZivfwgYJu7SMha9V5XcrP6qZuevTHV/QrN2vjKQ==
+
 "@types/q@^1.5.1":
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.1.tgz#48fd98c1561fe718b61733daed46ff115b496e18"
@@ -6112,6 +6117,13 @@ graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.15.tgz#ffb703e1066e8a0eeaa4c8b80ba9253eeefbfb00"
   integrity sha512-6uHUhOPEBgQ24HM+r6b/QwWfZq+yiFcipKFrOFiBEnWdy5sdzYoi+pJeQaPI5qOLRFqWmAXUPQNsielzdLoecA==
 
+graphlib@^2.1.5:
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/graphlib/-/graphlib-2.1.7.tgz#b6a69f9f44bd9de3963ce6804a2fc9e73d86aecc"
+  integrity sha512-TyI9jIy2J4j0qgPmOOrHTCtpPqJGN/aurBwc6ZT+bRii+di1I+Wv3obRhVrmBEXet+qkMaEX67dXrwsd3QQM6w==
+  dependencies:
+    lodash "^4.17.5"
+
 growly@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
@@ -6874,6 +6886,11 @@ is-glob@^4.0.0:
 is-hexadecimal@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/is-hexadecimal/-/is-hexadecimal-1.0.2.tgz#b6e710d7d07bb66b98cb8cece5c9b4921deeb835"
+
+is-jquery-obj@^0.1.0:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/is-jquery-obj/-/is-jquery-obj-0.1.1.tgz#e8d9cc9737b1ab0733b50303e33a38ed7cc2f60b"
+  integrity sha512-18toSebUVF7y717dgw/Dzn6djOCqrkiDp3MhB8P6TdKyCVkbD1ZwE7Uz8Hwx6hUPTvKjbyYH9ncXT4ts4qLaSA==
 
 is-module@^1.0.0:
   version "1.0.0"
@@ -11293,10 +11310,10 @@ testcafe-browser-tools@1.6.5:
     read-file-relative "^1.2.0"
     which-promise "^1.0.0"
 
-testcafe-hammerhead@14.4.7:
-  version "14.4.7"
-  resolved "https://registry.yarnpkg.com/testcafe-hammerhead/-/testcafe-hammerhead-14.4.7.tgz#9b2794864199b40a3445859c1f987191d3b9650f"
-  integrity sha512-9Su+yt0dSsc9y/LHZaRuZApN8yAc5zL6t5nx3CPXRhdgxi6OJ3hw+xAG32NRufaZrS8H/VXwknmfe+Pqw7d8KA==
+testcafe-hammerhead@14.4.12:
+  version "14.4.12"
+  resolved "https://registry.yarnpkg.com/testcafe-hammerhead/-/testcafe-hammerhead-14.4.12.tgz#f9b21219eb3199bc836125db86da6edb7ef114fa"
+  integrity sha512-GydhDB5M+wV8Md2DntIGh+p+Ad8ClY/9FKd344CHQRQae41V6WwAoyVgb16DmvB6pKXoizm0K2l3kANbjyLQKQ==
   dependencies:
     bowser "1.6.0"
     brotli "^1.3.1"
@@ -11322,15 +11339,16 @@ testcafe-hammerhead@14.4.7:
     tunnel-agent "0.6.0"
     webauth "^1.1.0"
 
-testcafe-legacy-api@3.1.9:
-  version "3.1.9"
-  resolved "https://registry.yarnpkg.com/testcafe-legacy-api/-/testcafe-legacy-api-3.1.9.tgz#9f1a730aeae56c72484f3b4e65cd58bdeac6bd0e"
-  integrity sha512-oV6Ej2+YWiirLjJEHs+GbgmPnwf2KuoegDoFg//0rZ6uIK0O3zPtTNTV+pZERwQReaNY7M3e9Jz8t0ZjDweZyA==
+testcafe-legacy-api@3.1.10:
+  version "3.1.10"
+  resolved "https://registry.yarnpkg.com/testcafe-legacy-api/-/testcafe-legacy-api-3.1.10.tgz#9cd68c9c2ae3a773c1f404f98f3d228a555ef701"
+  integrity sha512-21CrLzYneDKZ/nC1F/nqj4HF4qhUYLsDW0q6aQZKr7jyml3LtiYdBj98LZteNNdykYJR5ra3gIlvA+i+EJk1lQ==
   dependencies:
     async "0.2.6"
     babel-runtime "^5.8.34"
     dedent "^0.6.0"
     highlight-es "^1.0.0"
+    is-jquery-obj "^0.1.0"
     lodash "^4.14.0"
     moment "^2.14.1"
     mustache "^2.2.1"
@@ -11360,11 +11378,12 @@ testcafe-reporter-xunit@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/testcafe-reporter-xunit/-/testcafe-reporter-xunit-2.1.0.tgz#e6d66c572ce15af266706af0fd610b2a841dd443"
 
-testcafe@^0.23.3:
-  version "0.23.3"
-  resolved "https://registry.yarnpkg.com/testcafe/-/testcafe-0.23.3.tgz#8f9c6511b43ac99593d532bb08ae06c55ff72b5c"
-  integrity sha512-/ykDZ/Pvbb9oCK5kI/47DNm9nKYr8d7eY6U4nm7or5ETREkL9yEQwEzzyb2pC3Nt7iYzK+ZyPAcPWN4QFGiOXA==
+testcafe@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/testcafe/-/testcafe-1.0.0.tgz#560ed13acf72a14d1ce3c77c7daff6c87c4a8209"
+  integrity sha512-kPkcrMohMcnJwIFDIwlIWiezqqyQXSFfo8RttnkIhuyJNW6uvH27VV+bdr76N0L00UpNiKdbOnzCo/VeuqFY8g==
   dependencies:
+    "@types/node" "^10.12.19"
     async-exit-hook "^1.1.2"
     babel-core "^6.22.1"
     babel-plugin-transform-class-properties "^6.24.1"
@@ -11392,12 +11411,14 @@ testcafe@^0.23.3:
     error-stack-parser "^1.3.6"
     globby "^3.0.1"
     graceful-fs "^4.1.11"
+    graphlib "^2.1.5"
     gulp-data "^1.3.1"
     import-lazy "^3.1.0"
     indent-string "^1.2.2"
     is-ci "^1.0.10"
     is-glob "^2.0.1"
     is-stream "^1.1.0"
+    json5 "^2.1.0"
     lodash "^4.17.10"
     log-update-async-hook "^2.0.2"
     make-dir "^1.3.0"
@@ -11423,8 +11444,8 @@ testcafe@^0.23.3:
     source-map-support "^0.5.5"
     strip-bom "^2.0.0"
     testcafe-browser-tools "1.6.5"
-    testcafe-hammerhead "14.4.7"
-    testcafe-legacy-api "3.1.9"
+    testcafe-hammerhead "14.4.12"
+    testcafe-legacy-api "3.1.10"
     testcafe-reporter-json "^2.1.0"
     testcafe-reporter-list "^2.1.0"
     testcafe-reporter-minimal "^2.1.0"
