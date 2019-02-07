@@ -6,12 +6,10 @@ import getStubber from './util/get-stubber';
 import {
   isNotOverHome,
   isOverHome,
-  atRest,
-  ownProps,
+  homeAtRest,
   isOverForeign,
   foreignOwnProps,
 } from './util/get-props';
-import { preset } from '../draggable/util/get-props';
 
 it('should let a consumer know when a home list is being dragged over', () => {
   const myMock = jest.fn();
@@ -62,7 +60,7 @@ it('should update snapshot as dragging over changes', () => {
   };
 
   const wrapper: ReactWrapper = mount({
-    mapProps: atRest,
+    mapProps: homeAtRest,
     WrappedComponent: getStubber(myMock),
   });
   snapshotShouldBe(noDrag);
@@ -85,6 +83,6 @@ it('should update snapshot as dragging over changes', () => {
 
   // drag is now over
   myMock.mockClear();
-  wrapper.setProps(atRest);
+  wrapper.setProps(homeAtRest);
   snapshotShouldBe(noDrag);
 });

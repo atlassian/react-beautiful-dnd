@@ -8,7 +8,7 @@ import type {
 
 export const preset = getPreset();
 
-export const ownProps: OwnProps = {
+export const homeOwnProps: OwnProps = {
   droppableId: preset.home.descriptor.id,
   type: preset.home.descriptor.type,
   isDropDisabled: false,
@@ -19,19 +19,20 @@ export const ownProps: OwnProps = {
 };
 
 export const foreignOwnProps: OwnProps = {
-  ...ownProps,
+  ...homeOwnProps,
   droppableId: preset.foreign.descriptor.id,
   type: preset.foreign.descriptor.type,
   direction: preset.foreign.axis.direction,
 };
 
-export const atRest: MapProps = {
+export const homeAtRest: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
   placeholder: null,
   draggingFromList: null,
   shouldAnimatePlaceholder: true,
 };
+
 export const isOverHome: MapProps = {
   isDraggingOver: true,
   draggingOverWith: preset.inHome1.descriptor.id,
@@ -40,21 +41,22 @@ export const isOverHome: MapProps = {
   // this can change during a drag
   shouldAnimatePlaceholder: false,
 };
+
+export const isNotOverHome: MapProps = {
+  isDraggingOver: false,
+  draggingOverWith: null,
+  placeholder: preset.inHome1.placeholder,
+  draggingFromList: preset.inHome1.descriptor.id,
+  // this can change during a drag
+  shouldAnimatePlaceholder: false,
+};
+
 export const isOverForeign: MapProps = {
   isDraggingOver: true,
   draggingOverWith: preset.inHome1.descriptor.id,
   placeholder: preset.inHome1.placeholder,
   draggingFromList: null,
   shouldAnimatePlaceholder: true,
-};
-
-export const isNotOverHome: MapProps = {
-  isDraggingOver: false,
-  draggingOverWith: null,
-  placeholder: null,
-  draggingFromList: preset.inHome1.descriptor.id,
-  // this can change during a drag
-  shouldAnimatePlaceholder: false,
 };
 
 export const isNotOverForeign: MapProps = {

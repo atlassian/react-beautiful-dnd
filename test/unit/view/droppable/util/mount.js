@@ -10,8 +10,8 @@ import type {
 } from '../../../../../src/view/droppable/droppable-types';
 import Droppable from '../../../../../src/view/droppable/droppable';
 import {
-  ownProps as defaultOwnProps,
-  atRest,
+  homeOwnProps,
+  homeAtRest,
   dispatchProps as defaultDispatchProps,
 } from './get-props';
 import {
@@ -33,8 +33,8 @@ type MountArgs = {|
 
 export default ({
   WrappedComponent = getStubber(),
-  ownProps = defaultOwnProps,
-  mapProps = atRest,
+  ownProps = homeOwnProps,
+  mapProps = homeAtRest,
   dispatchProps = defaultDispatchProps,
   getIsDragging,
 }: MountArgs = {}): ReactWrapper =>

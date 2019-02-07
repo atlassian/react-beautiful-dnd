@@ -3,10 +3,10 @@ import React from 'react';
 import type { ReactWrapper } from 'enzyme';
 import type { Provided } from '../../../../src/view/droppable/droppable-types';
 import {
-  atRest,
+  homeAtRest,
   foreignOwnProps,
   isOverForeign,
-  isNotOver,
+  isNotOverForeign,
 } from './util/get-props';
 import mount from './util/mount';
 
@@ -48,7 +48,7 @@ describe('is over foreign', () => {
   it('should log a warning when updating', () => {
     const wrapper: ReactWrapper = mount({
       ownProps: foreignOwnProps,
-      mapProps: atRest,
+      mapProps: homeAtRest,
       WrappedComponent: WithNoPlaceholder,
     });
     expect(console.warn).not.toHaveBeenCalled();
@@ -64,7 +64,7 @@ describe('is not over foreign', () => {
   it('should not log a warning when mounting', () => {
     const wrapper: ReactWrapper = mount({
       ownProps: foreignOwnProps,
-      mapProps: isNotOver,
+      mapProps: isNotOverForeign,
       WrappedComponent: WithNoPlaceholder,
     });
 
@@ -76,12 +76,12 @@ describe('is not over foreign', () => {
   it('should not log a warning when updating', () => {
     const wrapper: ReactWrapper = mount({
       ownProps: foreignOwnProps,
-      mapProps: atRest,
+      mapProps: homeAtRest,
       WrappedComponent: WithNoPlaceholder,
     });
     expect(console.warn).not.toHaveBeenCalled();
 
-    wrapper.setProps(isNotOver);
+    wrapper.setProps(isNotOverForeign);
     expect(console.warn).not.toHaveBeenCalled();
 
     wrapper.unmount();
