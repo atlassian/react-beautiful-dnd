@@ -130,7 +130,8 @@ export default class Draggable extends React.Component<Props> {
       return;
     }
 
-    // There might be other properties on the element that are being transitioned
+    // There might be other properties on the element that are
+    // being transitioned. We do not want those to end a drop animation!
     if (event.propertyName !== 'transform') {
       return;
     }
