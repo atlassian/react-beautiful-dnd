@@ -3,6 +3,7 @@ import { getPreset } from '../../../../utils/dimension';
 import type {
   MapProps,
   OwnProps,
+  DispatchProps,
 } from '../../../../../src/view/droppable/droppable-types';
 
 export const preset = getPreset();
@@ -28,20 +29,43 @@ export const atRest: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
   placeholder: null,
+  draggingFromList: null,
+  shouldAnimatePlaceholder: true,
 };
 export const isOverHome: MapProps = {
   isDraggingOver: true,
   draggingOverWith: preset.inHome1.descriptor.id,
-  placeholder: null,
+  draggingFromList: preset.inHome1.descriptor.id,
+  placeholder: preset.inHome1.placeholder,
+  // this can change during a drag
+  shouldAnimatePlaceholder: false,
 };
 export const isOverForeign: MapProps = {
   isDraggingOver: true,
   draggingOverWith: preset.inHome1.descriptor.id,
   placeholder: preset.inHome1.placeholder,
+  draggingFromList: null,
+  shouldAnimatePlaceholder: true,
 };
 
-export const isNotOver: MapProps = {
+export const isNotOverHome: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
   placeholder: null,
+  draggingFromList: preset.inHome1.descriptor.id,
+  // this can change during a drag
+  shouldAnimatePlaceholder: false,
+};
+
+export const isNotOverForeign: MapProps = {
+  isDraggingOver: false,
+  draggingOverWith: null,
+  placeholder: null,
+  draggingFromList: null,
+  shouldAnimatePlaceholder: true,
+};
+
+export const dispatchProps: DispatchProps = {
+  // $ExpectError
+  updateViewportMaxScroll: () => {},
 };

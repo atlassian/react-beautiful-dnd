@@ -7,6 +7,7 @@ import {
   styleKey,
   canLiftKey,
   droppableTypeKey,
+  isDraggingOrDroppingKey,
 } from '../../src/view/context-keys';
 import createStore from '../../src/state/create-store';
 import { getMarshalStub } from './dimension-marshal';
@@ -93,6 +94,17 @@ export const withDimensionMarshal = (marshal?: DimensionMarshal): Object => ({
   },
   childContextTypes: {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
+  },
+});
+
+export const withIsDraggingOrDropping = (
+  getIsDragging?: () => boolean = () => true,
+) => ({
+  context: {
+    [isDraggingOrDroppingKey]: getIsDragging,
+  },
+  childContextTypes: {
+    [isDraggingOrDroppingKey]: PropTypes.func.isRequired,
   },
 });
 
