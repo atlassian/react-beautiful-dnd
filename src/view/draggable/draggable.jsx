@@ -121,10 +121,21 @@ export default class Draggable extends React.Component<Props> {
     this.ref = null;
   }
 
-  onMoveEnd = () => {
-    if (this.props.dragging && this.props.dragging.dropping) {
-      this.props.dropAnimationFinished();
+  onMoveEnd = (event: TransitionEvent) => {
+    const isDropping: boolean = Boolean(
+      this.props.dragging && this.props.dragging.dropping,
+    );
+
+    if (!isDropping) {
+      return;
     }
+
+    // There might be other properties on the element that are being transitioned
+    if (event.propertyName !== 'transform') {
+      return;
+    }
+
+    this.props.dropAnimationFinished();
   };
 
   onLift = (options: {
