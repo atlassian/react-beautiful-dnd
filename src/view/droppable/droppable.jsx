@@ -151,11 +151,9 @@ export default class Droppable extends Component<Props> {
     }
 
     // When dropping into a home list we do not collapse the placeholder.
-    // We need this placeholder to collapse instantly after the drag
-    // The default mapProp for shouldAnimatePlaceholder is true to avoid
-    // needing to re-render all lists when the drag ends.
-    // Because the default is true we need to ensure that any animations
-    // only occur when a drag or drop is occurring
+    // We need this placeholder to collapse instantly after the drag ends
+    // By setting placeholder animation to false we ensure that the
+    // placeholder is removed immediately
     return this.isAppDragging() || this.isAppDropping();
   }
 
