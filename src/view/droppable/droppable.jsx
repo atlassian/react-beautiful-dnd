@@ -14,7 +14,8 @@ import {
   droppableIdKey,
   droppableTypeKey,
   styleKey,
-  isDraggingOrDroppingKey,
+  isDraggingKey,
+  isDroppingKey,
 } from '../context-keys';
 import { warning } from '../../dev-warning';
 import checkOwnProps from './check-own-props';
@@ -36,7 +37,8 @@ export default class Droppable extends Component<Props> {
   // Need to declare childContextTypes without flow
   static contextTypes = {
     [styleKey]: PropTypes.string.isRequired,
-    [isDraggingOrDroppingKey]: PropTypes.func.isRequired,
+    [isDraggingKey]: PropTypes.func.isRequired,
+    [isDroppingKey]: PropTypes.func.isRequired,
   };
 
   constructor(props: Props, context: Object) {
@@ -129,23 +131,37 @@ export default class Droppable extends Component<Props> {
 
   onPlaceholderTransitionEnd = () => {
     // A placeholder change can impact the window's max scroll
-    if (this.isDraggingOrDropping()) {
+    if (this.isAppDragging()) {
       this.props.updateViewportMaxScroll({ maxScroll: getMaxWindowScroll() });
     }
   };
 
-  isDraggingOrDropping(): boolean {
-    return this.context[isDraggingOrDroppingKey](this.props.type);
+  isAppDropping(): boolean {
+    return this.context[isDroppingKey](this.props.type);
+  }
+
+  isAppDragging(): boolean {
+    return this.context[isDraggingKey](this.props.type);
+  }
+
+  shouldAnimatePlaceholder(): boolean {
+    const request: boolean = this.props.shouldAnimatePlaceholder;
+    if (!request) {
+      return false;
+    }
+
+    // When dropping into a home list we do not collapse the placeholder.
+    // We need this placeholder to collapse instantly after the drag
+    // The default mapProp for shouldAnimatePlaceholder is true to avoid
+    // needing to re-render all lists when the drag ends.
+    // Because the default is true we need to ensure that any animations
+    // only occur when a drag or drop is occurring
+    return this.isAppDragging() || this.isAppDropping();
   }
 
   getPlaceholder() {
     const placeholder: ?PlaceholderType = this.props.placeholder;
-    const shouldAnimatePlaceholder: boolean = this.props
-      .shouldAnimatePlaceholder;
-
-    // Need to be dragging or dropping for droppable animation to occur
-    const shouldAnimate: boolean =
-      this.isDraggingOrDropping() && shouldAnimatePlaceholder;
+    const shouldAnimate: boolean = this.shouldAnimatePlaceholder();
 
     // Placeholder > onClose / onTransitionEnd
     // might not fire in the case of very fast toggling

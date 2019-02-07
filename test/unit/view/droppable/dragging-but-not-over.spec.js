@@ -14,7 +14,7 @@ it('should let a consumer know what is dragging from it if it is the home list',
   mount({
     mapProps: isNotOverHome,
     WrappedComponent: getStubber(myMock),
-    getIsDragging: () => true,
+    isDragging: () => true,
   });
 
   const snapshot: StateSnapshot = myMock.mock.calls[0][0].snapshot;
@@ -33,7 +33,7 @@ it('should not publish what is dragging when it is a foreign list', () => {
     ownProps: foreignOwnProps,
     mapProps: isNotOverForeign,
     WrappedComponent: getStubber(myMock),
-    getIsDragging: () => true,
+    isDragging: () => true,
   });
 
   const snapshot: StateSnapshot = myMock.mock.calls[0][0].snapshot;

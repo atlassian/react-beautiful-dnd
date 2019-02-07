@@ -17,6 +17,7 @@ describe('home list', () => {
     const wrapper: ReactWrapper = mount({
       ownProps: homeOwnProps,
       mapProps: homeAtRest,
+      isDragging: () => false,
     });
 
     expect(wrapper.find(Placeholder)).toHaveLength(0);
@@ -26,6 +27,7 @@ describe('home list', () => {
     const wrapper: ReactWrapper = mount({
       ownProps: homeOwnProps,
       mapProps: isOverHome,
+      isDragging: () => true,
     });
 
     expect(wrapper.find(Placeholder)).toHaveLength(1);
@@ -35,6 +37,7 @@ describe('home list', () => {
     const wrapper: ReactWrapper = mount({
       ownProps: homeOwnProps,
       mapProps: isNotOverHome,
+      isDragging: () => true,
     });
 
     expect(wrapper.find(Placeholder)).toHaveLength(1);
@@ -44,6 +47,7 @@ describe('home list', () => {
     const wrapper: ReactWrapper = mount({
       ownProps: homeOwnProps,
       mapProps: isOverForeign,
+      isDragging: () => true,
     });
 
     expect(wrapper.find(Placeholder)).toHaveLength(1);
@@ -55,6 +59,7 @@ describe('foreign', () => {
     const wrapper: ReactWrapper = mount({
       ownProps: foreignOwnProps,
       mapProps: homeAtRest,
+      isDragging: () => false,
     });
 
     expect(wrapper.find(Placeholder)).toHaveLength(0);
@@ -64,6 +69,7 @@ describe('foreign', () => {
     const wrapper: ReactWrapper = mount({
       ownProps: foreignOwnProps,
       mapProps: isOverForeign,
+      isDragging: () => true,
     });
 
     expect(wrapper.find(Placeholder)).toHaveLength(1);
@@ -73,6 +79,7 @@ describe('foreign', () => {
     const wrapper: ReactWrapper = mount({
       ownProps: foreignOwnProps,
       mapProps: isNotOverForeign,
+      isDragging: () => true,
     });
 
     expect(wrapper.find(Placeholder)).toHaveLength(0);

@@ -28,8 +28,8 @@ export const foreignOwnProps: OwnProps = {
 export const homeAtRest: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
-  placeholder: null,
   draggingFromList: null,
+  placeholder: null,
   shouldAnimatePlaceholder: true,
 };
 

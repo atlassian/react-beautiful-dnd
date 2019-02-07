@@ -26,7 +26,8 @@ import {
   dimensionMarshalKey,
   styleKey,
   canLiftKey,
-  isDraggingOrDroppingKey,
+  isDraggingKey,
+  isDroppingKey,
 } from '../context-keys';
 import {
   clean,
@@ -41,7 +42,8 @@ import { getFormattedMessage } from '../../dev-warning';
 import { peerDependencies } from '../../../package.json';
 import checkReactVersion from './check-react-version';
 import checkDoctype from './check-doctype';
-import getIsDraggingOrDropping from '../../state/is-dragging-or-dropping';
+import getIsDragging from '../../state/is-dragging';
+import getIsDropping from '../../state/is-dropping';
 
 type Props = {|
   ...Responders,
@@ -151,7 +153,8 @@ export default class DragDropContext extends React.Component<Props> {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
     [styleKey]: PropTypes.string.isRequired,
     [canLiftKey]: PropTypes.func.isRequired,
-    [isDraggingOrDroppingKey]: PropTypes.func.isRequired,
+    [isDraggingKey]: PropTypes.func.isRequired,
+    [isDroppingKey]: PropTypes.func.isRequired,
   };
 
   getChildContext(): Context {
@@ -160,7 +163,8 @@ export default class DragDropContext extends React.Component<Props> {
       [dimensionMarshalKey]: this.dimensionMarshal,
       [styleKey]: this.styleMarshal.styleContext,
       [canLiftKey]: this.canLift,
-      [isDraggingOrDroppingKey]: this.isDraggingOrDropping,
+      [isDraggingKey]: this.isDragging,
+      [isDroppingKey]: this.isDropping,
     };
   }
 
@@ -173,8 +177,8 @@ export default class DragDropContext extends React.Component<Props> {
   // This is useful when the user
   canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
 
-  isDraggingOrDropping = (type: TypeId) =>
-    getIsDraggingOrDropping(type, this.store.getState());
+  isDragging = (type: TypeId) => getIsDragging(type, this.store.getState());
+  isDropping = (type: TypeId) => getIsDropping(type, this.store.getState());
 
   componentDidMount() {
     window.addEventListener('error', this.onWindowError);
