@@ -4,7 +4,7 @@ import { type Position, type BoxModel } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import { transitions, transforms, combine } from '../animation';
+import { transitions, transforms, combine } from '../../animation';
 import type {
   DraggableDimension,
   DroppableId,

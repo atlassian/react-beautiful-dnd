@@ -24,7 +24,7 @@ import {
   curves,
   combine,
   transforms,
-} from '../../../../src/view/animation';
+} from '../../../../src/animation';
 
 it('should animate a drop to a provided offset', () => {
   const myMock = jest.fn();

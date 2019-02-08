@@ -5,7 +5,7 @@ import type {
   Placeholder as PlaceholderType,
   InOutAnimationMode,
 } from '../../types';
-import { transitions } from '../animation';
+import { transitions } from '../../animation';
 import { noSpacing } from '../../state/spacing';
 
 export type PlaceholderStyle = {|
@@ -142,7 +142,6 @@ export default class Placeholder extends PureComponent<Props, State> {
       // this is to maintain any margin collapsing behaviour
 
       // creating borderBox
-      background: 'green',
       boxSizing: 'border-box',
       width: size.width,
       height: size.height,

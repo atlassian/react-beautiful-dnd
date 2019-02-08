@@ -15,10 +15,7 @@ import type {
   DragImpact,
   Combine,
 } from '../../../../src/types';
-import {
-  curves,
-  combine as combineStyle,
-} from '../../../../src/view/animation';
+import { curves, combine as combineStyle } from '../../../../src/animation';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 

@@ -1,6 +1,6 @@
 // @flow
 import type { Position } from 'css-box-model';
-import { isEqual, origin } from '../state/position';
+import { isEqual, origin } from './state/position';
 
 export const curves = {
   outOfTheWay: 'cubic-bezier(0.2, 0, 0, 1)',
@@ -21,11 +21,16 @@ export const combine = {
 
 export const timings = {
   outOfTheWay: 0.2,
-  placeholderTransitionDelay: 0.1,
+  // greater than the out of the way time
+  // so that when the drop ends everything will
+  // have to be out of the way
+  minDropTime: 0.33,
+  maxDropTime: 0.55,
 };
 
-const outOfTheWayTime: number = 0.2;
-const outOfTheWayTiming: string = `${outOfTheWayTime}s ${curves.outOfTheWay}`;
+const outOfTheWayTiming: string = `${timings.outOfTheWay}s ${
+  curves.outOfTheWay
+}`;
 export const placeholderTransitionDelayTime: number = 0.1;
 
 export const transitions = {

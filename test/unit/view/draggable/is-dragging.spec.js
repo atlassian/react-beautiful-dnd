@@ -16,7 +16,7 @@ import {
 } from './util/get-props';
 import getLastCall from './util/get-last-call';
 import { zIndexOptions } from '../../../../src/view/draggable/draggable';
-import { transitions, combine } from '../../../../src/view/animation';
+import { transitions, combine } from '../../../../src/animation';
 
 it('should move to the provided offset', () => {
   const myMock = jest.fn();

@@ -1,6 +1,6 @@
 // @flow
 import type { Position } from 'css-box-model';
-import { transforms } from '../../../../src/view/animation';
+import { transforms } from '../../../../src/animation';
 import getLastCall from './util/get-last-call';
 import { atRestMapProps, draggable, preset } from './util/get-props';
 import getStubber from './util/get-stubber';

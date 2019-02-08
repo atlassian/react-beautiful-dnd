@@ -11,7 +11,6 @@ import type { QuoteMap, Quote } from '../types';
 import Column from './column';
 import reorder, { reorderQuoteMap } from '../reorder';
 import { DragDropContext, Droppable } from '../../../src';
-import { grid } from '../constants';
 
 const ParentContainer = styled.div`
   height: ${({ height }) => height};
@@ -25,7 +24,6 @@ const Container = styled.div`
   /* like display:flex but will allow bleeding over the window width */
   min-width: 100vw;
   display: inline-flex;
-  padding: ${grid}px;
 `;
 
 type Props = {|
