@@ -2,7 +2,7 @@
 import React from 'react';
 import { mount, type ReactWrapper } from 'enzyme';
 import Placeholder from '../../../../src/view/placeholder';
-import { expectIsEmpty, expectIsFull } from './util/expect';
+import { expectIsFull } from './util/expect';
 import getPlaceholderStyle from './util/get-placeholder-style';
 import { placeholder } from './util/data';
 
