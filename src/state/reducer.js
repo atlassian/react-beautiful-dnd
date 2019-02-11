@@ -332,7 +332,6 @@ export default (state: State = idle, action: Action): State => {
   if (action.type === 'UPDATE_VIEWPORT_MAX_SCROLL') {
     // Could occur if a transitionEnd occurs after a drag ends
     if (!isMovementAllowed(state)) {
-      console.warn('TODO: remove this - dropping max window scroll update');
       return state;
     }
 

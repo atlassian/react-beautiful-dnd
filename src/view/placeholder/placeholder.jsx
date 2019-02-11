@@ -142,7 +142,7 @@ export default class Placeholder extends PureComponent<Props, State> {
       // this is to maintain any margin collapsing behaviour
 
       // creating borderBox
-      background: 'green',
+      // background: 'green',
       boxSizing: 'border-box',
       width: size.width,
       height: size.height,

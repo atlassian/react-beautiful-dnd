@@ -14,7 +14,7 @@ it('should update when a placeholder animation finishes', () => {
     ownProps: homeOwnProps,
     mapProps: isOverHome,
     dispatchProps,
-    isDragging: () => true,
+    isMovementAllowed: () => true,
   });
 
   wrapper
@@ -35,7 +35,7 @@ it('should update when a placeholder finishes and the list is not dragged over',
     ownProps: homeOwnProps,
     mapProps: isNotOverHome,
     dispatchProps,
-    isDragging: () => true,
+    isMovementAllowed: () => true,
   });
 
   wrapper
@@ -56,8 +56,8 @@ it('should not update when dropping', () => {
     ownProps: homeOwnProps,
     mapProps: isNotOverHome,
     dispatchProps,
-    isDragging: () => false,
-    isDropping: () => true,
+    // when dropping there is no movement allowed
+    isMovementAllowed: () => false,
   });
 
   wrapper

@@ -19,8 +19,7 @@ import {
   combine,
   withDimensionMarshal,
   withStyleContext,
-  withIsDragging,
-  withIsDropping,
+  withIsMovementAllowed,
 } from '../../../../utils/get-context-options';
 import getStubber from './get-stubber';
 
@@ -29,8 +28,7 @@ type MountArgs = {|
   ownProps?: OwnProps,
   mapProps?: MapProps,
   dispatchProps?: DispatchProps,
-  isDragging?: () => boolean,
-  isDropping?: () => boolean,
+  isMovementAllowed?: () => boolean,
 |};
 
 export default ({
@@ -38,8 +36,7 @@ export default ({
   ownProps = homeOwnProps,
   mapProps = homeAtRest,
   dispatchProps = defaultDispatchProps,
-  isDropping,
-  isDragging,
+  isMovementAllowed,
 }: MountArgs = {}): ReactWrapper =>
   mount(
     <Droppable {...ownProps} {...mapProps} {...dispatchProps}>
@@ -51,7 +48,6 @@ export default ({
       withStore(),
       withDimensionMarshal(),
       withStyleContext(),
-      withIsDragging(isDragging),
-      withIsDropping(isDropping),
+      withIsMovementAllowed(isMovementAllowed),
     ),
   );

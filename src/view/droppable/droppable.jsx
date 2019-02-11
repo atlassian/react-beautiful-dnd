@@ -1,21 +1,16 @@
 // @flow
-import React, { Component } from 'react';
+import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
-import type {
-  DroppableId,
-  TypeId,
-  Placeholder as PlaceholderType,
-} from '../../types';
+import type { DroppableId, TypeId } from '../../types';
 import Placeholder from '../placeholder';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import {
   droppableIdKey,
   droppableTypeKey,
   styleKey,
-  isDraggingKey,
-  isDroppingKey,
+  isMovementAllowedKey,
 } from '../context-keys';
 import { warning } from '../../dev-warning';
 import checkOwnProps from './check-own-props';
@@ -28,7 +23,7 @@ type Context = {
   [string]: DroppableId | TypeId,
 };
 
-export default class Droppable extends Component<Props> {
+export default class Droppable extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   styleContext: string;
   ref: ?HTMLElement = null;
@@ -37,8 +32,7 @@ export default class Droppable extends Component<Props> {
   // Need to declare childContextTypes without flow
   static contextTypes = {
     [styleKey]: PropTypes.string.isRequired,
-    [isDraggingKey]: PropTypes.func.isRequired,
-    [isDroppingKey]: PropTypes.func.isRequired,
+    [isMovementAllowedKey]: PropTypes.func.isRequired,
   };
 
   constructor(props: Props, context: Object) {
@@ -130,22 +124,14 @@ export default class Droppable extends Component<Props> {
   getDroppableRef = (): ?HTMLElement => this.ref;
 
   onPlaceholderTransitionEnd = () => {
+    const isMovementAllowed: boolean = this.context[isMovementAllowedKey]();
     // A placeholder change can impact the window's max scroll
-    if (this.isAppDragging()) {
+    if (isMovementAllowed) {
       this.props.updateViewportMaxScroll({ maxScroll: getMaxWindowScroll() });
     }
   };
 
-  // TODO: remove??
-  isAppDropping(): boolean {
-    return this.context[isDroppingKey](this.props.type);
-  }
-
-  isAppDragging(): boolean {
-    return this.context[isDraggingKey](this.props.type);
-  }
-
-  getPlaceholder() {
+  getPlaceholder(): Node {
     // Placeholder > onClose / onTransitionEnd
     // might not fire in the case of very fast toggling
     return (

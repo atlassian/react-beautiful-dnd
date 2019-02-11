@@ -12,17 +12,13 @@ import AnimateInOut from '../../../../src/view/animate-in-out/animate-in-out';
 
 it('should not display a placeholder after a flushed drag end in the home list', () => {
   // dropping
-  let isDropping: boolean = true;
   const wrapper: ReactWrapper = mount({
     ownProps: homeOwnProps,
     mapProps: isNotOverHome,
-    isDragging: () => false,
-    isDropping: () => isDropping,
   });
 
   expect(wrapper.find(Placeholder)).toHaveLength(1);
 
-  isDropping = false;
   wrapper.setProps({
     ...homeAtRest,
   });
@@ -33,17 +29,13 @@ it('should not display a placeholder after a flushed drag end in the home list',
 
 it('should animate a placeholder closed in a home list after a drag', () => {
   // dropping
-  let isDropping: boolean = true;
   const wrapper: ReactWrapper = mount({
     ownProps: homeOwnProps,
     mapProps: isNotOverHome,
-    isDragging: () => false,
-    isDropping: () => isDropping,
   });
 
   expect(wrapper.find(Placeholder)).toHaveLength(1);
 
-  isDropping = false;
   wrapper.setProps({
     ...homePostDropAnimation,
   });

@@ -19,15 +19,14 @@ import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
-import type { DraggableId, State, Responders, TypeId } from '../../types';
+import type { DraggableId, State, Responders } from '../../types';
 import type { Store } from '../../state/store-types';
 import {
   storeKey,
   dimensionMarshalKey,
   styleKey,
   canLiftKey,
-  isDraggingKey,
-  isDroppingKey,
+  isMovementAllowedKey,
 } from '../context-keys';
 import {
   clean,
@@ -42,8 +41,7 @@ import { getFormattedMessage } from '../../dev-warning';
 import { peerDependencies } from '../../../package.json';
 import checkReactVersion from './check-react-version';
 import checkDoctype from './check-doctype';
-import getIsDragging from '../../state/is-dragging';
-import getIsDropping from '../../state/is-dropping';
+import isMovementAllowed from '../../state/is-movement-allowed';
 
 type Props = {|
   ...Responders,
@@ -153,8 +151,7 @@ export default class DragDropContext extends React.Component<Props> {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
     [styleKey]: PropTypes.string.isRequired,
     [canLiftKey]: PropTypes.func.isRequired,
-    [isDraggingKey]: PropTypes.func.isRequired,
-    [isDroppingKey]: PropTypes.func.isRequired,
+    [isMovementAllowedKey]: PropTypes.func.isRequired,
   };
 
   getChildContext(): Context {
@@ -163,8 +160,7 @@ export default class DragDropContext extends React.Component<Props> {
       [dimensionMarshalKey]: this.dimensionMarshal,
       [styleKey]: this.styleMarshal.styleContext,
       [canLiftKey]: this.canLift,
-      [isDraggingKey]: this.isDragging,
-      [isDroppingKey]: this.isDropping,
+      [isMovementAllowedKey]: this.getIsMovementAllowed,
     };
   }
 
@@ -176,9 +172,7 @@ export default class DragDropContext extends React.Component<Props> {
   // on drag start which is too expensive.
   // This is useful when the user
   canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
-
-  isDragging = (type: TypeId) => getIsDragging(type, this.store.getState());
-  isDropping = (type: TypeId) => getIsDropping(type, this.store.getState());
+  getIsMovementAllowed = () => isMovementAllowed(this.store.getState());
 
   componentDidMount() {
     window.addEventListener('error', this.onWindowError);
