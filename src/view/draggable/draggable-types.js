@@ -64,7 +64,7 @@ export type DraggableProps = {|
   // used for shared global styles
   'data-react-beautiful-dnd-draggable': string,
   // used to know when a transition ends
-  onTransitionEnd: ?() => mixed,
+  onTransitionEnd: ?(event: TransitionEvent) => void,
 |};
 
 export type Provided = {|
