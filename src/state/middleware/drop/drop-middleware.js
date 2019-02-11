@@ -117,6 +117,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     Boolean(result.combine);
 
   if (!isAnimationRequired) {
+    console.error('TODO');
     dispatch(completeDrop(result));
     return;
   }

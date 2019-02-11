@@ -4,7 +4,7 @@ import type {
   Critical,
   DraggableId,
   DroppableId,
-  DropResult,
+  CompletedDrag,
   MovementMode,
   Viewport,
   DimensionMap,
@@ -252,12 +252,12 @@ export const animateDrop = (pending: PendingDrop): DropAnimateAction => ({
 
 export type DropCompleteAction = {
   type: 'DROP_COMPLETE',
-  payload: DropResult,
+  payload: CompletedDrag,
 };
 
-export const completeDrop = (result: DropResult): DropCompleteAction => ({
+export const completeDrop = (completed: CompletedDrag): DropCompleteAction => ({
   type: 'DROP_COMPLETE',
-  payload: result,
+  payload: completed,
 });
 
 type DropArgs = {|

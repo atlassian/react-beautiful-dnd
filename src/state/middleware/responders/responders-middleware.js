@@ -36,7 +36,7 @@ export default (
 
     // Drag end
     if (action.type === 'DROP_COMPLETE') {
-      const result: DropResult = action.payload;
+      const result: DropResult = action.payload.result;
       // flushing all pending responders before snapshots are updated
       publisher.flush();
       next(action);

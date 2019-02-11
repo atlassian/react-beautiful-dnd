@@ -12,6 +12,7 @@ import type {
   DraggingState,
   DragPositions,
   ClientPositions,
+  CompletedDrag,
   CollectingState,
   DropAnimatingState,
   DropPendingState,
@@ -57,7 +58,7 @@ const postDroppableChange = (
   });
 };
 
-const idle: IdleState = { phase: 'IDLE' };
+const idle: IdleState = { phase: 'IDLE', completed: null };
 
 export default (state: State = idle, action: Action): State => {
   if (action.type === 'CLEAN') {
@@ -432,7 +433,11 @@ export default (state: State = idle, action: Action): State => {
   // Action will be used by responders to call consumers
   // We can simply return to the idle state
   if (action.type === 'DROP_COMPLETE') {
-    return idle;
+    const completed: CompletedDrag = action.payload;
+    return {
+      phase: 'IDLE',
+      completed,
+    };
   }
 
   return state;

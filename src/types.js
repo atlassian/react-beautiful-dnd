@@ -290,8 +290,15 @@ export type Published = {|
   modified: DroppableDimension[],
 |};
 
+export type CompletedDrag = {|
+  critical: Critical,
+  result: DropResult,
+  impact: DragImpact,
+|};
+
 export type IdleState = {|
   phase: 'IDLE',
+  completed: ?CompletedDrag,
 |};
 
 export type DraggableIdMap = {

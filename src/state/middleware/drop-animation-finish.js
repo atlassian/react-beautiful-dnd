@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { completeDrop } from '../action-creators';
-import type { State } from '../../types';
+import type { State, CompletedDrag } from '../../types';
 import type { MiddlewareStore, Action, Dispatch } from '../store-types';
 
 export default (store: MiddlewareStore) => (next: Dispatch) => (
@@ -17,5 +17,10 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
     state.phase === 'DROP_ANIMATING',
     'Cannot finish a drop animating when no drop is occurring',
   );
-  store.dispatch(completeDrop(state.pending.result));
+  const completed: CompletedDrag = {
+    result: state.pending.result,
+    impact: state.pending.impact,
+    critical: state.critical,
+  };
+  store.dispatch(completeDrop(completed));
 };

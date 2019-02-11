@@ -8,6 +8,7 @@ import type {
   DroppableId,
   DraggableId,
   DragImpact,
+  CompletedDrag,
   DraggableDimension,
   Placeholder,
 } from '../../types';
@@ -24,14 +25,34 @@ import isStrictEqual from '../is-strict-equal';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../state/action-creators';
 
-const defaultMapProps: MapProps = {
+const withoutAnimation: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
   draggingFromList: null,
   placeholder: null,
-  // we return `true` as the default.
-  // if we used `false` we would need to re-render the Droppable when a drag ends
+  shouldAnimatePlaceholder: false,
+};
+
+const withAnimation: MapProps = {
+  ...withoutAnimation,
   shouldAnimatePlaceholder: true,
+};
+
+const shouldCollapseHomeAfterDrag = (
+  id: DroppableId,
+  completed: CompletedDrag,
+): boolean => {
+  const isHome: boolean = completed.critical.droppable.id === id;
+
+  if (!isHome) {
+    return false;
+  }
+
+  // should animate collapse when dropping into a foreign list
+
+  const wasOver: ?DroppableId = whatIsDraggedOver(completed.impact);
+
+  return Boolean(wasOver) && wasOver !== id;
 };
 
 // Returning a function to ensure each
@@ -99,15 +120,15 @@ export const makeMapStateToProps = (): Selector => {
     // not over the list
 
     if (!isHome) {
-      return defaultMapProps;
+      return withAnimation;
     }
 
     // showing a placeholder in the home list during a drag to prevent
     // other lists from being shifted on the page.
     // we animate the placeholder closed during a drop animation
-    if (isDropAnimating) {
-      return defaultMapProps;
-    }
+    // if (isDropAnimating) {
+    //   return withoutAnimation;
+    // }
     return getHomeNotDraggedOverMapProps(
       // this is the home list so we can use the draggable
       draggable.descriptor.id,
@@ -117,7 +138,7 @@ export const makeMapStateToProps = (): Selector => {
 
   const selector = (state: State, ownProps: OwnProps): MapProps => {
     if (ownProps.isDropDisabled) {
-      return defaultMapProps;
+      return withoutAnimation;
     }
 
     const id: DroppableId = ownProps.droppableId;
@@ -140,7 +161,15 @@ export const makeMapStateToProps = (): Selector => {
       return getMapProps(id, draggable, state.pending.impact, true, true);
     }
 
-    return defaultMapProps;
+    if (state.phase === 'IDLE' && state.completed) {
+      const completed: CompletedDrag = state.completed;
+      if (shouldCollapseHomeAfterDrag(id, completed)) {
+        console.log('should collapse with animation', id);
+        return withAnimation;
+      }
+      return withoutAnimation;
+    }
+    return withoutAnimation;
   };
 
   return selector;

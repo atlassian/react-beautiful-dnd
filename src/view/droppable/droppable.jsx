@@ -145,6 +145,7 @@ export default class Droppable extends Component<Props> {
   }
 
   shouldAnimatePlaceholder(): boolean {
+    return this.props.shouldAnimatePlaceholder;
     const request: boolean = this.props.shouldAnimatePlaceholder;
     if (!request) {
       return false;
@@ -160,6 +161,7 @@ export default class Droppable extends Component<Props> {
   getPlaceholder() {
     const placeholder: ?PlaceholderType = this.props.placeholder;
     const shouldAnimate: boolean = this.shouldAnimatePlaceholder();
+    console.log('should animate', this.props.droppableId, shouldAnimate);
 
     // Placeholder > onClose / onTransitionEnd
     // might not fire in the case of very fast toggling
@@ -205,6 +207,7 @@ export default class Droppable extends Component<Props> {
       draggingOverWith,
       draggingFromList,
     };
+    console.error('render', droppableId);
 
     return (
       <DroppableDimensionPublisher
