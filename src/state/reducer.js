@@ -433,10 +433,11 @@ export default (state: State = idle, action: Action): State => {
   // Action will be used by responders to call consumers
   // We can simply return to the idle state
   if (action.type === 'DROP_COMPLETE') {
-    const completed: CompletedDrag = action.payload;
+    const { completed, options } = action.payload;
+
     return {
       phase: 'IDLE',
-      completed,
+      completed: options.shouldFlush ? null : completed,
     };
   }
 

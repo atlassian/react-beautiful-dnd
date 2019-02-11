@@ -17,5 +17,5 @@ export default (store: MiddlewareStore) => (next: Dispatch) => (
     state.phase === 'DROP_ANIMATING',
     'Cannot finish a drop animating when no drop is occurring',
   );
-  store.dispatch(completeDrop(state.completed));
+  store.dispatch(completeDrop(state.completed, { shouldFlush: false }));
 };
