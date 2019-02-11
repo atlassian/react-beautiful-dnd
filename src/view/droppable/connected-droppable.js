@@ -10,7 +10,10 @@ import type {
   DragImpact,
   CompletedDrag,
   DraggableDimension,
+  DimensionMap,
   Placeholder,
+  TypeId,
+  Critical,
 } from '../../types';
 import type {
   MapProps,
@@ -38,6 +41,9 @@ const withAnimation: MapProps = {
   shouldAnimatePlaceholder: true,
 };
 
+const isMatchingType = (type: TypeId, critical: Critical): boolean =>
+  type === critical.droppable.type;
+
 const shouldCollapseHomeAfterDrag = (
   id: DroppableId,
   completed: CompletedDrag,
@@ -48,12 +54,18 @@ const shouldCollapseHomeAfterDrag = (
     return false;
   }
 
+  // should not animated when dropping into no list (will be returning to home list)
   // should animate collapse when dropping into a foreign list
 
   const wasOver: ?DroppableId = whatIsDraggedOver(completed.impact);
 
   return Boolean(wasOver) && wasOver !== id;
 };
+
+const getDraggable = (
+  critical: Critical,
+  dimensions: DimensionMap,
+): DraggableDimension => dimensions.draggables[critical.draggable.id];
 
 // Returning a function to ensure each
 // Droppable gets its own selector
@@ -142,13 +154,18 @@ export const makeMapStateToProps = (): Selector => {
     }
 
     const id: DroppableId = ownProps.droppableId;
+    const type: TypeId = ownProps.type;
 
     if (state.isDragging) {
-      const draggable: DraggableDimension =
-        state.dimensions.draggables[state.critical.draggable.id];
+      const critical: Critical = state.critical;
+
+      if (!isMatchingType(type, critical)) {
+        return withoutAnimation;
+      }
+
       return getMapProps(
         id,
-        draggable,
+        getDraggable(critical, state.dimensions),
         state.impact,
         false,
         state.shouldAnimatePlaceholder,
@@ -156,18 +173,35 @@ export const makeMapStateToProps = (): Selector => {
     }
 
     if (state.phase === 'DROP_ANIMATING') {
-      const draggable: DraggableDimension =
-        state.dimensions.draggables[state.completed.critical.draggable.id];
-      return getMapProps(id, draggable, state.completed.impact, true, true);
+      const completed: CompletedDrag = state.completed;
+
+      if (!isMatchingType(type, completed.critical)) {
+        return withoutAnimation;
+      }
+
+      return getMapProps(
+        id,
+        getDraggable(completed.critical, state.dimensions),
+        completed.impact,
+        true,
+        true,
+      );
     }
 
     if (state.phase === 'IDLE' && state.completed) {
       const completed: CompletedDrag = state.completed;
-      if (shouldCollapseHomeAfterDrag(id, completed)) {
-        return withAnimation;
+
+      if (!isMatchingType(type, completed.critical)) {
+        return withoutAnimation;
       }
-      return withoutAnimation;
+
+      if (!shouldCollapseHomeAfterDrag(id, completed)) {
+        return withoutAnimation;
+      }
+
+      return withAnimation;
     }
+
     return withoutAnimation;
   };
 
