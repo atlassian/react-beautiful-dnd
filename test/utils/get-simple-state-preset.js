@@ -13,7 +13,8 @@ import type {
   IdleState,
   DraggableDimension,
   DroppableDimension,
-  PendingDrop,
+  DropResult,
+  CompletedDrag,
   DropReason,
   DraggableId,
   DropAnimatingState,
@@ -36,6 +37,7 @@ export default (axis?: Axis = vertical) => {
 
   const idle: IdleState = {
     phase: 'IDLE',
+    completed: null,
   };
 
   const origin: Position = { x: 0, y: 0 };
@@ -161,22 +163,17 @@ export default (axis?: Axis = vertical) => {
       viewport: preset.viewport,
     });
 
-    const pending: PendingDrop = {
-      newHomeClientOffset: { x: 10, y: 20 },
-      dropDuration: 1,
-      impact,
-      result: {
-        draggableId: draggable.descriptor.id,
-        type: draggable.descriptor.type,
-        source: {
-          droppableId: draggable.descriptor.droppableId,
-          index: draggable.descriptor.index,
-        },
-        destination: getHomeLocation(draggable.descriptor),
-        reason,
-        combine: null,
-        mode: 'FLUID',
+    const result: DropResult = {
+      draggableId: draggable.descriptor.id,
+      type: draggable.descriptor.type,
+      source: {
+        droppableId: draggable.descriptor.droppableId,
+        index: draggable.descriptor.index,
       },
+      destination: getHomeLocation(draggable.descriptor),
+      reason,
+      combine: null,
+      mode: 'FLUID',
     };
 
     const ourCritical: Critical = {
@@ -184,13 +181,20 @@ export default (axis?: Axis = vertical) => {
       droppable: home.descriptor,
     };
 
-    const result: DropAnimatingState = {
-      phase: 'DROP_ANIMATING',
-      pending,
-      dimensions: preset.dimensions,
+    const completed: CompletedDrag = {
       critical: ourCritical,
+      impact,
+      result,
     };
-    return result;
+
+    const state: DropAnimatingState = {
+      phase: 'DROP_ANIMATING',
+      completed,
+      dimensions: preset.dimensions,
+      newHomeClientOffset: { x: 10, y: 20 },
+      dropDuration: 1,
+    };
+    return state;
   };
 
   const dropAnimating = (

@@ -19,25 +19,25 @@ export const combine = {
   },
 };
 
-// export const timings = {
-//   outOfTheWay: 0.2,
-//   // greater than the out of the way time
-//   // so that when the drop ends everything will
-//   // have to be out of the way
-//   minDropTime: 0.33,
-//   maxDropTime: 0.55,
-// };
-
-// slow timings
-// uncomment to use
 export const timings = {
-  outOfTheWay: 2,
+  outOfTheWay: 0.2,
   // greater than the out of the way time
   // so that when the drop ends everything will
   // have to be out of the way
-  minDropTime: 3,
-  maxDropTime: 4,
+  minDropTime: 0.33,
+  maxDropTime: 0.55,
 };
+
+// slow timings
+// uncomment to use
+// export const timings = {
+//   outOfTheWay: 2,
+//   // greater than the out of the way time
+//   // so that when the drop ends everything will
+//   // have to be out of the way
+//   minDropTime: 3,
+//   maxDropTime: 4,
+// };
 
 const outOfTheWayTiming: string = `${timings.outOfTheWay}s ${
   curves.outOfTheWay
