@@ -9,7 +9,6 @@ import type {
   Viewport,
   DimensionMap,
   DropReason,
-  PendingDrop,
   Published,
 } from '../types';
 
@@ -240,14 +239,20 @@ export const clean = (): CleanAction => ({
   payload: null,
 });
 
+export type AnimateDropArgs = {|
+  completed: CompletedDrag,
+  newHomeClientOffset: Position,
+  dropDuration: number,
+|};
+
 export type DropAnimateAction = {
   type: 'DROP_ANIMATE',
-  payload: PendingDrop,
+  payload: AnimateDropArgs,
 };
 
-export const animateDrop = (pending: PendingDrop): DropAnimateAction => ({
+export const animateDrop = (args: AnimateDropArgs): DropAnimateAction => ({
   type: 'DROP_ANIMATE',
-  payload: pending,
+  payload: args,
 });
 
 export type DropCompleteAction = {

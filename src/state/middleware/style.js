@@ -10,7 +10,7 @@ export default (marshal: StyleMarshal) => () => (next: Dispatch) => (
   }
 
   if (action.type === 'DROP_ANIMATE') {
-    marshal.dropping(action.payload.result.reason);
+    marshal.dropping(action.payload.completed.result.reason);
   }
 
   // this will clear any styles immediately before a reorder

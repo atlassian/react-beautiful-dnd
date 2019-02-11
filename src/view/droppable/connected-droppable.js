@@ -157,14 +157,13 @@ export const makeMapStateToProps = (): Selector => {
 
     if (state.phase === 'DROP_ANIMATING') {
       const draggable: DraggableDimension =
-        state.dimensions.draggables[state.critical.draggable.id];
-      return getMapProps(id, draggable, state.pending.impact, true, true);
+        state.dimensions.draggables[state.completed.critical.draggable.id];
+      return getMapProps(id, draggable, state.completed.impact, true, true);
     }
 
     if (state.phase === 'IDLE' && state.completed) {
       const completed: CompletedDrag = state.completed;
       if (shouldCollapseHomeAfterDrag(id, completed)) {
-        console.log('should collapse with animation', id);
         return withAnimation;
       }
       return withoutAnimation;

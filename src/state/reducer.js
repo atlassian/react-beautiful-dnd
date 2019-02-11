@@ -7,7 +7,6 @@ import type {
   StateWhenUpdatesAllowed,
   DraggableDimension,
   DroppableDimension,
-  PendingDrop,
   IdleState,
   DraggingState,
   DragPositions,
@@ -413,7 +412,7 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'DROP_ANIMATE') {
-    const pending: PendingDrop = action.payload;
+    const { completed, dropDuration, newHomeClientOffset } = action.payload;
     invariant(
       state.phase === 'DRAGGING' || state.phase === 'DROP_PENDING',
       `Cannot animate drop from phase ${state.phase}`,
@@ -422,9 +421,10 @@ export default (state: State = idle, action: Action): State => {
     // Moving into a new phase
     const result: DropAnimatingState = {
       phase: 'DROP_ANIMATING',
-      pending,
       dimensions: state.dimensions,
-      critical: state.critical,
+      completed,
+      dropDuration,
+      newHomeClientOffset,
     };
 
     return result;

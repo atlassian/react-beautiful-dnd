@@ -246,13 +246,6 @@ export type DropResult = {|
   reason: DropReason,
 |};
 
-export type PendingDrop = {|
-  newHomeClientOffset: Position,
-  dropDuration: number,
-  impact: DragImpact,
-  result: DropResult,
-|};
-
 export type ScrollOptions = {|
   shouldPublishImmediately: boolean,
 |};
@@ -357,10 +350,11 @@ export type DropPendingState = {|
 // An optional phase for animating the drop / cancel if it is needed
 export type DropAnimatingState = {|
   phase: 'DROP_ANIMATING',
-  pending: PendingDrop,
+  completed: CompletedDrag,
+  newHomeClientOffset: Position,
+  dropDuration: number,
   // We still need to render placeholders and fix the dimensions of the dragging item
   dimensions: DimensionMap,
-  critical: Critical,
 |};
 
 export type State =

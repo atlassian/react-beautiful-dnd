@@ -136,6 +136,7 @@ export default class Droppable extends Component<Props> {
     }
   };
 
+  // TODO: remove??
   isAppDropping(): boolean {
     return this.context[isDroppingKey](this.props.type);
   }
@@ -144,29 +145,14 @@ export default class Droppable extends Component<Props> {
     return this.context[isDraggingKey](this.props.type);
   }
 
-  shouldAnimatePlaceholder(): boolean {
-    return this.props.shouldAnimatePlaceholder;
-    const request: boolean = this.props.shouldAnimatePlaceholder;
-    if (!request) {
-      return false;
-    }
-
-    // When dropping into a home list we do not collapse the placeholder.
-    // We need this placeholder to collapse instantly after the drag ends
-    // By setting placeholder animation to false we ensure that the
-    // placeholder is removed immediately
-    return this.isAppDragging() || this.isAppDropping();
-  }
-
   getPlaceholder() {
-    const placeholder: ?PlaceholderType = this.props.placeholder;
-    const shouldAnimate: boolean = this.shouldAnimatePlaceholder();
-    console.log('should animate', this.props.droppableId, shouldAnimate);
-
     // Placeholder > onClose / onTransitionEnd
     // might not fire in the case of very fast toggling
     return (
-      <AnimateInOut on={placeholder} shouldAnimate={shouldAnimate}>
+      <AnimateInOut
+        on={this.props.placeholder}
+        shouldAnimate={this.props.shouldAnimatePlaceholder}
+      >
         {({ onClose, data, animate }: AnimateProvided) => (
           <Placeholder
             placeholder={(data: any)}

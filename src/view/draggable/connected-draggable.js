@@ -28,7 +28,7 @@ import type {
   DraggableDimension,
   CombineImpact,
   Displacement,
-  PendingDrop,
+  CompletedDrag,
   DragImpact,
   DisplacementMap,
   MovementMode,
@@ -171,22 +171,22 @@ export const makeMapStateToProps = (): Selector => {
 
     // Dropping
     if (state.phase === 'DROP_ANIMATING') {
-      const pending: PendingDrop = state.pending;
-      if (pending.result.draggableId !== ownProps.draggableId) {
+      const completed: CompletedDrag = state.completed;
+      if (completed.result.draggableId !== ownProps.draggableId) {
         return null;
       }
 
       const dimension: DraggableDimension =
         state.dimensions.draggables[ownProps.draggableId];
-      const draggingOver: ?DroppableId = whatIsDraggedOver(pending.impact);
-      const combineWith: ?DraggableId = getCombineWith(pending.impact);
-      const duration: number = pending.dropDuration;
-      const mode: MovementMode = pending.result.mode;
+      const draggingOver: ?DroppableId = whatIsDraggedOver(completed.impact);
+      const combineWith: ?DraggableId = getCombineWith(completed.impact);
+      const duration: number = state.dropDuration;
+      const mode: MovementMode = completed.result.mode;
 
       // not memoized as it is the only execution
       return {
         dragging: {
-          offset: pending.newHomeClientOffset,
+          offset: state.newHomeClientOffset,
           dimension,
           draggingOver,
           combineWith,
@@ -195,7 +195,7 @@ export const makeMapStateToProps = (): Selector => {
           dropping: {
             duration,
             curve: curves.drop,
-            moveTo: pending.newHomeClientOffset,
+            moveTo: state.newHomeClientOffset,
             opacity: combineWith ? combine.opacity.drop : null,
             scale: combineWith ? combine.scale.drop : null,
           },
@@ -224,14 +224,15 @@ export const makeMapStateToProps = (): Selector => {
 
     // Dropping
     if (state.phase === 'DROP_ANIMATING') {
+      const completed: CompletedDrag = state.completed;
       // do nothing if this was the dragging item
-      if (state.pending.result.draggableId === ownProps.draggableId) {
+      if (completed.result.draggableId === ownProps.draggableId) {
         return null;
       }
       return getSecondaryMovement(
         ownProps.draggableId,
-        state.pending.result.draggableId,
-        state.pending.impact,
+        completed.result.draggableId,
+        completed.impact,
       );
     }
 

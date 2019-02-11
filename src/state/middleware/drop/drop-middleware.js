@@ -6,15 +6,19 @@ import type {
   DropReason,
   Critical,
   DraggableLocation,
-  DragImpact,
   DropResult,
-  PendingDrop,
+  CompletedDrag,
   Combine,
   DimensionMap,
   DraggableDimension,
 } from '../../../types';
 import type { MiddlewareStore, Dispatch, Action } from '../../store-types';
-import { animateDrop, completeDrop, dropPending } from '../../action-creators';
+import {
+  animateDrop,
+  completeDrop,
+  dropPending,
+  type AnimateDropArgs,
+} from '../../action-creators';
 import { isEqual } from '../../position';
 import getDropDuration from './get-drop-duration';
 import getNewHomeClientOffset from './get-new-home-client-offset';
@@ -107,6 +111,12 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     onLift: state.onLift,
   });
 
+  const completed: CompletedDrag = {
+    critical: state.critical,
+    result,
+    impact,
+  };
+
   // Do not animate if you do not need to.
   // Animate the drop if:
   // - not already in the right spot OR
@@ -117,8 +127,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     Boolean(result.combine);
 
   if (!isAnimationRequired) {
-    console.error('TODO');
-    dispatch(completeDrop(result));
+    dispatch(completeDrop(completed));
     return;
   }
 
@@ -128,12 +137,11 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     reason,
   });
 
-  const pending: PendingDrop = {
+  const args: AnimateDropArgs = {
     newHomeClientOffset,
     dropDuration,
-    result,
-    impact,
+    completed,
   };
 
-  dispatch(animateDrop(pending));
+  dispatch(animateDrop(args));
 };
