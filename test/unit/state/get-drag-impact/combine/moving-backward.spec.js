@@ -13,7 +13,6 @@ import {
   forward,
   backward,
 } from '../../../../../src/state/user-direction/user-direction-preset';
-import getHomeImpact from '../../../../../src/state/get-home-impact';
 import getDragImpact from '../../../../../src/state/get-drag-impact';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { patch, add, subtract } from '../../../../../src/state/position';
