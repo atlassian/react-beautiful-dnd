@@ -57,7 +57,7 @@ const getEdges = (
     };
   }
 
-  // undo the displacement to be in the original position
+  //
   return {
     start: start - displacement,
     end: end - displacement,
@@ -96,14 +96,6 @@ export default ({
         if (isMovingForward) {
           // Moving forward will decrease the amount of things needed to be displaced
           return targetCenter < start + displacement;
-        }
-
-        // Displace while center center is before the start
-        if (isMovingForward) {
-          if (targetCenter < start + displacement) {
-            console.log('going over displaced start of', child.descriptor.id);
-          }
-          return targetCenter <= start + displacement;
         }
 
         // Moving backwards will increase the amount of things needed to be displaced

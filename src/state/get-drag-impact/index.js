@@ -70,6 +70,7 @@ export default ({
     pageBorderBoxCenter,
   );
 
+  // checking combine first so we combine before any reordering
   const withMerge: ?DragImpact = getCombineImpact({
     pageBorderBoxCenterWithDroppableScrollChange,
     previousImpact,
