@@ -27,6 +27,7 @@ const defaultMapProps: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
   placeholder: null,
+  isDropAnimating: false,
 };
 
 // Returning a function to ensure each
@@ -37,10 +38,12 @@ export const makeMapStateToProps = (): Selector => {
       isDraggingOver: boolean,
       draggingOverWith: ?DraggableId,
       placeholder: ?Placeholder,
+      isDropAnimating: boolean,
     ): MapProps => ({
       isDraggingOver,
       draggingOverWith,
       placeholder,
+      isDropAnimating,
     }),
   );
 
@@ -48,6 +51,7 @@ export const makeMapStateToProps = (): Selector => {
     id: DroppableId,
     draggable: DraggableDimension,
     impact: DragImpact,
+    result: ?DropResult,
   ) => {
     const isOver: boolean = whatIsDraggedOver(impact) === id;
     if (!isOver) {
@@ -62,7 +66,14 @@ export const makeMapStateToProps = (): Selector => {
       ? draggable.placeholder
       : null;
 
-    return getMapProps(true, draggable.descriptor.id, placeholder);
+    const isDropAnimating: boolean = result ? result.reason === 'DROP' : false;
+
+    return getMapProps(
+      true,
+      draggable.descriptor.id,
+      placeholder,
+      isDropAnimating,
+    );
   };
 
   const selector = (state: State, ownProps: OwnProps): MapProps => {
@@ -81,7 +92,12 @@ export const makeMapStateToProps = (): Selector => {
     if (state.phase === 'DROP_ANIMATING') {
       const draggable: DraggableDimension =
         state.dimensions.draggables[state.pending.result.draggableId];
-      return getDraggingOverProps(id, draggable, state.pending.impact);
+      return getDraggingOverProps(
+        id,
+        draggable,
+        state.pending.impact,
+        state.pending.result,
+      );
     }
 
     return defaultMapProps;

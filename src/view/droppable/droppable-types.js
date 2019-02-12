@@ -22,6 +22,7 @@ export type Provided = {|
 
 export type StateSnapshot = {|
   isDraggingOver: boolean,
+  isDropAnimating: boolean,
   draggingOverWith: ?DraggableId,
 |};
 
