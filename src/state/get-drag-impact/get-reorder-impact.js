@@ -91,10 +91,18 @@ export default ({
       (child: DraggableDimension): boolean => {
         const { start, end } = getEdges(child, displacement, axis, onLift);
 
-        // Moving forward will decrease the amount of things needed to be displaced
+        // we need to return `true` if the item needs to be displaced
+
+        if (isMovingForward) {
+          // Moving forward will decrease the amount of things needed to be displaced
+          return targetCenter < start + displacement;
+        }
+
         // Displace while center center is before the start
         if (isMovingForward) {
-          // On start edge = displace
+          if (targetCenter < start + displacement) {
+            console.log('going over displaced start of', child.descriptor.id);
+          }
           return targetCenter <= start + displacement;
         }
 

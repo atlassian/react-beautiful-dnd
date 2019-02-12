@@ -19,7 +19,6 @@ import {
 } from '../../../../../../src/state/user-direction/user-direction-preset';
 import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
 import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
-import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -27,28 +26,28 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
     const viewport: Viewport = preset.viewport;
 
     const crossAxisCenter: number =
-      preset.inHome3.page.borderBox.center[axis.crossAxisLine];
+      preset.foreign.page.borderBox.center[axis.crossAxisLine];
 
     const displacedBy: DisplacedBy = getDisplacedBy(
       axis,
-      preset.inHome3.displaceBy,
+      preset.inHome1.displaceBy,
     );
     const { onLift, impact: homeImpact } = getHomeOnLift({
-      draggable: preset.inHome3,
+      draggable: preset.inHome1,
       home: preset.home,
       draggables: preset.draggables,
       viewport: preset.viewport,
     });
 
-    const onEndOfInHome1: Position = patch(
+    const onEndOfInForeign2: Position = patch(
       axis.line,
-      preset.inHome1.page.borderBox[axis.end],
+      preset.inForeign2.page.borderBox[axis.end],
       crossAxisCenter,
     );
 
     const goingBackwards: DragImpact = getDragImpact({
-      pageBorderBoxCenter: onEndOfInHome1,
-      draggable: preset.inHome3,
+      pageBorderBoxCenter: onEndOfInForeign2,
+      draggable: preset.inHome1,
       draggables: preset.draggables,
       droppables: preset.droppables,
       previousImpact: homeImpact,
@@ -60,14 +59,14 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
     it('should displace items when moving backwards onto their bottom edge', () => {
       // after end of inHome1
       {
-        const afterEndOfInHome1: Position = add(
-          onEndOfInHome1,
+        const afterEndOfInForeign2: Position = add(
+          onEndOfInForeign2,
           patch(axis.line, 1),
         );
 
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterEndOfInHome1,
-          draggable: preset.inHome3,
+          pageBorderBoxCenter: afterEndOfInForeign2,
+          draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: preset.droppables,
           previousImpact: homeImpact,
@@ -77,11 +76,10 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
         });
 
         // ordered by closest to current location
+        // animated and visible as it is a foreign list
         const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inHome2),
-          // inHome3 is not displaced as it is the dragging item
-          // inHome4 would have been displaced on lift so it won't be animated
-          getNotAnimatedDisplacement(preset.inHome4),
+          getVisibleDisplacement(preset.inForeign3),
+          getVisibleDisplacement(preset.inForeign4),
         ];
         const expected: DragImpact = {
           movement: {
@@ -91,9 +89,9 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
           },
           direction: axis.direction,
           destination: {
-            // is now in position of inHome2
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome2.descriptor.index,
+            // is now in position of inForeign3
+            droppableId: preset.foreign.descriptor.id,
+            index: preset.inForeign3.descriptor.index,
           },
           merge: null,
         };
@@ -102,11 +100,9 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       }
       // ordered by closest to current location
       const displaced: Displacement[] = [
-        getVisibleDisplacement(preset.inHome1),
-        getVisibleDisplacement(preset.inHome2),
-        // inHome3 is not displaced as it is the dragging item
-        // inHome4 would have been displaced on lift so it won't be animated
-        getNotAnimatedDisplacement(preset.inHome4),
+        getVisibleDisplacement(preset.inForeign2),
+        getVisibleDisplacement(preset.inForeign3),
+        getVisibleDisplacement(preset.inForeign4),
       ];
       const expected: DragImpact = {
         movement: {
@@ -116,9 +112,9 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
         },
         direction: axis.direction,
         destination: {
-          // is now in position of inHome1
-          droppableId: preset.home.descriptor.id,
-          index: preset.inHome1.descriptor.index,
+          // is now in position of inForeign2
+          droppableId: preset.inForeign2.descriptor.droppableId,
+          index: preset.inForeign2.descriptor.index,
         },
         merge: null,
       };
@@ -127,15 +123,15 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
     });
 
     it('should end displacement if moving forward over the displaced top edge', () => {
-      const topEdgeOfInHome1: number =
-        preset.inHome1.page.borderBox[axis.start];
-      const displacedTopEdgeOfInHome1: number =
-        topEdgeOfInHome1 + displacedBy.value;
+      const topEdgeOfInForeign2: number =
+        preset.inForeign2.page.borderBox[axis.start];
+      const displacedTopEdgeOfInForeign2: number =
+        topEdgeOfInForeign2 + displacedBy.value;
 
       const displacedTopEdge: Position = patch(
         axis.line,
         // onto top edge with without displacement
-        displacedTopEdgeOfInHome1,
+        displacedTopEdgeOfInForeign2,
         // no change
         crossAxisCenter,
       );
@@ -148,7 +144,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       {
         const impact: DragImpact = getDragImpact({
           pageBorderBoxCenter: beforeDisplacedTopEdge,
-          draggable: preset.inHome3,
+          draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: preset.droppables,
           previousImpact: goingBackwards,
@@ -162,7 +158,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       {
         const impact: DragImpact = getDragImpact({
           pageBorderBoxCenter: displacedTopEdge,
-          draggable: preset.inHome3,
+          draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: preset.droppables,
           previousImpact: goingBackwards,
@@ -170,10 +166,10 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
           userDirection: forward,
           onLift,
         });
+        // ordered by closest impacted
         const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inHome2),
-          // not displacing inHome3 as it is the dragging item
-          getNotAnimatedDisplacement(preset.inHome4),
+          getVisibleDisplacement(preset.inForeign3),
+          getVisibleDisplacement(preset.inForeign4),
         ];
         const expected: DragImpact = {
           movement: {
@@ -183,9 +179,9 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
           },
           direction: axis.direction,
           destination: {
-            droppableId: preset.home.descriptor.id,
-            // is now in position of inHome2
-            index: preset.inHome2.descriptor.index,
+            // is now in position of inForeign3
+            droppableId: preset.inForeign3.descriptor.droppableId,
+            index: preset.inForeign3.descriptor.index,
           },
           merge: null,
         };
