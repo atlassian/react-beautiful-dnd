@@ -1,5 +1,5 @@
 // @flow
-import { type Position, type Spacing, type Rect } from 'css-box-model';
+import { type Position, type Rect } from 'css-box-model';
 import type {
   DragMovement,
   DraggableDimension,
@@ -54,7 +54,6 @@ export default ({
   const displaced: Displacement[] = insideDestinationWithoutDraggable
     .filter(
       (child: DraggableDimension): boolean => {
-        // const { start, end } = getEdges(child, displacement, axis, onLift);
         const borderBox: Rect = child.page.borderBox;
         const start: number = borderBox[axis.start];
         const end: number = borderBox[axis.end];
