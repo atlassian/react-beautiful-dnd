@@ -17,11 +17,17 @@ import getDragImpact from '../../../../../src/state/get-drag-impact';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { patch, add, subtract } from '../../../../../src/state/position';
 import getDisplacementMap from '../../../../../src/state/get-displacement-map';
+import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
-    const homeImpact: DragImpact = getHomeImpact(preset.inHome1, preset.home);
+    const { onLift, impact: homeImpact } = getHomeOnLift({
+      draggable: preset.inHome1,
+      home: preset.home,
+      draggables: preset.draggables,
+      viewport: preset.viewport,
+    });
     const withCombineEnabled: DroppableDimensionMap = enableCombining(
       preset.droppables,
     );
