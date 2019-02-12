@@ -42,7 +42,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
     const withDisplacement = (edge: number) => edge + displacedBy.value;
 
     describe('when entering list from outside', () => {
-      it.only('should displace if moving forward onto the displaced start edge', () => {
+      it('should displace if moving forward onto the displaced start edge', () => {
         // moving inHome1 into foreign
         const startEdge: number = preset.inForeign2.page.borderBox[axis.start];
         const displacedStartEdge: number = withDisplacement(startEdge);
@@ -89,7 +89,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
         expect(impact).toEqual(expected);
       });
 
-      it.only('should displace if moving backwards onto a non-displaced end', () => {
+      it('should displace if moving backwards onto a non-displaced end', () => {
         // moving inHome1 into foreign
         const endEdge: number = preset.inForeign2.page.borderBox[axis.end];
         const crossAxisCenter: number =
@@ -136,7 +136,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
       const crossAxisCenter: number =
         preset.foreign.page.borderBox.center[axis.crossAxisLine];
 
-      it.only('should remove displacement as moving forward over a displaced start edge', () => {
+      it('should remove displacement as moving forward over a displaced start edge', () => {
         const fromStart: Position = patch(
           axis.line,
           preset.foreign.page.borderBox[axis.start],
@@ -383,13 +383,13 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
         }
         // moving onto end edge of item before
         {
-          const onEnd: Position = patch(
+          const afterEndEdge: Position = patch(
             axis.line,
-            preset.inForeign4.page.borderBox[axis.end],
+            preset.inForeign4.page.borderBox[axis.end] + 1,
             crossAxisCenter,
           );
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: onEnd,
+            pageBorderBoxCenter: afterEndEdge,
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: preset.droppables,
@@ -416,11 +416,11 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
           };
           expect(impact).toEqual(expected);
         }
-        // moving over end edge of item before
+        // moving onto end edge of item before
         {
           const onEnd: Position = patch(
             axis.line,
-            preset.inForeign4.page.borderBox[axis.end] - 1,
+            preset.inForeign4.page.borderBox[axis.end],
             crossAxisCenter,
           );
           const impact: DragImpact = getDragImpact({
@@ -457,13 +457,13 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
         }
         // moving over edge of another item (testing ordering)
         {
-          const onEnd: Position = patch(
+          const beforeEndEdge: Position = patch(
             axis.line,
             preset.inForeign3.page.borderBox[axis.end] - 1,
             crossAxisCenter,
           );
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: onEnd,
+            pageBorderBoxCenter: beforeEndEdge,
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: preset.droppables,
