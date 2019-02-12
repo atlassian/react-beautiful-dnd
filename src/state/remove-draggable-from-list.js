@@ -6,8 +6,10 @@ export default memoizeOne(
   (
     remove: DraggableDimension,
     list: DraggableDimension[],
-  ): DraggableDimension[] =>
-    list.filter(
+  ): DraggableDimension[] => {
+    console.log('CACHE BREAK');
+    return list.filter(
       (item: DraggableDimension) => item.descriptor.id !== remove.descriptor.id,
-    ),
+    );
+  },
 );

@@ -19,8 +19,9 @@ import {
   backward,
   forward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
-import getDisplacedWithMap from './utils/get-displaced-with-map';
-import getHomeImpact from '../../../../../../src/state/get-home-impact';
+import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
+import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -28,19 +29,23 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
     const viewport: Viewport = preset.viewport;
 
     // behind start so will displace forwards
-    const willDisplaceForward: boolean = true;
     const displacedBy: DisplacedBy = getDisplacedBy(
       axis,
       preset.inHome3.displaceBy,
-      willDisplaceForward,
     );
+    const { onLift, impact: homeImpact } = getHomeOnLift({
+      draggable: preset.inHome3,
+      home: preset.home,
+      draggables: preset.draggables,
+      viewport: preset.viewport,
+    });
 
     describe('moving within list', () => {
       // moving inHome3 back past inHome1
       const goingBackwardsCenter: Position = patch(
         axis.line,
-        // on bottom edge
-        preset.inHome1.page.borderBox[axis.end],
+        // before bottom edge
+        preset.inHome1.page.borderBox[axis.end] - 1,
         // no change
         preset.inHome3.page.borderBox.center[axis.crossAxisLine],
       );
@@ -50,37 +55,34 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
         draggable: preset.inHome3,
         draggables: preset.draggables,
         droppables: preset.droppables,
-        // previousImpact: noImpact,
-        previousImpact: getHomeImpact(preset.inHome3, preset.home),
+        previousImpact: homeImpact,
         viewport,
         userDirection: backward,
+        onLift,
       });
 
       it('should displace items when moving over backwards over their bottom edge', () => {
-        // ordered by closest displaced
+        // ordered by closest to current location
+        const displaced: Displacement[] = [
+          // displacement is not animated as it started not animated
+          getVisibleDisplacement(preset.inHome1),
+          getVisibleDisplacement(preset.inHome2),
+          // inHome3 is not displaced as it is the dragging item
+
+          // inHome4 would have been displaced on lift so it won't be animated
+          getNotAnimatedDisplacement(preset.inHome4),
+        ];
         const expected: DragImpact = {
           movement: {
-            // ordered by closest to current location
-            ...getDisplacedWithMap([
-              {
-                draggableId: preset.inHome1.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-              {
-                draggableId: preset.inHome2.descriptor.id,
-                isVisible: true,
-                shouldAnimate: true,
-              },
-            ]),
-            willDisplaceForward,
+            displaced,
+            map: getDisplacementMap(displaced),
             displacedBy,
           },
           direction: axis.direction,
           destination: {
             droppableId: preset.home.descriptor.id,
             // is now before inHome1
-            index: 0,
+            index: preset.inHome1.descriptor.index,
           },
           merge: null,
         };
@@ -88,7 +90,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
         expect(goingBackwards).toEqual(expected);
       });
 
-      it('should end displacement if moving forward over the displaced top edge', () => {
+      it.only('should end displacement if moving forward over the displaced top edge', () => {
         const crossAxisCenter: number =
           preset.inHome3.page.borderBox.center[axis.crossAxisLine];
         const topEdgeOfInHome1: number =
@@ -111,6 +113,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
           previousImpact: goingBackwards,
           viewport,
           userDirection: forward,
+          onLift,
         });
         expect(forwardImpact1).toEqual(goingBackwards);
 
@@ -130,6 +133,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
           previousImpact: forwardImpact1,
           viewport,
           userDirection: forward,
+          onLift,
         });
         expect(forwardImpact2).toEqual(goingBackwards);
 
@@ -143,7 +147,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
         );
 
         // checking that it does not matter which impact we are going from
-        [goingBackwards, forwardImpact1, forwardImpact2].forEach(
+        [goingBackwards /* , forwardImpact1, forwardImpact2 */].forEach(
           (previousImpact: DragImpact) => {
             const impact: DragImpact = getDragImpact({
               pageBorderBoxCenter: goingForwardsEnough,
@@ -153,18 +157,17 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
               previousImpact,
               viewport,
               userDirection: forward,
+              onLift,
             });
+            const displaced: Displacement[] = [
+              getVisibleDisplacement(preset.inHome2),
+              // not displacing inHome3 as it is the dragging item
+              getNotAnimatedDisplacement(preset.inHome4),
+            ];
             const expected: DragImpact = {
               movement: {
-                // ordered by closest to current location
-                ...getDisplacedWithMap([
-                  {
-                    draggableId: preset.inHome2.descriptor.id,
-                    isVisible: true,
-                    shouldAnimate: true,
-                  },
-                ]),
-                willDisplaceForward,
+                displaced,
+                map: getDisplacementMap(displaced),
                 displacedBy,
               },
               direction: axis.direction,
@@ -207,6 +210,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
             previousImpact: noImpact,
             viewport,
             userDirection: forward,
+            onLift,
           });
           // everything displaced before inHome3
           const newDisplaced: Displacement[] = [
@@ -227,7 +231,6 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
               // ordered by closest to current location
               displaced: newDisplaced,
               map: newMap,
-              willDisplaceForward,
               displacedBy,
             },
             direction: axis.direction,
@@ -256,6 +259,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
             previousImpact: noImpact,
             viewport,
             userDirection: forward,
+            onLift,
           });
           // inHome1 will not be displaced
           const newDisplaced: Displacement[] = [
@@ -271,7 +275,6 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
               // ordered by closest to current location
               displaced: newDisplaced,
               map: newMap,
-              willDisplaceForward,
               displacedBy,
             },
             direction: axis.direction,
@@ -303,6 +306,7 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
           previousImpact: noImpact,
           viewport,
           userDirection: backward,
+          onLift,
         });
 
         // ordered by closest displaced
@@ -321,7 +325,6 @@ import getHomeImpact from '../../../../../../src/state/get-home-impact';
                 shouldAnimate: true,
               },
             ]),
-            willDisplaceForward,
             displacedBy,
           },
           direction: axis.direction,

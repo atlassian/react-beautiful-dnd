@@ -1,5 +1,5 @@
 // @flow
-import { type Position, type Spacing } from 'css-box-model';
+import { type Position, type Spacing, type Rect } from 'css-box-model';
 import type {
   DragMovement,
   DraggableDimension,
@@ -31,6 +31,39 @@ type Args = {|
   onLift: OnLift,
 |};
 
+type Edges = {|
+  start: number,
+  end: number,
+|};
+
+const getEdges = (
+  draggable: DraggableDimension,
+  displacement: number,
+  axis: Axis,
+  onLift: OnLift,
+): Edges => {
+  const borderBox: Rect = draggable.page.borderBox;
+  const start: number = borderBox[axis.start];
+  const end: number = borderBox[axis.end];
+  const didStartDisplaced: boolean = getDidStartDisplaced(
+    draggable.descriptor.id,
+    onLift,
+  );
+
+  if (!didStartDisplaced) {
+    return {
+      start,
+      end,
+    };
+  }
+
+  // undo the displacement to be in the original position
+  return {
+    start: start - displacement,
+    end: end - displacement,
+  };
+};
+
 export default ({
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
   draggable,
@@ -56,30 +89,19 @@ export default ({
   const displaced: Displacement[] = insideDestinationWithoutDraggable
     .filter(
       (child: DraggableDimension): boolean => {
-        // did this item start displaced when the drag started?
-        const didStartDisplaced: boolean = getDidStartDisplaced(
-          child.descriptor.id,
-          onLift,
-        );
-
-        const borderBox: Spacing = didStartDisplaced
-          ? // shift an item that started displaced to be as if it where not displaced
-            offsetByPosition(
-              child.page.borderBox,
-              negate(onLift.displacedBy.point),
-            )
-          : child.page.borderBox;
-        const start: number = borderBox[axis.start];
-        const end: number = borderBox[axis.end];
+        const { start, end } = getEdges(child, displacement, axis, onLift);
 
         // Moving forward will decrease the amount of things needed to be displaced
+        // Displace while center center is before the start
         if (isMovingForward) {
+          // On start edge = displace
           return targetCenter <= start + displacement;
         }
 
-        // Moving backwards towards top of list
         // Moving backwards will increase the amount of things needed to be displaced
-        return targetCenter < end;
+        // Displace an item if the center goes before the end of an item
+        // On end edge = displace
+        return targetCenter <= end;
       },
     )
     .map(

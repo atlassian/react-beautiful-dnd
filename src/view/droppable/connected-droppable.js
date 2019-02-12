@@ -59,7 +59,17 @@ const shouldCollapseHomeAfterDrag = (
 
   const wasOver: ?DroppableId = whatIsDraggedOver(completed.impact);
 
-  return Boolean(wasOver) && wasOver !== id;
+  // collapse after drop if over home list and merging
+  if (wasOver === id && completed.impact.merge) {
+    return true;
+  }
+
+  // collapse after drop if dropping into foreign list
+  if (Boolean(wasOver) && wasOver !== id) {
+    return true;
+  }
+
+  return false;
 };
 
 const getDraggable = (
@@ -110,16 +120,6 @@ export const makeMapStateToProps = (): Selector => {
       const draggingFromList: ?DraggableId = isHome
         ? draggable.descriptor.id
         : null;
-      // When dropping over a list
-      if (impact.merge && isDropAnimating) {
-        return {
-          isDraggingOver: true,
-          draggingFromList,
-          draggingOverWith: draggable.descriptor.id,
-          placeholder: null,
-          shouldAnimatePlaceholder: true,
-        };
-      }
 
       return getDraggingOverMapProps(
         draggable.descriptor.id,
