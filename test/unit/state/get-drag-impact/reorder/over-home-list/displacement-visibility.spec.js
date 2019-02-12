@@ -21,8 +21,13 @@ import {
   getDraggableDimension,
 } from '../../../../../utils/dimension';
 import getViewport from '../../../../../../src/view/window/get-viewport';
+import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getNotVisibleDisplacement from '../../../../../utils/get-displacement/get-not-visible-displacement';
+import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
 
 const viewport: Viewport = getViewport();
+
+// this is just an application of get-displacement.spec
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -128,30 +133,14 @@ const viewport: Viewport = getViewport();
         [droppable.descriptor.id]: droppable,
       };
       const displaced: Displacement[] = [
-        {
-          draggableId: visible.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
-        {
-          // partially visible items need to be visibly displaced
-          draggableId: partialVisible.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
-        {
-          // showing that the displacement in non-visual
-          draggableId: notVisible1.descriptor.id,
-          isVisible: false,
-          shouldAnimate: false,
-        },
+        getVisibleDisplacement(visible),
+        getVisibleDisplacement(partialVisible),
+        getNotVisibleDisplacement(notVisible1),
       ];
       // dragging notVisible2 backwards into first position
-      const willDisplaceForward: boolean = true;
       const displacedBy: DisplacedBy = getDisplacedBy(
         axis,
         notVisible2.displaceBy,
-        willDisplaceForward,
       );
       const expected: DragImpact = {
         movement: {
@@ -159,7 +148,6 @@ const viewport: Viewport = getViewport();
           displaced,
           map: getDisplacementMap(displaced),
           displacedBy,
-          willDisplaceForward,
         },
         direction: axis.direction,
         // moved into the first position
@@ -170,20 +158,25 @@ const viewport: Viewport = getViewport();
         merge: null,
       };
 
+      const { onLift, impact: homeImpact } = getHomeOnLift({
+        draggable: notVisible2,
+        home: droppable,
+        draggables: customDraggables,
+        viewport,
+      });
       const impact: DragImpact = getDragImpact({
         // moving backwards to near the start of the droppable
         pageBorderBoxCenter: { x: 1, y: 1 },
         draggable: notVisible2,
         draggables: customDraggables,
         droppables: customDroppables,
-        previousImpact: noImpact,
+        previousImpact: homeImpact,
         viewport,
         userDirection: backward,
+        onLift,
       });
 
       expect(impact).toEqual(expected);
-
-      // with scroll so that
     });
 
     it('should indicate when a displacement is not visible due to being outside of the viewport', () => {
@@ -268,29 +261,14 @@ const viewport: Viewport = getViewport();
         [droppable.descriptor.id]: droppable,
       };
       // dragging notVisible2 backwards into first position
-      const willDisplaceForward: boolean = true;
       const displacedBy: DisplacedBy = getDisplacedBy(
         axis,
         notVisible2.displaceBy,
-        willDisplaceForward,
       );
       const displaced: Displacement[] = [
-        {
-          draggableId: visible.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
-        {
-          draggableId: partialVisible.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
-        {
-          draggableId: notVisible1.descriptor.id,
-          // showing that the displacement in non-visual
-          isVisible: false,
-          shouldAnimate: false,
-        },
+        getVisibleDisplacement(visible),
+        getVisibleDisplacement(partialVisible),
+        getNotVisibleDisplacement(notVisible1),
       ];
       const expected: DragImpact = {
         movement: {
@@ -298,7 +276,6 @@ const viewport: Viewport = getViewport();
           displaced,
           map: getDisplacementMap(displaced),
           displacedBy,
-          willDisplaceForward,
         },
         direction: axis.direction,
         // moved into the first position
@@ -319,6 +296,10 @@ const viewport: Viewport = getViewport();
         previousImpact: noImpact,
         viewport,
         userDirection: backward,
+        onLift: {
+          displacedBy,
+          wasDisplaced: {},
+        },
       });
 
       expect(impact).toEqual(expected);
