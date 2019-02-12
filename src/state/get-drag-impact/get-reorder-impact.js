@@ -16,8 +16,6 @@ import getDisplacement from '../get-displacement';
 import getDisplacementMap from '../get-displacement-map';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
-import { offsetByPosition } from '../spacing';
-import { negate } from '../position';
 import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
 
 type Args = {|
@@ -30,39 +28,6 @@ type Args = {|
   userDirection: UserDirection,
   onLift: OnLift,
 |};
-
-type Edges = {|
-  start: number,
-  end: number,
-|};
-
-const getEdges = (
-  draggable: DraggableDimension,
-  displacement: number,
-  axis: Axis,
-  onLift: OnLift,
-): Edges => {
-  const borderBox: Rect = draggable.page.borderBox;
-  const start: number = borderBox[axis.start];
-  const end: number = borderBox[axis.end];
-  const didStartDisplaced: boolean = getDidStartDisplaced(
-    draggable.descriptor.id,
-    onLift,
-  );
-
-  if (!didStartDisplaced) {
-    return {
-      start,
-      end,
-    };
-  }
-
-  //
-  return {
-    start: start - displacement,
-    end: end - displacement,
-  };
-};
 
 export default ({
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
@@ -89,18 +54,38 @@ export default ({
   const displaced: Displacement[] = insideDestinationWithoutDraggable
     .filter(
       (child: DraggableDimension): boolean => {
-        const { start, end } = getEdges(child, displacement, axis, onLift);
+        // const { start, end } = getEdges(child, displacement, axis, onLift);
+        const borderBox: Rect = child.page.borderBox;
+        const start: number = borderBox[axis.start];
+        const end: number = borderBox[axis.end];
 
-        // we need to return `true` if the item needs to be displaced
+        const didStartDisplaced: boolean = getDidStartDisplaced(
+          child.descriptor.id,
+          onLift,
+        );
 
+        // Moving forward will decrease the amount of things needed to be displaced
         if (isMovingForward) {
-          // Moving forward will decrease the amount of things needed to be displaced
+          if (didStartDisplaced) {
+            // if started displaced then its displaced position is its resting position
+            // continue to keep the item at rest until we go onto the start of the item
+            return targetCenter < start;
+          }
+          // if the item did not start displaced then we displace the item
+          // while we are still before the start edge
           return targetCenter < start + displacement;
         }
 
         // Moving backwards will increase the amount of things needed to be displaced
-        // Displace an item if the center goes before the end of an item
-        // On end edge = displace
+        // The logic for this works by looking at assuming everything has been displaced
+        // backwards and then looking at how you would undo that
+
+        if (didStartDisplaced) {
+          // we continue to displace the item until we move back over the end of the item without displacement
+          return targetCenter <= end - displacement;
+        }
+
+        // a non-displaced item is at rest. when we hit the item from the bottom we move it out of the way
         return targetCenter <= end;
       },
     )
