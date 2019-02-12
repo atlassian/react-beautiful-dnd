@@ -22,7 +22,7 @@ it('should let a consumer know when a home list is being dragged over', () => {
 
   const expected: StateSnapshot = {
     isDraggingOver: true,
-    draggingFromList: isOverHome.draggingOverWith,
+    draggingFromThisWith: isOverHome.draggingOverWith,
     draggingOverWith: isOverHome.draggingOverWith,
   };
   expect(snapshot).toEqual(expected);
@@ -40,7 +40,7 @@ it('should let a consumer know when a foreign list is being dragged over', () =>
 
   const expected: StateSnapshot = {
     isDraggingOver: true,
-    draggingFromList: null,
+    draggingFromThisWith: null,
     draggingOverWith: isOverHome.draggingOverWith,
   };
   expect(snapshot).toEqual(expected);
@@ -55,7 +55,7 @@ it('should update snapshot as dragging over changes', () => {
   };
   const noDrag: StateSnapshot = {
     isDraggingOver: false,
-    draggingFromList: null,
+    draggingFromThisWith: null,
     draggingOverWith: null,
   };
 
@@ -69,7 +69,7 @@ it('should update snapshot as dragging over changes', () => {
   wrapper.setProps(isOverHome);
   snapshotShouldBe({
     isDraggingOver: true,
-    draggingFromList: isOverHome.draggingOverWith,
+    draggingFromThisWith: isOverHome.draggingOverWith,
     draggingOverWith: isOverHome.draggingOverWith,
   });
 
@@ -77,7 +77,7 @@ it('should update snapshot as dragging over changes', () => {
   wrapper.setProps(isNotOverHome);
   snapshotShouldBe({
     isDraggingOver: false,
-    draggingFromList: isOverHome.draggingOverWith,
+    draggingFromThisWith: isOverHome.draggingOverWith,
     draggingOverWith: null,
   });
 

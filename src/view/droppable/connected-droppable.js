@@ -31,7 +31,7 @@ import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../
 const withoutAnimation: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
-  draggingFromList: null,
+  draggingFromThisWith: null,
   placeholder: null,
   shouldAnimatePlaceholder: false,
 };
@@ -83,12 +83,12 @@ export const makeMapStateToProps = (): Selector => {
   const getDraggingOverMapProps = memoizeOne(
     (
       draggingOverWith: DraggableId,
-      draggingFromList: ?DraggableId,
+      draggingFromThisWith: ?DraggableId,
       placeholder: Placeholder,
       shouldAnimatePlaceholder: boolean,
     ): MapProps => ({
       isDraggingOver: true,
-      draggingFromList,
+      draggingFromThisWith,
       draggingOverWith,
       placeholder,
       shouldAnimatePlaceholder,
@@ -96,10 +96,13 @@ export const makeMapStateToProps = (): Selector => {
   );
 
   const getHomeNotDraggedOverMapProps = memoizeOne(
-    (draggingFromList: DraggableId, placeholder: Placeholder): MapProps => ({
+    (
+      draggingFromThisWith: DraggableId,
+      placeholder: Placeholder,
+    ): MapProps => ({
       isDraggingOver: false,
       // this is the home list so we need to provide the dragging id
-      draggingFromList,
+      draggingFromThisWith,
       draggingOverWith: null,
       placeholder,
       shouldAnimatePlaceholder: true,
@@ -117,13 +120,13 @@ export const makeMapStateToProps = (): Selector => {
     const isHome: boolean = draggable.descriptor.droppableId === id;
 
     if (isOver) {
-      const draggingFromList: ?DraggableId = isHome
+      const draggingFromThisWith: ?DraggableId = isHome
         ? draggable.descriptor.id
         : null;
 
       return getDraggingOverMapProps(
         draggable.descriptor.id,
-        draggingFromList,
+        draggingFromThisWith,
         draggable.placeholder,
         shouldAnimatePlaceholder,
       );

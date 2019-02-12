@@ -21,7 +21,7 @@ it('should let a consumer know what is dragging from it if it is the home list',
   const expected: StateSnapshot = {
     isDraggingOver: false,
     draggingOverWith: null,
-    draggingFromList: preset.inHome1.descriptor.id,
+    draggingFromThisWith: preset.inHome1.descriptor.id,
   };
   expect(snapshot).toEqual(expected);
 });
@@ -40,7 +40,7 @@ it('should not publish what is dragging when it is a foreign list', () => {
     isDraggingOver: false,
     draggingOverWith: null,
     // main difference
-    draggingFromList: null,
+    draggingFromThisWith: null,
   };
   expect(snapshot).toEqual(expected);
 });
