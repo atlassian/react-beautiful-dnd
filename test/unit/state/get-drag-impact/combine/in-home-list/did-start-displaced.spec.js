@@ -19,13 +19,12 @@ import { patch, subtract, add } from '../../../../../../src/state/position';
 import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
 import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
+import afterPoint from '../../../../../utils/after-point';
+import beforePoint from '../../../../../utils/before-point';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
-    const beforePoint = (point: Position) =>
-      subtract(point, patch(axis.line, 1));
-    const afterPoint = (point: Position) => add(point, patch(axis.line, 1));
 
     const { onLift, impact: homeImpact } = getHomeOnLift({
       draggable: preset.inHome2,
@@ -79,7 +78,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       // before start of inHome3
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforePoint(startOfInHome3),
+          pageBorderBoxCenter: beforePoint(startOfInHome3, axis),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -117,7 +116,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       // before onTwoThirds - still should merge
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforePoint(onTwoThirdsOfInHome3),
+          pageBorderBoxCenter: beforePoint(onTwoThirdsOfInHome3, axis),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -147,7 +146,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       // after two thirds - should reorder
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterPoint(onTwoThirdsOfInHome3),
+          pageBorderBoxCenter: afterPoint(onTwoThirdsOfInHome3, axis),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -184,7 +183,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       // before onTwoThirds and moving backwards - still should merge
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforePoint(onTwoThirdsOfInHome3),
+          pageBorderBoxCenter: beforePoint(onTwoThirdsOfInHome3, axis),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -292,7 +291,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
     // dragging inHome2 forward past inHome3 and then back onto inhome3
     it('should move backwards onto an item that was displaced but no longer is', () => {
       const first: DragImpact = getDragImpact({
-        pageBorderBoxCenter: afterPoint(onTwoThirdsOfInHome3),
+        pageBorderBoxCenter: afterPoint(onTwoThirdsOfInHome3, axis),
         draggable: preset.inHome2,
         draggables: preset.draggables,
         droppables: withCombineEnabled,
@@ -328,7 +327,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       // not quite moved backwards enough
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterPoint(onDisplacedEndOfInHome3),
+          pageBorderBoxCenter: afterPoint(onDisplacedEndOfInHome3, axis),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -379,7 +378,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       // before edge we are no longer merging
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforePoint(onTwoThirdsFromDisplacedEnd),
+          pageBorderBoxCenter: beforePoint(onTwoThirdsFromDisplacedEnd, axis),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -410,7 +409,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       // before edge we are no longer merging
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterPoint(onTwoThirdsFromDisplacedEnd),
+          pageBorderBoxCenter: afterPoint(onTwoThirdsFromDisplacedEnd, axis),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
