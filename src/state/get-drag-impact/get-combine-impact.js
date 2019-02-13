@@ -121,7 +121,6 @@ export default ({
   );
 
   if (!target) {
-    console.log('no target');
     return null;
   }
 

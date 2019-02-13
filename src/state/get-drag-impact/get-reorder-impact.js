@@ -80,15 +80,6 @@ export default ({
         // backwards and then looking at how you would undo that
 
         if (didStartDisplaced) {
-          console.warn('id', child.descriptor.id);
-          console.log('target center', targetCenter);
-          console.log('end', end);
-          console.log('displacement', displacement);
-          console.log('displaced end', end - displacement);
-          console.log(
-            'is target center smaller?',
-            targetCenter <= end - displacement,
-          );
           // we continue to displace the item until we move back over the end of the item without displacement
           return targetCenter <= end - displacement;
         }
@@ -107,8 +98,6 @@ export default ({
           onLift,
         }),
     );
-
-  console.log('displaced', displaced);
 
   const newIndex: number =
     insideDestinationWithoutDraggable.length - displaced.length;

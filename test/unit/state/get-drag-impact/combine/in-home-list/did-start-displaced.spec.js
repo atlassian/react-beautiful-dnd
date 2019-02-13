@@ -19,9 +19,8 @@ import { patch, subtract, add } from '../../../../../../src/state/position';
 import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
 import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
 
-[vertical /* , horizontal */].forEach((axis: Axis) => {
+[vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
     const beforePoint = (point: Position) =>
@@ -79,13 +78,8 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
     it('should move forward onto an item that started displaced', () => {
       // before start of inHome3
       {
-        const beforeStartOfInHome3: Position = subtract(
-          startOfInHome3,
-          patch(axis.line, 1),
-        );
-
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforeStartOfInHome3,
+          pageBorderBoxCenter: beforePoint(startOfInHome3),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -118,20 +112,12 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
       startOfInHome3,
       patch(axis.line, preset.inHome3.page.borderBox[axis.size] * 0.666),
     );
-    const beforeOnTwoThirdsOfInHome3: Position = subtract(
-      onTwoThirdsOfInHome3,
-      patch(axis.line, 1),
-    );
-    const afterTwoThirdsOfInHome3: Position = add(
-      onTwoThirdsOfInHome3,
-      patch(axis.line, 1),
-    );
 
     it('should remain displaced when moving forward in the first two thirds of the target', () => {
       // before onTwoThirds - still should merge
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforeOnTwoThirdsOfInHome3,
+          pageBorderBoxCenter: beforePoint(onTwoThirdsOfInHome3),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -161,7 +147,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
       // after two thirds - should reorder
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterTwoThirdsOfInHome3,
+          pageBorderBoxCenter: afterPoint(onTwoThirdsOfInHome3),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -198,7 +184,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
       // before onTwoThirds and moving backwards - still should merge
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforeOnTwoThirdsOfInHome3,
+          pageBorderBoxCenter: beforePoint(onTwoThirdsOfInHome3),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -278,10 +264,6 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
       preset.inHome3.page.borderBox[axis.end] - displacedBy.value,
       crossAxisCenter,
     );
-    const afterDisplacedEndOfInHome3: Position = add(
-      onDisplacedEndOfInHome3,
-      patch(axis.line, 1),
-    );
     const combineWithDisplacedInHome3Impact: DragImpact = (() => {
       const displaced: Displacement[] = [
         // inHome3 is not displaced. It is visibly displaced as the initial displacement has been removed
@@ -310,7 +292,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
     // dragging inHome2 forward past inHome3 and then back onto inhome3
     it('should move backwards onto an item that was displaced but no longer is', () => {
       const first: DragImpact = getDragImpact({
-        pageBorderBoxCenter: afterTwoThirdsOfInHome3,
+        pageBorderBoxCenter: afterPoint(onTwoThirdsOfInHome3),
         draggable: preset.inHome2,
         draggables: preset.draggables,
         droppables: withCombineEnabled,
@@ -346,7 +328,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
       // not quite moved backwards enough
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterDisplacedEndOfInHome3,
+          pageBorderBoxCenter: afterPoint(onDisplacedEndOfInHome3),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
@@ -380,16 +362,65 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
     );
 
     it('should remain displaced when when in the last two thirds of the visibly displaced target', () => {
-      const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter: afterDisplacedEndOfInHome3,
-        draggable: preset.inHome2,
-        draggables: preset.draggables,
-        droppables: withCombineEnabled,
-        previousImpact: combineWithDisplacedInHome3Impact,
-        viewport: preset.viewport,
-        userDirection: backward,
-        onLift,
-      });
+      // right up to the edge
+      {
+        const impact: DragImpact = getDragImpact({
+          pageBorderBoxCenter: onTwoThirdsFromDisplacedEnd,
+          draggable: preset.inHome2,
+          draggables: preset.draggables,
+          droppables: withCombineEnabled,
+          previousImpact: combineWithDisplacedInHome3Impact,
+          viewport: preset.viewport,
+          userDirection: backward,
+          onLift,
+        });
+        expect(impact).toEqual(combineWithDisplacedInHome3Impact);
+      }
+      // before edge we are no longer merging
+      {
+        const impact: DragImpact = getDragImpact({
+          pageBorderBoxCenter: beforePoint(onTwoThirdsFromDisplacedEnd),
+          draggable: preset.inHome2,
+          draggables: preset.draggables,
+          droppables: withCombineEnabled,
+          previousImpact: combineWithDisplacedInHome3Impact,
+          viewport: preset.viewport,
+          userDirection: backward,
+          onLift,
+        });
+        expect(impact.merge).toBe(null);
+      }
+    });
+
+    it('should remain displaced when moving forward last two thirds of the visibly displaced target', () => {
+      // right up to the edge
+      {
+        const impact: DragImpact = getDragImpact({
+          pageBorderBoxCenter: onTwoThirdsFromDisplacedEnd,
+          draggable: preset.inHome2,
+          draggables: preset.draggables,
+          droppables: withCombineEnabled,
+          previousImpact: combineWithDisplacedInHome3Impact,
+          viewport: preset.viewport,
+          userDirection: forward,
+          onLift,
+        });
+        expect(impact).toEqual(combineWithDisplacedInHome3Impact);
+      }
+      // before edge we are no longer merging
+      {
+        const impact: DragImpact = getDragImpact({
+          pageBorderBoxCenter: afterPoint(onTwoThirdsFromDisplacedEnd),
+          draggable: preset.inHome2,
+          draggables: preset.draggables,
+          droppables: withCombineEnabled,
+          previousImpact: combineWithDisplacedInHome3Impact,
+          viewport: preset.viewport,
+          userDirection: forward,
+          onLift,
+        });
+        expect(impact).toEqual(combineWithDisplacedInHome3Impact);
+      }
     });
   });
 });
