@@ -158,6 +158,7 @@ import afterPoint from '../../../../../utils/after-point';
           userDirection: backward,
           onLift,
         });
+
         const displaced: Displacement[] = [
           // is now animated
           getVisibleDisplacement(preset.inHome3),
