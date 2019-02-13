@@ -1,7 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
-import { add, patch, subtract } from '../../../../../../src/state/position';
+import { patch } from '../../../../../../src/state/position';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import { getPreset } from '../../../../../utils/dimension';
 import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
@@ -19,6 +19,8 @@ import {
 } from '../../../../../../src/state/user-direction/user-direction-preset';
 import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
 import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
+import afterPoint from '../../../../../utils/after-point';
+import beforePoint from '../../../../../utils/before-point';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -59,13 +61,8 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
     it('should displace items when moving backwards onto their bottom edge', () => {
       // after end of inHome1
       {
-        const afterEndOfInForeign2: Position = add(
-          onEndOfInForeign2,
-          patch(axis.line, 1),
-        );
-
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterEndOfInForeign2,
+          pageBorderBoxCenter: afterPoint(onEndOfInForeign2, axis),
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: preset.droppables,
@@ -135,15 +132,11 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
         // no change
         crossAxisCenter,
       );
-      const beforeDisplacedTopEdge: Position = subtract(
-        displacedTopEdge,
-        patch(axis.line, 1),
-      );
 
       // still not far enough
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforeDisplacedTopEdge,
+          pageBorderBoxCenter: beforePoint(displacedTopEdge, axis),
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: preset.droppables,
