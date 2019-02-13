@@ -6,7 +6,7 @@ import type {
   DisplacedBy,
   DroppableDimensionMap,
   Displacement,
-} from '../../../../../../src/types';
+} from '../../../../../src/types';
 import { vertical, horizontal } from '../../../../../src/state/axis';
 import { getPreset, enableCombining } from '../../../../utils/dimension';
 import {
