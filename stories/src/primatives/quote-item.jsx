@@ -108,6 +108,7 @@ const Author = styled.small`
   flex-grow: 0;
   margin: 0;
   background-color: ${props => props.colors.soft};
+  border-radius: ${borderRadius}px;
   font-weight: normal;
   padding: ${grid / 2}px;
 `;
