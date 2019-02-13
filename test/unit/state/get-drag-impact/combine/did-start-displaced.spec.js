@@ -7,20 +7,20 @@ import type {
   DroppableDimensionMap,
   Displacement,
 } from '../../../../../../src/types';
-import { vertical, horizontal } from '../../../../../../src/state/axis';
-import { getPreset, enableCombining } from '../../../../../utils/dimension';
+import { vertical, horizontal } from '../../../../../src/state/axis';
+import { getPreset, enableCombining } from '../../../../utils/dimension';
 import {
   forward,
   backward,
-} from '../../../../../../src/state/user-direction/user-direction-preset';
-import getDragImpact from '../../../../../../src/state/get-drag-impact';
-import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
-import { patch, subtract, add } from '../../../../../../src/state/position';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
-import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
-import afterPoint from '../../../../../utils/after-point';
-import beforePoint from '../../../../../utils/before-point';
+} from '../../../../../src/state/user-direction/user-direction-preset';
+import getDragImpact from '../../../../../src/state/get-drag-impact';
+import getDisplacedBy from '../../../../../src/state/get-displaced-by';
+import { patch, subtract, add } from '../../../../../src/state/position';
+import getDisplacementMap from '../../../../../src/state/get-displacement-map';
+import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
+import getNotAnimatedDisplacement from '../../../../utils/get-displacement/get-not-animated-displacement';
+import afterPoint from '../../../../utils/after-point';
+import beforePoint from '../../../../utils/before-point';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
