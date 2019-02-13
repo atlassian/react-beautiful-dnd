@@ -152,9 +152,7 @@ export const makeMapStateToProps = (): Selector => {
   };
 
   const selector = (state: State, ownProps: OwnProps): MapProps => {
-    if (ownProps.isDropDisabled) {
-      return withoutAnimation;
-    }
+    // not checking if item is disabled as we need the home list to display a placeholder
 
     const id: DroppableId = ownProps.droppableId;
     const type: TypeId = ownProps.type;
