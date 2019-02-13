@@ -18,12 +18,11 @@ import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { patch, subtract, add } from '../../../../../src/state/position';
 import getDisplacementMap from '../../../../../src/state/get-displacement-map';
 import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
-import getNotAnimatedDisplacement from '../../../../utils/get-displacement/get-not-animated-displacement';
 import afterPoint from '../../../../utils/after-point';
 import beforePoint from '../../../../utils/before-point';
 import getVisibleDisplacement from '../../../../utils/get-displacement/get-visible-displacement';
 
-[vertical /* , horizontal */].forEach((axis: Axis) => {
+[vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
     const { onLift } = getHomeOnLift({
@@ -253,6 +252,176 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
     });
 
     // moving onto a non-displaced inForeign2
-    describe('combining with non-displaced item', () => {});
+    describe('combining with non-displaced item', () => {
+      const endOfInForeign2: Position = patch(
+        axis.line,
+        preset.inForeign2.page.borderBox[axis.end],
+        crossAxisCenter,
+      );
+      const onOneThirdOfInForeign2: Position = subtract(
+        endOfInForeign2,
+        patch(axis.line, preset.inForeign2.page.borderBox[axis.size] * 0.666),
+      );
+      const combineWithInForeign2: DragImpact = (() => {
+        const displaced: Displacement[] = [
+          getVisibleDisplacement(preset.inForeign3),
+          getVisibleDisplacement(preset.inForeign4),
+        ];
+        const impact: DragImpact = {
+          movement: {
+            displaced,
+            map: getDisplacementMap(displaced),
+            displacedBy,
+          },
+          direction: axis.direction,
+          destination: null,
+          // now merging with inForeign2
+          merge: {
+            whenEntered: backward,
+            combine: {
+              draggableId: preset.inForeign2.descriptor.id,
+              droppableId: preset.inForeign2.descriptor.droppableId,
+            },
+          },
+        };
+        return impact;
+      })();
+
+      it('should combine with an item when moving backwards onto the end edge', () => {
+        // before is not far enough
+        {
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: afterPoint(endOfInForeign2, axis),
+            draggable: preset.inHome1,
+            draggables: preset.draggables,
+            droppables: withCombineEnabled,
+            previousImpact: whenEnteredForeign,
+            viewport: preset.viewport,
+            userDirection: backward,
+            onLift,
+          });
+          expect(impact).toEqual(whenEnteredForeign);
+        }
+        // on edge is enough
+        {
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: endOfInForeign2,
+            draggable: preset.inHome1,
+            draggables: preset.draggables,
+            droppables: withCombineEnabled,
+            previousImpact: whenEnteredForeign,
+            viewport: preset.viewport,
+            userDirection: backward,
+            onLift,
+          });
+          expect(impact).toEqual(combineWithInForeign2);
+        }
+      });
+
+      it('should stop combining when going back 2/3 of the size', () => {
+        // on top 1/3 line is good
+        {
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: onOneThirdOfInForeign2,
+            draggable: preset.inHome1,
+            draggables: preset.draggables,
+            droppables: withCombineEnabled,
+            previousImpact: whenEnteredForeign,
+            viewport: preset.viewport,
+            userDirection: backward,
+            onLift,
+          });
+          expect(impact).toEqual(combineWithInForeign2);
+        }
+        // past 1/3 top line is too far
+        {
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: beforePoint(onOneThirdOfInForeign2, axis),
+            draggable: preset.inHome1,
+            draggables: preset.draggables,
+            droppables: withCombineEnabled,
+            previousImpact: whenEnteredForeign,
+            viewport: preset.viewport,
+            userDirection: backward,
+            onLift,
+          });
+          const displaced: Displacement[] = [
+            getVisibleDisplacement(preset.inForeign2),
+            getVisibleDisplacement(preset.inForeign3),
+            getVisibleDisplacement(preset.inForeign4),
+          ];
+          const expected: DragImpact = {
+            movement: {
+              displaced,
+              map: getDisplacementMap(displaced),
+              displacedBy,
+            },
+            direction: axis.direction,
+            destination: {
+              index: preset.inForeign2.descriptor.index,
+              droppableId: preset.inForeign2.descriptor.droppableId,
+            },
+            merge: null,
+          };
+          expect(impact).toEqual(expected);
+        }
+      });
+
+      it('should continue to combine when forward movements are made after entering the bottom 2/3', () => {
+        const initial: DragImpact = getDragImpact({
+          pageBorderBoxCenter: endOfInForeign2,
+          draggable: preset.inHome1,
+          draggables: preset.draggables,
+          droppables: withCombineEnabled,
+          previousImpact: whenEnteredForeign,
+          viewport: preset.viewport,
+          userDirection: backward,
+          onLift,
+        });
+        expect(initial).toEqual(combineWithInForeign2);
+        // forward movement on bottom edge
+        {
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: endOfInForeign2,
+            draggable: preset.inHome1,
+            draggables: preset.draggables,
+            droppables: withCombineEnabled,
+            previousImpact: initial,
+            viewport: preset.viewport,
+            userDirection: forward,
+            onLift,
+          });
+          expect(impact).toEqual(combineWithInForeign2);
+        }
+        // forward on 1/3 edge
+        {
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: onOneThirdOfInForeign2,
+            draggable: preset.inHome1,
+            draggables: preset.draggables,
+            droppables: withCombineEnabled,
+            previousImpact: initial,
+            viewport: preset.viewport,
+            userDirection: forward,
+            onLift,
+          });
+          expect(impact).toEqual(combineWithInForeign2);
+        }
+        // forward in the grouping range
+        {
+          const impact: DragImpact = getDragImpact({
+            pageBorderBoxCenter: afterPoint(onOneThirdOfInForeign2, axis),
+            draggable: preset.inHome1,
+            draggables: preset.draggables,
+            droppables: withCombineEnabled,
+            previousImpact: initial,
+            viewport: preset.viewport,
+            userDirection: forward,
+            onLift,
+          });
+          expect(impact).toEqual(combineWithInForeign2);
+        }
+      });
+    });
   });
 });
