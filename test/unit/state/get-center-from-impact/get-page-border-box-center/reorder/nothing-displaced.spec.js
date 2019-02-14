@@ -57,10 +57,10 @@ import { negate } from '../../../../../../src/state/position';
             map: {},
           },
           direction: axis.direction,
-          // currently after inForeign4
+          // currently in position of inHome4
           destination: {
-            index: preset.inForeign4.descriptor.index + 1,
-            droppableId: preset.home.descriptor.id,
+            index: preset.inHome4.descriptor.index,
+            droppableId: preset.inHome4.descriptor.id,
           },
           merge: null,
         };
@@ -78,14 +78,53 @@ import { negate } from '../../../../../../src/state/position';
             preset.inHome4.page,
             negate(displacedBy.point),
           ),
-          isMoving: preset.inHome4.page,
+          isMoving: preset.inHome1.page,
         });
         expect(result).toEqual(expected);
       });
     });
 
     describe('last item did not start displaced', () => {
-      it('should go after the item in its current non-displaced location', () => {});
+      it('should go after the item in its current non-displaced location', () => {
+        const { onLift } = getHomeOnLift({
+          draggable: preset.inHome1,
+          home: preset.home,
+          draggables: preset.draggables,
+          viewport: preset.viewport,
+        });
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          preset.inHome1.displaceBy,
+        );
+        const impact: DragImpact = {
+          movement: {
+            displacedBy,
+            displaced: [],
+            map: {},
+          },
+          direction: axis.direction,
+          // currently after inForeign4
+          destination: {
+            index: preset.inForeign4.descriptor.index + 1,
+            droppableId: preset.inForeign4.descriptor.id,
+          },
+          merge: null,
+        };
+        const result: Position = getPageBorderBoxCenter({
+          impact,
+          onLift,
+          draggable: preset.inHome1,
+          draggables: preset.draggables,
+          droppable: preset.foreign,
+        });
+
+        const expected: Position = goAfter({
+          axis,
+          moveRelativeTo: preset.inForeign4.page,
+          isMoving: preset.inHome1.page,
+        });
+        expect(result).toEqual(expected);
+      });
     });
   });
 });
