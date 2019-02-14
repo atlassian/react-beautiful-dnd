@@ -58,7 +58,6 @@ export default ({
 
     // target is displaced and is already in it's starting position
     if (didStartDisplaced(closestAfter.descriptor.id, onLift)) {
-      console.log('going before', closestAfter.descriptor.id);
       return goBefore({
         axis,
         moveRelativeTo: closestAfter.page,
@@ -80,24 +79,22 @@ export default ({
     });
   }
 
-  // The closest before is not displaced. We want to go after it
-  const closestBefore: DraggableDimension =
+  // Nothing in list is displaced, we should go after the last item
+
+  const last: DraggableDimension =
     insideDestination[insideDestination.length - 1];
 
-  // we can just go into our original position
-  if (closestBefore.descriptor.id === draggable.descriptor.id) {
+  // we can just go into our original position if the last item
+  // is the dragging item
+  if (last.descriptor.id === draggable.descriptor.id) {
     return draggablePage.borderBox.center;
   }
 
-  // we need to go after the closest before
+  if (didStartDisplaced(last.descriptor.id, onLift)) {
+    // if the item started displaced and it is no longer displaced then
+    // we need to go after it it's non-displaced position
 
-  if (didStartDisplaced(closestBefore.descriptor.id, onLift)) {
-    // now the item is not displaced, it will not be sitting in it's original spot
-    // we need to remove the displacement to get the target to its original spot
-    const page: BoxModel = offset(
-      closestBefore.page,
-      negate(onLift.displacedBy.point),
-    );
+    const page: BoxModel = offset(last.page, negate(onLift.displacedBy.point));
     return goAfter({
       axis,
       moveRelativeTo: page,
@@ -108,7 +105,7 @@ export default ({
   // item is in its resting spot. we can go straight after it
   return goAfter({
     axis,
-    moveRelativeTo: closestBefore.page,
+    moveRelativeTo: last.page,
     isMoving: draggablePage,
   });
 };
