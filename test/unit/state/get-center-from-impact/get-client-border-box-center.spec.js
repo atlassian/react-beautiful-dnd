@@ -9,13 +9,19 @@ import { add, subtract } from '../../../../src/state/position';
 import { getPreset } from '../../../utils/dimension';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import getClientBorderBoxCenter from '../../../../src/state/get-center-from-impact/get-client-border-box-center';
-import getHomeImpact from '../../../../src/state/get-home-impact';
+import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import moveToNextPlace from '../../../../src/state/move-in-direction/move-to-next-place';
 
 const preset = getPreset();
 
 const draggable: DraggableDimension = preset.inHome1;
 const originalClientCenter: Position = preset.inHome1.client.borderBox.center;
-const impact: DragImpact = getHomeImpact(draggable, preset.home);
+const { onLift, impact } = getHomeOnLift({
+  draggable,
+  home: preset.home,
+  draggables: preset.draggables,
+  viewport: preset.viewport,
+});
 
 it('should give the client center without scroll change', () => {
   const result: Position = getClientBorderBoxCenter({
@@ -24,6 +30,7 @@ it('should give the client center without scroll change', () => {
     droppable: preset.home,
     draggables: preset.dimensions.draggables,
     viewport: preset.viewport,
+    onLift,
   });
 
   expect(result).toEqual(originalClientCenter);
@@ -40,6 +47,7 @@ it('should unwind any changes in viewport scroll', () => {
     droppable: preset.home,
     draggables: preset.dimensions.draggables,
     viewport: scrolled,
+    onLift,
   });
 
   expect(result).toEqual(subtract(originalClientCenter, scroll));
