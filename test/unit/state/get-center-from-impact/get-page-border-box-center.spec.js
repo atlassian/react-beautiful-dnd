@@ -17,7 +17,6 @@ import {
 } from '../../../../src/state/get-center-from-impact/move-relative-to';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../src/state/get-displacement-map';
-import getHomeImpact from '../../../../src/state/get-home-impact';
 import noImpact from '../../../../src/state/no-impact';
 import {
   backward,
@@ -27,6 +26,7 @@ import { getPreset, makeScrollable } from '../../../utils/dimension';
 
 import { negate, add } from '../../../../src/state/position';
 import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
+import getHomeOnLift from '../../../../src/state/get-home-on-lift';
 
 const getDisplacement = (draggable: DraggableDimension): Displacement => ({
   isVisible: true,
@@ -38,24 +38,32 @@ const getDisplacement = (draggable: DraggableDimension): Displacement => ({
   describe(`dropping on ${axis.direction} list`, () => {
     const preset = getPreset(axis);
     const original: Position = preset.inHome1.page.borderBox.center;
+    const { onLift, impact: homeImpact } = getHomeOnLift({
+      draggable: preset.inHome1,
+      home: preset.home,
+      draggables: preset.draggables,
+      viewport: preset.viewport,
+    });
 
-    it('should return original center when not over anything', () => {
+    it.only('should return original center when not over anything', () => {
       const result: Position = getPageBorderBoxCenter({
         impact: noImpact,
         draggable: preset.inHome1,
         droppable: null,
         draggables: preset.dimensions.draggables,
+        onLift,
       });
 
       expect(result).toEqual(original);
     });
 
-    it('should return home position over home location', () => {
+    it.only('should return home position over home location', () => {
       const result: Position = getPageBorderBoxCenter({
-        impact: getHomeImpact(preset.inHome1, preset.home),
+        impact: homeImpact,
         draggable: preset.inHome1,
         draggables: preset.dimensions.draggables,
         droppable: preset.home,
+        onLift,
       });
 
       expect(result).toEqual(original);

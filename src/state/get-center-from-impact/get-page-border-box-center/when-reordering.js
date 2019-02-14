@@ -58,6 +58,7 @@ export default ({
 
     // target is displaced and is already in it's starting position
     if (didStartDisplaced(closestAfter.descriptor.id, onLift)) {
+      console.log('going before', closestAfter.descriptor.id);
       return goBefore({
         axis,
         moveRelativeTo: closestAfter.page,
