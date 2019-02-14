@@ -312,20 +312,16 @@ export default class DroppableDimensionPublisher extends React.Component<Props> 
     };
     this.dragging = dragging;
 
-    const dimension: DroppableDimension = withoutPlaceholder(
-      this.props.getPlaceholderRef(),
-      () =>
-        getDimension({
-          ref: dragging.ref,
-          descriptor: dragging.descriptor,
-          env: dragging.env,
-          windowScroll: origin,
-          direction: this.props.direction,
-          isDropDisabled: this.props.isDropDisabled,
-          isCombineEnabled: this.props.isCombineEnabled,
-          shouldClipSubject: !this.props.ignoreContainerClipping,
-        }),
-    );
+    const dimension: DroppableDimension = getDimension({
+      ref,
+      descriptor,
+      env,
+      windowScroll,
+      direction: this.props.direction,
+      isDropDisabled: this.props.isDropDisabled,
+      isCombineEnabled: this.props.isCombineEnabled,
+      shouldClipSubject: !this.props.ignoreContainerClipping,
+    });
     if (env.closestScrollable) {
       // bind scroll listener
 

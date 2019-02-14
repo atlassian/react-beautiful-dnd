@@ -38,21 +38,14 @@ export const goAfter = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
     getCrossAxisBorderBoxCenter(axis, moveRelativeTo.marginBox, isMoving),
   );
 
-export const goBefore = ({
-  axis,
-  moveRelativeTo,
-  isMoving,
-}: Args): Position => {
-  console.log('is moving end', isMoving.marginBox[axis.end]);
-  console.log('move relative to start', moveRelativeTo.marginBox[axis.start]);
-  return patch(
+export const goBefore = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
+  patch(
     axis.line,
     // start measuring from the start of the target
     moveRelativeTo.marginBox[axis.start] -
       distanceFromEndToBorderBoxCenter(axis, isMoving),
     getCrossAxisBorderBoxCenter(axis, moveRelativeTo.marginBox, isMoving),
   );
-};
 type GoIntoArgs = {|
   axis: Axis,
   moveInto: BoxModel,
