@@ -1,5 +1,4 @@
 // @flow
-// @flow
 import type { Position } from 'css-box-model';
 import { offset } from 'css-box-model';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
