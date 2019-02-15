@@ -289,25 +289,56 @@ export const withAssortedSpacing = () => {
 
 export const getPreset = (axis?: Axis = vertical) => {
   const windowScroll: Position = { x: 50, y: 100 };
+  const assortedSpacing = withAssortedSpacing();
+
+  // TODO: cross axis values need to account for margin of assorted spacing
   const crossAxisStart: number = 0;
   const crossAxisEnd: number = 100;
   const foreignCrossAxisStart: number = 100;
   const foreignCrossAxisEnd: number = 200;
   const emptyForeignCrossAxisStart: number = 200;
   const emptyForeignCrossAxisEnd: number = 300;
+
+  const droppableBorderBoxSize: number = 200;
+  const droppableBorderBoxStart: number = assortedSpacing.margin[axis.start];
+  const droppableBorderBoxEnd: number =
+    droppableBorderBoxStart + droppableBorderBoxSize;
+
+  type BorderBoxAfterArgs = {|
+    goAfter: DraggableDimension,
+    droppable: DroppableDimension,
+    borderBoxSize: number,
+  |};
+
+  const borderBoxAfter = ({
+    goAfter,
+    droppable,
+    borderBoxSize,
+  }: BorderBoxAfterArgs): Spacing => {
+    // going directly after previou
+    const start: number =
+      goAfter.client.marginBox[axis.end] + assortedSpacing.margin[axis.start];
+
+    return {
+      [axis.start]: start,
+      [axis.crossAxisStart]: droppable.client.borderBox[axis.crossAxisStart],
+      [axis.crossAxisEnd]: droppable.client.borderBox[axis.crossAxisEnd],
+      [axis.end]: start + borderBoxSize,
+    };
+  };
+
   const home: DroppableDimension = getDroppableDimension({
     descriptor: {
       id: 'home',
       type: 'TYPE',
     },
     borderBox: {
-      // would be 0 but pushed forward by margin
-      [axis.start]: 10,
+      [axis.start]: droppableBorderBoxStart,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
-      [axis.end]: 200,
+      [axis.end]: droppableBorderBoxEnd,
     },
-    ...withAssortedSpacing(),
+    ...assortedSpacing,
     windowScroll,
     direction: axis.direction,
   });
@@ -318,12 +349,12 @@ export const getPreset = (axis?: Axis = vertical) => {
       type: 'TYPE',
     },
     borderBox: {
-      [axis.start]: 10,
+      [axis.start]: droppableBorderBoxStart,
       [axis.crossAxisStart]: foreignCrossAxisStart,
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
-      [axis.end]: 200,
+      [axis.end]: droppableBorderBoxEnd,
     },
-    ...withAssortedSpacing(),
+    ...assortedSpacing,
     windowScroll,
     direction: axis.direction,
   });
@@ -334,17 +365,17 @@ export const getPreset = (axis?: Axis = vertical) => {
       type: 'TYPE',
     },
     borderBox: {
-      // would be 0 but pushed forward by margin
-      [axis.start]: 10,
+      [axis.start]: droppableBorderBoxStart,
       [axis.crossAxisStart]: emptyForeignCrossAxisStart,
       [axis.crossAxisEnd]: emptyForeignCrossAxisEnd,
-      [axis.end]: 200,
+      [axis.end]: droppableBorderBoxEnd,
     },
-    ...withAssortedSpacing(),
+    ...assortedSpacing,
     windowScroll,
     direction: axis.direction,
   });
 
+  const inHome1Size: number = 20;
   const inHome1: DraggableDimension = getDraggableDimension({
     descriptor: {
       id: 'inhome1',
@@ -354,14 +385,32 @@ export const getPreset = (axis?: Axis = vertical) => {
     },
     borderBox: {
       // starting at start of home
-      [axis.start]: 10,
+      [axis.start]: droppableBorderBoxStart,
       [axis.crossAxisStart]: crossAxisStart,
       [axis.crossAxisEnd]: crossAxisEnd,
-      [axis.end]: 20,
+      [axis.end]: droppableBorderBoxStart + inHome1Size,
     },
     windowScroll,
-    ...withAssortedSpacing(),
+    ...assortedSpacing,
   });
+  console.log('inHome1', inHome1);
+
+  // const borderBoxAfter = (
+  //   previous: DraggableDimension,
+  //   borderBoxSize: number,
+  // ): Spacing => {
+  //   // going directly after previou
+  //   const start: number =
+  //     previous.client.marginBox[axis.end] + assortedSpacing.margin[axis.start];
+
+  //   return {
+  //     [axis.start]: start,
+  //     [axis.crossAxisStart]: crossAxisStart,
+  //     [axis.crossAxisEnd]: crossAxisEnd,
+  //     [axis.end]: start + borderBoxSize,
+  //   };
+  // };
+
   // size: 20
   const inHome2: DraggableDimension = getDraggableDimension({
     descriptor: {
@@ -371,15 +420,15 @@ export const getPreset = (axis?: Axis = vertical) => {
       index: 1,
     },
     // pushed forward by margin of inHome1
-    borderBox: {
-      [axis.start]: 30,
-      [axis.crossAxisStart]: crossAxisStart,
-      [axis.crossAxisEnd]: crossAxisEnd,
-      [axis.end]: 50,
-    },
-    ...withAssortedSpacing(),
+    borderBox: borderBoxAfter({
+      goAfter: inHome1,
+      droppable: home,
+      borderBoxSize: 20,
+    }),
+    ...assortedSpacing,
     windowScroll,
   });
+  console.log('inHome2', inHome2);
   // size: 30
   const inHome3: DraggableDimension = getDraggableDimension({
     descriptor: {
@@ -388,13 +437,12 @@ export const getPreset = (axis?: Axis = vertical) => {
       type: home.descriptor.type,
       index: 2,
     },
-    borderBox: {
-      [axis.start]: 60,
-      [axis.crossAxisStart]: crossAxisStart,
-      [axis.crossAxisEnd]: crossAxisEnd,
-      [axis.end]: 90,
-    },
-    ...withAssortedSpacing(),
+    borderBox: borderBoxAfter({
+      goAfter: inHome2,
+      droppable: home,
+      borderBoxSize: 30,
+    }),
+    ...assortedSpacing,
     windowScroll,
   });
   // size: 40
@@ -405,15 +453,18 @@ export const getPreset = (axis?: Axis = vertical) => {
       type: home.descriptor.type,
       index: 3,
     },
-    borderBox: {
-      [axis.start]: 100,
-      [axis.crossAxisStart]: crossAxisStart,
-      [axis.crossAxisEnd]: crossAxisEnd,
-      [axis.end]: 140,
-    },
-    ...withAssortedSpacing(),
+    borderBox: borderBoxAfter({
+      goAfter: inHome3,
+      droppable: home,
+      borderBoxSize: 40,
+    }),
+    ...assortedSpacing,
     windowScroll,
   });
+  invariant(
+    inHome4.client.marginBox[axis.end] < droppableBorderBoxEnd,
+    'Expecting items to be in bounds',
+  );
 
   // size: 10
   const inForeign1: DraggableDimension = getDraggableDimension({
@@ -429,7 +480,7 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 20,
     },
-    ...withAssortedSpacing(),
+    ...assortedSpacing,
     windowScroll,
   });
   // size: 20
@@ -446,7 +497,7 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 50,
     },
-    ...withAssortedSpacing(),
+    ...assortedSpacing,
     windowScroll,
   });
   // size: 30
@@ -463,7 +514,7 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 90,
     },
-    ...withAssortedSpacing(),
+    ...assortedSpacing,
     windowScroll,
   });
   // size: 40
@@ -480,7 +531,7 @@ export const getPreset = (axis?: Axis = vertical) => {
       [axis.crossAxisEnd]: foreignCrossAxisEnd,
       [axis.end]: 140,
     },
-    ...withAssortedSpacing(),
+    ...assortedSpacing,
     windowScroll,
   });
 
