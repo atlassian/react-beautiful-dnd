@@ -1,15 +1,16 @@
 // @flow
 import type { Position } from 'css-box-model';
 import { offset } from 'css-box-model';
-import { vertical, horizontal } from '../../../../../../src/state/axis';
-import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
-import { getPreset } from '../../../../../utils/dimension';
 import type {
   Axis,
   DragImpact,
   DisplacedBy,
+  Displacement,
 } from '../../../../../../src/types';
+import { vertical, horizontal } from '../../../../../../src/state/axis';
+import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
+import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import { getPreset } from '../../../../../utils/dimension';
 import { goBefore } from '../../../../../../src/state/get-center-from-impact/move-relative-to';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../src/state/get-displacement-map';

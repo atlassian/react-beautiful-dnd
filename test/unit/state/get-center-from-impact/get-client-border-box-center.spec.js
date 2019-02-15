@@ -1,16 +1,11 @@
 // @flow
 import type { Position } from 'css-box-model';
-import type {
-  DraggableDimension,
-  Viewport,
-  DragImpact,
-} from '../../../../src/types';
+import type { DraggableDimension, Viewport } from '../../../../src/types';
 import { add, subtract } from '../../../../src/state/position';
 import { getPreset } from '../../../utils/dimension';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import getClientBorderBoxCenter from '../../../../src/state/get-center-from-impact/get-client-border-box-center';
 import getHomeOnLift from '../../../../src/state/get-home-on-lift';
-import moveToNextPlace from '../../../../src/state/move-in-direction/move-to-next-place';
 
 const preset = getPreset();
 

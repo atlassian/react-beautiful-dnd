@@ -5,6 +5,7 @@ import type {
   DragImpact,
   DisplacedBy,
   DroppableDimension,
+  Displacement,
 } from '../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
@@ -37,7 +38,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
 
     it('should account for any scroll in the droppable being dropped into (into foreign list)', () => {
       // combining with inHome2
-      const displaced: Displacement = [
+      const displaced: Displacement[] = [
         getNotAnimatedDisplacement(preset.inHome2),
         getNotAnimatedDisplacement(preset.inHome3),
         getNotAnimatedDisplacement(preset.inHome4),

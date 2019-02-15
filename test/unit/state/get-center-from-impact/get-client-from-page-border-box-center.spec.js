@@ -7,7 +7,6 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
 import getClientFromPageBorderBoxCenter from '../../../../src/state/get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
 
 const preset = getPreset();
-
 const draggable: DraggableDimension = preset.inHome1;
 const originalPageCenter: Position = preset.inHome1.page.borderBox.center;
 const originalClientCenter: Position = preset.inHome1.client.borderBox.center;
