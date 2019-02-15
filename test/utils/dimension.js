@@ -19,6 +19,7 @@ import getDroppable, {
 import {
   toDroppableMap,
   toDroppableList,
+  toDraggableList,
 } from '../../src/state/dimension-structures';
 import type {
   Axis,
@@ -37,6 +38,7 @@ import type {
   ScrollSize,
 } from '../../src/types';
 import patchDroppableMap from '../../src/state/patch-droppable-map';
+import isTotallyVisibleThroughFrame from '../../src/state/visibility/is-totally-visible-through-frame';
 
 type GetComputedSpacingArgs = {|
   margin?: Spacing,
@@ -287,17 +289,64 @@ export const withAssortedSpacing = () => {
   return { margin, padding, border };
 };
 
+const validateIsInDroppable = (
+  inList: DraggableDimension[],
+  droppable: DroppableDimension,
+) => {
+  inList.forEach((item: DraggableDimension) => {
+    invariant(
+      isTotallyVisibleThroughFrame(droppable.client.borderBox)(
+        item.client.marginBox,
+      ),
+      `
+      draggable: "${item.descriptor.id}"
+      margin box must be within
+      droppable: "${droppable.descriptor.id}"
+      border box
+    `,
+    );
+  });
+};
+
+const validateIsStacked = (
+  inList: DraggableDimension[],
+  droppable: DroppableDimension,
+) => {
+  inList.forEach((item: DraggableDimension, index: number) => {
+    // ignore first
+    if (index === 0) {
+      return;
+    }
+    const axis: Axis = droppable.axis;
+    const before: DraggableDimension = inList[index - 1];
+
+    const startOfItem: number = item.client.marginBox[axis.start];
+    const endOfBefore: number = before.client.marginBox[axis.end];
+
+    invariant(
+      startOfItem === endOfBefore,
+      `
+      draggable: "${item.descriptor.id}"
+      must be after
+      draggable: "${before.descriptor.id}"
+    `,
+    );
+  });
+};
+
 export const getPreset = (axis?: Axis = vertical) => {
   const windowScroll: Position = { x: 50, y: 100 };
   const assortedSpacing = withAssortedSpacing();
 
   // TODO: cross axis values need to account for margin of assorted spacing
-  const crossAxisStart: number = 0;
-  const crossAxisEnd: number = 100;
-  const foreignCrossAxisStart: number = 100;
-  const foreignCrossAxisEnd: number = 200;
-  const emptyForeignCrossAxisStart: number = 200;
-  const emptyForeignCrossAxisEnd: number = 300;
+  const homeBorderBoxCrossAxisStart: number =
+    assortedSpacing.margin[axis.crossAxisStart];
+  const homeBorderBoxCrossAxisEnd: number = homeBorderBoxCrossAxisStart + 100;
+
+  const foreignCrossAxisStart: number = 150;
+  const foreignCrossAxisEnd: number = 250;
+  const emptyForeignCrossAxisStart: number = 250;
+  const emptyForeignCrossAxisEnd: number = 350;
 
   const droppableBorderBoxSize: number = 200;
   const droppableBorderBoxStart: number = assortedSpacing.margin[axis.start];
@@ -315,15 +364,23 @@ export const getPreset = (axis?: Axis = vertical) => {
     droppable,
     borderBoxSize,
   }: BorderBoxAfterArgs): Spacing => {
-    // going directly after previou
-    const start: number =
+    // going beneith the margin box, and accounting for own margin
+    const borderBoxStart: number =
       goAfter.client.marginBox[axis.end] + assortedSpacing.margin[axis.start];
 
+    // sitting inside the droppable, and accounting for own margin
+    const borderBoxCrossAxisStart: number =
+      droppable.client.borderBox[axis.crossAxisStart] +
+      assortedSpacing.margin[axis.crossAxisStart];
+    const borderBoxCrossAxisEnd: number =
+      droppable.client.borderBox[axis.crossAxisEnd] -
+      assortedSpacing.margin[axis.crossAxisEnd];
+
     return {
-      [axis.start]: start,
-      [axis.crossAxisStart]: droppable.client.borderBox[axis.crossAxisStart],
-      [axis.crossAxisEnd]: droppable.client.borderBox[axis.crossAxisEnd],
-      [axis.end]: start + borderBoxSize,
+      [axis.start]: borderBoxStart,
+      [axis.crossAxisStart]: borderBoxCrossAxisStart,
+      [axis.crossAxisEnd]: borderBoxCrossAxisEnd,
+      [axis.end]: borderBoxStart + borderBoxSize,
     };
   };
 
@@ -334,8 +391,8 @@ export const getPreset = (axis?: Axis = vertical) => {
     },
     borderBox: {
       [axis.start]: droppableBorderBoxStart,
-      [axis.crossAxisStart]: crossAxisStart,
-      [axis.crossAxisEnd]: crossAxisEnd,
+      [axis.crossAxisStart]: homeBorderBoxCrossAxisStart,
+      [axis.crossAxisEnd]: homeBorderBoxCrossAxisEnd,
       [axis.end]: droppableBorderBoxEnd,
     },
     ...assortedSpacing,
@@ -384,32 +441,20 @@ export const getPreset = (axis?: Axis = vertical) => {
       index: 0,
     },
     borderBox: {
-      // starting at start of home
-      [axis.start]: droppableBorderBoxStart,
-      [axis.crossAxisStart]: crossAxisStart,
-      [axis.crossAxisEnd]: crossAxisEnd,
+      // starting inside the droppable border box
+      // account for own margin
+      [axis.start]:
+        droppableBorderBoxStart + assortedSpacing.margin[axis.crossAxisStart],
+      [axis.crossAxisStart]:
+        homeBorderBoxCrossAxisStart +
+        assortedSpacing.margin[axis.crossAxisStart],
+      [axis.crossAxisEnd]:
+        homeBorderBoxCrossAxisEnd - assortedSpacing.margin[axis.crossAxisEnd],
       [axis.end]: droppableBorderBoxStart + inHome1Size,
     },
     windowScroll,
     ...assortedSpacing,
   });
-  console.log('inHome1', inHome1);
-
-  // const borderBoxAfter = (
-  //   previous: DraggableDimension,
-  //   borderBoxSize: number,
-  // ): Spacing => {
-  //   // going directly after previou
-  //   const start: number =
-  //     previous.client.marginBox[axis.end] + assortedSpacing.margin[axis.start];
-
-  //   return {
-  //     [axis.start]: start,
-  //     [axis.crossAxisStart]: crossAxisStart,
-  //     [axis.crossAxisEnd]: crossAxisEnd,
-  //     [axis.end]: start + borderBoxSize,
-  //   };
-  // };
 
   // size: 20
   const inHome2: DraggableDimension = getDraggableDimension({
@@ -428,7 +473,6 @@ export const getPreset = (axis?: Axis = vertical) => {
     ...assortedSpacing,
     windowScroll,
   });
-  console.log('inHome2', inHome2);
   // size: 30
   const inHome3: DraggableDimension = getDraggableDimension({
     descriptor: {
@@ -553,6 +597,11 @@ export const getPreset = (axis?: Axis = vertical) => {
   };
 
   const inHomeList: DraggableDimension[] = [inHome1, inHome2, inHome3, inHome4];
+
+  // validate our setup
+  // only being strict with inHomeList
+  validateIsInDroppable(inHomeList, home);
+  validateIsStacked(inHomeList, home);
 
   const inForeignList: DraggableDimension[] = [
     inForeign1,
