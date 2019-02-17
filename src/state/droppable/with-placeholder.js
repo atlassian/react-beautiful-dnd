@@ -57,12 +57,12 @@ export const addPlaceholder = (
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
 ): DroppableDimension => {
-  // no need to add to add space for a placeholder to destination
-  if (isHomeOf(draggable, droppable)) {
-    return droppable;
-  }
-
   const frame: ?Scrollable = droppable.frame;
+
+  invariant(
+    !isHomeOf(draggable, droppable),
+    'Should not add placeholder space to home list',
+  );
 
   invariant(
     !droppable.subject.withPlaceholder,

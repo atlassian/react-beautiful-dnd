@@ -20,6 +20,7 @@ import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border
 import isTotallyVisibleInNewLocation from '../move-to-next-place/is-totally-visible-in-new-location';
 import { addPlaceholder } from '../../droppable/with-placeholder';
 import removeDraggableFromList from '../../remove-draggable-from-list';
+import isHomeOf from '../../droppable/is-home-of';
 
 type Args = {|
   previousPageBorderBoxCenter: Position,
@@ -70,17 +71,14 @@ export default ({
       onLift,
     });
 
-    // need to check as if room was already added
-    // note: will not add placeholder space to home
-    const withPlaceholder: DroppableDimension = addPlaceholder(
-      destination,
-      draggable,
-      draggables,
-    );
+    // need to add room for a placeholder in a foreign list
+    const dimension: DroppableDimension = isHomeOf(draggable, destination)
+      ? destination
+      : addPlaceholder(destination, draggable, draggables);
 
     const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
       draggable,
-      destination: withPlaceholder,
+      destination: dimension,
       newPageBorderBoxCenter: pageBorderBoxCenter,
       viewport: viewport.frame,
       // already taken into account by getPageBorderBoxCenter

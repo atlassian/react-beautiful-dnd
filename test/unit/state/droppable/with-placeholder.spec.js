@@ -25,7 +25,7 @@ import { add, patch, origin, isEqual } from '../../../../src/state/position';
 const crossAxisStart: number = 0;
 const crossAxisEnd: number = 100;
 const crossAxisSize: number = crossAxisEnd - crossAxisStart;
-const size: number = 200;
+const droppableSize: number = 200;
 const gap: number = 10;
 
 [vertical, horizontal].forEach((axis: Axis) => {
@@ -41,12 +41,12 @@ const gap: number = 10;
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 0,
-        [axis.end]: size,
+        [axis.end]: droppableSize,
       },
     });
-    const draggable1: DraggableDimension = getDraggableDimension({
+    const inForeign1: DraggableDimension = getDraggableDimension({
       descriptor: {
-        id: 'draggable-1',
+        id: 'in-foreign-1',
         index: 0,
         droppableId: descriptor.id,
         type: descriptor.type,
@@ -55,13 +55,13 @@ const gap: number = 10;
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
         [axis.start]: 0,
-        [axis.end]: size / 2,
+        [axis.end]: droppableSize / 2,
       },
     });
 
-    const draggable2: DraggableDimension = getDraggableDimension({
+    const inForeign2: DraggableDimension = getDraggableDimension({
       descriptor: {
-        id: 'draggable-2',
+        id: 'in-foreign-2',
         index: 1,
         droppableId: descriptor.id,
         type: descriptor.type,
@@ -69,25 +69,55 @@ const gap: number = 10;
       borderBox: {
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
-        [axis.start]: size / 2,
+        [axis.start]: droppableSize / 2,
         // leave a little gap before the end
-        [axis.end]: size - gap,
+        [axis.end]: droppableSize - gap,
       },
     });
-    const draggables: DraggableDimensionMap = toDraggableMap([
-      draggable1,
-      draggable2,
-    ]);
+
+    const getHomeDraggable = (borderBoxSize: number): DraggableDimension =>
+      getDraggableDimension({
+        descriptor: {
+          id: 'in-foreign-3',
+          index: 2,
+          droppableId: 'home',
+          type: descriptor.type,
+        },
+        borderBox: {
+          [axis.crossAxisStart]: crossAxisStart,
+          [axis.crossAxisEnd]: crossAxisEnd,
+          [axis.start]: inForeign2.client.borderBox[axis.end],
+          [axis.end]: inForeign2.client.borderBox[axis.end] + borderBoxSize,
+        },
+      });
+
+    const withHomeDraggable = (
+      inHome1: DraggableDimension,
+    ): DraggableDimensionMap =>
+      toDraggableMap([inHome1, inForeign1, inForeign2]);
+
+    const getPlaceholderSize = (draggable: DraggableDimension): Position =>
+      patch(axis.line, draggable.displaceBy[axis.line]);
+
+    it('should throw an error if trying to add a placeholder to a home list', () => {
+      expect(() =>
+        addPlaceholder(
+          withoutFrame,
+          inForeign1,
+          toDraggableMap([inForeign1, inForeign2]),
+        ),
+      ).toThrow();
+    });
 
     describe('without frame', () => {
       describe('adding placeholder', () => {
         it('should not grow the subject if not required', () => {
-          const placeholderSize: Position = patch(axis.line, gap - 5);
+          const inHome: DraggableDimension = getHomeDraggable(gap - 5);
 
           const result: DroppableDimension = addPlaceholder(
             withoutFrame,
-            placeholderSize,
-            draggables,
+            inHome,
+            withHomeDraggable(inHome),
           );
 
           const expected: DroppableSubject = {
@@ -98,7 +128,7 @@ const gap: number = 10;
             withPlaceholder: {
               increasedBy: null,
               oldFrameMaxScroll: null,
-              placeholderSize,
+              placeholderSize: getPlaceholderSize(inHome),
             },
           };
           expect(result.subject).toEqual(expected);
@@ -106,12 +136,12 @@ const gap: number = 10;
 
         it('should grow the subject if required', () => {
           const excess: number = 20;
-          const placeholderSize: Position = patch(axis.line, gap + excess);
+          const inHome: DraggableDimension = getHomeDraggable(gap + excess);
 
           const result: DroppableDimension = addPlaceholder(
             withoutFrame,
-            placeholderSize,
-            draggables,
+            inHome,
+            withHomeDraggable(inHome),
           );
 
           const active: ?Rect = withoutFrame.subject.active;
@@ -128,7 +158,7 @@ const gap: number = 10;
             withPlaceholder: {
               increasedBy: patch(axis.line, excess),
               oldFrameMaxScroll: null,
-              placeholderSize,
+              placeholderSize: getPlaceholderSize(inHome),
             },
           };
           expect(result.subject).toEqual(expected);
@@ -137,12 +167,12 @@ const gap: number = 10;
 
       it('should restore the subject to its original size when placeholder is no longer needed', () => {
         const excess: number = 20;
-        const placeholderSize: Position = patch(axis.line, gap + excess);
+        const inHome: DraggableDimension = getHomeDraggable(gap + excess);
 
         const added: DroppableDimension = addPlaceholder(
           withoutFrame,
-          placeholderSize,
-          draggables,
+          inHome,
+          withHomeDraggable(inHome),
         );
         const removed: DroppableDimension = removePlaceholder(added);
 
@@ -158,8 +188,8 @@ const gap: number = 10;
         closest: {
           borderBox: withoutFrame.client.borderBox,
           scrollSize: {
-            scrollWidth: axis === vertical ? crossAxisSize : size,
-            scrollHeight: axis === vertical ? size : crossAxisSize,
+            scrollWidth: axis === vertical ? crossAxisSize : droppableSize,
+            scrollHeight: axis === vertical ? droppableSize : crossAxisSize,
           },
           scroll: origin,
           shouldClipSubject: false,
@@ -172,12 +202,12 @@ const gap: number = 10;
       );
 
       it('should not grow the subject if not required', () => {
-        const placeholderSize: Position = patch(axis.line, gap - 5);
+        const inHome: DraggableDimension = getHomeDraggable(gap - 5);
 
         const result: DroppableDimension = addPlaceholder(
           withFrame,
-          placeholderSize,
-          draggables,
+          inHome,
+          withHomeDraggable(inHome),
         );
 
         const expected: DroppableSubject = {
@@ -189,7 +219,7 @@ const gap: number = 10;
             increasedBy: null,
             // holding onto old max regardless
             oldFrameMaxScroll: originalFrame.scroll.max,
-            placeholderSize,
+            placeholderSize: getPlaceholderSize(inHome),
           },
         };
         expect(result.subject).toEqual(expected);
@@ -202,12 +232,12 @@ const gap: number = 10;
 
       it('should grow the subject if required', () => {
         const excess: number = 20;
-        const placeholderSize: Position = patch(axis.line, gap + excess);
+        const inHome: DraggableDimension = getHomeDraggable(gap + excess);
 
         const result: DroppableDimension = addPlaceholder(
           withFrame,
-          placeholderSize,
-          draggables,
+          inHome,
+          withHomeDraggable(inHome),
         );
 
         const increasedBy: Position = patch(axis.line, excess);
@@ -225,7 +255,7 @@ const gap: number = 10;
           withPlaceholder: {
             increasedBy,
             oldFrameMaxScroll: originalFrame.scroll.max,
-            placeholderSize,
+            placeholderSize: getPlaceholderSize(inHome),
           },
         };
         expect(result.subject).toEqual(expected);
@@ -242,12 +272,12 @@ const gap: number = 10;
 
       it('should restore the original frame when placeholder is no longer needed', () => {
         const excess: number = 20;
-        const placeholderSize: Position = patch(axis.line, gap + excess);
+        const inHome: DraggableDimension = getHomeDraggable(gap + excess);
 
         const added: DroppableDimension = addPlaceholder(
           withFrame,
-          placeholderSize,
-          draggables,
+          inHome,
+          withHomeDraggable(inHome),
         );
         const removed: DroppableDimension = removePlaceholder(added);
 
