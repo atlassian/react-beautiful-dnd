@@ -98,11 +98,6 @@ export default ({
     return addClosest(atProposedIndex, lastDisplaced);
   })();
 
-  console.group('result');
-  console.log('displaced:', displaced.map(d => d.draggableId));
-  console.log('new index', proposedIndex);
-  console.groupEnd();
-
   return {
     movement: {
       displacedBy,
