@@ -191,6 +191,7 @@ export type CombineImpact = {|
 export type DragImpact = {|
   movement: DragMovement,
   // the direction of the Droppable you are over
+  // TODO: is this needed?
   direction: ?Direction,
   // a reorder location
   destination: ?DraggableLocation,
