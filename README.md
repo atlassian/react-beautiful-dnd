@@ -635,7 +635,7 @@ This library supports dragging within scroll containers (DOM elements that have 
 
 where a _scrollable parent_ refers to a scroll container that is not the window itself.
 
-For more information see [how we detect scroll containers guide](/docs/how-we-detect-scroll-containers.md)
+For more information see [how we detect scroll containers guide](/docs/guides/how-we-detect-scroll-containers.md)
 
 > We currently only support a single scroll parent. We plan on adding support for [nested scroll containers](https://github.com/atlassian/react-beautiful-dnd/issues/131)
 
