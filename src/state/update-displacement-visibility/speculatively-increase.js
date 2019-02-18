@@ -2,6 +2,7 @@
 import type { Position } from 'css-box-model';
 import type {
   DroppableDimension,
+  DraggableDimension,
   DraggableDimensionMap,
   DragImpact,
   Displacement,
@@ -45,29 +46,43 @@ export default ({
     : destination;
 
   const updated: Displacement[] = displaced.map((entry: Displacement) => {
+    // already visible: do not need to speculatively increase
     if (entry.isVisible) {
       return entry;
     }
 
-    const result: Displacement = getDisplacement({
-      draggable: draggables[entry.draggableId],
-      destination: scrolledDroppable,
+    const draggable: DraggableDimension = draggables[entry.draggableId];
+
+    // check if would be visibly displaced in a scrolled droppable or viewport
+
+    const withScrolledViewport: Displacement = getDisplacement({
+      draggable,
+      destination,
       previousImpact: impact,
       viewport: scrolledViewport.frame,
       onLift,
+      forceShouldAnimate: false,
     });
 
-    if (!result.isVisible) {
-      return entry;
+    if (withScrolledViewport.isVisible) {
+      return withScrolledViewport;
     }
 
-    // speculatively visible!
-    return {
-      draggableId: entry.draggableId,
-      isVisible: true,
-      // force skipping animation
-      shouldAnimate: false,
-    };
+    const withScrolledDroppable: Displacement = getDisplacement({
+      draggable,
+      destination: scrolledDroppable,
+      previousImpact: impact,
+      viewport: viewport.frame,
+      onLift,
+      forceShouldAnimate: false,
+    });
+
+    if (withScrolledDroppable.isVisible) {
+      return withScrolledDroppable;
+    }
+
+    // still not visible
+    return entry;
   });
 
   return withNewDisplacement(impact, updated);
