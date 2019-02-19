@@ -95,7 +95,7 @@ import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-ce
   // in home list moving forward
   const displacedBy: DisplacedBy = getDisplacedBy(axis, inHome.displaceBy);
   const draggables: DraggableDimensionMap = toDraggableMap([inHome, inForeign]);
-  const { onLift, impact: homeImpact } = getHomeOnLift({
+  const { onLift } = getHomeOnLift({
     draggable: inHome,
     draggables,
     home,
