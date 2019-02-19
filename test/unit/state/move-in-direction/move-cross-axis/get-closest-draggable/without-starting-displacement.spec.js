@@ -1,24 +1,37 @@
 // @flow
 import { getRect, type Rect, type Position } from 'css-box-model';
-import getClosestDraggable from '../../../../../src/state/move-in-direction/move-cross-axis/get-closest-draggable';
-import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
-import { add, distance, patch } from '../../../../../src/state/position';
-import {
-  getDroppableDimension,
-  getDraggableDimension,
-  withAssortedSpacing,
-} from '../../../../utils/dimension';
-import { expandByPosition } from '../../../../../src/state/spacing';
-import { horizontal, vertical } from '../../../../../src/state/axis';
-import getViewport from '../../../../../src/view/window/get-viewport';
 import type {
   Axis,
   DraggableDimension,
   DroppableDimension,
   Viewport,
-} from '../../../../../src/types';
+  OnLift,
+} from '../../../../../../src/types';
+import getClosestDraggable from '../../../../../../src/state/move-in-direction/move-cross-axis/get-closest-draggable';
+import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
+import {
+  add,
+  distance,
+  patch,
+  origin,
+} from '../../../../../../src/state/position';
+import {
+  getDroppableDimension,
+  getDraggableDimension,
+  withAssortedSpacing,
+} from '../../../../../utils/dimension';
+import { expandByPosition } from '../../../../../../src/state/spacing';
+import { horizontal, vertical } from '../../../../../../src/state/axis';
+import getViewport from '../../../../../../src/view/window/get-viewport';
 
 const viewport: Viewport = getViewport();
+const noOnLift: OnLift = {
+  wasDisplaced: {},
+  displacedBy: {
+    point: origin,
+    value: 0,
+  },
+};
 
 describe('get closest draggable', () => {
   [vertical, horizontal].forEach((axis: Axis) => {
@@ -182,11 +195,11 @@ describe('get closest draggable', () => {
           100,
         );
         const result1: ?DraggableDimension = getClosestDraggable({
-          axis,
           pageBorderBoxCenter: center1,
           destination: droppable,
           insideDestination,
           viewport,
+          onLift: noOnLift,
         });
         expect(result1).toBe(visible1);
 
@@ -197,11 +210,11 @@ describe('get closest draggable', () => {
           100,
         );
         const result2: ?DraggableDimension = getClosestDraggable({
-          axis,
           pageBorderBoxCenter: center2,
           destination: droppable,
           insideDestination,
           viewport,
+          onLift: noOnLift,
         });
         expect(result2).toBe(visible2);
       });
@@ -213,11 +226,11 @@ describe('get closest draggable', () => {
         };
 
         const result: ?DraggableDimension = getClosestDraggable({
-          axis,
           pageBorderBoxCenter: center,
           destination: droppable,
           insideDestination: [],
           viewport,
+          onLift: noOnLift,
         });
 
         expect(result).toBe(null);
@@ -249,22 +262,22 @@ describe('get closest draggable', () => {
         );
 
         const result: ?DraggableDimension = getClosestDraggable({
-          axis,
           pageBorderBoxCenter: center,
           destination: scrolled,
           insideDestination,
           viewport,
+          onLift: noOnLift,
         });
 
         expect(result).toBe(visible2);
 
         // validation - with no scroll applied we are normally closer to visible1
         const result1: ?DraggableDimension = getClosestDraggable({
-          axis,
           pageBorderBoxCenter: center,
           destination: droppable,
           insideDestination,
           viewport,
+          onLift: noOnLift,
         });
         expect(result1).toBe(visible1);
       });
@@ -278,11 +291,11 @@ describe('get closest draggable', () => {
           );
 
           const result: ?DraggableDimension = getClosestDraggable({
-            axis,
             pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
+            onLift: noOnLift,
           });
 
           expect(result).toBe(visible1);
@@ -296,11 +309,11 @@ describe('get closest draggable', () => {
           );
 
           const result: ?DraggableDimension = getClosestDraggable({
-            axis,
             pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
+            onLift: noOnLift,
           });
 
           expect(result).toBe(visible1);
@@ -314,11 +327,11 @@ describe('get closest draggable', () => {
           );
 
           const result: ?DraggableDimension = getClosestDraggable({
-            axis,
             pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
+            onLift: noOnLift,
           });
 
           expect(result).toBe(visible2);
@@ -332,11 +345,11 @@ describe('get closest draggable', () => {
           );
 
           const result: ?DraggableDimension = getClosestDraggable({
-            axis,
             pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
+            onLift: noOnLift,
           });
 
           expect(result).toBe(visible2);
@@ -350,11 +363,11 @@ describe('get closest draggable', () => {
           );
 
           const result: ?DraggableDimension = getClosestDraggable({
-            axis,
             pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination,
             viewport,
+            onLift: noOnLift,
           });
 
           expect(result).toBe(visible2);
@@ -372,11 +385,11 @@ describe('get closest draggable', () => {
           };
 
           const result: ?DraggableDimension = getClosestDraggable({
-            axis,
             pageBorderBoxCenter: center,
             destination: droppable,
             insideDestination: notVisible,
             viewport,
+            onLift: noOnLift,
           });
 
           expect(result).toBe(null);
@@ -393,11 +406,11 @@ describe('get closest draggable', () => {
         );
 
         const result: ?DraggableDimension = getClosestDraggable({
-          axis,
           pageBorderBoxCenter: center,
           destination: droppable,
           insideDestination,
           viewport,
+          onLift: noOnLift,
         });
 
         expect(result).toBe(visible1);
@@ -411,11 +424,11 @@ describe('get closest draggable', () => {
 
         // 2. if we move beyond the edge visible2 will be selected
         const result2: ?DraggableDimension = getClosestDraggable({
-          axis,
           pageBorderBoxCenter: add(center, patch(axis.line, 1)),
           destination: droppable,
           insideDestination,
           viewport,
+          onLift: noOnLift,
         });
         expect(result2).toBe(visible2);
       });

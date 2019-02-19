@@ -12,13 +12,26 @@ import withDroppableDisplacement from '../../with-scroll-change/with-droppable-d
 import { offsetByPosition } from '../../spacing';
 import didStartDisplaced from '../../starting-displaced/did-start-displaced';
 
-const getDisplacedCenter = (
+const removeStartingDisplacementFromCenter = (
   draggable: DraggableDimension,
   onLift: OnLift,
 ): Position => {
   const original: Position = draggable.page.borderBox.center;
   return didStartDisplaced(draggable.descriptor.id, onLift)
     ? subtract(original, onLift.displacedBy.point)
+    : original;
+};
+
+const removeStartingDisplacementFromBorderBox = (
+  draggable: DraggableDimension,
+  onLift: OnLift,
+): Spacing => {
+  const original: Rect = draggable.page.borderBox;
+
+  // If we are moving back into the home list then all the
+  // items will be visibly displaced backwards
+  return didStartDisplaced(draggable.descriptor.id, onLift)
+    ? offsetByPosition(original, negate(onLift.displacedBy.point))
     : original;
 };
 
@@ -41,39 +54,33 @@ export default ({
 }: Args): ?DraggableDimension => {
   const sorted: DraggableDimension[] = insideDestination
     .filter(
-      (draggable: DraggableDimension): boolean => {
-        const borderBox: Rect = draggable.page.borderBox;
-
-        // If we are moving back into the home list then all the
-        // items will be displaced backwards
-        const target: Spacing = didStartDisplaced(
-          draggable.descriptor.id,
-          onLift,
-        )
-          ? offsetByPosition(borderBox, negate(onLift.displacedBy.point))
-          : borderBox;
-
+      (draggable: DraggableDimension): boolean =>
         // Allowing movement to draggables that are not visible in the viewport
         // but must be visible in the droppable
         // We can improve this, but this limitation is easier for now
-        return isTotallyVisible({
-          target,
+        isTotallyVisible({
+          target: removeStartingDisplacementFromBorderBox(draggable, onLift),
           destination,
           viewport: viewport.frame,
           withDroppableDisplacement: true,
-        });
-      },
+        }),
     )
     .sort(
       (a: DraggableDimension, b: DraggableDimension): number => {
         // Need to consider the change in scroll in the destination
         const distanceToA = distance(
           pageBorderBoxCenter,
-          withDroppableDisplacement(destination, getDisplacedCenter(a, onLift)),
+          withDroppableDisplacement(
+            destination,
+            removeStartingDisplacementFromCenter(a, onLift),
+          ),
         );
         const distanceToB = distance(
           pageBorderBoxCenter,
-          withDroppableDisplacement(destination, getDisplacedCenter(b, onLift)),
+          withDroppableDisplacement(
+            destination,
+            removeStartingDisplacementFromCenter(b, onLift),
+          ),
         );
 
         // if a is closer - return a
