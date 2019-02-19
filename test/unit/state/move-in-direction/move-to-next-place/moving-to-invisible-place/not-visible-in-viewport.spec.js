@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { getRect, type Position } from 'css-box-model';
+import { getRect, type Position, type BoxModel, offset } from 'css-box-model';
 import type {
   Axis,
   DragImpact,
@@ -12,7 +12,6 @@ import type {
   Viewport,
 } from '../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
-import getHomeImpact from '../../../../../../src/state/get-home-impact';
 import {
   getDraggableDimension,
   getDroppableDimension,
@@ -26,6 +25,7 @@ import { origin, subtract } from '../../../../../../src/state/position';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
 import scrollViewport from '../../../../../../src/state/scroll-viewport';
 import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visible';
+import { toDraggableMap } from '../../../../../../src/state/dimension-structures';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   const viewport: Viewport = createViewport({
@@ -40,9 +40,23 @@ import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visi
     scrollWidth: 2000,
   });
 
-  const hugeDroppable: DroppableDimension = getDroppableDimension({
+  const home: DroppableDimension = getDroppableDimension({
     descriptor: {
-      id: 'much bigger than viewport',
+      id: 'home - much bigger than viewport',
+      type: 'huge',
+    },
+    direction: axis.direction,
+    borderBox: {
+      top: 0,
+      right: 10000,
+      bottom: 10000,
+      left: 0,
+    },
+  });
+
+  const foreign: DroppableDimension = getDroppableDimension({
+    descriptor: {
+      id: 'foreign - much bigger than viewport',
       type: 'huge',
     },
     direction: axis.direction,
@@ -56,62 +70,67 @@ import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visi
 
   describe(`on ${axis.direction} axis`, () => {
     describe('moving forward', () => {
-      const asBigAsViewport: DraggableDimension = getDraggableDimension({
+      const inHome: DraggableDimension = getDraggableDimension({
         descriptor: {
-          id: 'inside',
+          id: 'in-home',
           index: 0,
-          droppableId: hugeDroppable.descriptor.id,
-          type: hugeDroppable.descriptor.type,
+          droppableId: home.descriptor.id,
+          type: home.descriptor.type,
         },
         borderBox: viewport.frame,
       });
-      const outsideViewport: DraggableDimension = getDraggableDimension({
+      const inForeign: DraggableDimension = getDraggableDimension({
         descriptor: {
-          id: 'outside',
-          index: 1,
-          droppableId: hugeDroppable.descriptor.id,
-          type: hugeDroppable.descriptor.type,
+          id: 'in-foreign',
+          index: 0,
+          droppableId: foreign.descriptor.id,
+          type: foreign.descriptor.type,
         },
-        borderBox: {
-          // is bottom left of the viewport
-          top: viewport.frame.bottom + 1,
-          right: viewport.frame.right + 100,
-          left: viewport.frame.right + 1,
-          bottom: viewport.frame.bottom + 100,
-        },
+        borderBox: viewport.frame,
       });
       // in home list moving forward
-      const willDisplaceForward: boolean = false;
-      const displacedBy: DisplacedBy = getDisplacedBy(
-        axis,
-        asBigAsViewport.displaceBy,
-        willDisplaceForward,
-      );
-      const draggables: DraggableDimensionMap = {
-        [asBigAsViewport.descriptor.id]: asBigAsViewport,
-        [outsideViewport.descriptor.id]: outsideViewport,
-      };
+      const displacedBy: DisplacedBy = getDisplacedBy(axis, inHome.displaceBy);
+      const draggables: DraggableDimensionMap = toDraggableMap([
+        inHome,
+        inForeign,
+      ]);
 
-      it('should request a jump scroll for movement that is outside of the viewport', () => {
+      it('should be setup correctly', () => {
         // verify visibility is as expected
         // before scroll
         expect(
           isTotallyVisible({
-            target: asBigAsViewport.page.borderBox,
+            target: inHome.page.borderBox,
             viewport: viewport.frame,
             withDroppableDisplacement: true,
-            destination: hugeDroppable,
+            destination: home,
           }),
         ).toBe(true);
         expect(
           isTotallyVisible({
-            target: outsideViewport.page.borderBox,
+            target: inForeign.page.borderBox,
             viewport: viewport.frame,
             withDroppableDisplacement: true,
-            destination: hugeDroppable,
+            destination: foreign,
+          }),
+        ).toBe(true);
+
+        const displaced: BoxModel = offset(
+          inForeign.client,
+          getDisplacedBy(vertical, inHome.displaceBy).point,
+        );
+
+        expect(
+          isTotallyVisible({
+            target: displaced.borderBox,
+            viewport: viewport.frame,
+            withDroppableDisplacement: true,
+            destination: foreign,
           }),
         ).toBe(false);
+      });
 
+      it('should request a jump scroll for movement that is outside of the viewport', () => {
         const displaced: Displacement[] = [
           {
             draggableId: outsideViewport.descriptor.id,

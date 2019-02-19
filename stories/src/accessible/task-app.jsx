@@ -6,6 +6,7 @@ import initial from './data';
 import reorder from '../reorder';
 import { grid } from '../constants';
 import { DragDropContext } from '../../../src';
+import BlurContext from './blur-context';
 import type {
   Announce,
   DragStart,
@@ -26,9 +27,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-const Blur = styled.div`
-  filter: blur(${props => props.amount}px);
 `;
 
 const BlurControls = styled.div`
@@ -126,9 +124,9 @@ export default class TaskApp extends Component<*, State> {
         onDragEnd={this.onDragEnd}
       >
         <Container>
-          <Blur amount={this.state.blur}>
+          <BlurContext.Provider value={this.state.blur}>
             <TaskList title="Todo" tasks={this.state.tasks} />
-          </Blur>
+          </BlurContext.Provider>
           <BlurControls>
             <Button
               aria-label="remove blur"
