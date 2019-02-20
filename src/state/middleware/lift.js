@@ -22,7 +22,7 @@ export default (getMarshal: () => DimensionMarshal) => ({
   // this can change the descriptor of the dragging item
   // Will call the onDragEnd responders
   if (initial.phase === 'DROP_ANIMATING') {
-    dispatch(completeDrop(initial.completed, { shouldFlush: true }));
+    dispatch(completeDrop({ completed: initial.completed, shouldFlush: true }));
   }
 
   invariant(getState().phase === 'IDLE', 'Incorrect phase to start a drag');

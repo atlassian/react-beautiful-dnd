@@ -255,28 +255,19 @@ export const animateDrop = (args: AnimateDropArgs): DropAnimateAction => ({
   payload: args,
 });
 
-export type CompleteDropOptions = {|
-  shouldFlush: boolean,
-|};
-export type DropCompleteResult = {|
+export type DropCompleteArgs = {|
   completed: CompletedDrag,
-  options: CompleteDropOptions,
+  shouldFlush: boolean,
 |};
 
 export type DropCompleteAction = {
   type: 'DROP_COMPLETE',
-  payload: DropCompleteResult,
+  payload: DropCompleteArgs,
 };
 
-export const completeDrop = (
-  completed: CompletedDrag,
-  options: CompleteDropOptions,
-): DropCompleteAction => ({
+export const completeDrop = (args: DropCompleteArgs): DropCompleteAction => ({
   type: 'DROP_COMPLETE',
-  payload: {
-    completed,
-    options,
-  },
+  payload: args,
 });
 
 type DropArgs = {|

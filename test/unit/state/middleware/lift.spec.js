@@ -82,7 +82,7 @@ it('should flush any animating drops', () => {
   expect(mock).toHaveBeenCalledWith(lift(liftArgs));
   // the previous drag is flushed
   expect(mock).toHaveBeenCalledWith(
-    completeDrop(completed, { shouldFlush: true }),
+    completeDrop({ completed, shouldFlush: true }),
   );
   // the new lift continues
   expect(mock).toHaveBeenCalledTimes(3);

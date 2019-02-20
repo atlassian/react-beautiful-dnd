@@ -15,6 +15,7 @@ import {
   getDroppableDimension,
   getDraggableDimension,
 } from '../../../../utils/dimension';
+import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
 
 const preset = getPreset();
 const viewport: Viewport = getViewport();
@@ -58,6 +59,12 @@ it('should return null if there are draggables in a destination list but none ar
     [preset.home.descriptor.id]: preset.home,
     [custom.descriptor.id]: custom,
   };
+  const { onLift } = getHomeOnLift({
+    draggable: preset.inHome1,
+    draggables,
+    home: preset.home,
+    viewport: preset.viewport,
+  });
 
   const result: ?PublicResult = moveCrossAxis({
     isMovingForward: true,
@@ -68,6 +75,7 @@ it('should return null if there are draggables in a destination list but none ar
     droppables,
     previousImpact: noImpact,
     viewport,
+    onLift,
   });
 
   expect(result).toBe(null);

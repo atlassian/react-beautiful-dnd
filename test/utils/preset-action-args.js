@@ -8,10 +8,13 @@ import type {
   DraggableDimension,
   DroppableDimension,
   Published,
+  CompletedDrag,
 } from '../../src/types';
 import type {
+  DropCompleteArgs,
   InitialPublishArgs,
   LiftArgs,
+  AnimateDropArgs,
 } from '../../src/state/action-creators';
 import { getPreset, getDraggableDimension, makeScrollable } from './dimension';
 import { offsetByPosition } from '../../src/state/spacing';
@@ -105,13 +108,18 @@ export const completed: CompletedDrag = {
   impact: homeImpact,
 };
 
+export const completeDropArgs: DropCompleteArgs = {
+  completed,
+  shouldFlush: false,
+};
+
 export const animateDropArgs: AnimateDropArgs = {
   completed,
   dropDuration: 1,
   newHomeClientOffset: { x: 10, y: 10 },
 };
 
-export const userCancelArgs: PendingDrop = {
+export const userCancelArgs: AnimateDropArgs = {
   ...animateDropArgs,
   completed: {
     ...completed,
