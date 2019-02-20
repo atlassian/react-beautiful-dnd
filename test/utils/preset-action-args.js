@@ -1,9 +1,5 @@
 // @flow
 import type { Position } from 'css-box-model';
-import { getPreset, getDraggableDimension, makeScrollable } from './dimension';
-import { offsetByPosition } from '../../src/state/spacing';
-import getHomeLocation from '../../src/state/get-home-location';
-import getHomeImpact from '../../src/state/get-home-impact';
 import type {
   Critical,
   DropResult,
@@ -11,13 +7,16 @@ import type {
   DimensionMap,
   DraggableDimension,
   DroppableDimension,
-  PendingDrop,
   Published,
 } from '../../src/types';
 import type {
   InitialPublishArgs,
   LiftArgs,
 } from '../../src/state/action-creators';
+import { getPreset, getDraggableDimension, makeScrollable } from './dimension';
+import { offsetByPosition } from '../../src/state/spacing';
+import getHomeLocation from '../../src/state/get-home-location';
+import getHomeOnLift from '../../src/state/get-home-on-lift';
 
 // In case a consumer needs the references
 export const preset = getPreset();
@@ -28,6 +27,13 @@ export const critical: Critical = {
   draggable: preset.inHome1.descriptor,
   droppable: preset.home.descriptor,
 };
+
+export const { onLift, impact: homeImpact } = getHomeOnLift({
+  draggable: preset.inHome1,
+  draggables: preset.draggables,
+  home: preset.home,
+  viewport: preset.viewport,
+});
 
 const clientSelection: Position = preset.inHome1.client.borderBox.center;
 
@@ -86,28 +92,33 @@ export const getDragStart = (custom?: Critical = critical): DragStart => ({
   mode: 'FLUID',
 });
 
-export const completeDropArgs: DropResult = {
+const result: DropResult = {
   ...getDragStart(critical),
   destination: getHomeLocation(critical.draggable),
   reason: 'DROP',
   combine: null,
 };
 
-export const animateDropArgs: PendingDrop = {
-  newHomeClientOffset: { x: 10, y: 10 },
-  impact: getHomeImpact(
-    preset.dimensions.draggables[critical.draggable.id],
-    preset.dimensions.droppables[critical.droppable.id],
-  ),
-  result: completeDropArgs,
+export const completed: CompletedDrag = {
+  critical,
+  result,
+  impact: homeImpact,
+};
+
+export const animateDropArgs: AnimateDropArgs = {
+  completed,
   dropDuration: 1,
+  newHomeClientOffset: { x: 10, y: 10 },
 };
 
 export const userCancelArgs: PendingDrop = {
   ...animateDropArgs,
-  result: {
-    ...completeDropArgs,
-    reason: 'CANCEL',
+  completed: {
+    ...completed,
+    result: {
+      ...completed.result,
+      reason: 'CANCEL',
+    },
   },
 };
 

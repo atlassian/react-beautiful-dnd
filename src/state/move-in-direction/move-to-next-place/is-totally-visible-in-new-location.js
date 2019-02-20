@@ -1,5 +1,5 @@
 // @flow
-import { type Position, type Rect, type Spacing, getRect } from 'css-box-model';
+import { type Position, type Rect, type Spacing } from 'css-box-model';
 import { subtract } from '../../position';
 import { offsetByPosition } from '../../spacing';
 import {
@@ -48,9 +48,5 @@ export default ({
     viewport,
   };
 
-  if (onlyOnMainAxis) {
-    return isTotallyVisibleOnAxis(args);
-  }
-
-  return isTotallyVisible(args);
+  return onlyOnMainAxis ? isTotallyVisibleOnAxis(args) : isTotallyVisible(args);
 };

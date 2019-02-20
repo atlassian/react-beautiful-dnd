@@ -1,5 +1,4 @@
 // @flow
-import type { PendingDrop } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import middleware from '../../../../src/state/middleware/lift';
@@ -11,19 +10,17 @@ import {
   initialPublish,
   animateDrop,
   completeDrop,
+  type AnimateDropArgs,
 } from '../../../../src/state/action-creators';
 import getDimensionMarshal, {
   populateMarshal,
 } from '../../../utils/dimension-marshal';
-import getHomeLocation from '../../../../src/state/get-home-location';
 import {
   preset,
   liftArgs,
   initialPublishArgs,
-  getDragStart,
-  critical,
+  completed,
 } from '../../../utils/preset-action-args';
-import { noMovement } from '../../../../src/state/no-impact';
 
 const getMarshal = (store: Store): DimensionMarshal => {
   const marshal: DimensionMarshal = getDimensionMarshal(store.dispatch);
@@ -71,23 +68,12 @@ it('should flush any animating drops', () => {
   expect(store.getState().phase).toBe('DRAGGING');
 
   // start a drop
-  const pending: PendingDrop = {
+  const args: AnimateDropArgs = {
     newHomeClientOffset: { x: -1, y: -1 },
     dropDuration: 1,
-    impact: {
-      movement: noMovement,
-      direction: 'vertical',
-      destination: getHomeLocation(critical.draggable),
-      merge: null,
-    },
-    result: {
-      ...getDragStart(),
-      destination: getHomeLocation(critical.draggable),
-      combine: null,
-      reason: 'DROP',
-    },
+    completed,
   };
-  store.dispatch(animateDrop(pending));
+  store.dispatch(animateDrop(args));
   expect(store.getState().phase).toBe('DROP_ANIMATING');
 
   // while drop animating a lift occurs
@@ -95,7 +81,9 @@ it('should flush any animating drops', () => {
   store.dispatch(lift(liftArgs));
   expect(mock).toHaveBeenCalledWith(lift(liftArgs));
   // the previous drag is flushed
-  expect(mock).toHaveBeenCalledWith(completeDrop(pending.result));
+  expect(mock).toHaveBeenCalledWith(
+    completeDrop(completed, { shouldFlush: true }),
+  );
   // the new lift continues
   expect(mock).toHaveBeenCalledTimes(3);
 });
