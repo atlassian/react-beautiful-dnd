@@ -54,15 +54,12 @@ export default ({
 
   const merge: ?CombineImpact = impact.merge;
 
-  if (!merge) {
-    return offset;
-  }
-
   // When dropping with a merge we want to drop the dragging item
   // into the new home location of the target.
   // The target will move as a result of a drop if it started displaced
+  if (merge && didStartDisplaced(merge.combine.draggableId, onLift)) {
+    return subtract(offset, onLift.displacedBy.point);
+  }
 
-  return didStartDisplaced(merge.combine.draggableId, onLift)
-    ? subtract(offset, onLift.displacedBy.point)
-    : offset;
+  return offset;
 };
