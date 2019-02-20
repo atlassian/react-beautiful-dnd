@@ -5,16 +5,10 @@ import type {
   DraggableDimension,
   DroppableDimension,
   Viewport,
-  OnLift,
 } from '../../../../../../src/types';
 import getClosestDraggable from '../../../../../../src/state/move-in-direction/move-cross-axis/get-closest-draggable';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
-import {
-  add,
-  distance,
-  patch,
-  origin,
-} from '../../../../../../src/state/position';
+import { add, distance, patch } from '../../../../../../src/state/position';
 import {
   getDroppableDimension,
   getDraggableDimension,
@@ -23,15 +17,9 @@ import {
 import { expandByPosition } from '../../../../../../src/state/spacing';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import getViewport from '../../../../../../src/view/window/get-viewport';
+import noOnLift from '../../../../../utils/no-on-lift';
 
 const viewport: Viewport = getViewport();
-const noOnLift: OnLift = {
-  wasDisplaced: {},
-  displacedBy: {
-    point: origin,
-    value: 0,
-  },
-};
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on the ${axis.direction} axis`, () => {
