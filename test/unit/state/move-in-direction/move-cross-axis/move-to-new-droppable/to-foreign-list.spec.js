@@ -196,6 +196,22 @@ import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
             onVisibleEdge,
             patch(axis.line, 1),
           );
+          // validate with no scroll
+          {
+            const result: ?DragImpact = moveToNewDroppable({
+              previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
+              draggable: preset.inHome1,
+              draggables: preset.draggables,
+              destination: preset.emptyForeign,
+              moveRelativeTo: null,
+              insideDestination: [],
+              previousImpact: homeImpact,
+              viewport,
+              onLift,
+            });
+
+            expect(result).toBeTruthy();
+          }
           // center on visible edge = can move
           {
             const scrolled: Viewport = scrollViewport(viewport, onVisibleEdge);
