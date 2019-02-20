@@ -5,7 +5,7 @@ import { negate, subtract } from '../../position';
 import { offsetByPosition } from '../../spacing';
 import didStartDisplaced from '../../starting-displaced/did-start-displaced';
 
-export const getCurrentCenter = (
+export const getCurrentPageBorderBoxCenter = (
   draggable: DraggableDimension,
   onLift: OnLift,
 ): Position => {
@@ -17,7 +17,7 @@ export const getCurrentCenter = (
     : original;
 };
 
-export const getCurrentBorderBox = (
+export const getCurrentPageBorderBox = (
   draggable: DraggableDimension,
   onLift: OnLift,
 ): Spacing => {

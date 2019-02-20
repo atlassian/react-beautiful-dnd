@@ -10,8 +10,8 @@ import { distance } from '../../position';
 import { isTotallyVisible } from '../../visibility/is-visible';
 import withDroppableDisplacement from '../../with-scroll-change/with-droppable-displacement';
 import {
-  getCurrentBorderBox,
-  getCurrentCenter,
+  getCurrentPageBorderBox,
+  getCurrentPageBorderBoxCenter,
 } from './without-starting-displacement';
 
 type Args = {|
@@ -38,7 +38,7 @@ export default ({
         // but must be visible in the droppable
         // We can improve this, but this limitation is easier for now
         isTotallyVisible({
-          target: getCurrentBorderBox(draggable, onLift),
+          target: getCurrentPageBorderBox(draggable, onLift),
           destination,
           viewport: viewport.frame,
           withDroppableDisplacement: true,
@@ -49,11 +49,17 @@ export default ({
         // Need to consider the change in scroll in the destination
         const distanceToA = distance(
           pageBorderBoxCenter,
-          withDroppableDisplacement(destination, getCurrentCenter(a, onLift)),
+          withDroppableDisplacement(
+            destination,
+            getCurrentPageBorderBoxCenter(a, onLift),
+          ),
         );
         const distanceToB = distance(
           pageBorderBoxCenter,
-          withDroppableDisplacement(destination, getCurrentCenter(b, onLift)),
+          withDroppableDisplacement(
+            destination,
+            getCurrentPageBorderBoxCenter(b, onLift),
+          ),
         );
 
         // if a is closer - return a
