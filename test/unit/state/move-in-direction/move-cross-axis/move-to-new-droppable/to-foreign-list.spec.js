@@ -174,26 +174,21 @@ import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
           }
         });
 
-        it('should not move into the start of list if the position is not visible due to page scroll', () => {
+        it.only('should not move into the start of list if the position is not visible due to page scroll', () => {
           const emptyForeignPageBox: BoxModel = preset.emptyForeign.page;
-          const distanceToStartOfDroppableContentBox: number = distanceToContentBoxStart(
-            emptyForeignPageBox,
-          );
-          const inHome1PageBox: BoxModel = preset.inHome1.page;
-          const distanceToCenterOfDragging: number =
-            distanceToContentBoxStart(inHome1PageBox) +
-            inHome1PageBox.contentBox[axis.size] / 2;
 
-          const distanceToStartOfViewport: number =
-            emptyForeignPageBox.marginBox[axis.start];
-          const onVisibleEdge: Position = patch(
+          // How far to the start of the droppable content box?
+          const distanceToStartOfDroppableContextBox: number =
+            emptyForeignPageBox.marginBox[axis.start] +
+            distanceToContentBoxStart(emptyForeignPageBox);
+
+          const onVisibleStartEdge: Position = patch(
             axis.line,
-            distanceToStartOfViewport +
-              distanceToStartOfDroppableContentBox +
-              distanceToCenterOfDragging,
+            distanceToStartOfDroppableContextBox +
+              preset.inHome1.page.margin[axis.start],
           );
-          const pastVisibleEdge: Position = add(
-            onVisibleEdge,
+          const pastVisibleStartEdge: Position = add(
+            onVisibleStartEdge,
             patch(axis.line, 1),
           );
           // validate with no scroll
@@ -214,7 +209,12 @@ import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
           }
           // center on visible edge = can move
           {
-            const scrolled: Viewport = scrollViewport(viewport, onVisibleEdge);
+            console.log('original viewport', viewport);
+            const scrolled: Viewport = scrollViewport(
+              viewport,
+              onVisibleStartEdge,
+            );
+            console.log('scrolled viewport', scrolled);
 
             const result: ?DragImpact = moveToNewDroppable({
               previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
@@ -234,7 +234,7 @@ import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
           {
             const scrolled: Viewport = scrollViewport(
               viewport,
-              pastVisibleEdge,
+              pastVisibleStartEdge,
             );
 
             const result: ?DragImpact = moveToNewDroppable({

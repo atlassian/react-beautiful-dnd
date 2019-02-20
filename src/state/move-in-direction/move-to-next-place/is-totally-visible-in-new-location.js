@@ -1,5 +1,5 @@
 // @flow
-import { type Position, type Rect, type Spacing } from 'css-box-model';
+import { type Position, type Rect, type Spacing, getRect } from 'css-box-model';
 import { subtract } from '../../position';
 import { offsetByPosition } from '../../spacing';
 import {
@@ -31,11 +31,21 @@ export default ({
   // We are not considering margins for this calculation.
   // This is because a move might move a Draggable slightly outside of the bounds
   // of a Droppable (which is okay)
-  const diff: Position = subtract(
+  const changeNeeded: Position = subtract(
     newPageBorderBoxCenter,
     draggable.page.borderBox.center,
   );
-  const shifted: Spacing = offsetByPosition(draggable.page.borderBox, diff);
+  const shifted: Spacing = offsetByPosition(
+    draggable.page.borderBox,
+    changeNeeded,
+  );
+
+  console.log('changeNeeded', changeNeeded);
+  console.log('original center', draggable.page.borderBox.center);
+  console.log('shifted center', getRect(shifted).center);
+  console.log('original top', draggable.page.borderBox.top);
+  console.log('shifted', shifted);
+  console.log('viewport', viewport);
 
   // Must be totally visible, not just partially visible.
   const args: IsVisibleArgs = {

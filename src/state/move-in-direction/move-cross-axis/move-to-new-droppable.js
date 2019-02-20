@@ -63,7 +63,7 @@ export default ({
       },
       merge: null,
     };
-    const pageBorderBoxCenter: Position = getPageBorderBoxCenter({
+    const proposedPageBorderBoxCenter: Position = getPageBorderBoxCenter({
       impact: proposed,
       draggable,
       droppable: destination,
@@ -72,14 +72,14 @@ export default ({
     });
 
     // need to add room for a placeholder in a foreign list
-    const dimension: DroppableDimension = isHomeOf(draggable, destination)
+    const withPlaceholder: DroppableDimension = isHomeOf(draggable, destination)
       ? destination
       : addPlaceholder(destination, draggable, draggables);
 
     const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
       draggable,
-      destination: dimension,
-      newPageBorderBoxCenter: pageBorderBoxCenter,
+      destination: withPlaceholder,
+      newPageBorderBoxCenter: proposedPageBorderBoxCenter,
       viewport: viewport.frame,
       // already taken into account by getPageBorderBoxCenter
       withDroppableDisplacement: false,
