@@ -1,40 +1,36 @@
 // @flow
+import type { BoxModel, Position, Spacing } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import { type Position, type BoxModel, type Spacing } from 'css-box-model';
 import type {
   Viewport,
   Axis,
   DragImpact,
-  DraggableDimension,
   DroppableDimension,
   DisplacedBy,
   Displacement,
-  DraggableDimensionMap,
 } from '../../../../../../src/types';
-import moveToNewDroppable from '../../../../../../src/state/move-in-direction/move-cross-axis/move-to-new-droppable';
-import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
-import {
-  add,
-  patch,
-  subtract,
-  negate,
-} from '../../../../../../src/state/position';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
-import {
-  getPreset,
-  makeScrollable,
-  getDraggableDimension,
-  getDroppableDimension,
-} from '../../../../../utils/dimension';
-import noImpact, { noMovement } from '../../../../../../src/state/no-impact';
+import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
+import { goIntoStart } from '../../../../../../src/state/get-center-from-impact/move-relative-to';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
-import { toDraggableMap } from '../../../../../../src/state/dimension-structures';
-import scrollViewport from '../../../../../../src/state/scroll-viewport';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
-import { goIntoStart } from '../../../../../../src/state/get-center-from-impact/move-relative-to';
-import { offsetByPosition } from '../../../../../../src/state/spacing';
 import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import moveToNewDroppable from '../../../../../../src/state/move-in-direction/move-cross-axis/move-to-new-droppable';
+import { noMovement } from '../../../../../../src/state/no-impact';
+import {
+  add,
+  negate,
+  patch,
+  subtract,
+} from '../../../../../../src/state/position';
+import scrollViewport from '../../../../../../src/state/scroll-viewport';
+import { offsetByPosition } from '../../../../../../src/state/spacing';
+import {
+  getDroppableDimension,
+  getPreset,
+  makeScrollable,
+} from '../../../../../utils/dimension';
+import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -174,7 +170,7 @@ import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
           }
         });
 
-        it.only('should not move into the start of list if the position is not visible due to page scroll', () => {
+        it('should not move into the start of list if the position is not visible due to page scroll', () => {
           const emptyForeignPageBox: BoxModel = preset.emptyForeign.page;
 
           // How far to the start of the droppable content box?
@@ -209,12 +205,10 @@ import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
           }
           // center on visible edge = can move
           {
-            console.log('original viewport', viewport);
             const scrolled: Viewport = scrollViewport(
               viewport,
               onVisibleStartEdge,
             );
-            console.log('scrolled viewport', scrolled);
 
             const result: ?DragImpact = moveToNewDroppable({
               previousPageBorderBoxCenter: preset.inHome1.page.borderBox.center,
@@ -230,7 +224,7 @@ import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
 
             expect(result).toBeTruthy();
           }
-          // center past visible edge = cannot move
+          // start is no longer visible = cannot move
           {
             const scrolled: Viewport = scrollViewport(
               viewport,

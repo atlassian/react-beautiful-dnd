@@ -40,13 +40,6 @@ export default ({
     changeNeeded,
   );
 
-  console.log('changeNeeded', changeNeeded);
-  console.log('original center', draggable.page.borderBox.center);
-  console.log('shifted center', getRect(shifted).center);
-  console.log('original top', draggable.page.borderBox.top);
-  console.log('shifted', shifted);
-  console.log('viewport', viewport);
-
   // Must be totally visible, not just partially visible.
   const args: IsVisibleArgs = {
     target: shifted,
