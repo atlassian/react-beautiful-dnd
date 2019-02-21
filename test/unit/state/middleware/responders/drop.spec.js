@@ -1,8 +1,11 @@
 // @flow
+import invariant from 'tiny-invariant';
 import type {
   Responders,
   DropResult,
   CompletedDrag,
+  State,
+  DraggableLocation,
 } from '../../../../../src/types';
 import type { Store } from '../../../../../src/state/store-types';
 import middleware from '../../../../../src/state/middleware/responders';
@@ -65,4 +68,40 @@ it('should throw an exception if there was no drag start published', () => {
       }),
     ),
   ).toThrow('Can only flush responders while dragging');
+});
+
+it('should use the drop result and not the final impact', () => {
+  const responders: Responders = getResponders();
+  const store: Store = createStore(middleware(() => responders, getAnnounce()));
+
+  store.dispatch(initialPublish(initialPublishArgs));
+  jest.runOnlyPendingTimers();
+  expect(responders.onDragStart).toHaveBeenCalledTimes(1);
+
+  const state: State = store.getState();
+  invariant(state.phase === 'DRAGGING');
+  const destination: ?DraggableLocation = state.impact.destination;
+  invariant(destination);
+  const fakeResult: DropResult = {
+    ...getDragStart(),
+    // ensuring the destination is different to the current impact to ensure
+    // that the result is used for responders and not the last impact
+    destination: {
+      droppableId: destination.droppableId,
+      index: destination.index + 1,
+    },
+    combine: null,
+    reason: 'DROP',
+  };
+
+  store.dispatch(
+    completeDrop({
+      completed: getCompletedWithResult(fakeResult, store.getState()),
+      shouldFlush: false,
+    }),
+  );
+  expect(responders.onDragEnd).toHaveBeenCalledWith(
+    fakeResult,
+    expect.any(Object),
+  );
 });
