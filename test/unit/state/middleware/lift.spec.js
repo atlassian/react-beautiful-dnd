@@ -1,4 +1,5 @@
 // @flow
+import type { CompletedDrag } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import middleware from '../../../../src/state/middleware/lift';
@@ -19,7 +20,7 @@ import {
   preset,
   liftArgs,
   initialPublishArgs,
-  completed,
+  getCompletedArgs,
 } from '../../../utils/preset-action-args';
 
 const getMarshal = (store: Store): DimensionMarshal => {
@@ -66,6 +67,8 @@ it('should flush any animating drops', () => {
   // start a drag
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
+
+  const completed: CompletedDrag = getCompletedArgs('DROP').completed;
 
   // start a drop
   const args: AnimateDropArgs = {

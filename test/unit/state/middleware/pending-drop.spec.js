@@ -19,8 +19,8 @@ import {
   critical,
   publishAdditionArgs,
   initialPublishWithScrollables,
-  completed,
   type DropCompletedArgs,
+  getCompletedArgs,
 } from '../../../utils/preset-action-args';
 
 it('should trigger a drop on a dynamic publish if a drop pending is waiting', () => {
@@ -47,14 +47,9 @@ it('should trigger a drop on a dynamic publish if a drop pending is waiting', ()
   mock.mockReset();
   store.dispatch(publishWhileDragging(publishAdditionArgs));
 
-  TODO;
+  console.log('mock', mock.mock.calls);
+
   expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
-  const result: DropResult = {
-    ...getDragStart(),
-    destination: getHomeLocation(critical.draggable),
-    reason: 'DROP',
-    combine: null,
-  };
   // const completed: CompletedDrag = {
   //   critical,
   //   result,
@@ -65,7 +60,10 @@ it('should trigger a drop on a dynamic publish if a drop pending is waiting', ()
   //   shouldFlush: false,
   // };
   expect(mock).toHaveBeenCalledWith(
-    completeDrop({ completed, shouldFlush: false }),
+    completeDrop({
+      completed: getCompletedArgs('DROP').completed,
+      shouldFlush: false,
+    }),
   );
   expect(mock).toHaveBeenCalledTimes(3);
   expect(store.getState().phase).toBe('IDLE');

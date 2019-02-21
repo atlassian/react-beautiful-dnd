@@ -6,8 +6,8 @@ import middleware from '../../../../src/state/middleware/auto-scroll';
 import {
   animateDropArgs,
   userCancelArgs,
-  completeDropArgs,
   initialPublishArgs,
+  getCompletedArgs,
 } from '../../../utils/preset-action-args';
 import {
   animateDrop,
@@ -23,7 +23,8 @@ const shouldCancelPending: Action[] = [collectionStarting()];
 const shouldStop: Action[] = [
   animateDrop(animateDropArgs),
   animateDrop(userCancelArgs),
-  completeDrop(completeDropArgs),
+  completeDrop(getCompletedArgs('CANCEL')),
+  completeDrop(getCompletedArgs('DROP')),
   clean(),
 ];
 
