@@ -40,11 +40,10 @@ import type {
   Combine,
   CombineImpact,
 } from '../../../../../src/types';
-import noImpact from '../../../../../src/state/no-impact';
 import getDropImpact from '../../../../../src/state/middleware/drop/get-drop-impact';
 import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get-new-home-client-offset';
 
-['DROP' /* , 'CANCEL' */].forEach((reason: DropReason) => {
+['DROP', 'CANCEL'].forEach((reason: DropReason) => {
   describe(`with drop reason: ${reason}`, () => {
     it('should fire a complete drop action is no drop animation is required', () => {
       const mock = jest.fn();
@@ -115,7 +114,7 @@ import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get
       expect(store.getState().phase).toBe('DROP_ANIMATING');
     });
 
-    it('should fire an animate drop action if combining, even if no movement is required', () => {
+    it('should fire an animate drop action if combining', () => {
       const mock = jest.fn();
       const store: Store = createStore(passThrough(mock), middleware);
 
@@ -150,100 +149,58 @@ import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get
       const current: State = store.getState();
       invariant(current.isDragging);
 
-      if (reason === 'DROP') {
-        // impact is cleared when cancelling
-        const merge: ?CombineImpact = current.impact.merge;
-        invariant(merge);
-        const combine: Combine = merge.combine;
-        invariant(combine);
-        // moved forwards past in home2, and then backwards onto it
-        expect(combine).toEqual({
-          draggableId: preset.inHome2.descriptor.id,
-          droppableId: preset.home.descriptor.id,
-        });
+      // if (reason === 'DROP') {
+      // impact is cleared when cancelling
+      const merge: ?CombineImpact = current.impact.merge;
+      invariant(merge);
+      const combine: Combine = merge.combine;
+      invariant(combine);
+      // moved forwards past in home2, and then backwards onto it
+      expect(combine).toEqual({
+        draggableId: preset.inHome2.descriptor.id,
+        droppableId: preset.home.descriptor.id,
+      });
 
-        store.dispatch(drop({ reason }));
-
-        const combineDropImpact: DragImpact = getDropImpact({
-          reason,
-          draggables: preset.draggables,
-          lastImpact: current.impact,
-          home: preset.home,
-          viewport: preset.viewport,
-          onLiftImpact: homeImpact,
-          onLift,
-        }).impact;
-
-        console.log('mock', mock.mock.calls[1][0].payload.completed);
-
-        const completed: CompletedDrag = {
-          critical,
-          impact: combineDropImpact,
-          result: {
-            ...getDragStart(),
-            // we are using snap movements
-            mode: 'SNAP',
-            destination: null,
-            combine,
-            reason,
-          },
-        };
-        const args: AnimateDropArgs = {
-          completed,
-          newHomeClientOffset: getNewHomeClientOffset({
-            impact: combineDropImpact,
-            draggable: preset.inHome1,
-            dimensions: preset.dimensions,
-            viewport: preset.viewport,
-            onLift,
-          }),
-          dropDuration: getDropDuration({
-            current: origin,
-            destination: origin,
-            reason,
-          }),
-        };
-        expect(mock).toHaveBeenCalledWith(drop({ reason }));
-        expect(mock).toHaveBeenCalledWith(animateDrop(args));
-        expect(mock).toHaveBeenCalledTimes(2);
-        expect(store.getState().phase).toBe('DROP_ANIMATING');
-        return;
-      }
-
-      // CANCEL
-      // there will be no animation as we are already in the right spot
       store.dispatch(drop({ reason }));
-      // const result: DropResult = {
-      //   ...getDragStart(),
-      //   mode: 'SNAP',
-      //   reason,
-      //   destination: null,
-      //   combine: null,
-      // };
-      // const completed: CompletedDrag = {
-      //   ...getCompletedArgs(reason).completed,
-      //   result: {
-      //     ...getDragStart(),
-      //     // we are using snap movements
-      //     mode: 'SNAP',
-      //     destination: null,
-      //     combine: null,
-      //     reason,
-      //   },
-      // };
-      // const args: AnimateDropArgs = {
-      //   completed,
-      //   newHomeClientOffset: origin,
-      //   dropDuration: getDropDuration({
-      //     current: origin,
-      //     destination: origin,
-      //     reason,
-      //   }),
-      // };
+
+      const combineDropImpact: DragImpact = getDropImpact({
+        reason,
+        draggables: preset.draggables,
+        lastImpact: current.impact,
+        home: preset.home,
+        viewport: preset.viewport,
+        onLiftImpact: homeImpact,
+        onLift,
+      }).impact;
+
+      const completed: CompletedDrag = {
+        critical,
+        impact: combineDropImpact,
+        result: {
+          ...getDragStart(),
+          // we are using snap movements
+          mode: 'SNAP',
+          destination: null,
+          combine: reason === 'DROP' ? combine : null,
+          reason,
+        },
+      };
+      const args: AnimateDropArgs = {
+        completed,
+        newHomeClientOffset: getNewHomeClientOffset({
+          impact: combineDropImpact,
+          draggable: preset.inHome1,
+          dimensions: preset.dimensions,
+          viewport: preset.viewport,
+          onLift,
+        }),
+        // $ExpectError - wrong type
+        dropDuration: expect.any(Number),
+      };
       expect(mock).toHaveBeenCalledWith(drop({ reason }));
-      expect(mock).toHaveBeenCalledWith(completeDrop(getCompletedArgs(reason)));
+      expect(mock).toHaveBeenCalledWith(animateDrop(args));
       expect(mock).toHaveBeenCalledTimes(2);
-      expect(store.getState().phase).toBe('IDLE');
+      expect(store.getState().phase).toBe('DROP_ANIMATING');
     });
   });
 });

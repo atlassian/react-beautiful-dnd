@@ -117,12 +117,11 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     impact,
   };
 
-  // Do not animate if you do not need to.
-  // Animate the drop if:
-  // - not already in the right spot OR
-  // - doing a combine (we still want to animate the scale and opacity fade)
   const isAnimationRequired: boolean =
+    // 1. not already in the right spot
     !isEqual(state.current.client.offset, newHomeClientOffset) ||
+    // 2. doing a combine (we still want to animate the scale and opacity fade)
+    // looking at the result and not the impact as the combine impact is cleared
     Boolean(result.combine);
 
   if (!isAnimationRequired) {
