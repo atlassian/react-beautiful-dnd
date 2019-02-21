@@ -9,10 +9,12 @@ import {
   initialPublish,
   move,
   moveDown,
-  type InitialPublishArgs,
   updateDroppableIsCombineEnabled,
   moveUp,
+  type InitialPublishArgs,
+  type AnimateDropArgs,
 } from '../../../../../src/state/action-creators';
+import type { Store } from '../../../../../src/state/store-types';
 import middleware from '../../../../../src/state/middleware/drop';
 import getDropDuration from '../../../../../src/state/middleware/drop/get-drop-duration';
 import { add, origin } from '../../../../../src/state/position';
@@ -20,12 +22,15 @@ import {
   preset,
   getDragStart,
   initialPublishArgs,
+  homeImpact,
+  critical,
+  getCompletedArgs,
 } from '../../../../utils/preset-action-args';
 import createStore from '../util/create-store';
 import passThrough from '../util/pass-through-middleware';
 import type {
   DropResult,
-  PendingDrop,
+  CompletedDrag,
   DraggableLocation,
   DropReason,
   DragImpact,
@@ -33,14 +38,11 @@ import type {
   Combine,
   CombineImpact,
 } from '../../../../../src/types';
-import type { Store } from '../../../../../src/state/store-types';
 import noImpact from '../../../../../src/state/no-impact';
 
-['DROP', 'CANCEL'].forEach((reason: DropReason) => {
+[/* 'DROP', */ 'CANCEL'].forEach((reason: DropReason) => {
   describe(`with drop reason: ${reason}`, () => {
-    it('should fire a complete drop action is no drop animation is required', () => {
-      const destination: ?DraggableLocation =
-        reason === 'CANCEL' ? null : getDragStart().source;
+    it.only('should fire a complete drop action is no drop animation is required', () => {
       const mock = jest.fn();
       const store: Store = createStore(passThrough(mock), middleware);
 
@@ -52,14 +54,8 @@ import noImpact from '../../../../../src/state/no-impact';
       mock.mockReset();
       store.dispatch(drop({ reason }));
 
-      const result: DropResult = {
-        ...getDragStart(),
-        destination,
-        reason,
-        combine: null,
-      };
       expect(mock).toHaveBeenCalledWith(drop({ reason }));
-      expect(mock).toHaveBeenCalledWith(completeDrop(result));
+      expect(mock).toHaveBeenCalledWith(completeDrop(getCompletedArgs(reason)));
       expect(mock).toHaveBeenCalledTimes(2);
 
       // reset to initial phase
@@ -90,7 +86,19 @@ import noImpact from '../../../../../src/state/no-impact';
       mock.mockReset();
       store.dispatch(drop({ reason }));
 
-      const pending: PendingDrop = {
+      const result: DropResult = {
+        ...getDragStart(),
+        destination,
+        reason,
+        combine: null,
+      };
+      const completed: CompletedDrag = {
+        result,
+        impact: homeImpact,
+        critical,
+      };
+      const args: AnimateDropArgs = {
+        completed,
         newHomeClientOffset: origin,
         impact,
         dropDuration: getDropDuration({
@@ -98,15 +106,9 @@ import noImpact from '../../../../../src/state/no-impact';
           destination: origin,
           reason,
         }),
-        result: {
-          ...getDragStart(),
-          destination,
-          combine: null,
-          reason,
-        },
       };
       expect(mock).toHaveBeenCalledWith(drop({ reason }));
-      expect(mock).toHaveBeenCalledWith(animateDrop(pending));
+      expect(mock).toHaveBeenCalledWith(animateDrop(args));
       expect(mock).toHaveBeenCalledTimes(2);
       expect(store.getState().phase).toBe('DROP_ANIMATING');
     });

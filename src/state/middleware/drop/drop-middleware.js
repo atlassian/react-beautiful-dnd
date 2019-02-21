@@ -121,12 +121,12 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   // Animate the drop if:
   // - not already in the right spot OR
   // - doing a combine (we still want to animate the scale and opacity fade)
-  // TODO: what about the placeholder that needs to animate??
   const isAnimationRequired: boolean =
     !isEqual(state.current.client.offset, newHomeClientOffset) ||
     Boolean(result.combine);
 
   if (!isAnimationRequired) {
+    console.log('completing');
     dispatch(completeDrop({ completed, shouldFlush: false }));
     return;
   }

@@ -2,6 +2,7 @@
 import type { Position } from 'css-box-model';
 import type {
   Critical,
+  DropReason,
   DropResult,
   DragStart,
   DimensionMap,
@@ -9,6 +10,7 @@ import type {
   DroppableDimension,
   Published,
   CompletedDrag,
+  DraggableLocation,
 } from '../../src/types';
 import type {
   DropCompleteArgs,
@@ -108,9 +110,24 @@ export const completed: CompletedDrag = {
   impact: homeImpact,
 };
 
-export const completeDropArgs: DropCompleteArgs = {
-  completed,
-  shouldFlush: false,
+export const getCompletedArgs = (reason: DropReason): DropCompleteArgs => {
+  const destination: ?DraggableLocation =
+    reason === 'CANCEL' ? null : getDragStart().source;
+
+  const customResult: DropResult = {
+    ...getDragStart(),
+    destination,
+    reason,
+    combine: null,
+  };
+
+  const customCompleted: CompletedDrag = {
+    result: customResult,
+    impact: homeImpact,
+    critical,
+  };
+
+  return { completed: customCompleted, shouldFlush: false };
 };
 
 export const animateDropArgs: AnimateDropArgs = {

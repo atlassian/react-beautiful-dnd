@@ -38,44 +38,46 @@ export default ({
   const didDropInsideDroppable: boolean =
     reason === 'DROP' && Boolean(whatIsDraggedOver(lastImpact));
 
-  if (didDropInsideDroppable) {
-    if (lastImpact.destination) {
-      return {
-        impact: lastImpact,
-        didDropInsideDroppable,
-      };
-    }
+  if (!didDropInsideDroppable) {
+    // Dropping outside of a list or the drag was cancelled
 
-    // When merging we remove the movement so that everything
-    // will animate closed
-    const withoutMovement: DragImpact = {
-      ...lastImpact,
-      movement: noMovement,
-    };
+    // Going to use the on lift impact
+    // Need to recompute the visibility of the original impact
+    // What is visible can be different to when  the drag started
+
+    const impact: DragImpact = recompute({
+      impact: onLiftImpact,
+      destination: home,
+      viewport,
+      draggables,
+      onLift,
+      // We need the draggables to animate back to their positions
+      forceShouldAnimate: true,
+    });
 
     return {
-      impact: withoutMovement,
+      impact,
       didDropInsideDroppable,
     };
   }
 
-  // Dropping outside of a list or the drag was cancelled
+  // use the existing impact
+  if (lastImpact.destination) {
+    return {
+      impact: lastImpact,
+      didDropInsideDroppable,
+    };
+  }
 
-  // Going to use the on lift impact
-  // Need to recompute the visibility of the original impact
-  // What is visible can be different to when  the drag started
-  const impact: DragImpact = recompute({
-    impact: onLiftImpact,
-    destination: home,
-    viewport,
-    draggables,
-    onLift,
-    // We need the draggables to animate back to their positions
-    forceShouldAnimate: true,
-  });
+  // When merging we remove the movement so that everything
+  // will animate closed
+  const withoutMovement: DragImpact = {
+    ...lastImpact,
+    movement: noMovement,
+  };
 
   return {
-    impact,
+    impact: withoutMovement,
     didDropInsideDroppable,
   };
 };

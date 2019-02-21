@@ -2,7 +2,6 @@
 import type { Position } from 'css-box-model';
 import type {
   DroppableDimension,
-  Viewport,
   Axis,
   DragImpact,
   DisplacedBy,
@@ -10,12 +9,7 @@ import type {
   DimensionMap,
 } from '../../../../../src/types';
 import { vertical, horizontal } from '../../../../../src/state/axis';
-import {
-  add,
-  negate,
-  subtract,
-  origin,
-} from '../../../../../src/state/position';
+import { negate, subtract, origin } from '../../../../../src/state/position';
 import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
 import { getPreset, makeScrollable } from '../../../../utils/dimension';
 import getNotAnimatedDisplacement from '../../../../utils/get-displacement/get-not-animated-displacement';
