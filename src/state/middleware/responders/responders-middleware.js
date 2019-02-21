@@ -36,6 +36,8 @@ export default (
 
     // Drag end
     if (action.type === 'DROP_COMPLETE') {
+      // it is important that we use the result and not the last impact
+      // the last impact might be different to the result for visual reasons
       const result: DropResult = action.payload.completed.result;
       // flushing all pending responders before snapshots are updated
       publisher.flush();
