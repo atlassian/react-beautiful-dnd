@@ -4,6 +4,7 @@ import type {
   Critical,
   DropReason,
   DropResult,
+  DragImpact,
   DragStart,
   DimensionMap,
   DraggableDimension,
@@ -22,6 +23,7 @@ import { getPreset, getDraggableDimension, makeScrollable } from './dimension';
 import { offsetByPosition } from '../../src/state/spacing';
 import getHomeLocation from '../../src/state/get-home-location';
 import getHomeOnLift from '../../src/state/get-home-on-lift';
+import getDropImpact from '../../src/state/middleware/drop/get-drop-impact';
 
 // In case a consumer needs the references
 export const preset = getPreset();
@@ -104,11 +106,22 @@ const result: DropResult = {
   combine: null,
 };
 
-export const completed: CompletedDrag = {
-  critical,
-  result,
-  impact: homeImpact,
-};
+// export const completed: CompletedDrag = {
+//   critical,
+//   result,
+//   impact: homeImpact,
+// };
+
+export const getDropImpactForReason = (reason: DropReason): DragImpact =>
+  getDropImpact({
+    reason,
+    draggables: preset.draggables,
+    lastImpact: homeImpact,
+    home: preset.home,
+    viewport: preset.viewport,
+    onLiftImpact: homeImpact,
+    onLift,
+  }).impact;
 
 export const getCompletedArgs = (reason: DropReason): DropCompleteArgs => {
   const destination: ?DraggableLocation =
@@ -121,17 +134,23 @@ export const getCompletedArgs = (reason: DropReason): DropCompleteArgs => {
     combine: null,
   };
 
-  const customCompleted: CompletedDrag = {
+  const completed: CompletedDrag = {
     result: customResult,
-    impact: homeImpact,
+    impact: getDropImpactForReason(reason),
     critical,
   };
 
-  return { completed: customCompleted, shouldFlush: false };
+  return { completed, shouldFlush: false };
+};
+
+const droppedOnHome: CompletedDrag = {
+  result,
+  impact: getDropImpactForReason('DROP'),
+  critical,
 };
 
 export const animateDropArgs: AnimateDropArgs = {
-  completed,
+  completed: droppedOnHome,
   dropDuration: 1,
   newHomeClientOffset: { x: 10, y: 10 },
 };
@@ -139,9 +158,9 @@ export const animateDropArgs: AnimateDropArgs = {
 export const userCancelArgs: AnimateDropArgs = {
   ...animateDropArgs,
   completed: {
-    ...completed,
+    ...droppedOnHome,
     result: {
-      ...completed.result,
+      ...droppedOnHome.result,
       reason: 'CANCEL',
     },
   },
