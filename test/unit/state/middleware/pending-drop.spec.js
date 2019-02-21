@@ -1,27 +1,22 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { State, DropResult } from '../../../../src/types';
+import type { State } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
+import {
+  collectionStarting,
+  completeDrop,
+  drop,
+  initialPublish,
+  publishWhileDragging,
+} from '../../../../src/state/action-creators';
+import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
 import middleware from '../../../../src/state/middleware/pending-drop';
+import {
+  initialPublishWithScrollables,
+  publishAdditionArgs,
+} from '../../../utils/preset-action-args';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
-import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
-import getHomeLocation from '../../../../src/state/get-home-location';
-import {
-  initialPublish,
-  drop,
-  completeDrop,
-  publishWhileDragging,
-  collectionStarting,
-} from '../../../../src/state/action-creators';
-import {
-  getDragStart,
-  critical,
-  publishAdditionArgs,
-  initialPublishWithScrollables,
-  type DropCompletedArgs,
-  getCompletedArgs,
-} from '../../../utils/preset-action-args';
 
 it('should trigger a drop on a dynamic publish if a drop pending is waiting', () => {
   const mock = jest.fn();
@@ -47,21 +42,12 @@ it('should trigger a drop on a dynamic publish if a drop pending is waiting', ()
   mock.mockReset();
   store.dispatch(publishWhileDragging(publishAdditionArgs));
 
-  console.log('mock', mock.mock.calls);
-
   expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
-  // const completed: CompletedDrag = {
-  //   critical,
-  //   result,
-  //   impact,
-  // };
-  // const expected: DropCompletedArgs = {
-  //   completed,
-  //   shouldFlush: false,
-  // };
+
   expect(mock).toHaveBeenCalledWith(
     completeDrop({
-      completed: getCompletedArgs('DROP').completed,
+      // $ExpectError - this calculation is not completed by this module and it is non trival
+      completed: expect.any(Object),
       shouldFlush: false,
     }),
   );
