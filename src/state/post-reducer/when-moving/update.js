@@ -115,8 +115,6 @@ export default ({
     dimensions: withUpdatedPlaceholders,
     impact: newImpact,
     viewport,
-    // after initial render all droppable placeholders are animated
-    shouldAnimatePlaceholder: true,
     scrollJumpRequest: scrollJumpRequest || null,
     // client updates can be applied as a part of a jump scroll
     // this can be to immediately reverse movement to allow for a nice animation

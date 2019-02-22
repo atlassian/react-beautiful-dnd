@@ -197,14 +197,7 @@ describe('foreign list', () => {
         withCombineImpact(base.impact, combine),
       );
       const props: MapProps = selector(withCombine, ownProps);
-
-      const expected: MapProps = {
-        isDraggingOver: true,
-        draggingOverWith: preset.inHome1.descriptor.id,
-        // placeholder when over foreign list
-        placeholder: preset.inHome1.placeholder,
-      };
-      expect(props).toEqual(expected);
+      expect(props).toEqual(isOverForeignMapProps);
     });
 
     it('should not break memoization between moves', () => {
@@ -220,13 +213,7 @@ describe('foreign list', () => {
       const props2: MapProps = selector(second, ownProps);
       const props3: MapProps = selector(third, ownProps);
 
-      const expected: MapProps = {
-        isDraggingOver: true,
-        draggingOverWith: preset.inHome1.descriptor.id,
-        // using placeholder when in foreign list
-        placeholder: preset.inHome1.placeholder,
-      };
-      expect(props1).toEqual(expected);
+      expect(props1).toEqual(isOverForeignMapProps);
       // memoization check
       expect(props2).toBe(props1);
       expect(props3).toBe(props1);

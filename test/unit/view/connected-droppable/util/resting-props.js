@@ -6,7 +6,7 @@ const restingProps: MapProps = {
   draggingOverWith: null,
   draggingFromThisWith: null,
   placeholder: null,
-  shouldAnimatePlaceholder: false,
+  shouldAnimatePlaceholder: true,
 };
 
 export default restingProps;

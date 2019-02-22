@@ -28,7 +28,7 @@ import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-
 import getVisibleDisplacement from '../../../utils/get-displacement/get-visible-displacement';
 import getNotVisibleDisplacement from '../../../utils/get-displacement/get-not-visible-displacement';
 import getHomeLocation from '../../../../src/state/get-home-location';
-import cloneImpact from './util/clone-impact';
+import cloneImpact from '../../../utils/clone-impact';
 
 const preset = getPreset();
 const state = getStatePreset();

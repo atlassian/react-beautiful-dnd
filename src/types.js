@@ -317,8 +317,6 @@ export type DraggingState = {|
   userDirection: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
-  // will be false on first render and then true for every othe render
-  shouldAnimatePlaceholder: boolean,
   onLift: OnLift,
   onLiftImpact: DragImpact,
   // when there is a fixed list we want to opt out of this behaviour

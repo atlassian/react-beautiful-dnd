@@ -97,8 +97,6 @@ export default (axis?: Axis = vertical) => {
       viewport,
       scrollJumpRequest: null,
       forceShouldAnimate: null,
-      // this will be true after any update
-      shouldAnimatePlaceholder: false,
     };
 
     return result;

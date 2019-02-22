@@ -28,17 +28,17 @@ import isStrictEqual from '../is-strict-equal';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../state/action-creators';
 
-const withoutAnimation: MapProps = {
+const idle: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
   draggingFromThisWith: null,
   placeholder: null,
-  shouldAnimatePlaceholder: false,
+  shouldAnimatePlaceholder: true,
 };
 
-const withAnimation: MapProps = {
-  ...withoutAnimation,
-  shouldAnimatePlaceholder: true,
+const idleWithoutAnimation: MapProps = {
+  ...idle,
+  shouldAnimatePlaceholder: false,
 };
 
 const isMatchingType = (type: TypeId, critical: Critical): boolean =>
@@ -48,12 +48,6 @@ const shouldCollapseHomeAfterDrag = (
   id: DroppableId,
   completed: CompletedDrag,
 ): boolean => {
-  const isHome: boolean = completed.critical.droppable.id === id;
-
-  if (!isHome) {
-    return false;
-  }
-
   // should not animated when dropping into no list (will be returning to home list)
   // should animate collapse when dropping into a foreign list
 
@@ -114,8 +108,6 @@ export const makeMapStateToProps = (): Selector => {
     id: DroppableId,
     draggable: DraggableDimension,
     impact: DragImpact,
-    isDropAnimating: boolean,
-    shouldAnimatePlaceholder: boolean,
   ): MapProps => {
     const isOver: boolean = whatIsDraggedOver(impact) === id;
     const isHome: boolean = draggable.descriptor.droppableId === id;
@@ -124,6 +116,7 @@ export const makeMapStateToProps = (): Selector => {
       const draggingFromThisWith: ?DraggableId = isHome
         ? draggable.descriptor.id
         : null;
+      const shouldAnimatePlaceholder: boolean = !isHome;
 
       return getDraggingOverMapProps(
         draggable.descriptor.id,
@@ -136,7 +129,7 @@ export const makeMapStateToProps = (): Selector => {
     // not over the list
 
     if (!isHome) {
-      return withAnimation;
+      return idle;
     }
 
     // showing a placeholder in the home list during a drag to prevent
@@ -160,51 +153,48 @@ export const makeMapStateToProps = (): Selector => {
 
     if (state.isDragging) {
       const critical: Critical = state.critical;
-
       if (!isMatchingType(type, critical)) {
-        return withoutAnimation;
+        return idle;
       }
 
       return getMapProps(
         id,
         getDraggable(critical, state.dimensions),
         state.impact,
-        false,
-        state.shouldAnimatePlaceholder,
       );
     }
 
     if (state.phase === 'DROP_ANIMATING') {
       const completed: CompletedDrag = state.completed;
-
       if (!isMatchingType(type, completed.critical)) {
-        return withoutAnimation;
+        return idle;
       }
 
       return getMapProps(
         id,
         getDraggable(completed.critical, state.dimensions),
         completed.impact,
-        true,
-        true,
       );
     }
 
     if (state.phase === 'IDLE' && state.completed) {
       const completed: CompletedDrag = state.completed;
-
       if (!isMatchingType(type, completed.critical)) {
-        return withoutAnimation;
+        return idle;
       }
 
-      if (!shouldCollapseHomeAfterDrag(id, completed)) {
-        return withoutAnimation;
+      const isHome: boolean = completed.critical.droppable.id === id;
+
+      if (!isHome) {
+        return idle;
       }
 
-      return withAnimation;
+      return shouldCollapseHomeAfterDrag(id, completed)
+        ? idle
+        : idleWithoutAnimation;
     }
 
-    return withoutAnimation;
+    return idle;
   };
 
   return selector;
