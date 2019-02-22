@@ -80,12 +80,11 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     dimensions.draggables[state.critical.draggable.id];
 
   // only populating destination / combine if 'didDropInsideDroppable' is true
-  const destination: ?DraggableLocation =
-    didDropInsideDroppable && impact ? impact.destination : null;
+  const destination: ?DraggableLocation = didDropInsideDroppable
+    ? impact.destination
+    : null;
   const combine: ?Combine =
-    didDropInsideDroppable && impact && impact.merge
-      ? impact.merge.combine
-      : null;
+    didDropInsideDroppable && impact.merge ? impact.merge.combine : null;
 
   const source: DraggableLocation = {
     index: critical.draggable.index,
