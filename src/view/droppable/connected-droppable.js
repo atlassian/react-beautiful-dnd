@@ -184,14 +184,26 @@ export const makeMapStateToProps = (): Selector => {
       }
 
       const isHome: boolean = completed.critical.droppable.id === id;
+      const wasOverId: ?DroppableId = whatIsDraggedOver(completed.impact);
+      const wasOver: boolean = Boolean(wasOverId) && wasOverId === id;
 
       if (!isHome) {
+        return wasOver ? idleWithoutAnimation : idle;
+      }
+
+      // this is the home list
+
+      // animate collapse after drop if over home list and merging
+      if (wasOver && completed.impact.merge) {
         return idle;
       }
 
-      return shouldCollapseHomeAfterDrag(id, completed)
-        ? idle
-        : idleWithoutAnimation;
+      // animate collapse after drop if over foreign list
+      if (Boolean(wasOverId) && !wasOver) {
+        return idle;
+      }
+
+      return idleWithoutAnimation;
     }
 
     return idle;
