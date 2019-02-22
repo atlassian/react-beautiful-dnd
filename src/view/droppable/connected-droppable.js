@@ -193,7 +193,7 @@ export const makeMapStateToProps = (): Selector => {
 
       // this is the home list
 
-      // might need to opt out of any animation
+      // might need to opt out of any home placeholder collapse animation
       if (state.shouldFlush) {
         return idleWithoutAnimation;
       }
