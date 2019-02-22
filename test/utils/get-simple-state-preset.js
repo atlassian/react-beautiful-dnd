@@ -170,7 +170,9 @@ export default (axis?: Axis = vertical) => {
         droppableId: draggable.descriptor.droppableId,
         index: draggable.descriptor.index,
       },
-      destination: getHomeLocation(draggable.descriptor),
+      // no destination when cancelling for result
+      destination:
+        reason === 'DROP' ? getHomeLocation(draggable.descriptor) : null,
       reason,
       combine: null,
       mode: 'FLUID',
