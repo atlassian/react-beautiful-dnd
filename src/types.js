@@ -295,6 +295,7 @@ export type CompletedDrag = {|
 export type IdleState = {|
   phase: 'IDLE',
   completed: ?CompletedDrag,
+  shouldFlush: boolean,
 |};
 
 export type DraggableIdMap = {

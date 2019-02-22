@@ -435,7 +435,8 @@ export default (state: State = idle, action: Action): State => {
 
     return {
       phase: 'IDLE',
-      completed: shouldFlush ? null : completed,
+      completed,
+      shouldFlush,
     };
   }
 

@@ -193,6 +193,11 @@ export const makeMapStateToProps = (): Selector => {
 
       // this is the home list
 
+      // might need to opt out of any animation
+      if (state.shouldFlush) {
+        return idleWithoutAnimation;
+      }
+
       // animate collapse after drop if over home list and merging
       if (wasOver && completed.impact.merge) {
         return idle;
