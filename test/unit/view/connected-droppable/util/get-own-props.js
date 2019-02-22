@@ -1,6 +1,6 @@
 // @flow
-import type { DroppableDimension } from '../../../../src/types';
-import type { OwnProps } from '../../../../src/view/droppable/droppable-types';
+import type { DroppableDimension } from '../../../../../src/types';
+import type { OwnProps } from '../../../../../src/view/droppable/droppable-types';
 
 export default (dimension: DroppableDimension): OwnProps => ({
   droppableId: dimension.descriptor.id,

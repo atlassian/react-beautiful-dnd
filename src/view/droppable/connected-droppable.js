@@ -105,7 +105,8 @@ export const makeMapStateToProps = (): Selector => {
       draggingFromThisWith,
       draggingOverWith: null,
       placeholder,
-      shouldAnimatePlaceholder: true,
+      // placeholder can only animated after drag finish
+      shouldAnimatePlaceholder: false,
     }),
   );
 

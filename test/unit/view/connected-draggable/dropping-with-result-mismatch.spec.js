@@ -8,14 +8,8 @@ import type {
   OwnProps,
   MapProps,
 } from '../../../../src/view/draggable/draggable-types';
-import type {
-  DropAnimatingState,
-  DragImpact,
-  Combine,
-} from '../../../../src/types';
-import { curves, combine as combineStyle } from '../../../../src/animation';
-import { forward } from '../../../../src/state/user-direction/user-direction-preset';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import type { DropAnimatingState } from '../../../../src/types';
+import { curves } from '../../../../src/animation';
 
 const preset = getPreset();
 const state = getStatePreset();
