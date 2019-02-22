@@ -10,14 +10,12 @@ import type {
 } from '../../../../src/view/draggable/draggable-types';
 import type {
   DropAnimatingState,
-  DisplacedBy,
-  Axis,
   DragImpact,
   Combine,
 } from '../../../../src/types';
 import { curves, combine as combineStyle } from '../../../../src/animation';
-import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
+import getHomeOnLift from '../../../../src/state/get-home-on-lift';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -32,13 +30,13 @@ describe('dropping', () => {
         dimension: preset.inHome1,
         draggingOver: preset.home.descriptor.id,
         forceShouldAnimate: null,
-        offset: current.pending.newHomeClientOffset,
-        mode: current.pending.result.mode,
+        offset: current.newHomeClientOffset,
+        mode: current.completed.result.mode,
         combineWith: null,
         dropping: {
-          duration: current.pending.dropDuration,
+          duration: current.dropDuration,
           curve: curves.drop,
-          moveTo: current.pending.newHomeClientOffset,
+          moveTo: current.newHomeClientOffset,
           opacity: null,
           scale: null,
         },
@@ -52,42 +50,30 @@ describe('dropping', () => {
   });
 
   it('should maintain combine information', () => {
-    const withoutCombine: DropAnimatingState = state.dropAnimating();
-    const axis: Axis = preset.home.axis;
-    const willDisplaceForward: boolean = false;
-    const displacedBy: DisplacedBy = getDisplacedBy(
-      axis,
-      preset.inHome1.displaceBy,
-      willDisplaceForward,
-    );
+    const { impact: homeImpact } = getHomeOnLift({
+      draggable: preset.inHome1,
+      home: preset.home,
+      draggables: preset.draggables,
+      viewport: preset.viewport,
+    });
     const combine: Combine = {
       draggableId: preset.inHome2.descriptor.id,
       droppableId: preset.inHome2.descriptor.droppableId,
     };
     const impact: DragImpact = {
-      movement: {
-        displaced: [],
-        map: {},
-        displacedBy,
-        willDisplaceForward,
-      },
-      direction: preset.home.axis.direction,
+      ...homeImpact,
       destination: null,
       merge: {
         whenEntered: forward,
         combine,
       },
     };
+    const withoutCombine: DropAnimatingState = state.dropAnimating();
     const withCombine: DropAnimatingState = {
       ...withoutCombine,
-      pending: {
-        ...withoutCombine.pending,
+      completed: {
+        ...withoutCombine.completed,
         impact,
-        result: {
-          ...withoutCombine.pending.result,
-          destination: null,
-          combine,
-        },
       },
     };
 
@@ -97,13 +83,13 @@ describe('dropping', () => {
         dimension: preset.inHome1,
         draggingOver: preset.home.descriptor.id,
         forceShouldAnimate: null,
-        offset: withCombine.pending.newHomeClientOffset,
-        mode: withCombine.pending.result.mode,
+        offset: withCombine.newHomeClientOffset,
+        mode: withCombine.completed.result.mode,
         combineWith: preset.inHome2.descriptor.id,
         dropping: {
-          duration: withCombine.pending.dropDuration,
+          duration: withCombine.dropDuration,
           curve: curves.drop,
-          moveTo: withCombine.pending.newHomeClientOffset,
+          moveTo: withCombine.newHomeClientOffset,
           scale: combineStyle.scale.drop,
           opacity: combineStyle.opacity.drop,
         },
