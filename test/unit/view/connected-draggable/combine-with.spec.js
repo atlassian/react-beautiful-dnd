@@ -1,37 +1,46 @@
 // @flow
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
-import { getPreset } from '../../../utils/dimension';
+import type {
+  Axis,
+  DragImpact,
+  DisplacedBy,
+  Displacement,
+} from '../../../../src/types';
 import type {
   Selector,
   OwnProps,
   MapProps,
 } from '../../../../src/view/draggable/draggable-types';
+import { getPreset } from '../../../utils/dimension';
 import {
   move,
   draggingStates,
   withImpact,
   type IsDraggingState,
 } from '../../../utils/dragging-state';
-import type { Axis, DragImpact, DisplacedBy } from '../../../../src/types';
 import getOwnProps from './util/get-own-props';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
+import getDisplacementMap from '../../../../src/state/get-displacement-map';
+import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-animated-displacement';
 
 const preset = getPreset();
 const ownProps: OwnProps = getOwnProps(preset.inHome1);
 const axis: Axis = preset.home.axis;
-const willDisplaceForward: boolean = false;
 const displacedBy: DisplacedBy = getDisplacedBy(
   axis,
   preset.inHome1.displaceBy,
-  willDisplaceForward,
 );
+const displaced: Displacement[] = [
+  getNotAnimatedDisplacement(preset.inHome2),
+  getNotAnimatedDisplacement(preset.inHome3),
+  getNotAnimatedDisplacement(preset.inHome4),
+];
 const impact: DragImpact = {
   movement: {
-    displaced: [],
-    map: {},
+    displaced,
+    map: getDisplacementMap(displaced),
     displacedBy,
-    willDisplaceForward,
   },
   direction: preset.home.axis.direction,
   destination: null,
