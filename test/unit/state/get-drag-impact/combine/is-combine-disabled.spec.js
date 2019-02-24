@@ -78,7 +78,6 @@ import getNotAnimatedDisplacement from '../../../../utils/get-displacement/get-n
             map: getDisplacementMap(displaced),
             displacedBy: getDisplacedBy(axis, preset.inHome2.displaceBy),
           },
-          direction: axis.direction,
           destination: null,
           merge: {
             whenEntered: forward,

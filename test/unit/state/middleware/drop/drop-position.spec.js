@@ -60,7 +60,6 @@ import patchDroppableMap from '../../../../../src/state/patch-droppable-map';
           map: getDisplacementMap(displaced),
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
         destination: {
           index: preset.inHome2.descriptor.index,
@@ -105,7 +104,6 @@ import patchDroppableMap from '../../../../../src/state/patch-droppable-map';
           map: getDisplacementMap(displaced),
           displacedBy,
         },
-        direction: axis.direction,
         destination: null,
         merge: {
           whenEntered: forward,

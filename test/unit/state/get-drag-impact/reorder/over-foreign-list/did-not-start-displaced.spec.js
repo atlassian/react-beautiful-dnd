@@ -84,7 +84,6 @@ import beforePoint from '../../../../../utils/before-point';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           destination: {
             // is now in position of inForeign3
             droppableId: preset.foreign.descriptor.id,
@@ -107,7 +106,6 @@ import beforePoint from '../../../../../utils/before-point';
           map: getDisplacementMap(displaced),
           displacedBy,
         },
-        direction: axis.direction,
         destination: {
           // is now in position of inForeign2
           droppableId: preset.inForeign2.descriptor.droppableId,
@@ -170,7 +168,6 @@ import beforePoint from '../../../../../utils/before-point';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           destination: {
             // is now in position of inForeign3
             droppableId: preset.inForeign3.descriptor.droppableId,

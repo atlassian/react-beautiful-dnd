@@ -149,7 +149,6 @@ const viewport: Viewport = getViewport();
           map: getDisplacementMap(displaced),
           displacedBy,
         },
-        direction: axis.direction,
         // moved into the first position
         destination: {
           droppableId: droppable.descriptor.id,
@@ -277,7 +276,6 @@ const viewport: Viewport = getViewport();
           map: getDisplacementMap(displaced),
           displacedBy,
         },
-        direction: axis.direction,
         // moved into the first position
         destination: {
           droppableId: droppable.descriptor.id,

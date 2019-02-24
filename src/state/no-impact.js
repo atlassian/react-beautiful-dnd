@@ -15,7 +15,6 @@ export const noMovement: DragMovement = {
 
 const noImpact: DragImpact = {
   movement: noMovement,
-  direction: null,
   destination: null,
   merge: null,
 };

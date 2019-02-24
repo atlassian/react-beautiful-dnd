@@ -36,7 +36,6 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
           displaced: [],
           map: {},
         },
-        direction: axis.direction,
         // moving into the last position
         destination: {
           index: 0,

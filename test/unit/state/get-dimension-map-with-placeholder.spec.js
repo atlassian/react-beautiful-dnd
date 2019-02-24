@@ -75,7 +75,6 @@ import patchDroppableMap from '../../../src/state/patch-droppable-map';
           displaced,
           map: getDisplacementMap(displaced),
         },
-        direction: preset.foreign.axis.direction,
         merge: null,
         destination: {
           index: preset.inForeign1.descriptor.index,
@@ -117,7 +116,6 @@ import patchDroppableMap from '../../../src/state/patch-droppable-map';
           displaced: displaced2,
           map: getDisplacementMap(displaced2),
         },
-        direction: preset.foreign.axis.direction,
         merge: null,
         destination: {
           index: preset.inForeign2.descriptor.index,
@@ -154,7 +152,6 @@ import patchDroppableMap from '../../../src/state/patch-droppable-map';
           displaced,
           map: getDisplacementMap(displaced),
         },
-        direction: preset.foreign.axis.direction,
         merge: null,
         destination: {
           index: preset.inForeign1.descriptor.index,

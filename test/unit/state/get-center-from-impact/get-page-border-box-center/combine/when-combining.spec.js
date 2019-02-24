@@ -51,7 +51,6 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           destination: null,
           merge: {
             whenEntered: forward,
@@ -86,7 +85,6 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           destination: null,
           merge: {
             whenEntered: backward,
@@ -130,7 +128,6 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           destination: null,
           merge: {
             whenEntered: backward,
@@ -170,7 +167,6 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           destination: null,
           merge: {
             whenEntered: backward,

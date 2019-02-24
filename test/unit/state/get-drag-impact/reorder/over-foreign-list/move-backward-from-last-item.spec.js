@@ -43,7 +43,6 @@ import getDisplacementMap from '../../../../../../src/state/get-displacement-map
           map: {},
           displacedBy,
         },
-        direction: axis.direction,
         // after last item
         destination: {
           index: preset.inForeign4.descriptor.index + 1,
@@ -72,7 +71,6 @@ import getDisplacementMap from '../../../../../../src/state/get-displacement-map
           displaced,
           map: getDisplacementMap(displaced),
         },
-        direction: axis.direction,
         // now in visual spot of inForeign4
         destination: {
           index: preset.inForeign4.descriptor.index,

@@ -72,7 +72,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           displaced,
           map: getDisplacementMap(displaced),
         },
-        direction: axis.direction,
         destination: {
           index: preset.inHome3.descriptor.index,
           droppableId: preset.home.descriptor.id,
@@ -152,7 +151,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           displaced,
           map: getDisplacementMap(displaced),
         },
-        direction: axis.direction,
         destination: {
           index: preset.inHome2.descriptor.index,
           droppableId: preset.home.descriptor.id,

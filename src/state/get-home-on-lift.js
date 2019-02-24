@@ -79,7 +79,6 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
 
   const impact: DragImpact = {
     movement,
-    direction: home.axis.direction,
     destination: getHomeLocation(draggable.descriptor),
     merge: null,
   };

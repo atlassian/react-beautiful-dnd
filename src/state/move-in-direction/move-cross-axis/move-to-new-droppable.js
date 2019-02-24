@@ -2,7 +2,6 @@
 import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import type {
-  Axis,
   DragImpact,
   DraggableDimension,
   DraggableDimensionMap,
@@ -45,8 +44,6 @@ export default ({
   viewport,
   onLift,
 }: Args): ?DragImpact => {
-  const axis: Axis = destination.axis;
-
   if (!moveRelativeTo) {
     // Draggables available, but none are candidates for movement
     if (insideDestination.length) {
@@ -56,7 +53,6 @@ export default ({
     // Try move to top of empty list if it is visible
     const proposed: DragImpact = {
       movement: noMovement,
-      direction: axis.direction,
       destination: {
         droppableId: destination.descriptor.id,
         index: 0,
@@ -138,7 +134,6 @@ export default ({
       displaced,
       map: getDisplacementMap(displaced),
     },
-    direction: axis.direction,
     destination: {
       droppableId: destination.descriptor.id,
       index: proposedIndex,

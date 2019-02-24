@@ -43,7 +43,6 @@ import type { Axis, DragImpact, Viewport } from '../../../../../../src/types';
           map: {},
           displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
         },
-        direction: axis.direction,
         // in the visual position of the last itme
         destination: {
           index: preset.inHome4.descriptor.index,

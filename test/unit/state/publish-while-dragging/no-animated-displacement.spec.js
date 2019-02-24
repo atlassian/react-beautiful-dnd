@@ -73,7 +73,6 @@ it('should not animate any displacement', () => {
       },
       willDisplaceForward: true,
     },
-    direction: scrollableHome.axis.direction,
     destination: {
       // still in the original position
       index: 0,

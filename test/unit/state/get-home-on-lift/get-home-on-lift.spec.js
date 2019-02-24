@@ -41,7 +41,6 @@ it('should displace everything below the dragging item', () => {
       map: getDisplacementMap(displaced),
       displacedBy,
     },
-    direction: preset.home.axis.direction,
     destination: getHomeLocation(preset.inHome2.descriptor),
     merge: null,
   };

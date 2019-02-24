@@ -157,7 +157,6 @@ describe('foreign list', () => {
         map: {},
         displacedBy,
       },
-      direction: preset.foreign.axis.direction,
       destination: {
         index: 0,
         droppableId: preset.foreign.descriptor.id,

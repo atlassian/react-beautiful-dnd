@@ -108,7 +108,6 @@ draggingStates.forEach((current: IsDraggingState) => {
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: preset.home.axis.direction,
           destination: inHome1Location,
           merge: null,
         };
@@ -138,7 +137,6 @@ draggingStates.forEach((current: IsDraggingState) => {
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: preset.home.axis.direction,
           destination: inHome1Location,
           merge: null,
         };
@@ -170,7 +168,6 @@ draggingStates.forEach((current: IsDraggingState) => {
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: preset.home.axis.direction,
           destination: inHome1Location,
           merge: null,
         };
@@ -193,7 +190,6 @@ draggingStates.forEach((current: IsDraggingState) => {
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: preset.home.axis.direction,
           destination: inHome1Location,
           merge: null,
         };
@@ -233,7 +229,6 @@ draggingStates.forEach((current: IsDraggingState) => {
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: preset.home.axis.direction,
           destination: inHome1Location,
           merge: null,
         };
@@ -272,7 +267,6 @@ describe('something else impacted by drag (testing for memoization leaks)', () =
         map: getDisplacementMap(displaced),
         displacedBy,
       },
-      direction: preset.home.axis.direction,
       destination: inHome1Location,
       merge: null,
     };

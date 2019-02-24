@@ -51,7 +51,6 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           destination: {
             index: preset.inHome3.descriptor.index,
             droppableId: preset.home.descriptor.id,
@@ -78,7 +77,6 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
             displaced: [],
             map: {},
           },
-          direction: axis.direction,
           destination: {
             index: preset.inHome4.descriptor.index,
             droppableId: preset.home.descriptor.id,
@@ -110,7 +108,6 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           destination: {
             index: preset.inHome3.descriptor.index,
             droppableId: preset.home.descriptor.id,
@@ -142,7 +139,6 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           destination: {
             index: preset.inHome2.descriptor.index,
             droppableId: preset.home.descriptor.id,
@@ -175,7 +171,6 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           destination: {
             index: preset.inHome1.descriptor.index,
             droppableId: preset.home.descriptor.id,
@@ -222,7 +217,6 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.home.descriptor.id,
@@ -258,7 +252,6 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.home.descriptor.id,
@@ -293,7 +286,6 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.home.descriptor.id,
@@ -324,7 +316,6 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.home.descriptor.id,
@@ -352,7 +343,6 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.home.descriptor.id,

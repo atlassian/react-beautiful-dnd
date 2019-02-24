@@ -81,7 +81,6 @@ import { getPreset, makeScrollable } from '../../../../utils/dimension';
 
         const expected: DragImpact = {
           movement: homeImpact.movement,
-          direction: axis.direction,
           destination: null,
           merge: {
             whenEntered: forward,

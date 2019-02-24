@@ -60,7 +60,6 @@ import beforePoint from '../../../../utils/before-point';
           map: getDisplacementMap(displaced),
           displacedBy,
         },
-        direction: axis.direction,
         destination: null,
         merge: {
           whenEntered: forward,
@@ -166,7 +165,6 @@ import beforePoint from '../../../../utils/before-point';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           // now in position of inHome3
           destination: {
             index: preset.inHome3.descriptor.index,
@@ -245,7 +243,6 @@ import beforePoint from '../../../../utils/before-point';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           destination: {
             // in the visual spot of inHome3
             index: preset.inHome3.descriptor.index,
@@ -274,7 +271,6 @@ import beforePoint from '../../../../utils/before-point';
           map: getDisplacementMap(displaced),
           displacedBy,
         },
-        direction: axis.direction,
         destination: null,
         // merging with visibly displaced inHome3
         merge: {
@@ -312,7 +308,6 @@ import beforePoint from '../../../../utils/before-point';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           // now in position of inHome3
           destination: {
             index: preset.inHome3.descriptor.index,

@@ -46,7 +46,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           displaced: initial,
           map: getDisplacementMap(initial),
         },
-        direction: axis.direction,
         merge: {
           whenEntered: forward,
           combine: {
@@ -80,7 +79,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           displaced,
           map: getDisplacementMap(displaced),
         },
-        direction: axis.direction,
         merge: null,
         destination: {
           index: preset.inForeign2.descriptor.index,
@@ -111,7 +109,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           displaced: initial,
           map: getDisplacementMap(initial),
         },
-        direction: axis.direction,
         merge: {
           whenEntered: forward,
           combine: {
@@ -170,7 +167,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           displaced: initial,
           map: getDisplacementMap(initial),
         },
-        direction: axis.direction,
         merge: {
           // moved backward onto inForeign1
           whenEntered: backward,
@@ -205,7 +201,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           displaced,
           map: getDisplacementMap(displaced),
         },
-        direction: axis.direction,
         merge: null,
         destination: {
           index: preset.inForeign2.descriptor.index,
@@ -242,7 +237,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           displaced: initial,
           map: getDisplacementMap(initial),
         },
-        direction: axis.direction,
         merge: {
           // moved backward onto inForeign1
           whenEntered: backward,
@@ -278,7 +272,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           displaced,
           map: getDisplacementMap(displaced),
         },
-        direction: axis.direction,
         merge: null,
         destination: {
           index: preset.inForeign1.descriptor.index,

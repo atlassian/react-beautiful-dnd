@@ -11,7 +11,6 @@ import {
   forward,
   backward,
 } from '../../../user-direction/user-direction-preset';
-import removeDraggableFromList from '../../../remove-draggable-from-list';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -78,9 +77,7 @@ export default ({
 
   // TODO: what if target is original!?
   const target: DraggableDimension = currentInsideDestination[targetIndex];
-  if (target === draggable) {
-    console.warn('target === draggable!!!');
-  }
+  invariant(target !== draggable, 'Cannot combine with self');
 
   const merge: CombineImpact = {
     whenEntered: isMovingForward ? forward : backward,
@@ -95,7 +92,6 @@ export default ({
     movement: previousImpact.movement,
     // grouping removes the destination
     destination: null,
-    direction: destination.axis.direction,
     merge,
   };
 

@@ -85,7 +85,6 @@ const dontCare: Position = { x: 0, y: 0 };
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           destination: {
             droppableId: preset.home.descriptor.id,
             index: preset.inHome2.descriptor.index,
@@ -135,7 +134,6 @@ const dontCare: Position = { x: 0, y: 0 };
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           destination: {
             droppableId: preset.home.descriptor.id,
             index: preset.inHome2.descriptor.index,
@@ -180,7 +178,6 @@ const dontCare: Position = { x: 0, y: 0 };
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           destination: {
             droppableId: preset.home.descriptor.id,
             index: preset.inHome4.descriptor.index,

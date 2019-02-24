@@ -54,7 +54,6 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
           map: getDisplacementMap(displaced),
           displacedBy,
         },
-        direction: axis.direction,
         // in position of inForeign3
         destination: {
           index: preset.inForeign3.descriptor.index,
@@ -93,7 +92,6 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           destination: null,
           // now merging with inForeign3
           merge: {
@@ -179,7 +177,6 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
               map: getDisplacementMap(displaced),
               displacedBy,
             },
-            direction: axis.direction,
             // now in spot of inForeign4
             destination: {
               index: preset.inForeign4.descriptor.index,
@@ -273,7 +270,6 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           destination: null,
           // now merging with inForeign2
           merge: {
@@ -356,7 +352,6 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
               map: getDisplacementMap(displaced),
               displacedBy,
             },
-            direction: axis.direction,
             destination: {
               index: preset.inForeign2.descriptor.index,
               droppableId: preset.inForeign2.descriptor.droppableId,

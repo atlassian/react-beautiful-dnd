@@ -55,7 +55,6 @@ import { negate } from '../../../../../../src/state/position';
             displaced: [],
             map: {},
           },
-          direction: axis.direction,
           // currently in position of inHome4
           destination: {
             index: preset.inHome4.descriptor.index,
@@ -101,7 +100,6 @@ import { negate } from '../../../../../../src/state/position';
             displaced: [],
             map: {},
           },
-          direction: axis.direction,
           // currently after inForeign4
           destination: {
             index: preset.inForeign4.descriptor.index + 1,

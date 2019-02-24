@@ -61,7 +61,6 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
 
         const expected: DragImpact = {
           movement: noMovement,
-          direction: preset.emptyForeign.axis.direction,
           destination: {
             droppableId: preset.emptyForeign.descriptor.id,
             index: 0,
@@ -324,7 +323,6 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: preset.foreign.axis.direction,
           destination: {
             droppableId: preset.foreign.descriptor.id,
             index: preset.inForeign2.descriptor.index,
@@ -376,7 +374,6 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: preset.foreign.axis.direction,
           destination: {
             droppableId: preset.foreign.descriptor.id,
             index: preset.inForeign2.descriptor.index,
@@ -422,7 +419,6 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
             map: {},
             displacedBy,
           },
-          direction: preset.foreign.axis.direction,
           destination: {
             droppableId: preset.foreign.descriptor.id,
             index: preset.inForeign1.descriptor.index + 1,

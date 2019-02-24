@@ -43,7 +43,6 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           // currently in position of inHome3
           destination: {
             index: preset.inHome3.descriptor.index,
@@ -92,7 +91,6 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           // currently in position of inForeign2
           destination: {
             index: preset.inForeign2.descriptor.index,

@@ -179,7 +179,6 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
             droppableId: foreign.descriptor.id,
             index: inForeign.descriptor.index,
           },
-          direction: axis.direction,
         };
 
         const result: ?PublicResult = moveToNextPlace({
@@ -206,7 +205,6 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
             droppableId: foreign.descriptor.id,
             index: inForeign.descriptor.index + 1,
           },
-          direction: axis.direction,
         };
         // if the item would have been visible - where would the center have been?
         const nonVisibleCenter = getPageBorderBoxCenter({
@@ -281,7 +279,6 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
             map: {},
             displacedBy: getDisplacedBy(axis, inHome.displaceBy),
           },
-          direction: axis.direction,
           destination: {
             droppableId: foreign.descriptor.id,
             index: inForeign.descriptor.index + 1,
@@ -339,7 +336,6 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
             droppableId: foreign.descriptor.id,
             index: inForeign.descriptor.index,
           },
-          direction: axis.direction,
         };
         // if the item would have been visible - where would the center have been?
         const nonVisibleCenter = getPageBorderBoxCenter({

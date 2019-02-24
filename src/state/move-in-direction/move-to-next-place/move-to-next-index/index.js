@@ -104,7 +104,6 @@ export default ({
       displaced,
       map: getDisplacementMap(displaced),
     },
-    direction: destination.axis.direction,
     destination: {
       droppableId: destination.descriptor.id,
       index: proposedIndex,

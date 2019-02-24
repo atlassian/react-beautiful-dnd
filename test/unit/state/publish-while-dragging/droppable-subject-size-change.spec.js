@@ -266,7 +266,6 @@ it('should reapply any with placeholder spacing', () => {
         willDisplaceForward,
       },
       merge: null,
-      direction: withPlaceholder.axis.direction,
       destination: {
         index: preset.inForeign1.descriptor.index,
         droppableId: withPlaceholder.descriptor.id,

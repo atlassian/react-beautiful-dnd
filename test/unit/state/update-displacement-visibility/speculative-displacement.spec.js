@@ -283,7 +283,6 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
           map: getDisplacementMap(initial),
           displacedBy,
         },
-        direction: axis.direction,
         destination: {
           droppableId: foreign.descriptor.id,
           index: inForeign2.descriptor.index,
@@ -434,7 +433,6 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
           map: getDisplacementMap(initial),
           displacedBy,
         },
-        direction: axis.direction,
         destination: {
           droppableId: foreign.descriptor.id,
           index: inForeign2.descriptor.index,

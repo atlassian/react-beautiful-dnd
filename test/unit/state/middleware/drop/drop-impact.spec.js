@@ -99,7 +99,6 @@ it('should use the existing impact when reordering', () => {
       map: getDisplacementMap(displaced),
       displacedBy,
     },
-    direction: vertical.direction,
     destination: {
       index: preset.inHome2.descriptor.index,
       droppableId: preset.home.descriptor.id,
@@ -139,7 +138,6 @@ it('should remove any movement when merging so items will collapse', () => {
         map: getDisplacementMap(displaced),
         displacedBy,
       },
-      direction: vertical.direction,
       destination: null,
       merge: {
         whenEntered: forward,

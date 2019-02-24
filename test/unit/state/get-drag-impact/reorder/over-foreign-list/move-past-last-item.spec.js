@@ -56,7 +56,6 @@ import type {
           map: {},
           displacedBy,
         },
-        direction: axis.direction,
         // after last item
         destination: {
           index: preset.inForeign4.descriptor.index + 1,

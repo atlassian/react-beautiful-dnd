@@ -223,7 +223,6 @@ describe('element has become visible after displacement', () => {
         map: getDisplacementMap(displaced),
         displacedBy: getDisplacedBy(vertical, dragging.displaceBy),
       },
-      direction: vertical.direction,
       destination: {
         index: 0,
         droppableId: home.descriptor.id,

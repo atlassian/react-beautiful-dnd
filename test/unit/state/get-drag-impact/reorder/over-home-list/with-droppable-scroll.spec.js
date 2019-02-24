@@ -86,7 +86,6 @@ const viewport: Viewport = getViewport();
             displaced,
             displacedBy,
           },
-          direction: axis.direction,
           destination: {
             // now in position of inHome2 as it has moved backwards (it started displaced)
             droppableId: preset.home.descriptor.id,
@@ -158,7 +157,6 @@ const viewport: Viewport = getViewport();
             displaced,
             map: getDisplacementMap(displaced),
           },
-          direction: axis.direction,
           destination: {
             // is now in place of inHome2
             droppableId: preset.home.descriptor.id,

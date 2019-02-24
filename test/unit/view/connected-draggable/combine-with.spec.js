@@ -42,7 +42,6 @@ const impact: DragImpact = {
     map: getDisplacementMap(displaced),
     displacedBy,
   },
-  direction: preset.home.axis.direction,
   destination: null,
   merge: {
     whenEntered: forward,

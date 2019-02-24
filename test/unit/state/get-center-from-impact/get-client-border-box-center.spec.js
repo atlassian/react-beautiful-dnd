@@ -79,7 +79,6 @@ import getDisplacementMap from '../../../../src/state/get-displacement-map';
         map: getDisplacementMap(displaced),
         displacedBy,
       },
-      direction: axis.direction,
       destination: null,
       merge: {
         whenEntered: forward,

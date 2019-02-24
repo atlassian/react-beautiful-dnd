@@ -86,7 +86,6 @@ import afterPoint from '../../../../../utils/after-point';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           destination: {
             // is now in position of inHome2
             droppableId: preset.home.descriptor.id,
@@ -111,7 +110,6 @@ import afterPoint from '../../../../../utils/after-point';
           map: getDisplacementMap(displaced),
           displacedBy,
         },
-        direction: axis.direction,
         destination: {
           // is now in position of inHome1
           droppableId: preset.home.descriptor.id,
@@ -174,7 +172,6 @@ import afterPoint from '../../../../../utils/after-point';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           destination: {
             droppableId: preset.home.descriptor.id,
             // is now in position of inHome2

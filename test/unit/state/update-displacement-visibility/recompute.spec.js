@@ -40,7 +40,6 @@ import { horizontal, vertical } from '../../../../src/state/axis';
         displaced: initial,
         map: getDisplacementMap(initial),
       },
-      direction: axis.direction,
       merge: null,
       destination: {
         droppableId: preset.home.descriptor.id,

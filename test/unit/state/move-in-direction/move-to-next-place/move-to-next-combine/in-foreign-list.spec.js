@@ -47,7 +47,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           map: getDisplacementMap(initial),
           displacedBy,
         },
-        direction: preset.foreign.axis.direction,
         merge: null,
         destination: {
           index: preset.inForeign2.descriptor.index,
@@ -93,7 +92,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           map: getDisplacementMap(initial),
           displacedBy,
         },
-        direction: preset.foreign.axis.direction,
         merge: null,
         destination: {
           index: preset.inForeign3.descriptor.index,
@@ -139,7 +137,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           map: getDisplacementMap(initial),
           displacedBy,
         },
-        direction: preset.foreign.axis.direction,
         merge: null,
         // in first position
         destination: {
@@ -169,7 +166,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           map: getDisplacementMap(initial),
           displacedBy,
         },
-        direction: preset.foreign.axis.direction,
         merge: null,
         // in last position
         destination: {

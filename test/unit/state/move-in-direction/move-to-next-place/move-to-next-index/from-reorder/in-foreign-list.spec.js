@@ -44,7 +44,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
           map: getDisplacementMap(initial),
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
         destination: {
           droppableId: preset.foreign.descriptor.id,
@@ -75,7 +74,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -107,7 +105,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -142,7 +139,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -176,7 +172,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -201,7 +196,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
           map: getDisplacementMap(initial),
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
         destination: {
           droppableId: preset.foreign.descriptor.id,
@@ -233,7 +227,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -268,7 +261,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -305,7 +297,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -339,7 +330,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -365,7 +355,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
           map: getDisplacementMap(initial),
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
         destination: {
           droppableId: preset.foreign.descriptor.id,
@@ -401,7 +390,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
           map: getDisplacementMap(initial),
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
         // currently in the spot that inForeign4 initially occupied
         destination: {
@@ -430,7 +418,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
           map: {},
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
         // trying to move after spot after inForeign4
         destination: {
@@ -448,7 +435,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         map: {},
         displacedBy,
       },
-      direction: axis.direction,
       merge: null,
       // after inForeign4
       destination: {
@@ -493,7 +479,6 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
           map: getDisplacementMap(displaced),
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
         // now in position of inForeign4
         destination: {

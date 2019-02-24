@@ -109,7 +109,6 @@ export default ({
   };
   const impact: DragImpact = {
     movement,
-    direction: axis.direction,
     destination: {
       droppableId: destination.descriptor.id,
       index: newIndex,
