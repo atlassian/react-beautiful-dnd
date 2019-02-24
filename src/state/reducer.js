@@ -56,7 +56,7 @@ const postDroppableChange = (
   });
 };
 
-const idle: IdleState = { phase: 'IDLE', completed: null };
+const idle: IdleState = { phase: 'IDLE', completed: null, shouldFlush: false };
 
 export default (state: State = idle, action: Action): State => {
   if (action.type === 'CLEAN') {
@@ -119,8 +119,6 @@ export default (state: State = idle, action: Action): State => {
       impact,
       onLift,
       onLiftImpact: impact,
-      // On initial render we do not animate the adding of the placeholder
-      shouldAnimatePlaceholder: false,
       viewport,
       userDirection: forward,
       scrollJumpRequest: null,
