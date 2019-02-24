@@ -161,58 +161,25 @@ export const makeMapStateToProps = (): Selector => {
         return idle;
       }
 
-      const isHome: boolean = completed.critical.droppable.id === id;
       const wasOverId: ?DroppableId = whatIsDraggedOver(completed.impact);
       const wasOver: boolean = Boolean(wasOverId) && wasOverId === id;
       const wasCombining: boolean = Boolean(completed.result.combine);
-      const isFlushing: boolean = state.shouldFlush;
 
       // need to cut any animations: sadly a memoization fail
-      if (isFlushing) {
-        return idleWithoutAnimation;
-      }
-
-      if (wasOver) {
-        return wasCombining ? idle : idleWithoutAnimation;
-      }
-
-      // over nothing = return to home
-      // need to cut any animation
-      if (isHome && wasOverId == null) {
-        return idleWithoutAnimation;
-      }
-
-      return idle;
-
-      if (!isHome) {
-        // need to immediately remove the placeholder if was over
-        // this will cause a memoization break for the next drag
-        // idleWithoutAnimation => idle
-        return wasOver ? idleWithoutAnimation : idle;
-      }
-
-      // This is the home list
-
-      // might need to opt out of any home placeholder collapse animation
+      // we need to do this for all lists as there might be
+      // lists that are still animating a placeholder closed
       if (state.shouldFlush) {
         return idleWithoutAnimation;
       }
 
-      // animate collapse after drop if over home list and merging
-      if (wasOver && completed.impact.merge) {
-        return idle;
+      if (wasOver) {
+        // if reordering we need to cut an animation immediately
+        // if merging: animate placeholder closed after drop
+        return wasCombining ? idle : idleWithoutAnimation;
       }
 
-      // animate collapse after drop if over foreign list
-      if (Boolean(wasOverId) && !wasOver) {
-        return idle;
-      }
-
-      // need to immediately remove the placeholder as we
-      // are dropping into the home list
-      // this will cause a memoization break for the next drag
-      // idleWithoutAnimation => idle
-      return idleWithoutAnimation;
+      // keep default value
+      return idle;
     }
 
     return idle;

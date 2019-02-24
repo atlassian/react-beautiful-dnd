@@ -38,6 +38,7 @@ export default (axis?: Axis = vertical) => {
   const idle: IdleState = {
     phase: 'IDLE',
     completed: null,
+    shouldFlush: false,
   };
 
   const origin: Position = { x: 0, y: 0 };

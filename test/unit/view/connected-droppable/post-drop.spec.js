@@ -1,10 +1,6 @@
 // @flow
-import getStatePreset from '../../../utils/get-simple-state-preset';
-import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
 import type {
-  DraggingState,
   DragImpact,
-  DisplacedBy,
   Combine,
   DropAnimatingState,
   IdleState,
@@ -14,149 +10,190 @@ import type {
   Selector,
   MapProps,
 } from '../../../../src/view/droppable/droppable-types';
-import getOwnProps from './util/get-own-props';
+import { forward } from '../../../../src/state/user-direction/user-direction-preset';
+import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
 import { getPreset } from '../../../utils/dimension';
-import {
-  move,
-  type IsDraggingState,
-  withImpact,
-} from '../../../utils/dragging-state';
-import noImpact from '../../../../src/state/no-impact';
-import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import withCombineImpact from './util/with-combine-impact';
-import restingProps from './util/resting-props';
+import getStatePreset from '../../../utils/get-simple-state-preset';
+import getOwnProps from './util/get-own-props';
 
 const preset = getPreset();
 const state = getStatePreset();
 
-const displacedBy: DisplacedBy = getDisplacedBy(
-  preset.foreign.axis,
-  preset.inHome1.displaceBy,
-);
-const overForeign: DragImpact = {
-  movement: {
-    // leaving empty for simplicity
-    displaced: [],
-    map: {},
-    displacedBy,
-  },
-  direction: preset.foreign.axis.direction,
-  destination: {
-    index: 0,
-    droppableId: preset.foreign.descriptor.id,
-  },
-  merge: null,
+const isOverHomeMapProps: MapProps = {
+  isDraggingOver: true,
+  draggingOverWith: preset.inHome1.descriptor.id,
+  draggingFromThisWith: preset.inHome1.descriptor.id,
+  placeholder: preset.inHome1.placeholder,
+  shouldAnimatePlaceholder: false,
 };
 
-describe.only('foreign list', () => {
-  describe('was over', () => {
-    it('should immediately remove a placeholder', () => {});
+describe('was over - reordering', () => {
+  it('should immediately remove a placeholder', () => {
+    const ownProps: OwnProps = getOwnProps(preset.home);
+    const selector: Selector = makeMapStateToProps();
+    // initial value: not animated
+    const atRest: MapProps = selector(state.idle, ownProps);
+    expect(atRest.shouldAnimatePlaceholder).toBe(true);
 
-    it('should cause a memoization break for the next drag', () => {});
-  });
+    // while dropping
+    const dropping: DropAnimatingState = state.dropAnimating(
+      preset.inHome1.descriptor.id,
+    );
+    const whileDropping: MapProps = selector(dropping, ownProps);
+    expect(whileDropping).toEqual(isOverHomeMapProps);
 
-  describe('was not over', () => {
-    it('should not break memoization at any point', () => {});
+    // drop complete
+    const idle: IdleState = {
+      phase: 'IDLE',
+      completed: dropping.completed,
+      shouldFlush: false,
+    };
+    const postDrop: MapProps = selector(idle, ownProps);
+    const expected: MapProps = {
+      ...atRest,
+      shouldAnimatePlaceholder: false,
+    };
+    expect(postDrop).toEqual(expected);
+    // this will cause a memoization break for the next drag
+    expect(postDrop).not.toEqual(atRest);
   });
 });
 
-describe('home list', () => {
-  it('should animate the collapse of a placeholder if merging in list', () => {});
-  it('should animate the collapse of a placeholder if dropping into a foreign list', () => {});
-  it('should not animate the collapse of a placeholder if dropping into the home list', () => {});
+describe('was over - merging', () => {
+  it('should animate a placeholder closed', () => {
+    const ownProps: OwnProps = getOwnProps(preset.home);
+    const selector: Selector = makeMapStateToProps();
+    const atRest: MapProps = selector(state.idle, ownProps);
 
-  it('should immediately collapse of a placeholder if the drop was flushed', () => {
-    // this will also cause a memoization break on the next drag
+    // while dropping
+    const combine: Combine = {
+      draggableId: preset.inHome2.descriptor.id,
+      droppableId: preset.inHome2.descriptor.droppableId,
+    };
+    const base: DropAnimatingState = state.dropAnimating();
+    const combineImpact: DragImpact = {
+      ...base.completed.impact,
+      destination: null,
+      merge: {
+        whenEntered: forward,
+        combine,
+      },
+    };
+    const dropping: DropAnimatingState = {
+      ...base,
+      completed: {
+        ...base.completed,
+        impact: combineImpact,
+        result: {
+          ...base.completed.result,
+          destination: null,
+          combine,
+        },
+      },
+    };
+    const whileDropping: MapProps = selector(dropping, ownProps);
+    expect(whileDropping).toEqual(isOverHomeMapProps);
+
+    // drop complete
+    const idle: IdleState = {
+      phase: 'IDLE',
+      completed: dropping.completed,
+      shouldFlush: false,
+    };
+    const postDrop: MapProps = selector(idle, ownProps);
+    // no memoization break for the next drag - returned at rest props
+    expect(postDrop).toBe(atRest);
+  });
+});
+
+describe('was not over', () => {
+  it('should animate a placeholder closed', () => {
+    const ownProps: OwnProps = getOwnProps(preset.foreign);
+    const selector: Selector = makeMapStateToProps();
+    const atRest: MapProps = selector(state.idle, ownProps);
+
+    // while dropping
+    const dropping: DropAnimatingState = state.dropAnimating();
+    const whileDropping: MapProps = selector(dropping, ownProps);
+    expect(whileDropping).toEqual(atRest);
+
+    // drop complete
+    const idle: IdleState = {
+      phase: 'IDLE',
+      completed: dropping.completed,
+      shouldFlush: false,
+    };
+    const postDrop: MapProps = selector(idle, ownProps);
+    // no memoization break for the next drag - returned at rest props
+    expect(postDrop).toBe(atRest);
+  });
+});
+
+describe('flushed', () => {
+  it('should cut an animation', () => {
+    const ownProps: OwnProps = getOwnProps(preset.home);
+    const selector: Selector = makeMapStateToProps();
+    const atRest: MapProps = selector(state.idle, ownProps);
+
+    // while dropping
+    const combine: Combine = {
+      draggableId: preset.inHome2.descriptor.id,
+      droppableId: preset.inHome2.descriptor.droppableId,
+    };
+    const base: DropAnimatingState = state.dropAnimating();
+    const combineImpact: DragImpact = {
+      ...base.completed.impact,
+      destination: null,
+      merge: {
+        whenEntered: forward,
+        combine,
+      },
+    };
+    const dropping: DropAnimatingState = {
+      ...base,
+      completed: {
+        ...base.completed,
+        impact: combineImpact,
+        result: {
+          ...base.completed.result,
+          destination: null,
+          combine,
+        },
+      },
+    };
+
+    // drop complete
+    const withFlush: IdleState = {
+      phase: 'IDLE',
+      completed: dropping.completed,
+      shouldFlush: true,
+    };
+    const postDrop: MapProps = selector(withFlush, ownProps);
+    const expected: MapProps = {
+      ...atRest,
+      shouldAnimatePlaceholder: false,
+    };
+    expect(postDrop).not.toBe(atRest);
+    expect(postDrop).toEqual(expected);
   });
 
-  it('should not break memoization for the next drag', () => {});
-});
+  it('should cut animation in a list that was not animating', () => {
+    const ownProps: OwnProps = getOwnProps(preset.foreign);
+    const selector: Selector = makeMapStateToProps();
+    const atRest: MapProps = selector(state.idle, ownProps);
 
-it('should animate a home placeholder closed if over a foreign list', () => {
-  const selector: Selector = makeMapStateToProps();
-  const ownProps: OwnProps = getOwnProps(preset.home);
-
-  const isNotOverHomeMapProps: MapProps = {
-    isDraggingOver: false,
-    draggingFromThisWith: preset.inHome1.descriptor.id,
-    draggingOverWith: null,
-    placeholder: preset.inHome1.placeholder,
-    shouldAnimatePlaceholder: false,
-  };
-
-  const dragging: IsDraggingState = withImpact(
-    state.dragging(preset.inHome1.descriptor.id),
-    overForeign,
-  );
-  const base: DropAnimatingState = state.dropAnimating();
-  const dropping: DropAnimatingState = {
-    ...base,
-    completed: {
-      ...base.completed,
-      impact: dragging.impact,
-    },
-  };
-  const done: IdleState = {
-    ...state.idle,
-    completed: dropping.completed,
-  };
-
-  const defaultMapProps: MapProps = selector(state.idle, ownProps);
-  const whenDragging: MapProps = selector(dragging, ownProps);
-  const whenDropping: MapProps = selector(dropping, ownProps);
-  const postDrop: MapProps = selector(done, ownProps);
-
-  expect(whenDragging).toEqual(isNotOverHomeMapProps);
-  // no memoization break
-  expect(whenDropping).toBe(whenDragging);
-  // going to default props (animation enabled)
-  expect(postDrop).toEqual(defaultMapProps);
-  expect(postDrop.shouldAnimatePlaceholder).toBe(true);
-});
-
-it('should immediately remove a home placeholder if dropped in a home list', () => {});
-
-it('should immediately remove a home placeholder if a drop is flushed', () => {
-  const selector: Selector = makeMapStateToProps();
-  const ownProps: OwnProps = getOwnProps(preset.home);
-
-  const isNotOverHomeMapProps: MapProps = {
-    isDraggingOver: false,
-    draggingFromThisWith: preset.inHome1.descriptor.id,
-    draggingOverWith: null,
-    placeholder: preset.inHome1.placeholder,
-    shouldAnimatePlaceholder: false,
-  };
-
-  const dragging: IsDraggingState = withImpact(
-    state.dragging(preset.inHome1.descriptor.id),
-    overForeign,
-  );
-  const base: DropAnimatingState = state.dropAnimating();
-  const dropping: DropAnimatingState = {
-    ...base,
-    completed: {
-      ...base.completed,
-      impact: dragging.impact,
-    },
-  };
-  const done: IdleState = {
-    phase: 'IDLE',
-    // flushed
-    completed: null,
-  };
-
-  const defaultMapProps: MapProps = selector(state.idle, ownProps);
-  const whenDragging: MapProps = selector(dragging, ownProps);
-  const whenDropping: MapProps = selector(dropping, ownProps);
-  const postDrop: MapProps = selector(done, ownProps);
-
-  expect(whenDragging).toEqual(isNotOverHomeMapProps);
-  // no memoization break
-  expect(whenDropping).toBe(whenDragging);
-  // animation flushed
-  expect(postDrop).toEqual({
-    ...defaultMapProps,
-    shouldAnimatePlaceholder: false,
+    // drop complete
+    const withFlush: IdleState = {
+      phase: 'IDLE',
+      completed: state.dropAnimating().completed,
+      shouldFlush: true,
+    };
+    const postDrop: MapProps = selector(withFlush, ownProps);
+    const expected: MapProps = {
+      ...atRest,
+      shouldAnimatePlaceholder: false,
+    };
+    expect(postDrop).not.toBe(atRest);
+    expect(postDrop).toEqual(expected);
   });
 });
