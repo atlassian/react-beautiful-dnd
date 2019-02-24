@@ -35,6 +35,7 @@ const displacedBy: DisplacedBy = getDisplacedBy(
 );
 const overForeign: DragImpact = {
   movement: {
+    // leaving empty for simplicity
     displaced: [],
     map: {},
     displacedBy,
@@ -46,45 +47,29 @@ const overForeign: DragImpact = {
   },
   merge: null,
 };
-it('should immediately remove a placeholder in a foreign list', () => {
-  const selector: Selector = makeMapStateToProps();
-  const ownProps: OwnProps = getOwnProps(preset.foreign);
 
-  const isOverForeignMapProps: MapProps = {
-    isDraggingOver: true,
-    draggingFromThisWith: null,
-    draggingOverWith: preset.inHome1.descriptor.id,
-    placeholder: preset.inHome1.placeholder,
-    shouldAnimatePlaceholder: true,
-  };
+describe.only('foreign list', () => {
+  describe('was over', () => {
+    it('should immediately remove a placeholder', () => {});
 
-  const dragging: IsDraggingState = withImpact(
-    state.dragging(preset.inHome1.descriptor.id),
-    overForeign,
-  );
-  const base: DropAnimatingState = state.dropAnimating();
-  const dropping: DropAnimatingState = {
-    ...base,
-    completed: {
-      ...base.completed,
-      impact: dragging.impact,
-    },
-  };
-  const done: IdleState = {
-    ...state.idle,
-    completed: dropping.completed,
-  };
+    it('should cause a memoization break for the next drag', () => {});
+  });
 
-  const defaultMapProps: MapProps = selector(state.idle, ownProps);
-  const whenDragging: MapProps = selector(dragging, ownProps);
-  const whenDropping: MapProps = selector(dropping, ownProps);
-  const postDrop: MapProps = selector(done, ownProps);
+  describe('was not over', () => {
+    it('should not break memoization at any point', () => {});
+  });
+});
 
-  expect(whenDragging).toEqual(isOverForeignMapProps);
-  // no memoization break
-  expect(whenDropping).toBe(whenDragging);
-  // going to default props (animation will be blocked by Droppable)
-  expect(postDrop).toEqual(defaultMapProps);
+describe('home list', () => {
+  it('should animate the collapse of a placeholder if merging in list', () => {});
+  it('should animate the collapse of a placeholder if dropping into a foreign list', () => {});
+  it('should not animate the collapse of a placeholder if dropping into the home list', () => {});
+
+  it('should immediately collapse of a placeholder if the drop was flushed', () => {
+    // this will also cause a memoization break on the next drag
+  });
+
+  it('should not break memoization for the next drag', () => {});
 });
 
 it('should animate a home placeholder closed if over a foreign list', () => {
@@ -131,7 +116,7 @@ it('should animate a home placeholder closed if over a foreign list', () => {
 
 it('should immediately remove a home placeholder if dropped in a home list', () => {});
 
-it.only('should immediately remove a home placeholder if a drop is flushed', () => {
+it('should immediately remove a home placeholder if a drop is flushed', () => {
   const selector: Selector = makeMapStateToProps();
   const ownProps: OwnProps = getOwnProps(preset.home);
 

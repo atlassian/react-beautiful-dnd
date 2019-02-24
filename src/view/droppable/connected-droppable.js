@@ -44,28 +44,6 @@ const idleWithoutAnimation: MapProps = {
 const isMatchingType = (type: TypeId, critical: Critical): boolean =>
   type === critical.droppable.type;
 
-const shouldCollapseHomeAfterDrag = (
-  id: DroppableId,
-  completed: CompletedDrag,
-): boolean => {
-  // should not animated when dropping into no list (will be returning to home list)
-  // should animate collapse when dropping into a foreign list
-
-  const wasOver: ?DroppableId = whatIsDraggedOver(completed.impact);
-
-  // collapse after drop if over home list and merging
-  if (wasOver === id && completed.impact.merge) {
-    return true;
-  }
-
-  // collapse after drop if dropping into foreign list
-  if (Boolean(wasOver) && wasOver !== id) {
-    return true;
-  }
-
-  return false;
-};
-
 const getDraggable = (
   critical: Critical,
   dimensions: DimensionMap,
@@ -186,12 +164,34 @@ export const makeMapStateToProps = (): Selector => {
       const isHome: boolean = completed.critical.droppable.id === id;
       const wasOverId: ?DroppableId = whatIsDraggedOver(completed.impact);
       const wasOver: boolean = Boolean(wasOverId) && wasOverId === id;
+      const wasCombining: boolean = Boolean(completed.result.combine);
+      const isFlushing: boolean = state.shouldFlush;
+
+      // need to cut any animations: sadly a memoization fail
+      if (isFlushing) {
+        return idleWithoutAnimation;
+      }
+
+      if (wasOver) {
+        return wasCombining ? idle : idleWithoutAnimation;
+      }
+
+      // over nothing = return to home
+      // need to cut any animation
+      if (isHome && wasOverId == null) {
+        return idleWithoutAnimation;
+      }
+
+      return idle;
 
       if (!isHome) {
+        // need to immediately remove the placeholder if was over
+        // this will cause a memoization break for the next drag
+        // idleWithoutAnimation => idle
         return wasOver ? idleWithoutAnimation : idle;
       }
 
-      // this is the home list
+      // This is the home list
 
       // might need to opt out of any home placeholder collapse animation
       if (state.shouldFlush) {
@@ -208,6 +208,10 @@ export const makeMapStateToProps = (): Selector => {
         return idle;
       }
 
+      // need to immediately remove the placeholder as we
+      // are dropping into the home list
+      // this will cause a memoization break for the next drag
+      // idleWithoutAnimation => idle
       return idleWithoutAnimation;
     }
 
