@@ -40,7 +40,6 @@ export default ({
   viewport,
 }: Args): DraggableDimensionMap => {
   const shifted: DraggableDimensionMap = {};
-  console.log('additions', addedDraggables.map(a => a.descriptor.id));
 
   toDroppableList(droppables).forEach((droppable: DroppableDimension) => {
     const axis: Axis = droppable.axis;
@@ -191,8 +190,6 @@ export default ({
       shifted[moved.descriptor.id] = updated;
     });
   });
-
-  console.log('shifted', shifted);
 
   const map: DraggableDimensionMap = {
     ...existing,

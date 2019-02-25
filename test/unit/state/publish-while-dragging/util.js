@@ -1,11 +1,5 @@
 // @flow
-import {
-  offset,
-  withScroll,
-  createBox,
-  type BoxModel,
-  type Position,
-} from 'css-box-model';
+import { createBox, type BoxModel, type Position } from 'css-box-model';
 import {
   getPreset,
   makeScrollable,
@@ -17,6 +11,7 @@ import type {
   DroppableDimension,
   CollectingState,
 } from '../../../../src/types';
+import offsetDraggable from '../../../../src/state/publish-while-dragging/update-draggables/offset-draggable';
 
 const preset = getPreset();
 
@@ -37,24 +32,21 @@ export const shift = ({
   change,
   newIndex,
 }: ShiftArgs): DraggableDimension => {
-  const client: BoxModel = offset(draggable.client, change);
-  const page: BoxModel = withScroll(client, preset.windowScroll);
+  const moved: DraggableDimension = offsetDraggable({
+    draggable,
+    offset: change,
+    initialWindowScroll: preset.windowScroll,
+  });
 
-  const moved: DraggableDimension = {
-    ...draggable,
+  const result: DraggableDimension = {
+    ...moved,
     descriptor: {
-      ...draggable.descriptor,
+      ...moved.descriptor,
       index: newIndex,
     },
-    placeholder: {
-      ...draggable.placeholder,
-      client,
-    },
-    client,
-    page,
   };
 
-  return moved;
+  return result;
 };
 
 export const scrollableHome: DroppableDimension = makeScrollable(preset.home);
