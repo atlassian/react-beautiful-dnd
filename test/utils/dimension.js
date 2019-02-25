@@ -19,7 +19,6 @@ import getDroppable, {
 import {
   toDroppableMap,
   toDroppableList,
-  toDraggableList,
 } from '../../src/state/dimension-structures';
 import type {
   Axis,
@@ -37,8 +36,8 @@ import type {
   DraggingState,
   ScrollSize,
 } from '../../src/types';
-import patchDroppableMap from '../../src/state/patch-droppable-map';
 import isTotallyVisibleThroughFrame from '../../src/state/visibility/is-totally-visible-through-frame';
+import patchDroppableMap from '../../src/state/patch-droppable-map';
 
 type GetComputedSpacingArgs = {|
   margin?: Spacing,
@@ -137,7 +136,10 @@ export const addDroppable = (
   droppable: DroppableDimension,
 ): DraggingState => ({
   ...base,
-  dimensions: patchDroppableMap(base.dimensions, droppable),
+  dimensions: {
+    draggables: base.dimensions.draggables,
+    droppables: patchDroppableMap(base.dimensions.droppables, droppable),
+  },
 });
 
 export const addDraggable = (

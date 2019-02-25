@@ -14,6 +14,7 @@ import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { add, patch } from '../position';
 import getSubject from './util/get-subject';
 import isHomeOf from './is-home-of';
+import getDisplacedBy from '../get-displaced-by';
 
 const getRequiredGrowthForPlaceholder = (
   droppable: DroppableDimension,
@@ -69,10 +70,10 @@ export const addPlaceholder = (
     'Cannot add placeholder size to a subject when it already has one',
   );
 
-  const placeholderSize: Position = patch(
-    droppable.axis.line,
-    draggable.displaceBy[droppable.axis.line],
-  );
+  const placeholderSize: Position = getDisplacedBy(
+    droppable.axis,
+    draggable.displaceBy,
+  ).point;
 
   const requiredGrowth: ?Position = getRequiredGrowthForPlaceholder(
     droppable,

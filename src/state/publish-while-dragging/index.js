@@ -20,6 +20,7 @@ import getDragPositions from './get-drag-positions';
 import updateDraggables from './update-draggables';
 import updateDroppables from './update-droppables';
 import withNoAnimatedDisplacement from './with-no-animated-displacement';
+import recomputePlaceholders from '../recompute-placeholders';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -36,14 +37,14 @@ export default ({
 
   // Change the subject size and scroll of droppables
   // will remove any subject.withPlaceholder
-  const droppables: DroppableDimensionMap = updateDroppables({
+  const updatedDroppables: DroppableDimensionMap = updateDroppables({
     modified: published.modified,
     existing: state.dimensions.droppables,
     viewport: state.viewport,
   });
 
   const draggables: DraggableDimensionMap = updateDraggables({
-    updatedDroppables: droppables,
+    updatedDroppables,
     // will not change during a drag
     criticalId: state.critical.draggable.id,
     existing: state.dimensions.draggables,
@@ -52,24 +53,27 @@ export default ({
     viewport: state.viewport,
   });
 
-  // const withPlaceholder: DroppableDimensionMap = getWithPlaceholder({
-  //   draggables,
-  //   droppables,
-  // });
-
-  const dimensions: DimensionMap = {
-    draggables,
-    droppables,
-    // droppables: withPlaceholder,
-  };
-
   const critical: Critical = {
-    draggable: dimensions.draggables[state.critical.draggable.id].descriptor,
-    droppable: dimensions.droppables[state.critical.droppable.id].descriptor,
+    draggable: draggables[state.critical.draggable.id].descriptor,
+    droppable: updatedDroppables[state.critical.droppable.id].descriptor,
   };
   const original: DraggableDimension =
     state.dimensions.draggables[critical.draggable.id];
   const updated: DraggableDimension = draggables[critical.draggable.id];
+
+  // TODO: this is a bit of a chicken and egg problem, but it will use the old impact for placeholders
+  const droppables: DroppableDimensionMap = recomputePlaceholders({
+    draggable: updated,
+    draggables,
+    droppables: updatedDroppables,
+    previousImpact: state.impact,
+    impact: state.impact,
+  });
+
+  const dimensions: DimensionMap = {
+    draggables,
+    droppables,
+  };
 
   // Get the updated drag positions to account for any
   // shift to the critical draggable

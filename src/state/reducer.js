@@ -29,8 +29,8 @@ import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
 import update from './post-reducer/when-moving/update';
 import refreshSnap from './post-reducer/when-moving/refresh-snap';
-import patchDroppableMap from './patch-droppable-map';
 import getHomeOnLift from './get-home-on-lift';
+import patchDroppableMap from './patch-droppable-map';
 
 const isSnapping = (state: StateWhenUpdatesAllowed): boolean =>
   state.movementMode === 'SNAP';
@@ -40,7 +40,11 @@ const postDroppableChange = (
   updated: DroppableDimension,
   isEnabledChanging: boolean,
 ): StateWhenUpdatesAllowed => {
-  const dimensions: DimensionMap = patchDroppableMap(state.dimensions, updated);
+  const dimensions: DimensionMap = {
+    draggables: state.dimensions.draggables,
+    droppables: patchDroppableMap(state.dimensions.droppables, updated),
+  };
+  console.log('patched', Object.keys(dimensions.droppables));
 
   // if the enabled state is changing, we need to force a update
   if (!isSnapping(state) || isEnabledChanging) {

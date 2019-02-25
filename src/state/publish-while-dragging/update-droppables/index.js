@@ -19,7 +19,10 @@ import type {
 } from '../../../types';
 import { isEqual } from '../../spacing';
 import scrollDroppable from '../../droppable/scroll-droppable';
-import { removePlaceholder } from '../../droppable/with-placeholder';
+import {
+  removePlaceholder,
+  addPlaceholder,
+} from '../../droppable/with-placeholder';
 import getFrame from '../../get-frame';
 import { toDroppableMap } from '../../dimension-structures';
 
@@ -66,7 +69,9 @@ export default ({
       const raw: ?DroppableDimension = existing[provided.descriptor.id];
       invariant(raw, 'Could not locate droppable in existing droppables');
 
-      const dimension: DroppableDimension = raw.subject.withPlaceholder
+      const hasPlaceholder: boolean = Boolean(raw.subject.withPlaceholder);
+
+      const dimension: DroppableDimension = hasPlaceholder
         ? removePlaceholder(raw)
         : raw;
 

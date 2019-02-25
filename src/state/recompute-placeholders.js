@@ -6,7 +6,8 @@ import {
 import whatIsDraggedOver from './droppable/what-is-dragged-over';
 import type {
   DroppableDimension,
-  DimensionMap,
+  DraggableDimensionMap,
+  DroppableDimensionMap,
   DraggableDimension,
   DragImpact,
   DroppableId,
@@ -17,80 +18,82 @@ import isHomeOf from './droppable/is-home-of';
 type ClearArgs = {|
   previousImpact: DragImpact,
   impact: DragImpact,
-  dimensions: DimensionMap,
+  droppables: DroppableDimensionMap,
 |};
 
 const clearUnusedPlaceholder = ({
   previousImpact,
   impact,
-  dimensions,
-}: ClearArgs): DimensionMap => {
+  droppables,
+}: ClearArgs): DroppableDimensionMap => {
   const last: ?DroppableId = whatIsDraggedOver(previousImpact);
   const now: ?DroppableId = whatIsDraggedOver(impact);
 
   if (!last) {
-    return dimensions;
+    return droppables;
   }
 
   // no change - can keep the last state
   if (last === now) {
-    return dimensions;
+    return droppables;
   }
 
-  const lastDroppable: DroppableDimension = dimensions.droppables[last];
+  const lastDroppable: DroppableDimension = droppables[last];
 
   // nothing to clear
   if (!lastDroppable.subject.withPlaceholder) {
-    return dimensions;
+    return droppables;
   }
 
   const updated: DroppableDimension = removePlaceholder(lastDroppable);
-  return patchDroppableMap(dimensions, updated);
+  return patchDroppableMap(droppables, updated);
 };
 
 type Args = {|
-  dimensions: DimensionMap,
   draggable: DraggableDimension,
+  draggables: DraggableDimensionMap,
+  droppables: DroppableDimensionMap,
   impact: DragImpact,
   previousImpact: DragImpact,
 |};
 
 export default ({
-  dimensions,
-  previousImpact,
   draggable,
+  draggables,
+  droppables,
+  previousImpact,
   impact,
-}: Args): DimensionMap => {
-  const base: DimensionMap = clearUnusedPlaceholder({
+}: Args): DroppableDimensionMap => {
+  const cleaned: DroppableDimensionMap = clearUnusedPlaceholder({
     previousImpact,
     impact,
-    dimensions,
+    droppables,
   });
 
   const isOver: ?DroppableId = whatIsDraggedOver(impact);
 
   if (!isOver) {
-    return base;
+    return cleaned;
   }
 
-  const droppable: DroppableDimension = base.droppables[isOver];
+  const droppable: DroppableDimension = droppables[isOver];
 
   // no need to add additional space to home droppable
   if (isHomeOf(draggable, droppable)) {
-    return base;
+    return cleaned;
   }
 
   // already have a placeholder - nothing to do here!
   if (droppable.subject.withPlaceholder) {
-    return base;
+    return cleaned;
   }
 
   // Need to patch the existing droppable
   const patched: DroppableDimension = addPlaceholder(
     droppable,
     draggable,
-    base.draggables,
+    draggables,
   );
 
-  return patchDroppableMap(base, patched);
+  return patchDroppableMap(cleaned, patched);
 };

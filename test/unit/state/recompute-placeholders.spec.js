@@ -1,66 +1,69 @@
 // @flow
-import type { Position } from 'css-box-model';
 import type {
   DisplacedBy,
   Axis,
-  DimensionMap,
   Displacement,
   DragImpact,
   DroppableDimension,
+  DroppableDimensionMap,
 } from '../../../src/types';
 import { getPreset } from '../../utils/dimension';
 import getDisplacedBy from '../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../src/state/get-displacement-map';
 import { horizontal, vertical } from '../../../src/state/axis';
-import getHomeImpact from '../../../src/state/get-home-impact';
-import getDimensionMapWithPlaceholder from '../../../src/state/get-dimension-map-with-placeholder';
+import recomputePlaceholders from '../../../src/state/recompute-placeholders';
 import noImpact from '../../../src/state/no-impact';
-import getVisibleDisplacement from '../../utils/get-visible-displacement';
+import getVisibleDisplacement from '../../utils/get-displacement/get-visible-displacement';
 import { addPlaceholder } from '../../../src/state/droppable/with-placeholder';
-import { patch } from '../../../src/state/position';
 import patchDroppableMap from '../../../src/state/patch-droppable-map';
+import getHomeOnLift from '../../../src/state/get-home-on-lift';
 
 [horizontal, vertical].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
-
-    const homeImpact: DragImpact = getHomeImpact(preset.inHome1, preset.home);
+    const { impact: homeImpact } = getHomeOnLift({
+      draggable: preset.inHome1,
+      draggables: preset.draggables,
+      home: preset.home,
+      viewport: preset.viewport,
+    });
 
     it('should not do anything if there is no destination change', () => {
-      const result: DimensionMap = getDimensionMapWithPlaceholder({
-        dimensions: preset.dimensions,
-        previousImpact: homeImpact,
-        impact: homeImpact,
+      const result: DroppableDimensionMap = recomputePlaceholders({
         draggable: preset.inHome1,
+        draggables: preset.draggables,
+        droppables: preset.droppables,
+        impact: homeImpact,
+        previousImpact: homeImpact,
       });
 
-      expect(result).toEqual(preset.dimensions);
+      expect(result).toEqual(preset.droppables);
     });
 
     it('should not do anything if there is no destination', () => {
-      const result1: DimensionMap = getDimensionMapWithPlaceholder({
-        dimensions: preset.dimensions,
+      const result1: DroppableDimensionMap = recomputePlaceholders({
         previousImpact: homeImpact,
         impact: noImpact,
         draggable: preset.inHome1,
+        draggables: preset.draggables,
+        droppables: preset.droppables,
       });
-      const result2: DimensionMap = getDimensionMapWithPlaceholder({
-        dimensions: preset.dimensions,
+      const result2: DroppableDimensionMap = recomputePlaceholders({
         previousImpact: noImpact,
         impact: noImpact,
         draggable: preset.inHome1,
+        draggables: preset.draggables,
+        droppables: preset.droppables,
       });
 
-      expect(result1).toEqual(preset.dimensions);
-      expect(result2).toEqual(preset.dimensions);
+      expect(result1).toEqual(preset.droppables);
+      expect(result2).toEqual(preset.droppables);
     });
 
     it('should add a placeholder if moving to a foreign list', () => {
-      const willDisplaceForward: boolean = true;
       const displacedBy: DisplacedBy = getDisplacedBy(
         axis,
         preset.inHome1.displaceBy,
-        willDisplaceForward,
       );
       const displaced: Displacement[] = [
         getVisibleDisplacement(preset.inForeign1),
@@ -70,7 +73,6 @@ import patchDroppableMap from '../../../src/state/patch-droppable-map';
       ];
       const overForeign: DragImpact = {
         movement: {
-          willDisplaceForward,
           displacedBy,
           displaced,
           map: getDisplacementMap(displaced),
@@ -82,25 +84,22 @@ import patchDroppableMap from '../../../src/state/patch-droppable-map';
         },
       };
 
-      const first: DimensionMap = getDimensionMapWithPlaceholder({
-        dimensions: preset.dimensions,
+      const first: DroppableDimensionMap = recomputePlaceholders({
+        draggables: preset.draggables,
+        droppables: preset.droppables,
         previousImpact: homeImpact,
         impact: overForeign,
         draggable: preset.inHome1,
       });
 
-      expect(first).not.toEqual(preset.dimensions);
-      const placeholderSize: Position = patch(
-        axis.line,
-        preset.inHome1.displaceBy[axis.line],
-      );
+      expect(first).not.toEqual(preset.droppables);
       const withPlaceholder: DroppableDimension = addPlaceholder(
         preset.foreign,
-        placeholderSize,
+        preset.inHome1,
         preset.draggables,
       );
       expect(first).toEqual(
-        patchDroppableMap(preset.dimensions, withPlaceholder),
+        patchDroppableMap(preset.droppables, withPlaceholder),
       );
 
       // now moving forward (should not add another placeholder)
@@ -111,7 +110,6 @@ import patchDroppableMap from '../../../src/state/patch-droppable-map';
       ];
       const overForeign2: DragImpact = {
         movement: {
-          willDisplaceForward,
           displacedBy,
           displaced: displaced2,
           map: getDisplacementMap(displaced2),
@@ -122,22 +120,21 @@ import patchDroppableMap from '../../../src/state/patch-droppable-map';
           droppableId: preset.foreign.descriptor.id,
         },
       };
-      const second: DimensionMap = getDimensionMapWithPlaceholder({
-        dimensions: preset.dimensions,
+      const second: DroppableDimensionMap = recomputePlaceholders({
+        draggable: preset.inHome1,
+        draggables: preset.draggables,
+        droppables: preset.droppables,
         previousImpact: overForeign,
         impact: overForeign2,
-        draggable: preset.inHome1,
       });
 
       expect(second).toEqual(first);
     });
 
     it('should remove a placeholder if moving from a foreign list', () => {
-      const willDisplaceForward: boolean = true;
       const displacedBy: DisplacedBy = getDisplacedBy(
         axis,
         preset.inHome1.displaceBy,
-        willDisplaceForward,
       );
       const displaced: Displacement[] = [
         getVisibleDisplacement(preset.inForeign1),
@@ -147,7 +144,6 @@ import patchDroppableMap from '../../../src/state/patch-droppable-map';
       ];
       const overForeign: DragImpact = {
         movement: {
-          willDisplaceForward,
           displacedBy,
           displaced,
           map: getDisplacementMap(displaced),
@@ -161,41 +157,43 @@ import patchDroppableMap from '../../../src/state/patch-droppable-map';
 
       // has a placeholder when moving over foreign
       {
-        const toForeign: DimensionMap = getDimensionMapWithPlaceholder({
-          dimensions: preset.dimensions,
+        const toForeign: DroppableDimensionMap = recomputePlaceholders({
+          draggables: preset.draggables,
+          droppables: preset.droppables,
           previousImpact: homeImpact,
           impact: overForeign,
           draggable: preset.inHome1,
         });
 
-        expect(toForeign).not.toEqual(preset.dimensions);
+        expect(toForeign).not.toEqual(preset.droppables);
         expect(
-          toForeign.droppables[preset.foreign.descriptor.id].subject
-            .withPlaceholder,
+          toForeign[preset.foreign.descriptor.id].subject.withPlaceholder,
         ).toBeTruthy();
       }
       // no placeholder when moving back over home
       {
-        const toHome: DimensionMap = getDimensionMapWithPlaceholder({
-          dimensions: preset.dimensions,
+        const toHome: DroppableDimensionMap = recomputePlaceholders({
+          draggables: preset.draggables,
+          droppables: preset.droppables,
           previousImpact: overForeign,
           impact: homeImpact,
           draggable: preset.inHome1,
         });
 
-        expect(toHome).toEqual(preset.dimensions);
+        expect(toHome).toEqual(preset.droppables);
       }
 
       // no placeholder when moving over nothing
       {
-        const toNoWhere: DimensionMap = getDimensionMapWithPlaceholder({
-          dimensions: preset.dimensions,
+        const toNoWhere: DroppableDimensionMap = recomputePlaceholders({
+          draggables: preset.draggables,
+          droppables: preset.droppables,
           previousImpact: overForeign,
           impact: noImpact,
           draggable: preset.inHome1,
         });
 
-        expect(toNoWhere).toEqual(preset.dimensions);
+        expect(toNoWhere).toEqual(preset.droppables);
       }
     });
   });
