@@ -1,13 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import {
-  offset,
-  withScroll,
-  type Position,
-  type BoxModel,
-} from 'css-box-model';
-import { add } from '../position';
-import { toDroppableMap } from '../dimension-structures';
+import { type Position } from 'css-box-model';
 import type {
   Viewport,
   DraggableDimension,
@@ -16,6 +9,9 @@ import type {
   DroppableDimensionMap,
   DroppableId,
 } from '../../types';
+import { add } from '../../position';
+import { toDroppableMap } from '../../dimension-structures';
+import offsetDraggable from './offset-draggable';
 
 type Args = {|
   additions: DraggableDimension[],
@@ -56,18 +52,12 @@ export default ({
         windowScrollChange,
         droppableScrollChange,
       );
-      const client: BoxModel = offset(draggable.client, totalChange);
-      const page: BoxModel = withScroll(client, viewport.scroll.initial);
 
-      const moved: DraggableDimension = {
-        ...draggable,
-        placeholder: {
-          ...draggable.placeholder,
-          client,
-        },
-        client,
-        page,
-      };
+      const moved: DraggableDimension = offsetDraggable({
+        draggable,
+        offset: totalChange,
+        initialWindowScroll: viewport.scroll.initial,
+      });
 
       return moved;
     },

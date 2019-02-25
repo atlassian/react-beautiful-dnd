@@ -1,10 +1,5 @@
 // @flow
-import {
-  offset as offsetBox,
-  withScroll,
-  type BoxModel,
-  type Position,
-} from 'css-box-model';
+import { type Position } from 'css-box-model';
 import type {
   Axis,
   DimensionMap,
@@ -13,9 +8,14 @@ import type {
   DraggableDimension,
   DraggableDimensionMap,
 } from '../../types';
-import { toDraggableMap, toDroppableList } from '../dimension-structures';
-import { patch, add, negate } from '../position';
-import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
+import {
+  toDraggableMap,
+  toDroppableList,
+  toDraggableList,
+} from '../../dimension-structures';
+import { patch, add, negate } from '../../position';
+import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
+import offsetDraggable from './offset-draggable';
 
 type Args = {|
   existing: DimensionMap,
@@ -38,7 +38,7 @@ export default ({
   additions: addedDraggables,
   removals: removedDraggables,
   initialWindowScroll,
-}: Args): DraggableDimensionMap => {
+}: Args): DraggableDimension[] => {
   const droppables: DroppableDimension[] = toDroppableList(existing.droppables);
 
   const shifted: DraggableDimensionMap = {};
@@ -110,7 +110,7 @@ export default ({
       },
     );
 
-    // phase 2: additions
+    // Phase 2: additions
     // We do this on the withRemovals array as the new index coming in already account for removals
 
     const additions: DraggableDimension[] = addedDraggables.filter(
@@ -167,41 +167,31 @@ export default ({
         return;
       }
 
-      const client: BoxModel = offsetBox(item.client, shift.offset);
-      const page: BoxModel = withScroll(client, initialWindowScroll);
-      const index: number = item.descriptor.index + shift.indexChange;
+      const moved: DraggableDimension = offsetDraggable({
+        draggable: item,
+        offset: shift.offset,
+        initialWindowScroll,
+      });
 
-      const moved: DraggableDimension = {
-        ...item,
+      const index: number = item.descriptor.index + shift.indexChange;
+      const updated: DraggableDimension = {
+        ...moved,
         descriptor: {
           ...item.descriptor,
           index,
         },
-        placeholder: {
-          ...item.placeholder,
-          client,
-        },
-        client,
-        page,
       };
 
       // Add to big cache
-      shifted[moved.descriptor.id] = moved;
+      shifted[moved.descriptor.id] = updated;
     });
   });
 
-  const draggableMap: DraggableDimensionMap = {
+  const map: DraggableDimensionMap = {
     ...existing.draggables,
     // will overwrite existing draggables with shifted values if required
     ...shifted,
-    // add the additions without modification - they are already in the right spot
-    ...toDraggableMap(addedDraggables),
   };
 
-  // delete draggables that have been removed
-  removedDraggables.forEach((id: DraggableId) => {
-    delete draggableMap[id];
-  });
-
-  return draggableMap;
+  return toDraggableList(map);
 };

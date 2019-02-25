@@ -10,17 +10,18 @@ import {
 } from 'css-box-model';
 import getDroppableDimension, {
   type Closest,
-} from '../droppable/get-droppable';
+} from '../../droppable/get-droppable';
 import type {
   DroppableDimension,
   DroppableDimensionMap,
   Scrollable,
   Axis,
-} from '../../types';
-import { isEqual } from '../spacing';
-import scrollDroppable from '../droppable/scroll-droppable';
-import { removePlaceholder } from '../droppable/with-placeholder';
-import getFrame from '../get-frame';
+} from '../../../types';
+import { isEqual } from '../../spacing';
+import scrollDroppable from '../../droppable/scroll-droppable';
+import { removePlaceholder } from '../../droppable/with-placeholder';
+import getFrame from '../../get-frame';
+import { toDroppableMap } from '../../dimension-structures';
 
 const throwIfSpacingChange = (old: BoxModel, fresh: BoxModel) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -42,42 +43,41 @@ const adjustBorderBoxSize = (axis: Axis, old: Rect, fresh: Rect): Spacing => ({
 });
 
 type Args = {|
+  existing: DroppableDimensionMap,
   modified: DroppableDimension[],
-  existingDroppables: DroppableDimensionMap,
   initialWindowScroll: Position,
 |};
 
 export default ({
   modified,
-  existingDroppables,
+  existing,
   initialWindowScroll,
-}: Args): DroppableDimension[] => {
+}: Args): DroppableDimensionMap => {
   // dynamically adjusting the client subject and page subject
   // of a droppable in response to dynamic additions and removals
 
   // No existing droppables modified
   if (!modified.length) {
-    return modified;
+    return existing;
   }
 
   const adjusted: DroppableDimension[] = modified.map(
     (provided: DroppableDimension): DroppableDimension => {
-      const raw: ?DroppableDimension =
-        existingDroppables[provided.descriptor.id];
+      const raw: ?DroppableDimension = existing[provided.descriptor.id];
       invariant(raw, 'Could not locate droppable in existing droppables');
 
-      const existing: DroppableDimension = raw.subject.withPlaceholder
+      const dimension: DroppableDimension = raw.subject.withPlaceholder
         ? removePlaceholder(raw)
         : raw;
 
-      const oldClient: BoxModel = existing.client;
+      const oldClient: BoxModel = dimension.client;
       const newClient: BoxModel = provided.client;
-      const oldScrollable: Scrollable = getFrame(existing);
+      const oldScrollable: Scrollable = getFrame(dimension);
       const newScrollable: Scrollable = getFrame(provided);
 
       // Extra checks to help with development
       if (process.env.NODE_ENV !== 'production') {
-        throwIfSpacingChange(existing.client, provided.client);
+        throwIfSpacingChange(dimension.client, provided.client);
         throwIfSpacingChange(
           oldScrollable.frameClient,
           newScrollable.frameClient,
@@ -97,7 +97,7 @@ export default ({
 
       const client: BoxModel = createBox({
         borderBox: adjustBorderBoxSize(
-          existing.axis,
+          dimension.axis,
           oldClient.borderBox,
           newClient.borderBox,
         ),
@@ -138,5 +138,11 @@ export default ({
     },
   );
 
-  return adjusted;
+  const result: DroppableDimensionMap = {
+    ...existing,
+    // will override any conflicts with existing
+    ...toDroppableMap(adjusted),
+  };
+
+  return result;
 };
