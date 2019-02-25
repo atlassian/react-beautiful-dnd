@@ -5,7 +5,7 @@ import {
   type Position,
   type BoxModel,
 } from 'css-box-model';
-import type { DraggableDimension } from '../../types';
+import type { DraggableDimension } from '../../../types';
 
 type Args = {|
   draggable: DraggableDimension,

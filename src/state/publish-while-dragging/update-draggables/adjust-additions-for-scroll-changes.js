@@ -8,20 +8,19 @@ import type {
   Scrollable,
   DroppableDimensionMap,
   DroppableId,
-} from '../../types';
+} from '../../../types';
 import { add } from '../../position';
-import { toDroppableMap } from '../../dimension-structures';
 import offsetDraggable from './offset-draggable';
 
 type Args = {|
   additions: DraggableDimension[],
-  modified: DroppableDimension[],
+  updatedDroppables: DroppableDimensionMap,
   viewport: Viewport,
 |};
 
 export default ({
   additions,
-  modified: modifiedDroppables,
+  updatedDroppables,
   viewport,
 }: Args): DraggableDimension[] => {
   // We need to adjust collected draggables so that they
@@ -36,12 +35,11 @@ export default ({
   // Need to undo the displacement caused by window scroll changes
   const windowScrollChange: Position = viewport.scroll.diff.value;
   // These modified droppables have already had their scroll changes correctly updated
-  const modifiedMap: DroppableDimensionMap = toDroppableMap(modifiedDroppables);
 
   return additions.map(
     (draggable: DraggableDimension): DraggableDimension => {
       const droppableId: DroppableId = draggable.descriptor.droppableId;
-      const modified: DroppableDimension = modifiedMap[droppableId];
+      const modified: DroppableDimension = updatedDroppables[droppableId];
 
       const frame: ?Scrollable = modified.frame;
       invariant(frame);

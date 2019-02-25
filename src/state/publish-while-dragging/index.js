@@ -7,26 +7,19 @@ import type {
   DropPendingState,
   Published,
   Critical,
-  DraggableId,
   DraggableDimension,
-  DroppableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
   DragImpact,
 } from '../../types';
 import * as timings from '../../debug/timings';
-import getDragPositions from './get-drag-positions';
-import adjustAdditionsForScrollChanges from './update-draggables/adjust-additions-for-scroll-changes';
-import getDraggableMap from './update-draggables/adjust-existing-for-additions-and-removals';
-import { toDroppableMap } from '../dimension-structures';
-import getDimensionMapWithPlaceholder from '../get-dimension-map-with-placeholder';
-import getHomeOnLift from '../get-home-on-lift';
-import getDragImpact from '../get-drag-impact';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
-import withNoAnimatedDisplacement from './with-no-animated-displacement';
-import adjustAdditionsForCollapsedHome from './adjust-additions-for-collapsed-home';
-import adjustExistingForAdditionsAndRemovals from './update-draggables/adjust-existing-for-additions-and-removals';
+import getDragImpact from '../get-drag-impact';
+import getHomeOnLift from '../get-home-on-lift';
+import getDragPositions from './get-drag-positions';
+import updateDraggables from './update-draggables';
 import updateDroppables from './update-droppables';
+import withNoAnimatedDisplacement from './with-no-animated-displacement';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -46,87 +39,37 @@ export default ({
   const droppables: DroppableDimensionMap = updateDroppables({
     modified: published.modified,
     existing: state.dimensions.droppables,
-    initialWindowScroll: state.viewport.scroll.initial,
+    viewport: state.viewport,
   });
 
   const draggables: DraggableDimensionMap = updateDraggables({
-    droppables,
+    updatedDroppables: droppables,
+    // will not change during a drag
+    criticalId: state.critical.draggable.id,
     existing: state.dimensions.draggables,
     additions: published.additions,
     removals: published.removals,
-    initialWindowScroll: state.viewport.scroll.initial,
+    viewport: state.viewport,
   });
 
-  // Adjust the existing draggables
-
-  const shiftedExistingDraggables: DraggableDimensionMap = adjustExistingForAdditionsAndRemovals(
-    {
-      droppables,
-      additions: withScrollChanges,
-    },
-  );
-
-  const dragging: DraggableDimension =
-    shiftedExistingDraggables[state.critical.draggable.id];
-  const home: DroppableDimension = droppables[state.critical.droppable.id];
-
-  const critical: Critical = {
-    // droppable cannot change during a drag
-    droppable: home.descriptor,
-    // draggable index can change during a drag
-    draggable: dragging.descriptor,
-  };
-
-  // Adjust the added draggables
-
-  const scrolledAdditions: DraggableDimension[] = adjustAdditionsForScrollChanges(
-    {
-      additions: published.additions,
-      // using our already adjusted droppables as they have the correct scroll changes
-      modified: adjustedDroppables,
-      viewport: state.viewport,
-    },
-  );
-
-  const shiftedAdditions: DraggableDimension[] = adjustAdditionsForCollapsedHome(
-    {
-      additions: scrolledAdditions,
-      dragging: updated,
-      // T OPDO
-      home: adjustedDroppables[critical.droppable.id],
-      viewport: state.viewport,
-    },
-  );
-
-  const patched: DimensionMap = {
-    draggables: state.dimensions.draggables,
-    droppables: {
-      ...state.dimensions.droppables,
-      ...toDroppableMap(adjusted),
-    },
-  };
-
-  // Add, remove and shift draggables
-  // const draggables: DraggableDimensionMap = getDraggableMap({
-  //   existing: patched,
-  //   additions: shifted,
-  //   removals: published.removals,
-  //   initialWindowScroll: state.viewport.scroll.initial,
+  // const withPlaceholder: DroppableDimensionMap = getWithPlaceholder({
+  //   draggables,
+  //   droppables,
   // });
 
-  const dragging: DraggableId = state.critical.draggable.id;
-  const original: DraggableDimension = state.dimensions.draggables[dragging];
-  const updated: DraggableDimension = draggables[dragging];
+  const dimensions: DimensionMap = {
+    draggables,
+    droppables,
+    // droppables: withPlaceholder,
+  };
 
-  const dimensions: DimensionMap = getDimensionMapWithPlaceholder({
-    previousImpact: state.impact,
-    impact: state.impact,
-    draggable: updated,
-    dimensions: {
-      draggables,
-      droppables: patched.droppables,
-    },
-  });
+  const critical: Critical = {
+    draggable: dimensions.draggables[state.critical.draggable.id].descriptor,
+    droppable: dimensions.droppables[state.critical.droppable.id].descriptor,
+  };
+  const original: DraggableDimension =
+    state.dimensions.draggables[critical.draggable.id];
+  const updated: DraggableDimension = draggables[critical.draggable.id];
 
   // Get the updated drag positions to account for any
   // shift to the critical draggable

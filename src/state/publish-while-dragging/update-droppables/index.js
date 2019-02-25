@@ -3,7 +3,6 @@ import invariant from 'tiny-invariant';
 import {
   withScroll,
   createBox,
-  type Position,
   type BoxModel,
   type Spacing,
   type Rect,
@@ -12,6 +11,7 @@ import getDroppableDimension, {
   type Closest,
 } from '../../droppable/get-droppable';
 import type {
+  Viewport,
   DroppableDimension,
   DroppableDimensionMap,
   Scrollable,
@@ -45,13 +45,13 @@ const adjustBorderBoxSize = (axis: Axis, old: Rect, fresh: Rect): Spacing => ({
 type Args = {|
   existing: DroppableDimensionMap,
   modified: DroppableDimension[],
-  initialWindowScroll: Position,
+  viewport: Viewport,
 |};
 
 export default ({
   modified,
   existing,
-  initialWindowScroll,
+  viewport,
 }: Args): DroppableDimensionMap => {
   // dynamically adjusting the client subject and page subject
   // of a droppable in response to dynamic additions and removals
@@ -109,7 +109,7 @@ export default ({
       const closest: Closest = {
         // not allowing a change to the scrollable frame size during a drag
         client: oldScrollable.frameClient,
-        page: withScroll(oldScrollable.frameClient, initialWindowScroll),
+        page: withScroll(oldScrollable.frameClient, viewport.scroll.initial),
         shouldClipSubject: oldScrollable.shouldClipSubject,
         // the scroll size can change during a drag
         scrollSize: newScrollable.scrollSize,
@@ -124,7 +124,7 @@ export default ({
         isFixedOnPage: provided.isFixedOnPage,
         direction: provided.axis.direction,
         client,
-        page: withScroll(client, initialWindowScroll),
+        page: withScroll(client, viewport.scroll.initial),
         closest,
       });
 

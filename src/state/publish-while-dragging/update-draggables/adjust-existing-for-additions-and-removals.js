@@ -2,26 +2,24 @@
 import { type Position } from 'css-box-model';
 import type {
   Axis,
-  DimensionMap,
+  DroppableDimensionMap,
   DraggableId,
   DroppableDimension,
   DraggableDimension,
   DraggableDimensionMap,
-} from '../../types';
-import {
-  toDraggableMap,
-  toDroppableList,
-  toDraggableList,
-} from '../../dimension-structures';
+  Viewport,
+} from '../../../types';
+import { toDraggableMap, toDroppableList } from '../../dimension-structures';
 import { patch, add, negate } from '../../position';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import offsetDraggable from './offset-draggable';
 
 type Args = {|
-  existing: DimensionMap,
+  droppables: DroppableDimensionMap,
+  existing: DraggableDimensionMap,
   additions: DraggableDimension[],
   removals: DraggableId[],
-  initialWindowScroll: Position,
+  viewport: Viewport,
 |};
 
 type Shift = {|
@@ -35,11 +33,12 @@ type ShiftMap = {
 
 export default ({
   existing,
+  droppables: droppableMap,
   additions: addedDraggables,
   removals: removedDraggables,
-  initialWindowScroll,
-}: Args): DraggableDimension[] => {
-  const droppables: DroppableDimension[] = toDroppableList(existing.droppables);
+  viewport,
+}: Args): DraggableDimensionMap => {
+  const droppables: DroppableDimension[] = toDroppableList(droppableMap);
 
   const shifted: DraggableDimensionMap = {};
 
@@ -48,7 +47,7 @@ export default ({
 
     const original: DraggableDimension[] = getDraggablesInsideDroppable(
       droppable.descriptor.id,
-      existing.draggables,
+      existing,
     );
 
     const toShift: ShiftMap = {};
@@ -87,9 +86,9 @@ export default ({
           return true;
         }
 
-        // moving backwards by size
+        // moving backwards by displacement
         const offset: Position = negate(
-          patch(axis.line, item.client.marginBox[axis.size]),
+          patch(axis.line, item.displaceBy[axis.line]),
         );
 
         original.slice(index).forEach((sibling: DraggableDimension) => {
@@ -170,7 +169,7 @@ export default ({
       const moved: DraggableDimension = offsetDraggable({
         draggable: item,
         offset: shift.offset,
-        initialWindowScroll,
+        initialWindowScroll: viewport.scroll.initial,
       });
 
       const index: number = item.descriptor.index + shift.indexChange;
@@ -193,5 +192,5 @@ export default ({
     ...shifted,
   };
 
-  return toDraggableList(map);
+  return map;
 };

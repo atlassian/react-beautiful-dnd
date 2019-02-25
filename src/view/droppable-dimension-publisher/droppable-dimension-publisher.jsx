@@ -12,6 +12,7 @@ import getScroll from './get-scroll';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
+  RecollectDroppableOptions,
 } from '../../state/dimension-marshal/dimension-marshal-types';
 import getEnv, { type Env } from './get-env';
 import type {
@@ -268,7 +269,7 @@ export default class DroppableDimensionPublisher extends React.Component<Props> 
   };
 
   // Used when Draggables are added or removed from a Droppable during a drag
-  recollect = (options: RecollectionOptions): DroppableDimension => {
+  recollect = (options: RecollectDroppableOptions): DroppableDimension => {
     const dragging: ?WhileDragging = this.dragging;
     const closest: ?Element = getClosestScrollable(dragging);
     invariant(
@@ -292,7 +293,7 @@ export default class DroppableDimensionPublisher extends React.Component<Props> 
       return execute();
     }
 
-    return withoutPlaceholder(this.props.getPlaceholderRef(), execute),
+    return withoutPlaceholder(this.props.getPlaceholderRef(), execute);
   };
 
   getDimensionAndWatchScroll = (

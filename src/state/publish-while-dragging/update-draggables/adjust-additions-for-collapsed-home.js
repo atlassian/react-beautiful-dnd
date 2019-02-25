@@ -4,8 +4,8 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DisplacedBy,
-} from '../../types';
-import getDisplacedBy from '../get-displaced-by';
+} from '../../../types';
+import getDisplacedBy from '../../get-displaced-by';
 import offsetDraggable from './offset-draggable';
 
 type Args = {|
