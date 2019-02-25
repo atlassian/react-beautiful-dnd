@@ -20,7 +20,7 @@ import noImpact from '../../../../../src/state/no-impact';
 import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
 import getDisplacementMap from '../../../../../src/state/get-displacement-map';
 import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get-new-home-client-offset';
-import patchDroppableMap from '../../../../../src/state/patch-droppable-map';
+import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -146,7 +146,7 @@ import patchDroppableMap from '../../../../../src/state/patch-droppable-map';
         scrollableHome,
         scroll,
       );
-      const withScrolledHome: DimensionMap = patchDroppableMap(
+      const withScrolledHome: DimensionMap = patchDimensionMap(
         preset.dimensions,
         scrolled,
       );

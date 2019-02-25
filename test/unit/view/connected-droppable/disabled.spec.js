@@ -10,9 +10,9 @@ import type {
 import getOwnProps from './util/get-own-props';
 import { getPreset, disableDroppable } from '../../../utils/dimension';
 import resting from './util/resting-props';
-import patchDroppableMap from '../../../../src/state/patch-droppable-map';
 import noImpact from '../../../../src/state/no-impact';
 import cloneImpact from '../../../utils/clone-impact';
+import patchDimensionMap from '../../../../src/state/patch-dimension-map';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -31,7 +31,7 @@ describe('home list', () => {
     const base: DraggingState = state.dragging(preset.inHome1.descriptor.id);
     const getNoWhere = (): DraggingState => ({
       ...base,
-      dimensions: patchDroppableMap(
+      dimensions: patchDimensionMap(
         base.dimensions,
         disableDroppable(preset.home),
       ),

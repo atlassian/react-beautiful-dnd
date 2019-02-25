@@ -37,7 +37,7 @@ import type {
   ScrollSize,
 } from '../../src/types';
 import isTotallyVisibleThroughFrame from '../../src/state/visibility/is-totally-visible-through-frame';
-import patchDroppableMap from '../../src/state/patch-droppable-map';
+import patchDimensionMap from '../../src/state/patch-dimension-map';
 
 type GetComputedSpacingArgs = {|
   margin?: Spacing,
@@ -136,10 +136,7 @@ export const addDroppable = (
   droppable: DroppableDimension,
 ): DraggingState => ({
   ...base,
-  dimensions: {
-    draggables: base.dimensions.draggables,
-    droppables: patchDroppableMap(base.dimensions.droppables, droppable),
-  },
+  dimensions: patchDimensionMap(base.dimensions, droppable),
 });
 
 export const addDraggable = (

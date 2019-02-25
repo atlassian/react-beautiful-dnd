@@ -7,7 +7,7 @@ import type {
   DroppableDimension,
   DimensionMap,
 } from '../../../../../../src/types';
-import patchDroppableMap from '../../../../../../src/state/patch-droppable-map';
+import patchDimensionMap from '../../../../../../src/state/patch-dimension-map';
 
 type DragToArgs = {|
   selection: Position,
@@ -35,10 +35,7 @@ export default ({
     if (!droppable) {
       return base.dimensions;
     }
-    return {
-      draggables: base.dimensions.draggables,
-      droppables: patchDroppableMap(base.dimensions.droppables, droppable),
-    };
+    return patchDimensionMap(base.dimensions, droppable);
   })();
 
   return {

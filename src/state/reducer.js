@@ -30,7 +30,7 @@ import { forward } from './user-direction/user-direction-preset';
 import update from './post-reducer/when-moving/update';
 import refreshSnap from './post-reducer/when-moving/refresh-snap';
 import getHomeOnLift from './get-home-on-lift';
-import patchDroppableMap from './patch-droppable-map';
+import patchDimensionMap from './patch-dimension-map';
 
 const isSnapping = (state: StateWhenUpdatesAllowed): boolean =>
   state.movementMode === 'SNAP';
@@ -40,10 +40,7 @@ const postDroppableChange = (
   updated: DroppableDimension,
   isEnabledChanging: boolean,
 ): StateWhenUpdatesAllowed => {
-  const dimensions: DimensionMap = {
-    draggables: state.dimensions.draggables,
-    droppables: patchDroppableMap(state.dimensions.droppables, updated),
-  };
+  const dimensions: DimensionMap = patchDimensionMap(state.dimensions, updated);
 
   // if the enabled state is changing, we need to force a update
   if (!isSnapping(state) || isEnabledChanging) {
