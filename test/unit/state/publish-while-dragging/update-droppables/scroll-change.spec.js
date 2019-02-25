@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { Position, BoxModel } from 'css-box-model';
+import { withScroll, type Position, type BoxModel } from 'css-box-model';
 import type {
   DroppableDimension,
   CollectingState,
@@ -9,19 +9,18 @@ import type {
   DropPendingState,
   ScrollSize,
   Scrollable,
-} from '../../../../src/types';
+} from '../../../../../src/types';
 import {
   getPreset,
   makeScrollable,
   addDroppable,
   getFrame,
-} from '../../../utils/dimension';
-import getStatePreset from '../../../utils/get-simple-state-preset';
-import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
-import getDroppable from '../../../../src/state/droppable/get-droppable';
-import publish from '../../../../src/state/publish-while-dragging';
-import { empty, adjustBox } from './util';
-import { withScroll } from '../../../../node_modules/css-box-model';
+} from '../../../../utils/dimension';
+import getStatePreset from '../../../../utils/get-simple-state-preset';
+import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
+import getDroppable from '../../../../../src/state/droppable/get-droppable';
+import publish from '../../../../../src/state/publish-while-dragging';
+import { empty, adjustBox } from '../util';
 
 const preset = getPreset();
 const state = getStatePreset();
