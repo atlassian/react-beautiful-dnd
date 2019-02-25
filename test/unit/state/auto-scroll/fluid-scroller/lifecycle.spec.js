@@ -37,10 +37,13 @@ forEach(({ state }: BlockFnArgs) => {
     scroller.stop();
 
     // started and then stopped multiple times
-    scroller.start(base);
-    scroller.stop();
-    scroller.stop();
-    scroller.stop();
+    const run = () => {
+      scroller.start(base);
+      scroller.stop();
+      scroller.stop();
+      scroller.stop();
+    };
+    expect(run).not.toThrow();
   });
 
   it('should throw if started multiple times', () => {
