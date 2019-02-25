@@ -56,6 +56,13 @@ export default (callbacks: Callbacks) => {
     callbacks: {
       publish: callbacks.publishWhileDragging,
       collectionStarting: callbacks.collectionStarting,
+      getCritical: (): Critical => {
+        invariant(
+          collection,
+          'Cannot get critical when there is no collection',
+        );
+        return collection.critical;
+      },
     },
     getEntries: (): Entries => entries,
   });
