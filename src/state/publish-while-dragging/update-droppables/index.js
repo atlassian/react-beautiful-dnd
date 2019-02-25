@@ -19,10 +19,7 @@ import type {
 } from '../../../types';
 import { isEqual } from '../../spacing';
 import scrollDroppable from '../../droppable/scroll-droppable';
-import {
-  removePlaceholder,
-  addPlaceholder,
-} from '../../droppable/with-placeholder';
+import { removePlaceholder } from '../../droppable/with-placeholder';
 import getFrame from '../../get-frame';
 import { toDroppableMap } from '../../dimension-structures';
 

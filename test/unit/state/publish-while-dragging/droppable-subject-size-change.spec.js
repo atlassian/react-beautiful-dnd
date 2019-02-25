@@ -233,7 +233,7 @@ it('should throw if any spacing changes to the frame', () => {
   });
 });
 
-it('should reapply any with placeholder spacing', () => {
+it('should reapply any dynamic placeholder spacing', () => {
   const draggable: DraggableDimension = preset.inHome1;
   const scrollableForeign: DroppableDimension = makeScrollable(
     preset.foreign,
@@ -242,15 +242,12 @@ it('should reapply any with placeholder spacing', () => {
   {
     const withPlaceholder: DroppableDimension = addPlaceholder(
       scrollableForeign,
-      draggable.displaceBy,
+      draggable,
       preset.draggables,
     );
-    // will always displace forward in a foreign list
-    const willDisplaceForward: boolean = true;
     const displacedBy: DisplacedBy = getDisplacedBy(
       withPlaceholder.axis,
       draggable.displaceBy,
-      willDisplaceForward,
     );
     const displaced: Displacement[] = [
       getVisibleDisplacement(preset.inForeign1),
@@ -263,7 +260,6 @@ it('should reapply any with placeholder spacing', () => {
         displacedBy,
         displaced,
         map: getDisplacementMap(displaced),
-        willDisplaceForward,
       },
       merge: null,
       destination: {
