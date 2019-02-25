@@ -21,5 +21,16 @@ it('should do not modify the dimensions when nothing has changed', () => {
   });
 
   invariant(result.phase === 'DRAGGING');
-  expect(result.dimensions).toEqual(original.dimensions);
+
+  // only minor modifications on original
+  const expected: DraggingState = {
+    phase: 'DRAGGING',
+    ...original,
+    // appeasing flow
+    // eslint-disable-next-line
+    phase: 'DRAGGING',
+    // we force no animation of the moving item
+    forceShouldAnimate: false,
+  };
+  expect(result).toEqual(expected);
 });

@@ -134,6 +134,7 @@ export default ({
     impact,
     dimensions,
     onLift,
+    onLiftImpact: homeImpact,
     // not animating this movement
     forceShouldAnimate: false,
   };
