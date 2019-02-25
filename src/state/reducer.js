@@ -44,7 +44,6 @@ const postDroppableChange = (
     draggables: state.dimensions.draggables,
     droppables: patchDroppableMap(state.dimensions.droppables, updated),
   };
-  console.log('patched', Object.keys(dimensions.droppables));
 
   // if the enabled state is changing, we need to force a update
   if (!isSnapping(state) || isEnabledChanging) {
