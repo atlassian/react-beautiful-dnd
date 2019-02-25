@@ -1,18 +1,18 @@
 // @flow
 import { offset, type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import publish from '../../../../src/state/publish-while-dragging';
+import publish from '../../../../../src/state/publish-while-dragging';
 import {
   getPreset,
   getDraggableDimension,
   addDroppable,
   getFrame,
-} from '../../../utils/dimension';
-import getStatePreset from '../../../utils/get-simple-state-preset';
-import { empty, withScrollables, scrollableHome } from './util';
-import { add, negate } from '../../../../src/state/position';
-import scrollViewport from '../../../../src/state/scroll-viewport';
-import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
+} from '../../../../utils/dimension';
+import getStatePreset from '../../../../utils/get-simple-state-preset';
+import { empty, withScrollables, scrollableHome } from '../util';
+import { add, negate } from '../../../../../src/state/position';
+import scrollViewport from '../../../../../src/state/scroll-viewport';
+import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
 import type {
   Published,
   DraggableDimension,
@@ -21,7 +21,7 @@ import type {
   CollectingState,
   Viewport,
   DroppableDimension,
-} from '../../../../src/types';
+} from '../../../../../src/types';
 
 const state = getStatePreset();
 const preset = getPreset();
