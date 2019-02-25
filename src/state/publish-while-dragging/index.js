@@ -1,28 +1,26 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type {
-  DragImpact,
   DimensionMap,
   DraggingState,
   CollectingState,
   DropPendingState,
   Published,
   Critical,
-  DraggableId,
   DraggableDimension,
-  DroppableDimension,
   DraggableDimensionMap,
+  DroppableDimensionMap,
+  DragImpact,
 } from '../../types';
 import * as timings from '../../debug/timings';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import getDragImpact from '../get-drag-impact';
+import getHomeOnLift from '../get-home-on-lift';
 import getDragPositions from './get-drag-positions';
-import adjustModifiedDroppables from './adjust-modified-droppables';
-import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-changes';
-import getDraggableMap from './get-draggable-map';
+import updateDraggables from './update-draggables';
+import updateDroppables from './update-droppables';
 import withNoAnimatedDisplacement from './with-no-animated-displacement';
-import { toDroppableMap } from '../dimension-structures';
-import noImpact from '../no-impact';
-import getDimensionMapWithPlaceholder from '../get-dimension-map-with-placeholder';
+import recomputePlaceholders from '../recompute-placeholders';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -39,61 +37,42 @@ export default ({
 
   // Change the subject size and scroll of droppables
   // will remove any subject.withPlaceholder
-  const adjusted: DroppableDimension[] = adjustModifiedDroppables({
+  const updatedDroppables: DroppableDimensionMap = updateDroppables({
     modified: published.modified,
-    existingDroppables: state.dimensions.droppables,
-    initialWindowScroll: state.viewport.scroll.initial,
-  });
-
-  const shifted: DraggableDimension[] = adjustAdditionsForScrollChanges({
-    additions: published.additions,
-    // using our already adjusted droppables as they have the correct scroll changes
-    modified: adjusted,
+    existing: state.dimensions.droppables,
     viewport: state.viewport,
   });
 
-  const patched: DimensionMap = {
-    draggables: state.dimensions.draggables,
-    droppables: {
-      ...state.dimensions.droppables,
-      ...toDroppableMap(adjusted),
-    },
-  };
-
-  // Add, remove and shift draggables
-  const draggables: DraggableDimensionMap = getDraggableMap({
-    existing: patched,
-    additions: shifted,
+  const draggables: DraggableDimensionMap = updateDraggables({
+    updatedDroppables,
+    // will not change during a drag
+    criticalId: state.critical.draggable.id,
+    existing: state.dimensions.draggables,
+    additions: published.additions,
     removals: published.removals,
-    initialWindowScroll: state.viewport.scroll.initial,
-  });
-
-  // const droppables: DroppableDimensionMap = reapplyPlaceholder({
-  //   wasOver: whatIsDraggedOver(state.impact),
-  //   previous: state.dimensions.droppables,
-  //   proposed: patched.droppables,
-  //   draggables,
-  // });
-
-  const dragging: DraggableId = state.critical.draggable.id;
-  const original: DraggableDimension = state.dimensions.draggables[dragging];
-  const updated: DraggableDimension = draggables[dragging];
-
-  const dimensions: DimensionMap = getDimensionMapWithPlaceholder({
-    previousImpact: state.impact,
-    impact: state.impact,
-    draggable: updated,
-    dimensions: {
-      draggables,
-      droppables: patched.droppables,
-    },
+    viewport: state.viewport,
   });
 
   const critical: Critical = {
-    // droppable cannot change during a drag
-    droppable: state.critical.droppable,
-    // draggable index can change during a drag
-    draggable: updated.descriptor,
+    draggable: draggables[state.critical.draggable.id].descriptor,
+    droppable: updatedDroppables[state.critical.droppable.id].descriptor,
+  };
+  const original: DraggableDimension =
+    state.dimensions.draggables[critical.draggable.id];
+  const updated: DraggableDimension = draggables[critical.draggable.id];
+
+  // TODO: this is a bit of a chicken and egg problem, but it will use the old impact for placeholders
+  const droppables: DroppableDimensionMap = recomputePlaceholders({
+    draggable: updated,
+    draggables,
+    droppables: updatedDroppables,
+    previousImpact: state.impact,
+    impact: state.impact,
+  });
+
+  const dimensions: DimensionMap = {
+    draggables,
+    droppables,
   };
 
   // Get the updated drag positions to account for any
@@ -108,29 +87,35 @@ export default ({
 
   // Get the impact of all of our changes
   // this could result in a strange snap placement (will be fixed on next move)
+  const { impact: homeImpact, onLift } = getHomeOnLift({
+    draggable: updated,
+    home: dimensions.droppables[critical.droppable.id],
+    draggables: dimensions.draggables,
+    viewport: state.viewport,
+  });
+  // now need to calculate the impact for the current pageBorderBoxCenter
   const impact: DragImpact = withNoAnimatedDisplacement(
     getDragImpact({
       pageBorderBoxCenter: current.page.borderBoxCenter,
-      draggable: dimensions.draggables[state.critical.draggable.id],
+      draggable: updated,
       draggables: dimensions.draggables,
       droppables: dimensions.droppables,
       // starting from a fresh slate
-      previousImpact: noImpact,
+      previousImpact: homeImpact,
       viewport: state.viewport,
       userDirection: state.userDirection,
+      onLift,
     }),
   );
 
   const isOrphaned: boolean = Boolean(
-    state.movementMode === 'SNAP' &&
-      state.impact.destination &&
-      !impact.destination,
+    state.movementMode === 'SNAP' && !whatIsDraggedOver(impact),
   );
 
   // TODO: try and recover?
   invariant(
     !isOrphaned,
-    'Dragging item no longer has a valid destination after a dynamic update. This is not supported',
+    'Dragging item no longer has a valid merge/destination after a dynamic update. This is not supported',
   );
 
   // TODO: move into move visually pleasing position if using JUMP auto scrolling
@@ -148,6 +133,8 @@ export default ({
     initial,
     impact,
     dimensions,
+    onLift,
+    onLiftImpact: homeImpact,
     // not animating this movement
     forceShouldAnimate: false,
   };

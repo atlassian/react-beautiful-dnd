@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
@@ -9,16 +9,21 @@ import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import {
   droppableIdKey,
   droppableTypeKey,
-  styleContextKey,
+  styleKey,
+  isMovementAllowedKey,
 } from '../context-keys';
 import { warning } from '../../dev-warning';
 import checkOwnProps from './check-own-props';
+import AnimateInOut, {
+  type AnimateProvided,
+} from '../animate-in-out/animate-in-out';
+import getMaxWindowScroll from '../window/get-max-window-scroll';
 
 type Context = {
   [string]: DroppableId | TypeId,
 };
 
-export default class Droppable extends Component<Props> {
+export default class Droppable extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   styleContext: string;
   ref: ?HTMLElement = null;
@@ -26,13 +31,14 @@ export default class Droppable extends Component<Props> {
 
   // Need to declare childContextTypes without flow
   static contextTypes = {
-    [styleContextKey]: PropTypes.string.isRequired,
+    [styleKey]: PropTypes.string.isRequired,
+    [isMovementAllowedKey]: PropTypes.func.isRequired,
   };
 
   constructor(props: Props, context: Object) {
     super(props, context);
 
-    this.styleContext = context[styleContextKey];
+    this.styleContext = context[styleKey];
 
     // a little run time check to avoid an easy to catch setup issues
     if (process.env.NODE_ENV !== 'production') {
@@ -84,9 +90,10 @@ export default class Droppable extends Component<Props> {
     }
 
     warning(`
-      Droppable setup issue: DroppableProvided > placeholder could not be found.
-      Please be sure to add the {provided.placeholder} Node as a child of your Droppable
+      Droppable setup issue [droppableId: "${this.props.droppableId}"]:
+      DroppableProvided > placeholder could not be found.
 
+      Please be sure to add the {provided.placeholder} React Node as a child of your Droppable.
       More information: https://github.com/atlassian/react-beautiful-dnd#1-provided-droppableprovided
     `);
   }
@@ -116,16 +123,32 @@ export default class Droppable extends Component<Props> {
 
   getDroppableRef = (): ?HTMLElement => this.ref;
 
-  getPlaceholder() {
-    if (!this.props.placeholder) {
-      return null;
+  onPlaceholderTransitionEnd = () => {
+    const isMovementAllowed: boolean = this.context[isMovementAllowedKey]();
+    // A placeholder change can impact the window's max scroll
+    if (isMovementAllowed) {
+      this.props.updateViewportMaxScroll({ maxScroll: getMaxWindowScroll() });
     }
+  };
 
+  getPlaceholder(): Node {
+    // Placeholder > onClose / onTransitionEnd
+    // might not fire in the case of very fast toggling
     return (
-      <Placeholder
-        placeholder={this.props.placeholder}
-        innerRef={this.setPlaceholderRef}
-      />
+      <AnimateInOut
+        on={this.props.placeholder}
+        shouldAnimate={this.props.shouldAnimatePlaceholder}
+      >
+        {({ onClose, data, animate }: AnimateProvided) => (
+          <Placeholder
+            placeholder={(data: any)}
+            onClose={onClose}
+            innerRef={this.setPlaceholderRef}
+            animate={animate}
+            onTransitionEnd={this.onPlaceholderTransitionEnd}
+          />
+        )}
+      </AnimateInOut>
     );
   }
 
@@ -142,6 +165,7 @@ export default class Droppable extends Component<Props> {
       ignoreContainerClipping,
       isDraggingOver,
       draggingOverWith,
+      draggingFromThisWith,
     } = this.props;
     const provided: Provided = {
       innerRef: this.setRef,
@@ -153,6 +177,7 @@ export default class Droppable extends Component<Props> {
     const snapshot: StateSnapshot = {
       isDraggingOver,
       draggingOverWith,
+      draggingFromThisWith,
     };
 
     return (

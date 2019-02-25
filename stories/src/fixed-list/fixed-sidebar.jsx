@@ -2,8 +2,9 @@
 import React, { type Node } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
+import { colors } from '@atlaskit/theme';
 import type { Quote } from '../types';
-import { colors, grid } from '../constants';
+import { grid } from '../constants';
 import { getQuotes } from '../data';
 import QuoteItem from '../primatives/quote-item';
 import {
@@ -28,7 +29,7 @@ const SidebarContainer = styled.div`
   width: ${sidebarWidth}px;
   height: 100vh;
   overflow: auto;
-  background-color: ${colors.blue.light};
+  background-color: ${colors.B50};
   position: fixed;
 `;
 

@@ -14,6 +14,7 @@ import type {
   DimensionMarshal,
   Callbacks,
   DroppableCallbacks,
+  RecollectDroppableOptions,
 } from '../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   DroppableDimension,
@@ -112,8 +113,8 @@ export const populateMarshal = (
       scroll: (change: Position) => {
         watcher.droppable.scroll(id, change);
       },
-      recollect: () => {
-        watcher.droppable.recollect(id);
+      recollect: (options: RecollectDroppableOptions) => {
+        watcher.droppable.recollect(id, options);
         return droppable;
       },
       dragStopped: () => {

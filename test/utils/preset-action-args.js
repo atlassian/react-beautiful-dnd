@@ -1,23 +1,29 @@
 // @flow
 import type { Position } from 'css-box-model';
-import { getPreset, getDraggableDimension, makeScrollable } from './dimension';
-import { offsetByPosition } from '../../src/state/spacing';
-import getHomeLocation from '../../src/state/get-home-location';
-import getHomeImpact from '../../src/state/get-home-impact';
 import type {
   Critical,
+  DropReason,
   DropResult,
+  DragImpact,
   DragStart,
   DimensionMap,
   DraggableDimension,
   DroppableDimension,
-  PendingDrop,
   Published,
+  CompletedDrag,
+  DraggableLocation,
 } from '../../src/types';
 import type {
+  DropCompleteArgs,
   InitialPublishArgs,
   LiftArgs,
+  AnimateDropArgs,
 } from '../../src/state/action-creators';
+import { getPreset, getDraggableDimension, makeScrollable } from './dimension';
+import { offsetByPosition } from '../../src/state/spacing';
+import getHomeLocation from '../../src/state/get-home-location';
+import getHomeOnLift from '../../src/state/get-home-on-lift';
+import getDropImpact from '../../src/state/middleware/drop/get-drop-impact';
 
 // In case a consumer needs the references
 export const preset = getPreset();
@@ -28,6 +34,13 @@ export const critical: Critical = {
   draggable: preset.inHome1.descriptor,
   droppable: preset.home.descriptor,
 };
+
+export const { onLift, impact: homeImpact } = getHomeOnLift({
+  draggable: preset.inHome1,
+  draggables: preset.draggables,
+  home: preset.home,
+  viewport: preset.viewport,
+});
 
 const clientSelection: Position = preset.inHome1.client.borderBox.center;
 
@@ -86,28 +99,70 @@ export const getDragStart = (custom?: Critical = critical): DragStart => ({
   mode: 'FLUID',
 });
 
-export const completeDropArgs: DropResult = {
+const result: DropResult = {
   ...getDragStart(critical),
   destination: getHomeLocation(critical.draggable),
   reason: 'DROP',
   combine: null,
 };
 
-export const animateDropArgs: PendingDrop = {
-  newHomeClientOffset: { x: 10, y: 10 },
-  impact: getHomeImpact(
-    preset.dimensions.draggables[critical.draggable.id],
-    preset.dimensions.droppables[critical.droppable.id],
-  ),
-  result: completeDropArgs,
-  dropDuration: 1,
+// export const completed: CompletedDrag = {
+//   critical,
+//   result,
+//   impact: homeImpact,
+// };
+
+export const getDropImpactForReason = (reason: DropReason): DragImpact =>
+  getDropImpact({
+    reason,
+    draggables: preset.draggables,
+    lastImpact: homeImpact,
+    home: preset.home,
+    viewport: preset.viewport,
+    onLiftImpact: homeImpact,
+    onLift,
+  }).impact;
+
+export const getCompletedArgs = (reason: DropReason): DropCompleteArgs => {
+  const destination: ?DraggableLocation =
+    reason === 'CANCEL' ? null : getDragStart().source;
+
+  const customResult: DropResult = {
+    ...getDragStart(),
+    destination,
+    reason,
+    combine: null,
+  };
+
+  const completed: CompletedDrag = {
+    result: customResult,
+    impact: getDropImpactForReason(reason),
+    critical,
+  };
+
+  return { completed, shouldFlush: false };
 };
 
-export const userCancelArgs: PendingDrop = {
+const droppedOnHome: CompletedDrag = {
+  result,
+  impact: getDropImpactForReason('DROP'),
+  critical,
+};
+
+export const animateDropArgs: AnimateDropArgs = {
+  completed: droppedOnHome,
+  dropDuration: 1,
+  newHomeClientOffset: { x: 10, y: 10 },
+};
+
+export const userCancelArgs: AnimateDropArgs = {
   ...animateDropArgs,
-  result: {
-    ...completeDropArgs,
-    reason: 'CANCEL',
+  completed: {
+    ...droppedOnHome,
+    result: {
+      ...droppedOnHome.result,
+      reason: 'CANCEL',
+    },
   },
 };
 

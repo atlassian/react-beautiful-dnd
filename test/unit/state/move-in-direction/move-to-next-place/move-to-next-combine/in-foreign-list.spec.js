@@ -16,7 +16,7 @@ import { getPreset } from '../../../../../utils/dimension';
 import moveToNextCombine from '../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-combine/index';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
-import getVisibleDisplacement from '../../../../../utils/get-visible-displacement';
+import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
 
 const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
   ...droppable,
@@ -27,11 +27,9 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
   const preset = getPreset(axis);
 
   // always displace forward in foreign list
-  const willDisplaceForward: boolean = true;
   const displacedBy: DisplacedBy = getDisplacedBy(
     axis,
     preset.inHome1.displaceBy,
-    willDisplaceForward,
   );
 
   describe(`on ${axis.direction} axis`, () => {
@@ -48,9 +46,7 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           displaced: initial,
           map: getDisplacementMap(initial),
           displacedBy,
-          willDisplaceForward,
         },
-        direction: preset.foreign.axis.direction,
         merge: null,
         destination: {
           index: preset.inForeign2.descriptor.index,
@@ -95,9 +91,7 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           displaced: initial,
           map: getDisplacementMap(initial),
           displacedBy,
-          willDisplaceForward,
         },
-        direction: preset.foreign.axis.direction,
         merge: null,
         destination: {
           index: preset.inForeign3.descriptor.index,
@@ -128,6 +122,68 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
         },
       };
       expect(result).toEqual(expected);
+    });
+
+    it('should not allow combining with anything before the first item', () => {
+      const initial: Displacement[] = [
+        getVisibleDisplacement(preset.inForeign1),
+        getVisibleDisplacement(preset.inForeign2),
+        getVisibleDisplacement(preset.inForeign3),
+        getVisibleDisplacement(preset.inForeign4),
+      ];
+      const current: DragImpact = {
+        movement: {
+          displaced: initial,
+          map: getDisplacementMap(initial),
+          displacedBy,
+        },
+        merge: null,
+        // in first position
+        destination: {
+          index: preset.inForeign1.descriptor.index,
+          droppableId: preset.foreign.descriptor.id,
+        },
+      };
+
+      const result: ?DragImpact = moveToNextCombine({
+        isMovingForward: false,
+        isInHomeList: false,
+        draggable: preset.inHome1,
+        destination: enableCombine(preset.foreign),
+        insideDestination: preset.inForeignList,
+        previousImpact: current,
+      });
+
+      expect(result).toEqual(null);
+    });
+
+    it('should not allow combining with anything after the last item', () => {
+      // in last position
+      const initial: Displacement[] = [];
+      const current: DragImpact = {
+        movement: {
+          displaced: initial,
+          map: getDisplacementMap(initial),
+          displacedBy,
+        },
+        merge: null,
+        // in last position
+        destination: {
+          index: preset.inForeign4.descriptor.index + 1,
+          droppableId: preset.foreign.descriptor.id,
+        },
+      };
+
+      const result: ?DragImpact = moveToNextCombine({
+        isMovingForward: true,
+        isInHomeList: false,
+        draggable: preset.inHome1,
+        destination: enableCombine(preset.foreign),
+        insideDestination: preset.inForeignList,
+        previousImpact: current,
+      });
+
+      expect(result).toEqual(null);
     });
   });
 });

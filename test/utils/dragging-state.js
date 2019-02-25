@@ -10,7 +10,6 @@ import type {
   DropPendingState,
   DragImpact,
   DropAnimatingState,
-  PendingDrop,
 } from '../../src/types';
 
 const state = getStatePreset();
@@ -35,13 +34,13 @@ export const withImpact = (
     impact,
   }: any);
 
-export const withPending = (
-  current: DropAnimatingState,
-  pending: PendingDrop,
-): DropAnimatingState => ({
-  ...current,
-  pending,
-});
+// export const dropAnimatingWithResult = (
+//   current: DropAnimatingState,
+//   result: PendingDrop,
+// ): DropAnimatingState => ({
+//   ...current,
+//   pending,
+// });
 
 export const move = (
   previous: IsDraggingState,

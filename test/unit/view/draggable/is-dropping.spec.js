@@ -1,5 +1,4 @@
 // @flow
-import type { ReactWrapper } from 'enzyme';
 import { type Position } from 'css-box-model';
 import type {
   MapProps,
@@ -18,7 +17,6 @@ import {
   whileDropping,
   droppable,
 } from './util/get-props';
-import Placeholder from '../../../../src/view/placeholder';
 import getLastCall from './util/get-last-call';
 import { zIndexOptions } from '../../../../src/view/draggable/draggable';
 import {
@@ -26,21 +24,7 @@ import {
   curves,
   combine,
   transforms,
-} from '../../../../src/view/animation';
-
-it('should render a placeholder', () => {
-  const myMock = jest.fn();
-
-  const wrapper: ReactWrapper = mount({
-    mapProps: whileDragging,
-    WrappedComponent: getStubber(myMock),
-  });
-
-  expect(wrapper.find(Placeholder).exists()).toBe(true);
-  expect(wrapper.find(Placeholder).props().placeholder).toBe(
-    preset.inHome1.placeholder,
-  );
-});
+} from '../../../../src/animation';
 
 it('should animate a drop to a provided offset', () => {
   const myMock = jest.fn();
@@ -158,14 +142,60 @@ it('should trigger a drop animation finished action when the transition is finis
 
   expect(dispatchPropsStub.dropAnimationFinished).not.toHaveBeenCalled();
 
-  wrapper.simulate('transitionEnd');
+  // $ExpectError - invalid event
+  const event: TransitionEvent = {
+    propertyName: 'transform',
+  };
+  wrapper.simulate('transitionend', event);
 
   expect(dispatchPropsStub.dropAnimationFinished).toHaveBeenCalled();
+});
+
+it('should not trigger a drop finished when a non-primary property finishes transitioning', () => {
+  const myMock = jest.fn();
+  const dispatchPropsStub = getDispatchPropsStub();
+  const offset: Position = { x: 10, y: 20 };
+  const duration: number = 1;
+  const dropping: DropAnimation = {
+    duration,
+    curve: curves.drop,
+    moveTo: offset,
+    opacity: null,
+    scale: null,
+  };
+  const mapProps: MapProps = {
+    ...whileDragging,
+    dragging: {
+      ...whileDragging.dragging,
+      offset,
+      dropping,
+    },
+  };
+
+  const wrapper = mount({
+    mapProps,
+    dispatchProps: dispatchPropsStub,
+    WrappedComponent: getStubber(myMock),
+  });
+
+  expect(dispatchPropsStub.dropAnimationFinished).not.toHaveBeenCalled();
+
+  // $ExpectError - invalid event
+  const event: TransitionEvent = {
+    propertyName: 'background',
+  };
+  wrapper.simulate('transitionend', event);
+
+  expect(dispatchPropsStub.dropAnimationFinished).not.toHaveBeenCalled();
 });
 
 it('should only trigger a drop animation finished event if a transition end occurs while dropping', () => {
   const myMock = jest.fn();
   const dispatchPropsStub = getDispatchPropsStub();
+  // $ExpectError - invalid event
+  const event: TransitionEvent = {
+    propertyName: 'transform',
+  };
 
   // not trigger at rest
   const wrapper = mount({
@@ -173,17 +203,17 @@ it('should only trigger a drop animation finished event if a transition end occu
     dispatchProps: dispatchPropsStub,
     WrappedComponent: getStubber(myMock),
   });
-  wrapper.simulate('transitionEnd');
+  wrapper.simulate('transitionend', event);
   expect(dispatchPropsStub.dropAnimationFinished).not.toHaveBeenCalled();
 
   // not triggered during drag
   wrapper.setProps(whileDragging);
-  wrapper.simulate('transitionEnd');
+  wrapper.simulate('transitionend', event);
   expect(dispatchPropsStub.dropAnimationFinished).not.toHaveBeenCalled();
 
   // triggered during drop
   wrapper.setProps(whileDropping);
-  wrapper.simulate('transitionEnd');
+  wrapper.simulate('transitionend', event);
   expect(dispatchPropsStub.dropAnimationFinished).toHaveBeenCalled();
 });
 

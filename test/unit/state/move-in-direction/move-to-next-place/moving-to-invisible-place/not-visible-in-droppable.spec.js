@@ -1,6 +1,12 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { getRect, type Position, type Rect } from 'css-box-model';
+import {
+  getRect,
+  type Position,
+  type BoxModel,
+  type Rect,
+  offset,
+} from 'css-box-model';
 import type {
   Axis,
   DragImpact,
@@ -12,7 +18,6 @@ import type {
   Viewport,
 } from '../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
-import getHomeImpact from '../../../../../../src/state/get-home-impact';
 import {
   getDraggableDimension,
   getDroppableDimension,
@@ -23,13 +28,21 @@ import getDisplacementMap from '../../../../../../src/state/get-displacement-map
 import { createViewport } from '../../../../../utils/viewport';
 import moveToNextPlace from '../../../../../../src/state/move-in-direction/move-to-next-place';
 import { type PublicResult } from '../../../../../../src/state/move-in-direction/move-in-direction-types';
-import { origin, subtract } from '../../../../../../src/state/position';
+import { origin, subtract, patch } from '../../../../../../src/state/position';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
-import { isTotallyVisible } from '../../../../../../src/state/visibility/is-visible';
+import scrollViewport from '../../../../../../src/state/scroll-viewport';
+import {
+  isTotallyVisible,
+  isPartiallyVisible,
+} from '../../../../../../src/state/visibility/is-visible';
+import { toDraggableMap } from '../../../../../../src/state/dimension-structures';
+import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
+import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
 
 [vertical, horizontal].forEach((axis: Axis) => {
-  const hugeViewport: Viewport = createViewport({
+  const viewport: Viewport = createViewport({
     frame: getRect({
       top: 0,
       left: 0,
@@ -41,10 +54,23 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
     scrollWidth: 10000,
   });
 
-  const scrollable: DroppableDimension = getDroppableDimension({
+  const home: DroppableDimension = getDroppableDimension({
     descriptor: {
-      id: 'scrollable droppable',
-      type: 'hey',
+      id: 'home',
+      type: 'droppable',
+    },
+    direction: axis.direction,
+    borderBox: {
+      top: 0,
+      right: 10000,
+      bottom: 10000,
+      left: 0,
+    },
+  });
+  const foreign: DroppableDimension = getDroppableDimension({
+    descriptor: {
+      id: 'scrollable foriegn',
+      type: 'droppable',
     },
     direction: axis.direction,
     // huge subject that will be cut by frame
@@ -69,120 +95,130 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
       },
     },
   });
+  const frameBorderBox: Rect = getFrame(foreign).frameClient.borderBox;
 
-  const frameBorderBox: Rect = getFrame(scrollable).frameClient.borderBox;
+  const inHome: DraggableDimension = getDraggableDimension({
+    descriptor: {
+      id: 'in-home',
+      index: 0,
+      droppableId: home.descriptor.id,
+      type: home.descriptor.type,
+    },
+    borderBox: frameBorderBox,
+  });
+  const inForeign: DraggableDimension = getDraggableDimension({
+    descriptor: {
+      id: 'in-foreign',
+      index: 0,
+      droppableId: foreign.descriptor.id,
+      type: foreign.descriptor.type,
+    },
+    borderBox: frameBorderBox,
+  });
+  // in home list moving forward
+  const displacedBy: DisplacedBy = getDisplacedBy(axis, inHome.displaceBy);
+  const draggables: DraggableDimensionMap = toDraggableMap([inHome, inForeign]);
+  const { onLift } = getHomeOnLift({
+    draggable: inHome,
+    draggables,
+    home,
+    viewport,
+  });
 
   describe(`on ${axis.direction} axis`, () => {
     describe('moving forward', () => {
-      const asBigAsFrame: DraggableDimension = getDraggableDimension({
-        descriptor: {
-          id: 'asBigAsFrame',
-          index: 0,
-          droppableId: scrollable.descriptor.id,
-          type: scrollable.descriptor.type,
-        },
-        borderBox: frameBorderBox,
-      });
-      const outsideFrame: DraggableDimension = getDraggableDimension({
-        descriptor: {
-          id: 'outside',
-          index: 1,
-          droppableId: scrollable.descriptor.id,
-          type: scrollable.descriptor.type,
-        },
-        borderBox: {
-          // is bottom left of the frame
-          top: frameBorderBox.bottom + 1,
-          right: frameBorderBox.right + 100,
-          left: frameBorderBox.right + 1,
-          bottom: frameBorderBox.bottom + 100,
-        },
-      });
-      // in home list moving forward
-      const willDisplaceForward: boolean = false;
-      const displacedBy: DisplacedBy = getDisplacedBy(
-        axis,
-        asBigAsFrame.displaceBy,
-        willDisplaceForward,
-      );
-      const draggables: DraggableDimensionMap = {
-        [asBigAsFrame.descriptor.id]: asBigAsFrame,
-        [outsideFrame.descriptor.id]: outsideFrame,
-      };
-
-      it('should request a jump scroll for movement that is outside of the viewport', () => {
+      it('should be setup correctly', () => {
         // verify visibility is as expected
+        // before scroll
         expect(
           isTotallyVisible({
-            target: asBigAsFrame.page.borderBox,
-            viewport: hugeViewport.frame,
+            target: inHome.page.borderBox,
+            viewport: viewport.frame,
             withDroppableDisplacement: true,
-            destination: scrollable,
+            destination: home,
           }),
         ).toBe(true);
         expect(
           isTotallyVisible({
-            target: outsideFrame.page.borderBox,
-            viewport: hugeViewport.frame,
+            target: inForeign.page.borderBox,
+            viewport: viewport.frame,
             withDroppableDisplacement: true,
-            destination: scrollable,
+            destination: foreign,
+          }),
+        ).toBe(true);
+
+        // would be visible if displaced
+        const displaced: BoxModel = offset(
+          inForeign.client,
+          getDisplacedBy(vertical, inHome.displaceBy).point,
+        );
+        expect(
+          isTotallyVisible({
+            target: displaced.borderBox,
+            viewport: viewport.frame,
+            withDroppableDisplacement: true,
+            destination: foreign,
           }),
         ).toBe(false);
+      });
 
-        const displaced: Displacement[] = [
-          {
-            draggableId: outsideFrame.descriptor.id,
-            // Even though the item started in an invisible place we force
-            // the displacement to be visible.
-            isVisible: true,
-            shouldAnimate: true,
-          },
-        ];
-        const expectedImpact: DragImpact = {
+      it('should request a jump scroll for movement that is outside of the viewport', () => {
+        const previousPageBorderBoxCenter: Position =
+          inHome.page.borderBox.center;
+        const previousClientSelection: Position =
+          inHome.client.borderBox.center;
+        const displaced: Displacement[] = [getVisibleDisplacement(inForeign)];
+        const previousImpact: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            willDisplaceForward,
             displacedBy,
           },
           merge: null,
           destination: {
-            droppableId: scrollable.descriptor.id,
-            index: outsideFrame.descriptor.index,
+            droppableId: foreign.descriptor.id,
+            index: inForeign.descriptor.index,
           },
-          direction: axis.direction,
         };
-        const previousPageBorderBoxCenter: Position =
-          asBigAsFrame.page.borderBox.center;
-        const previousClientSelection: Position =
-          asBigAsFrame.client.borderBox.center;
 
-        // figure out where we would have been if it was visible
+        const result: ?PublicResult = moveToNextPlace({
+          isMovingForward: true,
+          draggable: inHome,
+          destination: foreign,
+          draggables,
+          previousImpact,
+          viewport,
+          previousPageBorderBoxCenter,
+          previousClientSelection,
+          onLift,
+        });
+        invariant(result);
+
+        const expectedImpact: DragImpact = {
+          movement: {
+            displaced: [],
+            map: {},
+            displacedBy,
+          },
+          merge: null,
+          destination: {
+            droppableId: foreign.descriptor.id,
+            index: inForeign.descriptor.index + 1,
+          },
+        };
+        // if the item would have been visible - where would the center have been?
         const nonVisibleCenter = getPageBorderBoxCenter({
           impact: expectedImpact,
-          draggable: asBigAsFrame,
-          droppable: scrollable,
+          draggable: inHome,
+          droppable: foreign,
           draggables,
+          onLift,
         });
         const expectedScrollJump: Position = subtract(
           nonVisibleCenter,
           previousPageBorderBoxCenter,
         );
-
-        const result: ?PublicResult = moveToNextPlace({
-          isMovingForward: true,
-          draggable: asBigAsFrame,
-          destination: scrollable,
-          draggables,
-          previousImpact: getHomeImpact(asBigAsFrame, scrollable),
-          viewport: hugeViewport,
-          previousPageBorderBoxCenter,
-          previousClientSelection,
-        });
-        invariant(result);
-
         const expected: PublicResult = {
-          // unchanged
           clientSelection: previousClientSelection,
           impact: expectedImpact,
           scrollJumpRequest: expectedScrollJump,
@@ -192,146 +228,128 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
     });
 
     describe('moving backward', () => {
-      it('should request a jump scroll for movement that is outside of the viewport', () => {
-        const initiallyInsideFrame: DraggableDimension = getDraggableDimension({
-          descriptor: {
-            id: 'inside',
-            index: 0,
-            droppableId: scrollable.descriptor.id,
-            type: scrollable.descriptor.type,
-          },
-          borderBox: frameBorderBox,
-        });
-        const initiallyOutsideFrame: DraggableDimension = getDraggableDimension(
-          {
-            descriptor: {
-              id: 'outside',
-              index: 1,
-              droppableId: scrollable.descriptor.id,
-              type: scrollable.descriptor.type,
-            },
-            borderBox: {
-              // is bottom left of the frame
-              top: frameBorderBox.bottom + 1,
-              right: frameBorderBox.right + 100,
-              left: frameBorderBox.right + 1,
-              bottom: frameBorderBox.bottom + 100,
-            },
-          },
-        );
-        // in home list moving initiallyOutsideViewport backwards
-        const willDisplaceForward: boolean = true;
-        const displacedBy: DisplacedBy = getDisplacedBy(
-          axis,
-          initiallyOutsideFrame.displaceBy,
-          willDisplaceForward,
-        );
-        const draggables: DraggableDimensionMap = {
-          [initiallyInsideFrame.descriptor.id]: initiallyInsideFrame,
-          [initiallyOutsideFrame.descriptor.id]: initiallyOutsideFrame,
-        };
+      // inHome after inForeign and inForeign is not visible
+      const newScroll: Position = patch(
+        axis.line,
+        frameBorderBox[axis.end] + 1,
+      );
+      const scrolled: DroppableDimension = scrollDroppable(foreign, newScroll);
 
-        const newScroll: Position = {
-          x: frameBorderBox.bottom + 1,
-          y: frameBorderBox.right + 1,
-        };
-        const scrolled: DroppableDimension = scrollDroppable(
-          scrollable,
-          newScroll,
-        );
-
+      it('should be setup correctly', () => {
         // verify visibility is as expected
-        // before scroll
         expect(
           isTotallyVisible({
-            target: initiallyInsideFrame.page.borderBox,
-            viewport: hugeViewport.frame,
+            target: inForeign.page.borderBox,
+            viewport: viewport.frame,
             withDroppableDisplacement: true,
-            destination: scrollable,
-          }),
-        ).toBe(true);
-        expect(
-          isTotallyVisible({
-            target: initiallyOutsideFrame.page.borderBox,
-            viewport: hugeViewport.frame,
-            withDroppableDisplacement: true,
-            destination: scrollable,
+            destination: scrolled,
           }),
         ).toBe(false);
-
-        // after scroll: visibility is swapped
+        // going further - ensure it is not partially visible
         expect(
-          isTotallyVisible({
-            target: initiallyInsideFrame.page.borderBox,
-            viewport: hugeViewport.frame,
+          isPartiallyVisible({
+            target: inForeign.page.borderBox,
+            viewport: viewport.frame,
             withDroppableDisplacement: true,
             destination: scrolled,
           }),
         ).toBe(false);
 
+        // checking that if displaced then inForeign would be visible
+        // using raw .displacedBy as we are scolling on
+        const displaced: BoxModel = offset(
+          inForeign.client,
+          getDisplacedBy(axis, inHome.displaceBy).point,
+        );
         expect(
-          isTotallyVisible({
-            target: initiallyOutsideFrame.page.borderBox,
-            viewport: hugeViewport.frame,
+          isPartiallyVisible({
+            target: displaced.borderBox,
+            viewport: viewport.frame,
             withDroppableDisplacement: true,
             destination: scrolled,
           }),
         ).toBe(true);
+      });
 
-        const displaced: Displacement[] = [
-          {
-            draggableId: initiallyInsideFrame.descriptor.id,
-            // Even though the item started in an invisible place we force
-            // the displacement to be visible.
-            isVisible: true,
-            shouldAnimate: true,
+      it('should request a jump scroll for movement that is outside of the viewport', () => {
+        // after non-displaced inForeign
+        const previousImpact: DragImpact = {
+          movement: {
+            displaced: [],
+            map: {},
+            displacedBy: getDisplacedBy(axis, inHome.displaceBy),
           },
+          destination: {
+            droppableId: foreign.descriptor.id,
+            index: inForeign.descriptor.index + 1,
+          },
+          merge: null,
+        };
+        const previousPageBorderBoxCenter: Position = getPageBorderBoxCenter({
+          impact: previousImpact,
+          onLift,
+          draggable: inHome,
+          droppable: scrolled,
+          draggables,
+        });
+        const previousClientSelection: Position = getClientFromPageBorderBoxCenter(
+          {
+            pageBorderBoxCenter: previousPageBorderBoxCenter,
+            draggable: inHome,
+            viewport,
+          },
+        );
+        // const previousPageBorderBoxCenter: Position =
+        //   initiallyOutsideViewport.page.borderBox.center;
+        // const previousClientSelection: Position =
+        //   initiallyOutsideViewport.client.borderBox.center;
+
+        // figure out where we would have been if it was visible
+
+        const result: ?PublicResult = moveToNextPlace({
+          isMovingForward: false,
+          draggable: inHome,
+          destination: scrolled,
+          draggables,
+          previousImpact,
+          viewport,
+          previousPageBorderBoxCenter,
+          previousClientSelection,
+          onLift,
+        });
+        invariant(result);
+
+        const expectedDisplaced: Displacement[] = [
+          // Even though the item started in an invisible place we force
+          // the displacement to be visible.
+          getVisibleDisplacement(inForeign),
         ];
         const expectedImpact: DragImpact = {
           movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            willDisplaceForward,
+            displaced: expectedDisplaced,
+            map: getDisplacementMap(expectedDisplaced),
             displacedBy,
           },
           merge: null,
+          // moving into place of inForeign
           destination: {
-            droppableId: scrolled.descriptor.id,
-            index: initiallyInsideFrame.descriptor.index,
+            droppableId: foreign.descriptor.id,
+            index: inForeign.descriptor.index,
           },
-          direction: axis.direction,
         };
-        const previousPageBorderBoxCenter: Position =
-          initiallyOutsideFrame.page.borderBox.center;
-        const previousClientSelection: Position =
-          initiallyOutsideFrame.client.borderBox.center;
-
-        // figure out where we would have been if it was visible
+        // if the item would have been visible - where would the center have been?
         const nonVisibleCenter = getPageBorderBoxCenter({
           impact: expectedImpact,
-          draggable: initiallyOutsideFrame,
+          draggable: inHome,
           droppable: scrolled,
           draggables,
+          onLift,
         });
         const expectedScrollJump: Position = subtract(
           nonVisibleCenter,
           previousPageBorderBoxCenter,
         );
-
-        const result: ?PublicResult = moveToNextPlace({
-          isMovingForward: false,
-          draggable: initiallyOutsideFrame,
-          destination: scrolled,
-          draggables,
-          previousImpact: getHomeImpact(initiallyOutsideFrame, scrollable),
-          viewport: hugeViewport,
-          previousPageBorderBoxCenter,
-          previousClientSelection,
-        });
-        invariant(result);
-
         const expected: PublicResult = {
-          // unchanged
           clientSelection: previousClientSelection,
           impact: expectedImpact,
           scrollJumpRequest: expectedScrollJump,

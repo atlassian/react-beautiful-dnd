@@ -67,7 +67,7 @@ describe('on the vertical axis', () => {
     invariant(result, 'expected a result');
     const expected: DraggableLocation = {
       droppableId: preset.home.descriptor.id,
-      index: 1,
+      index: 0,
     };
     expect(result.impact.destination).toEqual(expected);
   });
@@ -128,7 +128,7 @@ describe('on the horizontal axis', () => {
     invariant(result, 'expected a result');
     const expected: DraggableLocation = {
       droppableId: preset.home.descriptor.id,
-      index: 1,
+      index: 0,
     };
     expect(result.impact.destination).toEqual(expected);
   });

@@ -3,25 +3,15 @@ import type { ReactWrapper } from 'enzyme';
 import type { StateSnapshot } from '../../../../src/view/droppable/droppable-types';
 import mount from './util/mount';
 import getStubber from './util/get-stubber';
-import { isNotOver, isOverHome, atRest } from './util/get-props';
+import {
+  isNotOverHome,
+  isOverHome,
+  homeAtRest,
+  isOverForeign,
+  foreignOwnProps,
+} from './util/get-props';
 
-it('should let a consumer know when a list is not being dragged over', () => {
-  const myMock = jest.fn();
-  mount({
-    mapProps: isNotOver,
-    WrappedComponent: getStubber(myMock),
-  });
-
-  const snapshot: StateSnapshot = myMock.mock.calls[0][0].snapshot;
-
-  const expected: StateSnapshot = {
-    isDraggingOver: false,
-    draggingOverWith: null,
-  };
-  expect(snapshot).toEqual(expected);
-});
-
-it('should let a consumer know when a list is being dragged over', () => {
+it('should let a consumer know when a home list is being dragged over', () => {
   const myMock = jest.fn();
   mount({
     mapProps: isOverHome,
@@ -32,6 +22,25 @@ it('should let a consumer know when a list is being dragged over', () => {
 
   const expected: StateSnapshot = {
     isDraggingOver: true,
+    draggingFromThisWith: isOverHome.draggingOverWith,
+    draggingOverWith: isOverHome.draggingOverWith,
+  };
+  expect(snapshot).toEqual(expected);
+});
+
+it('should let a consumer know when a foreign list is being dragged over', () => {
+  const myMock = jest.fn();
+  mount({
+    ownProps: foreignOwnProps,
+    mapProps: isOverForeign,
+    WrappedComponent: getStubber(myMock),
+  });
+
+  const snapshot: StateSnapshot = myMock.mock.calls[0][0].snapshot;
+
+  const expected: StateSnapshot = {
+    isDraggingOver: true,
+    draggingFromThisWith: null,
     draggingOverWith: isOverHome.draggingOverWith,
   };
   expect(snapshot).toEqual(expected);
@@ -40,28 +49,40 @@ it('should let a consumer know when a list is being dragged over', () => {
 it('should update snapshot as dragging over changes', () => {
   const myMock = jest.fn();
   const snapshotShouldBe = (expected: StateSnapshot) => {
-    const snapshot: StateSnapshot = myMock.mock.calls[0][0].snapshot;
+    const snapshot: StateSnapshot =
+      myMock.mock.calls[myMock.mock.calls.length - 1][0].snapshot;
     expect(snapshot).toEqual(expected);
   };
-  const whenAtRest: StateSnapshot = {
+  const noDrag: StateSnapshot = {
     isDraggingOver: false,
+    draggingFromThisWith: null,
     draggingOverWith: null,
   };
 
   const wrapper: ReactWrapper = mount({
-    mapProps: atRest,
+    mapProps: homeAtRest,
     WrappedComponent: getStubber(myMock),
   });
-  snapshotShouldBe(whenAtRest);
+  snapshotShouldBe(noDrag);
 
   myMock.mockClear();
   wrapper.setProps(isOverHome);
   snapshotShouldBe({
     isDraggingOver: true,
+    draggingFromThisWith: isOverHome.draggingOverWith,
     draggingOverWith: isOverHome.draggingOverWith,
   });
 
+  // now over foreign list
+  wrapper.setProps(isNotOverHome);
+  snapshotShouldBe({
+    isDraggingOver: false,
+    draggingFromThisWith: isOverHome.draggingOverWith,
+    draggingOverWith: null,
+  });
+
+  // drag is now over
   myMock.mockClear();
-  wrapper.setProps(atRest);
-  snapshotShouldBe(whenAtRest);
+  wrapper.setProps(homeAtRest);
+  snapshotShouldBe(noDrag);
 });

@@ -1,9 +1,10 @@
 // @flow
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
+import { colors } from '@atlaskit/theme';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import reorder from '../reorder';
-import { colors, grid } from '../constants';
+import { grid } from '../constants';
 import type { Quote } from '../types';
 import type {
   DropResult,
@@ -25,7 +26,7 @@ const TBody = styled.tbody`
 const THead = styled.thead`
   border: 0;
   border-bottom: none;
-  background-color: ${colors.grey.light};
+  background-color: ${colors.N50};
 `;
 
 const Row = styled.tr`
@@ -33,7 +34,7 @@ const Row = styled.tr`
   ${props =>
     props.isDragging
       ? `
-    background: ${colors.green};
+    background: ${colors.G100};
 
     /* maintain cell width while dragging */
     display: table;

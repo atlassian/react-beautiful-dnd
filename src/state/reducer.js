@@ -7,7 +7,6 @@ import type {
   StateWhenUpdatesAllowed,
   DraggableDimension,
   DroppableDimension,
-  PendingDrop,
   IdleState,
   DraggingState,
   DragPositions,
@@ -25,13 +24,13 @@ import publishWhileDragging from './publish-while-dragging';
 import moveInDirection from './move-in-direction';
 import { add, isEqual, origin } from './position';
 import scrollViewport from './scroll-viewport';
-import getHomeImpact from './get-home-impact';
 import isMovementAllowed from './is-movement-allowed';
 import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
 import update from './post-reducer/when-moving/update';
 import refreshSnap from './post-reducer/when-moving/refresh-snap';
-import patchDroppableMap from './patch-droppable-map';
+import getHomeOnLift from './get-home-on-lift';
+import patchDimensionMap from './patch-dimension-map';
 
 const isSnapping = (state: StateWhenUpdatesAllowed): boolean =>
   state.movementMode === 'SNAP';
@@ -41,7 +40,7 @@ const postDroppableChange = (
   updated: DroppableDimension,
   isEnabledChanging: boolean,
 ): StateWhenUpdatesAllowed => {
-  const dimensions: DimensionMap = patchDroppableMap(state.dimensions, updated);
+  const dimensions: DimensionMap = patchDimensionMap(state.dimensions, updated);
 
   // if the enabled state is changing, we need to force a update
   if (!isSnapping(state) || isEnabledChanging) {
@@ -57,7 +56,7 @@ const postDroppableChange = (
   });
 };
 
-const idle: IdleState = { phase: 'IDLE' };
+const idle: IdleState = { phase: 'IDLE', completed: null, shouldFlush: false };
 
 export default (state: State = idle, action: Action): State => {
   if (action.type === 'CLEAN') {
@@ -101,6 +100,13 @@ export default (state: State = idle, action: Action): State => {
       dimensions.droppables,
     ).every((item: DroppableDimension) => !item.isFixedOnPage);
 
+    const { impact, onLift } = getHomeOnLift({
+      draggable,
+      home,
+      draggables: dimensions.draggables,
+      viewport,
+    });
+
     const result: DraggingState = {
       phase: 'DRAGGING',
       isDragging: true,
@@ -110,7 +116,9 @@ export default (state: State = idle, action: Action): State => {
       initial,
       current: initial,
       isWindowScrollAllowed,
-      impact: getHomeImpact(draggable, home),
+      impact,
+      onLift,
+      onLiftImpact: impact,
       viewport,
       userDirection: forward,
       scrollJumpRequest: null,
@@ -319,12 +327,17 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'UPDATE_VIEWPORT_MAX_SCROLL') {
-    invariant(
-      isMovementAllowed(state),
-      `Cannot update viewport scroll in phase ${state.phase}`,
-    );
+    // Could occur if a transitionEnd occurs after a drag ends
+    if (!isMovementAllowed(state)) {
+      return state;
+    }
 
     const maxScroll: Position = action.payload.maxScroll;
+
+    if (isEqual(maxScroll, state.viewport.scroll.max)) {
+      return state;
+    }
+
     const withMaxScroll: Viewport = {
       ...state.viewport,
       scroll: {
@@ -395,7 +408,7 @@ export default (state: State = idle, action: Action): State => {
   }
 
   if (action.type === 'DROP_ANIMATE') {
-    const pending: PendingDrop = action.payload;
+    const { completed, dropDuration, newHomeClientOffset } = action.payload;
     invariant(
       state.phase === 'DRAGGING' || state.phase === 'DROP_PENDING',
       `Cannot animate drop from phase ${state.phase}`,
@@ -404,8 +417,10 @@ export default (state: State = idle, action: Action): State => {
     // Moving into a new phase
     const result: DropAnimatingState = {
       phase: 'DROP_ANIMATING',
-      pending,
       dimensions: state.dimensions,
+      completed,
+      dropDuration,
+      newHomeClientOffset,
     };
 
     return result;
@@ -414,7 +429,13 @@ export default (state: State = idle, action: Action): State => {
   // Action will be used by responders to call consumers
   // We can simply return to the idle state
   if (action.type === 'DROP_COMPLETE') {
-    return idle;
+    const { completed, shouldFlush } = action.payload;
+
+    return {
+      phase: 'IDLE',
+      completed,
+      shouldFlush,
+    };
   }
 
   return state;

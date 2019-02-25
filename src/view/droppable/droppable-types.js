@@ -8,6 +8,7 @@ import type {
   Placeholder,
   State,
 } from '../../types';
+import { updateViewportMaxScroll } from '../../state/action-creators';
 
 export type DroppableProps = {|
   // used for shared global styles
@@ -23,6 +24,7 @@ export type Provided = {|
 export type StateSnapshot = {|
   isDraggingOver: boolean,
   draggingOverWith: ?DraggableId,
+  draggingFromThisWith: ?DraggableId,
 |};
 
 export type MapProps = {|
@@ -33,6 +35,9 @@ export type MapProps = {|
   // not the user is dragging over a list that
   // is not the source list
   placeholder: ?Placeholder,
+  shouldAnimatePlaceholder: boolean,
+  // when dragging from a home list this will be populated even when not over the list
+  draggingFromThisWith: ?DraggableId,
 |};
 
 export type DefaultProps = {|
@@ -43,6 +48,10 @@ export type DefaultProps = {|
   ignoreContainerClipping: boolean,
 |};
 
+export type DispatchProps = {|
+  updateViewportMaxScroll: typeof updateViewportMaxScroll,
+|};
+
 export type OwnProps = {|
   ...DefaultProps,
   children: (Provided, StateSnapshot) => Node,
@@ -51,6 +60,7 @@ export type OwnProps = {|
 
 export type Props = {|
   ...MapProps,
+  ...DispatchProps,
   ...OwnProps,
 |};
 

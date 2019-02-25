@@ -10,7 +10,6 @@ import dropAnimationFinish from './middleware/drop-animation-finish';
 import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
 import autoScroll from './middleware/auto-scroll';
 import pendingDrop from './middleware/pending-drop';
-import updateViewportMaxScrollOnDestinationChange from './middleware/update-viewport-max-scroll-on-destination-change';
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
 import type { StyleMarshal } from '../view/style-marshal/style-marshal-types';
 import type { AutoScroller } from './auto-scroller/auto-scroller-types';
@@ -79,7 +78,6 @@ export default ({
         // When a drop animation finishes - fire a drop complete
         dropAnimationFinish,
         pendingDrop,
-        updateViewportMaxScrollOnDestinationChange,
         autoScroll(getScroller),
         // Fire responders for consumers (after update to store)
         responders(getResponders, announce),

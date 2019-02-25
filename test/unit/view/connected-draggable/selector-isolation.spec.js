@@ -16,19 +16,19 @@ const state = getStatePreset();
 it('should not break memoization across selectors', () => {
   const inHome1Selector: Selector = makeMapStateToProps();
   const inHome1OwnProps: OwnProps = getOwnProps(preset.inHome1);
-  const inHome2Selector: Selector = makeMapStateToProps();
-  const inHome2OwnProps: OwnProps = getOwnProps(preset.inHome2);
-  const defaultInHome2MapProps: MapProps = inHome2Selector(
+  const inForeign1Selector: Selector = makeMapStateToProps();
+  const inForeign1OwnProps: OwnProps = getOwnProps(preset.inForeign2);
+  const defaultInForeign1MapProps: MapProps = inForeign1Selector(
     state.idle,
-    inHome2OwnProps,
+    inForeign1OwnProps,
   );
 
   state.allPhases(preset.inHome1.descriptor.id).forEach((current: State) => {
     // independent selector
     inHome1Selector(current, inHome1OwnProps);
-    // should not break memoization of inHome2
-    expect(inHome2Selector(current, inHome2OwnProps)).toBe(
-      defaultInHome2MapProps,
+    // should not break memoization of inForeign1
+    expect(inForeign1Selector(current, inForeign1OwnProps)).toBe(
+      defaultInForeign1MapProps,
     );
   });
 });

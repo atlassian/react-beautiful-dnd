@@ -46,7 +46,6 @@ export const goBefore = ({ axis, moveRelativeTo, isMoving }: Args): Position =>
       distanceFromEndToBorderBoxCenter(axis, isMoving),
     getCrossAxisBorderBoxCenter(axis, moveRelativeTo.marginBox, isMoving),
   );
-
 type GoIntoArgs = {|
   axis: Axis,
   moveInto: BoxModel,

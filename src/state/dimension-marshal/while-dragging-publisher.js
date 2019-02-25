@@ -7,8 +7,13 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DraggableDescriptor,
+  Critical,
 } from '../../types';
-import type { Entries, DroppableEntry } from './dimension-marshal-types';
+import type {
+  Entries,
+  DroppableEntry,
+  RecollectDroppableOptions,
+} from './dimension-marshal-types';
 import * as timings from '../../debug/timings';
 import { origin } from '../position';
 import { warning } from '../../dev-warning';
@@ -36,6 +41,7 @@ type Staging = {|
 type Callbacks = {|
   publish: (args: Published) => mixed,
   collectionStarting: () => mixed,
+  getCritical: () => Critical,
 |};
 
 type Args = {|
@@ -89,6 +95,7 @@ export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
     frameId = requestAnimationFrame(() => {
       frameId = null;
       callbacks.collectionStarting();
+      const critical: Critical = callbacks.getCritical();
       timings.start(timingKey);
 
       const entries: Entries = getEntries();
@@ -111,7 +118,13 @@ export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
         (id: DroppableId) => {
           const entry: ?DroppableEntry = entries.droppables[id];
           invariant(entry, 'Cannot find dynamically added droppable in cache');
-          return entry.callbacks.recollect();
+          const isHome: boolean = entry.descriptor.id === critical.droppable.id;
+
+          // need to keep the placeholder when in home list
+          const options: RecollectDroppableOptions = {
+            withoutPlaceholder: !isHome,
+          };
+          return entry.callbacks.recollect(options);
         },
       );
 

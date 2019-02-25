@@ -166,7 +166,6 @@ export type DragMovement = {|
   displaced: Displacement[],
   // displaced as a map
   map: DisplacementMap,
-  willDisplaceForward: boolean,
   displacedBy: DisplacedBy,
 |};
 
@@ -191,9 +190,9 @@ export type CombineImpact = {|
 
 export type DragImpact = {|
   movement: DragMovement,
-  // the direction of the Droppable you are over
-  direction: ?Direction,
+  // a reorder location
   destination: ?DraggableLocation,
+  // a merge location
   merge: ?CombineImpact,
 |};
 
@@ -247,13 +246,6 @@ export type DropResult = {|
   reason: DropReason,
 |};
 
-export type PendingDrop = {|
-  newHomeClientOffset: Position,
-  dropDuration: number,
-  impact: DragImpact,
-  result: DropResult,
-|};
-
 export type ScrollOptions = {|
   shouldPublishImmediately: boolean,
 |};
@@ -291,8 +283,25 @@ export type Published = {|
   modified: DroppableDimension[],
 |};
 
+export type CompletedDrag = {|
+  critical: Critical,
+  result: DropResult,
+  impact: DragImpact,
+|};
+
 export type IdleState = {|
   phase: 'IDLE',
+  completed: ?CompletedDrag,
+  shouldFlush: boolean,
+|};
+
+export type DraggableIdMap = {
+  [id: DraggableId]: true,
+};
+
+export type OnLift = {|
+  wasDisplaced: DraggableIdMap,
+  displacedBy: DisplacedBy,
 |};
 
 export type DraggingState = {|
@@ -306,6 +315,8 @@ export type DraggingState = {|
   userDirection: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
+  onLift: OnLift,
+  onLiftImpact: DragImpact,
   // when there is a fixed list we want to opt out of this behaviour
   isWindowScrollAllowed: boolean,
   // if we need to jump the scroll (keyboard dragging)
@@ -338,7 +349,9 @@ export type DropPendingState = {|
 // An optional phase for animating the drop / cancel if it is needed
 export type DropAnimatingState = {|
   phase: 'DROP_ANIMATING',
-  pending: PendingDrop,
+  completed: CompletedDrag,
+  newHomeClientOffset: Position,
+  dropDuration: number,
   // We still need to render placeholders and fix the dimensions of the dragging item
   dimensions: DimensionMap,
 |};
@@ -353,6 +366,8 @@ export type State =
 export type StateWhenUpdatesAllowed = DraggingState | CollectingState;
 
 export type Announce = (message: string) => void;
+
+export type InOutAnimationMode = 'none' | 'open' | 'close';
 
 export type ResponderProvided = {|
   announce: Announce,

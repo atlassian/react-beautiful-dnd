@@ -23,6 +23,7 @@ forEach((control: Control) => {
   it('should abort a pending drag', () => {
     // not relevant for control
     if (!control.hasPreLift) {
+      expect(true).toBeTruthy();
       return;
     }
 

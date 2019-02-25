@@ -1,12 +1,9 @@
 // @flow
-import {
-  styleContextKey,
-  canLiftContextKey,
-} from '../../../../../src/view/context-keys';
+import { styleKey, canLiftKey } from '../../../../../src/view/context-keys';
 
 const basicContext = {
-  [styleContextKey]: 'hello',
-  [canLiftContextKey]: () => true,
+  [styleKey]: 'hello',
+  [canLiftKey]: () => true,
 };
 
 export default basicContext;

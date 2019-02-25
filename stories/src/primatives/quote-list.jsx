@@ -1,9 +1,10 @@
 // @flow
 import React from 'react';
 import styled from 'styled-components';
+import { colors } from '@atlaskit/theme';
 import { Droppable, Draggable } from '../../../src';
 import QuoteItem from './quote-item';
-import { grid, colors } from '../constants';
+import { grid } from '../constants';
 import Title from './title';
 import type { Quote } from '../types';
 import type {
@@ -13,16 +14,29 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
+const getBackgroundColor = (
+  isDraggingOver: boolean,
+  isDraggingFrom: boolean,
+): string => {
+  if (isDraggingOver) {
+    return colors.R50;
+  }
+  if (isDraggingFrom) {
+    return colors.T50;
+  }
+  return colors.N30;
+};
+
 const Wrapper = styled.div`
-  background-color: ${({ isDraggingOver }) =>
-    isDraggingOver ? colors.blue.lighter : colors.blue.light};
+  background-color: ${props =>
+    getBackgroundColor(props.isDraggingOver, props.isDraggingFrom)};
   display: flex;
   flex-direction: column;
   opacity: ${({ isDropDisabled }) => (isDropDisabled ? 0.5 : 'inherit')};
   padding: ${grid}px;
   border: ${grid}px;
   padding-bottom: 0;
-  transition: background-color 0.1s ease, opacity 0.1s ease;
+  transition: background-color 0.2s ease, opacity 0.1s ease;
   user-select: none;
   width: 250px;
 `;
@@ -37,7 +51,7 @@ const DropZone = styled.div`
     not relying on the items for a margin-bottom
     as it will collapse when the list is empty
   */
-  margin-bottom: ${grid}px;
+  padding-bottom: ${grid}px;
 `;
 
 const ScrollContainer = styled.div`
@@ -154,6 +168,7 @@ export default class QuoteList extends React.Component<Props> {
             style={style}
             isDraggingOver={dropSnapshot.isDraggingOver}
             isDropDisabled={isDropDisabled}
+            isDraggingFrom={Boolean(dropSnapshot.draggingFromThisWith)}
             {...dropProvided.droppableProps}
           >
             {internalScroll ? (

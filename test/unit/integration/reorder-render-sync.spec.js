@@ -200,7 +200,8 @@ it('should call the onBeforeDragStart before connected components are updated, a
 
   // initial lift will render the first item
   expect(first.onRender).toHaveBeenCalledTimes(1);
-  expect(second.onRender).toHaveBeenCalledTimes(0);
+  // it will also render the second item as it needs to be pushed down
+  expect(second.onRender).toHaveBeenCalledTimes(1);
   clearRenderMocks();
 
   pressArrowDown(wrapper.find('.drag-handle').first());

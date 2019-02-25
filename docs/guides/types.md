@@ -115,6 +115,7 @@ type DraggableStateSnapshot = {|
 export type DraggableProps = {|
   style: ?DraggableStyle,
   'data-react-beautiful-dnd-draggable': string,
+  onTransitionEnd: ?(event: TransitionEvent) => void,
 |};
 type DraggableStyle = DraggingStyle | NotDraggingStyle;
 type DraggingStyle = {|

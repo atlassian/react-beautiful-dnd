@@ -1,10 +1,10 @@
 // @flow
-import React, { Component, Fragment, type Node } from 'react';
+import React, { type Node } from 'react';
 import { type Position, type BoxModel } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import { transitions, transforms, combine } from '../animation';
+import { transitions, transforms, combine } from '../../animation';
 import type {
   DraggableDimension,
   DroppableId,
@@ -17,12 +17,7 @@ import type {
   DragHandleProps,
   Callbacks as DragHandleCallbacks,
 } from '../drag-handle/drag-handle-types';
-import Placeholder from '../placeholder';
-import {
-  droppableIdKey,
-  styleContextKey,
-  droppableTypeKey,
-} from '../context-keys';
+import { droppableIdKey, styleKey, droppableTypeKey } from '../context-keys';
 import * as timings from '../../debug/timings';
 import type {
   Props,
@@ -77,7 +72,7 @@ const getShouldDraggingAnimate = (dragging: DraggingMapProps): boolean => {
   return dragging.mode === 'SNAP';
 };
 
-export default class Draggable extends Component<Props> {
+export default class Draggable extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   callbacks: DragHandleCallbacks;
   styleContext: string;
@@ -88,7 +83,7 @@ export default class Draggable extends Component<Props> {
   static contextTypes = {
     [droppableIdKey]: PropTypes.string.isRequired,
     [droppableTypeKey]: PropTypes.string.isRequired,
-    [styleContextKey]: PropTypes.string.isRequired,
+    [styleKey]: PropTypes.string.isRequired,
   };
 
   constructor(props: Props, context: Object) {
@@ -111,7 +106,7 @@ export default class Draggable extends Component<Props> {
     };
 
     this.callbacks = callbacks;
-    this.styleContext = context[styleContextKey];
+    this.styleContext = context[styleKey];
 
     // Only running this check on creation.
     // Could run it on updates, but I don't think that would be needed
@@ -126,10 +121,22 @@ export default class Draggable extends Component<Props> {
     this.ref = null;
   }
 
-  onMoveEnd = () => {
-    if (this.props.dragging && this.props.dragging.dropping) {
-      this.props.dropAnimationFinished();
+  onMoveEnd = (event: TransitionEvent) => {
+    const isDropping: boolean = Boolean(
+      this.props.dragging && this.props.dragging.dropping,
+    );
+
+    if (!isDropping) {
+      return;
     }
+
+    // There might be other properties on the element that are
+    // being transitioned. We do not want those to end a drop animation!
+    if (event.propertyName !== 'transform') {
+      return;
+    }
+
+    this.props.dropAnimationFinished();
   };
 
   onLift = (options: {
@@ -290,26 +297,15 @@ export default class Draggable extends Component<Props> {
     }),
   );
 
-  renderChildren = (dragHandleProps: ?DragHandleProps): Node => {
+  renderChildren = (dragHandleProps: ?DragHandleProps): Node | null => {
     const dragging: ?DraggingMapProps = this.props.dragging;
     const secondary: ?SecondaryMapProps = this.props.secondary;
     const children: ChildrenFn = this.props.children;
 
     if (dragging) {
-      const child: ?Node = children(
+      return children(
         this.getDraggingProvided(dragging, dragHandleProps),
         this.getDraggingSnapshot(dragging),
-      );
-
-      const placeholder: Node = (
-        <Placeholder placeholder={dragging.dimension.placeholder} />
-      );
-
-      return (
-        <Fragment>
-          {child}
-          {placeholder}
-        </Fragment>
       );
     }
 
@@ -318,13 +314,10 @@ export default class Draggable extends Component<Props> {
       'If no DraggingMapProps are provided, then SecondaryMapProps are required',
     );
 
-    const child: ?Node = children(
+    return children(
       this.getSecondaryProvided(secondary, dragHandleProps),
       this.getSecondarySnapshot(secondary),
     );
-
-    // still wrapping in fragment to avoid reparenting
-    return <Fragment>{child}</Fragment>;
   };
 
   render() {

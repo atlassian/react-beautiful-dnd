@@ -1,31 +1,35 @@
 // @flow
 import { type Position } from 'css-box-model';
+import type {
+  Viewport,
+  DraggableDimension,
+  DroppableDimension,
+  OnLift,
+} from '../../../types';
 import { distance } from '../../position';
 import { isTotallyVisible } from '../../visibility/is-visible';
 import withDroppableDisplacement from '../../with-scroll-change/with-droppable-displacement';
-import type {
-  Viewport,
-  Axis,
-  DraggableDimension,
-  DroppableDimension,
-} from '../../../types';
+import {
+  getCurrentPageBorderBox,
+  getCurrentPageBorderBoxCenter,
+} from './without-starting-displacement';
 
 type Args = {|
-  axis: Axis,
   pageBorderBoxCenter: Position,
   viewport: Viewport,
   // the droppable that is being moved to
   destination: DroppableDimension,
   // the droppables inside the destination
   insideDestination: DraggableDimension[],
+  onLift: OnLift,
 |};
 
 export default ({
-  axis,
   pageBorderBoxCenter,
   viewport,
   destination,
   insideDestination,
+  onLift,
 }: Args): ?DraggableDimension => {
   const sorted: DraggableDimension[] = insideDestination
     .filter(
@@ -34,7 +38,7 @@ export default ({
         // but must be visible in the droppable
         // We can improve this, but this limitation is easier for now
         isTotallyVisible({
-          target: draggable.page.borderBox,
+          target: getCurrentPageBorderBox(draggable, onLift),
           destination,
           viewport: viewport.frame,
           withDroppableDisplacement: true,
@@ -45,11 +49,17 @@ export default ({
         // Need to consider the change in scroll in the destination
         const distanceToA = distance(
           pageBorderBoxCenter,
-          withDroppableDisplacement(destination, a.page.borderBox.center),
+          withDroppableDisplacement(
+            destination,
+            getCurrentPageBorderBoxCenter(a, onLift),
+          ),
         );
         const distanceToB = distance(
           pageBorderBoxCenter,
-          withDroppableDisplacement(destination, b.page.borderBox.center),
+          withDroppableDisplacement(
+            destination,
+            getCurrentPageBorderBoxCenter(b, onLift),
+          ),
         );
 
         // if a is closer - return a
@@ -63,8 +73,8 @@ export default ({
         }
 
         // if the distance to a and b are the same:
-        // return the one that appears first on the main axis
-        return a.page.borderBox[axis.start] - b.page.borderBox[axis.start];
+        // return the one with the lower index (it will be higher on the main axis)
+        return a.descriptor.index - b.descriptor.index;
       },
     );
 

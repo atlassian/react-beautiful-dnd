@@ -12,7 +12,7 @@ import type {
   Selector,
   MapProps,
 } from '../../../../src/view/droppable/droppable-types';
-import getOwnProps from './get-own-props';
+import getOwnProps from './util/get-own-props';
 import { getPreset } from '../../../utils/dimension';
 import {
   move,
@@ -22,18 +22,20 @@ import {
 import noImpact from '../../../../src/state/no-impact';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import withCombineImpact from './util/with-combine-impact';
+import restingProps from './util/resting-props';
 
 const preset = getPreset();
 const state = getStatePreset();
 
-const restingProps: MapProps = {
-  isDraggingOver: false,
-  draggingOverWith: null,
-  placeholder: null,
-};
-
 describe('home list', () => {
   const ownProps: OwnProps = getOwnProps(preset.home);
+  const isOverMapProps: MapProps = {
+    isDraggingOver: true,
+    draggingOverWith: preset.inHome1.descriptor.id,
+    draggingFromThisWith: preset.inHome1.descriptor.id,
+    placeholder: preset.inHome1.placeholder,
+    shouldAnimatePlaceholder: false,
+  };
 
   describe('is dragging over', () => {
     it('should indicate that it is being dragged over', () => {
@@ -43,13 +45,7 @@ describe('home list', () => {
         ownProps,
       );
 
-      const expected: MapProps = {
-        isDraggingOver: true,
-        draggingOverWith: preset.inHome1.descriptor.id,
-        // no placeholder when dragging in own list
-        placeholder: null,
-      };
-      expect(props).toEqual(expected);
+      expect(props).toEqual(isOverMapProps);
     });
 
     it('should indicate that it is being combined over', () => {
@@ -67,13 +63,7 @@ describe('home list', () => {
       );
       const props: MapProps = selector(withCombine, ownProps);
 
-      const expected: MapProps = {
-        isDraggingOver: true,
-        draggingOverWith: preset.inHome1.descriptor.id,
-        // no placeholder when dragging in own list
-        placeholder: null,
-      };
-      expect(props).toEqual(expected);
+      expect(props).toEqual(isOverMapProps);
     });
 
     it('should not break memoization between moves', () => {
@@ -96,13 +86,7 @@ describe('home list', () => {
       const props3: MapProps = selector(third, ownProps);
       const props4: MapProps = selector(fourth, ownProps);
 
-      const expected: MapProps = {
-        isDraggingOver: true,
-        draggingOverWith: preset.inHome1.descriptor.id,
-        // no placeholder when dragging in own list
-        placeholder: null,
-      };
-      expect(props1).toEqual(expected);
+      expect(props1).toEqual(isOverMapProps);
       // memoization check
       expect(props2).toBe(props1);
       expect(props3).toBe(props1);
@@ -116,18 +100,26 @@ describe('home list', () => {
       impact: { ...noImpact },
     });
 
+    const isHomeButNotOver: MapProps = {
+      isDraggingOver: false,
+      draggingOverWith: null,
+      draggingFromThisWith: preset.inHome1.descriptor.id,
+      placeholder: preset.inHome1.placeholder,
+      shouldAnimatePlaceholder: false,
+    };
+
     it('should indicate that it is not being dragged over', () => {
       const selector: Selector = makeMapStateToProps();
 
       const first: MapProps = selector(getNoWhere(), ownProps);
-      expect(first).toEqual(restingProps);
+      expect(first).toEqual(isHomeButNotOver);
     });
 
     it('should not break memoization between moves', () => {
       const selector: Selector = makeMapStateToProps();
 
       const first: MapProps = selector(getNoWhere(), ownProps);
-      expect(first).toEqual(restingProps);
+      expect(first).toEqual(isHomeButNotOver);
 
       expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(
         first,
@@ -155,25 +147,29 @@ describe('foreign list', () => {
   const ownProps: OwnProps = getOwnProps(preset.foreign);
 
   describe('is dragging over', () => {
-    const willDisplaceForward: boolean = true;
     const displacedBy: DisplacedBy = getDisplacedBy(
       preset.foreign.axis,
       preset.inHome1.displaceBy,
-      willDisplaceForward,
     );
     const overForeign: DragImpact = {
       movement: {
         displaced: [],
         map: {},
         displacedBy,
-        willDisplaceForward,
       },
-      direction: preset.foreign.axis.direction,
       destination: {
         index: 0,
         droppableId: preset.foreign.descriptor.id,
       },
       merge: null,
+    };
+
+    const isOverForeignMapProps: MapProps = {
+      isDraggingOver: true,
+      draggingFromThisWith: null,
+      draggingOverWith: preset.inHome1.descriptor.id,
+      placeholder: preset.inHome1.placeholder,
+      shouldAnimatePlaceholder: true,
     };
 
     it('should indicate that it is being dragged over', () => {
@@ -184,13 +180,7 @@ describe('foreign list', () => {
       );
       const props: MapProps = selector(current, ownProps);
 
-      const expected: MapProps = {
-        isDraggingOver: true,
-        draggingOverWith: preset.inHome1.descriptor.id,
-        // using placeholder when in foreign list
-        placeholder: preset.inHome1.placeholder,
-      };
-      expect(props).toEqual(expected);
+      expect(props).toEqual(isOverForeignMapProps);
     });
     it('should indicate that it is being combined over', () => {
       const selector: Selector = makeMapStateToProps();
@@ -206,14 +196,7 @@ describe('foreign list', () => {
         withCombineImpact(base.impact, combine),
       );
       const props: MapProps = selector(withCombine, ownProps);
-
-      const expected: MapProps = {
-        isDraggingOver: true,
-        draggingOverWith: preset.inHome1.descriptor.id,
-        // placeholder when over foreign list
-        placeholder: preset.inHome1.placeholder,
-      };
-      expect(props).toEqual(expected);
+      expect(props).toEqual(isOverForeignMapProps);
     });
 
     it('should not break memoization between moves', () => {
@@ -229,13 +212,7 @@ describe('foreign list', () => {
       const props2: MapProps = selector(second, ownProps);
       const props3: MapProps = selector(third, ownProps);
 
-      const expected: MapProps = {
-        isDraggingOver: true,
-        draggingOverWith: preset.inHome1.descriptor.id,
-        // using placeholder when in foreign list
-        placeholder: preset.inHome1.placeholder,
-      };
-      expect(props1).toEqual(expected);
+      expect(props1).toEqual(isOverForeignMapProps);
       // memoization check
       expect(props2).toBe(props1);
       expect(props3).toBe(props1);

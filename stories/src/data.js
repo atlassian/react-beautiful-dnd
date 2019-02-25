@@ -1,32 +1,54 @@
 // @flow
+import { colors } from '@atlaskit/theme';
 import type { Author, Quote, QuoteMap } from './types';
+import jakeImg from '../assets/jake.png';
+import finnImg from '../assets/finn.png';
+import bmoImg from '../assets/bmo.png';
+import princessImg from '../assets/princess.png';
 
+console.log('jakeimg', jakeImg);
 const jake: Author = {
   id: '1',
   name: 'Jake',
   url: 'http://adventuretime.wikia.com/wiki/Jake',
-  avatarUrl: 'https://68.media.tumblr.com/avatar_1f7bdbbeb59c_128.png',
+  avatarUrl: jakeImg,
+  colors: {
+    soft: colors.Y50,
+    hard: colors.Y200,
+  },
 };
 
 const BMO: Author = {
   id: '2',
   name: 'BMO',
   url: 'http://adventuretime.wikia.com/wiki/BMO',
-  avatarUrl: 'https://68.media.tumblr.com/avatar_1a34fe6de498_128.png',
+  avatarUrl: bmoImg,
+  colors: {
+    soft: colors.G50,
+    hard: colors.G200,
+  },
 };
 
 const finn: Author = {
   id: '3',
   name: 'Finn',
   url: 'http://adventuretime.wikia.com/wiki/Finn',
-  avatarUrl: 'https://68.media.tumblr.com/avatar_09404f3287c6_128.png',
+  avatarUrl: finnImg,
+  colors: {
+    soft: colors.B50,
+    hard: colors.B200,
+  },
 };
 
 const princess: Author = {
   id: '4',
   name: 'Princess bubblegum',
   url: 'http://adventuretime.wikia.com/wiki/Princess_Bubblegum',
-  avatarUrl: 'https://68.media.tumblr.com/avatar_ec98529441c4_128.png',
+  avatarUrl: princessImg,
+  colors: {
+    soft: colors.P50,
+    hard: colors.P200,
+  },
 };
 
 export const authors: Author[] = [jake, BMO, finn, princess];
@@ -95,16 +117,16 @@ export const quotes: Quote[] = [
   },
 ];
 
-let idCount: number = 0;
+// So we do not have any clashes with our hardcoded ones
+let idCount: number = quotes.length + 1;
 
 export const getQuotes = (count: number): Quote[] =>
   Array.from({ length: count }, (v, k) => k).map(() => {
     const random: Quote = quotes[Math.floor(Math.random() * quotes.length)];
 
     const custom: Quote = {
-      id: `quote-${idCount++}`,
-      content: random.content,
-      author: random.author,
+      ...random,
+      id: `G${idCount++}`,
     };
 
     return custom;
@@ -115,10 +137,8 @@ export const getAuthors = (count: number): Author[] =>
     const random: Author = authors[Math.floor(Math.random() * authors.length)];
 
     const custom: Author = {
+      ...random,
       id: `author-${idCount++}`,
-      name: random.name,
-      avatarUrl: random.avatarUrl,
-      url: random.url,
     };
 
     return custom;

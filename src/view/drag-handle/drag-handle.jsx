@@ -13,7 +13,7 @@ import type {
   CreateSensorArgs,
 } from './sensor/sensor-types';
 import type { DraggableId } from '../../types';
-import { styleContextKey, canLiftContextKey } from '../context-keys';
+import { styleKey, canLiftKey } from '../context-keys';
 import focusRetainer from './util/focus-retainer';
 import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
 import createMouseSensor from './sensor/create-mouse-sensor';
@@ -41,8 +41,8 @@ export default class DragHandle extends Component<Props> {
   // Need to declare contextTypes without flow
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
   static contextTypes = {
-    [styleContextKey]: PropTypes.string.isRequired,
-    [canLiftContextKey]: PropTypes.func.isRequired,
+    [styleKey]: PropTypes.string.isRequired,
+    [canLiftKey]: PropTypes.func.isRequired,
   };
 
   constructor(props: Props, context: Object) {
@@ -62,7 +62,7 @@ export default class DragHandle extends Component<Props> {
     this.keyboardSensor = createKeyboardSensor(args);
     this.touchSensor = createTouchSensor(args);
     this.sensors = [this.mouseSensor, this.keyboardSensor, this.touchSensor];
-    this.styleContext = context[styleContextKey];
+    this.styleContext = context[styleKey];
 
     // The canLift function is read directly off the context
     // and will communicate with the store. This is done to avoid
@@ -70,7 +70,7 @@ export default class DragHandle extends Component<Props> {
     // with that value. By putting it as a function on the context we are able
     // to avoid re-rendering to pass this information while still allowing
     // drag-handles to obtain this state if they need it.
-    this.canLift = context[canLiftContextKey];
+    this.canLift = context[canLiftKey];
   }
 
   componentDidMount() {

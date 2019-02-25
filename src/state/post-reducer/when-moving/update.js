@@ -1,9 +1,5 @@
 // @flow
 import type { Position } from 'css-box-model';
-import getDragImpact from '../../get-drag-impact';
-import { add, subtract } from '../../position';
-import getDimensionMapWithPlaceholder from '../../get-dimension-map-with-placeholder';
-import getUserDirection from '../../user-direction/get-user-direction';
 import type {
   DraggableDimension,
   DraggingState,
@@ -15,7 +11,12 @@ import type {
   DimensionMap,
   UserDirection,
   StateWhenUpdatesAllowed,
+  DroppableDimensionMap,
 } from '../../../types';
+import getDragImpact from '../../get-drag-impact';
+import { add, subtract } from '../../position';
+import getUserDirection from '../../user-direction/get-user-direction';
+import recomputePlaceholders from '../../recompute-placeholders';
 
 type Args = {|
   state: StateWhenUpdatesAllowed,
@@ -98,21 +99,25 @@ export default ({
       previousImpact: state.impact,
       viewport,
       userDirection,
+      onLift: state.onLift,
     });
 
-  const withUpdatedPlaceholders: DimensionMap = getDimensionMapWithPlaceholder({
+  const withUpdatedPlaceholders: DroppableDimensionMap = recomputePlaceholders({
     draggable,
     impact: newImpact,
     previousImpact: state.impact,
-    dimensions,
+    draggables: dimensions.draggables,
+    droppables: dimensions.droppables,
   });
-
   // dragging!
   const result: DraggingState = {
     ...state,
     current,
     userDirection,
-    dimensions: withUpdatedPlaceholders,
+    dimensions: {
+      draggables: dimensions.draggables,
+      droppables: withUpdatedPlaceholders,
+    },
     impact: newImpact,
     viewport,
     scrollJumpRequest: scrollJumpRequest || null,
