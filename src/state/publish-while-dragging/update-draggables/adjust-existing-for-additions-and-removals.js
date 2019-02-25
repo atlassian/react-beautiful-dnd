@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import type {
   Axis,
@@ -39,6 +40,7 @@ export default ({
   viewport,
 }: Args): DraggableDimensionMap => {
   const shifted: DraggableDimensionMap = {};
+  console.log('additions', addedDraggables.map(a => a.descriptor.id));
 
   toDroppableList(droppables).forEach((droppable: DroppableDimension) => {
     const axis: Axis = droppable.axis;
@@ -67,7 +69,13 @@ export default ({
     // phase 1: removals
     const removals: DraggableDimensionMap = toDraggableMap(
       removedDraggables
-        .map((id: DraggableId): DraggableDimension => existing.draggables[id])
+        .map(
+          (id: DraggableId): DraggableDimension => {
+            const item: ?DraggableDimension = existing[id];
+            invariant(item, `Could not find removed draggable "${id}"`);
+            return item;
+          },
+        )
         // only care about the ones inside of this droppable
         .filter(
           (draggable: DraggableDimension): boolean =>
@@ -183,6 +191,8 @@ export default ({
       shifted[moved.descriptor.id] = updated;
     });
   });
+
+  console.log('shifted', shifted);
 
   const map: DraggableDimensionMap = {
     ...existing,

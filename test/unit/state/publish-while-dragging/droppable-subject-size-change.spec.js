@@ -31,7 +31,7 @@ import { empty, adjustBox } from './util';
 import { addPlaceholder } from '../../../../src/state/droppable/with-placeholder';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../src/state/get-displacement-map';
-import getVisibleDisplacement from '../../../utils/get-visible-displacement';
+import getVisibleDisplacement from '../../../utils/get-displacement/get-visible-displacement';
 
 const preset = getPreset();
 const state = getStatePreset();

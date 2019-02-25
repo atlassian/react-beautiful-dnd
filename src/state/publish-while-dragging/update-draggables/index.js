@@ -10,6 +10,7 @@ import type {
 import adjustExistingForAdditionsAndRemovals from './adjust-existing-for-additions-and-removals';
 import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-changes';
 import adjustAdditionsForCollapsedHome from './adjust-additions-for-collapsed-home';
+import { toDraggableMap } from '../../dimension-structures';
 
 type Args = {|
   updatedDroppables: DroppableDimensionMap,
@@ -63,7 +64,7 @@ export default ({
 
   const map: DraggableDimensionMap = {
     ...existing,
-    ...additions,
+    ...toDraggableMap(additions),
   };
 
   // Phase 3: clear removed draggables

@@ -1,7 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../../utils/get-simple-state-preset';
 import type {
   Published,
   DraggableDimension,
@@ -10,42 +10,30 @@ import type {
   DraggableDimensionMap,
   CollectingState,
   DraggableId,
-} from '../../../../src/types';
-import publish from '../../../../src/state/publish-while-dragging';
-import { getPreset } from '../../../utils/dimension';
-import { patch, negate } from '../../../../src/state/position';
-import getDraggablesInsideDroppable from '../../../../src/state/get-draggables-inside-droppable';
-import { empty, shift, withScrollables, scrollableHome } from './util';
+} from '../../../../../src/types';
+import publish from '../../../../../src/state/publish-while-dragging';
+import { getPreset } from '../../../../utils/dimension';
+import { patch, negate } from '../../../../../src/state/position';
+import getDraggablesInsideDroppable from '../../../../../src/state/get-draggables-inside-droppable';
+import { empty, shift, withScrollables, scrollableHome } from '../util';
 
 const state = getStatePreset();
 const preset = getPreset();
 
-it('should do not modify the dimensions when nothing has changed', () => {
-  const original: CollectingState = withScrollables(state.collecting());
-
-  const result: DraggingState | DropPendingState = publish({
-    state: original,
-    published: empty,
-  });
-
-  invariant(result.phase === 'DRAGGING');
-  expect(result.dimensions).toEqual(original.dimensions);
-});
-
-it('should not shift anything when draggables are added to the end of a list', () => {
+it('should not shift anything when draggables are added to the end of a foreign list', () => {
   const added1: DraggableDimension = {
-    ...preset.inHome4,
+    ...preset.inForeign4,
     descriptor: {
-      ...preset.inHome4.descriptor,
-      index: preset.inHome4.descriptor.index + 1,
+      ...preset.inForeign4.descriptor,
+      index: preset.inForeign4.descriptor.index + 1,
       id: 'added1',
     },
   };
   const added2: DraggableDimension = {
-    ...preset.inHome4,
+    ...preset.inForeign4,
     descriptor: {
-      ...preset.inHome4.descriptor,
-      index: preset.inHome4.descriptor.index + 2,
+      ...preset.inForeign4.descriptor,
+      index: preset.inForeign4.descriptor.index + 2,
       id: 'added2',
     },
   };
@@ -88,7 +76,7 @@ it('should not shift anything when draggables are removed from the end of the li
     // everything else is unmodified
     ...preset.dimensions.draggables,
   };
-  // removing the ones that we don't care about
+  // removing the ones that have been removed
   delete expected[preset.inHome3.descriptor.id];
   delete expected[preset.inHome4.descriptor.id];
   expect(result.dimensions.draggables).toEqual(expected);
