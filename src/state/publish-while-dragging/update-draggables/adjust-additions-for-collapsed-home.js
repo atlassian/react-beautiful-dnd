@@ -33,10 +33,12 @@ export default ({
         return draggable;
       }
 
+      // appears before the draggable - no need to shift
       if (draggable.descriptor.index < dragging.descriptor.index) {
         return draggable;
       }
-      // item occurs after dragging item.
+
+      // item occurs after dragging item
       // need to shift it to account for collapsed home item
 
       return offsetDraggable({

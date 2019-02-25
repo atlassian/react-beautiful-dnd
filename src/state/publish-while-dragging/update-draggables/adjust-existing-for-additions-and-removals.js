@@ -33,16 +33,14 @@ type ShiftMap = {
 
 export default ({
   existing,
-  droppables: droppableMap,
+  droppables,
   additions: addedDraggables,
   removals: removedDraggables,
   viewport,
 }: Args): DraggableDimensionMap => {
-  const droppables: DroppableDimension[] = toDroppableList(droppableMap);
-
   const shifted: DraggableDimensionMap = {};
 
-  droppables.forEach((droppable: DroppableDimension) => {
+  toDroppableList(droppables).forEach((droppable: DroppableDimension) => {
     const axis: Axis = droppable.axis;
 
     const original: DraggableDimension[] = getDraggablesInsideDroppable(
@@ -187,7 +185,7 @@ export default ({
   });
 
   const map: DraggableDimensionMap = {
-    ...existing.draggables,
+    ...existing,
     // will overwrite existing draggables with shifted values if required
     ...shifted,
   };
