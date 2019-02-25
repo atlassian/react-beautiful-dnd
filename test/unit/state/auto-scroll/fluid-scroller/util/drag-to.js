@@ -5,6 +5,7 @@ import type {
   DragImpact,
   DraggingState,
   DroppableDimension,
+  DimensionMap,
 } from '../../../../../../src/types';
 import patchDroppableMap from '../../../../../../src/state/patch-droppable-map';
 
@@ -30,13 +31,21 @@ export default ({
     viewport,
   );
 
+  const dimensions: DimensionMap = (() => {
+    if (!droppable) {
+      return base.dimensions;
+    }
+    return {
+      draggables: base.dimensions.draggables,
+      droppables: patchDroppableMap(base.dimensions.droppables, droppable),
+    };
+  })();
+
   return {
     ...base,
     // add impact if needed
     impact: impact || base.impact,
     // add droppable if needed
-    dimensions: droppable
-      ? patchDroppableMap(base.dimensions, droppable)
-      : base.dimensions,
+    dimensions,
   };
 };
