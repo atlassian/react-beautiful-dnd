@@ -1,8 +1,13 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 
 module.exports = {
-  setupFiles: ['./test/env-setup.js'],
-  setupTestFrameworkScriptFile: './test/test-setup.js',
+  setupFiles: [
+    // for some painful reason this is needed for our 'async' usage
+    // in drop-dev-warnings-for-prod.spec.js
+    require.resolve('regenerator-runtime/runtime'),
+    './test/env-setup.js',
+  ],
+  setupFilesAfterEnv: ['./test/test-setup.js'],
   // node_modules is default.
   testPathIgnorePatterns: ['/node_modules/'],
   watchPlugins: [

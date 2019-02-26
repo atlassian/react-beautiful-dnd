@@ -6,7 +6,6 @@ import finnImg from '../assets/finn.png';
 import bmoImg from '../assets/bmo.png';
 import princessImg from '../assets/princess.png';
 
-console.log('jakeimg', jakeImg);
 const jake: Author = {
   id: '1',
   name: 'Jake',

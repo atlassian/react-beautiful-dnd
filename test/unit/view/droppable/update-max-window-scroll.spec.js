@@ -10,7 +10,7 @@ it('should update when a placeholder animation finishes', () => {
   const dispatchProps: DispatchProps = {
     updateViewportMaxScroll: jest.fn(),
   };
-  const wrapper: ReactWrapper = mount({
+  const wrapper: ReactWrapper<*> = mount({
     ownProps: homeOwnProps,
     mapProps: isOverHome,
     dispatchProps,
@@ -31,7 +31,7 @@ it('should update when a placeholder finishes and the list is not dragged over',
   const dispatchProps: DispatchProps = {
     updateViewportMaxScroll: jest.fn(),
   };
-  const wrapper: ReactWrapper = mount({
+  const wrapper: ReactWrapper<*> = mount({
     ownProps: homeOwnProps,
     mapProps: isNotOverHome,
     dispatchProps,
@@ -52,7 +52,7 @@ it('should not update when dropping', () => {
   const dispatchProps: DispatchProps = {
     updateViewportMaxScroll: jest.fn(),
   };
-  const wrapper: ReactWrapper = mount({
+  const wrapper: ReactWrapper<*> = mount({
     ownProps: homeOwnProps,
     mapProps: isNotOverHome,
     dispatchProps,

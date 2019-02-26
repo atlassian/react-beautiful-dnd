@@ -34,7 +34,7 @@ afterEach(() => {
 
 describe('is over foreign', () => {
   it('should log a warning when mounting', () => {
-    const wrapper: ReactWrapper = mount({
+    const wrapper: ReactWrapper<*> = mount({
       ownProps: foreignOwnProps,
       mapProps: isOverForeign,
       WrappedComponent: WithNoPlaceholder,
@@ -46,7 +46,7 @@ describe('is over foreign', () => {
   });
 
   it('should log a warning when updating', () => {
-    const wrapper: ReactWrapper = mount({
+    const wrapper: ReactWrapper<*> = mount({
       ownProps: foreignOwnProps,
       mapProps: homeAtRest,
       WrappedComponent: WithNoPlaceholder,
@@ -62,7 +62,7 @@ describe('is over foreign', () => {
 
 describe('is not over foreign', () => {
   it('should not log a warning when mounting', () => {
-    const wrapper: ReactWrapper = mount({
+    const wrapper: ReactWrapper<*> = mount({
       ownProps: foreignOwnProps,
       mapProps: isNotOverForeign,
       WrappedComponent: WithNoPlaceholder,
@@ -74,7 +74,7 @@ describe('is not over foreign', () => {
   });
 
   it('should not log a warning when updating', () => {
-    const wrapper: ReactWrapper = mount({
+    const wrapper: ReactWrapper<*> = mount({
       ownProps: foreignOwnProps,
       mapProps: homeAtRest,
       WrappedComponent: WithNoPlaceholder,

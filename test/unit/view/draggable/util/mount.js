@@ -41,8 +41,8 @@ export default ({
   dispatchProps = getDispatchPropsStub(),
   WrappedComponent = Item,
   styleMarshal,
-}: MountConnected = {}): ReactWrapper => {
-  const wrapper: ReactWrapper = mount(
+}: MountConnected = {}): ReactWrapper<*> => {
+  const wrapper: ReactWrapper<*> = mount(
     <Draggable {...ownProps} {...mapProps} {...dispatchProps}>
       {(provided: Provided, snapshot: StateSnapshot) => (
         <WrappedComponent provided={provided} snapshot={snapshot} />

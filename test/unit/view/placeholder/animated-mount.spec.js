@@ -10,7 +10,7 @@ import getPlaceholderStyle from './util/get-placeholder-style';
 jest.useFakeTimers();
 
 it('should animate a mount', () => {
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="open"
       placeholder={placeholder}
@@ -32,7 +32,7 @@ it('should animate a mount', () => {
 it('should not animate a mount if interrupted', () => {
   jest.spyOn(Placeholder.prototype, 'render');
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="open"
       placeholder={placeholder}
@@ -70,7 +70,7 @@ it('should not animate a mount if interrupted', () => {
 it('should not animate in if unmounted', () => {
   jest.spyOn(console, 'error');
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="open"
       placeholder={placeholder}

@@ -42,7 +42,7 @@ import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-typ
 const origin: Position = { x: 0, y: 0 };
 
 let callbacks: Callbacks;
-let wrapper: ReactWrapper;
+let wrapper: ReactWrapper<*>;
 
 beforeAll(() => {
   requestAnimationFrame.reset();

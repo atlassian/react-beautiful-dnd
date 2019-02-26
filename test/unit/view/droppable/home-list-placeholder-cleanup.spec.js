@@ -12,7 +12,7 @@ import AnimateInOut from '../../../../src/view/animate-in-out/animate-in-out';
 
 it('should not display a placeholder after a flushed drag end in the home list', () => {
   // dropping
-  const wrapper: ReactWrapper = mount({
+  const wrapper: ReactWrapper<*> = mount({
     ownProps: homeOwnProps,
     mapProps: isNotOverHome,
   });
@@ -29,7 +29,7 @@ it('should not display a placeholder after a flushed drag end in the home list',
 
 it('should animate a placeholder closed in a home list after a drag', () => {
   // dropping
-  const wrapper: ReactWrapper = mount({
+  const wrapper: ReactWrapper<*> = mount({
     ownProps: homeOwnProps,
     mapProps: isNotOverHome,
   });

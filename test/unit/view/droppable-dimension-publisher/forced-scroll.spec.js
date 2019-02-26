@@ -1,6 +1,7 @@
 // @flow
 import { mount } from 'enzyme';
 import React from 'react';
+import invariant from 'tiny-invariant';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
@@ -32,7 +33,8 @@ it('should throw if the droppable has no closest scrollable', () => {
     <App parentIsScrollable={false} droppableIsScrollable={false} />,
     withDimensionMarshal(marshal),
   );
-  const droppable: HTMLElement = wrapper.instance().getRef();
+  const droppable: ?HTMLElement = wrapper.instance().getRef();
+  invariant(droppable);
   const parent: HTMLElement = wrapper.getDOMNode();
   jest
     .spyOn(droppable, 'getBoundingClientRect')

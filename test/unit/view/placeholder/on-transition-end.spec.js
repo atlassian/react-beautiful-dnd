@@ -12,7 +12,7 @@ it('should only fire a single transitionend event a single time when transitioni
   const onTransitionEnd = jest.fn();
   const onClose = jest.fn();
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="open"
       placeholder={placeholder}

@@ -37,7 +37,7 @@ export default ({
   mapProps = homeAtRest,
   dispatchProps = defaultDispatchProps,
   isMovementAllowed,
-}: MountArgs = {}): ReactWrapper =>
+}: MountArgs = {}): ReactWrapper<*> =>
   mount(
     <Droppable {...ownProps} {...mapProps} {...dispatchProps}>
       {(provided: Provided, snapshot: StateSnapshot) => (

@@ -45,7 +45,7 @@ export const createRef = () => {
 export const getWrapper = (
   callbacks: Callbacks,
   context?: Object = basicContext,
-): ReactWrapper => {
+): ReactWrapper<*> => {
   const ref = createRef();
 
   return mount(

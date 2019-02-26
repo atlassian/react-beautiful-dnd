@@ -59,7 +59,7 @@ it('should update snapshot as dragging over changes', () => {
     draggingOverWith: null,
   };
 
-  const wrapper: ReactWrapper = mount({
+  const wrapper: ReactWrapper<*> = mount({
     mapProps: homeAtRest,
     WrappedComponent: getStubber(myMock),
   });

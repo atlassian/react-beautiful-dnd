@@ -186,7 +186,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
     second.onRender.mockClear();
   };
 
-  const wrapper: ReactWrapper = mount(<App />);
+  const wrapper: ReactWrapper<*> = mount(<App />);
 
   // clearing the initial render before a drag
   expect(first.onRender).toHaveBeenCalledTimes(1);

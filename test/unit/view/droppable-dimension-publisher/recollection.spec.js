@@ -1,5 +1,6 @@
 // @flow
 import { mount } from 'enzyme';
+import invariant from 'tiny-invariant';
 import React from 'react';
 import type {
   DimensionMarshal,
@@ -63,7 +64,8 @@ it('should recollect a dimension if requested', () => {
     <App droppableIsScrollable />,
     withDimensionMarshal(marshal),
   );
-  const el: HTMLElement = wrapper.instance().getRef();
+  const el: ?HTMLElement = wrapper.instance().getRef();
+  invariant(el);
   // returning smaller border box as this is what occurs when the element is scrollable
   jest
     .spyOn(el, 'getBoundingClientRect')
@@ -103,8 +105,10 @@ it('should hide any placeholder when recollecting dimensions if requested', () =
     <App droppableIsScrollable showPlaceholder />,
     withDimensionMarshal(marshal),
   );
-  const el: HTMLElement = wrapper.instance().getRef();
-  const placeholderEl: HTMLElement = wrapper.instance().getPlaceholderRef();
+  const el: ?HTMLElement = wrapper.instance().getRef();
+  const placeholderEl: ?HTMLElement = wrapper.instance().getPlaceholderRef();
+  invariant(el);
+  invariant(placeholderEl);
   // returning smaller border box as this is what occurs when the element is scrollable
   jest
     .spyOn(el, 'getBoundingClientRect')
@@ -141,8 +145,10 @@ it('should not hide any placeholder when recollecting dimensions if requested', 
     <App droppableIsScrollable showPlaceholder />,
     withDimensionMarshal(marshal),
   );
-  const el: HTMLElement = wrapper.instance().getRef();
-  const placeholderEl: HTMLElement = wrapper.instance().getPlaceholderRef();
+  const el: ?HTMLElement = wrapper.instance().getRef();
+  const placeholderEl: ?HTMLElement = wrapper.instance().getPlaceholderRef();
+  invariant(el);
+  invariant(placeholderEl);
   // returning smaller border box as this is what occurs when the element is scrollable
   jest
     .spyOn(el, 'getBoundingClientRect')

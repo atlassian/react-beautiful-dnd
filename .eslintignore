@@ -2,4 +2,5 @@
 dist/
 flow-typed/
 site/
+coverage/
 babel.config.js

@@ -9,7 +9,7 @@ import type {
   DroppableDimensionMap,
   DroppableId,
 } from '../../../types';
-import { add, isEqual, origin } from '../../position';
+import { add } from '../../position';
 import offsetDraggable from './offset-draggable';
 
 type Args = {|

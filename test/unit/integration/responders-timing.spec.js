@@ -77,7 +77,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
   jest
     .spyOn(window, 'getComputedStyle')
     .mockImplementation(() => getComputedSpacing({}));
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <DragDropContext {...responders}>
       <Droppable droppableId="droppable">
         {(droppableProvided: DroppableProvided) => (

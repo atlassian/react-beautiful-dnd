@@ -2,7 +2,7 @@
 import React from 'react';
 import { mount, type ReactWrapper } from 'enzyme';
 import Placeholder from '../../../../src/view/placeholder';
-import { expectIsEmpty, expectIsFull } from './util/expect';
+import { expectIsFull } from './util/expect';
 import getPlaceholderStyle from './util/get-placeholder-style';
 import { placeholder } from './util/data';
 
@@ -11,7 +11,7 @@ jest.useFakeTimers();
 it('should only fire a single onClose event', () => {
   const onClose = jest.fn();
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="none"
       placeholder={placeholder}
@@ -51,7 +51,7 @@ it('should only fire a single onClose event', () => {
 it('should not fire an onClose if not closing when a transitionend occurs', () => {
   const onClose = jest.fn();
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="none"
       placeholder={placeholder}
