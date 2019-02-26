@@ -123,6 +123,6 @@ workflows:
       - test-bundle:
           requires:
             - install
-      - cypress/run
+      - cypress/run:
           start: yarn run start-storybook -p 9002
           wait-on: http://localhost:9002
