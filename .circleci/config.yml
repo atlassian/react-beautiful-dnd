@@ -110,7 +110,9 @@ jobs:
           command: yarn run bundle-size:check
   test-browser:
     docker:
-      - image: circleci/node:8.11.3-browsers
+      # Single Docker container with Node 8 and Cypress dependencies
+      # https://github.com/cypress-io/circleci-orb/blob/master/src/orb.yml
+      - image: cypress/base:8
     working_directory: ~/repo
     steps:
       - checkout
@@ -123,10 +125,6 @@ jobs:
       - run:
           name: 'Forked PR dependency install'
           command: yarn
-
-      - run:
-          name: 'Install cypress'
-          command: yarn cypress install
 
       - run:
           name: 'Run cypress'
