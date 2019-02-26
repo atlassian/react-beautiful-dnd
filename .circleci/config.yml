@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   install:
     docker:
@@ -88,16 +88,16 @@ jobs:
       - store_test_results:
           path: test-reports/junit
 
-      - run:
-          name: Browser Suite
-          command: node browser-test-harness.js yarn test:browser
-
-      - store_test_results:
-          path: test-reports/browser
-
-      - store_artifacts:
-          path: .storybook-out
-          destination: storybook-out
+  #      - run:
+  #          name: Browser Suite
+  #          command: node browser-test-harness.js yarn test:browser
+  #
+  #      - store_test_results:
+  #          path: test-reports/browser
+  #
+  #      - store_artifacts:
+  #          path: .storybook-out
+  #          destination: storybook-out
   bundle-test:
     docker:
       - image: circleci/node:8.11.3-browsers
@@ -129,6 +129,11 @@ workflows:
       - test:
           requires:
             - install
+      - cypress/run:
+          requires:
+            - install
+          start: yarn run start-storybook -p 9002
+          wait-on: http://localhost:9002
       - bundle-test:
           requires:
             - install
