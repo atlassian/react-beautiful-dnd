@@ -4,7 +4,6 @@ import { mount, type ReactWrapper } from 'enzyme';
 import AnimateInOut, {
   type AnimateProvided,
 } from '../../../../src/view/animate-in-out/animate-in-out';
-import forceUpdate from '../../../utils/force-update';
 
 type ChildProps = {|
   provided: AnimateProvided,

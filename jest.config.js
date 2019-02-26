@@ -2,7 +2,7 @@
 
 module.exports = {
   setupFiles: ['./test/env-setup.js'],
-  setupTestFrameworkScriptFile: './test/test-setup.js',
+  setupFilesAfterEnv: ['./test/test-setup.js'],
   // node_modules is default.
   testPathIgnorePatterns: ['/node_modules/'],
   watchPlugins: [

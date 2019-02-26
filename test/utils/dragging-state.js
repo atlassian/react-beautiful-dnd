@@ -9,7 +9,6 @@ import type {
   CollectingState,
   DropPendingState,
   DragImpact,
-  DropAnimatingState,
 } from '../../src/types';
 
 const state = getStatePreset();
