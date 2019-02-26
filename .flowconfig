@@ -2,6 +2,9 @@
 # Issue with atlaskit/theme typing
 .*/node_modules/@atlaskit/theme
 
+[libs]
+./flow-typed/custom/
+
 [options]
 
 # Provides a way to suppress flow errors in the following line.

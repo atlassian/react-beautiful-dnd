@@ -29,13 +29,13 @@
     "/src"
   ],
   "config": {
-    "prettier_target": "*.{js,jsx,md,json} src/**/*.{js,jsx,md,json} test/**/*.{js,jsx,md,json} docs/**/*.{js,jsx,md,json} stories/**/*.{js,jsx,md,json}"
+    "prettier_target": "*.{js,jsx,md,json} src/**/*.{js,jsx,md,json} test/**/*.{js,jsx,md,json} docs/**/*.{js,jsx,md,json} stories/**/*.{js,jsx,md,json} cypress/**/*.{js,jsx,md,json}"
   },
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "test:ci": "jest test --maxWorkers=2",
-    "test:browser": "testcafe 'chrome:headless,chrome:headless:emulation:device=iphone 6;touch=true' ./test/browser/*  -r spec,xunit:./test-reports/browser/test-results.xml",
-    "test:browser:local": "testcafe 'chrome' ./test/browser/*",
+    "test:browser": "cypress open",
+    "test:browser:ci": "cypress run",
     "test:coverage": "yarn test --coverage --coveragePathIgnorePatterns=/debug",
     "validate": "yarn prettier:check && yarn lint:eslint && yarn lint:css && yarn typecheck",
     "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
@@ -84,11 +84,13 @@
     "babel-plugin-dev-expression": "^0.2.1",
     "babel-plugin-styled-components": "^1.10.0",
     "cross-env": "^5.2.0",
+    "cypress": "^3.1.5",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.9.1",
     "eslint": "^5.14.1",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-prettier": "^4.0.0",
+    "eslint-plugin-cypress": "^2.2.1",
     "eslint-plugin-flowtype": "^3.4.2",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jest": "^22.3.0",
@@ -122,7 +124,6 @@
     "stylelint-config-standard": "^18.2.0",
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.5.2",
-    "testcafe": "^1.0.1",
     "testcafe-reporter-xunit": "^2.1.0",
     "wait-port": "^0.2.2",
     "webpack": "^4.29.5"
