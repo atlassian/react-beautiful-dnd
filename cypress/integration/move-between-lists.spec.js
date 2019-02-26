@@ -6,31 +6,23 @@ beforeEach(() => {
   cy.visit('/iframe.html?selectedKind=board&selectedStory=simple');
 });
 
-const shouldHaveItemWithId2 = el => {
-  expect(el[0].innerText).to.have.string('id:2');
-};
-
-const shouldNotHaveItemWithId2 = el => {
-  expect(el[0].innerText).not.to.have.string('id:2');
-};
-
 it('should move between lists', () => {
   // first list has item with id:2
   cy.get('[data-react-beautiful-dnd-droppable]')
     .eq(1)
     .as('first-list')
-    .should(shouldHaveItemWithId2);
+    .should('contain', 'id:2');
 
   // second list does not have item with id:2
   cy.get('[data-react-beautiful-dnd-droppable]')
     .eq(2)
     .as('second-list')
-    .should(shouldNotHaveItemWithId2);
+    .should('not.contain', 'id:2');
 
   cy.get('@first-list')
     .find('[data-react-beautiful-dnd-drag-handle]')
     .first()
-    .should(shouldHaveItemWithId2)
+    .should('contain', 'id:2')
     .focus()
     .trigger('keydown', { keyCode: keyCodes.space })
     .trigger('keydown', { keyCode: keyCodes.arrowRight, force: true })
@@ -39,8 +31,8 @@ it('should move between lists', () => {
     .trigger('keydown', { keyCode: keyCodes.space, force: true });
 
   // no longer in the first list
-  cy.get('@first-list').should(shouldNotHaveItemWithId2);
+  cy.get('@first-list').should('not.contain', 'id:2');
 
   // now in the second list
-  cy.get('@second-list').should(shouldHaveItemWithId2);
+  cy.get('@second-list').should('contain', 'id:2');
 });

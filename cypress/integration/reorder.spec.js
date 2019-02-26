@@ -13,17 +13,12 @@ it('should reorder a list', () => {
   cy.get('[data-react-beautiful-dnd-drag-handle]')
     .eq(0)
     .as('first')
-    .should(el => {
-      expect(el[0].innerText).to.have.string('id:1');
-    });
-
+    .should('contain', 'id:1');
   cy.get('[data-react-beautiful-dnd-drag-handle]')
     .eq(1)
-    .should(el => {
-      expect(el[0].innerText).to.have.string('id:2');
-    });
+    .should('contain', 'id:2');
 
-  // do drag
+  // reorder operation
   cy.get('@first')
     .focus()
     .trigger('keydown', { keyCode: keyCodes.space })
@@ -33,16 +28,12 @@ it('should reorder a list', () => {
     .trigger('keydown', { keyCode: keyCodes.space, force: true });
 
   // order now 2, 1
-  // note: not using aliases as they where returning incorrect results
+  // note: not using get aliases as they where returning incorrect results
   cy.get('[data-react-beautiful-dnd-drag-handle]')
     .eq(0)
-    .should(el => {
-      expect(el[0].innerText).to.have.string('id:2');
-    });
+    .should('contain', 'id:2');
 
   cy.get('[data-react-beautiful-dnd-drag-handle]')
     .eq(1)
-    .should(el => {
-      expect(el[0].innerText).to.have.string('id:1');
-    });
+    .should('contain', 'id:1');
 });
