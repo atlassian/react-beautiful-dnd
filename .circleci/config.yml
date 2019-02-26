@@ -124,3 +124,5 @@ workflows:
           requires:
             - install
       - cypress/run
+          start: yarn run start-storybook -p 9002
+          wait-on: http://localhost:9002
