@@ -13,13 +13,15 @@ const secondCard: string = `[${attributes.dragHandle}]:nth-child(2)`;
 const fourthCard: string = `[${attributes.dragHandle}]:nth-child(5)`;
 
 // fixture is not defined
-// eslint-disable-next-line
+/* eslint-disable */
+// $FlowFixMe - need to fix this api
 fixture`Simple List Test Case`.page`${urlSimpleList}`.beforeEach(async t => {
   await t
     .navigateTo(urlSimpleList)
     .expect(Selector(singleListContainer).visible)
     .ok();
 });
+/* eslint-enable */
 
 test('Drag and drop using click / drag', async t => {
   const textBefore = await Selector(secondCard).innerText;
