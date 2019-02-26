@@ -131,6 +131,12 @@ jobs:
       - run:
           name: 'Run cypress'
           command: node browser-test-harness.js yarn test:browser:ci
+
+      # store videos and screenshots (if any) as CI artifacts
+      - store_artifacts:
+          path: cypress/videos
+      - store_artifacts:
+          path: cypress/screenshots
 workflows:
   version: 2
   build:
