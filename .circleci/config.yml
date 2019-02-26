@@ -110,7 +110,7 @@ jobs:
           command: yarn run bundle-size:check
 
 workflows:
-  version: 2.1
+  version: 2
   build:
     jobs:
       - install
