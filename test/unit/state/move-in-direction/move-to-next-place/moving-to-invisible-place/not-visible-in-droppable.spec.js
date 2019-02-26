@@ -30,7 +30,6 @@ import moveToNextPlace from '../../../../../../src/state/move-in-direction/move-
 import { type PublicResult } from '../../../../../../src/state/move-in-direction/move-in-direction-types';
 import { origin, subtract, patch } from '../../../../../../src/state/position';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
-import scrollViewport from '../../../../../../src/state/scroll-viewport';
 import {
   isTotallyVisible,
   isPartiallyVisible,
