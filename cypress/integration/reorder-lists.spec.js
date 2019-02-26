@@ -8,16 +8,18 @@ beforeEach(() => {
 
 it('should reorder lists', () => {
   // order: Jake, BMO
-  cy.get('[data-react-beautiful-dnd-drag-handle]')
+  cy.get('h4')
     .eq(0)
     .as('first')
     .should('have.text', 'Jake');
-  cy.get('[data-react-beautiful-dnd-drag-handle]')
-    .eq(3)
+
+  cy.get('h4')
+    .eq(1)
     .should('have.text', 'BMO');
 
   // reorder operation
   cy.get('@first')
+    .closest('[data-react-beautiful-dnd-drag-handle]')
     .focus()
     .trigger('keydown', { keyCode: keyCodes.space })
     .trigger('keydown', { keyCode: keyCodes.arrowRight, force: true })
@@ -27,12 +29,12 @@ it('should reorder lists', () => {
 
   // order now 2, 1
   // note: not using get aliases as they where returning incorrect results
-  cy.get('[data-react-beautiful-dnd-drag-handle]')
+  cy.get('h4')
     .eq(0)
     .should('have.text', 'BMO');
 
   // index of the drag handle has changed
-  cy.get('[data-react-beautiful-dnd-drag-handle]')
-    .eq(2)
+  cy.get('h4')
+    .eq(1)
     .should('have.text', 'Jake');
 });
