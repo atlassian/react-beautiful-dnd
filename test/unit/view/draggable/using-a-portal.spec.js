@@ -86,6 +86,7 @@ it('should keep focus if moving to a portal', () => {
   const inPortal: HTMLElement = wrapper.getDOMNode();
   expect(inPortal).not.toBe(original);
   expect(inPortal.parentElement).toBe(
+    // $ExpectError - not checking for null
     wrapper.find(WithPortal).instance().portal,
   );
 
@@ -105,6 +106,7 @@ it('should keep focus if moving to a portal', () => {
   // ref as it is remounted after leaving the portal
   expect(latest).not.toBe(original);
   // no longer in a portal
+  // $ExpectError - not checking for null
   expect(latest).not.toBe(wrapper.find(WithPortal).instance().portal);
 
   // cleanup

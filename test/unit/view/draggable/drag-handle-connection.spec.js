@@ -30,7 +30,7 @@ setViewport(viewport);
 
 // we need to unmount after each test to avoid
 // cross EventMarshal contamination
-let managedWrapper: ?ReactWrapper = null;
+let managedWrapper: ?ReactWrapper<*> = null;
 
 afterEach(() => {
   if (managedWrapper) {

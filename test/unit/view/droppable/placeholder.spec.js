@@ -14,7 +14,7 @@ import Placeholder from '../../../../src/view/placeholder';
 
 describe('home list', () => {
   it('should not render a placeholder when not dragging', () => {
-    const wrapper: ReactWrapper = mount({
+    const wrapper: ReactWrapper<*> = mount({
       ownProps: homeOwnProps,
       mapProps: homeAtRest,
     });
@@ -23,7 +23,7 @@ describe('home list', () => {
   });
 
   it('should render a placeholder when dragging over', () => {
-    const wrapper: ReactWrapper = mount({
+    const wrapper: ReactWrapper<*> = mount({
       ownProps: homeOwnProps,
       mapProps: isOverHome,
     });
@@ -32,7 +32,7 @@ describe('home list', () => {
   });
 
   it('should render a placeholder when dragging over nothing', () => {
-    const wrapper: ReactWrapper = mount({
+    const wrapper: ReactWrapper<*> = mount({
       ownProps: homeOwnProps,
       mapProps: isNotOverHome,
     });
@@ -41,7 +41,7 @@ describe('home list', () => {
   });
 
   it('should render a placeholder when dragging over a foreign list', () => {
-    const wrapper: ReactWrapper = mount({
+    const wrapper: ReactWrapper<*> = mount({
       ownProps: homeOwnProps,
       mapProps: isOverForeign,
     });
@@ -52,7 +52,7 @@ describe('home list', () => {
 
 describe('foreign', () => {
   it('should not render a placeholder when not dragging', () => {
-    const wrapper: ReactWrapper = mount({
+    const wrapper: ReactWrapper<*> = mount({
       ownProps: foreignOwnProps,
       mapProps: homeAtRest,
     });
@@ -61,7 +61,7 @@ describe('foreign', () => {
   });
 
   it('should render a placeholder when dragging over', () => {
-    const wrapper: ReactWrapper = mount({
+    const wrapper: ReactWrapper<*> = mount({
       ownProps: foreignOwnProps,
       mapProps: isOverForeign,
     });
@@ -70,7 +70,7 @@ describe('foreign', () => {
   });
 
   it('should not render a placeholder when over nothing', () => {
-    const wrapper: ReactWrapper = mount({
+    const wrapper: ReactWrapper<*> = mount({
       ownProps: foreignOwnProps,
       mapProps: isNotOverForeign,
     });

@@ -28,7 +28,7 @@ forEach((control: Control) => {
     }
 
     const callbacks: Callbacks = getStubCallbacks();
-    const wrapper: ReactWrapper = getWrapper(callbacks);
+    const wrapper: ReactWrapper<*> = getWrapper(callbacks);
 
     control.preLift(wrapper);
 
@@ -44,7 +44,7 @@ forEach((control: Control) => {
 
   it('should cancel an existing drag', () => {
     const callbacks: Callbacks = getStubCallbacks();
-    const wrapper: ReactWrapper = getWrapper(callbacks);
+    const wrapper: ReactWrapper<*> = getWrapper(callbacks);
 
     control.preLift(wrapper);
     control.lift(wrapper);
@@ -69,7 +69,7 @@ forEach((control: Control) => {
 
   it('should stop publishing movements', () => {
     const callbacks: Callbacks = getStubCallbacks();
-    const wrapper: ReactWrapper = getWrapper(callbacks);
+    const wrapper: ReactWrapper<*> = getWrapper(callbacks);
 
     control.preLift(wrapper);
     control.lift(wrapper);
@@ -97,7 +97,7 @@ forEach((control: Control) => {
 
   it('should allow subsequent drags', () => {
     const callbacks: Callbacks = getStubCallbacks();
-    const wrapper: ReactWrapper = getWrapper(callbacks);
+    const wrapper: ReactWrapper<*> = getWrapper(callbacks);
 
     control.preLift(wrapper);
     control.lift(wrapper);

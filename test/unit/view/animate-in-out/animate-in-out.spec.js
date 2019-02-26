@@ -8,7 +8,7 @@ import AnimateInOut, {
 it('should allow children not to be rendered (no animation allowed)', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <AnimateInOut on={null} shouldAnimate={false}>
       {child}
     </AnimateInOut>,
@@ -21,7 +21,7 @@ it('should allow children not to be rendered (no animation allowed)', () => {
 it('should allow children not to be rendered (even when animation is allowed)', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <AnimateInOut on={null} shouldAnimate>
       {child}
     </AnimateInOut>,
@@ -35,7 +35,7 @@ it('should pass data through to children', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <AnimateInOut on={data} shouldAnimate={false}>
       {child}
     </AnimateInOut>,
@@ -56,7 +56,7 @@ it('should open instantly if required', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <AnimateInOut on={data} shouldAnimate={false}>
       {child}
     </AnimateInOut>,
@@ -77,7 +77,7 @@ it('should animate open if requested', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <AnimateInOut on={data} shouldAnimate>
       {child}
     </AnimateInOut>,
@@ -98,7 +98,7 @@ it('should close instantly if required', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <AnimateInOut on={data} shouldAnimate={false}>
       {child}
     </AnimateInOut>,
@@ -126,7 +126,7 @@ it('should animate closed if required', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <AnimateInOut on={data} shouldAnimate={false}>
       {child}
     </AnimateInOut>,

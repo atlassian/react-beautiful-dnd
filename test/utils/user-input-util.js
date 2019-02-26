@@ -97,7 +97,7 @@ export const dispatchWindowTouchEvent = (
 
 export const mouseEvent = (
   eventName: string,
-  wrapper: ReactWrapper,
+  wrapper: ReactWrapper<*>,
   client?: Position = origin,
   button?: number = primaryButton,
   options?: Object = {},
@@ -111,7 +111,7 @@ export const mouseEvent = (
 };
 
 export const withKeyboard = (keyCode: number): Function => (
-  wrapper: ReactWrapper,
+  wrapper: ReactWrapper<*>,
   options?: Object = {},
 ): void => {
   wrapper.simulate('keydown', { keyCode, ...options });
@@ -119,7 +119,7 @@ export const withKeyboard = (keyCode: number): Function => (
 
 export const touchEvent = (
   eventName: string,
-  wrapper: ReactWrapper,
+  wrapper: ReactWrapper<*>,
   client?: Position = { x: 0, y: 0 },
   force?: number = 0,
   options?: Object = {},
