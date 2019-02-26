@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  cypress: cypress-io/cypress@1
 jobs:
   install:
     docker:
@@ -108,6 +110,7 @@ jobs:
           command: yarn run bundle-size:check
 
 workflows:
+  version: 2.1
   build:
     jobs:
       - install
