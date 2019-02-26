@@ -63,7 +63,7 @@ jobs:
       - run:
           name: Lint + Typecheck
           command: yarn validate
-  test:
+  test-unit:
     docker:
       - image: circleci/node:8.11.3-browsers
     working_directory: ~/repo
@@ -87,18 +87,7 @@ jobs:
 
       - store_test_results:
           path: test-reports/junit
-
-  #      - run:
-  #          name: Browser Suite
-  #          command: node browser-test-harness.js yarn test:browser
-  #
-  #      - store_test_results:
-  #          path: test-reports/browser
-  #
-  #      - store_artifacts:
-  #          path: .storybook-out
-  #          destination: storybook-out
-  bundle-test:
+  test-bundle:
     docker:
       - image: circleci/node:8.11.3-browsers
     working_directory: ~/repo
@@ -125,7 +114,10 @@ workflows:
       - validate:
           requires:
             - install
-      - test:
+      - test-unit:
+          requires:
+            - install
+      - test-bundle:
           requires:
             - install
       - cypress/run:
@@ -133,6 +125,3 @@ workflows:
             - install
           start: yarn run start-storybook -p 9002
           wait-on: http://localhost:9002
-      - bundle-test:
-          requires:
-            - install
