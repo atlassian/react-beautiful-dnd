@@ -34,8 +34,8 @@
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "test:ci": "jest test --maxWorkers=2",
-    "test:browser": "cypress run",
-    "test:browser:local": "cypress open",
+    "test:browser": "cypress open",
+    "test:browser:ci": "cypress run",
     "test:coverage": "yarn test --coverage --coveragePathIgnorePatterns=/debug",
     "validate": "yarn prettier:check && yarn lint:eslint && yarn lint:css && yarn typecheck",
     "prettier:check": "yarn prettier --debug-check $npm_package_config_prettier_target",
