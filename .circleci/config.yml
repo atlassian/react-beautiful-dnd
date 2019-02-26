@@ -1,6 +1,4 @@
-version: 2.1
-orbs:
-  cypress: cypress-io/cypress@1
+version: 2
 jobs:
   install:
     docker:
@@ -13,9 +11,9 @@ jobs:
       - restore_cache:
           keys:
             # Restore cached node_modules
-            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v2-dependencies-{{ checksum "yarn.lock" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - v2-dependencies-
 
       - run:
           name: Add CI global modules
@@ -45,7 +43,7 @@ jobs:
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "yarn.lock" }}
+          key: v2-dependencies-{{ checksum "yarn.lock" }}
   validate:
     docker:
       - image: circleci/node:8.11.3-browsers
@@ -55,7 +53,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v2-dependencies-{{ checksum "yarn.lock" }}
 
       - run:
           # PR's from forks cannot use the dependency cache for performance reasons
@@ -74,7 +72,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v2-dependencies-{{ checksum "yarn.lock" }}
 
       - run:
           # PR's from forks cannot use the dependency cache for performance reasons
@@ -98,7 +96,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v2-dependencies-{{ checksum "yarn.lock" }}
 
       # PR's from forks cannot use the dependency cache for performance reasons
       - run:
@@ -119,7 +117,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v2-dependencies-{{ checksum "yarn.lock" }}
 
       # PR's from forks cannot use the dependency cache for performance reasons
       - run:
