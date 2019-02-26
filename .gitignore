@@ -20,6 +20,9 @@ coverage/
 # test reports
 test-reports/
 
+# test videos
+cypress/videos/
+
 # storybook
 .storybook.out
 .cache/
