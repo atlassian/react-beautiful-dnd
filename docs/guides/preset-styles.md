@@ -1,6 +1,6 @@
 # Preset styles
 
-We apply a number of non-visible styles to facilitate the dragging experience. We do this using combination of styling targets and techniques. It is a goal of the library to provide unopinioned styling. However, we do apply some reasonable `cursor` styling on drag handles by default. This is designed to make the library work as simply as possible out of the box. If you want to use your own cursors you are more than welcome to. All you need to do is override our cursor style rules by using a rule with [higher specificity](https://css-tricks.com/specifics-on-css-specificity/).
+We apply a number of **non-visible** styles to facilitate the dragging experience. We do this using combination of styling targets and techniques. It is a goal of the library to provide unopinioned styling. However, we do apply some reasonable `cursor` styling on drag handles by default. This is designed to make the library work as simply as possible out of the box. If you want to use your own cursors you are more than welcome to. All you need to do is override our cursor style rules by using a rule with [higher specificity](https://css-tricks.com/specifics-on-css-specificity/).
 
 Here are the styles that are applied at various points in the drag lifecycle:
 

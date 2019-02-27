@@ -1,5 +1,9 @@
 # Installation
 
+[![module formats: umd, cjs, and esm](https://img.shields.io/badge/module%20formats-umd%2c%20cjs%2c%20esm-green.svg?style=flat)](https://unpkg.com/react-beautiful-dnd/dist/)
+
+## General
+
 1. Add the `react-beautiful-dnd` package
 
 ```bash
