@@ -18,12 +18,12 @@
 
 ## Core characteristics 💐♿️🚀
 
-- Beautiful and natural movement of items 💐
-- Accessible: powerful keyboard and screen reader support ♿️
+- Beautiful and [natural movement](/docs/general/philosophy.md) of items 💐
+- [Accessible](/docs/general/accessibility.md): powerful keyboard and screen reader support ♿️
 - [Extremely performant](/docs/general/media.md) 🚀
 - Clean and powerful api which is simple to get started with
 - Plays extremely well with standard browser interactions
-- Unopinionated styling
+- [Unopinionated styling](/docs/guides/preset-styles.md)
 - No creation of additional wrapper dom nodes - flexbox and focus management friendly!
 
 ## Get started 👩‍🏫
