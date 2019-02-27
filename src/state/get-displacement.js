@@ -1,5 +1,5 @@
 // @flow
-import { type Rect, expand } from 'css-box-model';
+import { type Rect, type Spacing, expand, getRect } from 'css-box-model';
 import type {
   DraggableId,
   Displacement,
@@ -70,7 +70,7 @@ const getTarget = (draggable: DraggableDimension, onLift: OnLift): Rect => {
     bottom: 0,
     left: 0,
   };
-  return expand(marginBox, expandBy);
+  return getRect(expand(marginBox, expandBy));
 };
 
 export default ({
