@@ -16,7 +16,7 @@
 
 </div>
 
-## Core characteristics 💐♿️🚀
+## Core characteristics
 
 - Beautiful and [natural movement](/docs/general/philosophy.md) of items 💐
 - [Accessible](/docs/general/accessibility.md): powerful keyboard and screen reader support ♿️
@@ -63,10 +63,7 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - [Installation](/docs/general/installation.md)
 - [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
 - [Design philosophy](/docs/general/philosphy.md) - _worth a read to understand the motivations and thinking behind the library_
-- Drag types
-  -- [Mouse dragging 🐭](/docs/general/sensor/mouse.md)
-  -- [Touch dragging 👉📱](/docs/general/sensor/touch.md)
-  -- [Keyboard dragging 🎹♿️](/docs/general/sensor/keyboard.md)
+- [Mouse dragging 🐭](/docs/general/sensor/mouse.md) | [Touch dragging 👉📱](/docs/general/sensor/touch.md) | [Keyboard dragging 🎹♿️](/docs/general/sensor/keyboard.md)
 - [Accessibility](/docs/general/accessibility.md)
 - [Browser support](/docs/general/browser-support.md)
 - [Community and addons](/docs/general/community-and-addons.md)
