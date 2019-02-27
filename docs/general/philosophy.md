@@ -1,8 +1,13 @@
-# Philosophy
+# Philosophy 📖
 
 This page goes over the design and interaction thinking behind `react-beautiful-dnd`.
 
-> For an audio overview you can listen to [@alexandereardon](https://twitter.com/alexandereardon) on the [React podcast](https://reactpodcast.simplecast.fm/17).
+## Going deeper
+
+For a bit more context on the thinking outlined on this page you are welcome to check out the following:
+
+- 📖 [Rethinking drag and drop](https://medium.com/@alexandereardon/rethinking-drag-and-drop-d9f5770b4e6b)
+- 🎧 [React podcast: fast, accessible and beautiful drag and drop](https://reactpodcast.simplecast.fm/17)
 
 ## Foundational idea: physicality
 
