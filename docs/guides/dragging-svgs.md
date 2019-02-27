@@ -1,10 +1,10 @@
 # Dragging `<svg>`s
 
-> Summary: `react-beautiful-dnd` does not support the usage of `<svg>` (`SVGElement`) for a `Draggable` or it's _drag handle_. You are still able to drag SVG's around using a number of different strategies listed below
+> Summary: `react-beautiful-dnd` does not support the usage of `<svg>` (`SVGElement`) for a `<Draggable />` or it's _drag handle_. You are still able to drag SVG's around using a number of different strategies listed below
 
 ## Background: [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement)
 
-We require that a `Draggable` and its drag handle be a `HTMLElement`. Almost every element that you make in the browser is a `HTMLElement`. [See huge list on MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Element). A `HTMLElement` extends [`Element`](https://developer.mozilla.org/en-US/docs/Web/API/Element)
+We require that a `<Draggable />` and its drag handle be a `HTMLElement`. Almost every element that you make in the browser is a `HTMLElement`. [See huge list on MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Element). A `HTMLElement` extends [`Element`](https://developer.mozilla.org/en-US/docs/Web/API/Element)
 
 ![HTMLElement](https://user-images.githubusercontent.com/2182637/42302315-9150d4e0-805d-11e8-8345-71bc32135203.png)
 
@@ -12,7 +12,7 @@ We require that a `Draggable` and its drag handle be a `HTMLElement`. Almost eve
 
 We use and manipulate focus on a drag handle during a drag if it is needed. This is especially true for keyboard dragging that relies on focus management.
 
-An element loses focus when it moves into a [`React Portal`](https://reactjs.org/docs/portals.html). We can detect when a `Draggable` is moving into a portal and we give the new element in the portal focus with `.focus()`. Additionally, we also will maintain focus when you move a `Draggable` from one list to another using `.focus()` if it had focus when dragging. An element will always have focus when keyboard dragging.
+An element loses focus when it moves into a [`React Portal`](https://reactjs.org/docs/portals.html). We can detect when a `<Draggable />` is moving into a portal and we give the new element in the portal focus with `.focus()`. Additionally, we also will maintain focus when you move a `<Draggable />` from one list to another using `.focus()` if it had focus when dragging. An element will always have focus when keyboard dragging.
 
 ## Enter [`SVGElement`](https://developer.mozilla.org/en-US/docs/Web/API/SVGElement) 🖼
 
@@ -33,7 +33,7 @@ One of the core values of `react-beautiful-dnd` is accessibility
 
 ### Option 1: Wrap in an `HTMLElement`
 
-In order to provide the best accessibility and cross browser experience for consumers we enforce that `SVGElement`s need to be wrapped in a `HTMLElement` such as `<span>` or `<div>` if you want to have them as your `Draggable` or _drag handle_.
+In order to provide the best accessibility and cross browser experience for consumers we enforce that `SVGElement`s need to be wrapped in a `HTMLElement` such as `<span>` or `<div>` if you want to have them as your `<Draggable />` or _drag handle_.
 
 ```js
 // ❌ not supported

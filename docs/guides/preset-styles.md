@@ -66,7 +66,7 @@ pointer-events: none;
 
 **Styles applied using the `data-react-beautiful-dnd-draggable` attribute**
 
-This is what we use to control `Draggable`s that need to move out of the way of a dragging `Draggable`.
+This is what we use to control `<Draggable />`s that need to move out of the way of a dragging `<Draggable />`.
 
 ```css
 transition: ${string};
@@ -76,7 +76,7 @@ transition: ${string};
 
 **Styles applied using the `data-react-beautiful-dnd-droppable` attribute**
 
-We apply `pointer-events: none` to a `Droppable` during a drag. This is technically not required as an optimisation. However, it gets around a common issue where hover styles are triggered during a drag. You are welcome to opt out of this one as it is it not required for functinality.
+We apply `pointer-events: none` to a `<Droppable />` during a drag. This is technically not required as an optimisation. However, it gets around a common issue where hover styles are triggered during a drag. You are welcome to opt out of this one as it is it not required for functinality.
 
 ```css
 pointer-events: none;
@@ -115,7 +115,7 @@ user-select: none;
 
 **Styles applied using the `data-react-beautiful-dnd-drag-handle` attribute**
 
-We apply the grab cursor to all drag handles except the drag handle for the dropping `Draggable`. At this point the user is able to drag other `Draggable`'s if they like.
+We apply the grab cursor to all drag handles except the drag handle for the dropping `<Draggable />`. At this point the user is able to drag other `<Draggable />`'s if they like.
 
 ```css
 cursor: grab;

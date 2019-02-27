@@ -6,28 +6,28 @@
 
 ## Keyboard shortcuts: keyboard dragging
 
-When a drag is not occurring, the user will be able to navigate through the `Draggable`'s on a page using the standard **tab** <kbd>tab ↹</kbd> key to move forward through the tabbable elements and (**shift** + **tab**) (<kbd>shift</kbd> + )<kbd>tab ↹</kbd>) to move backwards. We achieve this by adding a `tab-index` to the `Draggable`. When a `Draggable` has focus the **spacebar** <kbd>space</kbd> will **lift** a `Draggable`. This will start the drag.
+When a drag is not occurring, the user will be able to navigate through the `<Draggable />`'s on a page using the standard **tab** <kbd>tab ↹</kbd> key to move forward through the tabbable elements and (**shift** + **tab**) (<kbd>shift</kbd> + )<kbd>tab ↹</kbd>) to move backwards. We achieve this by adding a `tab-index` to the `<Draggable />`. When a `<Draggable />` has focus the **spacebar** <kbd>space</kbd> will **lift** a `<Draggable />`. This will start the drag.
 
 Once a drag is started the following keyboard shortcuts can be used:
 
-- **spacebar** <kbd>space</kbd> - drop the `Draggable`
+- **spacebar** <kbd>space</kbd> - drop the `<Draggable />`
 - **escape** <kbd>esc</kbd> - cancel the drag
 
-The following commands are also available but they depend on the `type` of `Droppable` that the `Draggable` is _currently_ in:
+The following commands are also available but they depend on the `type` of `<Droppable />` that the `<Draggable />` is _currently_ in:
 
 ### Within a vertical list
 
-- **Up arrow** <kbd>↑</kbd> - move a `Draggable` upwards in a `Droppable`
-- **Down arrow** <kbd>↓</kbd> - move a `Draggable` downwards in a `Droppable`
-- **Right arrow** <kbd>→</kbd> - move a `Draggable` to a `Droppable` to the _right_ of the current `Droppable` (move to new list)
-- **Left arrow** <kbd>←</kbd> - move a `Draggable` to a `Droppable` to the _left_ of the current `Droppable` (move to new list)
+- **Up arrow** <kbd>↑</kbd> - move a `<Draggable />` upwards in a `<Droppable />`
+- **Down arrow** <kbd>↓</kbd> - move a `<Draggable />` downwards in a `<Droppable />`
+- **Right arrow** <kbd>→</kbd> - move a `<Draggable />` to a `<Droppable />` to the _right_ of the current `<Droppable />` (move to new list)
+- **Left arrow** <kbd>←</kbd> - move a `<Draggable />` to a `<Droppable />` to the _left_ of the current `<Droppable />` (move to new list)
 
 ### Within a horizontal list
 
-- **Up arrow** <kbd>↑</kbd> - move a `Draggable` to a `Droppable` to _above_ the current `Droppable` (move to new list)
-- **Down arrow** <kbd>↓</kbd> - move a `Draggable` to a `Droppable` to _below_ the current `Droppable` (move to new list)
-- **Right arrow** <kbd>→</kbd> - move a `Draggable` to the _right_ in the current `Droppable`
-- **Left arrow** <kbd>←</kbd> - move a `Draggable` to the _left_ in the current `Droppable`
+- **Up arrow** <kbd>↑</kbd> - move a `<Draggable />` to a `<Droppable />` to _above_ the current `<Droppable />` (move to new list)
+- **Down arrow** <kbd>↓</kbd> - move a `<Draggable />` to a `<Droppable />` to _below_ the current `<Droppable />` (move to new list)
+- **Right arrow** <kbd>→</kbd> - move a `<Draggable />` to the _right_ in the current `<Droppable />`
+- **Left arrow** <kbd>←</kbd> - move a `<Draggable />` to the _left_ in the current `<Droppable />`
 
 During a drag the following standard keyboard events have their default behaviour prevented (through `event.preventDefault()`) to avoid a bad experience:
 

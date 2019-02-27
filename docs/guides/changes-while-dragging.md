@@ -3,13 +3,13 @@
 > ⚠️ This is fairly advanced behavior
 > 👶 This feature is still quite young. The circumstances that we support are fairly limited. We wanted to get it out there for people to play with
 
-`react-beautiful-dnd` supports the addition and removal of `Draggable`s during a drag.
+`react-beautiful-dnd` supports the addition and removal of `<Draggable />`s during a drag.
 
 ## What behaviours does this unlock?
 
 ### Lazy loading of list items
 
-> In this example we are adding more `Draggable`s to a list we scroll closer to the bottom of the list
+> In this example we are adding more `<Draggable />`s to a list we scroll closer to the bottom of the list
 
 ![lazy-loading 2018-11-01 17_01_21](https://user-images.githubusercontent.com/2182637/47835395-ec8b1a80-ddf7-11e8-88e6-848848ab4af1.gif)
 
@@ -25,11 +25,11 @@
 
 - You are allowed to add or remove `Draggables` during a drag
 - You can only add or remove `Draggables` that are of the same `type` as the dragging item.
-- Any changes must occur within a `Droppable` that is a _scroll container_ (has `overflow: auto` or `overflow: scroll`). _This is prevent accidental shifts to other `Droppables` on the page_
+- Any changes must occur within a `<Droppable />` that is a _scroll container_ (has `overflow: auto` or `overflow: scroll`). _This is prevent accidental shifts to other `Droppables` on the page_
 - The size of the internal content of the _scroll container_ can change, but the outer bounds of the _scroll container_ itself cannot change.
-- You cannot modify the sizes of any existing `Draggable` or `Droppable` during a drag
-- You cannot add or remove a `Droppable` during a drag. _We did this to avoid accidental shifting of other `Droppable`s_
-- When an item is removed or added it must be done instantly. You cannot animate the size of the item. You are welcome to animate a property when adding a `Draggable` that does not impact the size of the item, such as `opacity`
+- You cannot modify the sizes of any existing `<Draggable />` or `<Droppable />` during a drag
+- You cannot add or remove a `<Droppable />` during a drag. _We did this to avoid accidental shifting of other `<Droppable />`s_
+- When an item is removed or added it must be done instantly. You cannot animate the size of the item. You are welcome to animate a property when adding a `<Draggable />` that does not impact the size of the item, such as `opacity`
 
 ## `DragDropContext > onDragUpdate` behavior
 
@@ -59,7 +59,7 @@
 }
 ```
 
-2. The first `Draggable` in the list (`item-0`) is removed.
+2. The first `<Draggable />` in the list (`item-0`) is removed.
 
 `onDragUpdate` is called with `DragUpdate`:
 
@@ -97,4 +97,4 @@
 
 ## Drag end while we are patching the virtual model
 
-If a drag ends after a `Draggable` has been added or removed, but we have not finished collecting and patching the _virtual dimension model_ then we will delay the drop until the patch is finished. This is usually only a single frame. The `onDropEnd` callback will be called with a `DropResult` that is correct after the patch.
+If a drag ends after a `<Draggable />` has been added or removed, but we have not finished collecting and patching the _virtual dimension model_ then we will delay the drop until the patch is finished. This is usually only a single frame. The `onDropEnd` callback will be called with a `DropResult` that is correct after the patch.

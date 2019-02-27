@@ -96,7 +96,7 @@ The user needs to move a small threshold before we consider the movement to be a
 
 - `preventDefault()` is not called on `touchstart`.
 
-When a user presses their finger (or other input) on a `Draggable` we are not sure if they where intending to _tap_, _force press_, _scroll the container_ or _drag_. Because we do not know what the user is trying to do yet we do not call `preventDefault()` on the event.
+When a user presses their finger (or other input) on a `<Draggable />` we are not sure if they where intending to _tap_, _force press_, _scroll the container_ or _drag_. Because we do not know what the user is trying to do yet we do not call `preventDefault()` on the event.
 
 ### The user has indicated that they are not touch dragging
 

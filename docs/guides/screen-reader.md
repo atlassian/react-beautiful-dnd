@@ -35,15 +35,15 @@ const endPosition = destination ? position(destination.index) : null;
 
 ## Use names where possible
 
-All of our built in screen reader messages use `id`'s to identify `Draggable` and `Droppable`s. You might want to consider replacing these with more readable names.
+All of our built in screen reader messages use `id`'s to identify `<Draggable />` and `<Droppable />`s. You might want to consider replacing these with more readable names.
 
-> Potentially this could be a prop for `Draggable` and `Droppable` 🤔. Please raise an issue if you would like to see this happen!
+> Potentially this could be a prop for `<Draggable />` and `<Droppable />` 🤔. Please raise an issue if you would like to see this happen!
 
 ## Instructions to cover
 
 ### Step 1: Introduce draggable item
 
-When a user `tabs` to a `Draggable`, we need to tell them how to start a drag. We do this by using the `aria-roledescription` property on a _drag handle_.
+When a user `tabs` to a `<Draggable />`, we need to tell them how to start a drag. We do this by using the `aria-roledescription` property on a _drag handle_.
 
 **Default message**: "Draggable item. Press space bar to lift"
 
@@ -58,7 +58,7 @@ Think about substituting the word "item" for a noun that matches your problem do
 
 ### Step 2: Start drag
 
-When a user lifts a `Draggable` by using the `spacebar` we want to tell them a number of things.
+When a user lifts a `<Draggable />` by using the `spacebar` we want to tell them a number of things.
 
 **Default message**: "You have lifted an item in position `${startPosition}`. Use the arrow keys to move, space bar to drop, and escape to cancel."
 
@@ -72,7 +72,7 @@ Notice that we don't tell them that they are in position `1 of x`. This is becau
 
 **Message with more info**: "You have lifted an item in position `${startPosition}` of `${listLength}` in the `${listName}` list. Use the arrow keys to move, space bar to drop, and escape to cancel."
 
-You control the message printed to the user through the `DragDropContext` > `onDragStart` responder
+You control the message printed to the user through the `<DragDropContext />` > `onDragStart` responder
 
 ```js
 onDragStart = (start: DragStart, provided: ResponderProvided) => {
@@ -84,7 +84,7 @@ onDragStart = (start: DragStart, provided: ResponderProvided) => {
 
 When a user has started a drag, there are different scenarios that can spring from that, so we'll create different messaging for each scenario.
 
-We can control the announcement through the `DragDropContext` > `onDragUpdate` responder.
+We can control the announcement through the `<DragDropContext />` > `onDragUpdate` responder.
 
 ```js
 onDragUpdate = (update: DragUpdate, provided: ResponderProvided) => {
@@ -119,13 +119,13 @@ Think about using friendlier text for the name of the droppable, and including t
 
 #### Scenario 4. Combining in same list
 
-The user has moved over another `Draggable` in [combine mode](/docs/guides/combining.md) in the same list
+The user has moved over another `<Draggable />` in [combine mode](/docs/guides/combining.md) in the same list
 
 **Default message** "The item `${source.draggableId}` has been combined with `${combine.draggableId}`"
 
 #### Scenario 5: Combining in different list
 
-The user has moved over another `Draggable` in [combine mode](/docs/guides/combining.md) in a list that is not the list the dragging item started in
+The user has moved over another `<Draggable />` in [combine mode](/docs/guides/combining.md) in a list that is not the list the dragging item started in
 
 **Default message** "The item `${source.draggableId}` in list `${source.droppableId}` has been combined with `${combine.draggableId}` in list `${combine.droppableId}`"
 
@@ -180,15 +180,15 @@ The messaging for this scenario should be similar to 'dropped in a home list', b
 
 **Default message**: "You have dropped the item. It has moved from position `${startPosition}` in list `${result.source.droppableId}` to position `${endPosition}` in list `${result.destination.droppableId}`"
 
-#### Scenario 4. Dropped on another `Draggable` in the home list
+#### Scenario 4. Dropped on another `<Draggable />` in the home list
 
-The user has dropped onto another `Draggable` in [combine mode](/docs/guides/combining.md) in the same list that the drag started in
+The user has dropped onto another `<Draggable />` in [combine mode](/docs/guides/combining.md) in the same list that the drag started in
 
 **Default message**: "You have dropped the item. The item `${source.draggableId}` has been combined with `${combine.draggableId}`"
 
-#### Scenario 5. Dropped on another `Draggable` in a foreign list
+#### Scenario 5. Dropped on another `<Draggable />` in a foreign list
 
-The user has dropped onto another `Draggable` in [combine mode](/docs/guides/combining.md) in a list that is not the list the dragging item started in
+The user has dropped onto another `<Draggable />` in [combine mode](/docs/guides/combining.md) in a list that is not the list the dragging item started in
 
 **Default message**: "The item `${source.draggableId}` in list `${source.droppableId}` has been combined with `${combine.draggableId}` in list `${combine.droppableId}`"
 

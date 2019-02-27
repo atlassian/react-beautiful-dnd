@@ -2,7 +2,7 @@
 
 > `Draggable > draggableId` and `Droppable > droppableId`
 
-A `Draggable` and a `Droppable` have an id. These are `draggableId` and `droppableId` respectively.
+A `<Draggable />` and a `<Droppable />` have an id. These are `draggableId` and `droppableId` respectively.
 
 ## String
 
@@ -18,9 +18,9 @@ type DraggableId = Id;
 
 ## Ids must be unique
 
-A id must uniquely identify a `Draggable` or `Droppable` within a `DragDropContext`. So if you have multiple connected lists, each `Droppable` needs to have a unique id and each `Draggable` needs to have a unique id, even if the item is in a different list.
+A id must uniquely identify a `<Draggable />` or `<Droppable />` within a `<DragDropContext />`. So if you have multiple connected lists, each `<Droppable />` needs to have a unique id and each `<Draggable />` needs to have a unique id, even if the item is in a different list.
 
-The id must also be unique even if the `type` argument on the `Droppable` is different.
+The id must also be unique even if the `type` argument on the `<Droppable />` is different.
 
 ## Avoid reusing ids
 

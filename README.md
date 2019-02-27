@@ -50,7 +50,7 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - Custom drag handles - you can drag a whole item by just a part of it
 - Compatible with [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html) - [portal pattern](/docs/patterns/using-a-portal.md)
 - 🌲 Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) package
-- A `Droppable` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
+- A `<Droppable />` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
 - Server side rendering (SSR) compatible - see [resetServerContext()](/docs/api/reset-server-context.md)
 - Plays well with [nested interactive elements](TODO) by default
@@ -84,8 +84,8 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 
 ### Guides 🗺
 
-- [`<DragDropContext>` responders](/docs/guides/responders.md) - _`onDragStart`, `onDragUpdate`, `onDragEnd` and `onBeforeDragStart`_
-- [Combining `<Draggable>`s](/docs/guides/combining.md)
+- [`<DragDropContext />` responders](/docs/guides/responders.md) - _`onDragStart`, `onDragUpdate`, `onDragEnd` and `onBeforeDragStart`_
+- [Combining `<Draggable />`s](/docs/guides/combining.md)
 - [Common setup issues](/docs/guides/common-setup-issues.md)
 - [Using `innerRef`](/docs/guides/using-inner-ref.md)
 - [Developer warnings and how to disable them](/docs/guides/developer-warnings.md)
@@ -100,7 +100,7 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - [Non-visible preset styles](/docs/guides/preset-styles.md)
 - [How we detect scroll containers](/docs/guides/how-we-detect-scroll-containers.md)
 - [How we use dom events](/docs/guides/how-we-use-dom-events.md) - _Useful if you need to build on top of `react-beautiful-dnd`_
-- [Adding `<Draggable>`s during a drag](/docs/guides/changes-while-dragging.md) - _⚠️ Advanced_
+- [Adding `<Draggable />`s during a drag](/docs/guides/changes-while-dragging.md) - _⚠️ Advanced_
 
 ### Patterns 👷‍
 

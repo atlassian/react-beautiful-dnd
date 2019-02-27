@@ -4,11 +4,11 @@ Out of the box we provide a beautiful drop animation for you to use. We have wor
 
 ## Styling a drop
 
-You are able to add your own style to a `Draggable` while it is dropping (such as `background-color`). You know a drop is occurring when `DraggableStateSnapshot > DropAnimation` is populated.
+You are able to add your own style to a `<Draggable />` while it is dropping (such as `background-color`). You know a drop is occurring when `DraggableStateSnapshot > DropAnimation` is populated.
 
 ## Patching the drop animation
 
-In some cases you might want to add an additional `transform` or change the `transition`. In which case, you can patch the style of a `Draggable` while a drop is occurring. (patch `DraggableProvided > DraggableProps > DraggableStyle`)
+In some cases you might want to add an additional `transform` or change the `transition`. In which case, you can patch the style of a `<Draggable />` while a drop is occurring. (patch `DraggableProvided > DraggableProps > DraggableStyle`)
 
 Here is the shape of `DropAnimation`:
 

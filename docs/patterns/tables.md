@@ -7,9 +7,9 @@
 | Can copy paste the table into other applications | Browser                  |
 | Can reorder items in the table!                  | `react-beautiful-dnd` 😎 |
 
-`react-beautiful-dnd` requires no additional wrapping elements to create `Draggable` and `Droppable` components. Therefore it is possible to have a `<table>` that has valid HTML as well as supporting drag and drop.
+`react-beautiful-dnd` requires no additional wrapping elements to create `<Draggable />` and `<Droppable />` components. Therefore it is possible to have a `<table>` that has valid HTML as well as supporting drag and drop.
 
-> We have not found a way to achieve semantic reordering of table columns at this stage. This is because there is no one element that represents a table column - rather, a column is a result of cell placements within repeating rows. As such as cannot wrap a `Draggable` around a 'column' in order to make it draggable. PR's to this guide are welcome if you find a working approach!
+> We have not found a way to achieve semantic reordering of table columns at this stage. This is because there is no one element that represents a table column - rather, a column is a result of cell placements within repeating rows. As such as cannot wrap a `<Draggable />` around a 'column' in order to make it draggable. PR's to this guide are welcome if you find a working approach!
 
 ## Strategies
 
@@ -22,7 +22,7 @@ There are two strategies you can use when reordering tables.
 
 In order to use this strategy the widths of your columns need to be fixed - that is, they will not change depending on what content is placed in the cells. This can be achieve with either a `table-layout: fixed` or `table-layout: auto` as long as you manually set the width of the cells (eg `50%`).
 
-The only thing you need to do is set `display: table` on a `Draggable` row while it is dragging.
+The only thing you need to do is set `display: table` on a `<Draggable />` row while it is dragging.
 
 [See example code here](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20fixed%20width%20columns&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
 

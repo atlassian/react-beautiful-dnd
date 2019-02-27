@@ -16,18 +16,18 @@ If you are not sure if your `package.json` version satisfies `16.3.1` have a rea
 
 ## No duplicate ids
 
-`draggableId` and `droppableId` values must be unique for the whole `DragDropContext` and not just a list.
+`draggableId` and `droppableId` values must be unique for the whole `<DragDropContext />` and not just a list.
 
 More information: [identifiers guide](/docs/guides/identifiers.md)
 
 ## No margin collapsing between `Draggables`
 
-This can happen if you have a `margin-top` as well as a `margin-bottom` on a `Draggable`.
+This can happen if you have a `margin-top` as well as a `margin-bottom` on a `<Draggable />`.
 
 [More information](https://github.com/atlassian/react-beautiful-dnd#unsupported-margin-setups)
 
 ## Avoid empty lists
 
-We recommend you set a `min-height` or `min-width` on a `Droppable` to ensure that there is a visible drop target when a list is empty
+We recommend you set a `min-height` or `min-width` on a `<Droppable />` to ensure that there is a visible drop target when a list is empty
 
 We go over this in our [Get started with `react-beautiful-dnd` course](https://egghead.io/lessons/react-move-items-between-columns-with-react-beautiful-dnd-using-ondragend)
