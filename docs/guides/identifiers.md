@@ -1,6 +1,6 @@
 # Identifiers (ids)
 
-> `Draggable > draggableId` and `Droppable > droppableId`
+> `<Draggable /> > draggableId` and `<Droppable /> > droppableId`
 
 A `<Draggable />` and a `<Droppable />` have an id. These are `draggableId` and `droppableId` respectively.
 

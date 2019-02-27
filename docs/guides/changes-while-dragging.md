@@ -31,12 +31,12 @@
 - You cannot add or remove a `<Droppable />` during a drag. _We did this to avoid accidental shifting of other `<Droppable />`s_
 - When an item is removed or added it must be done instantly. You cannot animate the size of the item. You are welcome to animate a property when adding a `<Draggable />` that does not impact the size of the item, such as `opacity`
 
-## `DragDropContext > onDragUpdate` behavior
+## `<DragDropContext /> > onDragUpdate` behavior
 
 - `onDragUpdate` will be called if the `DragUpdate > source > index` of the dragging item has changed as the result of `Draggables` being added or removed before it.
 - `onDragUpdate` will be called if the `DragUpdate > destination` of the dragging item has changed as a result of the addition or removal.
 
-## `DragDropContext > onDragEnd` behavior
+## `<DragDropContext /> > onDragEnd` behavior
 
 `onDragEnd` will be called with values that are adjusted for any additions or removals of `Draggables` during a drag. This can mean that the `onDragStart: DragStart > source > index` can be different from the `onDragEnd: DropResult > source > index`.
 

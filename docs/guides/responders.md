@@ -1,6 +1,6 @@
 # Responders
 
-> `DragDropContext > Responders`
+> `<DragDropContext /> > Responders`
 
 Responders are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
 

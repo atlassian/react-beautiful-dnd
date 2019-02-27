@@ -14,7 +14,7 @@ Choose a tone that best supports what your audience is trying to do. If you need
 
 ## How to control announcements
 
-The `announce` function is provided to each of the `DragDropContext > Responder` functions and can be used to deliver your own screen reader messages. Messages will be immediately read out. It's important to deliver messages immediately, so your users have a fast and responsive experience.
+The `announce` function is provided to each of the `<DragDropContext /> > Responder` functions and can be used to deliver your own screen reader messages. Messages will be immediately read out. It's important to deliver messages immediately, so your users have a fast and responsive experience.
 
 If you attempt to hold onto the `announce` function and call it later, it won't work and will just print a warning to the console. If you try to call announce twice for the same event, only the first will be read by the screen reader with subsequent calls to announce being ignored and a warning printed.
 
@@ -139,7 +139,7 @@ Think about how you could make this messaging friendlier and clearer.
 
 ### Step 4: On drop
 
-There are two ways a drop can happen. Either the drag is cancelled or the user drops the dragging item. You can control the messaging for these events using the `DragDropContext > onDragEnd` responder.
+There are two ways a drop can happen. Either the drag is cancelled or the user drops the dragging item. You can control the messaging for these events using the `<DragDropContext /> > onDragEnd` responder.
 
 #### Scenario 1. Drag cancelled
 
