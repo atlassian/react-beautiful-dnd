@@ -16,50 +16,21 @@
 
 </div>
 
-## Core characteristics 🎖
+## Core characteristics 💐♿️🚀
 
-- Beautiful and natural movement of items
+- Beautiful and natural movement of items 💐
+- Accessible: powerful keyboard and screen reader support ♿️
+- [Extremely performant](/docs/general/media.md) 🚀
 - Clean and powerful api which is simple to get started with
 - Plays extremely well with standard browser interactions
 - Unopinionated styling
 - No creation of additional wrapper dom nodes - flexbox and focus management friendly!
-- Accessible: powerful keyboard and screen reader support ♿️🚀
-- [Extremely performant](TODO)
 
-## Get started 🤩
+## Get started 👩‍🏫
 
-We have created [a free course on `egghead.io`](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help people get started with `react-beautiful-dnd` as quickly as possible
+We have created [a free course on `egghead.io`](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help people get started with `react-beautiful-dnd` as quickly as possible.
 
-<a href="https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd"><img src="https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png" alt="egghead course logo"/></a>
-
-## Examples 🎉
-
-See how beautiful it is for yourself!
-
-### Viewing on a desktop
-
-[All the examples!](https://react-beautiful-dnd.netlify.com)
-
-### Viewing on a mobile or tablet
-
-- [Simple list](https://react-beautiful-dnd.netlify.com/iframe.html)
-- [Board](https://react-beautiful-dnd.netlify.com/iframe.html?selectedKind=board&selectedStory=simple) - best viewed in landscape
-
-> We provide different links for touch devices as currently [storybook](https://github.com/storybooks/storybook) does not have a good mobile menu experience [more information](https://github.com/storybooks/storybook/issues/124)
-
-## Basic usage examples
-
-We have created some basic examples on `codesandbox` for you to play with directly:
-
-- [Simple vertical list](https://codesandbox.io/s/k260nyxq9v)
-- [Simple horizontal list](https://codesandbox.io/s/mmrp44okvj)
-- [Simple DnD between two lists](https://codesandbox.io/s/ql08j35j3q)
-
-## Read this in other languages
-
-- [![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **한글/Korean**](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
-
-- [![china](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **中文/Chinese**](https://github.com/chinanf-boy/react-beautiful-dnd-zh)
+[![course-logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
 
 ## Currently supported feature set
 
@@ -84,13 +55,57 @@ We have created some basic examples on `codesandbox` for you to play with direct
 - Server side rendering compatible
 - Plays well with [nested interactive elements](https://github.com/atlassian/react-beautiful-dnd#interactive-child-elements-within-a-draggable) by default
 
-### Roadmap 🏎
+## Documentation 📖
 
-You can check out all the features that will be landing soon [on our issue page](https://github.com/atlassian/react-beautiful-dnd/issues).
+### General 👋
 
-## Not for everyone 🙅‍
+- [Examples and samples](/docs/general/examples.md)
+- [Installation](/docs/general/installation.md)
+- [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
+- [Design philosophy](/docs/general/philosphy.md) - _worth a read to understand the motivations and thinking behind the library_
+- [Community and addons](/docs/general/community-and-addons.md)
+- [Release notes and changelog](https://github.com/atlassian/react-beautiful-dnd/releases)
+- [Upgrading](/docs/general/upgrading.md)
+- [Media](/docs/general/media.md)
+- [Road map](https://github.com/atlassian/react-beautiful-dnd/issues)
 
-There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
+### API 🏋️‍
+
+[TODO: diagram]
+
+- [`<DragDropContext />`](/docs/api/drag-drop-context.md): Wraps the part of your application you want to have drag and drop enabled for
+- [`<Droppable />`](/docs/api/droppable.md): An area that can be dropped into. Contains `<Draggable />`s
+- [`<Draggable />`](/docs/api/draggable.md): What can be dragged around
+- [`resetServerContext()`](/docs/api/reset-server-context.md): Utility for server side rendering (SSR)
+
+### Guides 🗺
+
+- [`<DragDropContext>` responders](/docs/guides/responders.md) - _`onDragStart`, `onDragUpdate`, `onDragEnd` and `onBeforeDragStart`_
+- [Combining `<Draggable>`s](/docs/guides/combining.md)
+- [Common setup issues](/docs/guides/common-setup-issues.md)
+- [Using `innerRef`](/docs/guides/using-inner-ref.md)
+- [Developer warnings and how to disable them](/docs/guides/developer-warnings.md)
+- [Rules for `draggableId` and `droppableId`s](/docs/guides/identifiers.md)
+- [Customising or skipping the drop animation](/docs/guides/drop-animation.md)
+- [Controlling the screen reader](/docs/guides/screen-reader.md)
+- [`TypeScript` and `flow`](/docs/guides/types.md)
+- [Dragging `<svg>`s](/docs/guides/dragging-svgs.md)
+- [Non-visible preset styles](/docs/guides/preset-styles.md)
+- [How we detect scroll containers](/docs/guides/how-we-detect-scroll-containers.md)
+- [How we use dom events](/docs/guides/how-we-use-dom-events.md) - _Useful if you need to build on top of `react-beautiful-dnd`_
+- [Adding `<Draggable>`s during a drag](/docs/guides/changes-while-dragging.md) - _⚠️ advanced_
+
+### Patterns 👷‍
+
+- [Multi drag](/docs/patterns/multi-drag.md)
+- [Tables](/docs/patterns/tables.md)
+- [Using a portal (`ReactDOM.createPortal`)](/docs/patterns/using-a-portal.md)
+
+## Read this in other languages
+
+- [![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **한글/Korean**](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
+
+- [![china](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **中文/Chinese**](https://github.com/chinanf-boy/react-beautiful-dnd-zh)
 
 ## Carefully designed animations
 
@@ -319,46 +334,6 @@ Be sure that you have specified the html5 `doctype` ([Document Type Definition -
 A `doctype` impacts browser layout and measurement apis. Not specifying a `doctype` is a world of pain 🔥. Browsers will use some other `doctype` such as ["Quirks mode"](https://en.wikipedia.org/wiki/Quirks_mode) which can drastically change layout and measurement ([more information](https://www.w3.org/QA/Tips/Doctype)). The html5 `doctype` is our only supported `doctype`.
 
 For non `production` builds we will log a warning to the `console` if a html5 `doctype` is not found. You can [disable the warning](#disable-warnings) if you like.
-
-## Developer only warnings 👷‍
-
-For common setup and usage issues and errors `react-beautiful-dnd` will log some information `console` for development builds (`process.env.NODE_ENV !== 'production'`). These logs are stripped from productions builds to save kbs and to keep the `console` clean.
-
-![dev only warnings](https://user-images.githubusercontent.com/2182637/46385261-98a8eb00-c6fe-11e8-9b46-0699bf3e6043.png)
-
-How to drop the developer messages from your bundles:
-
-- [React docs](https://reactjs.org/docs/optimizing-performance.html#use-the-production-build)
-- [webpack instructions](https://webpack.js.org/guides/production/#specify-the-mode)
-- [rollup instructions](https://github.com/rollup/rollup-plugin-replace)
-
-### Disable warnings
-
-If you want to disable the warnings in development, you just need to update a flag:
-
-```js
-// disable all react-beautiful-dnd development warnings
-window['__react-beautiful-dnd-disable-dev-warnings'] = true;
-```
-
-Disabling the warnings will not stop a drag from being aborted in the case of an error. It only disabling the logging about it.
-
-## `Flow` and `TypeScript` usage
-
-Please see our [types guide](/docs/guides/types.md)
-
-## Community ❤️👋
-
-- [kanban-dnd](https://kanban-dnd.glitch.me) \- A Kanban style to-do list, with the ability to create custom lanes and reorder them on the fly. - Simple Trello - A simple cloning version of Trello, using React ecosystem.
-  - [Demo](https://simple-trello.netlify.com/)
-  - [Source](https://github.com/ng-hai/simple-trello)
-- 🎮 A drag'n'drop Checkers game
-  - [Demo](https://checkers-game.netlify.com/)
-  - [Source](https://github.com/emanuellarini/checkers)
-
-## Addons
-
-- [natural-drag-animation-rbdnd](https://github.com/rokborf/natural-drag-animation-rbdnd) adds natural dragging animation
 
 ## Engineering health
 
