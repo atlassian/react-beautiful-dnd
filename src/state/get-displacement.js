@@ -1,5 +1,5 @@
 // @flow
-import { type Rect, getRect } from 'css-box-model';
+import { type Rect, expand } from 'css-box-model';
 import type {
   DraggableId,
   Displacement,
@@ -10,8 +10,6 @@ import type {
   OnLift,
 } from '../types';
 import { isPartiallyVisible } from './visibility/is-visible';
-import { offsetByPosition } from './spacing';
-import { negate } from './position';
 import didStartDisplaced from './starting-displaced/did-start-displaced';
 
 type Args = {|
@@ -60,7 +58,19 @@ const getTarget = (draggable: DraggableDimension, onLift: OnLift): Rect => {
     return marginBox;
   }
 
-  return getRect(offsetByPosition(marginBox, negate(onLift.displacedBy.point)));
+  // We are expanding rather than offsetting the marginBox.
+  // In some cases we want
+  // - the target based on the starting position (such as when dropping outside of any list)
+  // - the target based on the items position without starting displacement (such as when moving inside a list)
+  // To keep things simple we just expand the whole area for this check
+  // The worst case is some minor redundant offscreen movements
+  const expandBy: Spacing = {
+    top: onLift.displacedBy.point.y,
+    right: onLift.displacedBy.point.x,
+    bottom: 0,
+    left: 0,
+  };
+  return expand(marginBox, expandBy);
 };
 
 export default ({
