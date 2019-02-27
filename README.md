@@ -32,28 +32,28 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 
 [![course-logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
 
-## Currently supported feature set
+## Currently supported feature set ✅
 
 - Vertical lists ↕
 - Horizontal lists ↔
 - Movement between lists (▤ ↔ ▤)
-- Combining items (see [combining guide](/docs/guides/combining.md))
-- Mouse 🐭, keyboard 🎹 and touch 👉📱 (mobile, tablet and so on) support
+- [Combining items](/docs/guides/combining.md)
+- Mouse 🐭, keyboard 🎹♿️ and touch 👉📱 (mobile, tablet and so on) support
 - [Multi drag support](/docs/patterns/multi-drag.md)
-- Incredible screen reader support - we provide an amazing experience for english screen readers out of the box 📦. We also provide complete customisation control and internationalisation support for those who need it 💖
-- Conditional [dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
+- Incredible screen reader support ♿️ - we provide an amazing experience for english screen readers out of the box 📦. We also provide complete customisation control and internationalisation support for those who need it 💖
+- [Conditional dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [conditional dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
 - Multiple independent lists on the one page
 - Flexible item sizes - the draggable items can have different heights (vertical lists) or widths (horizontal lists)
-- Add and remove `Draggable`s during a drag (see [changes while dragging guide](/docs/guides/changes-while-dragging.md))
-- Compatible with semantic table reordering - [table pattern](/docs/patterns/tables.md)
+- [Add and remove items during a drag](/docs/guides/changes-while-dragging.md)
+- Compatible with semantic `<table>` reordering - [table pattern](/docs/patterns/tables.md)
 - Auto scrolling - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
 - Custom drag handles - you can drag a whole item by just a part of it
 - Compatible with [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html) - [portal pattern](/docs/patterns/using-a-portal.md)
 - 🌲 Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) package
 - A `Droppable` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
-- Server side rendering compatible
-- Plays well with [nested interactive elements](https://github.com/atlassian/react-beautiful-dnd#interactive-child-elements-within-a-draggable) by default
+- Server side rendering (SSR) compatible - see [resetServerContext()](/docs/api/reset-server-context.md)
+- Plays well with [nested interactive elements](TODO) by default
 
 ## Documentation 📖
 
@@ -73,10 +73,10 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 
 [TODO: diagram]
 
-- [`<DragDropContext />`](/docs/api/drag-drop-context.md): Wraps the part of your application you want to have drag and drop enabled for
-- [`<Droppable />`](/docs/api/droppable.md): An area that can be dropped into. Contains `<Draggable />`s
-- [`<Draggable />`](/docs/api/draggable.md): What can be dragged around
-- [`resetServerContext()`](/docs/api/reset-server-context.md): Utility for server side rendering (SSR)
+- [`<DragDropContext />`](/docs/api/drag-drop-context.md) - _Wraps the part of your application you want to have drag and drop enabled for_
+- [`<Droppable />`](/docs/api/droppable.md) - _An area that can be dropped into. Contains `<Draggable />`s_
+- [`<Draggable />`](/docs/api/draggable.md) - _What can be dragged around_
+- [`resetServerContext()`](/docs/api/reset-server-context.md) - _Utility for server side rendering (SSR)_
 
 ### Guides 🗺
 
@@ -93,7 +93,7 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - [Non-visible preset styles](/docs/guides/preset-styles.md)
 - [How we detect scroll containers](/docs/guides/how-we-detect-scroll-containers.md)
 - [How we use dom events](/docs/guides/how-we-use-dom-events.md) - _Useful if you need to build on top of `react-beautiful-dnd`_
-- [Adding `<Draggable>`s during a drag](/docs/guides/changes-while-dragging.md) - _⚠️ advanced_
+- [Adding `<Draggable>`s during a drag](/docs/guides/changes-while-dragging.md) - _⚠️ Advanced_
 
 ### Patterns 👷‍
 
@@ -104,7 +104,6 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 ## Read this in other languages
 
 - [![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **한글/Korean**](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
-
 - [![china](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **中文/Chinese**](https://github.com/chinanf-boy/react-beautiful-dnd-zh)
 
 ## Carefully designed animations
