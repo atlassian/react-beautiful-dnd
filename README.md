@@ -1,18 +1,37 @@
-![react beautiful dnd](https://raw.githubusercontent.com/alexreardon/files/master/resources/react-beautiful-dnd-logo.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/alexreardon/files/master/resources/react-beautiful-dnd-logo.png" />
+</p>
+<h1 align="center">react-beautiful-dnd</h1>
 
-# react-beautiful-dnd
+<div align="center">
 
-Beautiful and accessible drag and drop for lists with [`React`](https://facebook.github.io/react/)
+**Beautiful** and **accessible** drag and drop for lists with [`React`](https://facebook.github.io/react/)
 
 [![CircleCI branch](https://img.shields.io/circleci/project/github/atlassian/react-beautiful-dnd/master.svg)](https://circleci.com/gh/atlassian/react-beautiful-dnd/tree/master)
 [![npm](https://img.shields.io/npm/v/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
-[![dependencies](https://david-dm.org/atlassian/react-beautiful-dnd.svg)](https://david-dm.org/atlassian/react-beautiful-dnd)
-[![Downloads per month](https://img.shields.io/npm/dm/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
-[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/react-beautiful-dnd)
-[![Greenkeeper badge](https://badges.greenkeeper.io/atlassian/react-beautiful-dnd.svg)](https://greenkeeper.io/)
-[![SemVer](https://img.shields.io/badge/SemVer-2.0.0-brightgreen.svg)](http://semver.org/spec/v2.0.0.html)
 
 ![quote application example](https://raw.githubusercontent.com/alexreardon/files/master/resources/website-board.gif?raw=true)
+
+Play with this example if you want!
+
+</div>
+
+## Core characteristics
+
+- Beautiful and natural movement of items
+- Clean and powerful api which is simple to get started with
+- Plays extremely well with standard browser interactions
+- Unopinionated styling
+- No creation of additional wrapper dom nodes - flexbox and focus management friendly!
+- Accessible: powerful keyboard and screen reader support ♿️🚀
+
+## Get started 🤩
+
+We have created [a free course on `egghead.io`](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help people get started with `react-beautiful-dnd` as quickly as possible
+
+<a href="https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd"><img src="https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png" alt="egghead course logo"/></a>
+
+[@alexandereardon](https://twitter.com/alexandereardon) has spoken on [React podcast](https://reactpodcast.simplecast.fm/17) about the foundational ideas and goals of `react-beautiful-dnd`
 
 ## Examples 🎉
 
@@ -36,23 +55,6 @@ We have created some basic examples on `codesandbox` for you to play with direct
 - [Simple vertical list](https://codesandbox.io/s/k260nyxq9v)
 - [Simple horizontal list](https://codesandbox.io/s/mmrp44okvj)
 - [Simple DnD between two lists](https://codesandbox.io/s/ql08j35j3q)
-
-## Core characteristics
-
-- Beautiful, natural movement of items
-- Clean and powerful api which is simple to get started with
-- Plays extremely well with standard browser interactions
-- Unopinionated styling
-- No creation of additional wrapper dom nodes - flexbox and focus management friendly!
-- Accessible: powerful keyboard and screen reader support ♿️🚀
-
-## Get started 🤩
-
-We have created [a free course on `egghead.io`](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help people get started with `react-beautiful-dnd` as quickly as possible
-
-![Course logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)
-
-[@alexandereardon](https://twitter.com/alexandereardon) has spoken on [React podcast](https://reactpodcast.simplecast.fm/17) about the foundational ideas and goals of `react-beautiful-dnd`
 
 ## Read this in other languages
 
@@ -83,7 +85,7 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - Server side rendering compatible
 - Plays well with [nested interactive elements](https://github.com/atlassian/react-beautiful-dnd#interactive-child-elements-within-a-draggable) by default
 
-### Lots more coming soon
+### Roadmap 🏆
 
 You can check out all the features that will be landing soon [on our issue page](https://github.com/atlassian/react-beautiful-dnd/issues).
 
@@ -102,46 +104,6 @@ We have created upgrade instructions in our release notes to help you upgrade to
 ## Not for everyone
 
 There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by react-dnd. So this library might not be for you depending on what your use case is.
-
-## Driving philosophy: physicality
-
-The core design idea of `react-beautiful-dnd` is physicality: we want users to feel like they are moving physical objects around
-
-### Application 1: no instant movement
-
-It is a fairly standard drag and drop pattern for things to disappear and reappear in response to the users drag. For a more natural drag we animate the movement of items as they need to move out of the way while dragging to more clearly show a drags effect. We also animate the drop of an item so that it animates into its new home position. At no point is an item instantly moved anywhere — regardless of whether it is dragging or not.
-
-### Application 2: knowing when to move
-
-It is quite common for drag and drop interactions to be based on the position that user started the drag from.
-
-In `react-beautiful-dnd` a dragging items impact is based on its centre of gravity — regardless of where a user grabs an item from. A dragging items impact follows similar rules to a set of scales ⚖️. Here are some rules that are followed to allow for a natural drag experience even with items of flexible height:
-
-- A list is _dragged over_ when the centre position of a dragging item goes over one of the boundaries of the list
-- A resting drag item will move out of the way of a dragging item when the centre position of the dragging item goes over the edge of the resting item. Put another way: once the centre position of an item (A) goes over the edge of another item (B), B moves out of the way.
-
-### Application 3: no drop shadows
-
-Drop shadows are useful in an environment where items and their destinations snap around. However, with `react-beautiful-dnd` it should be obvious where things will be dropping based on the movement of items. This might be changed in the future - but the experiment is to see how far we can get without any of these affordances.
-
-### Application 4: maximise interactivity
-
-`react-beautiful-dnd` works really hard to avoid as many periods of non-interactivity as possible. The user should feel like they are in control of the interface and not waiting for an animation to finish before they can continue to interact with the interface. However, there is a balance that needs to be made between correctness and power in order to make everybody's lives more sane. Here are the only situations where some things are not interactive:
-
-1.  From when a user cancels a drag to when the drop animation completes. On cancel there are lots of things moving back to where they should be. If you grab an item in a location that is not its true home then the following drag will be incorrect.
-2.  Starting a drag on an item that is animating its own drop. For simplicity this is the case - it is actually quite hard to grab something while it is animating home. It could be coded around - but it seems like an edge case that would add a lot of complexity.
-
-Keep in mind that these periods of inactivity may not always exist.
-
-### Application 5: no drag axis locking
-
-For now, the library does not support drag axis locking (aka drag rails). This is where the user is restricted to only dragging along one axis. The current thinking is this breaks the physical metaphor we are going for and sends a message to the user that they are interacting with a piece of software rather than moving physical objects around. It is possible to ensure that a user can only drop in a single list by using props `type` and `isDropDisabled`. You can also do some visual treatment to the list `onDragStart` to show the user that this is the only place they can interact with.
-
-### Application 6: natural cross list movement
-
-Rather than using an index based approach for keyboard movement between lists, `react-beautiful-dnd` performs cross list movement based on **inertia, gravity and collisions**. You can find out more about how this works by reading the blog ["Natural keyboard movement between lists"](https://medium.com/@alexandereardon/friction-gravity-and-collisions-3adac3a94e19).
-
-![example](https://raw.githubusercontent.com/alexreardon/files/master/resources/collision.gif?raw=true)
 
 ## Carefully designed animations
 
