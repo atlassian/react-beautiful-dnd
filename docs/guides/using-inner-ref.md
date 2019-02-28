@@ -145,7 +145,7 @@ You can then correctly supply the DOM node to a `<Draggable />` or `<Droppable /
 </Draggable>
 ```
 
-> Note, if you are using **styled-components v4** the `innerRef` prop was removed in favor of the [React 16 forwardRef API](https://reactjs.org/docs/forwarding-refs.html). Just use the normal ref prop instead.
+> Note, if you are using **styled-components v4** the `innerRef` prop was replaced with just `ref`. It uses the [React 16 `forwardRef` API](https://reactjs.org/docs/forwarding-refs.html) to pass the DOM node through the `ref` callback rather than the instance of the Component. Similarly, **emotion v10+** the `innerRef` prop was deprecated in favor `ref` with a `forwardRef` passthrough.
 
 ⚠️ This approach will cause a `React` warning as we are spreading all of the props of the component onto the DOM node. `{...this.props}` This includes the `innerRef` prop which `React` does not like you adding to an element. So you can set things up like this:
 

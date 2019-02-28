@@ -162,7 +162,11 @@ When moving a `<Draggable />` from one list to another the default browser behav
 
 #### Extending `DraggableProps.style`
 
-If you are using inline styles you are welcome to extend the `DraggableProps.style` object. You are also welcome to apply the `DraggableProps.style` object using inline styles and use your own styling solution for the component itself - such as [styled-components](https://github.com/styled-components/styled-components).
+If you are using inline styles you are welcome to extend the `DraggableProps.style` object. You are also welcome to apply the `DraggableProps.style` object using inline styles and use your own styling solution for the component itself. You can use anything you like to style the `<Draggable />` such as
+
+- css-in-js such as [`styled-components`](https://www.styled-components.com) or [`emotion`](https://emotion.sh)
+- sass, less
+- vanilla css
 
 If you are overriding inline styles be sure to do it after you spread the `provided.draggableProps` or the spread will override your inline style.
 
