@@ -63,7 +63,6 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - [Installation](/docs/general/installation.md)
 - [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
 - [Design philosophy](/docs/general/philosophy.md) - _worth a read to understand the motivations and thinking behind the library_
-- [Mouse dragging 🐭](/docs/general/sensor/mouse.md) | [Touch dragging 👉📱](/docs/general/sensor/touch.md) | [Keyboard dragging 🎹♿️](/docs/general/sensor/keyboard.md)
 - [Accessibility](/docs/general/accessibility.md)
 - [Browser support](/docs/general/browser-support.md)
 - [Community and addons](/docs/general/community-and-addons.md)
@@ -72,6 +71,14 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - [Engineering health](/docs/general/engineering-health.md)
 - [Media](/docs/general/media.md)
 - [Road map](https://github.com/atlassian/react-beautiful-dnd/issues)
+
+### Sensors 🔉
+
+> The ways in which somebody can start and control a drag
+
+- [Mouse dragging 🐭](/docs/sensor/mouse.md)
+- [Touch dragging 👉📱](/docs/sensor/touch.md)
+- [Keyboard dragging 🎹♿️](/docs/sensor/keyboard.md)
 
 ### API 🏋️‍
 
