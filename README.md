@@ -18,7 +18,7 @@
 
 ## Core characteristics
 
-- Beautiful and [natural movement](/docs/general/philosophy.md) of items 💐
+- Beautiful and [natural movement](/docs/general/animation.md) of items 💐
 - [Accessible](/docs/general/accessibility.md): powerful keyboard and screen reader support ♿️
 - [Extremely performant](/docs/general/media.md) 🚀
 - Clean and powerful api which is simple to get started with
@@ -28,7 +28,7 @@
 
 ## Get started 👩‍🏫
 
-We have created [a free course on `egghead.io`](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help people get started with `react-beautiful-dnd` as quickly as possible.
+We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help you get started with `react-beautiful-dnd` as quickly as possible.
 
 [![course-logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
 
@@ -55,22 +55,28 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - Server side rendering (SSR) compatible - see [resetServerContext()](/docs/api/reset-server-context.md)
 - Plays well with [nested interactive elements](/docs/api/draggable.md#interactive-child-elements-within-a-draggable-) by default
 
+## Motivation 🤔
+
+`react-beautiful-dnd` exists to create beautiful drag and drop for lists that anyone can use - even people who cannot see. For a good overview of the history and motivations of the project you can take a look at these external resources:
+
+- 📖 [Rethinking drag and drop](https://medium.com/@alexandereardon/rethinking-drag-and-drop-d9f5770b4e6b)
+- 🎧 [React podcast: fast, accessible and beautiful drag and drop](https://reactpodcast.simplecast.fm/17)
+
+## `react-beautiful-dnd` is focused on lists 🤾‍
+
+There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. `react-beautiful-dnd` is a higher level abstraction specifically built for lists (vertical, horizontal, movement between lists, nested lists and so on). Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by `react-dnd`. So `react-beautiful-dnd` might not be for you depending on what your use case is.
+
 ## Documentation 📖
 
-### General 👋
+### About 👋
 
-- [Examples and samples](/docs/general/examples.md)
+- [Introduction](/docs/general/introduction.md)
 - [Installation](/docs/general/installation.md)
+- [Examples and samples](/docs/general/examples.md)
+- [Design principles](/docs/general/design-principles.md)
 - [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
-- [Design philosophy](/docs/general/philosophy.md) - _worth a read to understand the motivations and thinking behind the library_
-- [Accessibility](/docs/general/accessibility.md)
+- [How are we accessible?](/docs/general/accessibility.md)
 - [Browser support](/docs/general/browser-support.md)
-- [Community and addons](/docs/general/community-and-addons.md)
-- [Release notes and changelog](https://github.com/atlassian/react-beautiful-dnd/releases)
-- [Upgrading](/docs/general/upgrading.md)
-- [Engineering health](/docs/general/engineering-health.md)
-- [Media](/docs/general/media.md)
-- [Road map](https://github.com/atlassian/react-beautiful-dnd/issues)
 
 ### Sensors 🔉
 
@@ -114,6 +120,15 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - [Multi drag](/docs/patterns/multi-drag.md)
 - [Tables](/docs/patterns/tables.md)
 - [Using a portal (`ReactDOM.createPortal`)](/docs/patterns/using-a-portal.md)
+
+### Maintenance 👩‍⚕️
+
+- [Engineering health](/docs/general/engineering-health.md)
+- [Community and addons](/docs/general/community-and-addons.md)
+- [Release notes and changelog](https://github.com/atlassian/react-beautiful-dnd/releases)
+- [Upgrading](/docs/general/upgrading.md)
+- [Road map](https://github.com/atlassian/react-beautiful-dnd/issues)
+- [Media](/docs/general/media.md)
 
 ## Read this in other languages 🌎
 
