@@ -1,6 +1,9 @@
 // @flow
 import globby from 'globby';
 import fs from 'fs-extra';
+// Disabling eslint design to prevent using regeneratorRuntime in distributions
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
 
 it('should end all nested docs with a link back to the documentation root', async () => {
   const files: string[] = await globby('docs/**/*.md');
@@ -18,7 +21,6 @@ it('should use correct wording', async () => {
   const files: string[] = await globby(['**/*.md', '!node_modules/']);
   expect(files.length).toBeGreaterThan(0);
 
-  const draggable: string = '<Draggable />';
   for (const file of files) {
     const contents: string = await fs.readFile(file, 'utf8');
 
