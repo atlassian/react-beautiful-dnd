@@ -14,4 +14,4 @@ resetServerContext();
 renderToString(...);
 ```
 
-[Back to home](/README.md#documentation-)
+[Back to documentation](/README.md#documentation-)

@@ -26,4 +26,4 @@ How it is composed:
 
 > Animation curve used when moving out of the way
 
-[Back to home](/README.md#documentation-)
+[Back to documentation](/README.md#documentation-)

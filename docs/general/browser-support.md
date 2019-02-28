@@ -16,4 +16,4 @@ This library supports the standard [Atlassian supported browsers](https://conflu
 | Mobile Safari (iOS)      | Latest stable version supported                           |
 | Android (Android)        | The default browser on Android 4.0.3 (Ice Cream Sandwich) |
 
-[Back to home](/README.md#documentation-)
+[Back to documentation](/README.md#documentation-)

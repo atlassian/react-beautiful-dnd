@@ -135,4 +135,4 @@ This is the same as `Phase: dropping`. However we do not apply a `cursor: grab` 
 
 All styles applied are vendor prefixed correctly to meet the requirements of our [supported browser matrix](https://confluence.atlassian.com/cloud/supported-browsers-744721663.html). This is done by hand to avoid adding to react-beautiful-dnd's size by including a css-in-js library
 
-[Back to home](/README.md#documentation-)
+[Back to documentation](/README.md#documentation-)
