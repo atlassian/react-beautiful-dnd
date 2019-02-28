@@ -95,6 +95,7 @@ const defaultProps = ({
   direction: 'vertical',
   isDropDisabled: false,
   isCombineEnabled: false,
+  isSortDisabled: false,
   ignoreContainerClipping: false,
 }: DefaultProps);
 

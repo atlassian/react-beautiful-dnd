@@ -87,6 +87,7 @@ type Args = {|
   direction: Direction,
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
+  isSortDisabled: boolean,
   shouldClipSubject: boolean,
 |};
 
@@ -98,6 +99,7 @@ export default ({
   direction,
   isDropDisabled,
   isCombineEnabled,
+  isSortDisabled,
   shouldClipSubject,
 }: Args): DroppableDimension => {
   const closestScrollable: ?Element = env.closestScrollable;
@@ -128,6 +130,7 @@ export default ({
     descriptor,
     isEnabled: !isDropDisabled,
     isCombineEnabled,
+    isSortDisabled,
     isFixedOnPage: env.isFixedOnPage,
     direction,
     client,

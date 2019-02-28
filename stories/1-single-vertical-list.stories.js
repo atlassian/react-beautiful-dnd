@@ -58,4 +58,7 @@ storiesOf('single vertical list', module)
   ))
   .add('with combine enabled', () => (
     <QuoteApp initial={data.small} isCombineEnabled />
+  ))
+  .add('with combine enabled and with sort disabled', () => (
+    <QuoteApp initial={data.small} isCombineEnabled isSortDisabled />
   ));

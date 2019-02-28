@@ -280,6 +280,39 @@ export default (state: State = idle, action: Action): State => {
     return postDroppableChange(state, updated, true);
   }
 
+  if (action.type === 'UPDATE_DROPPABLE_IS_SORT_DISABLED') {
+    // Things are locked at this point
+    if (state.phase === 'DROP_PENDING') {
+      return state;
+    }
+
+    invariant(
+      isMovementAllowed(state),
+      `Attempting to move in an unsupported phase ${state.phase}`,
+    );
+
+    const { id, isSortDisabled } = action.payload;
+    const target: ?DroppableDimension = state.dimensions.droppables[id];
+
+    invariant(
+      target,
+      `Cannot find Droppable[id: ${id}] to toggle its isSortDisabled state`,
+    );
+
+    invariant(
+      target.isSortDisabled !== isSortDisabled,
+      `Trying to set droppable isSortDisabled to ${String(isSortDisabled)}
+      but it is already ${String(target.isSortDisabled)}`,
+    );
+
+    const updated: DroppableDimension = {
+      ...target,
+      isSortDisabled,
+    };
+
+    return postDroppableChange(state, updated, true);
+  }
+
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
     // No longer accepting changes
     if (state.phase === 'DROP_PENDING' || state.phase === 'DROP_ANIMATING') {

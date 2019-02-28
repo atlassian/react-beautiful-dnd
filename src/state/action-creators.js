@@ -124,6 +124,23 @@ export const updateDroppableIsCombineEnabled = (
   payload: args,
 });
 
+export type UpdateDroppableIsSortDisabledArgs = {|
+  id: DroppableId,
+  isSortDisabled: boolean,
+|};
+
+export type UpdateDroppableIsSortDisabledAction = {|
+  type: 'UPDATE_DROPPABLE_IS_SORT_DISABLED',
+  payload: UpdateDroppableIsSortDisabledArgs,
+|};
+
+export const updateDroppableIsSortDisabled = (
+  args: UpdateDroppableIsSortDisabledArgs,
+): UpdateDroppableIsSortDisabledAction => ({
+  type: 'UPDATE_DROPPABLE_IS_SORT_DISABLED',
+  payload: args,
+});
+
 export type MoveArgs = {|
   client: Position,
 |};
@@ -304,6 +321,7 @@ export type Action =
   | UpdateDroppableScrollAction
   | UpdateDroppableIsEnabledAction
   | UpdateDroppableIsCombineEnabledAction
+  | UpdateDroppableIsSortDisabledAction
   | MoveByWindowScrollAction
   | UpdateViewportMaxScrollAction
   // | PostJumpScrollAction

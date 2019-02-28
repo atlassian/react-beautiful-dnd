@@ -128,6 +128,7 @@ export type DroppableDimension = {|
   axis: Axis,
   isEnabled: boolean,
   isCombineEnabled: boolean,
+  isSortDisabled: boolean,
   // relative to the current viewport
   client: BoxModel,
   // relative to the whole page
@@ -186,6 +187,7 @@ export type Combine = {|
 export type CombineImpact = {|
   // This has an impact on the hitbox for a grouping action
   whenEntered: UserDirection,
+  index: number,
   combine: Combine,
 |};
 

@@ -13,6 +13,10 @@ export default (props: Props) => {
     'isCombineEnabled must be a boolean',
   );
   invariant(
+    typeof props.isSortDisabled === 'boolean',
+    'isSortDisabled must be a boolean',
+  );
+  invariant(
     typeof props.ignoreContainerClipping === 'boolean',
     'ignoreContainerClipping must be a boolean',
   );
