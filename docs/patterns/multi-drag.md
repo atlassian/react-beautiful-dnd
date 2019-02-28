@@ -304,4 +304,4 @@ Additionally, when a drag starts we can also update the appearance of a lot of `
 
 When dragging you need to display a count of the items that are dragging. In our example we provide this information down by re-rendering the tree. As with selection changes it would be good to only render the item that needs the change. You could publish this information down using `redux` and `redux-select`. For this particular problem you might be able to get away with [`unstated`](https://github.com/jamiebuilds/unstated) or the new [React 16.3 `Context` api](https://github.com/reactjs/rfcs/blob/master/text/0002-new-version-of-context.md).
 
-[Back to documentation 📖](/README.md#documentation-)
+[Back to documentation](/README.md#documentation-)

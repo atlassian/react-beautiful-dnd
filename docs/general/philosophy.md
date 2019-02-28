@@ -64,4 +64,4 @@ Rather than using an index based approach for keyboard movement between lists, `
 
 ![example](https://raw.githubusercontent.com/alexreardon/files/master/resources/collision.gif?raw=true)
 
-[Back to documentation 📖](/README.md#documentation-)
+[Back to documentation](/README.md#documentation-)

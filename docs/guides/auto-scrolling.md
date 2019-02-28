@@ -38,4 +38,4 @@ We also correctly update the scroll position as required when keyboard dragging.
 
 This is amazing for users with visual impairments as they can correctly move items around in big lists without needing to use mouse positioning.
 
-[Back to documentation 📖](/README.md#documentation-)
+[Back to documentation](/README.md#documentation-)

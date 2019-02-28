@@ -68,4 +68,4 @@ There is also an [example codepen](https://codepen.io/alexreardon/project/editor
 
 You can consume `react-beautiful-dnd` from within `ClojureScript` using [CLJSJS](https://cljsjs.github.io/)!
 
-[Back to documentation 📖](/README.md#documentation-)
+[Back to documentation](/README.md#documentation-)

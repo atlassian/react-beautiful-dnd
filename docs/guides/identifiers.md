@@ -61,4 +61,4 @@ Yep!
 
 But we do things this way for simplicity and performance. Feel free to continue this conversation in a Github issue if you feel strongly about it.
 
-[Back to documentation 📖](/README.md#documentation-)
+[Back to documentation](/README.md#documentation-)

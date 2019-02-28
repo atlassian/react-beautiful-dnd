@@ -12,7 +12,7 @@
 
 ![quote application example](https://raw.githubusercontent.com/alexreardon/files/master/resources/website-board.gif?raw=true)
 
-[Play with this example if you want!](https://react-beautiful-dnd.netlify.com/?selectedKind=board&selectedStory=simple&full=0&addons=0&stories=1&panelRight=0)
+[Play with this example if you want!](TODO)
 
 </div>
 

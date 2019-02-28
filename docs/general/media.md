@@ -60,4 +60,4 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - Mybridge React.JS Top 10 Articles For the Past Month [v.Sep 2017](https://medium.mybridge.co/react-js-top-10-articles-for-the-past-month-v-sep-2017-1894c4d91e0c)
 - Inside Dev [Sep 3rd, 2017](https://inside.com/campaigns/inside-dev-2017-09-03-3154/sections/dive-deeper-arcore-17345)
 
-[Back to documentation 📖](/README.md#documentation-)
+[Back to documentation](/README.md#documentation-)
