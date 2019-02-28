@@ -25,4 +25,4 @@ During a mouse drag the following standard keyboard events are prevented to prev
 
 Other than these explicitly prevented keyboard events all standard keyboard events should work as expected.
 
-[Back to documentation](/README.md#documentation-)
+[← Back to documentation](/README.md#documentation-)

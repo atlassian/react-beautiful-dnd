@@ -40,4 +40,4 @@ When dragging with a keyboard, `react-beautiful-dnd` will also perform [auto scr
 
 [auto-scroll-board-keyboard](https://user-images.githubusercontent.com/2182637/36520650-3d3638f8-17e6-11e8-9cba-1fb439070285.gif)
 
-[Back to documentation](/README.md#documentation-)
+[← Back to documentation](/README.md#documentation-)

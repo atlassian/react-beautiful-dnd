@@ -10,4 +10,4 @@ A `doctype` impacts browser layout and measurement apis. Not specifying a `docty
 
 For non `production` builds we will log a warning to the `console` if a html5 `doctype` is not found. You can [disable the warning](#disable-warnings) if you like.
 
-[Back to documentation](/README.md#documentation-)
+[← Back to documentation](/README.md#documentation-)

@@ -8,4 +8,4 @@ See our [screen reader guide](/docs/guides/screen-reader.md) for a guide on cont
 
 ![screen-reader-text](https://user-images.githubusercontent.com/2182637/36571009-d326d82a-1888-11e8-9a1d-e44f8b969c2f.gif)
 
-[Back to documentation](/README.md#documentation-)
+[← Back to documentation](/README.md#documentation-)

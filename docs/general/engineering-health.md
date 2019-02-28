@@ -42,4 +42,4 @@ This codebase is designed to be **extremely performant** - it is part of its DNA
 
 Great care has been taken to keep the library as light as possible. There could be a smaller net cost if you where already using one of the underlying dependencies.
 
-[Back to documentation](/README.md#documentation-)
+[← Back to documentation](/README.md#documentation-)

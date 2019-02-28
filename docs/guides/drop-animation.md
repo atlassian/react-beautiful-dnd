@@ -116,4 +116,4 @@ class TaskItem extends React.Component {
 }
 ```
 
-[Back to documentation](/README.md#documentation-)
+[← Back to documentation](/README.md#documentation-)

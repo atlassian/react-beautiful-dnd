@@ -229,4 +229,4 @@ When moving into a new list, the visible `Draggables` will have their `render` f
 
 Unfortunately we are [unable to apply this optimisation for you](https://medium.com/merrickchristensen/function-as-child-components-5f3920a9ace9). It is a byproduct of using the render-props pattern.
 
-[Back to documentation](/README.md#documentation-)
+[← Back to documentation](/README.md#documentation-)
