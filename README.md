@@ -41,7 +41,7 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - Mouse 🐭, keyboard 🎹♿️ and touch 👉📱 (mobile, tablet and so on) support
 - [Multi drag support](/docs/patterns/multi-drag.md)
 - Incredible screen reader support ♿️ - we provide an amazing experience for english screen readers out of the box 📦. We also provide complete customisation control and internationalisation support for those who need it 💖
-- [Conditional dragging](https://github.com/atlassian/react-beautiful-dnd#props-1) and [conditional dropping](https://github.com/atlassian/react-beautiful-dnd#conditionally-dropping)
+- [Conditional dragging](/docs/api/draggable.md) and [conditional dropping](/docs/api.droppable.md)
 - Multiple independent lists on the one page
 - Flexible item sizes - the draggable items can have different heights (vertical lists) or widths (horizontal lists)
 - [Add and remove items during a drag](/docs/guides/changes-while-dragging.md)
@@ -53,7 +53,7 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - A `<Droppable />` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
 - Server side rendering (SSR) compatible - see [resetServerContext()](/docs/api/reset-server-context.md)
-- Plays well with [nested interactive elements](TODO) by default
+- Plays well with [nested interactive elements](/docs/api/draggable.md) by default
 
 ## Documentation 📖
 
@@ -62,7 +62,7 @@ We have created [a free course on `egghead.io`](https://egghead.io/courses/beaut
 - [Examples and samples](/docs/general/examples.md)
 - [Installation](/docs/general/installation.md)
 - [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
-- [Design philosophy](/docs/general/philosphy.md) - _worth a read to understand the motivations and thinking behind the library_
+- [Design philosophy](/docs/general/philosophy.md) - _worth a read to understand the motivations and thinking behind the library_
 - [Mouse dragging 🐭](/docs/general/sensor/mouse.md) | [Touch dragging 👉📱](/docs/general/sensor/touch.md) | [Keyboard dragging 🎹♿️](/docs/general/sensor/keyboard.md)
 - [Accessibility](/docs/general/accessibility.md)
 - [Browser support](/docs/general/browser-support.md)
