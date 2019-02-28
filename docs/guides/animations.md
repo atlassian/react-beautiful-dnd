@@ -25,3 +25,5 @@ How it is composed:
 ![animation curve](https://raw.githubusercontent.com/alexreardon/files/master/resources/dnd-ease-in-out-small.png?raw=true)
 
 > Animation curve used when moving out of the way
+
+[Back to home](/README.md#documentation-)

@@ -20,3 +20,5 @@ window['__react-beautiful-dnd-disable-dev-warnings'] = true;
 ```
 
 Disabling the warnings will not stop a drag from being aborted in the case of an error. It only disabling the logging about it.
+
+[Back to home](/README.md#documentation-)

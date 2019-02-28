@@ -50,3 +50,5 @@ class App extends React.Component {
   /*...*/
 }
 ```
+
+[Back to home](/README.md#documentation-)

@@ -132,3 +132,5 @@ This animation attempts to communicate one item _moving into_ another item in a 
 ![combining](https://user-images.githubusercontent.com/2182637/48045145-318dc300-e1e3-11e8-83bd-22c9bd44c442.gif)
 
 You are welcome to customise this animation using the information found in our [drop animation guide](/docs/guides/drop-animation.md)
+
+[Back to home](/README.md#documentation-)

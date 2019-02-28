@@ -393,3 +393,5 @@ It is possible for your `<Draggable />` to contain interactive elements. By defa
 - [`contenteditable`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable) (any elements that are `contenteditable` or are within a `contenteditable` container)
 
 You can opt out of this behavior by adding the `disableInteractiveElementBlocking` prop to a `<Draggable />`. However, it is questionable as to whether you should be doing so because it will render the interactive element unusable. If you need to _conditionally_ block dragging from interactive elements you can add the `disableInteractiveElementBlocking` prop to opt out of the default blocking and monkey patch the `dragHandleProps (DragHandleProps)` event handlers to disable dragging as required.
+
+[Back to home](/README.md#documentation-)

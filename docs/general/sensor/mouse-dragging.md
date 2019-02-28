@@ -24,3 +24,5 @@ During a mouse drag the following standard keyboard events are prevented to prev
 - **enter** <kbd>⏎</kbd> - preventing submission
 
 Other than these explicitly prevented keyboard events all standard keyboard events should work as expected.
+
+[Back to home](/README.md#documentation-)

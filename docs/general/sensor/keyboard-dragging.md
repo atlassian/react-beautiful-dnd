@@ -39,3 +39,5 @@ During a drag the following standard keyboard events have their default behaviou
 When dragging with a keyboard, `react-beautiful-dnd` will also perform [auto scrolling](/docs/guides/auto-scrolling.md) operations to ensure the item can be moved around
 
 [auto-scroll-board-keyboard](https://user-images.githubusercontent.com/2182637/36520650-3d3638f8-17e6-11e8-9cba-1fb439070285.gif)
+
+[Back to home](/README.md#documentation-)

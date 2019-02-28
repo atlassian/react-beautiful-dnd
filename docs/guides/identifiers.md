@@ -60,3 +60,5 @@ new droppableId: "droppable-5"
 Yep!
 
 But we do things this way for simplicity and performance. Feel free to continue this conversation in a Github issue if you feel strongly about it.
+
+[Back to home](/README.md#documentation-)

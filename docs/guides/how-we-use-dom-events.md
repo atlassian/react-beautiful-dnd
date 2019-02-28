@@ -148,3 +148,5 @@ Unlike mouse dragging a keyboard drag starts as soon as the user presses the **s
 - `preventDefault()` is called on a `keydown` if it is the **spacebar** <kbd>space</kbd> key as it is dropping the item
 - `preventDefault()` is called on a `keydown` if it is the **escape** <kbd>esc</kbd> key as it is explicitly cancelling the drag
 - `preventDefault()` is not called on events that indirectly cancel a drag such as `resize` or `mousedown`.
+
+[Back to home](/README.md#documentation-)

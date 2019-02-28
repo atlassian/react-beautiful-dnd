@@ -212,3 +212,5 @@ If you are using Mac, then you are welcome to test against the inbuilt `VoiceOve
 ## That's all folks
 
 We hope you find this guide useful. Feel free to send in suggestions for scenarios you'd like to see included, or you might want to share your own default messages and grow the knowledge even further 🙂.
+
+[Back to home](/README.md#documentation-)

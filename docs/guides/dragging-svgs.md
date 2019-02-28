@@ -109,3 +109,5 @@ Alternatively you could also apply the SVG as a `background-image` to another `H
 ```
 
 > You can read more about this approach on [CSS-Tricks](https://css-tricks.com/using-svg/)
+
+[Back to home](/README.md#documentation-)

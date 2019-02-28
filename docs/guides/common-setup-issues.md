@@ -31,3 +31,5 @@ This can happen if you have a `margin-top` as well as a `margin-bottom` on a `<D
 We recommend you set a `min-height` or `min-width` on a `<Droppable />` to ensure that there is a visible drop target when a list is empty
 
 We go over this in our [Get started with `react-beautiful-dnd` course](https://egghead.io/lessons/react-move-items-between-columns-with-react-beautiful-dnd-using-ondragend)
+
+[Back to home](/README.md#documentation-)

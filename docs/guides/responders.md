@@ -247,3 +247,5 @@ Here are a few poor user experiences that can occur if you change things _during
 ## `onDragStart` and `onDragEnd` pairing
 
 We try very hard to ensure that each `onDragStart` event is paired with a single `onDragEnd` event. However, there maybe a rogue situation where this is not the case. If that occurs - it is a bug. Currently there is no official mechanism to tell the library to cancel a current drag externally.
+
+[Back to home](/README.md#documentation-)

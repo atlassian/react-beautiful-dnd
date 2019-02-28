@@ -13,3 +13,5 @@ import { renderToString } from 'react-dom/server';
 resetServerContext();
 renderToString(...);
 ```
+
+[Back to home](/README.md#documentation-)

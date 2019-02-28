@@ -12,3 +12,5 @@
 ## Addons
 
 - [natural-drag-animation-rbdnd](https://github.com/rokborf/natural-drag-animation-rbdnd) adds natural dragging animation
+
+[Back to home](/README.md#documentation-)

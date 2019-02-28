@@ -115,3 +115,5 @@ class TaskItem extends React.Component {
   }
 }
 ```
+
+[Back to home](/README.md#documentation-)

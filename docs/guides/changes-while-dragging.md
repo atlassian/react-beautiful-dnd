@@ -98,3 +98,5 @@
 ## Drag end while we are patching the virtual model
 
 If a drag ends after a `<Draggable />` has been added or removed, but we have not finished collecting and patching the _virtual dimension model_ then we will delay the drop until the patch is finished. This is usually only a single frame. The `onDropEnd` callback will be called with a `DropResult` that is correct after the patch.
+
+[Back to home](/README.md#documentation-)

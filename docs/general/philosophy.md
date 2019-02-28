@@ -63,3 +63,5 @@ For now, the library does not support drag axis locking (aka drag rails). This i
 Rather than using an index based approach for keyboard movement between lists, `react-beautiful-dnd` performs cross list movement based on **inertia, gravity and collisions**. You can find out more about how this works by reading the blog ["Natural keyboard movement between lists"](https://medium.com/@alexandereardon/friction-gravity-and-collisions-3adac3a94e19).
 
 ![example](https://raw.githubusercontent.com/alexreardon/files/master/resources/collision.gif?raw=true)
+
+[Back to home](/README.md#documentation-)

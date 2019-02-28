@@ -228,3 +228,5 @@ By using the approach you are able to make style changes to a `<Droppable />` wh
 When moving into a new list, the visible `Draggables` will have their `render` function called directly even with this optimisation. This is because we need to move those `Draggables` out of the way. The `InnerList` optimisation will prevent the `<Droppable />` from calling `render` on the whole list from the top down. This optimisation will prevent the non-visible `Draggables` from having their render function called.
 
 Unfortunately we are [unable to apply this optimisation for you](https://medium.com/merrickchristensen/function-as-child-components-5f3920a9ace9). It is a byproduct of using the render-props pattern.
+
+[Back to home](/README.md#documentation-)

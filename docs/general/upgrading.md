@@ -9,3 +9,5 @@ We have created upgrade instructions in our [Github release notes](https://githu
 - [Upgrading from `5.x` to `6.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v6.0.0)
 - [Upgrading from `4.x` to `5.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v5.0.0)
 - [Upgrading from `3.x` to `4.x`](https://github.com/atlassian/react-beautiful-dnd/releases/tag/v4.0.0)
+
+[Back to home](/README.md#documentation-)

@@ -64,3 +64,5 @@ It seems like the only way to get things working is to:
 2.  If a component is mounting and `DraggableStateSnapshot > isDragging` is true then you can see if there is a previously recorded width. If there is then you can apply that width.
 
 This gets a little complicated - so we [created another example](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20portal&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel) for you showing you how this technique works! You're welcome!
+
+[Back to home](/README.md#documentation-)

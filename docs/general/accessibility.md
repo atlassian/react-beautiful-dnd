@@ -7,3 +7,5 @@ We provide **fantastic support for screen readers** to assist users with visual 
 See our [screen reader guide](/docs/guides/screen-reader.md) for a guide on controlling and crafting useful screen reader messaging.
 
 ![screen-reader-text](https://user-images.githubusercontent.com/2182637/36571009-d326d82a-1888-11e8-9a1d-e44f8b969c2f.gif)
+
+[Back to home](/README.md#documentation-)

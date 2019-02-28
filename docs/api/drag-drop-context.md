@@ -66,3 +66,5 @@ class App extends React.Component {
 Responders are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
 
 [Please see our Responders guide](/docs/guides/responders.md) for detailed information about responders ❤️
+
+[Back to home](/README.md#documentation-)
