@@ -155,7 +155,7 @@ export default class Board extends Component<Props, State> {
           )}
         </DragDropContext>
         <Global
-          styles={`
+          styles={css`
             body {
               background: ${colors.B200};
             }
