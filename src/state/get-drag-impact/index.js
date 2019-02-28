@@ -76,7 +76,7 @@ export default ({
     return withMerge;
   }
 
-  return isWithinHomeDroppable
+  const test = isWithinHomeDroppable
     ? inHomeList({
         pageBorderBoxCenterWithDroppableScrollChange,
         draggable,
@@ -95,4 +95,8 @@ export default ({
         viewport,
         userDirection,
       });
+
+  console.log(test.destination);
+
+  return test;
 };

@@ -34,6 +34,7 @@ import {
   updateDroppableScroll,
   updateDroppableIsEnabled,
   updateDroppableIsCombineEnabled,
+  updateDroppableIsSortDisabled,
   collectionStarting,
 } from '../../state/action-creators';
 import { getFormattedMessage } from '../../dev-warning';
@@ -121,6 +122,7 @@ export default class DragDropContext extends React.Component<Props> {
         updateDroppableScroll,
         updateDroppableIsEnabled,
         updateDroppableIsCombineEnabled,
+        updateDroppableIsSortDisabled,
         collectionStarting,
       },
       this.store.dispatch,

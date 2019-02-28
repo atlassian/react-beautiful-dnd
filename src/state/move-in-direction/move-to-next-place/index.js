@@ -49,24 +49,32 @@ export default ({
   );
   const isInHomeList: boolean = isHomeOf(draggable, destination);
 
-  const impact: ?DragImpact =
-    moveToNextCombine({
-      isInHomeList,
-      isMovingForward,
-      draggable,
-      destination,
-      insideDestination,
-      previousImpact,
-    }) ||
-    moveToNextIndex({
-      isMovingForward,
-      isInHomeList,
-      draggable,
-      draggables,
-      destination,
-      insideDestination,
-      previousImpact,
-    });
+  const impact: ?DragImpact = destination.isSortDisabled
+    ? moveToNextCombine({
+        isInHomeList,
+        isMovingForward,
+        draggable,
+        destination,
+        insideDestination,
+        previousImpact,
+      })
+    : moveToNextCombine({
+        isInHomeList,
+        isMovingForward,
+        draggable,
+        destination,
+        insideDestination,
+        previousImpact,
+      }) ||
+      moveToNextIndex({
+        isMovingForward,
+        isInHomeList,
+        draggable,
+        draggables,
+        destination,
+        insideDestination,
+        previousImpact,
+      });
 
   if (!impact) {
     return null;

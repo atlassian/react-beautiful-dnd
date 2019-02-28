@@ -40,6 +40,7 @@ type IsCombiningWithArgs = {|
 
 const isCombiningWith = ({
   id,
+  destination,
   currentCenter,
   axis,
   borderBox,
@@ -50,7 +51,7 @@ const isCombiningWith = ({
   const start: number = borderBox[axis.start] + displacedBy;
   const end: number = borderBox[axis.end] + displacedBy;
   const size: number = borderBox[axis.size];
-  const twoThirdsOfSize: number = size * 0.666;
+  const combineArea = destination.isSortDisabled ? size * 0.5 : size * 0.666;
 
   const whenEntered: UserDirection = getWhenEntered(
     id,
@@ -62,10 +63,10 @@ const isCombiningWith = ({
 
   if (isMovingForward) {
     // combine when moving in the front 2/3 of the item
-    return isWithin(start, start + twoThirdsOfSize)(targetCenter);
+    return isWithin(start, start + combineArea)(targetCenter);
   }
   // combine when moving in the back 2/3 of the item
-  return isWithin(end - twoThirdsOfSize, end)(targetCenter);
+  return isWithin(end - combineArea, end)(targetCenter);
 };
 
 type Args = {|
@@ -107,6 +108,7 @@ export default ({
 
       return isCombiningWith({
         id,
+        destination,
         currentCenter,
         axis,
         borderBox: child.page.borderBox,
@@ -130,7 +132,6 @@ export default ({
   };
 
   // no change of displacement
-  // clearing any destination
   const withMerge: DragImpact = {
     ...previousImpact,
     destination: null,

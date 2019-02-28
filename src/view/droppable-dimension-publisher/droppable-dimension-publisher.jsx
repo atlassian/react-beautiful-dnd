@@ -31,6 +31,7 @@ type Props = {|
   direction: Direction,
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
+  isSortDisabled: boolean,
   ignoreContainerClipping: boolean,
   getPlaceholderRef: () => ?HTMLElement,
   getDroppableRef: () => ?HTMLElement,
@@ -188,6 +189,8 @@ export default class DroppableDimensionPublisher extends React.Component<Props> 
       this.props.isDropDisabled !== prevProps.isDropDisabled;
     const isCombineChanged: boolean =
       this.props.isCombineEnabled !== prevProps.isCombineEnabled;
+    const isSortChanged: boolean =
+      this.props.isSortDiabled !== prevProps.isSortDisabled;
 
     if (!isDisabledChanged && !isCombineChanged) {
       return;
@@ -206,6 +209,13 @@ export default class DroppableDimensionPublisher extends React.Component<Props> 
       marshal.updateDroppableIsCombineEnabled(
         this.props.droppableId,
         this.props.isCombineEnabled,
+      );
+    }
+
+    if (isSortChanged) {
+      marshal.updateDroppableIsSortDisabled(
+        this.props.droppableId,
+        this.props.isSortDisabled,
       );
     }
   }
@@ -285,6 +295,7 @@ export default class DroppableDimensionPublisher extends React.Component<Props> 
         direction: this.props.direction,
         isDropDisabled: this.props.isDropDisabled,
         isCombineEnabled: this.props.isCombineEnabled,
+        isSortDisabled: this.props.isSortDisabled,
         shouldClipSubject: !this.props.ignoreContainerClipping,
       }),
     );
@@ -320,6 +331,7 @@ export default class DroppableDimensionPublisher extends React.Component<Props> 
       direction: this.props.direction,
       isDropDisabled: this.props.isDropDisabled,
       isCombineEnabled: this.props.isCombineEnabled,
+      isSortDisabled: this.props.isSortDisabled,
       shouldClipSubject: !this.props.ignoreContainerClipping,
     });
 

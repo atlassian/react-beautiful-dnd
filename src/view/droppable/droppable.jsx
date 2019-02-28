@@ -138,6 +138,7 @@ export default class Droppable extends Component<Props> {
       droppableId,
       isDropDisabled,
       isCombineEnabled,
+      isSortDisabled,
       // mapProps
       ignoreContainerClipping,
       isDraggingOver,
@@ -163,6 +164,7 @@ export default class Droppable extends Component<Props> {
         ignoreContainerClipping={ignoreContainerClipping}
         isDropDisabled={isDropDisabled}
         isCombineEnabled={isCombineEnabled}
+        isSortDisabled={isSortDisabled}
         getDroppableRef={this.getDroppableRef}
         getPlaceholderRef={this.getPlaceholderRef}
       >

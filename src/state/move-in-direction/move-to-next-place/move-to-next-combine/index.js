@@ -33,15 +33,17 @@ export default ({
     return null;
   }
 
-  // we move from a merge to a reorder
-  if (previousImpact.merge) {
+  // we move from a merge to a reorder, unless sort is disabled
+  if (previousImpact.merge && !destination.isSortDisabled) {
     return null;
   }
 
   // we are on a location, and we are trying to combine onto a sibling
   // that sibling might be displaced
 
-  const location: ?DraggableLocation = previousImpact.destination;
+  const location: ?DraggableLocation = destination.isSortDisabled
+    ? previousImpact.destination || previousImpact.merge
+    : previousImpact.destination;
   invariant(location, 'Need a previous location to move from into a combine');
 
   const currentIndex: number = location.index;
@@ -79,6 +81,7 @@ export default ({
 
   const merge: CombineImpact = {
     whenEntered: isMovingForward ? forward : backward,
+    index: targetIndex,
     combine: {
       draggableId: target.descriptor.id,
       droppableId: destination.descriptor.id,
