@@ -133,4 +133,4 @@ This animation attempts to communicate one item _moving into_ another item in a 
 
 You are welcome to customise this animation using the information found in our [drop animation guide](/docs/guides/drop-animation.md)
 
-[Back to documentation](/README.md#documentation-)
+[Back to documentation 📖](/README.md#documentation-)

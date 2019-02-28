@@ -219,4 +219,4 @@ Here is an example that shows off the learnings presented in this guide: https:/
 
 `react-beautiful-dnd` does not support the dragging of `<svg>` elements. Wrap your `<svg>` in a `HTMLElement` such as `<span>` or `<div>` for great accessibility and cross browser support. See our [using SVGs guide](https://github.com/atlassian/react-beautiful-dnd/tree/master/docs/guides/using-svgs.md) for more information.
 
-[Back to documentation](/README.md#documentation-)
+[Back to documentation 📖](/README.md#documentation-)

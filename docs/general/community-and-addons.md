@@ -13,4 +13,4 @@
 
 - [natural-drag-animation-rbdnd](https://github.com/rokborf/natural-drag-animation-rbdnd) adds natural dragging animation
 
-[Back to documentation](/README.md#documentation-)
+[Back to documentation 📖](/README.md#documentation-)
