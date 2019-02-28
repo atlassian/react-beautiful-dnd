@@ -70,13 +70,12 @@ There are a lot of libraries out there that allow for drag and drop interactions
 
 ### About 👋
 
-- [Introduction](/docs/about/introduction.md)
 - [Installation](/docs/about/installation.md)
 - [Examples and samples](/docs/about/examples.md)
 - [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
 - [Design principles](/docs/about/design-principles.md)
-- [How are we accessible?](/docs/about/accessibility.md)
 - [Animations](/docs/about/animations.md)
+- [Accessibility](/docs/about/accessibility.md)
 - [Browser support](/docs/about/browser-support.md)
 
 ### Sensors 🔉
