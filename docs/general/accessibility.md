@@ -1,11 +1,20 @@
 # Accessibility ♿️
 
-Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library ships with support for drag and drop interactions [**using only a keyboard**](/docs/sensor/keyboard.md). This enables power users to drive their experience entirely from the keyboard. Keyboard dragging also opens up drag and drop experiences to people who would have been excluded previously.
+Traditionally drag and drop interactions have been exclusively a mouse or touch interaction. This library has invested a huge amount of effort to ensure that everybody has access to drag and drop interactions
 
-We provide **fantastic support for screen readers** to assist users with visual (or other) impairments. We ship with english messaging out of the box 📦. However, you are welcome to override these messages by using the `announce` function that it provided to all of the `<DragDropContext /> > responder` functions.
+## What we do to include everyone
 
-See our [screen reader guide](/docs/guides/screen-reader.md) for a guide on controlling and crafting useful screen reader messaging.
+- [Full keyboard support](/docs/sensor/keyboard.md) (reordering, combining, moving between lists)
+- [Keyboard multi drag support](/docs/patterns/multi-drag.md)
+- Keyboard [auto scrolling](/docs/guides/auto-scrolling.md)
+- Fantastic [screen reader support](/docs/guides/screen-reader.md) - _We ship with english messaging out of the box 📦_
+- Correct use of `aria-*` attributes for [lift announcements](/docs/guides/screen-reader.md)
+- Ensure a dragging item maintains focus if started dragging with focus - [more info](/docs/guides/draggable.md)
+- Ensure a dragging item maintains focus when dropping into a new list to allow drags to be chained together - [more info](/docs/guides/draggable.md)
+- Ensure a dragging item maintains focus moving into a [portal](/docs/patterns/using-a-portal.md)
 
 ![screen-reader-text](https://user-images.githubusercontent.com/2182637/36571009-d326d82a-1888-11e8-9a1d-e44f8b969c2f.gif)
+
+> Example screen reader announcement
 
 [← Back to documentation](/README.md#documentation-)

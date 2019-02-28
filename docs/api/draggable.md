@@ -376,7 +376,7 @@ The `children` function is also provided with a small amount of state relating t
 
 ## Adding an `onClick` handler to a `<Draggable />` or a _drag handle_
 
-You are welcome to add your own `onClick` handler to a `<Draggable />` or a _drag handle_ (which might be the same element). `onClick` events handlers will always be called if a click occurred. If we are preventing the click, then the `event.defaultPrevented` property will be set to `true`. We prevent click events from occurring when the user was dragging an item. See [sloppy clicks and click prevention](/docs/sensors/mouse-dragging.md#sloppy-clicks-and-click-prevention-) for more information.
+You are welcome to add your own `onClick` handler to a `<Draggable />` or a _drag handle_ (which might be the same element). `onClick` events handlers will always be called if a click occurred. If we are preventing the click, then the `event.defaultPrevented` property will be set to `true`. We prevent click events from occurring when the user was dragging an item. See [sloppy clicks and click prevention](/docs/sensors/mouse.md#sloppy-clicks-and-click-prevention-) for more information.
 
 ## Interactive child elements within a `<Draggable />`
 

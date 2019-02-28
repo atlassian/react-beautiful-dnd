@@ -211,7 +211,7 @@ class Task extends Component<Props> {
 
 #### `window` `click` handler
 
-We add a `click` handler to the `window` to detect for a click that is not on a `<Draggable />`. We call `preventDefault` in our selection `onClick` handler so `click` events used for selection will have the `event.defaultPrevented` property set to `true`. Additionally, if a drag occurred the default `click` action [will be prevented](/docs/sensors/mouse-dragging.md#sloppy-clicks-and-click-prevention-). So if we receive a `click` event on the window that has not has `event.defaultPrevented` set to false we clear the current selection.
+We add a `click` handler to the `window` to detect for a click that is not on a `<Draggable />`. We call `preventDefault` in our selection `onClick` handler so `click` events used for selection will have the `event.defaultPrevented` property set to `true`. Additionally, if a drag occurred the default `click` action [will be prevented](/docs/sensors/mouse.md#sloppy-clicks-and-click-prevention-). So if we receive a `click` event on the window that has not has `event.defaultPrevented` set to false we clear the current selection.
 
 #### `window` `keydown` handler
 
