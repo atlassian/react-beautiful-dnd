@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import QuoteList from '../primatives/quote-list';
 import { DragDropContext } from '../../../src';
 import { generateQuoteMap, authors } from '../data';

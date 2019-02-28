@@ -3,7 +3,7 @@ import React, { Component, type Node } from 'react';
 import ReactDOM from 'react-dom';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { colors } from '@atlaskit/theme';
 import { Draggable } from '../../../src';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';

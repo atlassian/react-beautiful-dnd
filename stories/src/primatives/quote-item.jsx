@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { colors } from '@atlaskit/theme';
 import { borderRadius, grid } from '../constants';
 import type { Quote, AuthorColors } from '../types';
