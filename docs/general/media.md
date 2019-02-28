@@ -50,6 +50,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 
 ## Articles and blogs
 
+- [Dynamically Update Positions During Drag Using react-beautiful-dnd](https://medium.com/@egiblin88/dynamically-update-positions-during-drag-using-react-beautiful-dnd-4a986d704c2e)
 - [Want To Recruit Better Engineers? Open Source Your Code](https://angel.co/blog/want-to-recruit-better-engineers-open-source-your-code)
 - [How To Implement Better Drag and Drop in your React App](https://blog.bitsrc.io/implement-better-drag-and-drop-in-your-react-app-beafc4451599)
 - [Beautiful drag and drop with React — The beginner’s guide](https://medium.com/@AlejandroSobko/7798e3928290)
