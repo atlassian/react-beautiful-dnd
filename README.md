@@ -18,9 +18,9 @@
 
 ## Core characteristics
 
-- Beautiful and [natural movement](/docs/general/animation.md) of items 💐
-- [Accessible](/docs/general/accessibility.md): powerful keyboard and screen reader support ♿️
-- [Extremely performant](/docs/general/media.md) 🚀
+- Beautiful and [natural movement](/docs/about/animation.md) of items 💐
+- [Accessible](/docs/about/accessibility.md): powerful keyboard and screen reader support ♿️
+- [Extremely performant](/docs/support/media.md) 🚀
 - Clean and powerful api which is simple to get started with
 - Plays extremely well with standard browser interactions
 - [Unopinionated styling](/docs/guides/preset-styles.md)
@@ -70,13 +70,14 @@ There are a lot of libraries out there that allow for drag and drop interactions
 
 ### About 👋
 
-- [Introduction](/docs/general/introduction.md)
-- [Installation](/docs/general/installation.md)
-- [Examples and samples](/docs/general/examples.md)
-- [Design principles](/docs/general/design-principles.md)
+- [Introduction](/docs/about/introduction.md)
+- [Installation](/docs/about/installation.md)
+- [Examples and samples](/docs/about/examples.md)
 - [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
-- [How are we accessible?](/docs/general/accessibility.md)
-- [Browser support](/docs/general/browser-support.md)
+- [Design principles](/docs/about/design-principles.md)
+- [How are we accessible?](/docs/about/accessibility.md)
+- [Animations](/docs/about/animations.md)
+- [Browser support](/docs/about/browser-support.md)
 
 ### Sensors 🔉
 
@@ -103,7 +104,6 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [Using `innerRef`](/docs/guides/using-inner-ref.md)
 - [Developer warnings and how to disable them](/docs/guides/developer-warnings.md)
 - [Rules for `draggableId` and `droppableId`s](/docs/guides/identifiers.md)
-- [Animations](/docs/guides/animations.md)
 - [Customising or skipping the drop animation](/docs/guides/drop-animation.md)
 - [Auto scrolling](/docs/guides/auto-scrolling.md)
 - [Controlling the screen reader](/docs/guides/screen-reader.md)
@@ -121,14 +121,14 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [Tables](/docs/patterns/tables.md)
 - [Using a portal (`ReactDOM.createPortal`)](/docs/patterns/using-a-portal.md)
 
-### Maintenance 👩‍⚕️
+### Support 👩‍⚕️
 
-- [Engineering health](/docs/general/engineering-health.md)
-- [Community and addons](/docs/general/community-and-addons.md)
+- [Engineering health](/docs/support/engineering-health.md)
+- [Community and addons](/docs/support/community-and-addons.md)
 - [Release notes and changelog](https://github.com/atlassian/react-beautiful-dnd/releases)
-- [Upgrading](/docs/general/upgrading.md)
+- [Upgrading](/docs/support/upgrading.md)
 - [Road map](https://github.com/atlassian/react-beautiful-dnd/issues)
-- [Media](/docs/general/media.md)
+- [Media](/docs/support/media.md)
 
 ## Read this in other languages 🌎
 

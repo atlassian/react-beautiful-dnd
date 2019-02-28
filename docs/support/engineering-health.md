@@ -34,7 +34,7 @@ This codebase is designed to be **extremely performant** - it is part of its DNA
 - [Dragging React performance forward](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33)
 - [Grabbing the flame 🔥](https://medium.com/@alexandereardon/grabbing-the-flame-290c794fe852)
 
-> More in [media](/docs/general/media.md)
+> More in [media](/docs/support/media.md)
 
 ## Size
 
