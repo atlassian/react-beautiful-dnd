@@ -21,4 +21,4 @@ We have created some basic examples on `codesandbox` for you to play with direct
 - [Simple horizontal list](https://codesandbox.io/s/mmrp44okvj)
 - [Simple DnD between two lists](https://codesandbox.io/s/ql08j35j3q)
 
-[Back to home](/README.md#documentation)
+[Back to home](/README.md#documentation-)
