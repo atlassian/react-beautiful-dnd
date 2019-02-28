@@ -9,7 +9,7 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   parser: 'babel-eslint',
-  plugins: ['prettier', 'flowtype', 'react', 'import', 'jest'],
+  plugins: ['prettier', 'flowtype', 'emotion', 'react', 'import', 'jest'],
   env: {
     es6: true,
     browser: true,

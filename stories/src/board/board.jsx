@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from '@emotion/styled';
+import { Global, css } from '@emotion/core';
 import { colors } from '@atlaskit/theme';
 import type {
   DropResult,
@@ -37,12 +38,6 @@ type State = {|
   columns: QuoteMap,
   ordered: string[],
 |};
-
-const GlobalStyle = createGlobalStyle`
-  body {
-    background: ${colors.B200};
-  }
-`;
 
 export default class Board extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
@@ -159,7 +154,13 @@ export default class Board extends Component<Props, State> {
             board
           )}
         </DragDropContext>
-        <GlobalStyle />
+        <Global
+          styles={css`
+            body {
+              background: ${colors.B200};
+            }
+          `}
+        />
       </React.Fragment>
     );
   }

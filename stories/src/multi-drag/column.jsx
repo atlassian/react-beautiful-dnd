@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import memoizeOne from 'memoize-one';
 import { colors } from '@atlaskit/theme';
 import { Droppable } from '../../../src';

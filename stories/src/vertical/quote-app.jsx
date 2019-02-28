@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import type { Quote } from '../types';
 import type { DropResult } from '../../../src/types';
 import { DragDropContext } from '../../../src';

@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import TaskList from './task-list';
 import initial from './data';
 import reorder from '../reorder';
