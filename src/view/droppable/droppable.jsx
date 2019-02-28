@@ -94,7 +94,7 @@ export default class Droppable extends React.Component<Props> {
       DroppableProvided > placeholder could not be found.
 
       Please be sure to add the {provided.placeholder} React Node as a child of your Droppable.
-      More information: https://github.com/atlassian/react-beautiful-dnd#1-provided-droppableprovided
+      More information: https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/droppable.md
     `);
   }
 

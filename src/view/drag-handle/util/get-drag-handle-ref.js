@@ -37,7 +37,7 @@ const getDragHandleRef = (draggableRef: HTMLElement): HTMLElement => {
       Cannot find drag handle element inside of Draggable.
       Please be sure to apply the {...provided.dragHandleProps} to your Draggable
 
-      More information: https://github.com/atlassian/react-beautiful-dnd#draggable
+      More information: https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/api/draggable.md
     `,
   );
 

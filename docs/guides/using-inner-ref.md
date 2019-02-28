@@ -2,7 +2,7 @@
 
 > If you have not used `ref`'s before, please take a look at the [`React`: Refs and the DOM guide](https://reactjs.org/docs/refs-and-the-dom.html) on their documentation website.
 
-Our `Draggable` and `Droppable` components both require a [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) to be provided to them. This is done using the `innerRef` property on the `DraggableProvided` and `DroppableProvided` objects.
+Our `<Draggable />` and `<Droppable />` components both require a [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) to be provided to them. This is done using the `innerRef` property on the `DraggableProvided` and `DroppableProvided` objects.
 
 ```diff
 <Draggable draggableId="draggable-1" index={0}>
@@ -108,7 +108,7 @@ Take a look at this example:
 
 While it looks correct, it **will cause your application to explode 💥!**
 
-This is because `react-beautiful-dnd` expects the `provided.innerRef` function for a `Draggable` and a `Droppable` to be called with the DOM node of the component, and not the _instance_ of the class. In this example we are calling `provided.innerRef` with an _instance_ of `Person` and not the underlying DOM node.
+This is because `react-beautiful-dnd` expects the `provided.innerRef` function for a `<Draggable />` and a `<Droppable />` to be called with the DOM node of the component, and not the _instance_ of the class. In this example we are calling `provided.innerRef` with an _instance_ of `Person` and not the underlying DOM node.
 
 ## Exposing a DOM ref from your Component 🤩
 
@@ -128,7 +128,7 @@ class Person extends React.Component {
 
 > Note, the name `innerRef` is just a convention. You could call it whatever you want for your component. Something like `domRef` is fine.
 
-You can then correctly supply the DOM node to a `Draggable` or `Droppable`
+You can then correctly supply the DOM node to a `<Draggable />` or `<Droppable />`
 
 ```diff
 <Draggable draggableId="draggable-1" index={0}>
@@ -218,3 +218,5 @@ Here is an example that shows off the learnings presented in this guide: https:/
 ## A note on SVG's
 
 `react-beautiful-dnd` does not support the dragging of `<svg>` elements. Wrap your `<svg>` in a `HTMLElement` such as `<span>` or `<div>` for great accessibility and cross browser support. See our [using SVGs guide](https://github.com/atlassian/react-beautiful-dnd/tree/master/docs/guides/using-svgs.md) for more information.
+
+[← Back to documentation](/README.md#documentation-)
