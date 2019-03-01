@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/alexreardon/files/master/resources/react-beautiful-dnd-logo.png" />
+  <img src="https://user-images.githubusercontent.com/2182637/53611279-0ca1dd80-3c22-11e9-939f-937c6b3b8625.png" />
 </p>
 <h1 align="center">react-beautiful-dnd</h1>
 
