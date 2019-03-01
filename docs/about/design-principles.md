@@ -1,21 +1,10 @@
-# Philosophy 📖
+# Design principles 📖
 
 This page goes over the design and interaction thinking behind `react-beautiful-dnd`.
-
-## Going deeper
-
-For a bit more context on the thinking outlined on this page you are welcome to check out the following:
-
-- 📖 [Rethinking drag and drop](https://medium.com/@alexandereardon/rethinking-drag-and-drop-d9f5770b4e6b)
-- 🎧 [React podcast: fast, accessible and beautiful drag and drop](https://reactpodcast.simplecast.fm/17)
 
 ## Foundational idea: physicality
 
 The core design idea of `react-beautiful-dnd` is physicality: we want users to feel like they are moving physical objects around
-
-## `react-beautiful-dnd` is not for everyone 🙅‍
-
-There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. **`react-beautiful-dnd` is a higher level abstraction specifically built for vertical and horizontal lists**. Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by `react-dnd`. So this library might not be for you depending on what your use case is.
 
 ### Application 1: no instant movement (no snapping)
 
