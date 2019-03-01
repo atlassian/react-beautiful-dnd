@@ -88,7 +88,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 
 ### API 🏋️‍
 
-![diagram](https://user-images.githubusercontent.com/2182637/53532424-f70db480-3b4a-11e9-81d0-943eae735242.gif)
+![diagram](https://user-images.githubusercontent.com/2182637/53607406-c8f3a780-3c12-11e9-979c-7f3b5bd1bfbd.gif)
 
 - [`<DragDropContext />`](/docs/api/drag-drop-context.md) - _Wraps the part of your application you want to have drag and drop enabled for_
 - [`<Droppable />`](/docs/api/droppable.md) - _An area that can be dropped into. Contains `<Draggable />`s_
