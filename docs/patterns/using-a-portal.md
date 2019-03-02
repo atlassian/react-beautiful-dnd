@@ -1,6 +1,6 @@
 # Using a Portal
 
-> This guide will go through how you can move your `<Draggable />` into a [`React.Portal`](https://reactjs.org/docs/portals.html) while dragging.
+> This guide will go through how you can move your `<Draggable />` into a [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html) while dragging.
 
 > ⚠️ Moving items into a React Portal after a `touchstart` is currently not working 😞. React issue: [#13113](https://github.com/facebook/react/issues/13113). We are tracking it here: [#582](https://github.com/atlassian/react-beautiful-dnd/issues/582). Due to this issue with React Portals drag and drop will not work on touch devices if using a React Portal
 
@@ -14,17 +14,17 @@ To get around the issue you can use a `portal`.
 
 Wait, what is a `portal`? A `portal` is a simply another DOM node outside of the current component tree. By using a portal you are able to move the `<Draggable />` into another DOM node while dragging. This can allow you to get around the limitations of `position: fixed`.
 
-## Not using `React.Portal` by default
+## Not using `ReactDOM.createPortal` by default
 
-React provides a first class api for using `portals`: [`React.Portal`](https://reactjs.org/docs/portals.html). Originally we wanted to use it for all `<Draggable />`s while dragging. Unfortunately it has a big performance penalty - especially when dragging nodes with a lot of children ([React issue](https://github.com/facebook/react/issues/12247)). The reason for this is because components moving to a `React.Portal` are mounted and remounted which is quite expensive. Therefore we are currently not supporting it out of the box.
+React provides a first class api for using `portals`: [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html). Originally we wanted to use it for all `<Draggable />`s while dragging. Unfortunately it has a big performance penalty - especially when dragging nodes with a lot of children ([React issue](https://github.com/facebook/react/issues/12247)). The reason for this is because components moving to a `ReactDOM.createPortal` are mounted and remounted which is quite expensive. Therefore we are currently not supporting it out of the box.
 
-If your `<Draggable />` does not have many children nodes then you are welcome to use `React.Portal` on top of `react-beautiful-dnd`. If you are simply dragging cards in a list then you _should_ be fine using `React.Portal`. However, if you are dragging a column full of cards then you will get significant jank when a drag is starting.
+If your `<Draggable />` does not have many children nodes then you are welcome to use `ReactDOM.createPortal` on top of `react-beautiful-dnd`. If you are simply dragging cards in a list then you _should_ be fine using `ReactDOM.createPortal`. However, if you are dragging a column full of cards then you will get significant jank when a drag is starting.
 
 ## Example
 
 <!-- TODO: embed example here on new website -->
 
-We have created a [working example](https://react-beautiful-dnd.netlify.com/?selectedKind=Portals&selectedStory=Using%20your%20own%20portal&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel) that uses `React.Portal` to guide you. You can view the [source here](https://github.com/atlassian/react-beautiful-dnd/blob/master/stories/11-portal-story.js)
+We have created a [working example](https://react-beautiful-dnd.netlify.com/?selectedKind=Portals&selectedStory=Using%20your%20own%20portal&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel) that uses `ReactDOM.createPortal` to guide you. You can view the [source here](https://github.com/atlassian/react-beautiful-dnd/blob/master/stories/11-portal-story.js)
 
 ## Tables
 

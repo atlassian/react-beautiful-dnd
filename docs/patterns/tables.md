@@ -41,20 +41,20 @@ For tables with less than 50 rows this should approach be fine!
 
 [See example code here](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20dimension%20locking&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
 
-## Advanced: using [`React.Portal`](https://reactjs.org/docs/portals.html)
+## Advanced: using [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html)
 
-If you want to use `React.Portal` in combination with table row reordering then there are few extra steps you need to go through.
+If you want to use `ReactDOM.createPortal` in combination with table row reordering then there are few extra steps you need to go through.
 
 First up, have a read of our [using a portal pattern](/docs/patterns/using-a-portal.md) to get familiar with the approach.
 
-It is important to know things timings of mount / unmount actions in React. We have created a [codesandbox.io example](https://codesandbox.io/s/nkl52y1wn0) to show how the mount timings work when moving in and out of a `React.Portal`.
+It is important to know things timings of mount / unmount actions in React. We have created a [codesandbox.io example](https://codesandbox.io/s/nkl52y1wn0) to show how the mount timings work when moving in and out of a `ReactDOM.createPortal`.
 
-When moving an existing `<tr>` into a `React.Portal` it is important to know that the existing `<tr>` is unmounted and a new `<tr>` is mounted into the portal. Here is the order of those operations:
+When moving an existing `<tr>` into a `ReactDOM.createPortal` it is important to know that the existing `<tr>` is unmounted and a new `<tr>` is mounted into the portal. Here is the order of those operations:
 
 1.  The old `<tr>` has `componentWillUnmount` called
 2.  The new `<tr>` has `componentWillMount` called
 
-In order to preserve the cell dimensions of the cells in the row that we are moving into a `React.Portal` we need to lock its dimensions using inline styles (see strategy #2). Sadly though, the new component does not directly have access to the information about the component that was in the tree before it moved to the portal. So in order to do this we need to obtain the cell dimensions of the `<tr>` when it is unmounting and re-apply it to the new `<tr>` when it mounted in `componentDidMount`.
+In order to preserve the cell dimensions of the cells in the row that we are moving into a `ReactDOM.createPortal` we need to lock its dimensions using inline styles (see strategy #2). Sadly though, the new component does not directly have access to the information about the component that was in the tree before it moved to the portal. So in order to do this we need to obtain the cell dimensions of the `<tr>` when it is unmounting and re-apply it to the new `<tr>` when it mounted in `componentDidMount`.
 
 There is no great way to do this as when `componentDidMount` is called we are not sure if the component is unmouting as the `tr` is no longer needed, or if it is unmounting because it is about to move into a portal.
 
