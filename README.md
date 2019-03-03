@@ -18,7 +18,7 @@
 
 ## Core characteristics
 
-- Beautiful and [natural movement](/docs/about/animation.md) of items 💐
+- Beautiful and [natural movement](/docs/about/animations.md) of items 💐
 - [Accessible](/docs/about/accessibility.md): powerful keyboard and screen reader support ♿️
 - [Extremely performant](/docs/support/media.md) 🚀
 - Clean and powerful api which is simple to get started with
@@ -82,9 +82,9 @@ There are a lot of libraries out there that allow for drag and drop interactions
 
 > The ways in which somebody can start and control a drag
 
-- [Mouse dragging 🐭](/docs/sensor/mouse.md)
-- [Touch dragging 👉📱](/docs/sensor/touch.md)
-- [Keyboard dragging 🎹♿️](/docs/sensor/keyboard.md)
+- [Mouse dragging 🐭](/docs/sensors/mouse.md)
+- [Touch dragging 👉📱](/docs/sensors/touch.md)
+- [Keyboard dragging 🎹♿️](/docs/sensors/keyboard.md)
 
 ### API 🏋️‍
 
