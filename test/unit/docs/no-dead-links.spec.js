@@ -24,22 +24,22 @@ const withLeadingSlash = (file: string): string => {
 
 const validate = (token: Token, currentFile: string, files: string[]) => {
   const href: string = token.attrs[0][1];
-  // don't care about external links
+  // Not validating external links
   if (href.startsWith('http')) {
     return;
   }
 
-  // linking within a file - not checking for now
+  // not checking links within a file for now
   if (href.startsWith('#')) {
     return;
   }
 
-  const withoutFragment: string = href.split('#')[0];
-
-  // ignoring stories links - only checking markdown links for now
-  if (withoutFragment.startsWith('/stories')) {
+  // not checking links to stories for now
+  if (href.startsWith('/stories')) {
     return;
   }
+
+  const withoutFragment: string = href.split('#')[0];
 
   const isValid: boolean = files.some(
     (filePath: string): boolean =>
@@ -50,10 +50,12 @@ const validate = (token: Token, currentFile: string, files: string[]) => {
     return;
   }
 
-  expect(false).toBe(
-    `dead link: ${withoutFragment}
-      in file: ${currentFile}`,
-  );
+  const message: string = `
+    Dead link: ${withoutFragment}
+    Found in:  ${withLeadingSlash(currentFile)}
+  `;
+
+  expect(false).toBe(message);
 };
 
 const parse = (token: Token, file: string, files: string[]) => {
@@ -73,6 +75,7 @@ it('should use have no dead links', async () => {
     const contents: string = await fs.readFile(file, 'utf8');
 
     const tokens: Token[] = markdown.parse(contents, {});
+    expect(tokens.length).toBeGreaterThan(0);
     tokens.forEach((token: Token) => parse(token, file, files));
   }
 
