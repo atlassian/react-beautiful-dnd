@@ -73,7 +73,7 @@
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@emotion/core": "0.x",
-    "@storybook/addon-options": "^4.1.11",
+    "@storybook/addon-options": "^5.0.0",
     "@storybook/addons": "^5.0.0",
     "@storybook/react": "^5.0.0",
     "babel-core": "^7.0.0-bridge.0",
