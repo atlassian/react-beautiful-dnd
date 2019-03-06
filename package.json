@@ -101,7 +101,7 @@
     "jest-watch-typeahead": "^0.2.0",
     "prettier": "^1.16.0",
     "raf-stub": "^2.0.2",
-    "react": "16.4.2",
+    "react": "16.8.4",
     "react-dom": "16.4.2",
     "react-test-renderer": "16.4.2",
     "rimraf": "^2.6.3",
