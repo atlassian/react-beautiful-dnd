@@ -7,5 +7,6 @@ export default (dimension: DraggableDimension): OwnProps => ({
   index: dimension.descriptor.index,
   isDragDisabled: false,
   disableInteractiveElementBlocking: false,
+  shouldRespectForceTouch: true,
   children: () => null,
 });

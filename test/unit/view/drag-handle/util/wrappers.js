@@ -57,6 +57,7 @@ export const getWrapper = (
       isEnabled
       getDraggableRef={ref.getRef}
       canDragInteractiveElements={false}
+      getShouldRespectForceTouch={() => true}
     >
       {(dragHandleProps: ?DragHandleProps) => (
         <Child dragHandleProps={dragHandleProps} innerRef={ref.setRef} />

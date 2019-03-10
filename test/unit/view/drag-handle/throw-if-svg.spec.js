@@ -33,6 +33,7 @@ it('should throw if a help SVG message if the drag handle is a SVG', () => {
         isEnabled
         getDraggableRef={ref.getRef}
         canDragInteractiveElements={false}
+        getShouldRespectForceTouch={() => true}
       >
         {(dragHandleProps: ?DragHandleProps) => (
           // $ExpectError - this fails the flow check! Success!
