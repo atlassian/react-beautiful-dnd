@@ -93,7 +93,12 @@ class InnerQuoteList extends React.Component<QuoteListProps> {
 
   render() {
     return this.props.quotes.map((quote: Quote, index: number) => (
-      <Draggable key={quote.id} draggableId={quote.id} index={index}>
+      <Draggable
+        key={quote.id}
+        draggableId={quote.id}
+        index={index}
+        shouldRespectForceTouch={false}
+      >
         {(
           dragProvided: DraggableProvided,
           dragSnapshot: DraggableStateSnapshot,
