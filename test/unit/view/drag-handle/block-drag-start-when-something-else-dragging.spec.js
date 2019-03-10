@@ -27,6 +27,7 @@ forEach((control: Control) => {
         isDropAnimating={false}
         isEnabled
         getDraggableRef={ref.getRef}
+        getShouldRespectForceTouch={() => true}
         canDragInteractiveElements={false}
       >
         {(dragHandleProps: ?DragHandleProps) => (

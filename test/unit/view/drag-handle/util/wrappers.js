@@ -45,6 +45,7 @@ export const createRef = () => {
 export const getWrapper = (
   callbacks: Callbacks,
   context?: Object = basicContext,
+  shouldRespectForceTouch?: boolean = true,
 ): ReactWrapper<*> => {
   const ref = createRef();
 
@@ -57,6 +58,7 @@ export const getWrapper = (
       isEnabled
       getDraggableRef={ref.getRef}
       canDragInteractiveElements={false}
+      getShouldRespectForceTouch={() => shouldRespectForceTouch}
     >
       {(dragHandleProps: ?DragHandleProps) => (
         <Child dragHandleProps={dragHandleProps} innerRef={ref.setRef} />

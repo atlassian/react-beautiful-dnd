@@ -83,6 +83,7 @@ describe('Portal usage (ref changing while mounted)', () => {
           isEnabled
           getDraggableRef={() => this.ref}
           canDragInteractiveElements={false}
+          getShouldRespectForceTouch={() => true}
         >
           {(dragHandleProps: ?DragHandleProps) => (
             <Child
@@ -172,6 +173,7 @@ describe('Focus retention moving between lists (focus retention between mounts)'
           isEnabled
           getDraggableRef={() => this.ref}
           canDragInteractiveElements={false}
+          getShouldRespectForceTouch={() => true}
         >
           {(dragHandleProps: ?DragHandleProps) => (
             <div ref={this.setRef} {...dragHandleProps}>

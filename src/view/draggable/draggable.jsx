@@ -179,6 +179,8 @@ export default class Draggable extends React.Component<Props> {
   };
 
   getDraggableRef = (): ?HTMLElement => this.ref;
+  getShouldRespectForceTouch = (): boolean =>
+    this.props.shouldRespectForceTouch;
 
   getDraggingStyle = memoizeOne(
     (dragging: DraggingMapProps): DraggingStyle => {
@@ -349,6 +351,7 @@ export default class Draggable extends React.Component<Props> {
           isEnabled={!isDragDisabled}
           callbacks={this.callbacks}
           getDraggableRef={this.getDraggableRef}
+          getShouldRespectForceTouch={this.getShouldRespectForceTouch}
           // by default we do not allow dragging on interactive elements
           canDragInteractiveElements={disableInteractiveElementBlocking}
         >

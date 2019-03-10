@@ -106,6 +106,7 @@ export default ({
   callbacks,
   getWindow,
   canStartCapturing,
+  getShouldRespectForceTouch,
 }: CreateSensorArgs): TouchSensor => {
   let state: State = initial;
 
@@ -345,6 +346,10 @@ export default ({
     {
       eventName: 'touchforcechange',
       fn: (event: TouchEvent) => {
+        if (!state.isDragging && !state.pending) {
+          return;
+        }
+
         // A force push action will no longer fire after a touchmove
         if (state.hasMoved) {
           // This is being super safe. While this situation should not occur we
@@ -354,6 +359,12 @@ export default ({
         }
 
         // A drag could be pending or has already started but no movement has occurred
+
+        // Not respecting force touches - prevent the event
+        if (!getShouldRespectForceTouch()) {
+          event.preventDefault();
+          return;
+        }
 
         const touch: TouchWithForce = (event.touches[0]: any);
 

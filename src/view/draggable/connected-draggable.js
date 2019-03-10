@@ -262,8 +262,10 @@ const mapDispatchToProps: DispatchProps = {
 
 const defaultProps = ({
   isDragDisabled: false,
-  // cannot drag interactive elements by default
+  // Cannot drag interactive elements by default
   disableInteractiveElementBlocking: false,
+  // Respecting browser force touch interaction by default
+  shouldRespectForceTouch: true,
 }: DefaultProps);
 
 // Abstract class allows to specify props and defaults to component.

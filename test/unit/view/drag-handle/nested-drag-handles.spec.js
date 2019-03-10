@@ -26,6 +26,7 @@ const getNestedWrapper = (
       isDropAnimating={false}
       isEnabled
       getDraggableRef={parent.getRef}
+      getShouldRespectForceTouch={() => true}
       canDragInteractiveElements={false}
     >
       {(parentProps: ?DragHandleProps) => (
@@ -42,6 +43,7 @@ const getNestedWrapper = (
             isEnabled
             getDraggableRef={inner.getRef}
             canDragInteractiveElements={false}
+            getShouldRespectForceTouch={() => true}
           >
             {(childProps: ?DragHandleProps) => (
               <Child

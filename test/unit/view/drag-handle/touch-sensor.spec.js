@@ -625,79 +625,175 @@ describe('force press', () => {
       ],
     });
 
-  describe('drag not yet started', () => {
-    it('should not start a drag if a force press occurs', () => {
-      touchStart(wrapper);
-      const event: Event = windowForcePress(forcePressThreshold);
-      // would normally start a drag
-      jest.runAllTimers();
+  describe('force touch respected', () => {
+    describe('drag not yet started', () => {
+      it('should not start a drag if a force press occurs', () => {
+        touchStart(wrapper);
+        const event: Event = windowForcePress(forcePressThreshold);
+        // would normally start a drag
+        jest.runAllTimers();
 
-      expect(
-        callbacksCalled(callbacks)({
-          onLift: 0,
-        }),
-      ).toBe(true);
-      // This is an indirect cancel
-      expect(event.defaultPrevented).toBe(false);
-    });
+        expect(
+          callbacksCalled(callbacks)({
+            onLift: 0,
+          }),
+        ).toBe(true);
+        // This is an indirect cancel
+        expect(event.defaultPrevented).toBe(false);
+      });
 
-    it('should not block lifting if the force press is not strong enough', () => {
-      touchStart(wrapper);
-      windowForcePress(forcePressThreshold - 0.1);
-      // would normally start a drag
-      jest.runAllTimers();
-
-      expect(
-        callbacksCalled(callbacks)({
-          onLift: 1,
-        }),
-      ).toBe(true);
-    });
-  });
-
-  describe('drag started', () => {
-    it('should cancel the drag if no movement has occurred yet', () => {
-      start();
-      const event: Event = windowForcePress();
-
-      expect(
-        callbacksCalled(callbacks)({
-          onLift: 1,
-          onCancel: 1,
-        }),
-      ).toBe(true);
-      // we are not preventing the force press
-      expect(event.defaultPrevented).toBe(false);
-    });
-
-    describe('force press after drag movement', () => {
-      // This situation should not be possible, but we are being extra careful
-
-      it('should not cancel the drag', () => {
-        start();
-        windowTouchMove({ x: 10, y: 20 });
-        // drag has started
-        windowForcePress();
+      it('should not block lifting if the force press is not strong enough', () => {
+        touchStart(wrapper);
+        windowForcePress(forcePressThreshold - 0.1);
+        // would normally start a drag
+        jest.runAllTimers();
 
         expect(
           callbacksCalled(callbacks)({
             onLift: 1,
-            onCancel: 0,
           }),
         ).toBe(true);
       });
 
-      it('should prevent a force press action', () => {
-        start();
-        windowTouchMove({ x: 10, y: 20 });
+      it('should block lifting if the force press is strong enough', () => {
+        touchStart(wrapper);
+        windowForcePress(forcePressThreshold);
+        // would normally start a drag
+        jest.runAllTimers();
 
-        const weak: Event = windowForcePress(0);
-        const strong: Event = windowForcePress(forcePressThreshold);
-
-        // does not matter what type of force press
-        expect(weak.defaultPrevented).toBe(true);
-        expect(strong.defaultPrevented).toBe(true);
+        expect(
+          callbacksCalled(callbacks)({
+            onLift: 0,
+          }),
+        ).toBe(true);
       });
+    });
+
+    describe('drag started', () => {
+      it('should cancel the drag if no movement has occurred yet', () => {
+        start();
+        const event: Event = windowForcePress();
+
+        expect(
+          callbacksCalled(callbacks)({
+            onLift: 1,
+            onCancel: 1,
+          }),
+        ).toBe(true);
+        // we are not preventing the force press
+        expect(event.defaultPrevented).toBe(false);
+      });
+
+      describe('force press after drag movement', () => {
+        // This situation should not be possible, but we are being extra careful
+
+        it('should not cancel the drag', () => {
+          start();
+          windowTouchMove({ x: 10, y: 20 });
+          // drag has started
+          windowForcePress();
+
+          expect(
+            callbacksCalled(callbacks)({
+              onLift: 1,
+              onCancel: 0,
+            }),
+          ).toBe(true);
+        });
+
+        it('should prevent a force press action', () => {
+          start();
+          windowTouchMove({ x: 10, y: 20 });
+
+          const weak: Event = windowForcePress(0);
+          const strong: Event = windowForcePress(forcePressThreshold);
+
+          // does not matter what type of force press
+          expect(weak.defaultPrevented).toBe(true);
+          expect(strong.defaultPrevented).toBe(true);
+        });
+      });
+    });
+  });
+
+  describe('force touch not respected', () => {
+    let customCallbacks: Callbacks;
+    let notRespected: ReactWrapper<*>;
+    beforeEach(() => {
+      customCallbacks = getStubCallbacks();
+      notRespected = getWrapper(
+        customCallbacks,
+        undefined,
+        // should not respect force touch
+        false,
+      );
+    });
+
+    afterEach(() => {
+      notRespected.unmount();
+    });
+
+    it('should not cancel a lift if a force press is fired while a lift is pending', () => {
+      touchStart(notRespected);
+      // would cancel a pending drag if force touch is respected
+      windowForcePress(forcePressThreshold);
+      jest.runAllTimers();
+
+      expect(
+        callbacksCalled(customCallbacks)({
+          onLift: 1,
+        }),
+      ).toBe(true);
+    });
+
+    it('should not cancel a drag if a force press occurs during a drag (before movement)', () => {
+      // drag started but no movement yet
+      touchStart(notRespected);
+      jest.runAllTimers();
+      expect(
+        callbacksCalled(customCallbacks)({
+          onLift: 1,
+        }),
+      ).toBe(true);
+
+      // not cancelling the drag with a force press
+      windowForcePress(forcePressThreshold);
+      expect(
+        callbacksCalled(customCallbacks)({
+          onLift: 1,
+          onCancel: 0,
+        }),
+      ).toBe(true);
+    });
+
+    it('should not cancel a drag if a force press occurs during a drag (after movement)', () => {
+      // drag started
+      touchStart(notRespected);
+      jest.runAllTimers();
+      expect(
+        callbacksCalled(customCallbacks)({
+          onLift: 1,
+        }),
+      ).toBe(true);
+
+      // movement
+      move({ x: 10, y: 20 });
+      expect(
+        callbacksCalled(customCallbacks)({
+          onLift: 1,
+          onMove: 1,
+        }),
+      ).toBe(true);
+
+      // not cancelling the drag with a force press
+      windowForcePress(forcePressThreshold);
+      expect(
+        callbacksCalled(customCallbacks)({
+          onLift: 1,
+          onMove: 1,
+          onCancel: 0,
+        }),
+      ).toBe(true);
     });
   });
 });
