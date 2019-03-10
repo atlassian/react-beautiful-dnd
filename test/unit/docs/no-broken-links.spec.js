@@ -1,5 +1,6 @@
 // @flow
 import globby from 'globby';
+/* $FlowFixMe: flow is saying there is no default export from fs-extra */
 import fs from 'fs-extra';
 import getProcessor from 'markdown-it';
 // Disabling eslint design to prevent using regeneratorRuntime in distributions

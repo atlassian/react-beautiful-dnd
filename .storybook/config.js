@@ -1,21 +1,29 @@
 import React from 'react';
-import { configure, addDecorator } from '@storybook/react';
-import { withOptions } from '@storybook/addon-options';
-import PopIframeDecorator from './decorator/pop-iframe';
+import { addParameters, configure, addDecorator } from '@storybook/react';
+import { create } from '@storybook/theming';
 import GlobalStylesDecorator from './decorator/global-styles';
 // adding css reset - storybook includes a css loader
 import '@atlaskit/css-reset';
+import { colors } from '@atlaskit/theme';
+import logo from './compressed-logo-rbd.svg';
 import { version } from '../package.json';
 
-addDecorator(
-  withOptions({
-    name: 'react-beautiful-dnd',
-    url: 'https://github.com/atlassian/react-beautiful-dnd',
-  }),
-);
+const theme = create({
+  brandImage: logo,
+  brandName: 'react-beautiful-dnd',
+  brandUrl: 'https://github.com/atlassian/react-beautiful-dnd',
+});
 
+addParameters({
+  options: {
+    // currently not using any addons
+    showPanel: false,
+    theme,
+  },
+});
+
+// Using theme would be good for this, but it looks like theme is just for the chrome around the story
 addDecorator(GlobalStylesDecorator);
-addDecorator(PopIframeDecorator);
 
 // automatically import all files ending in *.stories.js
 const req = require.context('../stories/', true, /.stories.js$/);
