@@ -22,8 +22,7 @@ addParameters({
   },
 });
 
-// TODO: use theme
-// It looks like the docs are a bit out of sync for v5 so i'll leave this for now
+// Using theme would be good for this, but it looks like theme is just for the chrome around the story
 addDecorator(GlobalStylesDecorator);
 
 // automatically import all files ending in *.stories.js

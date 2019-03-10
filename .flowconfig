@@ -1,7 +1,6 @@
 [untyped]
 # Issue with atlaskit/theme typing
 .*/node_modules/@atlaskit/theme
-.*/node_modules/@emotion/core
 
 [libs]
 ./flow-typed/custom/
