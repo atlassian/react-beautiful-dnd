@@ -4,7 +4,7 @@ import { getPreset } from './dimension';
 import { vertical } from '../../src/state/axis';
 import getViewport from '../../src/view/window/get-viewport';
 import { add } from '../../src/state/position';
-import getHomeImpact from '../../src/state/get-home-impact';
+import getHomeOnLift from '../../src/state/get-home-on-lift';
 import getHomeLocation from '../../src/state/get-home-location';
 import { forward } from '../../src/state/user-direction/user-direction-preset';
 import type {
@@ -13,7 +13,8 @@ import type {
   IdleState,
   DraggableDimension,
   DroppableDimension,
-  PendingDrop,
+  DropResult,
+  CompletedDrag,
   DropReason,
   DraggableId,
   DropAnimatingState,
@@ -36,6 +37,8 @@ export default (axis?: Axis = vertical) => {
 
   const idle: IdleState = {
     phase: 'IDLE',
+    completed: null,
+    shouldFlush: false,
   };
 
   const origin: Position = { x: 0, y: 0 };
@@ -72,6 +75,13 @@ export default (axis?: Axis = vertical) => {
       page,
     };
 
+    const { impact, onLift } = getHomeOnLift({
+      draggable,
+      home: droppable,
+      draggables: preset.dimensions.draggables,
+      viewport,
+    });
+
     const result: DraggingState = {
       phase: 'DRAGGING',
       critical: ourCritical,
@@ -80,7 +90,9 @@ export default (axis?: Axis = vertical) => {
       dimensions: preset.dimensions,
       initial,
       current: initial,
-      impact: getHomeImpact(draggable, droppable),
+      impact,
+      onLift,
+      onLiftImpact: impact,
       userDirection: forward,
       isWindowScrollAllowed: true,
       viewport,
@@ -142,30 +154,48 @@ export default (axis?: Axis = vertical) => {
     const draggable: DraggableDimension = preset.draggables[id];
     const home: DroppableDimension =
       preset.droppables[draggable.descriptor.droppableId];
-    const pending: PendingDrop = {
-      newHomeClientOffset: { x: 10, y: 20 },
-      dropDuration: 1,
-      impact: getHomeImpact(draggable, home),
-      result: {
-        draggableId: draggable.descriptor.id,
-        type: draggable.descriptor.type,
-        source: {
-          droppableId: draggable.descriptor.droppableId,
-          index: draggable.descriptor.index,
-        },
-        destination: getHomeLocation(draggable.descriptor),
-        reason,
-        combine: null,
-        mode: 'FLUID',
+
+    const { impact } = getHomeOnLift({
+      draggable,
+      home,
+      draggables: preset.dimensions.draggables,
+      viewport: preset.viewport,
+    });
+
+    const result: DropResult = {
+      draggableId: draggable.descriptor.id,
+      type: draggable.descriptor.type,
+      source: {
+        droppableId: draggable.descriptor.droppableId,
+        index: draggable.descriptor.index,
       },
+      // no destination when cancelling for result
+      destination:
+        reason === 'DROP' ? getHomeLocation(draggable.descriptor) : null,
+      reason,
+      combine: null,
+      mode: 'FLUID',
     };
 
-    const result: DropAnimatingState = {
-      phase: 'DROP_ANIMATING',
-      pending,
-      dimensions: preset.dimensions,
+    const ourCritical: Critical = {
+      draggable: draggable.descriptor,
+      droppable: home.descriptor,
     };
-    return result;
+
+    const completed: CompletedDrag = {
+      critical: ourCritical,
+      impact,
+      result,
+    };
+
+    const state: DropAnimatingState = {
+      phase: 'DROP_ANIMATING',
+      completed,
+      dimensions: preset.dimensions,
+      newHomeClientOffset: { x: 10, y: 20 },
+      dropDuration: 1,
+    };
+    return state;
   };
 
   const dropAnimating = (

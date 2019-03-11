@@ -16,7 +16,7 @@ const getRemoveCount = (): number =>
   countWithErrorsExcluded(window.removeEventListener);
 
 forEach((control: Control) => {
-  let wrapper: ReactWrapper;
+  let wrapper: ReactWrapper<*>;
   let callbacks: Callbacks;
 
   beforeEach(() => {

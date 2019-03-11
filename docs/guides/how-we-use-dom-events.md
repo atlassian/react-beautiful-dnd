@@ -16,10 +16,10 @@ Without needing going into all the details below, here are the safest event hand
 
 > These can be added on the _drag handle_, anywhere else higher on the tree or to the window directly.
 
-- `onClick`: the `event.defaultPrevented` property will be set to `true` if occurred as a part of the drag interaction. This is true even if the drag was not finished with a pre-click action such as `mouseup` or `touchend`. See [sloppy clicks and click prevention](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-prevention-).
-- `onKeyDown`: the `event.defaultPrevented` property will be set to `true` if it was used as a part of a drag. If you add `onKeyDown` to the _drag handle_ you will need to monkey patch the [`DragHandleProps`](https://github.com/atlassian/react-beautiful-dnd#draghandleprops-type-information) `onKeyDown` event handler.
+- `onClick`: the `event.defaultPrevented` property will be set to `true` if occurred as a part of the drag interaction. This is true even if the drag was not finished with a pre-click action such as `mouseup` or `touchend`. See [sloppy clicks and click prevention](/docs/sensors/mouse.md#sloppy-clicks-and-click-prevention-).
+- `onKeyDown`: the `event.defaultPrevented` property will be set to `true` if it was used as a part of a drag. If you add `onKeyDown` to the _drag handle_ you will need to monkey patch the [`DragHandleProps`](/docs/api/draggable.md) `onKeyDown` event handler.
 
-You may need to enchance the logic of your event handlers with information from [`onDragStart`](https://github.com/atlassian/react-beautiful-dnd#ondragstart-optional) and [`onDragEnd`](https://github.com/atlassian/react-beautiful-dnd#ondragend-required) to know about whether a drag is occuring while those events fire.
+You may need to enchance the logic of your event handlers with information from [`onDragStart`](/docs/guides/responders.md) and [`onDragEnd`](/docs/guides/responders.md) to know about whether a drag is occuring while those events fire.
 
 You are welcome to add other event handlers but you may be more reliant on `onDragStart` and `onDragEnd` information.
 
@@ -67,7 +67,7 @@ When the user first performs a `mousedown` on a _drag handle_ we are not sure if
 
 - `preventDefault()` not called on `mousemove`
 
-The user needs to move a small threshold before we consider the movement to be a drag. In this period of time we do not call `preventDefault()` on any `mousemove` events as we are not sure if they are dragging or just performing a [sloppy click](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-prevention-)
+The user needs to move a small threshold before we consider the movement to be a drag. In this period of time we do not call `preventDefault()` on any `mousemove` events as we are not sure if they are dragging or just performing a [sloppy click](/docs/sensors/mouse.md#sloppy-clicks-and-click-prevention-)
 
 ### The user has indicated that they are not mouse dragging
 
@@ -84,7 +84,7 @@ The user needs to move a small threshold before we consider the movement to be a
 
 - `preventDefault()` is called on a `mouseup` if it ended the drag
 - `preventDefault()` is called on a **escape** <kbd>esc</kbd> `keydown` if it ended the drag as it directly ended the drag
-- `preventDefault()` is called on the next `click` event regardless of how the drag ended. See [sloppy clicks and click prevention](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-prevention-)
+- `preventDefault()` is called on the next `click` event regardless of how the drag ended. See [sloppy clicks and click prevention](/docs/sensors/mouse.md#sloppy-clicks-and-click-prevention-)
 - `preventDefault()` is not called on other events such as `resize` that indirectly ended a drag
 - `preventDefault()` is not called on `keyup` events even if they caused the drag to end
 
@@ -96,7 +96,7 @@ The user needs to move a small threshold before we consider the movement to be a
 
 - `preventDefault()` is not called on `touchstart`.
 
-When a user presses their finger (or other input) on a `Draggable` we are not sure if they where intending to _tap_, _force press_, _scroll the container_ or _drag_. Because we do not know what the user is trying to do yet we do not call `preventDefault()` on the event.
+When a user presses their finger (or other input) on a `<Draggable />` we are not sure if they where intending to _tap_, _force press_, _scroll the container_ or _drag_. Because we do not know what the user is trying to do yet we do not call `preventDefault()` on the event.
 
 ### The user has indicated that they are not touch dragging
 
@@ -121,11 +121,21 @@ It is possible to cancel a touch drag with over events such as an `orientationch
 
 ### Force press
 
-> See [force press support](https://github.com/atlassian/react-beautiful-dnd#force-press-support)
+> See [force press support](/docs/sensors/touch.md#force-press-support)
+
+#### `<Draggable shouldRespectForceTouch />` (the default)
+
+> Respecting standard force touch interactions
 
 - `preventDefault()` is not called on `touchforcechange` if a drag has not started yet
 - `preventDefault()` is not called on `touchforcechange` a drag that has started but no movement has occurred yet. The force press cancels the drag and is an indirect cancel.
 - `preventDefault()` is called after on `touchforcechange` a drag has started and a `touchmove` has fired. This is defensive as a force press `touchforcechange` should not occur after a `touchmove`.
+
+#### `<Draggable shouldRespectForceTouch={false} />`
+
+> Opting out of force change events
+
+`preventDefault()` is called on all `touchforcechange` events
 
 ## Keyboard dragging 🎹
 
@@ -148,3 +158,5 @@ Unlike mouse dragging a keyboard drag starts as soon as the user presses the **s
 - `preventDefault()` is called on a `keydown` if it is the **spacebar** <kbd>space</kbd> key as it is dropping the item
 - `preventDefault()` is called on a `keydown` if it is the **escape** <kbd>esc</kbd> key as it is explicitly cancelling the drag
 - `preventDefault()` is not called on events that indirectly cancel a drag such as `resize` or `mousedown`.
+
+[← Back to documentation](/README.md#documentation-)

@@ -1,7 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
-import { grid, colors, borderRadius } from '../constants';
+import styled from '@emotion/styled';
+import { colors } from '@atlaskit/theme';
+import { grid, borderRadius } from '../constants';
 import { Draggable } from '../../../src';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import QuoteList from '../primatives/quote-list';
@@ -21,11 +22,11 @@ const Header = styled.div`
   border-top-left-radius: ${borderRadius}px;
   border-top-right-radius: ${borderRadius}px;
   background-color: ${({ isDragging }) =>
-    isDragging ? colors.blue.lighter : colors.blue.light};
-  transition: background-color 0.1s ease;
+    isDragging ? colors.G50 : colors.N30};
+  transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: ${colors.blue.lighter};
+    background-color: ${colors.G50};
   }
 `;
 
@@ -57,6 +58,9 @@ export default class Column extends Component<Props> {
             <QuoteList
               listId={title}
               listType="QUOTE"
+              style={{
+                backgroundColor: snapshot.isDragging ? colors.G50 : null,
+              }}
               quotes={quotes}
               internalScroll={this.props.isScrollable}
               isCombineEnabled={Boolean(this.props.isCombineEnabled)}

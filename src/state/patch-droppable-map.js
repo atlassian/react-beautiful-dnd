@@ -1,13 +1,10 @@
 // @flow
-import type { DroppableDimension, DimensionMap } from '../types';
+import type { DroppableDimension, DroppableDimensionMap } from '../types';
 
 export default (
-  dimensions: DimensionMap,
+  droppables: DroppableDimensionMap,
   updated: DroppableDimension,
-): DimensionMap => ({
-  ...dimensions,
-  droppables: {
-    ...dimensions.droppables,
-    [updated.descriptor.id]: updated,
-  },
+): DroppableDimensionMap => ({
+  ...droppables,
+  [updated.descriptor.id]: updated,
 });

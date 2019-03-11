@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import PropTypes from 'prop-types';
-import { storeKey, canLiftContextKey } from '../../../../src/view/context-keys';
+import { storeKey, canLiftKey } from '../../../../src/view/context-keys';
 
 export default class App extends React.Component<*> {
   // Part of reacts api is to use flow types for this.
@@ -12,7 +12,7 @@ export default class App extends React.Component<*> {
       subscribe: PropTypes.func.isRequired,
       getState: PropTypes.func.isRequired,
     }).isRequired,
-    [canLiftContextKey]: PropTypes.func.isRequired,
+    [canLiftKey]: PropTypes.func.isRequired,
   };
 
   render() {

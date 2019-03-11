@@ -1,10 +1,11 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
+import { colors } from '@atlaskit/theme';
 import { Droppable, Draggable } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
 import Title from '../primatives/title';
-import { grid, colors } from '../constants';
+import { grid } from '../constants';
 import type { Quote } from '../types';
 import type { NestedQuoteList } from './types';
 import type {
@@ -20,7 +21,7 @@ const Root = styled.div`
 
 const Container = styled.div`
   background-color: ${({ isDraggingOver }) =>
-    isDraggingOver ? colors.blue.lighter : colors.blue.light};
+    isDraggingOver ? colors.B50 : colors.B75};
   display: flex;
   flex-direction: column;
   padding: ${grid}px;
@@ -29,7 +30,7 @@ const Container = styled.div`
   transition: background-color 0.1s ease;
 
   &:focus {
-    outline: 2px solid ${colors.purple};
+    outline: 2px solid ${colors.P200};
     outline-offset: 2px;
   }
 `;

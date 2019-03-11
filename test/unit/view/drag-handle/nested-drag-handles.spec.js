@@ -14,7 +14,7 @@ import { createRef, Child } from './util/wrappers';
 const getNestedWrapper = (
   parentCallbacks: Callbacks,
   childCallbacks: Callbacks,
-): ReactWrapper => {
+): ReactWrapper<*> => {
   const parent = createRef();
   const inner = createRef();
 
@@ -26,6 +26,7 @@ const getNestedWrapper = (
       isDropAnimating={false}
       isEnabled
       getDraggableRef={parent.getRef}
+      getShouldRespectForceTouch={() => true}
       canDragInteractiveElements={false}
     >
       {(parentProps: ?DragHandleProps) => (
@@ -42,6 +43,7 @@ const getNestedWrapper = (
             isEnabled
             getDraggableRef={inner.getRef}
             canDragInteractiveElements={false}
+            getShouldRespectForceTouch={() => true}
           >
             {(childProps: ?DragHandleProps) => (
               <Child
@@ -64,11 +66,11 @@ forEach((control: Control) => {
   it('should not start a drag on a parent if a child drag handle has already received the event', () => {
     const parentCallbacks = getStubCallbacks();
     const childCallbacks = getStubCallbacks();
-    const nested: ReactWrapper = getNestedWrapper(
+    const nested: ReactWrapper<*> = getNestedWrapper(
       parentCallbacks,
       childCallbacks,
     );
-    const child: ReactWrapper = nested.find('.child').first();
+    const child: ReactWrapper<*> = nested.find('.child').first();
 
     // React enzyme will bubble events within a wrapper
     control.preLift(child);
@@ -84,11 +86,11 @@ forEach((control: Control) => {
   it('should start a drag on a parent the event is trigged on the parent', () => {
     const parentCallbacks = getStubCallbacks();
     const childCallbacks = getStubCallbacks();
-    const nested: ReactWrapper = getNestedWrapper(
+    const nested: ReactWrapper<*> = getNestedWrapper(
       parentCallbacks,
       childCallbacks,
     );
-    const parent: ReactWrapper = nested.find('.parent').first();
+    const parent: ReactWrapper<*> = nested.find('.parent').first();
 
     control.preLift(parent);
     control.lift(parent);

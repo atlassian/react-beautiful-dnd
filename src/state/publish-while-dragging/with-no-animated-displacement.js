@@ -11,6 +11,10 @@ export default (impact: DragImpact): DragImpact => {
 
   const withoutAnimation: Displacement[] = displaced.map(
     (displacement: Displacement): Displacement => {
+      if (!displacement.isVisible) {
+        return displacement;
+      }
+
       // Already do not need to animate it - can return as is
       if (!displacement.shouldAnimate) {
         return displacement;

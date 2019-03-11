@@ -24,8 +24,9 @@ import type { Store } from '../../state/store-types';
 import {
   storeKey,
   dimensionMarshalKey,
-  styleContextKey,
-  canLiftContextKey,
+  styleKey,
+  canLiftKey,
+  isMovementAllowedKey,
 } from '../context-keys';
 import {
   clean,
@@ -40,6 +41,7 @@ import { getFormattedMessage } from '../../dev-warning';
 import { peerDependencies } from '../../../package.json';
 import checkReactVersion from './check-react-version';
 import checkDoctype from './check-doctype';
+import isMovementAllowed from '../../state/is-movement-allowed';
 
 type Props = {|
   ...Responders,
@@ -147,16 +149,18 @@ export default class DragDropContext extends React.Component<Props> {
       getState: PropTypes.func.isRequired,
     }).isRequired,
     [dimensionMarshalKey]: PropTypes.object.isRequired,
-    [styleContextKey]: PropTypes.string.isRequired,
-    [canLiftContextKey]: PropTypes.func.isRequired,
+    [styleKey]: PropTypes.string.isRequired,
+    [canLiftKey]: PropTypes.func.isRequired,
+    [isMovementAllowedKey]: PropTypes.func.isRequired,
   };
 
   getChildContext(): Context {
     return {
       [storeKey]: this.store,
       [dimensionMarshalKey]: this.dimensionMarshal,
-      [styleContextKey]: this.styleMarshal.styleContext,
-      [canLiftContextKey]: this.canLift,
+      [styleKey]: this.styleMarshal.styleContext,
+      [canLiftKey]: this.canLift,
+      [isMovementAllowedKey]: this.getIsMovementAllowed,
     };
   }
 
@@ -168,6 +172,7 @@ export default class DragDropContext extends React.Component<Props> {
   // on drag start which is too expensive.
   // This is useful when the user
   canLift = (id: DraggableId) => canStartDrag(this.store.getState(), id);
+  getIsMovementAllowed = () => isMovementAllowed(this.store.getState());
 
   componentDidMount() {
     window.addEventListener('error', this.onWindowError);

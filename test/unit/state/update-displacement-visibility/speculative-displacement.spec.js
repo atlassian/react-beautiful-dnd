@@ -18,7 +18,6 @@ import {
   getDroppableDimension,
 } from '../../../utils/dimension';
 import speculativelyIncrease from '../../../../src/state/update-displacement-visibility/speculatively-increase';
-import getHomeImpact from '../../../../src/state/get-home-impact';
 import noImpact from '../../../../src/state/no-impact';
 import { createViewport } from '../../../utils/viewport';
 import { origin, patch } from '../../../../src/state/position';
@@ -26,38 +25,32 @@ import { vertical, horizontal } from '../../../../src/state/axis';
 import { toDraggableMap } from '../../../../src/state/dimension-structures';
 import getDisplacementMap from '../../../../src/state/get-displacement-map';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import getVisibleDisplacement from '../../../utils/get-visible-displacement';
+import getVisibleDisplacement from '../../../utils/get-displacement/get-visible-displacement';
+import getNotVisibleDisplacement from '../../../utils/get-displacement/get-not-visible-displacement';
+import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-animated-displacement';
 import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
-
-const getNotVisibleDisplacement = (
-  draggable: DraggableDimension,
-): Displacement => ({
-  draggableId: draggable.descriptor.id,
-  shouldAnimate: false,
-  isVisible: false,
-});
-
-const getVisibleDisplacementWithoutAnimation = (
-  draggable: DraggableDimension,
-): Displacement => ({
-  draggableId: draggable.descriptor.id,
-  shouldAnimate: false,
-  isVisible: true,
-});
+import getHomeOnLift from '../../../../src/state/get-home-on-lift';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     it('should do nothing when there is no displacement', () => {
-      const preset = getPreset();
+      const preset = getPreset(axis);
+      const { onLift, impact: homeImpact } = getHomeOnLift({
+        draggable: preset.inHome1,
+        draggables: preset.draggables,
+        home: preset.home,
+        viewport: preset.viewport,
+      });
 
       const impact1: DragImpact = speculativelyIncrease({
-        impact: getHomeImpact(preset.inHome1, preset.home),
+        impact: homeImpact,
         viewport: preset.viewport,
         destination: preset.home,
         draggables: preset.draggables,
         maxScrollChange: { x: 1000, y: 1000 },
+        onLift,
       });
-      expect(impact1).toEqual(getHomeImpact(preset.inHome1, preset.home));
+      expect(impact1).toEqual(homeImpact);
 
       const impact2: DragImpact = speculativelyIncrease({
         impact: noImpact,
@@ -65,6 +58,7 @@ const getVisibleDisplacementWithoutAnimation = (
         destination: preset.home,
         draggables: preset.draggables,
         maxScrollChange: { x: 1000, y: 1000 },
+        onLift,
       });
       expect(impact2).toEqual(noImpact);
     });
@@ -266,13 +260,15 @@ const getVisibleDisplacementWithoutAnimation = (
       ).toBe(false);
 
       // inHome1 has moved into the foreign list below inForeign1
-      const willDisplaceForward: boolean = true;
-      const displacedBy: DisplacedBy = getDisplacedBy(
-        axis,
-        inHome1.displaceBy,
-        willDisplaceForward,
-      );
+      const displacedBy: DisplacedBy = getDisplacedBy(axis, inHome1.displaceBy);
+      const { onLift } = getHomeOnLift({
+        draggable: inHome1,
+        draggables,
+        home,
+        viewport,
+      });
 
+      // moved inHome1 over foreign
       const initial: Displacement[] = [
         // would normally be visible in viewport
         getVisibleDisplacement(inForeign2),
@@ -285,10 +281,8 @@ const getVisibleDisplacementWithoutAnimation = (
         movement: {
           displaced: initial,
           map: getDisplacementMap(initial),
-          willDisplaceForward,
           displacedBy,
         },
-        direction: axis.direction,
         destination: {
           droppableId: foreign.descriptor.id,
           index: inForeign2.descriptor.index,
@@ -302,14 +296,15 @@ const getVisibleDisplacementWithoutAnimation = (
         destination: foreign,
         draggables,
         maxScrollChange: patch(axis.line, sizeOfInHome1),
+        onLift,
       });
 
       const displaced: Displacement[] = [
         // already visibly displaced
         getVisibleDisplacement(inForeign2),
         // speculatively increased
-        getVisibleDisplacementWithoutAnimation(inForeign3),
-        getVisibleDisplacementWithoutAnimation(inForeign4),
+        getNotAnimatedDisplacement(inForeign3),
+        getNotAnimatedDisplacement(inForeign4),
         // not speculatively increased
         getNotVisibleDisplacement(inForeign5),
       ];
@@ -319,7 +314,6 @@ const getVisibleDisplacementWithoutAnimation = (
         movement: {
           displaced,
           map: getDisplacementMap(displaced),
-          willDisplaceForward,
           displacedBy,
         },
       };
@@ -417,12 +411,13 @@ const getVisibleDisplacementWithoutAnimation = (
       ).toBe(false);
 
       // inHome1 has moved into the foreign list below inForeign1
-      const willDisplaceForward: boolean = true;
-      const displacedBy: DisplacedBy = getDisplacedBy(
-        axis,
-        inHome1.displaceBy,
-        willDisplaceForward,
-      );
+      const displacedBy: DisplacedBy = getDisplacedBy(axis, inHome1.displaceBy);
+      const { onLift } = getHomeOnLift({
+        draggable: inHome1,
+        draggables,
+        home,
+        viewport,
+      });
 
       const initial: Displacement[] = [
         // would normally be visible in viewport
@@ -436,10 +431,8 @@ const getVisibleDisplacementWithoutAnimation = (
         movement: {
           displaced: initial,
           map: getDisplacementMap(initial),
-          willDisplaceForward,
           displacedBy,
         },
-        direction: axis.direction,
         destination: {
           droppableId: foreign.descriptor.id,
           index: inForeign2.descriptor.index,
@@ -453,14 +446,15 @@ const getVisibleDisplacementWithoutAnimation = (
         destination: foreign,
         draggables,
         maxScrollChange: patch(axis.line, sizeOfInHome1),
+        onLift,
       });
 
       const displaced: Displacement[] = [
         // already visibly displaced
         getVisibleDisplacement(inForeign2),
         // speculatively increased
-        getVisibleDisplacementWithoutAnimation(inForeign3),
-        getVisibleDisplacementWithoutAnimation(inForeign4),
+        getNotAnimatedDisplacement(inForeign3),
+        getNotAnimatedDisplacement(inForeign4),
         // not speculatively increased
         getNotVisibleDisplacement(inForeign5),
       ];
@@ -470,7 +464,6 @@ const getVisibleDisplacementWithoutAnimation = (
         movement: {
           displaced,
           map: getDisplacementMap(displaced),
-          willDisplaceForward,
           displacedBy,
         },
       };

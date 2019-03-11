@@ -132,7 +132,7 @@ describe('dimension registration', () => {
 describe('dimension publishing', () => {
   // we are doing this rather than spying on the prototype.
   // Sometimes setRef was being provided with an element that did not have the mocked prototype :|
-  const setBoundingClientRect = (wrapper: ReactWrapper, borderBox: Rect) => {
+  const setBoundingClientRect = (wrapper: ReactWrapper<*>, borderBox: Rect) => {
     const ref: ?HTMLElement = wrapper.instance().getRef();
     invariant(ref);
 
@@ -161,7 +161,7 @@ describe('dimension publishing', () => {
       .mockImplementation(() => noComputedSpacing);
     const marshal: DimensionMarshal = getMarshalStub();
 
-    const wrapper: ReactWrapper = mount(
+    const wrapper: ReactWrapper<*> = mount(
       <Item
         draggableId={expected.descriptor.id}
         index={expected.descriptor.index}
@@ -207,7 +207,7 @@ describe('dimension publishing', () => {
       .mockImplementation(() => getComputedSpacing({ margin }));
     const marshal: DimensionMarshal = getMarshalStub();
 
-    const wrapper: ReactWrapper = mount(
+    const wrapper: ReactWrapper<*> = mount(
       <Item
         draggableId={expected.descriptor.id}
         index={expected.descriptor.index}
@@ -247,7 +247,7 @@ describe('dimension publishing', () => {
       .spyOn(window, 'getComputedStyle')
       .mockImplementation(() => noComputedSpacing);
 
-    const wrapper: ReactWrapper = mount(
+    const wrapper: ReactWrapper<*> = mount(
       <Item
         draggableId={expected.descriptor.id}
         index={expected.descriptor.index}
@@ -284,7 +284,7 @@ describe('dimension publishing', () => {
     }
     const marshal: DimensionMarshal = getMarshalStub();
 
-    const wrapper: ReactWrapper = mount(
+    const wrapper: ReactWrapper<*> = mount(
       <NoRefItem />,
       withDimensionMarshal(marshal),
     );

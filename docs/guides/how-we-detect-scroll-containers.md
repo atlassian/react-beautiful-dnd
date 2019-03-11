@@ -56,3 +56,5 @@ We have some playgrounds on `codepen` that can be a good start for digging into 
 > Try changing the `overflow`, `height` and `width` properties on the `html` and `body` elements
 
 It looks like when the `html` element has some `width` and `height` related properties set then this can impact things. However, finding a purely javascript solution for detecting this has alluded us so far
+
+[← Back to documentation](/README.md#documentation-)

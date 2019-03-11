@@ -4,9 +4,10 @@ import {
   storeKey,
   droppableIdKey,
   dimensionMarshalKey,
-  styleContextKey,
-  canLiftContextKey,
+  styleKey,
+  canLiftKey,
   droppableTypeKey,
+  isMovementAllowedKey,
 } from '../../src/view/context-keys';
 import createStore from '../../src/state/create-store';
 import { getMarshalStub } from './dimension-marshal';
@@ -71,19 +72,19 @@ export const withDroppableType = (type: TypeId): Object => ({
 
 export const withStyleContext = (marshal?: StyleMarshal): Object => ({
   context: {
-    [styleContextKey]: marshal ? marshal.styleContext : 'fake-style-context',
+    [styleKey]: marshal ? marshal.styleContext : 'fake-style-context',
   },
   childContextTypes: {
-    [styleContextKey]: PropTypes.string.isRequired,
+    [styleKey]: PropTypes.string.isRequired,
   },
 });
 
 export const withCanLift = (): Object => ({
   context: {
-    [canLiftContextKey]: () => true,
+    [canLiftKey]: () => true,
   },
   childContextTypes: {
-    [canLiftContextKey]: PropTypes.func.isRequired,
+    [canLiftKey]: PropTypes.func.isRequired,
   },
 });
 
@@ -93,6 +94,17 @@ export const withDimensionMarshal = (marshal?: DimensionMarshal): Object => ({
   },
   childContextTypes: {
     [dimensionMarshalKey]: PropTypes.object.isRequired,
+  },
+});
+
+export const withIsMovementAllowed = (
+  getIsMovementAllowed?: () => boolean = () => false,
+) => ({
+  context: {
+    [isMovementAllowedKey]: getIsMovementAllowed,
+  },
+  childContextTypes: {
+    [isMovementAllowedKey]: PropTypes.func.isRequired,
   },
 });
 

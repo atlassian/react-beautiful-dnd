@@ -102,7 +102,7 @@ it('should allow the disabling of a droppable in onDragStart', () => {
     onDragUpdate: jest.fn(),
     onDragEnd: jest.fn(),
   };
-  const wrapper: ReactWrapper = mount(<App {...responders} />);
+  const wrapper: ReactWrapper<*> = mount(<App {...responders} />);
 
   pressSpacebar(wrapper.find('.drag-handle'));
   // flush responder

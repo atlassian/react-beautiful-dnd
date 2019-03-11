@@ -11,12 +11,10 @@ export const noMovement: DragMovement = {
   displaced: [],
   map: {},
   displacedBy: noDisplacedBy,
-  willDisplaceForward: false,
 };
 
 const noImpact: DragImpact = {
   movement: noMovement,
-  direction: null,
   destination: null,
   merge: null,
 };

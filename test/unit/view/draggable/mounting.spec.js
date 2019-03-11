@@ -10,7 +10,7 @@ import { atRestMapProps } from './util/get-props';
 import * as attributes from '../../../../src/view/data-attributes';
 
 it('should not create any wrapping elements', () => {
-  const wrapper: ReactWrapper = mount();
+  const wrapper: ReactWrapper<*> = mount();
 
   const node = wrapper.getDOMNode();
 

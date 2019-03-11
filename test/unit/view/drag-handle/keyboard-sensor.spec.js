@@ -1,10 +1,7 @@
 // @flow
 import { getRect, type Position } from 'css-box-model';
 import { type ReactWrapper } from 'enzyme';
-import {
-  canLiftContextKey,
-  styleContextKey,
-} from '../../../../src/view/context-keys';
+import { canLiftKey, styleKey } from '../../../../src/view/context-keys';
 import * as keyCodes from '../../../../src/view/key-codes';
 import { withKeyboard } from '../../../utils/user-input-util';
 import {
@@ -38,7 +35,7 @@ import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-typ
 const origin: Position = { x: 0, y: 0 };
 
 let callbacks: Callbacks;
-let wrapper: ReactWrapper;
+let wrapper: ReactWrapper<*>;
 
 beforeAll(() => {
   requestAnimationFrame.reset();
@@ -135,8 +132,8 @@ describe('initiation', () => {
   it('should not lift if the state does not currently allow lifting', () => {
     const customCallbacks: Callbacks = getStubCallbacks();
     const customContext = {
-      [styleContextKey]: 'hello',
-      [canLiftContextKey]: () => false,
+      [styleKey]: 'hello',
+      [canLiftKey]: () => false,
     };
     const customWrapper = getWrapper(customCallbacks, customContext);
     const mock: MockEvent = createMockEvent();

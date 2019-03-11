@@ -3,16 +3,13 @@ import React from 'react';
 import { mount } from 'enzyme';
 import DragHandle from '../../../../src/view/drag-handle/drag-handle';
 import type { DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
-import {
-  styleContextKey,
-  canLiftContextKey,
-} from '../../../../src/view/context-keys';
+import { styleKey, canLiftKey } from '../../../../src/view/context-keys';
 import { getStubCallbacks } from './util/callbacks';
 import { createRef } from './util/wrappers';
 
 const basicContext = {
-  [styleContextKey]: 'hello',
-  [canLiftContextKey]: () => true,
+  [styleKey]: 'hello',
+  [canLiftKey]: () => true,
 };
 
 beforeEach(() => {
@@ -36,6 +33,7 @@ it('should throw if a help SVG message if the drag handle is a SVG', () => {
         isEnabled
         getDraggableRef={ref.getRef}
         canDragInteractiveElements={false}
+        getShouldRespectForceTouch={() => true}
       >
         {(dragHandleProps: ?DragHandleProps) => (
           // $ExpectError - this fails the flow check! Success!

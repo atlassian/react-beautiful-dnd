@@ -12,6 +12,7 @@ import getScroll from './get-scroll';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
+  RecollectDroppableOptions,
 } from '../../state/dimension-marshal/dimension-marshal-types';
 import getEnv, { type Env } from './get-env';
 import type {
@@ -268,7 +269,7 @@ export default class DroppableDimensionPublisher extends React.Component<Props> 
   };
 
   // Used when Draggables are added or removed from a Droppable during a drag
-  recollect = (): DroppableDimension => {
+  recollect = (options: RecollectDroppableOptions): DroppableDimension => {
     const dragging: ?WhileDragging = this.dragging;
     const closest: ?Element = getClosestScrollable(dragging);
     invariant(
@@ -276,7 +277,7 @@ export default class DroppableDimensionPublisher extends React.Component<Props> 
       'Can only recollect Droppable client for Droppables that have a scroll container',
     );
 
-    return withoutPlaceholder(this.props.getPlaceholderRef(), () =>
+    const execute = (): DroppableDimension =>
       getDimension({
         ref: dragging.ref,
         descriptor: dragging.descriptor,
@@ -286,8 +287,13 @@ export default class DroppableDimensionPublisher extends React.Component<Props> 
         isDropDisabled: this.props.isDropDisabled,
         isCombineEnabled: this.props.isCombineEnabled,
         shouldClipSubject: !this.props.ignoreContainerClipping,
-      }),
-    );
+      });
+
+    if (!options.withoutPlaceholder) {
+      return execute();
+    }
+
+    return withoutPlaceholder(this.props.getPlaceholderRef(), execute);
   };
 
   getDimensionAndWatchScroll = (

@@ -3,11 +3,12 @@ import { getPreset } from '../../../../utils/dimension';
 import type {
   MapProps,
   OwnProps,
+  DispatchProps,
 } from '../../../../../src/view/droppable/droppable-types';
 
 export const preset = getPreset();
 
-export const ownProps: OwnProps = {
+export const homeOwnProps: OwnProps = {
   droppableId: preset.home.descriptor.id,
   type: preset.home.descriptor.type,
   isDropDisabled: false,
@@ -18,30 +19,63 @@ export const ownProps: OwnProps = {
 };
 
 export const foreignOwnProps: OwnProps = {
-  ...ownProps,
+  ...homeOwnProps,
   droppableId: preset.foreign.descriptor.id,
   type: preset.foreign.descriptor.type,
   direction: preset.foreign.axis.direction,
 };
 
-export const atRest: MapProps = {
+export const homeAtRest: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
+  draggingFromThisWith: null,
   placeholder: null,
+  shouldAnimatePlaceholder: false,
 };
+
 export const isOverHome: MapProps = {
   isDraggingOver: true,
   draggingOverWith: preset.inHome1.descriptor.id,
-  placeholder: null,
+  draggingFromThisWith: preset.inHome1.descriptor.id,
+  placeholder: preset.inHome1.placeholder,
+  // this can change during a drag
+  shouldAnimatePlaceholder: false,
 };
+
+export const isNotOverHome: MapProps = {
+  isDraggingOver: false,
+  draggingOverWith: null,
+  placeholder: preset.inHome1.placeholder,
+  draggingFromThisWith: preset.inHome1.descriptor.id,
+  // this can change during a drag
+  shouldAnimatePlaceholder: false,
+};
+
+export const homePostDropAnimation: MapProps = {
+  isDraggingOver: false,
+  draggingOverWith: null,
+  draggingFromThisWith: null,
+  placeholder: null,
+  shouldAnimatePlaceholder: true,
+};
+
 export const isOverForeign: MapProps = {
   isDraggingOver: true,
   draggingOverWith: preset.inHome1.descriptor.id,
   placeholder: preset.inHome1.placeholder,
+  draggingFromThisWith: null,
+  shouldAnimatePlaceholder: true,
 };
 
-export const isNotOver: MapProps = {
+export const isNotOverForeign: MapProps = {
   isDraggingOver: false,
   draggingOverWith: null,
   placeholder: null,
+  draggingFromThisWith: null,
+  shouldAnimatePlaceholder: false,
+};
+
+export const dispatchProps: DispatchProps = {
+  // $ExpectError
+  updateViewportMaxScroll: () => {},
 };

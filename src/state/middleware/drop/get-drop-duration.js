@@ -1,6 +1,7 @@
 // @flow
 import type { Position } from 'css-box-model';
 import { distance as getDistance } from '../../position';
+import { timings } from '../../../animation';
 import type { DropReason } from '../../../types';
 
 type GetDropDurationArgs = {|
@@ -9,8 +10,7 @@ type GetDropDurationArgs = {|
   reason: DropReason,
 |};
 
-const minDropTime: number = 0.33;
-const maxDropTime: number = 0.55;
+const { minDropTime, maxDropTime } = timings;
 const dropTimeRange: number = maxDropTime - minDropTime;
 const maxDropTimeAtDistance: number = 1500;
 // will bring a time lower - which makes it faster
