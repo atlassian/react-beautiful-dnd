@@ -33,6 +33,7 @@ type Props = {|
   // optional
   isDragDisabled: ?boolean,
   disableInteractiveElementBlocking: ?boolean,
+  shouldRespectForceTouch: ?boolean,
 |};
 ```
 
@@ -65,6 +66,7 @@ type Props = {|
 
 - `isDragDisabled`: A flag to control whether or not the `<Draggable />` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
 - `disableInteractiveElementBlocking`: A flag to opt out of blocking a drag from interactive elements. For more information refer to the section _Interactive child elements within a `<Draggable />`_
+- `shouldRespectForceTouch`: Whether or not the _drag handle_ should respect force touch interactions. This defaults to `true` in order to play as nicely as possible with browsers. However, heavy presses can cancel a drag. This can be frustrating for users. By setting `shouldRespectForceTouch` to `false`, force touch interactions will have `event.preventDefault()` called on them and the user will be able to use any amount of pressure for a touch drag.
 
 ## Children function (render props / function as child)
 

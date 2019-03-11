@@ -90,6 +90,7 @@ type DroppableProvided = {|
 type DroppableStateSnapshot = {|
   isDraggingOver: boolean,
   draggingOverWith: ?DraggableId,
+  draggingFromThisWith: ?DraggableId,
 |};
 ```
 

@@ -123,9 +123,19 @@ It is possible to cancel a touch drag with over events such as an `orientationch
 
 > See [force press support](/docs/sensors/touch.md#force-press-support)
 
+#### `<Draggable shouldRespectForceTouch />` (the default)
+
+> Respecting standard force touch interactions
+
 - `preventDefault()` is not called on `touchforcechange` if a drag has not started yet
 - `preventDefault()` is not called on `touchforcechange` a drag that has started but no movement has occurred yet. The force press cancels the drag and is an indirect cancel.
 - `preventDefault()` is called after on `touchforcechange` a drag has started and a `touchmove` has fired. This is defensive as a force press `touchforcechange` should not occur after a `touchmove`.
+
+#### `<Draggable shouldRespectForceTouch={false} />`
+
+> Opting out of force change events
+
+`preventDefault()` is called on all `touchforcechange` events
 
 ## Keyboard dragging 🎹
 

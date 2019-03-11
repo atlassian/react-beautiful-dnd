@@ -106,6 +106,9 @@ type DroppableStateSnapshot = {|
   isDraggingOver: boolean,
   // What is the id of the draggable that is dragging over the Droppable?
   draggingOverWith: ?DraggableId,
+  // What is the id of the draggable that is dragging from this list?
+  // Useful for styling the home list when not being dragged over
+  draggingFromThisWith: ?DraggableId,
 |};
 ```
 
@@ -126,13 +129,6 @@ The `children` function is also provided with a small amount of state relating t
 </Droppable>
 ```
 
-## Conditionally dropping
-
-- `<Droppable />`s can only be dropped on by `<Draggable />`s who share the same `type`. This is a simple way of allowing conditional dropping. If you do not provide a `type` for the `<Droppable />`, then it will only accept `<Draggable />`s which also have the default type. `<Draggable />`s and `<Droppable />`s both will have their `types` set to `'DEFAULT'` when none is provided. There is currently no way to set multiple `types`, or a `type` wildcard that will accept `<Draggable />`s of multiple any types. This could be added if there is a valid use case.
-- Using the `isDropDisabled` prop you can conditionally allow dropping. This allows you to do arbitrarily complex conditional transitions. This will only be considered if the `type` of the `<Droppable />` matches the `type` of the currently dragging `<Draggable />`.
-- You can disable dropping on a `<Droppable />` altogether by always setting `isDropDisabled` to `true`. You can do this to create a list that is never able to be dropped on, but contains `<Draggable />`s.
-- Technically you do not need to use `type` and do all of your conditional drop logic with the `isDropDisabled` function. The `type` parameter is a convenient shortcut for a common use case.
-
 ## Combining
 
 `react-beautiful-dnd` supports the combining of `<Draggable />`s 🤩
@@ -144,6 +140,13 @@ You can enable a _combining_ mode for a `<Droppable />` by setting `isCombineEna
 ## Adding and removing `<Draggable />`s while dragging
 
 It is possible to change the `<Draggable />`s in a `<Droppable />` for a limited set of circumstances. We have created a comprehensive [changes while dragging guide](/docs/guides/changes-while-dragging.md)
+
+## Conditionally dropping
+
+- `<Droppable />`s can only be dropped on by `<Draggable />`s who share the same `type`. This is a simple way of allowing conditional dropping. If you do not provide a `type` for the `<Droppable />`, then it will only accept `<Draggable />`s which also have the default type. `<Draggable />`s and `<Droppable />`s both will have their `types` set to `'DEFAULT'` when none is provided. There is currently no way to set multiple `types`, or a `type` wildcard that will accept `<Draggable />`s of multiple any types. This could be added if there is a valid use case.
+- Using the `isDropDisabled` prop you can conditionally allow dropping. This allows you to do arbitrarily complex conditional transitions. This will only be considered if the `type` of the `<Droppable />` matches the `type` of the currently dragging `<Draggable />`.
+- You can disable dropping on a `<Droppable />` altogether by always setting `isDropDisabled` to `true`. You can do this to create a list that is never able to be dropped on, but contains `<Draggable />`s.
+- Technically you do not need to use `type` and do all of your conditional drop logic with the `isDropDisabled` function. The `type` parameter is a convenient shortcut for a common use case.
 
 ## Scroll containers
 
@@ -165,6 +168,31 @@ It is recommended that you put a `min-height` on a vertical `<Droppable />` or a
 ## Fixed `<Droppable />`s
 
 `react-beautiful-dnd` has partial support for `<Droppable />` lists that use `position: fixed`. When you start a drag and _any_ list of the same type is `position:fixed` then auto window scrolling will be disabled. This is because our virtual model assumes that when the page scroll changes the position of a `<Droppable />` will shift too. If a manual window scroll is detected then the scroll will be aborted. Scroll container scroll is still allowed. We could improve this support, but it would just be a big effort. Please raise an issue if you would be keen to be a part of this effort ❤️
+
+## Recommended 🏠 home list styling
+
+We recommend you style the home list when it is not being dragged over. This makes it easy for a user to see where an item is dragging from. You can use the `snapshot.draggingFromThisWith` value for this. This will be populated in the home list.
+
+In this example we set the `background-color` of the home list to `pink` when we are dragging over the list. We set the `background-color` of the home list to `blue` when not dragging over the home list.
+
+![no-placeholder-when-over-no-list](https://user-images.githubusercontent.com/2182637/54155390-251ebd00-4498-11e9-8748-ab441795d19f.gif)
+
+```js
+const getBackgroundColor = (snapshot: DroppableStateSnapshot): string => {
+  // Giving isDraggingOver preference
+  if (snapshot.isDraggingOver) {
+    return 'pink';
+  }
+
+  // If it is the home list but not dragging over
+  if (snapshot.draggingFromThisWith) {
+    return 'blue';
+  }
+
+  // Otherwise use our default background
+  return 'white';
+};
+```
 
 ## Recommended `<Droppable />` performance optimisation
 
