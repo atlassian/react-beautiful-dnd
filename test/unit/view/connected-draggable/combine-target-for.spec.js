@@ -1,51 +1,37 @@
 // @flow
-import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
-import { getPreset } from '../../../utils/dimension';
+import type { DragImpact } from '../../../../src/types';
 import type {
   Selector,
   OwnProps,
   MapProps,
 } from '../../../../src/view/draggable/draggable-types';
+import { forward } from '../../../../src/state/user-direction/user-direction-preset';
+import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
+import { getPreset } from '../../../utils/dimension';
 import {
   draggingStates,
   withImpact,
   type IsDraggingState,
 } from '../../../utils/dragging-state';
-import type { Axis, DragImpact, DisplacedBy } from '../../../../src/types';
 import getOwnProps from './util/get-own-props';
-import { forward } from '../../../../src/state/user-direction/user-direction-preset';
-import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import { origin } from '../../../../src/state/position';
 
 const preset = getPreset();
 const ownProps: OwnProps = getOwnProps(preset.inHome2);
-const axis: Axis = preset.home.axis;
-const willDisplaceForward: boolean = false;
-const displacedBy: DisplacedBy = getDisplacedBy(
-  axis,
-  preset.inHome1.displaceBy,
-  willDisplaceForward,
-);
-const impact: DragImpact = {
-  movement: {
-    displaced: [],
-    map: {},
-    displacedBy,
-    willDisplaceForward,
-  },
-  direction: preset.home.axis.direction,
-  destination: null,
-  merge: {
-    whenEntered: forward,
-    combine: {
-      draggableId: preset.inHome2.descriptor.id,
-      droppableId: preset.inHome2.descriptor.droppableId,
-    },
-  },
-};
 
 draggingStates.forEach((withoutMerge: IsDraggingState) => {
   describe(`in phase: ${withoutMerge.phase}`, () => {
+    const impact: DragImpact = {
+      ...withoutMerge.impact,
+      destination: null,
+      merge: {
+        whenEntered: forward,
+        combine: {
+          draggableId: preset.inHome2.descriptor.id,
+          droppableId: preset.inHome2.descriptor.droppableId,
+        },
+      },
+    };
+
     const withMerge: IsDraggingState = withImpact(withoutMerge, impact);
 
     it('should indicate that it is a combine target', () => {
@@ -55,8 +41,8 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
       const expected: MapProps = {
         dragging: null,
         secondary: {
-          offset: origin,
-          shouldAnimateDisplacement: true,
+          offset: impact.movement.displacedBy.point,
+          shouldAnimateDisplacement: false,
           combineTargetFor: preset.inHome1.descriptor.id,
         },
       };
@@ -68,8 +54,8 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
       const expected: MapProps = {
         dragging: null,
         secondary: {
-          offset: origin,
-          shouldAnimateDisplacement: true,
+          offset: impact.movement.displacedBy.point,
+          shouldAnimateDisplacement: false,
           combineTargetFor: preset.inHome1.descriptor.id,
         },
       };

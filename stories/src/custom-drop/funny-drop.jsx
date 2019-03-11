@@ -1,7 +1,8 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
-import { grid, colors } from '../constants';
+import styled from '@emotion/styled';
+import { colors } from '@atlaskit/theme';
+import { grid } from '../constants';
 import reorder from '../reorder';
 import {
   DragDropContext,
@@ -27,7 +28,7 @@ type TaskItemProps = {|
 
 const Canvas = styled.div`
   padding: ${grid}px;
-  background: ${props => (props.isDragging ? colors.green : colors.blue.light)};
+  background: ${props => (props.isDragging ? colors.G50 : colors.B50)};
   margin-bottom: ${grid}px;
   border-radius: 3px;
 `;

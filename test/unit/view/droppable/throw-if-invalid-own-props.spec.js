@@ -1,7 +1,7 @@
 // @flow
 import type { OwnProps } from '../../../../src/view/droppable/droppable-types';
 import mount from './util/mount';
-import { ownProps as defaultOwnProps } from './util/get-props';
+import { homeOwnProps as defaultOwnProps } from './util/get-props';
 
 beforeAll(() => {
   jest.spyOn(console, 'error').mockImplementation(() => {});

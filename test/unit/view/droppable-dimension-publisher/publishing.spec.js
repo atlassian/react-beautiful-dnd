@@ -1,6 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
 import { mount, type ReactWrapper } from 'enzyme';
+import invariant from 'tiny-invariant';
 import React from 'react';
 import type {
   DimensionMarshal,
@@ -50,7 +51,7 @@ it('should publish the dimensions of the target', () => {
     border,
     windowScroll: { x: 0, y: 0 },
   });
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <ScrollableItem
       droppableId={expected.descriptor.id}
       type={expected.descriptor.type}
@@ -58,7 +59,8 @@ it('should publish the dimensions of the target', () => {
     />,
     withDimensionMarshal(marshal),
   );
-  const el: HTMLElement = wrapper.instance().getRef();
+  const el: ?HTMLElement = wrapper.instance().getRef();
+  invariant(el);
   jest
     .spyOn(el, 'getBoundingClientRect')
     .mockImplementation(() => bigClient.borderBox);
@@ -98,7 +100,7 @@ it('should consider the window scroll when calculating dimensions', () => {
     windowScroll,
   });
 
-  const wrapper: ReactWrapper = mount(
+  const wrapper: ReactWrapper<*> = mount(
     <ScrollableItem
       droppableId={expected.descriptor.id}
       type={expected.descriptor.type}
@@ -106,7 +108,8 @@ it('should consider the window scroll when calculating dimensions', () => {
     />,
     withDimensionMarshal(marshal),
   );
-  const el: HTMLElement = wrapper.instance().getRef();
+  const el: ?HTMLElement = wrapper.instance().getRef();
+  invariant(el);
   jest
     .spyOn(el, 'getBoundingClientRect')
     .mockImplementation(() => bigClient.borderBox);
@@ -138,7 +141,8 @@ describe('no closest scrollable', () => {
       <App parentIsScrollable={false} />,
       withDimensionMarshal(marshal),
     );
-    const el: HTMLElement = wrapper.instance().getRef();
+    const el: ?HTMLElement = wrapper.instance().getRef();
+    invariant(el);
     jest
       .spyOn(el, 'getBoundingClientRect')
       .mockImplementation(() => bigClient.borderBox);
@@ -193,7 +197,8 @@ describe('droppable is scrollable', () => {
       <App droppableIsScrollable />,
       withDimensionMarshal(marshal),
     );
-    const el: HTMLElement = wrapper.instance().getRef();
+    const el: ?HTMLElement = wrapper.instance().getRef();
+    invariant(el);
     // returning smaller border box as this is what occurs when the element is scrollable
     jest
       .spyOn(el, 'getBoundingClientRect')
@@ -255,7 +260,8 @@ describe('droppable is scrollable', () => {
       <App droppableIsScrollable />,
       withDimensionMarshal(marshal),
     );
-    const el: HTMLElement = wrapper.instance().getRef();
+    const el: ?HTMLElement = wrapper.instance().getRef();
+    invariant(el);
     // returning smaller border box as this is what occurs when the element is scrollable
     jest
       .spyOn(el, 'getBoundingClientRect')
@@ -311,7 +317,8 @@ describe('parent of droppable is scrollable', () => {
       <App parentIsScrollable droppableIsScrollable={false} />,
       withDimensionMarshal(marshal),
     );
-    const droppable: HTMLElement = wrapper.instance().getRef();
+    const droppable: ?HTMLElement = wrapper.instance().getRef();
+    invariant(droppable);
     jest
       .spyOn(droppable, 'getBoundingClientRect')
       .mockImplementation(() => bigClient.borderBox);
@@ -366,7 +373,8 @@ describe('both droppable and parent is scrollable', () => {
       <App parentIsScrollable droppableIsScrollable />,
       withDimensionMarshal(marshal),
     );
-    const droppable: HTMLElement = wrapper.instance().getRef();
+    const droppable: ?HTMLElement = wrapper.instance().getRef();
+    invariant(droppable);
     const parent: HTMLElement = wrapper.getDOMNode();
     jest
       .spyOn(droppable, 'getBoundingClientRect')
@@ -408,7 +416,8 @@ it('should capture the initial scroll of the closest scrollable', () => {
     <App parentIsScrollable droppableIsScrollable={false} />,
     withDimensionMarshal(marshal),
   );
-  const droppable: HTMLElement = wrapper.instance().getRef();
+  const droppable: ?HTMLElement = wrapper.instance().getRef();
+  invariant(droppable);
   const parent: HTMLElement = wrapper.getDOMNode();
   // manually setting the scroll of the parent node
   parent.scrollTop = frameScroll.y;
@@ -469,7 +478,8 @@ it('should indicate if subject clipping is permitted based on the ignoreContaine
     />,
     withDimensionMarshal(marshal),
   );
-  const droppable: HTMLElement = wrapper.instance().getRef();
+  const droppable: ?HTMLElement = wrapper.instance().getRef();
+  invariant(droppable);
   const parent: HTMLElement = wrapper.getDOMNode();
   const scrollSize: ScrollSize = {
     scrollWidth: bigClient.paddingBox.width,

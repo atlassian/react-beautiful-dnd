@@ -1,24 +1,28 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
-import { animateDrop, completeDrop, dropPending } from '../../action-creators';
-import noImpact from '../../no-impact';
-import { isEqual } from '../../position';
-import getDropDuration from './get-drop-duration';
-import getNewHomeClientOffset from './get-new-home-client-offset';
 import type {
   State,
   DropReason,
   Critical,
   DraggableLocation,
-  DragImpact,
   DropResult,
-  PendingDrop,
+  CompletedDrag,
   Combine,
   DimensionMap,
   DraggableDimension,
 } from '../../../types';
 import type { MiddlewareStore, Dispatch, Action } from '../../store-types';
+import {
+  animateDrop,
+  completeDrop,
+  dropPending,
+  type AnimateDropArgs,
+} from '../../action-creators';
+import { isEqual } from '../../position';
+import getDropDuration from './get-drop-duration';
+import getNewHomeClientOffset from './get-new-home-client-offset';
+import getDropImpact, { type Result } from './get-drop-impact';
 
 export default ({ getState, dispatch }: MiddlewareStore) => (
   next: Dispatch,
@@ -62,12 +66,25 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   const dimensions: DimensionMap = state.dimensions;
   // Only keeping impact when doing a user drop - otherwise we are cancelling
 
-  const impact: DragImpact = reason === 'DROP' ? state.impact : noImpact;
+  const { impact, didDropInsideDroppable }: Result = getDropImpact({
+    reason,
+    lastImpact: state.impact,
+    onLift: state.onLift,
+    onLiftImpact: state.onLiftImpact,
+    home: state.dimensions.droppables[state.critical.droppable.id],
+    viewport: state.viewport,
+    draggables: state.dimensions.draggables,
+  });
+
   const draggable: DraggableDimension =
     dimensions.draggables[state.critical.draggable.id];
-  const destination: ?DraggableLocation = impact ? impact.destination : null;
+
+  // only populating destination / combine if 'didDropInsideDroppable' is true
+  const destination: ?DraggableLocation = didDropInsideDroppable
+    ? impact.destination
+    : null;
   const combine: ?Combine =
-    impact && impact.merge ? impact.merge.combine : null;
+    didDropInsideDroppable && impact.merge ? impact.merge.combine : null;
 
   const source: DraggableLocation = {
     index: critical.draggable.index,
@@ -78,10 +95,11 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     draggableId: draggable.descriptor.id,
     type: draggable.descriptor.type,
     source,
+    reason,
     mode: state.movementMode,
+    // destination / combine will be null if didDropInsideDroppable is true
     destination,
     combine,
-    reason,
   };
 
   const newHomeClientOffset: Position = getNewHomeClientOffset({
@@ -89,18 +107,24 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     draggable,
     dimensions,
     viewport: state.viewport,
+    onLift: state.onLift,
   });
 
-  // Do not animate if you do not need to.
-  // Animate the drop if:
-  // - not already in the right spot OR
-  // - doing a combine (we still want to animate the scale and opacity fade)
+  const completed: CompletedDrag = {
+    critical: state.critical,
+    result,
+    impact,
+  };
+
   const isAnimationRequired: boolean =
+    // 1. not already in the right spot
     !isEqual(state.current.client.offset, newHomeClientOffset) ||
+    // 2. doing a combine (we still want to animate the scale and opacity fade)
+    // looking at the result and not the impact as the combine impact is cleared
     Boolean(result.combine);
 
   if (!isAnimationRequired) {
-    dispatch(completeDrop(result));
+    dispatch(completeDrop({ completed, shouldFlush: false }));
     return;
   }
 
@@ -110,12 +134,11 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     reason,
   });
 
-  const pending: PendingDrop = {
+  const args: AnimateDropArgs = {
     newHomeClientOffset,
     dropDuration,
-    result,
-    impact,
+    completed,
   };
 
-  dispatch(animateDrop(pending));
+  dispatch(animateDrop(args));
 };

@@ -8,7 +8,7 @@ import Draggable from './draggable';
 import { storeKey } from '../context-keys';
 import { origin } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
-import { curves, combine } from '../animation';
+import { curves, combine } from '../../animation';
 import {
   lift as liftAction,
   move as moveAction,
@@ -28,7 +28,7 @@ import type {
   DraggableDimension,
   CombineImpact,
   Displacement,
-  PendingDrop,
+  CompletedDrag,
   DragImpact,
   DisplacementMap,
   MovementMode,
@@ -157,7 +157,6 @@ export const makeMapStateToProps = (): Selector => {
       const mode: MovementMode = state.movementMode;
       const draggingOver: ?DroppableId = whatIsDraggedOver(state.impact);
       const combineWith: ?DraggableId = getCombineWith(state.impact);
-
       const forceShouldAnimate: ?boolean = state.forceShouldAnimate;
 
       return getDraggingProps(
@@ -172,22 +171,23 @@ export const makeMapStateToProps = (): Selector => {
 
     // Dropping
     if (state.phase === 'DROP_ANIMATING') {
-      const pending: PendingDrop = state.pending;
-      if (pending.result.draggableId !== ownProps.draggableId) {
+      const completed: CompletedDrag = state.completed;
+      if (completed.result.draggableId !== ownProps.draggableId) {
         return null;
       }
 
-      const draggingOver: ?DroppableId = whatIsDraggedOver(pending.impact);
-      const combineWith: ?DraggableId = getCombineWith(pending.impact);
-      const duration: number = pending.dropDuration;
-      const mode: MovementMode = pending.result.mode;
+      const dimension: DraggableDimension =
+        state.dimensions.draggables[ownProps.draggableId];
+      const draggingOver: ?DroppableId = whatIsDraggedOver(completed.impact);
+      const combineWith: ?DraggableId = getCombineWith(completed.impact);
+      const duration: number = state.dropDuration;
+      const mode: MovementMode = completed.result.mode;
 
       // not memoized as it is the only execution
       return {
         dragging: {
-          offset: pending.newHomeClientOffset,
-          // still need to provide the dimension for the placeholder
-          dimension: state.dimensions.draggables[ownProps.draggableId],
+          offset: state.newHomeClientOffset,
+          dimension,
           draggingOver,
           combineWith,
           mode,
@@ -195,7 +195,7 @@ export const makeMapStateToProps = (): Selector => {
           dropping: {
             duration,
             curve: curves.drop,
-            moveTo: pending.newHomeClientOffset,
+            moveTo: state.newHomeClientOffset,
             opacity: combineWith ? combine.opacity.drop : null,
             scale: combineWith ? combine.scale.drop : null,
           },
@@ -224,14 +224,15 @@ export const makeMapStateToProps = (): Selector => {
 
     // Dropping
     if (state.phase === 'DROP_ANIMATING') {
+      const completed: CompletedDrag = state.completed;
       // do nothing if this was the dragging item
-      if (state.pending.result.draggableId === ownProps.draggableId) {
+      if (completed.result.draggableId === ownProps.draggableId) {
         return null;
       }
       return getSecondaryMovement(
         ownProps.draggableId,
-        state.pending.result.draggableId,
-        state.pending.impact,
+        completed.result.draggableId,
+        completed.impact,
       );
     }
 
@@ -261,8 +262,10 @@ const mapDispatchToProps: DispatchProps = {
 
 const defaultProps = ({
   isDragDisabled: false,
-  // cannot drag interactive elements by default
+  // Cannot drag interactive elements by default
   disableInteractiveElementBlocking: false,
+  // Respecting browser force touch interaction by default
+  shouldRespectForceTouch: true,
 }: DefaultProps);
 
 // Abstract class allows to specify props and defaults to component.
@@ -280,7 +283,7 @@ class DraggableType extends Component<OwnProps> {
 const ConnectedDraggable: typeof DraggableType = (connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
-  (mapDispatchToProps: any),
+  mapDispatchToProps,
   // mergeProps: use default
   null,
   // options
@@ -294,7 +297,6 @@ const ConnectedDraggable: typeof DraggableType = (connect(
     // When pure, compares the result of mapStateToProps to its previous value.
     // Default value: shallowEqual
     // Switching to a strictEqual as we return a memoized object on changes
-    // $FlowFixMe - incorrect type signature
     areStatePropsEqual: isStrictEqual,
   },
 ): any)(Draggable);

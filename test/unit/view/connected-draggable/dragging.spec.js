@@ -1,7 +1,6 @@
 // @flow
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
 import { getPreset } from '../../../utils/dimension';
-import getHomeImpact from '../../../../src/state/get-home-impact';
 import noImpact from '../../../../src/state/no-impact';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import type {
@@ -18,6 +17,7 @@ import {
 } from '../../../utils/dragging-state';
 import getOwnProps from './util/get-own-props';
 import getDraggingMapProps from './util/get-dragging-map-props';
+import getHomeOnLift from '../../../../src/state/get-home-on-lift';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -78,11 +78,14 @@ draggingStates.forEach((current: IsDraggingState) => {
 
     it('should indicate when over a droppable', () => {
       const selector: Selector = makeMapStateToProps();
+      const { impact: homeImpact } = getHomeOnLift({
+        draggable: preset.inHome1,
+        draggables: preset.draggables,
+        viewport: preset.viewport,
+        home: preset.home,
+      });
 
-      const inHome: IsDraggingState = withImpact(
-        current,
-        getHomeImpact(preset.inHome1, preset.home),
-      );
+      const inHome: IsDraggingState = withImpact(current, homeImpact);
       const overHome: DraggingMapProps = getDraggingMapProps(
         selector(inHome, ownProps),
       );

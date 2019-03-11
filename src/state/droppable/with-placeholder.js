@@ -13,6 +13,8 @@ import type {
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import { add, patch } from '../position';
 import getSubject from './util/get-subject';
+import isHomeOf from './is-home-of';
+import getDisplacedBy from '../get-displaced-by';
 
 const getRequiredGrowthForPlaceholder = (
   droppable: DroppableDimension,
@@ -53,20 +55,25 @@ const withMaxScroll = (frame: Scrollable, max: Position): Scrollable => ({
 
 export const addPlaceholder = (
   droppable: DroppableDimension,
-  displaceBy: Position,
+  draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
 ): DroppableDimension => {
   const frame: ?Scrollable = droppable.frame;
+
+  invariant(
+    !isHomeOf(draggable, droppable),
+    'Should not add placeholder space to home list',
+  );
 
   invariant(
     !droppable.subject.withPlaceholder,
     'Cannot add placeholder size to a subject when it already has one',
   );
 
-  const placeholderSize: Position = patch(
-    droppable.axis.line,
-    displaceBy[droppable.axis.line],
-  );
+  const placeholderSize: Position = getDisplacedBy(
+    droppable.axis,
+    draggable.displaceBy,
+  ).point;
 
   const requiredGrowth: ?Position = getRequiredGrowthForPlaceholder(
     droppable,

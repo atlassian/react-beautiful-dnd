@@ -90,6 +90,7 @@ type DroppableProvided = {|
 type DroppableStateSnapshot = {|
   isDraggingOver: boolean,
   draggingOverWith: ?DraggableId,
+  draggingFromThisWith: ?DraggableId,
 |};
 ```
 
@@ -115,6 +116,7 @@ type DraggableStateSnapshot = {|
 export type DraggableProps = {|
   style: ?DraggableStyle,
   'data-react-beautiful-dnd-draggable': string,
+  onTransitionEnd: ?(event: TransitionEvent) => void,
 |};
 type DraggableStyle = DraggingStyle | NotDraggingStyle;
 type DraggingStyle = {|
@@ -174,3 +176,5 @@ Here is an [example written in typescript](https://github.com/abeaudoin2013/reac
 ## Sample application with flow types
 
 We have created a [sample application](https://github.com/alexreardon/react-beautiful-dnd-flow-example) which exercises the flowtypes. It is a super simple `React` project based on [`react-create-app`](https://github.com/facebookincubator/create-react-app). You can use this as a reference to see how to set things up correctly.
+
+[← Back to documentation](/README.md#documentation-)

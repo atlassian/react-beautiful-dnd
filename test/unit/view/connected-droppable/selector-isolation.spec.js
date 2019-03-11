@@ -7,7 +7,7 @@ import type {
   Selector,
   MapProps,
 } from '../../../../src/view/droppable/droppable-types';
-import getOwnProps from './get-own-props';
+import getOwnProps from './util/get-own-props';
 import { getPreset } from '../../../utils/dimension';
 
 const preset = getPreset();

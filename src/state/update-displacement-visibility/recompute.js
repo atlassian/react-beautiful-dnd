@@ -5,6 +5,7 @@ import type {
   DragImpact,
   Displacement,
   Viewport,
+  OnLift,
 } from '../../types';
 import getDisplacement from '../get-displacement';
 import withNewDisplacement from './with-new-displacement';
@@ -13,7 +14,9 @@ type RecomputeArgs = {|
   impact: DragImpact,
   destination: DroppableDimension,
   viewport: Viewport,
+  onLift: OnLift,
   draggables: DraggableDimensionMap,
+  forceShouldAnimate?: boolean,
 |};
 
 export default ({
@@ -21,6 +24,8 @@ export default ({
   viewport,
   destination,
   draggables,
+  onLift,
+  forceShouldAnimate,
 }: RecomputeArgs): DragImpact => {
   const updated: Displacement[] = impact.movement.displaced.map(
     (entry: Displacement) =>
@@ -29,6 +34,8 @@ export default ({
         destination,
         previousImpact: impact,
         viewport: viewport.frame,
+        onLift,
+        forceShouldAnimate,
       }),
   );
 

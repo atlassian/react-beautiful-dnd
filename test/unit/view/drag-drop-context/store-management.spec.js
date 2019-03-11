@@ -7,7 +7,7 @@ import { Provider, connect } from 'react-redux';
 import { createStore } from 'redux';
 import { Droppable, Draggable, DragDropContext } from '../../../../src';
 import type { DraggableProvided, DroppableProvided } from '../../../../src';
-import { storeKey, canLiftContextKey } from '../../../../src/view/context-keys';
+import { storeKey, canLiftKey } from '../../../../src/view/context-keys';
 import App from './app';
 // Imported as wildcard so we can mock `resetStyleContext` using spyOn
 
@@ -49,30 +49,32 @@ describe('can start drag', () => {
       throw new Error('Invalid test setup');
     }
 
-    expect(app.context[canLiftContextKey]).toBeInstanceOf(Function);
+    expect(app.context[canLiftKey]).toBeInstanceOf(Function);
   });
 });
 
 describe('Playing with other redux apps', () => {
-  type ExternalState = {|
+  type AppState = {|
     foo: string,
   |};
-  const original: ExternalState = {
+  const original: AppState = {
     foo: 'bar',
   };
   // super boring reducer that always returns the same thing
-  const reducer = (state: ExternalState = original) => state;
+  const reducer = (state: AppState = original) => state;
   const store = createStore(reducer);
 
-  class Unconnected extends Component<ExternalState> {
+  class Unconnected extends Component<AppState> {
     render() {
       return <div>{this.props.foo}</div>;
     }
   }
 
-  const Connected = connect((state: ExternalState): ExternalState => state)(
-    Unconnected,
-  );
+  function mapStateToProps(state: AppState): AppState {
+    return state;
+  }
+
+  const Connected = connect(mapStateToProps)(Unconnected);
 
   it('should avoid clashes with parent redux applications', () => {
     class Container extends Component<*> {
@@ -93,6 +95,7 @@ describe('Playing with other redux apps', () => {
                           {...draggableProvided.dragHandleProps}
                           {...draggableProvided.draggableProps}
                         >
+                          {/* $FlowFixMe - not sure why this requires foo */}
                           <Connected />
                         </div>
                       )}
@@ -130,6 +133,7 @@ describe('Playing with other redux apps', () => {
                         {...draggableProvided.draggableProps}
                       >
                         <Provider store={store}>
+                          {/* $FlowFixMe - not sure why this requires foo */}
                           <Connected />
                         </Provider>
                       </div>

@@ -44,7 +44,7 @@ class WillThrow extends React.Component<Props> {
   }
 }
 
-const withThrow = (throwFn: Function): ReactWrapper =>
+const withThrow = (throwFn: Function): ReactWrapper<*> =>
   mount(
     <DragDropContext onDragEnd={() => {}}>
       <Droppable droppableId="droppable">
@@ -96,7 +96,7 @@ const whenIdle: DraggableStateSnapshot = {
 };
 
 it('should reset the application state and swallow the exception if an invariant exception occurs', () => {
-  const wrapper: ReactWrapper = withThrow(() => invariant(false));
+  const wrapper: ReactWrapper<*> = withThrow(() => invariant(false));
 
   // Execute a lift which will throw an error
   wrapper.find(WillThrow).simulate('keydown', { keyCode: keyCodes.space });
@@ -106,14 +106,14 @@ it('should reset the application state and swallow the exception if an invariant
   expect(console.error).toHaveBeenCalled();
 
   // WillThrough can still be found in the DOM
-  const willThrough: ReactWrapper = wrapper.find(WillThrow);
+  const willThrough: ReactWrapper<*> = wrapper.find(WillThrow);
   expect(willThrough.length).toBeTruthy();
   // no longer dragging
   expect(willThrough.props().snapshot).toEqual(whenIdle);
 });
 
 it('should not reset the application state an exception occurs and throw it', () => {
-  const wrapper: ReactWrapper = withThrow(() => {
+  const wrapper: ReactWrapper<*> = withThrow(() => {
     throw new Error('YOLO');
   });
 
@@ -125,7 +125,7 @@ it('should not reset the application state an exception occurs and throw it', ()
   // Messages printed
   expect(console.error).toHaveBeenCalled();
 
-  const willThrough: ReactWrapper = wrapper.find(WillThrow);
+  const willThrough: ReactWrapper<*> = wrapper.find(WillThrow);
   expect(willThrough.length).toBeTruthy();
   // no longer dragging
   expect(willThrough.props().snapshot).toEqual(whenIdle);

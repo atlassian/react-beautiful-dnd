@@ -7,7 +7,7 @@ import { forEach, type Control } from './util/controls';
 import { getStubCallbacks, callbacksCalled } from './util/callbacks';
 import basicContext from './util/basic-context';
 import { Child, createRef } from './util/wrappers';
-import { canLiftContextKey } from '../../../../src/view/context-keys';
+import { canLiftKey } from '../../../../src/view/context-keys';
 
 forEach((control: Control) => {
   it('should not start a drag if something else is already dragging in the system', () => {
@@ -16,7 +16,7 @@ forEach((control: Control) => {
     const canLift = jest.fn().mockImplementation(() => false);
     const customContext = {
       ...basicContext,
-      [canLiftContextKey]: canLift,
+      [canLiftKey]: canLift,
     };
     const customCallbacks = getStubCallbacks();
     const wrapper = mount(
@@ -27,6 +27,7 @@ forEach((control: Control) => {
         isDropAnimating={false}
         isEnabled
         getDraggableRef={ref.getRef}
+        getShouldRespectForceTouch={() => true}
         canDragInteractiveElements={false}
       >
         {(dragHandleProps: ?DragHandleProps) => (

@@ -24,6 +24,7 @@ import type {
 import type { Store, Dispatch } from '../../../../../src/state/store-types';
 import createResponders from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
+import getCompletedWithResult from './util/get-completed-with-result';
 
 jest.useFakeTimers();
 
@@ -64,12 +65,17 @@ const update = (dispatch: Dispatch) => {
   jest.runOnlyPendingTimers();
 };
 
-const end = (dispatch: Dispatch) => {
+const end = (store: Store) => {
   const result: DropResult = {
     ...moveForwardUpdate,
     reason: 'DROP',
   };
-  dispatch(completeDrop(result));
+  store.dispatch(
+    completeDrop({
+      completed: getCompletedWithResult(result, store.getState()),
+      shouldFlush: false,
+    }),
+  );
 };
 
 const cases: Case[] = [
@@ -111,7 +117,7 @@ const cases: Case[] = [
     execute: (store: Store) => {
       start(store.dispatch);
       update(store.dispatch);
-      end(store.dispatch);
+      end(store);
     },
     defaultMessage: messagePreset.onDragEnd({
       ...moveForwardUpdate,
@@ -137,6 +143,7 @@ cases.forEach((current: Case) => {
     it('should announce with the default message if no responder is provided', () => {
       // This test is not relevant for onDragEnd as it must always be provided
       if (current.responder === 'onDragEnd') {
+        expect(true).toBe(true);
         return;
       }
       // unsetting responder

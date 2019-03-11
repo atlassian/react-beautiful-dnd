@@ -1,5 +1,4 @@
 // @flow
-import type { DropResult, PendingDrop } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import middleware from '../../../../src/state/middleware/dimension-marshal-stopper';
@@ -15,9 +14,9 @@ import {
 } from '../../../../src/state/action-creators';
 import {
   initialPublishArgs,
-  getDragStart,
+  getCompletedArgs,
+  userCancelArgs,
 } from '../../../utils/preset-action-args';
-import noImpact from '../../../../src/state/no-impact';
 
 const getMarshal = (stopPublishing: Function): DimensionMarshal => {
   const fake: DimensionMarshal = ({
@@ -73,13 +72,7 @@ it('should stop a collection if a drag is complete', () => {
   expect(stopPublishing).not.toHaveBeenCalled();
 
   // complete drop
-  const result: DropResult = {
-    ...getDragStart(),
-    destination: null,
-    combine: null,
-    reason: 'CANCEL',
-  };
-  store.dispatch(completeDrop(result));
+  store.dispatch(completeDrop(getCompletedArgs('DROP')));
 
   expect(stopPublishing).toHaveBeenCalled();
 });
@@ -96,19 +89,7 @@ it('should stop a collection if a drop animation starts', () => {
   expect(store.getState().phase).toBe('DRAGGING');
   expect(stopPublishing).not.toHaveBeenCalled();
 
-  const pending: PendingDrop = {
-    newHomeClientOffset: { x: 0, y: 0 },
-    impact: noImpact,
-    dropDuration: 1,
-    result: {
-      ...getDragStart(),
-      // destination cleared
-      combine: null,
-      destination: null,
-      reason: 'CANCEL',
-    },
-  };
-  store.dispatch(animateDrop(pending));
+  store.dispatch(animateDrop(userCancelArgs));
 
   expect(stopPublishing).toHaveBeenCalled();
 });

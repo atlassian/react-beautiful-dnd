@@ -6,6 +6,7 @@ import {
   combine,
   withDimensionMarshal,
   withStyleContext,
+  withIsMovementAllowed,
 } from '../../../utils/get-context-options';
 import Droppable from '../../../../src/view/droppable/connected-droppable';
 import forceUpdate from '../../../utils/force-update';
@@ -38,6 +39,7 @@ const contextOptions = combine(
   withStore(),
   withDimensionMarshal(),
   withStyleContext(),
+  withIsMovementAllowed(),
 );
 
 beforeEach(() => {

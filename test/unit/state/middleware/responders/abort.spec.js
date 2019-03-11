@@ -1,5 +1,12 @@
 // @flow
 import invariant from 'tiny-invariant';
+import type {
+  DraggableLocation,
+  Responders,
+  State,
+  DropResult,
+} from '../../../../../src/types';
+import type { Store } from '../../../../../src/state/store-types';
 import {
   clean,
   completeDrop,
@@ -13,13 +20,7 @@ import {
 import createStore from '../util/create-store';
 import getAnnounce from './util/get-announce-stub';
 import createResponders from './util/get-responders-stub';
-import type {
-  DraggableLocation,
-  Responders,
-  State,
-  DropResult,
-} from '../../../../../src/types';
-import type { Store } from '../../../../../src/state/store-types';
+import getCompletedWithResult from './util/get-completed-with-result';
 
 jest.useFakeTimers();
 
@@ -93,7 +94,12 @@ it('should not publish an onDragEnd if aborted after a drop', () => {
     combine: null,
     reason: 'CANCEL',
   };
-  store.dispatch(completeDrop(result));
+  store.dispatch(
+    completeDrop({
+      completed: getCompletedWithResult(result, store.getState()),
+      shouldFlush: false,
+    }),
+  );
   expect(responders.onDragEnd).toHaveBeenCalledTimes(1);
   responders.onDragEnd.mockReset();
 
@@ -119,7 +125,12 @@ it('should publish an on drag end if aborted before the publish of an onDragStar
     combine: null,
     reason: 'CANCEL',
   };
-  store.dispatch(completeDrop(result));
+  store.dispatch(
+    completeDrop({
+      completed: getCompletedWithResult(result, store.getState()),
+      shouldFlush: false,
+    }),
+  );
   expect(responders.onDragEnd).toHaveBeenCalledTimes(1);
 
   // validation - onDragStart has been flushed

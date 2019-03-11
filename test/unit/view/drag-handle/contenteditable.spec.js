@@ -35,6 +35,7 @@ forEach((control: Control) => {
           isEnabled
           getDraggableRef={ref.getRef}
           canDragInteractiveElements={false}
+          getShouldRespectForceTouch={() => true}
         >
           {(dragHandleProps: ?DragHandleProps) => (
             <div {...dragHandleProps} contentEditable ref={ref.setRef} />
@@ -72,6 +73,7 @@ forEach((control: Control) => {
           isEnabled
           getDraggableRef={ref.getRef}
           canDragInteractiveElements={false}
+          getShouldRespectForceTouch={() => true}
         >
           {(dragHandleProps: ?DragHandleProps) => (
             <div {...dragHandleProps} ref={ref.setRef}>
@@ -110,6 +112,7 @@ forEach((control: Control) => {
           isEnabled
           getDraggableRef={ref.getRef}
           canDragInteractiveElements={false}
+          getShouldRespectForceTouch={() => true}
         >
           {(dragHandleProps: ?DragHandleProps) => (
             <div {...dragHandleProps} ref={ref.setRef}>
@@ -155,6 +158,7 @@ forEach((control: Control) => {
           isEnabled
           getDraggableRef={ref.getRef}
           canDragInteractiveElements={false}
+          getShouldRespectForceTouch={() => true}
         >
           {(dragHandleProps: ?DragHandleProps) => (
             <div {...dragHandleProps} ref={ref.setRef}>
@@ -202,6 +206,7 @@ forEach((control: Control) => {
           isDropAnimating={false}
           isEnabled
           getDraggableRef={ref.getRef}
+          getShouldRespectForceTouch={() => true}
           // stating that we can drag
           canDragInteractiveElements
         >
@@ -246,6 +251,7 @@ forEach((control: Control) => {
           isDropAnimating={false}
           isEnabled
           getDraggableRef={ref.getRef}
+          getShouldRespectForceTouch={() => true}
           // stating that we can drag
           canDragInteractiveElements
         >

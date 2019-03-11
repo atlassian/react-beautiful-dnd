@@ -1,33 +1,22 @@
 // @flow
-import invariant from 'tiny-invariant';
-import type {
-  DraggableDimension,
-  DragImpact,
-  DraggableLocation,
-} from '../../../../types';
+import type { DraggableDimension, DraggableLocation } from '../../../../types';
 import type { Instruction } from './move-to-next-index-types';
 
 type Args = {|
   isMovingForward: boolean,
   isInHomeList: boolean,
+  location: DraggableLocation,
   draggable: DraggableDimension,
   insideDestination: DraggableDimension[],
-  previousImpact: DragImpact,
 |};
 
 export default ({
   isMovingForward,
   isInHomeList,
-  previousImpact,
   draggable,
   insideDestination: initialInside,
+  location,
 }: Args): ?Instruction => {
-  if (previousImpact.merge) {
-    return null;
-  }
-  const location: ?DraggableLocation = previousImpact.destination;
-  invariant(location, 'Cannot move to next index without previous destination');
-
   const insideDestination: DraggableDimension[] = initialInside.slice();
   const currentIndex: number = location.index;
   const isInForeignList: boolean = !isInHomeList;

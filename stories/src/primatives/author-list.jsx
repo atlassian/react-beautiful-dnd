@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
+import { colors } from '@atlaskit/theme';
 import { Droppable, Draggable } from '../../../src';
 import Author from './author-item';
-import { grid, colors } from '../constants';
+import { grid } from '../constants';
 import type { Quote } from '../types';
 import type {
   DroppableProvided,
@@ -14,7 +15,7 @@ import type {
 
 const Wrapper = styled.div`
   background-color: ${({ isDraggingOver }) =>
-    isDraggingOver ? colors.blue.lighter : colors.blue.light};
+    isDraggingOver ? colors.B50 : colors.B75};
   display: flex;
   flex-direction: column;
   padding: ${grid}px;

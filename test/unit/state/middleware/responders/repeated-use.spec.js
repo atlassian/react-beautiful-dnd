@@ -18,6 +18,7 @@ import type {
 } from '../../../../../src/types';
 import createResponders from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
+import getCompletedWithResult from './util/get-completed-with-result';
 
 jest.useFakeTimers();
 
@@ -57,7 +58,12 @@ it('should behave correctly across multiple drags', () => {
       ...update,
       reason: 'DROP',
     };
-    store.dispatch(completeDrop(result));
+    store.dispatch(
+      completeDrop({
+        completed: getCompletedWithResult(result, store.getState()),
+        shouldFlush: false,
+      }),
+    );
     expect(responders.onDragEnd).toHaveBeenCalledWith(
       result,
       expect.any(Object),
