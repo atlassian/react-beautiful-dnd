@@ -72,7 +72,7 @@
     "@babel/preset-env": "^7.3.0",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
-    "@emotion/core": "0.x",
+    "@emotion/core": "^10.0.9",
     "@storybook/addon-options": "^4.1.11",
     "@storybook/addons": "^4.1.11",
     "@storybook/react": "^4.1.7",
