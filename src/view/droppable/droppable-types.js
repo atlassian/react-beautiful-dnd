@@ -22,8 +22,12 @@ export type Provided = {|
 |};
 
 export type StateSnapshot = {|
+  // Is the Droppable being dragged over?
   isDraggingOver: boolean,
+  // What is the id of the draggable that is dragging over the Droppable?
   draggingOverWith: ?DraggableId,
+  // What is the id of the draggable that is dragging from this list?
+  // Useful for styling the home list when not being dragged over
   draggingFromThisWith: ?DraggableId,
 |};
 
