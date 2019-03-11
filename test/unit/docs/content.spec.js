@@ -13,7 +13,18 @@ it('should end all nested docs with a link back to the documentation root', asyn
 
   for (const file of files) {
     const contents: string = await fs.readFile(file, 'utf8');
-    expect(contents.endsWith(backLink)).toBe(true);
+    const isValid: boolean = contents.endsWith(backLink);
+
+    if (isValid) {
+      expect(isValid).toBe(true);
+      return;
+    }
+
+    // Printing a nice message to allow for quick fixing
+    expect(`
+      File: "${file}"
+      Did not end with back link
+    `).toBe(true);
   }
 });
 
