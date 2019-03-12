@@ -9,6 +9,8 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - [Rethinking drag and drop](https://medium.com/@alexandereardon/rethinking-drag-and-drop-d9f5770b4e6b)
 - [Natural keyboard movement between lists](https://medium.com/@alexandereardon/friction-gravity-and-collisions-3adac3a94e19)
 - [Beautiful drag and drop: a year in review](https://medium.com/@alexandereardon/beautiful-drag-and-drop-a-year-in-review-1febc3fac7ce)
+- [Beautiful interactions: Crafting elegant and robust drag and drop animations](https://medium.com/@alexandereardon/beautiful-interactions-8f67502ccf73)
+- [Design process for our new logo](https://www.maryannemade.com/reactbeautifuldnd-logo)
 
 ### Performance related
 
