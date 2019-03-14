@@ -1,5 +1,11 @@
 // @flow
-import React, { type Node } from 'react';
+import React, {
+  useCallback,
+  useMemo,
+  useEffect,
+  useContext,
+  useRef,
+} from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
@@ -74,7 +80,108 @@ const withoutPlaceholder = (
   return result;
 };
 
-export default class DroppableDimensionPublisher extends React.Component<Props> {
+export default function useDroppableDimensionPublisher(args: Props) {
+  const marshal: DimensionMarshal = useContext(dimensionMarshalContext);
+  const whileDraggingRef = useRef(null);
+
+  const descriptor: DroppableDescriptor = useMemo(
+    (): DroppableDescriptor => ({
+      id: args.droppableId,
+      type: args.type,
+    }),
+    [args.droppableId, args.type],
+  );
+
+  const onClosestScroll = useCallback(() => {
+    const whileDragging: ?WhileDragging = whileDraggingRef.current;.
+    invariant(
+      whileDragging,
+      'Cannot handle scroll if there is no drag',
+    );
+    const closest: ?Element = getClosestScrollable(whileDragging);
+    invariant(closest);
+
+    const options: ScrollOptions = whileDragging.scrollOptions;
+
+    if (options.shouldPublishImmediately) {
+      this.updateScroll();
+      return;
+    }
+    this.scheduleScrollUpdate();
+  }, []);
+
+  const getDimensionAndWatchScroll = useCallback(
+    (windowScroll: Position, options: ScrollOptions) => {
+      invariant(
+        !whileDraggingRef.current,
+        'Cannot collect a droppable while a drag is occurring',
+      );
+      const ref: ?HTMLElement = args.getDroppableRef();
+      invariant(ref, 'Cannot collect without a droppable ref');
+      const env: Env = getEnv(ref);
+
+      const dragging: WhileDragging = {
+        ref,
+        descriptor,
+        env,
+        scrollOptions: options,
+      };
+      // side effect
+      whileDraggingRef.current = dragging;
+
+      const dimension: DroppableDimension = getDimension({
+        ref,
+        descriptor,
+        env,
+        windowScroll,
+        direction: args.direction,
+        isDropDisabled: this.props.isDropDisabled,
+        isCombineEnabled: this.props.isCombineEnabled,
+        shouldClipSubject: !this.props.ignoreContainerClipping,
+      });
+
+      if (env.closestScrollable) {
+        // bind scroll listener
+
+        env.closestScrollable.addEventListener(
+          'scroll',
+          onClosestScroll,
+          getListenerOptions(dragging.scrollOptions),
+        );
+        // print a debug warning if using an unsupported nested scroll container setup
+        if (process.env.NODE_ENV !== 'production') {
+          checkForNestedScrollContainers(env.closestScrollable);
+        }
+      }
+
+      return dimension;
+    },
+  );
+  const recollect = useCallback(() => {}, []);
+  const dragStopped = useCallback(() => {}, []);
+  const scroll = useCallback(() => {});
+
+  const callbacks: DroppableCallbacks = useMemo(
+    () => ({
+      getDimensionAndWatchScroll,
+      recollect,
+      dragStopped,
+      scroll,
+    }),
+    [dragStopped, getDimensionAndWatchScroll, recollect, scroll],
+  );
+
+  // Register with the marshal and let it know of:
+  // - any descriptor changes
+  // - when it unmounts
+  useEffect(() => {
+    marshal.registerDroppable(descriptor, callbacks);
+
+    return () => marshal.unregisterDroppable(descriptor);
+  }, [callbacks, descriptor, marshal]);
+}
+
+export class DroppableDimensionPublisher extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   dragging: ?WhileDragging;
   callbacks: DroppableCallbacks;

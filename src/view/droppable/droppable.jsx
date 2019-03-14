@@ -14,14 +14,22 @@ import {
 } from '../context-keys';
 import { warning } from '../../dev-warning';
 import checkOwnProps from './check-own-props';
-import AnimateInOut, {
+import useAnimateInOut, {
   type AnimateProvided,
-} from '../animate-in-out/animate-in-out';
+} from '../use-animate-in-out/use-animate-in-out';
 import getMaxWindowScroll from '../window/get-max-window-scroll';
 
 type Context = {
   [string]: DroppableId | TypeId,
 };
+
+function useDroppable(props: Props) {
+  const styleContext: string = useContext(styleContext);
+  const isMovementAllowed: string = useContext(isMovementAllowed);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => checkOwnProps(props), []);
+}
 
 export default class Droppable extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
