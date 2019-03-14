@@ -30,4 +30,4 @@ We have created a [working example](https://react-beautiful-dnd.netlify.com/?sel
 
 If you are doing drag and drop reordering within a `<table>` we have created a portal section inside our [table guide](/docs/patterns/tables.md)
 
-[← Back to documentation](/README.md#documentation-).
+[← Back to documentation](/README.md#documentation-)

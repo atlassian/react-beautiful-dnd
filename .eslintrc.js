@@ -9,7 +9,15 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   parser: 'babel-eslint',
-  plugins: ['prettier', 'flowtype', 'emotion', 'react', 'import', 'jest'],
+  plugins: [
+    'prettier',
+    'flowtype',
+    'emotion',
+    'react',
+    'react-hooks',
+    'import',
+    'jest',
+  ],
   env: {
     es6: true,
     browser: true,
@@ -92,5 +100,10 @@ module.exports = {
 
     // Allowing importing from dev deps (for stories and tests)
     'import/no-extraneous-dependencies': 'off',
+
+    // Enforce rules of hooks
+    'react-hooks/rules-of-hooks': 'error',
+    // Second argument to hook functions
+    'react-hooks/exhaustive-deps': 'warn',
   },
 };
