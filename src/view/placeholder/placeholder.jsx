@@ -109,8 +109,8 @@ const getStyle = ({
   };
 };
 
-const Placeholder = function Placeholder(props: Props) {
-  const mountTimer = useRef(null);
+const Placeholder = React.memo(function Placeholder(props: Props) {
+  const mountTimer = useRef<?TimeoutID>(null);
 
   const [isAnimatingOpenOnMount, setIsAnimatingOpenOnMount] = useState<boolean>(
     props.animate === 'open',
@@ -164,6 +164,6 @@ const Placeholder = function Placeholder(props: Props) {
     onTransitionEnd,
     ref: props.innerRef,
   });
-};
+});
 
 export default Placeholder;
