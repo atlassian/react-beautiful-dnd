@@ -24,7 +24,7 @@ In `react-beautiful-dnd` a dragging items impact is based on its centre of gravi
 > No support for drop shadows or line markings
 > _Drop shadow: putting a clone or 'shadow' of the dragging item in the drop location_
 
-`react-beautiful-dnd` relies on movement to communicate positioning. It is trying to create a system that is based on physical metaphores. Drop shadows, lines and other affordences are useful in drag and drop contexts where natural movement is not possible.
+`react-beautiful-dnd` relies on movement to communicate positioning. It is trying to create a system that is based on physical metaphores. Drop shadows, lines and other affordances are useful in drag and drop contexts where natural movement is not possible.
 
 Drop shadows pose a number of confusing design moments if combined with a natural movement system, including:
 
