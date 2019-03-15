@@ -41,6 +41,7 @@ import type {
   Selector,
 } from './draggable-types';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
+import StoreContext from '../context/store-context';
 
 const getCombineWith = (impact: DragImpact): ?DraggableId => {
   if (!impact.merge) {
@@ -288,10 +289,8 @@ const ConnectedDraggable: typeof DraggableType = (connect(
   null,
   // options
   {
-    // Using our own store key.
-    // This allows consumers to also use redux
-    // Note: the default store key is 'store'
-    storeKey,
+    // Using our own context for the store to avoid clashing with consumers
+    context: StoreContext,
     // Default value, but being really clear
     pure: true,
     // When pure, compares the result of mapStateToProps to its previous value.

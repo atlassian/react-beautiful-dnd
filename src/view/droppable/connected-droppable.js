@@ -22,7 +22,6 @@ import type {
   Selector,
   DispatchProps,
 } from './droppable-types';
-import { storeKey } from '../context-keys';
 import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
@@ -220,10 +219,8 @@ const ConnectedDroppable: typeof DroppableType = (connect(
   // mergeProps - using default
   null,
   {
-    // Using our own store key.
-    // This allows consumers to also use redux
-    // Note: the default store key is 'store'
-    storeKey,
+    // Ensuring our context does not clash with consumers
+    context: StoreContext,
     // pure: true is default value, but being really clear
     pure: true,
     // When pure, compares the result of mapStateToProps to its previous value.
