@@ -6,6 +6,4 @@ export type StyleMarshal = {|
   dropping: (reason: DropReason) => void,
   resting: () => void,
   styleContext: string,
-  unmount: () => void,
-  mount: () => void,
 |};

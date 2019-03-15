@@ -40,8 +40,8 @@ const getStyles = (rules: Rule[], property: string): string =>
 
 const noPointerEvents: string = 'pointer-events: none;';
 
-export default (styleContext: string): Styles => {
-  const getSelector = makeGetSelector(styleContext);
+export default (uniqueContext: string): Styles => {
+  const getSelector = makeGetSelector(uniqueContext);
 
   // ## Drag handle styles
 

@@ -5,8 +5,6 @@ import type { Announce } from '../../types';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';
 
-let count: number = 0;
-
 // https://allyjs.io/tutorials/hiding-elements.html
 // Element is visually hidden but is readable by screen readers
 const visuallyHidden: Object = {
@@ -22,10 +20,10 @@ const visuallyHidden: Object = {
   'clip-path': 'inset(100%)',
 };
 
-export default function useAnnouncer(): Announce {
+export default function useAnnouncer(uniqueId: number): Announce {
   const id: string = useMemo(
-    () => `react-beautiful-dnd-announcement-${count++}`,
-    [],
+    () => `react-beautiful-dnd-announcement-${uniqueId}`,
+    [uniqueId],
   );
   const ref = useRef<?HTMLElement>(null);
 

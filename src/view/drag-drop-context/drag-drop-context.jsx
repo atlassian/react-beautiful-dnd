@@ -11,14 +11,13 @@ import { Provider } from 'react-redux';
 import invariant from 'tiny-invariant';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
-import createStyleMarshal, {
-  resetStyleContext,
-} from '../style-marshal/style-marshal';
+import createStyleMarshal from '../use-style-marshal/use-style-marshal';
 import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../window/scroll-window';
 import createAutoScroller from '../../state/auto-scroller';
+import useStyleMarshal from '../use-style-marshal/use-style-marshal';
 import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
-import type { StyleMarshal } from '../style-marshal/style-marshal-types';
+import type { StyleMarshal } from '../use-style-marshal/style-marshal-types';
 import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
@@ -55,11 +54,6 @@ type Props = {|
   children: Node | null,
 |};
 
-// Reset any context that gets persisted across server side renders
-export const resetServerContext = () => {
-  resetStyleContext();
-};
-
 const printFatalDevError = (error: Error) => {
   if (process.env.NODE_ENV === 'production') {
     return;
@@ -86,11 +80,32 @@ const createResponders = (props: Props): Responders => ({
   onDragUpdate: props.onDragUpdate,
 });
 
+let count: number = 0;
+
+// Reset any context that gets persisted across server side renders
+export function resetServerContext() {
+  count = 0;
+}
+
 export default function DragDropContext(props: Props) {
-  const announce: Announce = useAnnouncer();
-  const styleMarshal: StyleMarshal = useStyleMarshal();
+  const uniqueId: number = useMemo(
+    (): number => count++,
+    // this must stay constant for each component
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+  const announce: Announce = useAnnouncer(uniqueId);
+  const styleMarshal: StyleMarshal = useStyleMarshal(uniqueId);
   const dimensionMarshal: DimensionMarshal = useDimensionMarshal();
   const autoScroller: AutoScroller = useAutoScroller();
+
+  // some validation when mounting
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      checkReactVersion(peerDependencies.react, React.version);
+      checkDoctype(document);
+    }
+  }, []);
 
   // lazy collection of responders using a ref
   const respondersRef = useRef<?Responders>(null);
@@ -116,12 +131,12 @@ export default function DragDropContext(props: Props) {
 
   const getCanLift = useCallback(
     (id: DraggableId) => canStartDrag(storeRef.current.getState(), id),
-    [storeRef],
+    [],
   );
 
   const getIsMovementAllowed = useCallback(
     () => isMovementAllowed(storeRef.current.getState()),
-    [storeRef],
+    [],
   );
 
   const appContext: AppContextValue = useMemo(
