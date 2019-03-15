@@ -11,7 +11,6 @@ import { Provider } from 'react-redux';
 import invariant from 'tiny-invariant';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
-import createStyleMarshal from '../use-style-marshal/use-style-marshal';
 import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../window/scroll-window';
 import createAutoScroller from '../../state/auto-scroller';
@@ -107,17 +106,15 @@ export default function DragDropContext(props: Props) {
     }
   }, []);
 
-  // lazy collection of responders using a ref
-  const respondersRef = useRef<?Responders>(null);
+  // lazy collection of responders using a ref - update on ever render
+  const lastPropsRef = useRef<Props>(props);
   useEffect(() => {
-    respondersRef.current = createResponders(props);
-  }, [props]);
+    lastPropsRef.current = props;
+  });
 
   const getResponders = useCallback((): Responders => {
-    const responders: ?Responders = respondersRef.current;
-    invariant(responders, 'Responders not created yet');
-    return responders;
-  }, [respondersRef]);
+    return createResponders(lastPropsRef.current);
+  }, []);
 
   const storeRef = useRef<Store>(
     createStore({
