@@ -26,6 +26,7 @@ import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../state/action-creators';
+import StoreContext from '../context/store-context';
 
 const idle: MapProps = {
   isDraggingOver: false,

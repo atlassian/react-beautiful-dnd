@@ -1,5 +1,5 @@
 // @flow
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { type Position, type BoxModel } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
@@ -34,6 +34,10 @@ import type {
 import getWindowScroll from '../window/get-window-scroll';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import checkOwnProps from './check-own-props';
+import AppContext, { type AppContextValue } from '../context/app-context';
+import DroppableContext, {
+  type DroppableContextValue,
+} from '../context/droppable-context';
 
 export const zIndexOptions: ZIndexOptions = {
   dragging: 5000,
@@ -72,14 +76,94 @@ const getShouldDraggingAnimate = (dragging: DraggingMapProps): boolean => {
   return dragging.mode === 'SNAP';
 };
 
-// function Draggable(props: Props) {
-//   const styleContext: string = useContext(styleContext);
-//   const ref = useRef<?HTMLElement>(null);
+function getDraggingStyle(dragging: DraggingMapProps): DraggingStyle {
+  const dimension: DraggableDimension = dragging.dimension;
+  const box: BoxModel = dimension.client;
+  const { offset, combineWith, dropping } = dragging;
 
-//   // A one time check for the validity of hooks
-//   // eslint-disable-next-line react-hooks/exhaustive-deps
-//   useEffect(() => checkOwnProps(props), []);
-// }
+  const isCombining: boolean = Boolean(combineWith);
+
+  const shouldAnimate: boolean = getShouldDraggingAnimate(dragging);
+  const isDropAnimating: boolean = Boolean(dropping);
+
+  const transform: ?string = isDropAnimating
+    ? transforms.drop(offset, isCombining)
+    : transforms.moveTo(offset);
+
+  const style: DraggingStyle = {
+    // ## Placement
+    position: 'fixed',
+    // As we are applying the margins we need to align to the start of the marginBox
+    top: box.marginBox.top,
+    left: box.marginBox.left,
+
+    // ## Sizing
+    // Locking these down as pulling the node out of the DOM could cause it to change size
+    boxSizing: 'border-box',
+    width: box.borderBox.width,
+    height: box.borderBox.height,
+
+    // ## Movement
+    // Opting out of the standard css transition for the dragging item
+    transition: getDraggingTransition(shouldAnimate, dropping),
+    transform,
+    opacity: getDraggingOpacity(isCombining, isDropAnimating),
+    // ## Layering
+    zIndex: isDropAnimating
+      ? zIndexOptions.dropAnimating
+      : zIndexOptions.dragging,
+
+    // ## Blocking any pointer events on the dragging or dropping item
+    // global styles on cover while dragging
+    pointerEvents: 'none',
+  };
+  return style;
+}
+
+function getSecondaryStyle(secondary: SecondaryMapProps): NotDraggingStyle {
+  return {
+    transform: transforms.moveTo(secondary.offset),
+    // transition style is applied in the head
+    transition: secondary.shouldAnimateDisplacement ? null : 'none',
+  };
+}
+
+function Draggable(props: Props) {
+  const appContext: ?AppContextValue = useContext(AppContext);
+  invariant(
+    appContext,
+    'Draggable expected a AppContext to be populated. Have you forgot a DragDropContext?',
+  );
+  const droppableContext: ?DroppableContextValue = useContext(DroppableContext);
+  invariant(
+    appContext,
+    'Draggable expected a DroppableContext to be populated. Have you forgot a Droppable?',
+  );
+
+  const callbacks: DragHandleCallbacks = {};
+  const dragHandleProps: DragHandleProvided = useDragHandle(callbacks);
+
+  const { dragging, secondary } = props;
+
+  const provided: Provided = useMemo(() => {
+    const style: DraggableStyle = dragging
+      ? getDraggingStyle(dragging)
+      : getSecondaryStyle(secondary);
+    const onTransitionEnd = dragging && dragging.dropping ? onMoveEnd : null;
+
+    const result: Provided = {
+      innerRef: setRef,
+      draggableProps: {
+        'data-react-beautiful-dnd-draggable': appContext.style,
+        style,
+        onTransitionEnd,
+      },
+      dragHandleProps,
+    };
+
+    return result;
+  }, [appContext.style, dragHandleProps, dragging, secondary]);
+}
 
 export default class Draggable extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
@@ -193,47 +277,7 @@ export default class Draggable extends React.Component<Props> {
 
   getDraggingStyle = memoizeOne(
     (dragging: DraggingMapProps): DraggingStyle => {
-      const dimension: DraggableDimension = dragging.dimension;
-      const box: BoxModel = dimension.client;
-      const { offset, combineWith, dropping } = dragging;
-
-      const isCombining: boolean = Boolean(combineWith);
-
-      const shouldAnimate: boolean = getShouldDraggingAnimate(dragging);
-      const isDropAnimating: boolean = Boolean(dropping);
-
-      const transform: ?string = isDropAnimating
-        ? transforms.drop(offset, isCombining)
-        : transforms.moveTo(offset);
-
-      const style: DraggingStyle = {
-        // ## Placement
-        position: 'fixed',
-        // As we are applying the margins we need to align to the start of the marginBox
-        top: box.marginBox.top,
-        left: box.marginBox.left,
-
-        // ## Sizing
-        // Locking these down as pulling the node out of the DOM could cause it to change size
-        boxSizing: 'border-box',
-        width: box.borderBox.width,
-        height: box.borderBox.height,
-
-        // ## Movement
-        // Opting out of the standard css transition for the dragging item
-        transition: getDraggingTransition(shouldAnimate, dropping),
-        transform,
-        opacity: getDraggingOpacity(isCombining, isDropAnimating),
-        // ## Layering
-        zIndex: isDropAnimating
-          ? zIndexOptions.dropAnimating
-          : zIndexOptions.dragging,
-
-        // ## Blocking any pointer events on the dragging or dropping item
-        // global styles on cover while dragging
-        pointerEvents: 'none',
-      };
-      return style;
+      co;
     },
   );
 
