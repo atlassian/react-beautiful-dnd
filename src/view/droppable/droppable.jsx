@@ -9,11 +9,9 @@ import React, {
   type Node,
 } from 'react';
 import type { Props, Provided, StateSnapshot } from './droppable-types';
-import type { DroppableId, TypeId } from '../../types';
+import useDroppableDimensionPublisher from '../use-droppable-dimension-publisher';
 import Placeholder from '../placeholder';
-import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 import AppContext, { type AppContextValue } from '../context/app-context';
-import { warning } from '../../dev-warning';
 import DroppableContext, {
   type DroppableContextValue,
 } from '../context/droppable-context';
@@ -22,10 +20,6 @@ import useAnimateInOut, {
 } from '../use-animate-in-out/use-animate-in-out';
 import getMaxWindowScroll from '../window/get-max-window-scroll';
 import { checkOwnProps, checkPlaceholder, checkProvidedRef } from './check';
-
-type Context = {
-  [string]: DroppableId | TypeId,
-};
 
 export default function Droppable(props: Props) {
   const appContext: ?AppContextValue = useContext<?AppContextValue>(AppContext);
@@ -84,9 +78,9 @@ export default function Droppable(props: Props) {
     droppableId,
     type,
     direction,
-    ignoreContainerClipping,
     isDropDisabled,
     isCombineEnabled,
+    ignoreContainerClipping,
     getDroppableRef,
     getPlaceholderRef,
   });
