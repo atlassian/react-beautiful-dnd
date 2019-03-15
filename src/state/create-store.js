@@ -27,19 +27,19 @@ const composeEnhancers =
     : compose;
 
 type Args = {|
-  getDimensionMarshal: () => DimensionMarshal,
+  dimensionMarshal: DimensionMarshal,
   styleMarshal: StyleMarshal,
   getResponders: () => Responders,
   announce: Announce,
-  getScroller: () => AutoScroller,
+  autoScroller: AutoScroller,
 |};
 
 export default ({
-  getDimensionMarshal,
+  dimensionMarshal,
   styleMarshal,
   getResponders,
   announce,
-  getScroller,
+  autoScroller,
 }: Args): Store =>
   createStore(
     reducer,
@@ -71,14 +71,14 @@ export default ({
         // when moving into a phase where collection is no longer needed.
         // We need to stop the marshal before responders fire as responders can cause
         // dimension registration changes in response to reordering
-        dimensionMarshalStopper(getDimensionMarshal),
+        dimensionMarshalStopper(dimensionMarshal),
         // Fire application responders in response to drag changes
-        lift(getDimensionMarshal),
+        lift(dimensionMarshal),
         drop,
         // When a drop animation finishes - fire a drop complete
         dropAnimationFinish,
         pendingDrop,
-        autoScroll(getScroller),
+        autoScroll(autoScroller),
         // Fire responders for consumers (after update to store)
         responders(getResponders, announce),
       ),

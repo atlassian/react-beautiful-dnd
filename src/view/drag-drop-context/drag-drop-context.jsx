@@ -1,8 +1,14 @@
 // @flow
-import React, { type Node } from 'react';
+import React, {
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+  type Node,
+} from 'react';
 import { bindActionCreators } from 'redux';
+import { Provider } from 'react-redux';
 import invariant from 'tiny-invariant';
-import PropTypes from 'prop-types';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import createStyleMarshal, {
@@ -10,16 +16,14 @@ import createStyleMarshal, {
 } from '../style-marshal/style-marshal';
 import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../window/scroll-window';
-import createAnnouncer from '../announcer/announcer';
 import createAutoScroller from '../../state/auto-scroller';
-import type { Announcer } from '../announcer/announcer-types';
 import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
 import type { StyleMarshal } from '../style-marshal/style-marshal-types';
 import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
-import type { DraggableId, State, Responders } from '../../types';
+import type { DraggableId, State, Responders, Announce } from '../../types';
 import type { Store } from '../../state/store-types';
 import {
   storeKey,
@@ -42,16 +46,14 @@ import { peerDependencies } from '../../../package.json';
 import checkReactVersion from './check-react-version';
 import checkDoctype from './check-doctype';
 import isMovementAllowed from '../../state/is-movement-allowed';
+import useAnnouncer from '../use-announcer';
+import AppContext, { type AppContextValue } from '../context/app-context';
 
 type Props = {|
   ...Responders,
   // we do not technically need any children for this component
   children: Node | null,
 |};
-
-type Context = {
-  [string]: Store,
-};
 
 // Reset any context that gets persisted across server side renders
 export const resetServerContext = () => {
@@ -77,7 +79,74 @@ const printFatalDevError = (error: Error) => {
   console.error('raw', error);
 };
 
-export default class DragDropContext extends React.Component<Props> {
+const createResponders = (props: Props): Responders => ({
+  onBeforeDragStart: props.onBeforeDragStart,
+  onDragStart: props.onDragStart,
+  onDragEnd: props.onDragEnd,
+  onDragUpdate: props.onDragUpdate,
+});
+
+export default function DragDropContext(props: Props) {
+  const announce: Announce = useAnnouncer();
+  const styleMarshal: StyleMarshal = useStyleMarshal();
+  const dimensionMarshal: DimensionMarshal = useDimensionMarshal();
+  const autoScroller: AutoScroller = useAutoScroller();
+
+  // lazy collection of responders using a ref
+  const respondersRef = useRef<?Responders>(null);
+  useEffect(() => {
+    respondersRef.current = createResponders(props);
+  }, [props]);
+
+  const getResponders = useCallback((): Responders => {
+    const responders: ?Responders = respondersRef.current;
+    invariant(responders, 'Responders not created yet');
+    return responders;
+  }, [respondersRef]);
+
+  const storeRef = useRef<Store>(
+    createStore({
+      dimensionMarshal,
+      styleMarshal,
+      announce,
+      autoScroller,
+      getResponders,
+    }),
+  );
+
+  const getCanLift = useCallback(
+    (id: DraggableId) => canStartDrag(storeRef.current.getState(), id),
+    [storeRef],
+  );
+
+  const getIsMovementAllowed = useCallback(
+    () => isMovementAllowed(storeRef.current.getState()),
+    [storeRef],
+  );
+
+  const appContext: AppContextValue = useMemo(
+    () => ({
+      marshal: dimensionMarshal,
+      style: styleMarshal.styleContext,
+      canLift: getCanLift,
+      isMovementAllowed: getIsMovementAllowed,
+    }),
+    [
+      dimensionMarshal,
+      getCanLift,
+      getIsMovementAllowed,
+      styleMarshal.styleContext,
+    ],
+  );
+
+  return (
+    <AppContext.Provider value={appContext}>
+      <Provider store={storeRef.current}>{props.children}</Provider>
+    </AppContext.Provider>
+  );
+}
+
+export class DragDropContext extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
   store: Store;
   dimensionMarshal: DimensionMarshal;

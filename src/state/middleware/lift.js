@@ -5,7 +5,7 @@ import type { DimensionMarshal } from '../dimension-marshal/dimension-marshal-ty
 import type { State, ScrollOptions, LiftRequest } from '../../types';
 import type { MiddlewareStore, Action, Dispatch } from '../store-types';
 
-export default (getMarshal: () => DimensionMarshal) => ({
+export default (marshal: DimensionMarshal) => ({
   getState,
   dispatch,
 }: MiddlewareStore) => (next: Dispatch) => (action: Action): any => {
@@ -14,7 +14,6 @@ export default (getMarshal: () => DimensionMarshal) => ({
     return;
   }
 
-  const marshal: DimensionMarshal = getMarshal();
   const { id, clientSelection, movementMode } = action.payload;
   const initial: State = getState();
 
