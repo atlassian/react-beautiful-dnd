@@ -1,5 +1,5 @@
 // @flow
-import React, { type Node } from 'react';
+import React, { useEffect } from 'react';
 import { type Position, type BoxModel } from 'css-box-model';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
@@ -71,6 +71,15 @@ const getShouldDraggingAnimate = (dragging: DraggingMapProps): boolean => {
   }
   return dragging.mode === 'SNAP';
 };
+
+// function Draggable(props: Props) {
+//   const styleContext: string = useContext(styleContext);
+//   const ref = useRef<?HTMLElement>(null);
+
+//   // A one time check for the validity of hooks
+//   // eslint-disable-next-line react-hooks/exhaustive-deps
+//   useEffect(() => checkOwnProps(props), []);
+// }
 
 export default class Draggable extends React.Component<Props> {
   /* eslint-disable react/sort-comp */
