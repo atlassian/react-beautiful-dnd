@@ -1,5 +1,5 @@
 // @flow
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useMemo } from 'react';
 import invariant from 'tiny-invariant';
 import memoizeOne from 'memoize-one';
 import getStyles, { type Styles } from './get-styles';
@@ -21,7 +21,9 @@ const createStyleEl = (): HTMLStyleElement => {
 
 export default function useStyleMarshal(uniqueId: number) {
   const uniqueContext: string = `${uniqueId}`;
-  const styles: Styles = getStyles(uniqueContext);
+  const styles: Styles = useMemo(() => getStyles(uniqueContext), [
+    uniqueContext,
+  ]);
   const alwaysRef = useRef<?HTMLStyleElement>(null);
   const dynamicRef = useRef<?HTMLStyleElement>(null);
 
@@ -39,7 +41,7 @@ export default function useStyleMarshal(uniqueId: number) {
     const el: ?HTMLStyleElement = alwaysRef.current;
     invariant(el, 'Cannot set dynamic style element if it is not set');
     el.textContent = proposed;
-  });
+  }, []);
 
   useEffect(() => {
     invariant(
