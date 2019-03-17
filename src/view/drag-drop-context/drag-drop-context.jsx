@@ -82,6 +82,7 @@ export function resetServerContext() {
 }
 
 export default function DragDropContext(props: Props) {
+  // TODO: cannot useMemo as it can be thrown away
   const uniqueId: number = useMemo(
     (): number => count++,
     // this must stay constant for each component
@@ -127,6 +128,14 @@ export default function DragDropContext(props: Props) {
     },
     lazyDispatch,
   );
+  // TODO: needs to be a ref
+  const dimensionMarshalRef = useRef<DimensionMarshal>();
+  function getDimensionMarshal(): DimensionMarshal {
+    if (dimensionMarshalRef.current) {
+      return dimensionMarshalRef.current;
+    }
+    dimension;
+  }
   const dimensionMarshal: DimensionMarshal = useMemo(
     () => createDimensionMarshal(callbacks),
     // dimension marshal cannot change
