@@ -7,7 +7,7 @@ export type Callbacks = {|
   onLift: ({
     clientSelection: Position,
     movementMode: MovementMode,
-  }) => void,
+  }) => mixed,
   onMove: (point: Position) => mixed,
   onWindowScroll: () => mixed,
   onMoveUp: () => mixed,

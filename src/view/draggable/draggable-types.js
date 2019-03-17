@@ -114,12 +114,16 @@ export type DraggingMapProps = {|
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
   forceShouldAnimate: ?boolean,
+  // TODO: snapshot
+  // snapshot: StateSnapshot,
 |};
 
 export type SecondaryMapProps = {|
   offset: Position,
   combineTargetFor: ?DraggableId,
   shouldAnimateDisplacement: boolean,
+  // TODO: snapshot
+  // snapshot: StateSnapshot,
 |};
 
 export type MapProps = {|
