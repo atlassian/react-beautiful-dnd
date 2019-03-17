@@ -58,5 +58,5 @@ export type Args = {|
   // whether interactive elements should be permitted to start a drag
   canDragInteractiveElements: boolean,
   // whether force touch interactions should be respected
-  getShouldRespectForceTouch: () => boolean,
+  shouldRespectForceTouch: boolean,
 |};

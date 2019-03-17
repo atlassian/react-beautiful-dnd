@@ -11,19 +11,14 @@ import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import getStyle from './get-style';
-import useDragHandle from './use-drag-handle';
+import useDragHandle from '../use-drag-handle/use-drag-handle';
 import type {
-  DraggableDimension,
-  DroppableId,
-  MovementMode,
-  TypeId,
-} from '../../types';
-import DraggableDimensionPublisher from '../draggable-dimension-publisher';
-import DragHandle from '../drag-handle';
-import type {
+  Args as DragHandleArgs,
   DragHandleProps,
-  Callbacks as DragHandleCallbacks,
-} from '../drag-handle/drag-handle-types';
+} from '../use-drag-handle/drag-handle-types';
+import type { DroppableId, MovementMode, TypeId } from '../../types';
+import DraggableDimensionPublisher from '../draggable-dimension-publisher';
+
 import { droppableIdKey, styleKey, droppableTypeKey } from '../context-keys';
 import * as timings from '../../debug/timings';
 import type {
@@ -54,6 +49,7 @@ export default function Draggable(props: Props) {
   const setRef = useCallback((el: ?HTMLElement) => {
     ref.current = el;
   }, []);
+  const getRef = useCallback((): ?HTMLElement => ref.current, []);
 
   // context
   const appContext: AppContextValue = useRequiredContext(AppContext);
@@ -67,6 +63,9 @@ export default function Draggable(props: Props) {
     children,
     draggableId,
     isDragDisabled,
+    shouldRespectForceTouch,
+    disableInteractiveElementBlocking: canDragInteractiveElements,
+    index,
 
     // mapProps
     dragging,
@@ -83,6 +82,28 @@ export default function Draggable(props: Props) {
     lift: liftAction,
     dropAnimationFinished: dropAnimationFinishedAction,
   } = props;
+
+  // The dimension publisher
+  const publisherArgs: DimensionPublisherArgs = useMemo(
+    () => ({
+      draggableId,
+      droppableId: droppableContext.droppableId,
+      type: droppableContext.type,
+      index,
+      getDraggableRef: getRef,
+    }),
+    [
+      draggableId,
+      droppableContext.droppableId,
+      droppableContext.type,
+      getRef,
+      index,
+    ],
+  );
+
+  useDraggableDimensionPublisher(publisherArgs);
+
+  // The Drag handle
 
   const onLift = useCallback(
     () => (options: {
@@ -132,7 +153,34 @@ export default function Draggable(props: Props) {
       onLift,
     ],
   );
-  const dragHandleProps: DragHandleProps = useDragHandle(callbacks);
+
+  const isDragging: boolean = Boolean(dragging);
+  const isDropAnimating: boolean = Boolean(dragging && dragging.dropping);
+
+  const dragHandleArgs: DragHandleArgs = useMemo(
+    () => ({
+      draggableId,
+      isDragging,
+      isDropAnimating,
+      isEnabled: !isDragDisabled,
+      callbacks,
+      getDraggableRef: getRef,
+      shouldRespectForceTouch,
+      canDragInteractiveElements,
+    }),
+    [
+      callbacks,
+      canDragInteractiveElements,
+      draggableId,
+      getRef,
+      isDragDisabled,
+      isDragging,
+      isDropAnimating,
+      shouldRespectForceTouch,
+    ],
+  );
+
+  const dragHandleProps: DragHandleProps = useDragHandle(dragHandleArgs);
 
   const onMoveEnd = useCallback(
     (event: TransitionEvent) => {
