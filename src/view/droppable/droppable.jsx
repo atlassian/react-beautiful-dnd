@@ -19,6 +19,7 @@ import useAnimateInOut, {
   type AnimateProvided,
 } from '../use-animate-in-out/use-animate-in-out';
 import getMaxWindowScroll from '../window/get-max-window-scroll';
+import { useConstantFn } from '../use-constant';
 import { checkOwnProps, checkPlaceholder, checkProvidedRef } from './check';
 
 export default function Droppable(props: Props) {
@@ -52,20 +53,18 @@ export default function Droppable(props: Props) {
     updateViewportMaxScroll,
   } = props;
 
-  const getDroppableRef = useCallback(
+  const getDroppableRef = useConstantFn(
     (): ?HTMLElement => droppableRef.current,
-    [],
   );
-  const getPlaceholderRef = useCallback(
+  const getPlaceholderRef = useConstantFn(
     (): ?HTMLElement => placeholderRef.current,
-    [],
   );
-  const setDroppableRef = useCallback((value: ?HTMLElement) => {
+  const setDroppableRef = useConstantFn((value: ?HTMLElement) => {
     droppableRef.current = value;
-  }, []);
-  const setPlaceholderRef = useCallback((value: ?HTMLElement) => {
+  });
+  const setPlaceholderRef = useConstantFn((value: ?HTMLElement) => {
     placeholderRef.current = value;
-  }, []);
+  });
 
   const onPlaceholderTransitionEnd = useCallback(() => {
     // A placeholder change can impact the window's max scroll

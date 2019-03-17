@@ -1,5 +1,10 @@
 // @flow
-import React, { useEffect, useRef, type Node } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  type Node,
+  type MutableRefObject,
+} from 'react';
 import { bindActionCreators } from 'redux';
 import { Provider } from 'react-redux';
 import createStore from '../../state/create-store';

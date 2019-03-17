@@ -20,13 +20,14 @@ const createStyleEl = (): HTMLStyleElement => {
 };
 
 export default function useStyleMarshal(uniqueId: number) {
-  const uniqueContext: string = `${uniqueId}`;
+  const uniqueContext: string = useMemo(() => `${uniqueId}`, [uniqueId]);
   const styles: Styles = useMemo(() => getStyles(uniqueContext), [
     uniqueContext,
   ]);
   const alwaysRef = useRef<?HTMLStyleElement>(null);
   const dynamicRef = useRef<?HTMLStyleElement>(null);
 
+  // TODO: need to check if the memoize one is working
   const setDynamicStyle = useCallback(
     // Using memoizeOne to prevent frequent updates to textContext
     memoizeOne((proposed: string) => {
@@ -87,34 +88,34 @@ export default function useStyleMarshal(uniqueId: number) {
     uniqueContext,
   ]);
 
-  const dragging = useCallback(
-    () => setDynamicStyle(styles.dragging),
-    // we can never invalidate this reference
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+  const dragging = useCallback(() => setDynamicStyle(styles.dragging), [
+    setDynamicStyle,
+    styles.dragging,
+  ]);
+  const dropping = useCallback(
+    (reason: DropReason) => {
+      if (reason === 'DROP') {
+        setDynamicStyle(styles.dropAnimating);
+        return;
+      }
+      setDynamicStyle(styles.userCancel);
+    },
+    [setDynamicStyle, styles.dropAnimating, styles.userCancel],
   );
-  const dropping = useCallback((reason: DropReason) => {
-    if (reason === 'DROP') {
-      setDynamicStyle(styles.dropAnimating);
-      return;
-    }
-    setDynamicStyle(styles.userCancel);
-    // we can never invalidate this reference
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const resting = useCallback(
-    () => setDynamicStyle(styles.resting),
-    // we can never invalidate this reference
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+  const resting = useCallback(() => setDynamicStyle(styles.resting), [
+    setDynamicStyle,
+    styles.resting,
+  ]);
 
-  const marshal: StyleMarshal = {
-    dragging,
-    dropping,
-    resting,
-    styleContext: uniqueContext,
-  };
+  const marshal: StyleMarshal = useMemo(
+    () => ({
+      dragging,
+      dropping,
+      resting,
+      styleContext: uniqueContext,
+    }),
+    [dragging, dropping, resting, uniqueContext],
+  );
 
   return marshal;
 }
