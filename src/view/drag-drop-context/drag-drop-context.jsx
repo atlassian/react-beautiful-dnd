@@ -1,12 +1,5 @@
 // @flow
-import React, {
-  useCallback,
-  useMemo,
-  useEffect,
-  useRef,
-  type Node,
-  type MutableRefObject,
-} from 'react';
+import React, { useEffect, useRef, type Node } from 'react';
 import { bindActionCreators } from 'redux';
 import { Provider } from 'react-redux';
 import createStore from '../../state/create-store';
@@ -24,6 +17,7 @@ import type {
 import type { DraggableId, State, Responders, Announce } from '../../types';
 import type { Store, Action } from '../../state/store-types';
 import StoreContext from '../context/store-context';
+import { useConstant, useConstantFn } from '../use-constant';
 import {
   clean,
   move,
@@ -82,13 +76,7 @@ export function resetServerContext() {
 }
 
 export default function DragDropContext(props: Props) {
-  // TODO: cannot useMemo as it can be thrown away
-  const uniqueId: number = useMemo(
-    (): number => count++,
-    // this must stay constant for each component
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+  const uniqueId: number = useConstant<number>((): number => count++);
 
   let storeRef: MutableRefObject<Store>;
 
@@ -106,62 +94,51 @@ export default function DragDropContext(props: Props) {
     lastPropsRef.current = props;
   });
 
-  const getResponders = useCallback((): Responders => {
+  const getResponders: () => Responders = useConstantFn(() => {
     return createResponders(lastPropsRef.current);
-  }, []);
+  });
 
   const announce: Announce = useAnnouncer(uniqueId);
   const styleMarshal: StyleMarshal = useStyleMarshal(uniqueId);
 
-  const lazyDispatch = useCallback((action: Action) => {
-    storeRef.current.dispatch(action);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const callbacks: DimensionMarshalCallbacks = bindActionCreators(
-    {
-      publishWhileDragging,
-      updateDroppableScroll,
-      updateDroppableIsEnabled,
-      updateDroppableIsCombineEnabled,
-      collectionStarting,
+  const lazyDispatch: Action => void = useConstantFn(
+    (action: Action): void => {
+      storeRef.current.dispatch(action);
     },
-    lazyDispatch,
-  );
-  // TODO: needs to be a ref
-  const dimensionMarshalRef = useRef<DimensionMarshal>();
-  function getDimensionMarshal(): DimensionMarshal {
-    if (dimensionMarshalRef.current) {
-      return dimensionMarshalRef.current;
-    }
-    dimension;
-  }
-  const dimensionMarshal: DimensionMarshal = useMemo(
-    () => createDimensionMarshal(callbacks),
-    // dimension marshal cannot change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
   );
 
-  const autoScroller: AutoScroller = useMemo<AutoScroller>(
-    () =>
-      createAutoScroller({
-        scrollWindow,
-        scrollDroppable: dimensionMarshal.scrollDroppable,
-        ...bindActionCreators(
-          {
-            move,
-          },
-          lazyDispatch,
-        ),
-      }),
-    // forcing only one time creation.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+  const callbacks: DimensionMarshalCallbacks = useConstant(() =>
+    bindActionCreators(
+      {
+        publishWhileDragging,
+        updateDroppableScroll,
+        updateDroppableIsEnabled,
+        updateDroppableIsCombineEnabled,
+        collectionStarting,
+      },
+      // $FlowFixMe - not sure why this is wrong
+      lazyDispatch,
+    ),
+  );
+  const dimensionMarshal: DimensionMarshal = useConstant<DimensionMarshal>(() =>
+    createDimensionMarshal(callbacks),
   );
 
-  // TODO: will this create a new store every render?
-  storeRef = useRef<Store>(
+  const autoScroller: AutoScroller = useConstant<AutoScroller>(() =>
+    createAutoScroller({
+      scrollWindow,
+      scrollDroppable: dimensionMarshal.scrollDroppable,
+      ...bindActionCreators(
+        {
+          move,
+        },
+        // $FlowFixMe - not sure why this is wrong
+        lazyDispatch,
+      ),
+    }),
+  );
+
+  const store: Store = useConstant(() =>
     createStore({
       dimensionMarshal,
       styleMarshal,
@@ -171,30 +148,22 @@ export default function DragDropContext(props: Props) {
     }),
   );
 
-  const getCanLift = useCallback(
-    (id: DraggableId) => canStartDrag(storeRef.current.getState(), id),
-    [storeRef],
+  storeRef = useRef<Store>(store);
+
+  const getCanLift = useConstantFn((id: DraggableId) =>
+    canStartDrag(storeRef.current.getState(), id),
   );
 
-  const getIsMovementAllowed = useCallback(
-    () => isMovementAllowed(storeRef.current.getState()),
-    [storeRef],
+  const getIsMovementAllowed = useConstantFn(() =>
+    isMovementAllowed(storeRef.current.getState()),
   );
 
-  const appContext: AppContextValue = useMemo(
-    () => ({
-      marshal: dimensionMarshal,
-      style: styleMarshal.styleContext,
-      canLift: getCanLift,
-      isMovementAllowed: getIsMovementAllowed,
-    }),
-    [
-      dimensionMarshal,
-      getCanLift,
-      getIsMovementAllowed,
-      styleMarshal.styleContext,
-    ],
-  );
+  const appContext: AppContextValue = useConstant(() => ({
+    marshal: dimensionMarshal,
+    style: styleMarshal.styleContext,
+    canLift: getCanLift,
+    isMovementAllowed: getIsMovementAllowed,
+  }));
 
   return (
     <AppContext.Provider value={appContext}>
