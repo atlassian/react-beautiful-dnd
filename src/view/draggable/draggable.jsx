@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import invariant from 'tiny-invariant';
 import getStyle from './get-style';
+import useDragHandle from './use-drag-handle';
 import type {
   DraggableDimension,
   DroppableId,

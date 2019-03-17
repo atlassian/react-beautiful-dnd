@@ -44,7 +44,7 @@ export type DragHandleProps = {|
   onDragStart: (event: DragEvent) => void,
 |};
 
-export type Props = {|
+export type Args = {|
   draggableId: DraggableId,
   // callbacks provided by the draggable
   callbacks: Callbacks,
@@ -59,5 +59,4 @@ export type Props = {|
   canDragInteractiveElements: boolean,
   // whether force touch interactions should be respected
   getShouldRespectForceTouch: () => boolean,
-  children: (?DragHandleProps) => Node,
 |};

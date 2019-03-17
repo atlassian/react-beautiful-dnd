@@ -1,20 +1,24 @@
 // @flow
 import { useRef } from 'react';
-import { warning } from '../dev-warning';
 
+// Using an object to hold the result incase the result is falsy
+type Result<T> = {
+  value: T,
+};
+
+// Similiar to useMemo(() => T, []), but not subject to memoization purging
 export function useConstant<T>(fn: () => T): T {
-  const bucket = useRef<?T>(null);
+  const bucket = useRef<?Result<T>>(null);
 
   if (bucket.current) {
-    return bucket.current;
+    return bucket.current.value;
   }
 
-  bucket.current = fn();
+  bucket.current = {
+    value: fn(),
+  };
 
-  if (!bucket.current) {
-    warning('Expected constantFn to be truthy');
-  }
-  return bucket.current;
+  return bucket.current.value;
 }
 
 export function useConstantFn<GetterFn: Function>(getter: GetterFn): GetterFn {
