@@ -24,7 +24,7 @@ More information: [identifiers guide](/docs/guides/identifiers.md)
 
 This can happen if you have a `margin-top` as well as a `margin-bottom` on a `<Draggable />`.
 
-[More information](https://github.com/atlassian/react-beautiful-dnd#unsupported-margin-setups)
+[More information](/docs/api/draggable.md#unsupported-margin-setups)
 
 ## Avoid empty lists
 
