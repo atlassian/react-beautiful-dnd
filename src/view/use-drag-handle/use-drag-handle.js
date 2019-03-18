@@ -93,6 +93,7 @@ export default function useDragHandle(args: Args): DragHandleProps {
 
   // handle aborting
   useLayoutEffect(() => {
+    // No longer dragging but still capturing: need to abort
     if (!isDragging && isAnythingCapturingRef.current) {
       setShouldAbortCapture(true);
     }
@@ -100,7 +101,7 @@ export default function useDragHandle(args: Args): DragHandleProps {
 
   // handle is being disabled
   useLayoutEffect(() => {
-    // nothing capturing - we are all good
+    // No longer enabled but still capturing: need to abort
     if (!isEnabled && isAnythingCapturingRef.current) {
       setShouldAbortCapture(true);
     }
@@ -125,6 +126,7 @@ export default function useDragHandle(args: Args): DragHandleProps {
       'data-react-beautiful-dnd-drag-handle': styleContext,
       // English default. Consumers are welcome to add their own start instruction
       'aria-roledescription': 'Draggable item. Press space bar to lift',
+      // Opting out of html5 drag and drops
       draggable: false,
       onDragStart: preventHtml5Dnd,
     }),
