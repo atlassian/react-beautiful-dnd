@@ -1,5 +1,10 @@
 // @flow
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+} from 'react';
 import type { Spacing } from 'css-box-model';
 import type {
   Placeholder as PlaceholderType,
@@ -109,49 +114,37 @@ const getStyle = ({
   };
 };
 
-const Placeholder = React.memo(function Placeholder(props: Props) {
-  const mountTimer = useRef<?TimeoutID>(null);
-
+function Placeholder(props: Props) {
+  const { animate, onTransitionEnd, onClose } = props;
   const [isAnimatingOpenOnMount, setIsAnimatingOpenOnMount] = useState<boolean>(
     props.animate === 'open',
   );
 
+  // will run after a render is flushed
   useEffect(() => {
-    const clear = () => {
-      if (mountTimer.current) {
-        clearTimeout(mountTimer.current);
-        mountTimer.current = null;
-      }
-    };
-
-    if (!isAnimatingOpenOnMount) {
-      return clear;
-    }
-
-    mountTimer.current = setTimeout(() => {
-      mountTimer.current = null;
-
+    if (isAnimatingOpenOnMount) {
       setIsAnimatingOpenOnMount(false);
-    });
-
-    return clear;
+    }
   }, [isAnimatingOpenOnMount]);
 
-  const onTransitionEnd = (event: TransitionEvent) => {
-    // We transition height, width and margin
-    // each of those transitions will independently call this callback
-    // Because they all have the same duration we can just respond to one of them
-    // 'height' was chosen for no particular reason :D
-    if (event.propertyName !== 'height') {
-      return;
-    }
+  const onSizeChangeEnd = useCallback(
+    (event: TransitionEvent) => {
+      // We transition height, width and margin
+      // each of those transitions will independently call this callback
+      // Because they all have the same duration we can just respond to one of them
+      // 'height' was chosen for no particular reason :D
+      if (event.propertyName !== 'height') {
+        return;
+      }
 
-    props.onTransitionEnd();
+      onTransitionEnd();
 
-    if (props.animate === 'close') {
-      props.onClose();
-    }
-  };
+      if (animate === 'close') {
+        onClose();
+      }
+    },
+    [animate, onClose, onTransitionEnd],
+  );
 
   const style: PlaceholderStyle = getStyle({
     isAnimatingOpenOnMount,
@@ -161,9 +154,9 @@ const Placeholder = React.memo(function Placeholder(props: Props) {
 
   return React.createElement(props.placeholder.tagName, {
     style,
-    onTransitionEnd,
+    onTransitionEnd: onSizeChangeEnd,
     ref: props.innerRef,
   });
-});
+}
 
-export default Placeholder;
+export default React.memo(Placeholder);

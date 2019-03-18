@@ -1,5 +1,5 @@
 // @flow
-import { useMemo, useCallback, useEffect, useState } from 'react';
+import { useMemo, useCallback, useLayoutEffect, useState } from 'react';
 import type { InOutAnimationMode } from '../../types';
 
 export type AnimateProvided = {|
@@ -20,7 +20,10 @@ export default function useAnimateInOut(args: Args): ?AnimateProvided {
     args.shouldAnimate && args.on ? 'open' : 'none',
   );
 
-  useEffect(() => {
+  console.warn('useAnimateInOut: render');
+
+  useLayoutEffect(() => {
+    console.warn('useAnimateInOut: layout effect');
     if (!args.shouldAnimate) {
       setIsVisible(Boolean(args.on));
       setData(args.on);

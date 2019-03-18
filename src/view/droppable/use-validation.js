@@ -39,11 +39,19 @@ function checkPlaceholderRef(props: Props, placeholderEl: ?HTMLElement) {
   `);
 }
 
-export default function useValidation(
+type Args = {|
   props: Props,
   getDroppableRef: () => ?HTMLElement,
+  shouldCheckPlaceholder: boolean,
   getPlaceholderRef: () => ?HTMLElement,
-) {
+|};
+
+export default function useValidation({
+  props,
+  getDroppableRef,
+  shouldCheckPlaceholder,
+  getPlaceholderRef,
+}: Args) {
   // Running on every update
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
@@ -52,6 +60,8 @@ export default function useValidation(
 
     checkOwnProps(props);
     checkIsValidInnerRef(getDroppableRef());
-    checkPlaceholderRef(props, getPlaceholderRef());
+    if (shouldCheckPlaceholder) {
+      checkPlaceholderRef(props, getPlaceholderRef());
+    }
   });
 }

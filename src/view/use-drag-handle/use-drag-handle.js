@@ -13,7 +13,9 @@ function preventHtml5Dnd(event: DragEvent) {
 }
 
 export default function useDragHandle(args: Args): DragHandleProps {
-  const { canLift, style }: AppContextValue = useRequiredContext(AppContext);
+  const { canLift, style: styleContext }: AppContextValue = useRequiredContext(
+    AppContext,
+  );
   const { callbacks, getDraggableRef, getShouldRespectForceTouch } = args;
 
   const getWindow = useCallback(
@@ -51,13 +53,13 @@ export default function useDragHandle(args: Args): DragHandleProps {
       onFocus,
       onBlur,
       tabIndex: 0,
-      'data-react-beautiful-dnd-drag-handle': style,
+      'data-react-beautiful-dnd-drag-handle': styleContext,
       // English default. Consumers are welcome to add their own start instruction
       'aria-roledescription': 'Draggable item. Press space bar to lift',
       draggable: false,
       onDragStart: preventHtml5Dnd,
     }),
-    [onBlur, onFocus, onMouseDown, style],
+    [onBlur, onFocus, onMouseDown, styleContext],
   );
 
   return props;

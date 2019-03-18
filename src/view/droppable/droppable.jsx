@@ -27,11 +27,7 @@ export default function Droppable(props: Props) {
   const droppableRef = useRef<?HTMLElement>(null);
   const placeholderRef = useRef<?HTMLElement>(null);
 
-  useValidation(
-    props,
-    () => droppableRef.current,
-    () => placeholderRef.current,
-  );
+  // Note: Running validation at the end as it uses some placeholder things
 
   const {
     // own props
@@ -125,6 +121,15 @@ export default function Droppable(props: Props) {
     }),
     [droppableId, type],
   );
+
+  useValidation({
+    props,
+    getDroppableRef: () => droppableRef.current,
+    // Not checking on the first placement :(
+    // The droppable placeholder is not set yet as the useLayoutEffect + setState has not finished
+    shouldCheckPlaceholder: Boolean(instruction),
+    getPlaceholderRef: () => placeholderRef.current,
+  });
 
   return (
     <DroppableContext.Provider value={droppableContext}>

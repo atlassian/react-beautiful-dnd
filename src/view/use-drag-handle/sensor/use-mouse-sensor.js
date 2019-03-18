@@ -157,9 +157,10 @@ export default function useMouseSensor(args: Args): Result {
       {
         eventName: 'mouseup',
         fn: (event: MouseEvent) => {
+          const wasDragging: boolean = isDraggingRef.current;
           stop();
 
-          if (isDraggingRef.current) {
+          if (wasDragging) {
             // preventing default as we are using this event
             event.preventDefault();
             callbacks.onDrop();

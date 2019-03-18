@@ -1,5 +1,12 @@
 // @flow
-import { useCallback, useMemo, useEffect, useContext, useRef } from 'react';
+import {
+  useCallback,
+  useMemo,
+  useEffect,
+  useContext,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import rafSchedule from 'raf-schd';
@@ -231,22 +238,22 @@ export default function useDroppableDimensionPublisher(args: Props) {
   }, [onClosestScroll, scheduleScrollUpdate]);
   const scroll = useCallback(() => {
     invariant('TODO');
-  });
+  }, []);
 
-  const callbacks: DroppableCallbacks = useMemo(
-    () => ({
+  const callbacks: DroppableCallbacks = useMemo(() => {
+    console.log('breaking callbacks memo');
+    return {
       getDimensionAndWatchScroll,
       recollect,
       dragStopped,
       scroll,
-    }),
-    [dragStopped, getDimensionAndWatchScroll, recollect, scroll],
-  );
+    };
+  }, [dragStopped, getDimensionAndWatchScroll, recollect, scroll]);
 
   // Register with the marshal and let it know of:
   // - any descriptor changes
   // - when it unmounts
-  useEffect(() => {
+  useLayoutEffect(() => {
     marshal.registerDroppable(descriptor, callbacks);
 
     return () => {
