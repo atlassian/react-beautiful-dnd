@@ -29,7 +29,7 @@ const scrollJumpKeys: KeyMap = {
 const noop = () => {};
 
 export default ({
-  callbacks,
+  getCallbacks,
   getWindow,
   getDraggableRef,
   canStartCapturing,
@@ -59,10 +59,11 @@ export default ({
     }
   };
   const cancel = () => {
-    stopDragging(callbacks.onCancel);
+    stopDragging(getCallbacks().onCancel);
   };
   const isDragging = (): boolean => state.isDragging;
-  const schedule = createScheduler(callbacks);
+  // TODO: we assume here that the callbacks can never change
+  const schedule = createScheduler(getCallbacks());
 
   const onKeyDown = (event: KeyboardEvent) => {
     // not yet dragging
@@ -93,7 +94,7 @@ export default ({
       // we are using this event for part of the drag
       event.preventDefault();
       startDragging(() =>
-        callbacks.onLift({
+        getCallbacks().onLift({
           clientSelection: center,
           movementMode: 'SNAP',
         }),
@@ -112,7 +113,7 @@ export default ({
     if (event.keyCode === keyCodes.space) {
       // need to stop parent Draggable's thinking this is a lift
       event.preventDefault();
-      stopDragging(callbacks.onDrop);
+      stopDragging(getCallbacks().onDrop);
       return;
     }
 
@@ -200,7 +201,7 @@ export default ({
           return;
         }
 
-        callbacks.onWindowScroll();
+        getCallbacks().onWindowScroll();
       },
     },
     // Cancel on page visibility change

@@ -7,7 +7,7 @@ import type {
   KeyboardSensor,
   TouchSensor,
 } from './sensor/sensor-types';
-import type { Args, DragHandleProps } from './drag-handle-types';
+import type { Args, DragHandleProps, Callbacks } from './drag-handle-types';
 import { useConstant, useConstantFn } from '../use-constant';
 import createKeyboardSensor from './sensor/create-keyboard-sensor';
 import createTouchSensor from './sensor/create-touch-sensor';
@@ -23,21 +23,16 @@ function preventHtml5Dnd(event: DragEvent) {
 }
 
 export default function useDragHandle(args: Args): DragHandleProps {
-  console.log('rendering drag handle');
   const { canLift, style }: AppContextValue = useRequiredContext(AppContext);
-  const {
-    draggableId,
-    callbacks,
-    isEnabled,
-    isDragging,
-    canDragInteractiveElements,
-    getShouldRespectForceTouch,
-    getDraggableRef,
-  } = args;
+
+  // side effect on every render
+  const latestArgsRef = useRef<Args>(args);
+  latestArgsRef.current = args;
+  const getLatestArgs = useConstantFn(() => latestArgsRef.current);
 
   // TODO: things will go bad if getDraggableRef changes
   const getWindow = useConstantFn(
-    (): HTMLElement => getWindowFromEl(getDraggableRef()),
+    (): HTMLElement => getWindowFromEl(getLatestArgs().getDraggableRef()),
   );
 
   const isFocusedRef = useRef<boolean>(false);
@@ -48,13 +43,12 @@ export default function useDragHandle(args: Args): DragHandleProps {
     isFocusedRef.current = false;
   });
 
-  let sensors: Sensor[];
-
   const isAnySensorCapturing = useConstantFn(() =>
-    sensors.some((sensor: Sensor): boolean => sensor.isCapturing()),
+    // using getSensors before it is defined
+    // eslint-disable-next-line no-use-before-define
+    getSensors().some((sensor: Sensor): boolean => sensor.isCapturing()),
   );
 
-  // TODO: this will break if draggableId changes
   const canStartCapturing = useConstantFn((event: Event) => {
     // this might be before a drag has started - isolated to this element
     if (isAnySensorCapturing()) {
@@ -62,20 +56,27 @@ export default function useDragHandle(args: Args): DragHandleProps {
     }
 
     // this will check if anything else in the system is dragging
-    if (!canLift(draggableId)) {
+    if (!canLift(getLatestArgs().draggableId)) {
       return false;
     }
 
     // check if we are dragging an interactive element
-    return shouldAllowDraggingFromTarget(event, canDragInteractiveElements);
+    return shouldAllowDraggingFromTarget(
+      event,
+      getLatestArgs().canDragInteractiveElements,
+    );
   });
 
+  const getCallbacks = useConstantFn(
+    (): Callbacks => getLatestArgs().callbacks,
+  );
+
   const createArgs: CreateSensorArgs = useConstant(() => ({
-    callbacks,
-    getDraggableRef,
+    getCallbacks,
+    getDraggableRef: getLatestArgs().getDraggableRef,
     canStartCapturing,
     getWindow,
-    getShouldRespectForceTouch,
+    getShouldRespectForceTouch: getLatestArgs().getShouldRespectForceTouch,
   }));
 
   const mouse: MouseSensor = useConstant(() => createMouseSensor(createArgs));
@@ -83,7 +84,7 @@ export default function useDragHandle(args: Args): DragHandleProps {
     createKeyboardSensor(createArgs),
   );
   const touch: TouchSensor = useConstant(() => createTouchSensor(createArgs));
-  sensors = useConstant(() => [mouse, keyboard, touch]);
+  const getSensors = useConstantFn(() => [mouse, keyboard, touch]);
 
   const onKeyDown = useConstantFn((event: KeyboardEvent) => {
     // let the other sensors deal with it
@@ -119,14 +120,14 @@ export default function useDragHandle(args: Args): DragHandleProps {
   useLayoutEffect(() => {
     // Just a cleanup function
     return () => {
-      sensors.forEach((sensor: Sensor) => {
+      getSensors().forEach((sensor: Sensor) => {
         // kill the current drag and fire a cancel event if
         const wasDragging: boolean = sensor.isDragging();
 
         sensor.unmount();
         // Cancel if drag was occurring
         if (wasDragging) {
-          callbacks.onCancel();
+          latestArgsRef.current.callbacks.onCancel();
         }
       });
     };
@@ -136,7 +137,7 @@ export default function useDragHandle(args: Args): DragHandleProps {
 
   // Checking for disabled changes during a drag
   useLayoutEffect(() => {
-    sensors.forEach((sensor: Sensor) => {
+    getSensors().forEach((sensor: Sensor) => {
       if (!sensor.isCapturing()) {
         return;
       }
@@ -148,23 +149,23 @@ export default function useDragHandle(args: Args): DragHandleProps {
         warning(
           'You have disabled dragging on a Draggable while it was dragging. The drag has been cancelled',
         );
-        callbacks.onCancel();
+        getLatestArgs().callbacks.onCancel();
       }
     });
-  }, [callbacks, isEnabled, sensors]);
+  }, [getLatestArgs, getSensors]);
 
   // Drag aborted elsewhere in application
   useLayoutEffect(() => {
-    if (isDragging) {
+    if (getLatestArgs().isDragging) {
       return;
     }
 
-    sensors.forEach((sensor: Sensor) => {
+    getSensors().forEach((sensor: Sensor) => {
       if (sensor.isCapturing()) {
         sensor.kill();
       }
     });
-  }, [isDragging, sensors]);
+  }, [getLatestArgs, getSensors]);
 
   const props: DragHandleProps = useConstant(() => ({
     onMouseDown,

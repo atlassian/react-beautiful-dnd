@@ -103,7 +103,7 @@ const initial: State = {
 };
 
 export default ({
-  callbacks,
+  getCallbacks,
   getWindow,
   canStartCapturing,
   getShouldRespectForceTouch,
@@ -119,7 +119,8 @@ export default ({
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean =>
     Boolean(state.pending || state.isDragging || state.longPressTimerId);
-  const schedule = createScheduler(callbacks);
+  // TODO: assuming they do not change reference...
+  const schedule = createScheduler(getCallbacks());
   const postDragEventPreventer: EventPreventer = createPostDragEventPreventer(
     getWindow,
   );
@@ -143,7 +144,7 @@ export default ({
       longPressTimerId: null,
     });
 
-    callbacks.onLift({
+    getCallbacks().onLift({
       clientSelection: pending,
       movementMode: 'FLUID',
     });
@@ -208,7 +209,7 @@ export default ({
   };
 
   const cancel = () => {
-    kill(callbacks.onCancel);
+    kill(getCallbacks().onCancel);
   };
 
   const windowBindings: EventBinding[] = [
@@ -257,7 +258,7 @@ export default ({
 
         // already dragging - this event is directly ending a drag
         event.preventDefault();
-        stopDragging(callbacks.onDrop);
+        stopDragging(getCallbacks().onDrop);
       },
     },
     {
@@ -271,7 +272,7 @@ export default ({
 
         // already dragging - this event is directly ending a drag
         event.preventDefault();
-        stopDragging(callbacks.onCancel);
+        stopDragging(getCallbacks().onCancel);
       },
     },
     // another touch start should not happen without a

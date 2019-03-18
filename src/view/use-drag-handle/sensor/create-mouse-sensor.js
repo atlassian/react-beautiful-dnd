@@ -36,7 +36,7 @@ const noop = () => {};
 const mouseDownMarshal: EventMarshal = createEventMarshal();
 
 export default ({
-  callbacks,
+  getCallbacks,
   getWindow,
   canStartCapturing,
 }: CreateSensorArgs): MouseSensor => {
@@ -49,7 +49,8 @@ export default ({
   };
   const isDragging = (): boolean => state.isDragging;
   const isCapturing = (): boolean => Boolean(state.pending || state.isDragging);
-  const schedule = createScheduler(callbacks);
+  // TODO: we assume here that the callbacks can never change
+  const schedule = createScheduler(getCallbacks());
   const postDragEventPreventer: EventPreventer = createPostDragEventPreventer(
     getWindow,
   );
@@ -101,7 +102,7 @@ export default ({
   };
 
   const cancel = () => {
-    kill(callbacks.onCancel);
+    kill(getCallbacks().onCancel);
   };
 
   const windowBindings: EventBinding[] = [
@@ -146,7 +147,7 @@ export default ({
         // preventing default as we are using this event
         event.preventDefault();
         startDragging(() =>
-          callbacks.onLift({
+          getCallbacks().onLift({
             clientSelection: point,
             movementMode: 'FLUID',
           }),
@@ -163,7 +164,7 @@ export default ({
 
         // preventing default as we are using this event
         event.preventDefault();
-        stopDragging(callbacks.onDrop);
+        stopDragging(getCallbacks().onDrop);
       },
     },
     {
@@ -175,7 +176,7 @@ export default ({
           event.preventDefault();
         }
 
-        stopDragging(callbacks.onCancel);
+        stopDragging(getCallbacks().onCancel);
       },
     },
     {
@@ -225,7 +226,7 @@ export default ({
           stopPendingDrag();
           return;
         }
-        // callbacks.onWindowScroll();
+        // getCallbacks().onWindowScroll();
         schedule.windowScrollMove();
       },
     },
