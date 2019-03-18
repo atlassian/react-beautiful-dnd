@@ -20,10 +20,7 @@ export default function useAnimateInOut(args: Args): ?AnimateProvided {
     args.shouldAnimate && args.on ? 'open' : 'none',
   );
 
-  console.warn('useAnimateInOut: render');
-
   useLayoutEffect(() => {
-    console.warn('useAnimateInOut: layout effect');
     if (!args.shouldAnimate) {
       setIsVisible(Boolean(args.on));
       setData(args.on);

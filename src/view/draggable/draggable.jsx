@@ -97,7 +97,6 @@ export default function Draggable(props: Props) {
   const onLift = useCallback(
     (options: { clientSelection: Position, movementMode: MovementMode }) => {
       timings.start('LIFT');
-      console.warn('ON_LIFT');
       const el: ?HTMLElement = ref.current;
       invariant(el);
       invariant(!isDragDisabled, 'Cannot lift a Draggable when it is disabled');
