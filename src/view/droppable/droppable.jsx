@@ -27,7 +27,11 @@ export default function Droppable(props: Props) {
   const droppableRef = useRef<?HTMLElement>(null);
   const placeholderRef = useRef<?HTMLElement>(null);
 
-  useValidation(props, droppableRef.current, placeholderRef.current);
+  useValidation(
+    props,
+    () => droppableRef.current,
+    () => placeholderRef.current,
+  );
 
   const {
     // own props

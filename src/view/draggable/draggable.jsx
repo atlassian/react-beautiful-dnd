@@ -45,7 +45,7 @@ export default function Draggable(props: Props) {
   );
 
   // Validating props and innerRef
-  useValidation(props, ref.current);
+  useValidation(props, getRef);
 
   // props
   const {

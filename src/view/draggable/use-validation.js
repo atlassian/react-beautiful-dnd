@@ -17,13 +17,16 @@ function checkOwnProps(props: Props) {
   );
 }
 
-export default function useValidation(props: Props, el: ?HTMLElement) {
+export default function useValidation(
+  props: Props,
+  getRef: () => ?HTMLElement,
+) {
   // running after every update in development
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
       return;
     }
     checkOwnProps(props);
-    checkIsValidInnerRef(el);
+    checkIsValidInnerRef(getRef());
   });
 }

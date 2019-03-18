@@ -41,8 +41,8 @@ function checkPlaceholderRef(props: Props, placeholderEl: ?HTMLElement) {
 
 export default function useValidation(
   props: Props,
-  droppableRef: ?HTMLElement,
-  placeholderRef: ?HTMLElement,
+  getDroppableRef: () => ?HTMLElement,
+  getPlaceholderRef: () => ?HTMLElement,
 ) {
   // Running on every update
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function useValidation(
     }
 
     checkOwnProps(props);
-    checkPlaceholderRef(props, placeholderRef);
-    checkIsValidInnerRef(droppableRef);
+    checkIsValidInnerRef(getDroppableRef());
+    checkPlaceholderRef(props, getPlaceholderRef());
   });
 }
