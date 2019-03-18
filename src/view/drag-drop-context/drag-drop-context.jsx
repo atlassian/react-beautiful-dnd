@@ -33,12 +33,10 @@ import {
   collectionStarting,
 } from '../../state/action-creators';
 import { getFormattedMessage } from '../../dev-warning';
-import { peerDependencies } from '../../../package.json';
-import checkReactVersion from './check-react-version';
-import checkDoctype from './check-doctype';
 import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
 import AppContext, { type AppContextValue } from '../context/app-context';
+import useStartupValidation from './use-startup-validation';
 
 type Props = {|
   ...Responders,
@@ -81,17 +79,12 @@ export function resetServerContext() {
 }
 
 export default function DragDropContext(props: Props) {
+  // We do not want this to change
   const uniqueId: number = useConstant<number>((): number => count++);
 
   let storeRef: MutableRefObject<Store>;
 
-  // some validation when mounting
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      checkReactVersion(peerDependencies.react, React.version);
-      checkDoctype(document);
-    }
-  }, []);
+  useStartupValidation();
 
   // lazy collection of responders using a ref - update on ever render
   const lastPropsRef = useRef<Props>(props);

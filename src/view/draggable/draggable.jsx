@@ -28,6 +28,7 @@ import DroppableContext, {
   type DroppableContextValue,
 } from '../context/droppable-context';
 import useRequiredContext from '../use-required-context';
+import useValidation from './use-validation';
 
 export default function Draggable(props: Props) {
   // reference to DOM node
@@ -42,6 +43,9 @@ export default function Draggable(props: Props) {
   const droppableContext: DroppableContextValue = useRequiredContext(
     DroppableContext,
   );
+
+  // Validating props and innerRef
+  useValidation(props, ref.current);
 
   // props
   const {
