@@ -30,7 +30,7 @@ import DroppableContext, {
 import useRequiredContext from '../use-required-context';
 
 export default function Draggable(props: Props) {
-  // instance members
+  // reference to DOM node
   const ref = useRef<?HTMLElement>(null);
   const setRef = useCallback((el: ?HTMLElement) => {
     ref.current = el;
@@ -69,8 +69,8 @@ export default function Draggable(props: Props) {
     dropAnimationFinished: dropAnimationFinishedAction,
   } = props;
 
-  // The dimension publisher
-  const publisherArgs: DimensionPublisherArgs = useMemo(
+  // The dimension publisher: talks to the marshal
+  const forPublisher: DimensionPublisherArgs = useMemo(
     () => ({
       draggableId,
       droppableId: droppableContext.droppableId,
@@ -86,8 +86,7 @@ export default function Draggable(props: Props) {
       index,
     ],
   );
-
-  useDraggableDimensionPublisher(publisherArgs);
+  useDraggableDimensionPublisher(forPublisher);
 
   // The Drag handle
 

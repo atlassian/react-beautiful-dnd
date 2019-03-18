@@ -1,7 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
 import React, {
-  useEffect,
   useMemo,
   useRef,
   useCallback,
@@ -19,8 +18,7 @@ import useAnimateInOut, {
   type AnimateProvided,
 } from '../use-animate-in-out/use-animate-in-out';
 import getMaxWindowScroll from '../window/get-max-window-scroll';
-import { useConstantFn } from '../use-constant';
-import { checkOwnProps, checkPlaceholder, checkProvidedRef } from './check';
+import useValidation from './use-validation';
 
 export default function Droppable(props: Props) {
   const appContext: ?AppContextValue = useContext<?AppContextValue>(AppContext);
@@ -29,12 +27,7 @@ export default function Droppable(props: Props) {
   const droppableRef = useRef<?HTMLElement>(null);
   const placeholderRef = useRef<?HTMLElement>(null);
 
-  // validating setup
-  useEffect(() => {
-    checkOwnProps(props);
-    checkPlaceholder(props, placeholderRef.current);
-    checkProvidedRef(droppableRef.current);
-  });
+  useValidation(props, droppableRef.current, placeholderRef.current);
 
   const {
     // own props
@@ -53,18 +46,20 @@ export default function Droppable(props: Props) {
     updateViewportMaxScroll,
   } = props;
 
-  const getDroppableRef = useConstantFn(
+  const getDroppableRef = useCallback(
     (): ?HTMLElement => droppableRef.current,
+    [],
   );
-  const getPlaceholderRef = useConstantFn(
+  const getPlaceholderRef = useCallback(
     (): ?HTMLElement => placeholderRef.current,
+    [],
   );
-  const setDroppableRef = useConstantFn((value: ?HTMLElement) => {
+  const setDroppableRef = useCallback((value: ?HTMLElement) => {
     droppableRef.current = value;
-  });
-  const setPlaceholderRef = useConstantFn((value: ?HTMLElement) => {
+  }, []);
+  const setPlaceholderRef = useCallback((value: ?HTMLElement) => {
     placeholderRef.current = value;
-  });
+  }, []);
 
   const onPlaceholderTransitionEnd = useCallback(() => {
     // A placeholder change can impact the window's max scroll

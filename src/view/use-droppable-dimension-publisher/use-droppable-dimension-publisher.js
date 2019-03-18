@@ -25,6 +25,7 @@ import AppContext, { type AppContextValue } from '../context/app-context';
 import withoutPlaceholder from './without-placeholder';
 import { warning } from '../../dev-warning';
 import getListenerOptions from './get-listener-options';
+import useRequiredContext from '../use-required-context';
 
 type Props = {|
   droppableId: DroppableId,
@@ -49,8 +50,7 @@ const getClosestScrollableFromDrag = (dragging: ?WhileDragging): ?Element =>
 
 export default function useDroppableDimensionPublisher(args: Props) {
   const whileDraggingRef = useRef<?WhileDragging>(null);
-  const appContext: ?AppContextValue = useContext<?AppContextValue>(AppContext);
-  invariant(appContext, 'Could not find app content');
+  const appContext: AppContextValue = useRequiredContext(AppContext);
   const marshal: DimensionMarshal = appContext.marshal;
 
   const {
@@ -229,7 +229,9 @@ export default function useDroppableDimensionPublisher(args: Props) {
       getListenerOptions(dragging.scrollOptions),
     );
   }, [onClosestScroll, scheduleScrollUpdate]);
-  const scroll = useCallback(() => {});
+  const scroll = useCallback(() => {
+    invariant('TODO');
+  });
 
   const callbacks: DroppableCallbacks = useMemo(
     () => ({

@@ -1,10 +1,11 @@
 // @flow
+import { useEffect } from 'react';
 import invariant from 'tiny-invariant';
 import type { Props } from './droppable-types';
-import isHtmlElement from '../is-type-of-element/is-html-element';
 import { warning } from '../../dev-warning';
+import checkIsValidInnerRef from '../check-is-valid-inner-ref';
 
-export function checkOwnProps(props: Props) {
+function checkOwnProps(props: Props) {
   invariant(props.droppableId, 'A Droppable requires a droppableId prop');
   invariant(
     typeof props.isDropDisabled === 'boolean',
@@ -20,11 +21,7 @@ export function checkOwnProps(props: Props) {
   );
 }
 
-export function checkPlaceholder(props: Props, placeholderEl: ?HTMLElement) {
-  if (process.env.NODE_ENV === 'production') {
-    return;
-  }
-
+function checkPlaceholderRef(props: Props, placeholderEl: ?HTMLElement) {
   if (!props.placeholder) {
     return;
   }
@@ -42,14 +39,19 @@ export function checkPlaceholder(props: Props, placeholderEl: ?HTMLElement) {
   `);
 }
 
-export function checkProvidedRef(ref: ?mixed) {
-  invariant(
-    ref && isHtmlElement(ref),
-    `
-    provided.innerRef has not been provided with a HTMLElement.
+export default function useValidation(
+  props: Props,
+  droppableRef: ?HTMLElement,
+  placeholderRef: ?HTMLElement,
+) {
+  // Running on every update
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      return;
+    }
 
-    You can find a guide on using the innerRef callback functions at:
-    https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/using-inner-ref.md
-  `,
-  );
+    checkOwnProps(props);
+    checkPlaceholderRef(props, placeholderRef);
+    checkIsValidInnerRef(droppableRef);
+  });
 }
