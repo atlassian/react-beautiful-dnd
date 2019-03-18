@@ -46,7 +46,7 @@ export default function useStyleMarshal(uniqueId: number) {
 
   useEffect(() => {
     invariant(
-      alwaysRef.current || dynamicRef.current,
+      !alwaysRef.current && !dynamicRef.current,
       'style elements already mounted',
     );
 
