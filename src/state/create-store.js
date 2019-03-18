@@ -11,7 +11,7 @@ import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
 import autoScroll from './middleware/auto-scroll';
 import pendingDrop from './middleware/pending-drop';
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
-import type { StyleMarshal } from '../view/style-marshal/style-marshal-types';
+import type { StyleMarshal } from '../view/use-style-marshal/style-marshal-types';
 import type { AutoScroller } from './auto-scroller/auto-scroller-types';
 import type { Responders, Announce } from '../types';
 import type { Store } from './store-types';

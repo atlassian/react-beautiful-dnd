@@ -3,13 +3,17 @@ import type { Position } from 'css-box-model';
 import { useRef, useCallback, useMemo, useLayoutEffect } from 'react';
 import invariant from 'tiny-invariant';
 import type { EventBinding } from '../util/event-types';
-import createEventMarshal from '../util/create-event-marshal';
+import createEventMarshal, {
+  type EventMarshal,
+} from '../util/create-event-marshal';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import createScheduler from '../util/create-scheduler';
 import { warning } from '../../../dev-warning';
 import * as keyCodes from '../../key-codes';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
-import createPostDragEventPreventer from '../util/create-post-drag-event-preventer';
+import createPostDragEventPreventer, {
+  type EventPreventer,
+} from '../util/create-post-drag-event-preventer';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
 import type { Callbacks } from '../drag-handle-types';
@@ -20,8 +24,12 @@ export type Args = {|
   getWindow: () => HTMLElement,
   canStartCapturing: (event: Event) => boolean,
   getShouldRespectForceTouch: () => boolean,
+  shouldAbortCapture: boolean,
 |};
-export type Result = (event: MouseEvent) => void;
+export type Result = {
+  onMouseDown: (event: MouseEvent) => void,
+  isCapturing: boolean,
+};
 
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
@@ -36,7 +44,7 @@ const noop = () => {};
 const mouseDownMarshal: EventMarshal = createEventMarshal();
 
 export default function useMouseSensor(args: Args): Result {
-  const { canStartCapturing, getWindow, callbacks } = args;
+  const { canStartCapturing, getWindow, callbacks, shouldAbortCapture } = args;
   const pendingRef = useRef<?Position>(null);
   const isDraggingRef = useRef<boolean>(false);
   const unbindWindowEventsRef = useRef<() => void>(noop);
@@ -79,6 +87,11 @@ export default function useMouseSensor(args: Args): Result {
     },
     [getIsCapturing, postDragEventPreventer, reset, schedule],
   );
+
+  // instructed to stop capturing
+  if (shouldAbortCapture && getIsCapturing()) {
+    stop();
+  }
 
   const cancel = useCallback(() => {
     const wasDragging: boolean = isDraggingRef.current;
@@ -349,5 +362,8 @@ export default function useMouseSensor(args: Args): Result {
     // TODO: do logic for unmounting
   }, []);
 
-  return onMouseDown;
+  return {
+    onMouseDown,
+    isCapturing: getIsCapturing(),
+  };
 }

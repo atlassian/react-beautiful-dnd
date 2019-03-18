@@ -1,22 +1,40 @@
 // @flow
-import { useLayoutEffect, useRef, useMemo, useCallback } from 'react';
-import type { Args, DragHandleProps, Callbacks } from './drag-handle-types';
+import { useLayoutEffect, useRef, useMemo, useState, useCallback } from 'react';
+import type { Args, DragHandleProps } from './drag-handle-types';
 import getWindowFromEl from '../window/get-window-from-el';
 import useRequiredContext from '../use-required-context';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useMouseSensor, {
   type Args as MouseSensorArgs,
 } from './sensor/use-mouse-sensor';
+import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
 }
 
 export default function useDragHandle(args: Args): DragHandleProps {
+  // Capturing
+  const isAnythingCapturingRef = useRef<boolean>(false);
+  const [shouldAbortCapture, setShouldAbortCapture] = useState<boolean>(false);
+  const recordCapture = useCallback((isCapturingList: boolean[]) => {
+    isAnythingCapturingRef.current = isCapturingList.some(
+      (isCapturing: boolean) => isCapturing,
+    );
+  }, []);
+
   const { canLift, style: styleContext }: AppContextValue = useRequiredContext(
     AppContext,
   );
-  const { callbacks, getDraggableRef, getShouldRespectForceTouch } = args;
+  const {
+    isDragging,
+    isEnabled,
+    draggableId,
+    callbacks,
+    getDraggableRef,
+    getShouldRespectForceTouch,
+    canDragInteractiveElements,
+  } = args;
 
   const getWindow = useCallback(
     (): HTMLElement => getWindowFromEl(getDraggableRef()),
@@ -31,18 +49,69 @@ export default function useDragHandle(args: Args): DragHandleProps {
     isFocusedRef.current = false;
   }, []);
 
+  const canStartCapturing = useCallback(
+    (event: Event) => {
+      // Something on this element might be capturing but a drag has not started yet
+      // We want to prevent anything else from capturing
+      if (isAnythingCapturingRef.current) {
+        return false;
+      }
+      // Do not drag if anything else in the system is dragging
+      if (!canLift(draggableId)) {
+        return false;
+      }
+
+      // Check if we are dragging an interactive element
+      return shouldAllowDraggingFromTarget(event, canDragInteractiveElements);
+    },
+    [canDragInteractiveElements, canLift, draggableId],
+  );
+
   const mouseArgs: MouseSensorArgs = useMemo(
     () => ({
       callbacks,
       getDraggableRef,
       getWindow,
-      canStartCapturing: () => true,
+      canStartCapturing,
       getShouldRespectForceTouch,
+      shouldAbortCapture,
     }),
-    [callbacks, getDraggableRef, getShouldRespectForceTouch, getWindow],
+    [
+      shouldAbortCapture,
+      callbacks,
+      canStartCapturing,
+      getDraggableRef,
+      getShouldRespectForceTouch,
+      getWindow,
+    ],
   );
 
-  const onMouseDown = useMouseSensor(mouseArgs);
+  const { isCapturing: isMouseCapturing, onMouseDown } = useMouseSensor(
+    mouseArgs,
+  );
+  recordCapture([isMouseCapturing]);
+
+  // handle aborting
+  useLayoutEffect(() => {
+    if (!isDragging && isAnythingCapturingRef.current) {
+      setShouldAbortCapture(true);
+    }
+  }, [isDragging]);
+
+  // handle is being disabled
+  useLayoutEffect(() => {
+    // nothing capturing - we are all good
+    if (!isEnabled && isAnythingCapturingRef.current) {
+      setShouldAbortCapture(true);
+    }
+  }, [isEnabled]);
+
+  // flip the abort capture flag back to true after use
+  useLayoutEffect(() => {
+    if (shouldAbortCapture) {
+      setShouldAbortCapture(false);
+    }
+  }, [shouldAbortCapture]);
 
   const props: DragHandleProps = useMemo(
     () => ({
