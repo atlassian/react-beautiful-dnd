@@ -1,6 +1,5 @@
 // @flow
 import { type Position } from 'css-box-model';
-import { type Node } from 'react';
 import type { MovementMode, DraggableId } from '../../types';
 
 export type Callbacks = {|
@@ -58,5 +57,5 @@ export type Args = {|
   // whether interactive elements should be permitted to start a drag
   canDragInteractiveElements: boolean,
   // whether force touch interactions should be respected
-  shouldRespectForceTouch: boolean,
+  getShouldRespectForceTouch: () => boolean,
 |};

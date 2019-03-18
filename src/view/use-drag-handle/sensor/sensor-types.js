@@ -35,3 +35,5 @@ export type TouchSensor = {|
   ...SensorBase,
   onTouchStart: (event: TouchEvent) => void,
 |};
+
+export type Sensor = MouseSensor | KeyboardSensor | TouchSensor;
