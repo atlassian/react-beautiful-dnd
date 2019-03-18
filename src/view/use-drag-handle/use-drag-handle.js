@@ -23,6 +23,7 @@ function preventHtml5Dnd(event: DragEvent) {
 }
 
 export default function useDragHandle(args: Args): DragHandleProps {
+  console.log('rendering drag handle');
   const { canLift, style }: AppContextValue = useRequiredContext(AppContext);
   const {
     draggableId,
