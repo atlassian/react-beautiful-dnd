@@ -6,7 +6,7 @@ type Result<T> = {
   value: T,
 };
 
-// Similiar to useMemo(() => T, []), but not subject to memoization purging
+// Similar to useMemo(() => T, []), but not subject to memoization purging
 export function useConstant<T>(fn: () => T): T {
   const bucket = useRef<?Result<T>>(null);
 

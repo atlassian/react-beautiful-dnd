@@ -143,7 +143,7 @@ export default function DragDropContext(props: Props) {
     }),
   );
 
-  const store: Store = useConstant(() =>
+  const store: Store = useConstant<Store>(() =>
     createStore({
       dimensionMarshal,
       styleMarshal,
