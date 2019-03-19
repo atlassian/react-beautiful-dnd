@@ -370,7 +370,7 @@ export default function useMouseSensor(args: Args): Result {
 
   // When unmounting - cancel
   useLayoutEffect(() => {
-    return () => cancel();
+    return cancel;
   }, [cancel]);
 
   return {
