@@ -34,7 +34,7 @@ export default function useDraggableDimensionPublisher(args: Args) {
       type,
       index,
     };
-    console.log('creating new descriptor', result);
+    // console.log('creating new descriptor', result);
     return result;
   }, [draggableId, droppableId, index, type]);
 
