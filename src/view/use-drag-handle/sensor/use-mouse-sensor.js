@@ -358,9 +358,10 @@ export default function useMouseSensor(args: Args): Result {
     [canStartCapturing, getIsCapturing, startPendingDrag],
   );
 
+  // When unmounting - cancel
   useLayoutEffect(() => {
-    // TODO: do logic for unmounting
-  }, []);
+    return () => cancel();
+  }, [cancel]);
 
   return {
     onMouseDown,
