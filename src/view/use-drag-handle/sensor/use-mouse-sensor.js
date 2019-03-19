@@ -58,10 +58,6 @@ export default function useMouseSensor(args: Args): Result {
     () => Boolean(pendingRef.current || isDraggingRef.current),
     [],
   );
-  const reset = useCallback(() => {
-    pendingRef.current = null;
-    isDraggingRef.current = false;
-  }, []);
 
   const schedule = useMemo(() => {
     invariant(
@@ -76,23 +72,24 @@ export default function useMouseSensor(args: Args): Result {
     [getWindow],
   );
 
-  const stop = useCallback(
-    (shouldBlockClick: ?boolean = true) => {
-      if (!getIsCapturing()) {
-        return;
-      }
+  const stop = useCallback(() => {
+    if (!getIsCapturing()) {
+      return;
+    }
 
-      schedule.cancel();
+    schedule.cancel();
+    unbindWindowEventsRef.current();
 
-      unbindWindowEventsRef.current();
-      mouseDownMarshal.reset();
-      if (shouldBlockClick) {
-        postDragEventPreventer.preventNext();
-      }
-      reset();
-    },
-    [getIsCapturing, postDragEventPreventer, reset, schedule],
-  );
+    const shouldBlockClick: boolean = isDraggingRef.current;
+
+    mouseDownMarshal.reset();
+    if (shouldBlockClick) {
+      postDragEventPreventer.preventNext();
+    }
+    // resettting refs
+    pendingRef.current = null;
+    isDraggingRef.current = false;
+  }, [getIsCapturing, postDragEventPreventer, schedule]);
 
   // instructed to stop capturing
   if (shouldAbortCapture && getIsCapturing()) {
@@ -264,16 +261,16 @@ export default function useMouseSensor(args: Args): Result {
             return;
           }
 
+          const forcePressThreshold: number = (MouseEvent: any)
+            .WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
+          const isForcePressing: boolean =
+            event.webkitForce >= forcePressThreshold;
+
           // New behaviour
           if (!getShouldRespectForceTouch()) {
             event.preventDefault();
             return;
           }
-
-          const forcePressThreshold: number = (MouseEvent: any)
-            .WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
-          const isForcePressing: boolean =
-            event.webkitForce >= forcePressThreshold;
 
           if (isForcePressing) {
             // it is considered a indirect cancel so we do not
@@ -289,7 +286,16 @@ export default function useMouseSensor(args: Args): Result {
       },
     ];
     return bindings;
-  }, [getIsCapturing, cancel, startDragging, schedule, stop, callbacks, getWindow, getShouldRespectForceTouch]);
+  }, [
+    getIsCapturing,
+    cancel,
+    startDragging,
+    schedule,
+    stop,
+    callbacks,
+    getWindow,
+    getShouldRespectForceTouch,
+  ]);
 
   const bindWindowEvents = useCallback(() => {
     const win: HTMLElement = getWindow();
