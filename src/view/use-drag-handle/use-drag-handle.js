@@ -1,13 +1,16 @@
 // @flow
 import { useLayoutEffect, useRef, useMemo, useState, useCallback } from 'react';
+import invariant from 'tiny-invariant';
 import type { Args, DragHandleProps } from './drag-handle-types';
 import getWindowFromEl from '../window/get-window-from-el';
 import useRequiredContext from '../use-required-context';
 import AppContext, { type AppContextValue } from '../context/app-context';
+import focusRetainer from './util/focus-retainer';
 import useMouseSensor, {
   type Args as MouseSensorArgs,
 } from './sensor/use-mouse-sensor';
 import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
+import getDragHandleRef from './util/get-drag-handle-ref';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
@@ -28,6 +31,7 @@ export default function useDragHandle(args: Args): DragHandleProps {
   );
   const {
     isDragging,
+    isDropAnimating,
     isEnabled,
     draggableId,
     callbacks,
@@ -90,6 +94,9 @@ export default function useDragHandle(args: Args): DragHandleProps {
     mouseArgs,
   );
   recordCapture([isMouseCapturing]);
+
+  // mounting focus retention
+  useLayoutEffect(() => {});
 
   // handle aborting
   useLayoutEffect(() => {

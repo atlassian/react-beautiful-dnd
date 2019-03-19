@@ -54,12 +54,12 @@ export const authors: Author[] = [jake, BMO, finn, princess];
 
 export const quotes: Quote[] = [
   {
-    id: '1',
+    id: 'item:0',
     content: 'Sometimes life is scary and dark',
     author: BMO,
   },
   {
-    id: '2',
+    id: 'item:1',
     content:
       'Sucking at something is the first step towards being sorta good at something.',
     author: jake,

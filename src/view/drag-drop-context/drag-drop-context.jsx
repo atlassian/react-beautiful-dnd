@@ -37,6 +37,7 @@ import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
+import ErrorBoundary from '../error-boundary';
 
 type Props = {|
   ...Responders,
@@ -163,11 +164,20 @@ export default function DragDropContext(props: Props) {
     isMovementAllowed: getIsMovementAllowed,
   }));
 
+  const recoverStoreFromError = useConstantFn(() => {
+    const state: State = storeRef.current.getState();
+    if (state.phase !== 'IDLE') {
+      store.dispatch(clean());
+    }
+  });
+
   return (
     <AppContext.Provider value={appContext}>
-      <Provider context={StoreContext} store={storeRef.current}>
-        {props.children}
-      </Provider>
+      <ErrorBoundary onError={recoverStoreFromError}>
+        <Provider context={StoreContext} store={storeRef.current}>
+          {props.children}
+        </Provider>
+      </ErrorBoundary>
     </AppContext.Provider>
   );
 }

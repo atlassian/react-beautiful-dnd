@@ -27,15 +27,16 @@ export default function useDraggableDimensionPublisher(args: Args) {
   const appContext: AppContextValue = useRequiredContext(AppContext);
   const marshal: DimensionMarshal = appContext.marshal;
 
-  const descriptor: DraggableDescriptor = useMemo(
-    () => ({
+  const descriptor: DraggableDescriptor = useMemo(() => {
+    const result = {
       id: draggableId,
       droppableId,
       type,
       index,
-    }),
-    [draggableId, droppableId, index, type],
-  );
+    };
+    console.log('creating new descriptor', result);
+    return result;
+  }, [draggableId, droppableId, index, type]);
 
   const makeDimension = useCallback(
     (windowScroll?: Position): DraggableDimension => {
