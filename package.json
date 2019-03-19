@@ -58,7 +58,7 @@
     "css-box-model": "^1.1.1",
     "memoize-one": "^5.0.0",
     "raf-schd": "^4.0.0",
-    "react-redux": "6.0.1",
+    "react-redux": "npm:@acemarke/react-redux@next",
     "redux": "^4.0.1",
     "tiny-invariant": "^1.0.3"
   },
