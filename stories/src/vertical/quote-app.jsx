@@ -69,7 +69,6 @@ export default class QuoteApp extends Component<Props, State> {
       result.destination.index,
     );
 
-    console.warn('REORDERING QUOTES');
     this.setState({
       quotes,
     });
