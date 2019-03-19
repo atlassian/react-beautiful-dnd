@@ -44,7 +44,13 @@ const noop = () => {};
 const mouseDownMarshal: EventMarshal = createEventMarshal();
 
 export default function useMouseSensor(args: Args): Result {
-  const { canStartCapturing, getWindow, callbacks, shouldAbortCapture } = args;
+  const {
+    canStartCapturing,
+    getWindow,
+    callbacks,
+    shouldAbortCapture,
+    getShouldRespectForceTouch,
+  } = args;
   const pendingRef = useRef<?Position>(null);
   const isDraggingRef = useRef<boolean>(false);
   const unbindWindowEventsRef = useRef<() => void>(noop);
@@ -258,6 +264,12 @@ export default function useMouseSensor(args: Args): Result {
             return;
           }
 
+          // New behaviour
+          if (!getShouldRespectForceTouch()) {
+            event.preventDefault();
+            return;
+          }
+
           const forcePressThreshold: number = (MouseEvent: any)
             .WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
           const isForcePressing: boolean =
@@ -277,15 +289,7 @@ export default function useMouseSensor(args: Args): Result {
       },
     ];
     return bindings;
-  }, [
-    callbacks,
-    cancel,
-    getWindow,
-    getIsCapturing,
-    schedule,
-    startDragging,
-    stop,
-  ]);
+  }, [getIsCapturing, cancel, startDragging, schedule, stop, callbacks, getWindow, getShouldRespectForceTouch]);
 
   const bindWindowEvents = useCallback(() => {
     const win: HTMLElement = getWindow();
