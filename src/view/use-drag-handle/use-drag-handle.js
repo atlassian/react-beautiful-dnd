@@ -1,6 +1,5 @@
 // @flow
 import { useLayoutEffect, useRef, useMemo, useState, useCallback } from 'react';
-import invariant from 'tiny-invariant';
 import type { Args, DragHandleProps } from './drag-handle-types';
 import getWindowFromEl from '../window/get-window-from-el';
 import useRequiredContext from '../use-required-context';
@@ -10,7 +9,6 @@ import useMouseSensor, {
   type Args as MouseSensorArgs,
 } from './sensor/use-mouse-sensor';
 import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
-import getDragHandleRef from './util/get-drag-handle-ref';
 import useKeyboardSensor, {
   type Args as KeyboardSensorArgs,
 } from './sensor/use-keyboard-sensor';
