@@ -1,5 +1,4 @@
 // @flow
-import type { Props } from '../drag-handle-types';
 import isElement from '../../is-type-of-element/is-element';
 
 export type TagNameMap = {
@@ -56,9 +55,9 @@ const isAnInteractiveElement = (
   return isAnInteractiveElement(parent, current.parentElement);
 };
 
-export default (event: Event, props: Props): boolean => {
+export default (event: Event, canDragInteractiveElements: boolean): boolean => {
   // Allowing drag with all element types
-  if (props.canDragInteractiveElements) {
+  if (canDragInteractiveElements) {
     return true;
   }
 

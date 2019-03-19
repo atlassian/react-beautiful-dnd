@@ -167,7 +167,7 @@ export default function DragDropContext(props: Props) {
   const recoverStoreFromError = useConstantFn(() => {
     const state: State = storeRef.current.getState();
     if (state.phase !== 'IDLE') {
-      store.dispatch(clean());
+      store.dispatch(clean({ shouldFlush: true }));
     }
   });
 

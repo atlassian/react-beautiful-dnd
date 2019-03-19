@@ -155,6 +155,12 @@ export const makeMapStateToProps = (): Selector => {
       );
     }
 
+    // An error occurred and we need to clear everything
+    // TODO: validate and add test
+    if (state.phase === 'IDLE' && !state.completed && state.shouldFlush) {
+      return idleWithoutAnimation;
+    }
+
     if (state.phase === 'IDLE' && state.completed) {
       const completed: CompletedDrag = state.completed;
       if (!isMatchingType(type, completed.critical)) {

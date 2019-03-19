@@ -27,7 +27,14 @@ function printFatalError(error: Error) {
 }
 
 export default class ErrorBoundary extends React.Component<Props> {
-  componentDidCatch(error: Error) {
+  componentDidMount() {
+    window.addEventListener('error', this.onFatalError);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('error', this.onFatalError);
+  }
+
+  onFatalError = (error: Error) => {
     printFatalError(error);
     this.props.onError();
 
@@ -39,6 +46,10 @@ export default class ErrorBoundary extends React.Component<Props> {
 
     // Error is more serious and we throw it
     throw error;
+  };
+
+  componentDidCatch(error: Error) {
+    this.onFatalError(error);
   }
 
   render() {

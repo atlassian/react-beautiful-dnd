@@ -27,7 +27,6 @@ export default function useStyleMarshal(uniqueId: number) {
   const alwaysRef = useRef<?HTMLStyleElement>(null);
   const dynamicRef = useRef<?HTMLStyleElement>(null);
 
-  // TODO: need to check if the memoize one is working
   const setDynamicStyle = useCallback(
     // Using memoizeOne to prevent frequent updates to textContext
     memoizeOne((proposed: string) => {
