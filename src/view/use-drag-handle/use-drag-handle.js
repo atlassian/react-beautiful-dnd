@@ -14,6 +14,9 @@ import getDragHandleRef from './util/get-drag-handle-ref';
 import useKeyboardSensor, {
   type Args as KeyboardSensorArgs,
 } from './sensor/use-keyboard-sensor';
+import useTouchSensor, {
+  type Args as TouchSensorArgs,
+} from './sensor/use-touch-sensor';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
@@ -115,7 +118,28 @@ export default function useDragHandle(args: Args): DragHandleProps {
   const { isCapturing: isKeyboardCapturing, onKeyDown } = useKeyboardSensor(
     keyboardArgs,
   );
-  recordCapture([isMouseCapturing, isKeyboardCapturing]);
+  const touchArgs: TouchSensorArgs = useMemo(
+    () => ({
+      callbacks,
+      getDraggableRef,
+      getWindow,
+      canStartCapturing,
+      getShouldRespectForceTouch,
+      shouldAbortCapture,
+    }),
+    [
+      shouldAbortCapture,
+      callbacks,
+      canStartCapturing,
+      getDraggableRef,
+      getShouldRespectForceTouch,
+      getWindow,
+    ],
+  );
+  const { isCapturing: isTouchCapturing, onTouchStart } = useTouchSensor(
+    touchArgs,
+  );
+  recordCapture([isMouseCapturing, isKeyboardCapturing, isTouchCapturing]);
 
   // mounting focus retention
   useLayoutEffect(() => {});
@@ -147,8 +171,7 @@ export default function useDragHandle(args: Args): DragHandleProps {
     () => ({
       onMouseDown,
       onKeyDown,
-      // TODO
-      onTouchStart: () => {},
+      onTouchStart,
       onFocus,
       onBlur,
       tabIndex: 0,
@@ -159,7 +182,7 @@ export default function useDragHandle(args: Args): DragHandleProps {
       draggable: false,
       onDragStart: preventHtml5Dnd,
     }),
-    [onBlur, onFocus, onKeyDown, onMouseDown, styleContext],
+    [onBlur, onFocus, onKeyDown, onMouseDown, onTouchStart, styleContext],
   );
 
   return props;
