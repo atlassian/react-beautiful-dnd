@@ -86,7 +86,7 @@ export default function Droppable(props: Props) {
 
   const placeholder: Node | null = instruction ? (
     <Placeholder
-      placeholder={instruction.data}
+      placeholder={(instruction.data: any)}
       onClose={instruction.onClose}
       innerRef={setPlaceholderRef}
       animate={instruction.animate}

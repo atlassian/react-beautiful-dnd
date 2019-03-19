@@ -1,10 +1,5 @@
 // @flow
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-} from 'react';
+import React, { useState, useCallback, useEffect, type Node } from 'react';
 import type { Spacing } from 'css-box-model';
 import type {
   Placeholder as PlaceholderType,
@@ -114,7 +109,7 @@ const getStyle = ({
   };
 };
 
-function Placeholder(props: Props) {
+function Placeholder(props: Props): Node {
   const { animate, onTransitionEnd, onClose } = props;
   const [isAnimatingOpenOnMount, setIsAnimatingOpenOnMount] = useState<boolean>(
     props.animate === 'open',
@@ -159,4 +154,4 @@ function Placeholder(props: Props) {
   });
 }
 
-export default React.memo(Placeholder);
+export default React.memo<Props>(Placeholder);

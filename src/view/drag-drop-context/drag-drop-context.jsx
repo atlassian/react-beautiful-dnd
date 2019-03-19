@@ -45,26 +45,6 @@ type Props = {|
   children: Node | null,
 |};
 
-// TODO: handle errors
-const printFatalDevError = (error: Error) => {
-  if (process.env.NODE_ENV === 'production') {
-    return;
-  }
-  // eslint-disable-next-line no-console
-  console.error(
-    ...getFormattedMessage(
-      `
-      An error has occurred while a drag is occurring.
-      Any existing drag will be cancelled.
-
-      > ${error.message}
-      `,
-    ),
-  );
-  // eslint-disable-next-line no-console
-  console.error('raw', error);
-};
-
 const createResponders = (props: Props): Responders => ({
   onBeforeDragStart: props.onBeforeDragStart,
   onDragStart: props.onDragStart,
@@ -72,16 +52,16 @@ const createResponders = (props: Props): Responders => ({
   onDragUpdate: props.onDragUpdate,
 });
 
-let count: number = 0;
+let instanceCount: number = 0;
 
 // Reset any context that gets persisted across server side renders
 export function resetServerContext() {
-  count = 0;
+  instanceCount = 0;
 }
 
 export default function DragDropContext(props: Props) {
   // We do not want this to change
-  const uniqueId: number = useConstant<number>((): number => count++);
+  const uniqueId: number = useConstant<number>((): number => instanceCount++);
 
   let storeRef: MutableRefObject<Store>;
 
