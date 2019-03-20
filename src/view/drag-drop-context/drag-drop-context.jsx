@@ -37,7 +37,6 @@ import {
   updateDroppableIsCombineEnabled,
   collectionStarting,
 } from '../../state/action-creators';
-import { getFormattedMessage } from '../../dev-warning';
 import { peerDependencies } from '../../../package.json';
 import checkReactVersion from './check-react-version';
 import checkDoctype from './check-doctype';
@@ -157,7 +156,6 @@ export default class DragDropContext extends React.Component<Props> {
   getIsMovementAllowed = () => isMovementAllowed(this.store.getState());
 
   componentDidMount() {
-    window.addEventListener('error', this.onWindowError);
     this.styleMarshal.mount();
     this.announcer.mount();
 
@@ -165,19 +163,6 @@ export default class DragDropContext extends React.Component<Props> {
       checkReactVersion(peerDependencies.react, React.version);
       checkDoctype(document);
     }
-  }
-
-  componentDidCatch(error: Error) {
-    this.onFatalError(error);
-
-    // If the failure was due to an invariant failure - then we handle the error
-    if (error.message.indexOf('Invariant failed') !== -1) {
-      this.setState({});
-      return;
-    }
-
-    // Error is more serious and we throw it
-    throw error;
   }
 
   componentWillUnmount() {
