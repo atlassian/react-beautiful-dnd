@@ -220,11 +220,11 @@ export const makeMapStateToProps = (): Selector => {
         state.dimensions.draggables[ownProps.draggableId];
 
       const result: DropResult = completed.result;
+      const mode: MovementMode = result.mode;
       // these need to be pulled from the result as they can be different to the final impact
       const draggingOver: ?DroppableId = getDraggingOverFromResult(result);
       const combineWith: ?DraggableId = getCombineWithFromResult(result);
       const duration: number = state.dropDuration;
-      const mode: MovementMode = completed.result.mode;
 
       // not memoized as it is the only execution
       const dropping: DropAnimation = {

@@ -1,5 +1,5 @@
 // @flow
-import { zIndexOptions } from '../../../../src/view/draggable/draggable';
+import { zIndexOptions } from '../../../../src/view/draggable/get-style';
 import mount from './util/mount';
 import { whileDragging, whileDropping, atRestMapProps } from './util/get-props';
 

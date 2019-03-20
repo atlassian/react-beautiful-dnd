@@ -1,10 +1,6 @@
 // @flow
 import type { Position } from 'css-box-model';
-import { transforms } from '../../../../src/animation';
-import getLastCall from './util/get-last-call';
-import { atRestMapProps, draggable, preset } from './util/get-props';
-import getStubber from './util/get-stubber';
-import mount from './util/mount';
+import type { DraggableId } from '../../../../src/types';
 import type {
   MapProps,
   Provided,
@@ -12,6 +8,11 @@ import type {
   NotDraggingStyle,
   OwnProps,
 } from '../../../../src/view/draggable/draggable-types';
+import { transforms } from '../../../../src/animation';
+import getLastCall from './util/get-last-call';
+import { atRestMapProps, draggable, preset } from './util/get-props';
+import getStubber from './util/get-stubber';
+import mount from './util/mount';
 
 const ownProps: OwnProps = {
   draggableId: preset.inHome2.descriptor.id,
@@ -21,6 +22,18 @@ const ownProps: OwnProps = {
   shouldRespectForceTouch: true,
   children: () => null,
 };
+
+const getSecondarySnapshot = (
+  combineTargetFor: ?DraggableId,
+): StateSnapshot => ({
+  isDragging: false,
+  isDropAnimating: false,
+  dropAnimation: null,
+  mode: null,
+  draggingOver: null,
+  combineTargetFor,
+  combineWith: null,
+});
 
 describe('provided', () => {
   const atRestStyle: NotDraggingStyle = {
@@ -45,11 +58,12 @@ describe('provided', () => {
     const myMock = jest.fn();
     const offset: Position = { x: 10, y: 20 };
     const mapProps: MapProps = {
-      dragging: null,
-      secondary: {
+      mapped: {
+        type: 'SECONDARY',
         offset,
         combineTargetFor: null,
         shouldAnimateDisplacement: true,
+        snapshot: getSecondarySnapshot(null),
       },
     };
 
@@ -72,11 +86,12 @@ describe('provided', () => {
     const myMock = jest.fn();
     const offset: Position = { x: 10, y: 20 };
     const mapProps: MapProps = {
-      dragging: null,
-      secondary: {
+      mapped: {
+        type: 'SECONDARY',
         offset,
         combineTargetFor: null,
         shouldAnimateDisplacement: false,
+        snapshot: getSecondarySnapshot(null),
       },
     };
 
@@ -97,17 +112,7 @@ describe('provided', () => {
 });
 
 describe('snapshot', () => {
-  const empty: StateSnapshot = {
-    isDragging: false,
-    isDropAnimating: false,
-    dropAnimation: null,
-    draggingOver: null,
-    combineWith: null,
-    combineTargetFor: null,
-    mode: null,
-  };
-
-  it('should give a empty snapshot when at rest', () => {
+  it('should pass along snapshots - at rest', () => {
     const myMock = jest.fn();
 
     mount({
@@ -117,18 +122,19 @@ describe('snapshot', () => {
     });
 
     const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
-    expect(snapshot).toEqual(empty);
+    expect(snapshot).toBe(atRestMapProps.mapped.snapshot);
   });
 
-  it('should give an empty snapshot when moving out of the way', () => {
+  it('should pass along snapshots - when moving out the way', () => {
     const myMock = jest.fn();
     const offset: Position = { x: 10, y: 20 };
     const mapProps: MapProps = {
-      dragging: null,
-      secondary: {
+      mapped: {
+        type: 'SECONDARY',
         offset,
         combineTargetFor: null,
         shouldAnimateDisplacement: true,
+        snapshot: getSecondarySnapshot(null),
       },
     };
 
@@ -139,18 +145,19 @@ describe('snapshot', () => {
     });
 
     const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
-    expect(snapshot).toEqual(empty);
+    expect(snapshot).toBe(mapProps.mapped.snapshot);
   });
 
-  it('should let a consumer know when it is being combined with', () => {
+  it('should pass along snapshots - when being combined with', () => {
     const myMock = jest.fn();
     const offset: Position = { x: 10, y: 20 };
     const mapProps: MapProps = {
-      dragging: null,
-      secondary: {
+      mapped: {
+        type: 'SECONDARY',
         offset,
         combineTargetFor: draggable.id,
         shouldAnimateDisplacement: true,
+        snapshot: getSecondarySnapshot(null),
       },
     };
 
@@ -160,16 +167,7 @@ describe('snapshot', () => {
       WrappedComponent: getStubber(myMock),
     });
 
-    const expected: StateSnapshot = {
-      isDragging: false,
-      isDropAnimating: false,
-      dropAnimation: null,
-      draggingOver: null,
-      combineWith: null,
-      combineTargetFor: draggable.id,
-      mode: null,
-    };
     const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
-    expect(snapshot).toEqual(expected);
+    expect(snapshot).toEqual(mapProps.mapped.snapshot);
   });
 });
