@@ -4,7 +4,6 @@ import type { Args, DragHandleProps } from './drag-handle-types';
 import getWindowFromEl from '../window/get-window-from-el';
 import useRequiredContext from '../use-required-context';
 import AppContext, { type AppContextValue } from '../context/app-context';
-import focusRetainer from './util/focus-retainer';
 import useMouseSensor, {
   type Args as MouseSensorArgs,
 } from './sensor/use-mouse-sensor';
@@ -35,7 +34,6 @@ export default function useDragHandle(args: Args): DragHandleProps {
   );
   const {
     isDragging,
-    isDropAnimating,
     isEnabled,
     draggableId,
     callbacks,

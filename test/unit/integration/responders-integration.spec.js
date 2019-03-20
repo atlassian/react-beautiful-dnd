@@ -4,7 +4,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { getRect, type Rect, type Position } from 'css-box-model';
 import { DragDropContext, Draggable, Droppable } from '../../../src';
-import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
+import { sloppyClickThreshold } from '../../../src/view/use-drag-handle/util/is-sloppy-click-threshold-exceeded';
 import {
   dispatchWindowMouseEvent,
   dispatchWindowKeyDownEvent,
@@ -151,7 +151,13 @@ describe('responders integration', () => {
 
     const waitForReturnToHome = () => {
       // cheating
-      wrapper.find(Draggable).simulate('transitionEnd');
+      console.log(
+        'find',
+        wrapper.find('[data-react-beautiful-dnd-draggable]').length,
+      );
+      wrapper
+        .find('[data-react-beautiful-dnd-draggable]')
+        .simulate('onMoveEnd');
     };
 
     const stop = () => {

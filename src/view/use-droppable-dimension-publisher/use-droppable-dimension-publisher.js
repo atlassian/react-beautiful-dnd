@@ -1,12 +1,5 @@
 // @flow
-import {
-  useCallback,
-  useMemo,
-  useEffect,
-  useContext,
-  useLayoutEffect,
-  useRef,
-} from 'react';
+import { useCallback, useMemo, useLayoutEffect, useRef } from 'react';
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import rafSchedule from 'raf-schd';
@@ -236,8 +229,17 @@ export default function useDroppableDimensionPublisher(args: Props) {
       getListenerOptions(dragging.scrollOptions),
     );
   }, [onClosestScroll, scheduleScrollUpdate]);
-  const scroll = useCallback(() => {
-    invariant('TODO');
+
+  const scroll = useCallback((change: Position) => {
+    // arrange
+    const dragging: ?WhileDragging = whileDraggingRef.current;
+    invariant(dragging, 'Cannot scroll when there is no drag');
+    const closest: ?Element = getClosestScrollableFromDrag(dragging);
+    invariant(closest, 'Cannot scroll a droppable with no closest scrollable');
+
+    // act
+    closest.scrollTop += change.y;
+    closest.scrollLeft += change.x;
   }, []);
 
   const callbacks: DroppableCallbacks = useMemo(() => {

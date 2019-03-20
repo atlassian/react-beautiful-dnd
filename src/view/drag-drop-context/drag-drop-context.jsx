@@ -1,10 +1,5 @@
 // @flow
-import React, {
-  useEffect,
-  useRef,
-  type Node,
-  type MutableRefObject,
-} from 'react';
+import React, { useEffect, useRef, type Node } from 'react';
 import { bindActionCreators } from 'redux';
 import { Provider } from 'react-redux';
 import createStore from '../../state/create-store';
@@ -32,7 +27,6 @@ import {
   updateDroppableIsCombineEnabled,
   collectionStarting,
 } from '../../state/action-creators';
-import { getFormattedMessage } from '../../dev-warning';
 import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
 import AppContext, { type AppContextValue } from '../context/app-context';
@@ -63,7 +57,9 @@ export default function DragDropContext(props: Props) {
   // We do not want this to change
   const uniqueId: number = useConstant<number>((): number => instanceCount++);
 
-  let storeRef: MutableRefObject<Store>;
+  // flow does not support MutableRefObject
+  // let storeRef: MutableRefObject<Store>;
+  let storeRef;
 
   useStartupValidation();
 
