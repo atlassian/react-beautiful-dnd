@@ -19,7 +19,7 @@ import { getPreset } from '../../../utils/dimension';
 import { setViewport } from '../../../utils/viewport';
 import mount from './util/mount';
 import Item from './util/item';
-import DragHandle from '../../../../src/view/drag-handle';
+import DragHandle from '../../../../src/view/use-drag-handle';
 import { withKeyboard } from '../../../utils/user-input-util';
 import * as keyCodes from '../../../../src/view/key-codes';
 
