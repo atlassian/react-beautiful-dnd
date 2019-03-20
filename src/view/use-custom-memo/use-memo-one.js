@@ -1,15 +1,6 @@
 // @flow
 import { useRef } from 'react';
-
-const isShallowEqual = (newValue: mixed, oldValue: mixed): boolean =>
-  newValue === oldValue;
-
-const isEqual = (newInputs: mixed[], lastInputs: mixed[]): boolean =>
-  newInputs.length === lastInputs.length &&
-  newInputs.every(
-    (newArg: mixed, index: number): boolean =>
-      isShallowEqual(newArg, lastInputs[index]),
-  );
+import areInputsEqual from './are-inputs-equal';
 
 export default function useMemoOne<T>(
   // getResult changes on every call,
@@ -25,12 +16,13 @@ export default function useMemoOne<T>(
 
   // on first call return the initial result
   if (isFirstCallRef.current) {
+    isFirstCallRef.current = false;
     resultRef.current = getResult();
     return resultRef.current;
   }
 
   // Don't recalculate result if the inputs have not changed
-  if (isEqual(inputs, lastInputsRef.current)) {
+  if (areInputsEqual(inputs, lastInputsRef.current)) {
     return resultRef.current;
   }
 
