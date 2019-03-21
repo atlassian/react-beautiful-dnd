@@ -18,9 +18,10 @@ import { withImpact } from '../../../utils/dragging-state';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import noImpact from '../../../../src/state/no-impact';
 import cloneImpact from '../../../utils/clone-impact';
+import getDisplacedBy from '../../../../src/state/get-displaced-by';
 
-const preset = getPreset();
 const state = getStatePreset();
+const preset = state.preset;
 
 describe('home list', () => {
   describe('was being dragged over', () => {
@@ -92,6 +93,7 @@ describe('home list', () => {
 
       const whileDropping: MapProps = selector(stateWhenDropping, ownProps);
       const expected: MapProps = {
+        // placeholder is still present
         placeholder: preset.inHome1.placeholder,
         shouldAnimatePlaceholder: false,
         snapshot: {
