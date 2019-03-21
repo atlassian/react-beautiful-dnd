@@ -251,7 +251,7 @@ export default ({
         const isForcePressing: boolean =
           event.webkitForce >= forcePressThreshold;
 
-        // force touch is not being respected
+        // force press is not being respected
         // opt out of default browser behaviour and continue the drag
         if (!getShouldRespectForceTouch()) {
           event.preventDefault();
