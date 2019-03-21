@@ -31,6 +31,7 @@ import type {
   DragImpact,
   DisplacementMap,
   MovementMode,
+  DropResult,
 } from '../../types';
 import type {
   MapProps,
@@ -38,46 +39,74 @@ import type {
   DefaultProps,
   DispatchProps,
   Selector,
+  StateSnapshot,
+  DropAnimation,
 } from './draggable-types';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import StoreContext from '../context/store-context';
 
-const getCombineWith = (impact: DragImpact): ?DraggableId => {
-  if (!impact.merge) {
-    return null;
+const getDraggingOverFromResult = (result: DropResult): ?DraggableId => {
+  if (result.destination) {
+    return result.destination.droppableId;
   }
-  return impact.merge.combine.draggableId;
+  if (result.combine) {
+    return result.combine.droppableId;
+  }
+  return null;
 };
 
-const defaultMapProps: MapProps = {
-  secondary: {
-    offset: origin,
-    combineTargetFor: null,
-    shouldAnimateDisplacement: true,
-  },
-  dragging: null,
+const getCombineWithFromResult = (result: DropResult): ?DraggableId => {
+  return result.combine ? result.combine.draggableId : null;
+};
+
+const getCombineWithFromImpact = (impact: DragImpact): ?DraggableId => {
+  return impact.merge ? impact.merge.combine.draggableId : null;
 };
 
 // Returning a function to ensure each
 // Draggable gets its own selector
 export const makeMapStateToProps = (): Selector => {
-  const memoizedOffset = memoizeOne(
-    (x: number, y: number): Position => ({ x, y }),
+  const getDraggingSnapshot = memoizeOne(
+    (
+      mode: MovementMode,
+      draggingOver: ?DroppableId,
+      combineWith: ?DraggableId,
+      dropping: ?DropAnimation,
+    ): StateSnapshot => ({
+      isDragging: true,
+      isDropAnimating: Boolean(dropping),
+      dropAnimation: dropping,
+      mode,
+      draggingOver,
+      combineWith,
+      combineTargetFor: null,
+    }),
   );
 
-  const getSecondaryProps = memoizeOne(
-    (
-      offset: Position,
-      combineTargetFor: ?DraggableId = null,
-      shouldAnimateDisplacement: boolean,
-    ): MapProps => ({
-      secondary: {
-        offset,
-        combineTargetFor,
-        shouldAnimateDisplacement,
-      },
-      dragging: null,
+  const getSecondarySnapshot = memoizeOne(
+    (combineTargetFor: ?DraggableId): StateSnapshot => ({
+      isDragging: false,
+      isDropAnimating: false,
+      dropAnimation: null,
+      mode: null,
+      draggingOver: null,
+      combineTargetFor,
+      combineWith: null,
     }),
+  );
+
+  const defaultMapProps: MapProps = {
+    mapped: {
+      type: 'SECONDARY',
+      offset: origin,
+      combineTargetFor: null,
+      shouldAnimateDisplacement: true,
+      snapshot: getSecondarySnapshot(null),
+    },
+  };
+
+  const memoizedOffset = memoizeOne(
+    (x: number, y: number): Position => ({ x, y }),
   );
 
   const getDraggingProps = memoizeOne(
@@ -91,16 +120,33 @@ export const makeMapStateToProps = (): Selector => {
       combineWith: ?DraggableId,
       forceShouldAnimate: ?boolean,
     ): MapProps => ({
-      dragging: {
-        mode,
+      mapped: {
+        type: 'DRAGGING',
         dropping: null,
-        offset,
-        dimension,
         draggingOver,
         combineWith,
+        mode,
+        offset,
+        dimension,
         forceShouldAnimate,
+        snapshot: getDraggingSnapshot(mode, draggingOver, combineWith, null),
       },
-      secondary: null,
+    }),
+  );
+
+  const getSecondaryProps = memoizeOne(
+    (
+      offset: Position,
+      combineTargetFor: ?DraggableId = null,
+      shouldAnimateDisplacement: boolean,
+    ): MapProps => ({
+      mapped: {
+        type: 'SECONDARY',
+        offset,
+        combineTargetFor,
+        shouldAnimateDisplacement,
+        snapshot: getSecondarySnapshot(combineTargetFor),
+      },
     }),
   );
 
@@ -156,7 +202,7 @@ export const makeMapStateToProps = (): Selector => {
       // const shouldAnimateDragMovement: boolean = state.shouldAnimate;
       const mode: MovementMode = state.movementMode;
       const draggingOver: ?DroppableId = whatIsDraggedOver(state.impact);
-      const combineWith: ?DraggableId = getCombineWith(state.impact);
+      const combineWith: ?DraggableId = getCombineWithFromImpact(state.impact);
       const forceShouldAnimate: ?boolean = state.forceShouldAnimate;
 
       return getDraggingProps(
@@ -178,29 +224,40 @@ export const makeMapStateToProps = (): Selector => {
 
       const dimension: DraggableDimension =
         state.dimensions.draggables[ownProps.draggableId];
-      const draggingOver: ?DroppableId = whatIsDraggedOver(completed.impact);
-      const combineWith: ?DraggableId = getCombineWith(completed.impact);
+
+      const result: DropResult = completed.result;
+      const mode: MovementMode = result.mode;
+      // these need to be pulled from the result as they can be different to the final impact
+      const draggingOver: ?DroppableId = getDraggingOverFromResult(result);
+      const combineWith: ?DraggableId = getCombineWithFromResult(result);
       const duration: number = state.dropDuration;
-      const mode: MovementMode = completed.result.mode;
 
       // not memoized as it is the only execution
+      const dropping: DropAnimation = {
+        duration,
+        curve: curves.drop,
+        moveTo: state.newHomeClientOffset,
+        opacity: combineWith ? combine.opacity.drop : null,
+        scale: combineWith ? combine.scale.drop : null,
+      };
+
       return {
-        dragging: {
+        mapped: {
+          type: 'DRAGGING',
           offset: state.newHomeClientOffset,
           dimension,
+          dropping,
           draggingOver,
           combineWith,
           mode,
           forceShouldAnimate: null,
-          dropping: {
-            duration,
-            curve: curves.drop,
-            moveTo: state.newHomeClientOffset,
-            opacity: combineWith ? combine.opacity.drop : null,
-            scale: combineWith ? combine.scale.drop : null,
-          },
+          snapshot: getDraggingSnapshot(
+            mode,
+            draggingOver,
+            combineWith,
+            dropping,
+          ),
         },
-        secondary: null,
       };
     }
 

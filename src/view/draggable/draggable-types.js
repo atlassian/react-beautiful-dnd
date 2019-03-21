@@ -19,7 +19,7 @@ import {
   drop,
   dropAnimationFinished,
 } from '../../state/action-creators';
-import type { DragHandleProps } from '../use-drag-handle/drag-handle-types';
+import type { DragHandleProps } from '../drag-handle/drag-handle-types';
 
 export type DraggingStyle = {|
   position: 'fixed',
@@ -107,30 +107,33 @@ export type DispatchProps = {|
 |};
 
 export type DraggingMapProps = {|
+  type: 'DRAGGING',
   offset: Position,
   mode: MovementMode,
   dropping: ?DropAnimation,
-  dimension: DraggableDimension,
-  draggingOver: ?DroppableId,
+  draggingOver: ?DraggableId,
   combineWith: ?DraggableId,
+  dimension: DraggableDimension,
   forceShouldAnimate: ?boolean,
-  // TODO: snapshot
-  // snapshot: StateSnapshot,
+  snapshot: StateSnapshot,
 |};
 
 export type SecondaryMapProps = {|
+  type: 'SECONDARY',
   offset: Position,
   combineTargetFor: ?DraggableId,
   shouldAnimateDisplacement: boolean,
-  // TODO: snapshot
-  // snapshot: StateSnapshot,
+  snapshot: StateSnapshot,
 |};
+
+export type MappedProps = DraggingMapProps | SecondaryMapProps;
 
 export type MapProps = {|
   // when an item is being displaced by a dragging item,
   // we need to know if that movement should be animated
-  dragging: ?DraggingMapProps,
-  secondary: ?SecondaryMapProps,
+  mapped: MappedProps,
+  // dragging: ?DraggingMapProps,
+  // secondary: ?SecondaryMapProps,
 |};
 
 export type ChildrenFn = (Provided, StateSnapshot) => Node | null;

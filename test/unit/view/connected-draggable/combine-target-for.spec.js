@@ -14,6 +14,7 @@ import {
   type IsDraggingState,
 } from '../../../utils/dragging-state';
 import getOwnProps from './util/get-own-props';
+import { getSecondarySnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
 const ownProps: OwnProps = getOwnProps(preset.inHome2);
@@ -39,11 +40,14 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
       const result: MapProps = selector(withMerge, ownProps);
 
       const expected: MapProps = {
-        dragging: null,
-        secondary: {
+        mapped: {
+          type: 'SECONDARY',
           offset: impact.movement.displacedBy.point,
           shouldAnimateDisplacement: false,
           combineTargetFor: preset.inHome1.descriptor.id,
+          snapshot: getSecondarySnapshot({
+            combineTargetFor: preset.inHome1.descriptor.id,
+          }),
         },
       };
       expect(result).toEqual(expected);
@@ -52,11 +56,14 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
     it('should not break memoization on multiple calls with the same impact', () => {
       const selector: Selector = makeMapStateToProps();
       const expected: MapProps = {
-        dragging: null,
-        secondary: {
+        mapped: {
+          type: 'SECONDARY',
           offset: impact.movement.displacedBy.point,
           shouldAnimateDisplacement: false,
           combineTargetFor: preset.inHome1.descriptor.id,
+          snapshot: getSecondarySnapshot({
+            combineTargetFor: preset.inHome1.descriptor.id,
+          }),
         },
       };
 

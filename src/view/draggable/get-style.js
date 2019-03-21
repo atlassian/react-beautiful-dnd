@@ -1,6 +1,5 @@
 // @flow
 import type { BoxModel } from 'css-box-model';
-import invariant from 'tiny-invariant';
 import { combine, transforms, transitions } from '../../animation';
 import type { DraggableDimension } from '../../types';
 import type {
@@ -10,6 +9,8 @@ import type {
   DropAnimation,
   SecondaryMapProps,
   DraggingMapProps,
+  DraggableStyle,
+  MappedProps,
 } from './draggable-types';
 
 export const zIndexOptions: ZIndexOptions = {
@@ -101,13 +102,8 @@ function getSecondaryStyle(secondary: SecondaryMapProps): NotDraggingStyle {
   };
 }
 
-export default function getStyle(
-  dragging: ?DraggingMapProps,
-  secondary: ?SecondaryMapProps,
-) {
-  if (dragging) {
-    return getDraggingStyle(dragging);
-  }
-  invariant(secondary, 'expect either dragging or secondary to exist');
-  return getSecondaryStyle(secondary);
+export default function getStyle(mapped: MappedProps): DraggableStyle {
+  return mapped.type === 'DRAGGING'
+    ? getDraggingStyle(mapped)
+    : getSecondaryStyle(mapped);
 }

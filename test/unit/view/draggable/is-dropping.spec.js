@@ -15,10 +15,9 @@ import {
   atRestMapProps,
   getDispatchPropsStub,
   whileDropping,
-  droppable,
 } from './util/get-props';
 import getLastCall from './util/get-last-call';
-import { zIndexOptions } from '../../../../src/view/draggable/draggable';
+import { zIndexOptions } from '../../../../src/view/draggable/get-style';
 import {
   transitions,
   curves,
@@ -38,9 +37,9 @@ it('should animate a drop to a provided offset', () => {
     scale: null,
   };
   const mapProps: MapProps = {
-    ...whileDragging,
-    dragging: {
-      ...whileDragging.dragging,
+    mapped: {
+      type: 'DRAGGING',
+      ...whileDragging.mapped,
       offset,
       dropping,
     },
@@ -81,9 +80,9 @@ it('should animate opacity and scale when combining', () => {
     scale: combine.scale.drop,
   };
   const mapProps: MapProps = {
-    ...whileDragging,
-    dragging: {
-      ...whileDragging.dragging,
+    mapped: {
+      type: 'DRAGGING',
+      ...whileDragging.mapped,
       combineWith: preset.inHome2.descriptor.id,
       offset,
       dropping,
@@ -126,9 +125,9 @@ it('should trigger a drop animation finished action when the transition is finis
     scale: null,
   };
   const mapProps: MapProps = {
-    ...whileDragging,
-    dragging: {
-      ...whileDragging.dragging,
+    mapped: {
+      type: 'DRAGGING',
+      ...whileDragging.mapped,
       offset,
       dropping,
     },
@@ -164,9 +163,9 @@ it('should not trigger a drop finished when a non-primary property finishes tran
     scale: null,
   };
   const mapProps: MapProps = {
-    ...whileDragging,
-    dragging: {
-      ...whileDragging.dragging,
+    mapped: {
+      type: 'DRAGGING',
+      ...whileDragging.mapped,
       offset,
       dropping,
     },
@@ -217,43 +216,14 @@ it('should only trigger a drop animation finished event if a transition end occu
   expect(dispatchPropsStub.dropAnimationFinished).toHaveBeenCalled();
 });
 
-describe('snapshot', () => {
-  it('should let consumers know a drop is occuring and provide drop animation information', () => {
-    const offset: Position = { x: 10, y: 20 };
-    const duration: number = 1;
-    const dropping: DropAnimation = {
-      duration,
-      curve: curves.drop,
-      moveTo: offset,
-      opacity: null,
-      scale: null,
-    };
-    const mapProps: MapProps = {
-      ...whileDragging,
-      dragging: {
-        ...whileDragging.dragging,
-        offset,
-        dropping,
-      },
-    };
-    const myMock = jest.fn();
+it('should pass along snapshots', () => {
+  const myMock = jest.fn();
 
-    mount({
-      mapProps,
-      WrappedComponent: getStubber(myMock),
-    });
-
-    const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
-    const expected: StateSnapshot = {
-      // still set to true while dropping
-      isDragging: true,
-      isDropAnimating: true,
-      dropAnimation: dropping,
-      draggingOver: droppable.id,
-      combineWith: null,
-      combineTargetFor: null,
-      mode: 'FLUID',
-    };
-    expect(snapshot).toEqual(expected);
+  mount({
+    mapProps: whileDropping,
+    WrappedComponent: getStubber(myMock),
   });
+
+  const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
+  expect(snapshot).toEqual(whileDropping.mapped.snapshot);
 });
