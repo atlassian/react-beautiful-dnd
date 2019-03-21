@@ -1,5 +1,6 @@
 // @flow
 // eslint-disable-next-line
+import invariant from 'tiny-invariant';
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
@@ -66,29 +67,41 @@ export const makeMapStateToProps = (): Selector => {
       const draggableId: DraggableId = dragging.descriptor.id;
       const isHome: boolean = dragging.descriptor.droppableId === id;
 
-      // reuse idle when not over and not in the home list
-      if (!isDraggingOver && !isHome) {
+      if (isHome) {
+        const draggingOverWith: ?DraggableId = isDraggingOver
+          ? draggableId
+          : null;
+
+        return {
+          isDraggingOver,
+          draggingFromThisWith: draggableId,
+          placeholder: dragging.placeholder,
+          draggingOverWith,
+          shouldAnimatePlaceholder: false,
+          snapshot: {
+            isDraggingOver,
+            draggingOverWith,
+            draggingFromThisWith: draggableId,
+          },
+        };
+      }
+
+      // not over foreign list - return idle
+      if (!isDraggingOver) {
         return idle;
       }
 
-      const draggingOverWith: ?DraggableId = isDraggingOver
-        ? draggableId
-        : null;
-
-      const draggingFromThisWith: ?DraggableId = isHome ? draggableId : null;
-      const placeholder: ?Placeholder = isHome ? dragging.placeholder : null;
-      const shouldAnimatePlaceholder: boolean = !isHome;
-
       return {
         isDraggingOver,
-        draggingFromThisWith,
-        placeholder,
-        draggingOverWith,
-        shouldAnimatePlaceholder,
+        draggingFromThisWith: null,
+        placeholder: dragging.placeholder,
+        draggingOverWith: draggableId,
+        // Animating placeholder in foreign list
+        shouldAnimatePlaceholder: true,
         snapshot: {
           isDraggingOver,
-          draggingOverWith,
-          draggingFromThisWith,
+          draggingOverWith: draggableId,
+          draggingFromThisWith: null,
         },
       };
     },

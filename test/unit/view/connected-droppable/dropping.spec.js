@@ -30,6 +30,11 @@ describe('home list', () => {
       draggingFromThisWith: preset.inHome1.descriptor.id,
       placeholder: preset.inHome1.placeholder,
       shouldAnimatePlaceholder: false,
+      snapshot: {
+        isDraggingOver: true,
+        draggingOverWith: preset.inHome1.descriptor.id,
+        draggingFromThisWith: preset.inHome1.descriptor.id,
+      },
     };
 
     it('should not break memoization from a reorder', () => {
@@ -89,6 +94,11 @@ describe('home list', () => {
         draggingFromThisWith: preset.inHome1.descriptor.id,
         placeholder: preset.inHome1.placeholder,
         shouldAnimatePlaceholder: false,
+        snapshot: {
+          isDraggingOver: false,
+          draggingOverWith: null,
+          draggingFromThisWith: preset.inHome1.descriptor.id,
+        },
       };
 
       const whileDragging: DraggingState = {
@@ -101,6 +111,10 @@ describe('home list', () => {
         completed: {
           ...base.completed,
           impact: cloneImpact(noImpact),
+          result: {
+            ...base.completed.result,
+            destination: null,
+          },
         },
       };
 

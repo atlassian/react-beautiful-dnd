@@ -7,6 +7,11 @@ const restingProps: MapProps = {
   draggingFromThisWith: null,
   placeholder: null,
   shouldAnimatePlaceholder: true,
+  snapshot: {
+    isDraggingOver: false,
+    draggingOverWith: null,
+    draggingFromThisWith: null,
+  },
 };
 
 export default restingProps;

@@ -43,6 +43,11 @@ describe('home list', () => {
       draggingFromThisWith: preset.inHome1.descriptor.id,
       placeholder: preset.inHome1.placeholder,
       shouldAnimatePlaceholder: false,
+      snapshot: {
+        isDraggingOver: false,
+        draggingOverWith: null,
+        draggingFromThisWith: preset.inHome1.descriptor.id,
+      },
     };
 
     const result: MapProps = selector(getNoWhere(), ownProps);

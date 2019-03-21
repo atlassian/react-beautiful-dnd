@@ -25,6 +25,11 @@ const isOverHomeMapProps: MapProps = {
   draggingFromThisWith: preset.inHome1.descriptor.id,
   placeholder: preset.inHome1.placeholder,
   shouldAnimatePlaceholder: false,
+  snapshot: {
+    isDraggingOver: true,
+    draggingOverWith: preset.inHome1.descriptor.id,
+    draggingFromThisWith: preset.inHome1.descriptor.id,
+  },
 };
 
 describe('was over - reordering', () => {
