@@ -46,7 +46,13 @@ import type {
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 
 const getDraggingOverFromResult = (result: DropResult): ?DraggableId => {
-  return result.destination ? result.destination.droppableId : null;
+  if (result.destination) {
+    return result.destination.droppableId;
+  }
+  if (result.combine) {
+    return result.combine.droppableId;
+  }
+  return null;
 };
 
 const getCombineWithFromResult = (result: DropResult): ?DraggableId => {
