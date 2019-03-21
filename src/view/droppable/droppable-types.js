@@ -42,6 +42,9 @@ export type MapProps = {|
   shouldAnimatePlaceholder: boolean,
   // when dragging from a home list this will be populated even when not over the list
   draggingFromThisWith: ?DraggableId,
+
+  // snapshot based on redux state to be provided to consumers
+  snapshot: StateSnapshot,
 |};
 
 export type DefaultProps = {|
