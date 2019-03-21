@@ -26,53 +26,65 @@ export const foreignOwnProps: OwnProps = {
 };
 
 export const homeAtRest: MapProps = {
-  isDraggingOver: false,
-  draggingOverWith: null,
-  draggingFromThisWith: null,
   placeholder: null,
   shouldAnimatePlaceholder: false,
+  snapshot: {
+    isDraggingOver: false,
+    draggingOverWith: null,
+    draggingFromThisWith: null,
+  },
 };
 
 export const isOverHome: MapProps = {
-  isDraggingOver: true,
-  draggingOverWith: preset.inHome1.descriptor.id,
-  draggingFromThisWith: preset.inHome1.descriptor.id,
   placeholder: preset.inHome1.placeholder,
   // this can change during a drag
   shouldAnimatePlaceholder: false,
+  snapshot: {
+    isDraggingOver: true,
+    draggingOverWith: preset.inHome1.descriptor.id,
+    draggingFromThisWith: preset.inHome1.descriptor.id,
+  },
 };
 
 export const isNotOverHome: MapProps = {
-  isDraggingOver: false,
-  draggingOverWith: null,
   placeholder: preset.inHome1.placeholder,
-  draggingFromThisWith: preset.inHome1.descriptor.id,
   // this can change during a drag
   shouldAnimatePlaceholder: false,
+  snapshot: {
+    isDraggingOver: false,
+    draggingOverWith: null,
+    draggingFromThisWith: preset.inHome1.descriptor.id,
+  },
 };
 
 export const homePostDropAnimation: MapProps = {
-  isDraggingOver: false,
-  draggingOverWith: null,
-  draggingFromThisWith: null,
   placeholder: null,
   shouldAnimatePlaceholder: true,
+  snapshot: {
+    isDraggingOver: false,
+    draggingOverWith: null,
+    draggingFromThisWith: null,
+  },
 };
 
 export const isOverForeign: MapProps = {
-  isDraggingOver: true,
-  draggingOverWith: preset.inHome1.descriptor.id,
   placeholder: preset.inHome1.placeholder,
-  draggingFromThisWith: null,
   shouldAnimatePlaceholder: true,
+  snapshot: {
+    isDraggingOver: true,
+    draggingOverWith: preset.inHome1.descriptor.id,
+    draggingFromThisWith: null,
+  },
 };
 
 export const isNotOverForeign: MapProps = {
-  isDraggingOver: false,
-  draggingOverWith: null,
   placeholder: null,
-  draggingFromThisWith: null,
   shouldAnimatePlaceholder: false,
+  snapshot: {
+    isDraggingOver: false,
+    draggingOverWith: null,
+    draggingFromThisWith: null,
+  },
 };
 
 export const dispatchProps: DispatchProps = {
