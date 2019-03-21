@@ -37,11 +37,11 @@ import {
   updateDroppableIsCombineEnabled,
   collectionStarting,
 } from '../../state/action-creators';
-import { getFormattedMessage } from '../../dev-warning';
 import { peerDependencies } from '../../../package.json';
 import checkReactVersion from './check-react-version';
 import checkDoctype from './check-doctype';
 import isMovementAllowed from '../../state/is-movement-allowed';
+import ErrorBoundary from '../error-boundary';
 
 type Props = {|
   ...Responders,
@@ -56,25 +56,6 @@ type Context = {
 // Reset any context that gets persisted across server side renders
 export const resetServerContext = () => {
   resetStyleContext();
-};
-
-const printFatalDevError = (error: Error) => {
-  if (process.env.NODE_ENV === 'production') {
-    return;
-  }
-  // eslint-disable-next-line no-console
-  console.error(
-    ...getFormattedMessage(
-      `
-      An error has occurred while a drag is occurring.
-      Any existing drag will be cancelled.
-
-      > ${error.message}
-      `,
-    ),
-  );
-  // eslint-disable-next-line no-console
-  console.error('raw', error);
 };
 
 export default class DragDropContext extends React.Component<Props> {
@@ -175,7 +156,6 @@ export default class DragDropContext extends React.Component<Props> {
   getIsMovementAllowed = () => isMovementAllowed(this.store.getState());
 
   componentDidMount() {
-    window.addEventListener('error', this.onWindowError);
     this.styleMarshal.mount();
     this.announcer.mount();
 
@@ -185,43 +165,24 @@ export default class DragDropContext extends React.Component<Props> {
     }
   }
 
-  componentDidCatch(error: Error) {
-    this.onFatalError(error);
-
-    // If the failure was due to an invariant failure - then we handle the error
-    if (error.message.indexOf('Invariant failed') !== -1) {
-      this.setState({});
-      return;
-    }
-
-    // Error is more serious and we throw it
-    throw error;
-  }
-
   componentWillUnmount() {
-    window.removeEventListener('error', this.onWindowError);
-
-    const state: State = this.store.getState();
-    if (state.phase !== 'IDLE') {
-      this.store.dispatch(clean());
-    }
-
+    this.tryResetStore();
     this.styleMarshal.unmount();
     this.announcer.unmount();
   }
 
-  onFatalError = (error: Error) => {
-    printFatalDevError(error);
-
+  tryResetStore = () => {
     const state: State = this.store.getState();
     if (state.phase !== 'IDLE') {
       this.store.dispatch(clean());
     }
   };
 
-  onWindowError = (error: Error) => this.onFatalError(error);
-
   render() {
-    return this.props.children;
+    return (
+      <ErrorBoundary onError={this.tryResetStore}>
+        {this.props.children}
+      </ErrorBoundary>
+    );
   }
 }

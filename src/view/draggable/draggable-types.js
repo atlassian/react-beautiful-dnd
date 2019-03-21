@@ -107,26 +107,33 @@ export type DispatchProps = {|
 |};
 
 export type DraggingMapProps = {|
+  type: 'DRAGGING',
   offset: Position,
   mode: MovementMode,
   dropping: ?DropAnimation,
-  dimension: DraggableDimension,
-  draggingOver: ?DroppableId,
+  draggingOver: ?DraggableId,
   combineWith: ?DraggableId,
+  dimension: DraggableDimension,
   forceShouldAnimate: ?boolean,
+  snapshot: StateSnapshot,
 |};
 
 export type SecondaryMapProps = {|
+  type: 'SECONDARY',
   offset: Position,
   combineTargetFor: ?DraggableId,
   shouldAnimateDisplacement: boolean,
+  snapshot: StateSnapshot,
 |};
+
+export type MappedProps = DraggingMapProps | SecondaryMapProps;
 
 export type MapProps = {|
   // when an item is being displaced by a dragging item,
   // we need to know if that movement should be animated
-  dragging: ?DraggingMapProps,
-  secondary: ?SecondaryMapProps,
+  mapped: MappedProps,
+  // dragging: ?DraggingMapProps,
+  // secondary: ?SecondaryMapProps,
 |};
 
 export type ChildrenFn = (Provided, StateSnapshot) => Node | null;
