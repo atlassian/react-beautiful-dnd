@@ -29,6 +29,7 @@ import getVisibleDisplacement from '../../../utils/get-displacement/get-visible-
 import getNotVisibleDisplacement from '../../../utils/get-displacement/get-not-visible-displacement';
 import getHomeLocation from '../../../../src/state/get-home-location';
 import cloneImpact from '../../../utils/clone-impact';
+import { getSecondarySnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -114,11 +115,14 @@ draggingStates.forEach((current: IsDraggingState) => {
         const impacted: IsDraggingState = withImpact(current, impact);
 
         const expected: MapProps = {
-          dragging: null,
-          secondary: {
+          mapped: {
+            type: 'SECONDARY',
             shouldAnimateDisplacement: false,
             offset: displacedBy.point,
             combineTargetFor: null,
+            snapshot: getSecondarySnapshot({
+              combineTargetFor: null,
+            }),
           },
         };
         expect(selector(impacted, ownProps)).toEqual(expected);
@@ -143,11 +147,14 @@ draggingStates.forEach((current: IsDraggingState) => {
         const impacted: IsDraggingState = withImpact(current, impact);
 
         const expected: MapProps = {
-          dragging: null,
-          secondary: {
+          mapped: {
+            type: 'SECONDARY',
             shouldAnimateDisplacement: true,
             offset: displacedBy.point,
             combineTargetFor: null,
+            snapshot: getSecondarySnapshot({
+              combineTargetFor: null,
+            }),
           },
         };
         expect(selector(impacted, ownProps)).toEqual(expected);
@@ -196,11 +203,14 @@ draggingStates.forEach((current: IsDraggingState) => {
         const first: MapProps = selector(withImpact(current, impact), ownProps);
 
         const expected: MapProps = {
-          dragging: null,
-          secondary: {
+          mapped: {
+            type: 'SECONDARY',
             offset: displacedBy.point,
             shouldAnimateDisplacement: true,
             combineTargetFor: null,
+            snapshot: getSecondarySnapshot({
+              combineTargetFor: null,
+            }),
           },
         };
         expect(first).toEqual(expected);

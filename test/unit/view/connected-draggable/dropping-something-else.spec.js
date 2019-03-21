@@ -21,6 +21,7 @@ import type {
 } from '../../../../src/types';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import getSecondaryMapProps from './util/get-secondary-map-props';
+import { getSecondarySnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -44,11 +45,14 @@ draggingStates.forEach((current: IsDraggingState) => {
         const whileDragging: MapProps = selector(dragging, ownProps);
 
         const expected: MapProps = {
-          dragging: null,
-          secondary: {
+          mapped: {
+            type: 'SECONDARY',
             offset: displacedBy.point,
             combineTargetFor: null,
             shouldAnimateDisplacement: false,
+            snapshot: getSecondarySnapshot({
+              combineTargetFor: null,
+            }),
           },
         };
         expect(whileDragging).toEqual(expected);
@@ -77,11 +81,14 @@ draggingStates.forEach((current: IsDraggingState) => {
         const ownProps: OwnProps = getOwnProps(preset.inForeign1);
         const selector: Selector = makeMapStateToProps();
         const expected: MapProps = {
-          dragging: null,
-          secondary: {
+          mapped: {
+            type: 'SECONDARY',
             offset: { x: 0, y: 0 },
             shouldAnimateDisplacement: true,
             combineTargetFor: null,
+            snapshot: getSecondarySnapshot({
+              combineTargetFor: null,
+            }),
           },
         };
 

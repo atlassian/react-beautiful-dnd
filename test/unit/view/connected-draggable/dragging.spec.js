@@ -18,6 +18,7 @@ import {
 import getOwnProps from './util/get-own-props';
 import getDraggingMapProps from './util/get-dragging-map-props';
 import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import { getDraggingSnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -34,7 +35,8 @@ draggingStates.forEach((current: IsDraggingState) => {
       );
 
       const expected: MapProps = {
-        dragging: {
+        mapped: {
+          type: 'DRAGGING',
           offset: { x: 20, y: 30 },
           mode: 'FLUID',
           dimension: preset.inHome1,
@@ -42,8 +44,13 @@ draggingStates.forEach((current: IsDraggingState) => {
           dropping: null,
           combineWith: null,
           forceShouldAnimate: null,
+          snapshot: getDraggingSnapshot({
+            mode: 'FLUID',
+            draggingOver: preset.home.descriptor.id,
+            combineWith: null,
+            dropping: null,
+          }),
         },
-        secondary: null,
       };
       expect(result).toEqual(expected);
     });
