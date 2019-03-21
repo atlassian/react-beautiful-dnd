@@ -7,40 +7,52 @@ import type {
   Selector,
   OwnProps,
   MapProps,
+  DropAnimation,
 } from '../../../../src/view/draggable/draggable-types';
 import type { DropAnimatingState } from '../../../../src/types';
 import { curves } from '../../../../src/animation';
+import { getDraggingSnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
 const state = getStatePreset();
 const ownProps: OwnProps = getOwnProps(preset.inHome1);
 
-it('should use the impact and not the result for animation', () => {
+it('should use result for providing data and not the impact', () => {
   const current: DropAnimatingState = state.userCancel();
 
-  // little validation
+  // little validation: the result is null, but the impact has a destination
   expect(current.completed.result.destination).toBe(null);
   expect(current.completed.impact.destination).toBeTruthy();
 
   const selector: Selector = makeMapStateToProps();
+
+  const dropping: DropAnimation = {
+    duration: current.dropDuration,
+    curve: curves.drop,
+    moveTo: current.newHomeClientOffset,
+    opacity: null,
+    scale: null,
+  };
+
   const expected: MapProps = {
-    dragging: {
+    mapped: {
+      type: 'DRAGGING',
       dimension: preset.inHome1,
-      // even though result is null the impact will provide this information
-      draggingOver: preset.home.descriptor.id,
+      // using result
+      draggingOver: null,
       forceShouldAnimate: null,
       offset: current.newHomeClientOffset,
       mode: current.completed.result.mode,
       combineWith: null,
-      dropping: {
-        duration: current.dropDuration,
-        curve: curves.drop,
-        moveTo: current.newHomeClientOffset,
-        opacity: null,
-        scale: null,
-      },
+      dropping,
+      snapshot: getDraggingSnapshot({
+        mode: current.completed.result.mode,
+        // using result
+        draggingOver: null,
+        combineWith: null,
+        dropping,
+      }),
     },
-    secondary: null,
   };
 
   const whileDropping: MapProps = selector(current, ownProps);

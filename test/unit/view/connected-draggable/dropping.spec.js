@@ -7,6 +7,7 @@ import type {
   Selector,
   OwnProps,
   MapProps,
+  DropAnimation,
 } from '../../../../src/view/draggable/draggable-types';
 import type {
   DropAnimatingState,
@@ -16,6 +17,7 @@ import type {
 import { curves, combine as combineStyle } from '../../../../src/animation';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import { getDraggingSnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -24,23 +26,30 @@ const ownProps: OwnProps = getOwnProps(preset.inHome1);
 it('should move to the new home offset', () => {
   const current: DropAnimatingState = state.dropAnimating();
   const selector: Selector = makeMapStateToProps();
+  const dropping: DropAnimation = {
+    duration: current.dropDuration,
+    curve: curves.drop,
+    moveTo: current.newHomeClientOffset,
+    opacity: null,
+    scale: null,
+  };
   const expected: MapProps = {
-    dragging: {
+    mapped: {
+      type: 'DRAGGING',
       dimension: preset.inHome1,
       draggingOver: preset.home.descriptor.id,
       forceShouldAnimate: null,
       offset: current.newHomeClientOffset,
       mode: current.completed.result.mode,
       combineWith: null,
-      dropping: {
-        duration: current.dropDuration,
-        curve: curves.drop,
-        moveTo: current.newHomeClientOffset,
-        opacity: null,
-        scale: null,
-      },
+      dropping,
+      snapshot: getDraggingSnapshot({
+        draggingOver: preset.home.descriptor.id,
+        mode: current.completed.result.mode,
+        combineWith: null,
+        dropping,
+      }),
     },
-    secondary: null,
   };
 
   const whileDropping: MapProps = selector(current, ownProps);
@@ -71,29 +80,41 @@ it('should maintain combine information', () => {
   const withCombine: DropAnimatingState = {
     ...withoutCombine,
     completed: {
-      ...withoutCombine.completed,
+      critical: withoutCombine.completed.critical,
       impact,
+      result: {
+        ...withoutCombine.completed.result,
+        destination: null,
+        combine,
+      },
     },
   };
 
   const selector: Selector = makeMapStateToProps();
+  const dropping: DropAnimation = {
+    duration: withCombine.dropDuration,
+    curve: curves.drop,
+    moveTo: withCombine.newHomeClientOffset,
+    scale: combineStyle.scale.drop,
+    opacity: combineStyle.opacity.drop,
+  };
   const expected: MapProps = {
-    dragging: {
+    mapped: {
+      type: 'DRAGGING',
       dimension: preset.inHome1,
       draggingOver: preset.home.descriptor.id,
       forceShouldAnimate: null,
       offset: withCombine.newHomeClientOffset,
       mode: withCombine.completed.result.mode,
       combineWith: preset.inHome2.descriptor.id,
-      dropping: {
-        duration: withCombine.dropDuration,
-        curve: curves.drop,
-        moveTo: withCombine.newHomeClientOffset,
-        scale: combineStyle.scale.drop,
-        opacity: combineStyle.opacity.drop,
-      },
+      dropping,
+      snapshot: getDraggingSnapshot({
+        mode: withCombine.completed.result.mode,
+        combineWith: preset.inHome2.descriptor.id,
+        dropping,
+        draggingOver: preset.home.descriptor.id,
+      }),
     },
-    secondary: null,
   };
 
   const whileDropping: MapProps = selector(withCombine, ownProps);
