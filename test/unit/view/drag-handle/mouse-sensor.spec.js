@@ -1353,5 +1353,30 @@ describe('webkit force press', () => {
         }),
       ).toBe(true);
     });
+
+    it('should not cancel a drag if force press is not being respected', () => {
+      // arrange
+      const shouldRespectForceTouch: boolean = false;
+      const customWrapper = getWrapper(
+        callbacks,
+        undefined,
+        shouldRespectForceTouch,
+      );
+
+      // start the drag
+      mouseDown(customWrapper);
+      windowMouseMove({ x: 0, y: sloppyClickThreshold });
+
+      // will not cancel the drag
+      windowMouseForceChange(mouseForcePressThreshold);
+
+      expect(
+        callbacksCalled(callbacks)({
+          onLift: 1,
+          // no cancel called
+          onCancel: 0,
+        }),
+      ).toBe(true);
+    });
   });
 });
