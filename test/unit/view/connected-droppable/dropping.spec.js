@@ -79,6 +79,31 @@ describe('home list', () => {
       // referential equality: memoization check
       expect(whileDragging).toBe(whileDropping);
     });
+
+    it('should use the completed.result and not the completed.impact for determining if over', () => {
+      const ownProps: OwnProps = getOwnProps(preset.home);
+      const selector: Selector = makeMapStateToProps();
+
+      const stateWhenDropping: DropAnimatingState = state.userCancel();
+      // the impact has the home destination
+      expect(stateWhenDropping.completed.impact.destination).toBeTruthy();
+      // the user facing result has been cleared
+      expect(stateWhenDropping.completed.result.destination).toBe(null);
+
+      const whileDropping: MapProps = selector(stateWhenDropping, ownProps);
+      const expected: MapProps = {
+        placeholder: preset.inHome1.placeholder,
+        shouldAnimatePlaceholder: false,
+        snapshot: {
+          // still the home list so this is populated
+          draggingFromThisWith: preset.inHome1.descriptor.id,
+          // cleared from result and cleared version is given to consumer
+          isDraggingOver: false,
+          draggingOverWith: null,
+        },
+      };
+      expect(whileDropping).toEqual(expected);
+    });
   });
 
   describe('was not being dragged over', () => {
