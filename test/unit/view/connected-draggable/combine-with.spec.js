@@ -23,6 +23,7 @@ import { forward } from '../../../../src/state/user-direction/user-direction-pre
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../src/state/get-displacement-map';
 import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-animated-displacement';
+import { getDraggingSnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
 const ownProps: OwnProps = getOwnProps(preset.inHome1);
@@ -64,7 +65,8 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
       );
 
       const expected: MapProps = {
-        dragging: {
+        mapped: {
+          type: 'DRAGGING',
           offset: { x: 1, y: 2 },
           mode: 'FLUID',
           dimension: preset.inHome1,
@@ -73,8 +75,13 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
           combineWith: preset.inHome2.descriptor.id,
           dropping: null,
           forceShouldAnimate: null,
+          snapshot: getDraggingSnapshot({
+            mode: 'FLUID',
+            draggingOver: preset.home.descriptor.id,
+            combineWith: preset.inHome2.descriptor.id,
+            dropping: null,
+          }),
         },
-        secondary: null,
       };
 
       expect(result).toEqual(expected);
