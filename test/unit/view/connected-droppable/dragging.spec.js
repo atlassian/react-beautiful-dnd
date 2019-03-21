@@ -30,11 +30,13 @@ const state = getStatePreset();
 describe('home list', () => {
   const ownProps: OwnProps = getOwnProps(preset.home);
   const isOverMapProps: MapProps = {
-    isDraggingOver: true,
-    draggingOverWith: preset.inHome1.descriptor.id,
-    draggingFromThisWith: preset.inHome1.descriptor.id,
     placeholder: preset.inHome1.placeholder,
     shouldAnimatePlaceholder: false,
+    snapshot: {
+      isDraggingOver: true,
+      draggingOverWith: preset.inHome1.descriptor.id,
+      draggingFromThisWith: preset.inHome1.descriptor.id,
+    },
   };
 
   describe('is dragging over', () => {
@@ -101,11 +103,13 @@ describe('home list', () => {
     });
 
     const isHomeButNotOver: MapProps = {
-      isDraggingOver: false,
-      draggingOverWith: null,
-      draggingFromThisWith: preset.inHome1.descriptor.id,
       placeholder: preset.inHome1.placeholder,
       shouldAnimatePlaceholder: false,
+      snapshot: {
+        isDraggingOver: false,
+        draggingOverWith: null,
+        draggingFromThisWith: preset.inHome1.descriptor.id,
+      },
     };
 
     it('should indicate that it is not being dragged over', () => {
@@ -165,11 +169,13 @@ describe('foreign list', () => {
     };
 
     const isOverForeignMapProps: MapProps = {
-      isDraggingOver: true,
-      draggingFromThisWith: null,
-      draggingOverWith: preset.inHome1.descriptor.id,
       placeholder: preset.inHome1.placeholder,
       shouldAnimatePlaceholder: true,
+      snapshot: {
+        isDraggingOver: true,
+        draggingFromThisWith: null,
+        draggingOverWith: preset.inHome1.descriptor.id,
+      },
     };
 
     it('should indicate that it is being dragged over', () => {
