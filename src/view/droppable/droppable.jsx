@@ -2,7 +2,7 @@
 import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher';
-import type { Props, Provided, StateSnapshot } from './droppable-types';
+import type { Props, Provided } from './droppable-types';
 import type { DroppableId, TypeId } from '../../types';
 import Placeholder from '../placeholder';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
@@ -161,11 +161,9 @@ export default class Droppable extends React.Component<Props> {
       droppableId,
       isDropDisabled,
       isCombineEnabled,
-      // mapProps
       ignoreContainerClipping,
-      isDraggingOver,
-      draggingOverWith,
-      draggingFromThisWith,
+      // mapProps
+      snapshot,
     } = this.props;
     const provided: Provided = {
       innerRef: this.setRef,
@@ -173,11 +171,6 @@ export default class Droppable extends React.Component<Props> {
       droppableProps: {
         'data-react-beautiful-dnd-droppable': this.styleContext,
       },
-    };
-    const snapshot: StateSnapshot = {
-      isDraggingOver,
-      draggingOverWith,
-      draggingFromThisWith,
     };
 
     return (
