@@ -19,6 +19,7 @@ import type {
   DefaultProps,
   Selector,
   DispatchProps,
+  StateSnapshot,
 } from './droppable-types';
 import { storeKey } from '../context-keys';
 import Droppable from './droppable';
@@ -58,23 +59,15 @@ export const makeMapStateToProps = (): Selector => {
       id: DroppableId,
       isDraggingOver: boolean,
       dragging: DraggableDimension,
+      snapshot: StateSnapshot,
     ): MapProps => {
-      const draggableId: DraggableId = dragging.descriptor.id;
       const isHome: boolean = dragging.descriptor.droppableId === id;
 
       if (isHome) {
-        const draggingOverWith: ?DraggableId = isDraggingOver
-          ? draggableId
-          : null;
-
         return {
           placeholder: dragging.placeholder,
           shouldAnimatePlaceholder: false,
-          snapshot: {
-            isDraggingOver,
-            draggingOverWith,
-            draggingFromThisWith: draggableId,
-          },
+          snapshot,
         };
       }
 
@@ -87,11 +80,28 @@ export const makeMapStateToProps = (): Selector => {
         placeholder: dragging.placeholder,
         // Animating placeholder in foreign list
         shouldAnimatePlaceholder: true,
-        snapshot: {
-          isDraggingOver,
-          draggingOverWith: draggableId,
-          draggingFromThisWith: null,
-        },
+        snapshot,
+      };
+    },
+  );
+
+  const getSnapshot = memoizeOne(
+    (
+      id: DroppableId,
+      isDraggingOver: boolean,
+      dragging: DraggableDimension,
+    ): StateSnapshot => {
+      const draggableId: DraggableId = dragging.descriptor.id;
+      const isHome: boolean = dragging.descriptor.droppableId === id;
+      const draggingOverWith: ?DraggableId = isDraggingOver
+        ? draggableId
+        : null;
+      const draggingFromThisWith: ?DraggableId = isHome ? draggableId : null;
+
+      return {
+        isDraggingOver,
+        draggingOverWith,
+        draggingFromThisWith,
       };
     },
   );
@@ -113,7 +123,10 @@ export const makeMapStateToProps = (): Selector => {
         state.dimensions,
       );
       const isDraggingOver: boolean = whatIsDraggedOver(state.impact) === id;
-      return getMapProps(id, isDraggingOver, dragging);
+
+      // Snapshot based on current impact
+      const snapshot: StateSnapshot = getSnapshot(id, isDraggingOver, dragging);
+      return getMapProps(id, isDraggingOver, dragging, snapshot);
     }
 
     if (state.phase === 'DROP_ANIMATING') {
@@ -126,10 +139,22 @@ export const makeMapStateToProps = (): Selector => {
         completed.critical,
         state.dimensions,
       );
-      const isDraggingOver: boolean =
-        whatIsDraggedOverFromResult(completed.result) === id;
 
-      return getMapProps(id, isDraggingOver, dragging);
+      // Snapshot based on result and not impact
+      // The result might be null (cancel) but the impact is populated
+      // to move everything back
+      const snapshot: StateSnapshot = getSnapshot(
+        id,
+        whatIsDraggedOverFromResult(completed.result) === id,
+        dragging,
+      );
+
+      return getMapProps(
+        id,
+        whatIsDraggedOver(completed.impact) === id,
+        dragging,
+        snapshot,
+      );
     }
 
     if (state.phase === 'IDLE' && state.completed) {
@@ -138,8 +163,7 @@ export const makeMapStateToProps = (): Selector => {
         return idle;
       }
 
-      const wasOver: boolean =
-        whatIsDraggedOverFromResult(completed.result) === id;
+      const wasOver: boolean = whatIsDraggedOver(completed.impact) === id;
       const wasCombining: boolean = Boolean(completed.result.combine);
 
       // need to cut any animations: sadly a memoization fail
