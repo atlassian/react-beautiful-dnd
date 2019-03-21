@@ -2,7 +2,7 @@
 import React, { type Node } from 'react';
 import PropTypes from 'prop-types';
 import DroppableDimensionPublisher from '../droppable-dimension-publisher';
-import type { Props, Provided, StateSnapshot } from './droppable-types';
+import type { Props, Provided } from './droppable-types';
 import type { DroppableId, TypeId } from '../../types';
 import Placeholder from '../placeholder';
 import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
