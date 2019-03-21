@@ -32,17 +32,11 @@ export type StateSnapshot = {|
 |};
 
 export type MapProps = {|
-  isDraggingOver: boolean,
-  // The id of the draggable that is dragging over
-  draggingOverWith: ?DraggableId,
-  // placeholder is used to hold space when
-  // not the user is dragging over a list that
-  // is not the source list
+  // placeholder:
+  // - used to keep space in the home list during the whole drag and drop
+  // - used to make space in foreign lists during a drag
   placeholder: ?Placeholder,
   shouldAnimatePlaceholder: boolean,
-  // when dragging from a home list this will be populated even when not over the list
-  draggingFromThisWith: ?DraggableId,
-
   // snapshot based on redux state to be provided to consumers
   snapshot: StateSnapshot,
 |};

@@ -20,9 +20,6 @@ const preset = getPreset();
 const state = getStatePreset();
 
 const isOverHomeMapProps: MapProps = {
-  isDraggingOver: true,
-  draggingOverWith: preset.inHome1.descriptor.id,
-  draggingFromThisWith: preset.inHome1.descriptor.id,
   placeholder: preset.inHome1.placeholder,
   shouldAnimatePlaceholder: false,
   snapshot: {

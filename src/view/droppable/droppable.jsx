@@ -161,11 +161,9 @@ export default class Droppable extends React.Component<Props> {
       droppableId,
       isDropDisabled,
       isCombineEnabled,
-      // mapProps
       ignoreContainerClipping,
-      isDraggingOver,
-      draggingOverWith,
-      draggingFromThisWith,
+      // mapProps
+      snapshot,
     } = this.props;
     const provided: Provided = {
       innerRef: this.setRef,
@@ -173,11 +171,6 @@ export default class Droppable extends React.Component<Props> {
       droppableProps: {
         'data-react-beautiful-dnd-droppable': this.styleContext,
       },
-    };
-    const snapshot: StateSnapshot = {
-      isDraggingOver,
-      draggingOverWith,
-      draggingFromThisWith,
     };
 
     return (

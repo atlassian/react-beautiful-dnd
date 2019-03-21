@@ -26,9 +26,6 @@ export const foreignOwnProps: OwnProps = {
 };
 
 export const homeAtRest: MapProps = {
-  isDraggingOver: false,
-  draggingOverWith: null,
-  draggingFromThisWith: null,
   placeholder: null,
   shouldAnimatePlaceholder: false,
   snapshot: {
@@ -39,9 +36,6 @@ export const homeAtRest: MapProps = {
 };
 
 export const isOverHome: MapProps = {
-  isDraggingOver: true,
-  draggingOverWith: preset.inHome1.descriptor.id,
-  draggingFromThisWith: preset.inHome1.descriptor.id,
   placeholder: preset.inHome1.placeholder,
   // this can change during a drag
   shouldAnimatePlaceholder: false,
@@ -53,9 +47,6 @@ export const isOverHome: MapProps = {
 };
 
 export const isNotOverHome: MapProps = {
-  isDraggingOver: false,
-  draggingOverWith: null,
-  draggingFromThisWith: preset.inHome1.descriptor.id,
   placeholder: preset.inHome1.placeholder,
   // this can change during a drag
   shouldAnimatePlaceholder: false,
@@ -67,9 +58,6 @@ export const isNotOverHome: MapProps = {
 };
 
 export const homePostDropAnimation: MapProps = {
-  isDraggingOver: false,
-  draggingOverWith: null,
-  draggingFromThisWith: null,
   placeholder: null,
   shouldAnimatePlaceholder: true,
   snapshot: {
@@ -80,9 +68,6 @@ export const homePostDropAnimation: MapProps = {
 };
 
 export const isOverForeign: MapProps = {
-  isDraggingOver: true,
-  draggingOverWith: preset.inHome1.descriptor.id,
-  draggingFromThisWith: null,
   placeholder: preset.inHome1.placeholder,
   shouldAnimatePlaceholder: true,
   snapshot: {
@@ -93,9 +78,6 @@ export const isOverForeign: MapProps = {
 };
 
 export const isNotOverForeign: MapProps = {
-  isDraggingOver: false,
-  draggingOverWith: null,
-  draggingFromThisWith: null,
   placeholder: null,
   shouldAnimatePlaceholder: false,
   snapshot: {

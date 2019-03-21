@@ -25,9 +25,6 @@ const state = getStatePreset();
 describe('home list', () => {
   describe('was being dragged over', () => {
     const isOverMapProps: MapProps = {
-      isDraggingOver: true,
-      draggingOverWith: preset.inHome1.descriptor.id,
-      draggingFromThisWith: preset.inHome1.descriptor.id,
       placeholder: preset.inHome1.placeholder,
       shouldAnimatePlaceholder: false,
       snapshot: {
@@ -89,9 +86,6 @@ describe('home list', () => {
       const ownProps: OwnProps = getOwnProps(preset.home);
       const selector: Selector = makeMapStateToProps();
       const isHomeButNotOver: MapProps = {
-        isDraggingOver: false,
-        draggingOverWith: null,
-        draggingFromThisWith: preset.inHome1.descriptor.id,
         placeholder: preset.inHome1.placeholder,
         shouldAnimatePlaceholder: false,
         snapshot: {

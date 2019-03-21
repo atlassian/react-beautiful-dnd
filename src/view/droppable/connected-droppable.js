@@ -1,6 +1,5 @@
 // @flow
-// eslint-disable-next-line
-import invariant from 'tiny-invariant';
+// eslint-disable-next-line no-unused-vars
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
@@ -11,7 +10,6 @@ import type {
   CompletedDrag,
   DraggableDimension,
   DimensionMap,
-  Placeholder,
   TypeId,
   Critical,
 } from '../../types';
@@ -41,10 +39,7 @@ const getDraggable = (
 // Droppable gets its own selector
 export const makeMapStateToProps = (): Selector => {
   const idle: MapProps = {
-    isDraggingOver: false,
-    draggingFromThisWith: null,
     placeholder: null,
-    draggingOverWith: null,
     shouldAnimatePlaceholder: true,
     snapshot: {
       isDraggingOver: false,
@@ -73,10 +68,7 @@ export const makeMapStateToProps = (): Selector => {
           : null;
 
         return {
-          isDraggingOver,
-          draggingFromThisWith: draggableId,
           placeholder: dragging.placeholder,
-          draggingOverWith,
           shouldAnimatePlaceholder: false,
           snapshot: {
             isDraggingOver,
@@ -92,10 +84,7 @@ export const makeMapStateToProps = (): Selector => {
       }
 
       return {
-        isDraggingOver,
-        draggingFromThisWith: null,
         placeholder: dragging.placeholder,
-        draggingOverWith: draggableId,
         // Animating placeholder in foreign list
         shouldAnimatePlaceholder: true,
         snapshot: {
