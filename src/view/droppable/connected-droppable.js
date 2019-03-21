@@ -7,7 +7,6 @@ import type {
   State,
   DroppableId,
   DraggableId,
-  DragImpact,
   CompletedDrag,
   DraggableDimension,
   DimensionMap,
@@ -27,19 +26,7 @@ import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../state/action-creators';
-
-const idle: MapProps = {
-  isDraggingOver: false,
-  draggingOverWith: null,
-  draggingFromThisWith: null,
-  placeholder: null,
-  shouldAnimatePlaceholder: true,
-};
-
-const idleWithoutAnimation: MapProps = {
-  ...idle,
-  shouldAnimatePlaceholder: false,
-};
+import whatIsDraggedOverFromResult from '../../state/droppable/what-is-dragged-over-from-result';
 
 const isMatchingType = (type: TypeId, critical: Critical): boolean =>
   type === critical.droppable.type;
@@ -52,76 +39,60 @@ const getDraggable = (
 // Returning a function to ensure each
 // Droppable gets its own selector
 export const makeMapStateToProps = (): Selector => {
-  const getDraggingOverMapProps = memoizeOne(
-    (
-      draggingOverWith: DraggableId,
-      draggingFromThisWith: ?DraggableId,
-      placeholder: Placeholder,
-      shouldAnimatePlaceholder: boolean,
-    ): MapProps => ({
-      isDraggingOver: true,
-      draggingFromThisWith,
-      draggingOverWith,
-      placeholder,
-      shouldAnimatePlaceholder,
-    }),
-  );
-
-  const getHomeNotDraggedOverMapProps = memoizeOne(
-    (
-      draggingFromThisWith: DraggableId,
-      placeholder: Placeholder,
-    ): MapProps => ({
+  const idle: MapProps = {
+    isDraggingOver: false,
+    draggingFromThisWith: null,
+    placeholder: null,
+    draggingOverWith: null,
+    shouldAnimatePlaceholder: true,
+    snapshot: {
       isDraggingOver: false,
-      // this is the home list so we need to provide the dragging id
-      draggingFromThisWith,
       draggingOverWith: null,
-      placeholder,
-      // placeholder can only animated after drag finish
-      shouldAnimatePlaceholder: false,
-    }),
-  );
+      draggingFromThisWith: null,
+    },
+  };
 
-  const getMapProps = (
-    id: DroppableId,
-    draggable: DraggableDimension,
-    impact: DragImpact,
-  ): MapProps => {
-    const isOver: boolean = whatIsDraggedOver(impact) === id;
-    const isHome: boolean = draggable.descriptor.droppableId === id;
+  const idleWithoutAnimation = {
+    ...idle,
+    shouldAnimatePlaceholder: false,
+  };
 
-    if (isOver) {
-      const draggingFromThisWith: ?DraggableId = isHome
-        ? draggable.descriptor.id
+  const getMapProps = memoizeOne(
+    (
+      id: DroppableId,
+      isDraggingOver: boolean,
+      dragging: DraggableDimension,
+    ): MapProps => {
+      const draggableId: DraggableId = dragging.descriptor.id;
+      const isHome: boolean = dragging.descriptor.droppableId === id;
+
+      // reuse idle when not over and not in the home list
+      if (!isDraggingOver && !isHome) {
+        return idle;
+      }
+
+      const draggingOverWith: ?DraggableId = isDraggingOver
+        ? draggableId
         : null;
+
+      const draggingFromThisWith: ?DraggableId = isHome ? draggableId : null;
+      const placeholder: ?Placeholder = isHome ? dragging.placeholder : null;
       const shouldAnimatePlaceholder: boolean = !isHome;
 
-      return getDraggingOverMapProps(
-        draggable.descriptor.id,
+      return {
+        isDraggingOver,
         draggingFromThisWith,
-        draggable.placeholder,
+        placeholder,
+        draggingOverWith,
         shouldAnimatePlaceholder,
-      );
-    }
-
-    // not over the list
-
-    if (!isHome) {
-      return idle;
-    }
-
-    // showing a placeholder in the home list during a drag to prevent
-    // other lists from being shifted on the page.
-    // we animate the placeholder closed during a drop animation
-    // if (isDropAnimating) {
-    //   return withoutAnimation;
-    // }
-    return getHomeNotDraggedOverMapProps(
-      // this is the home list so we can use the draggable
-      draggable.descriptor.id,
-      draggable.placeholder,
-    );
-  };
+        snapshot: {
+          isDraggingOver,
+          draggingOverWith,
+          draggingFromThisWith,
+        },
+      };
+    },
+  );
 
   const selector = (state: State, ownProps: OwnProps): MapProps => {
     // not checking if item is disabled as we need the home list to display a placeholder
@@ -135,11 +106,12 @@ export const makeMapStateToProps = (): Selector => {
         return idle;
       }
 
-      return getMapProps(
-        id,
-        getDraggable(critical, state.dimensions),
-        state.impact,
+      const dragging: DraggableDimension = getDraggable(
+        critical,
+        state.dimensions,
       );
+      const isDraggingOver: boolean = whatIsDraggedOver(state.impact) === id;
+      return getMapProps(id, isDraggingOver, dragging);
     }
 
     if (state.phase === 'DROP_ANIMATING') {
@@ -148,11 +120,14 @@ export const makeMapStateToProps = (): Selector => {
         return idle;
       }
 
-      return getMapProps(
-        id,
-        getDraggable(completed.critical, state.dimensions),
-        completed.impact,
+      const dragging: DraggableDimension = getDraggable(
+        completed.critical,
+        state.dimensions,
       );
+      const isDraggingOver: boolean =
+        whatIsDraggedOverFromResult(completed.result) === id;
+
+      return getMapProps(id, isDraggingOver, dragging);
     }
 
     if (state.phase === 'IDLE' && state.completed) {
@@ -161,8 +136,8 @@ export const makeMapStateToProps = (): Selector => {
         return idle;
       }
 
-      const wasOverId: ?DroppableId = whatIsDraggedOver(completed.impact);
-      const wasOver: boolean = Boolean(wasOverId) && wasOverId === id;
+      const wasOver: boolean =
+        whatIsDraggedOverFromResult(completed.result) === id;
       const wasCombining: boolean = Boolean(completed.result.combine);
 
       // need to cut any animations: sadly a memoization fail
