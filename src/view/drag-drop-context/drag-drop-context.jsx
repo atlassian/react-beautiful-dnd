@@ -17,7 +17,6 @@ import type {
 import type { DraggableId, State, Responders, Announce } from '../../types';
 import type { Store, Action } from '../../state/store-types';
 import StoreContext from '../context/store-context';
-import { useConstant, useConstantFn } from '../use-constant';
 import {
   clean,
   move,
@@ -32,6 +31,8 @@ import useAnnouncer from '../use-announcer';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
 import ErrorBoundary from '../error-boundary';
+import useMemoOne from '../use-custom-memo/use-memo-one';
+import useCallbackOne from '../use-custom-memo/use-callback-one';
 
 type Props = {|
   ...Responders,
@@ -125,31 +126,36 @@ export default function DragDropContext(props: Props) {
 
   storeRef = useRef<Store>(store);
 
-  const getCanLift = useConstantFn((id: DraggableId) =>
+  const getCanLift = useCallbackOne((id: DraggableId) =>
     canStartDrag(storeRef.current.getState(), id),
   );
 
-  const getIsMovementAllowed = useConstantFn(() =>
+  const getIsMovementAllowed = useCallbackOne(() =>
     isMovementAllowed(storeRef.current.getState()),
   );
 
-  const appContext: AppContextValue = useConstant(() => ({
+  const appContext: AppContextValue = useMemoOne(() => ({
     marshal: dimensionMarshal,
     style: styleMarshal.styleContext,
     canLift: getCanLift,
     isMovementAllowed: getIsMovementAllowed,
   }));
 
-  const recoverStoreFromError = useConstantFn(() => {
+  const tryResetStore = useCallbackOne(() => {
     const state: State = storeRef.current.getState();
     if (state.phase !== 'IDLE') {
       store.dispatch(clean({ shouldFlush: true }));
     }
   });
 
+  // Clean store when unmounting
+  useEffect(() => {
+    return tryResetStore;
+  }, [tryResetStore]);
+
   return (
     <AppContext.Provider value={appContext}>
-      <ErrorBoundary onError={recoverStoreFromError}>
+      <ErrorBoundary onError={tryResetStore}>
         <Provider context={StoreContext} store={storeRef.current}>
           {props.children}
         </Provider>

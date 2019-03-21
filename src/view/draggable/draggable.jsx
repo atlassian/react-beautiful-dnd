@@ -14,12 +14,7 @@ import useDraggableDimensionPublisher, {
   type Args as DimensionPublisherArgs,
 } from '../use-draggable-dimension-publisher/use-draggable-dimension-publisher';
 import * as timings from '../../debug/timings';
-import type {
-  Props,
-  Provided,
-  StateSnapshot,
-  DraggableStyle,
-} from './draggable-types';
+import type { Props, Provided, DraggableStyle } from './draggable-types';
 import getWindowScroll from '../window/get-window-scroll';
 // import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 // import checkOwnProps from './check-own-props';
@@ -58,8 +53,7 @@ export default function Draggable(props: Props) {
     index,
 
     // mapProps
-    dragging,
-    secondary,
+    mapped,
 
     // dispatchProps
     moveUp: moveUpAction,
@@ -145,8 +139,9 @@ export default function Draggable(props: Props) {
     ],
   );
 
-  const isDragging: boolean = Boolean(dragging);
-  const isDropAnimating: boolean = Boolean(dragging && dragging.dropping);
+  const isDragging: boolean = mapped.type === 'DRAGGING';
+  const isDropAnimating: boolean =
+    mapped.type === 'DRAGGING' && Boolean(mapped.dropping);
 
   const dragHandleArgs: DragHandleArgs = useMemo(
     () => ({
@@ -175,9 +170,11 @@ export default function Draggable(props: Props) {
 
   const onMoveEnd = useCallback(
     (event: TransitionEvent) => {
-      const isDropping: boolean = Boolean(dragging && dragging.dropping);
+      if (mapped.type !== 'DRAGGING') {
+        return;
+      }
 
-      if (!isDropping) {
+      if (!mapped.dropping) {
         return;
       }
 
@@ -189,12 +186,13 @@ export default function Draggable(props: Props) {
 
       dropAnimationFinishedAction();
     },
-    [dragging, dropAnimationFinishedAction],
+    [dropAnimationFinishedAction, mapped],
   );
 
   const provided: Provided = useMemo(() => {
-    const style: DraggableStyle = getStyle(dragging, secondary);
-    const onTransitionEnd = dragging && dragging.dropping ? onMoveEnd : null;
+    const style: DraggableStyle = getStyle(mapped);
+    const onTransitionEnd =
+      mapped.type === 'DRAGGING' && mapped.dropping ? onMoveEnd : null;
 
     const result: Provided = {
       innerRef: setRef,
@@ -207,39 +205,7 @@ export default function Draggable(props: Props) {
     };
 
     return result;
-  }, [
-    appContext.style,
-    dragHandleProps,
-    dragging,
-    onMoveEnd,
-    secondary,
-    setRef,
-  ]);
+  }, [appContext.style, dragHandleProps, mapped, onMoveEnd, setRef]);
 
-  // TODO: this could be done in the connected component
-  const snapshot: StateSnapshot = useMemo(() => {
-    if (dragging) {
-      return {
-        isDragging: true,
-        isDropAnimating: Boolean(dragging.dropping),
-        dropAnimation: dragging.dropping,
-        mode: dragging.mode,
-        draggingOver: dragging.draggingOver,
-        combineWith: dragging.combineWith,
-        combineTargetFor: null,
-      };
-    }
-    invariant(secondary, 'Expected dragging or secondary snapshot');
-    return {
-      isDragging: false,
-      isDropAnimating: false,
-      dropAnimation: null,
-      mode: null,
-      draggingOver: null,
-      combineTargetFor: secondary.combineTargetFor,
-      combineWith: null,
-    };
-  }, [dragging, secondary]);
-
-  return children(provided, snapshot);
+  return children(provided, mapped.snapshot);
 }
