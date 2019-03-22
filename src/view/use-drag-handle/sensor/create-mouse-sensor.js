@@ -39,6 +39,7 @@ export default ({
   getCallbacks,
   getWindow,
   canStartCapturing,
+  getShouldRespectForceTouch,
 }: CreateSensorArgs): MouseSensor => {
   let state: State = {
     isDragging: false,
@@ -250,6 +251,13 @@ export default ({
           .WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
         const isForcePressing: boolean =
           event.webkitForce >= forcePressThreshold;
+
+        // force press is not being respected
+        // opt out of default browser behaviour and continue the drag
+        if (!getShouldRespectForceTouch()) {
+          event.preventDefault();
+          return;
+        }
 
         if (isForcePressing) {
           // it is considered a indirect cancel so we do not

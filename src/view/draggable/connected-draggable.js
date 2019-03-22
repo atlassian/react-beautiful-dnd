@@ -44,16 +44,7 @@ import type {
 } from './draggable-types';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import StoreContext from '../context/store-context';
-
-const getDraggingOverFromResult = (result: DropResult): ?DraggableId => {
-  if (result.destination) {
-    return result.destination.droppableId;
-  }
-  if (result.combine) {
-    return result.combine.droppableId;
-  }
-  return null;
-};
+import whatIsDraggedOverFromResult from '../../state/droppable/what-is-dragged-over-from-result';
 
 const getCombineWithFromResult = (result: DropResult): ?DraggableId => {
   return result.combine ? result.combine.draggableId : null;
@@ -228,7 +219,7 @@ export const makeMapStateToProps = (): Selector => {
       const result: DropResult = completed.result;
       const mode: MovementMode = result.mode;
       // these need to be pulled from the result as they can be different to the final impact
-      const draggingOver: ?DroppableId = getDraggingOverFromResult(result);
+      const draggingOver: ?DroppableId = whatIsDraggedOverFromResult(result);
       const combineWith: ?DraggableId = getCombineWithFromResult(result);
       const duration: number = state.dropDuration;
 

@@ -361,7 +361,7 @@ export default ({
 
         // A drag could be pending or has already started but no movement has occurred
 
-        // Not respecting force touches - prevent the event
+        // Not respecting force press - prevent the event
         if (!getShouldRespectForceTouch()) {
           event.preventDefault();
           return;
