@@ -7,7 +7,7 @@ import React, {
   useContext,
   type Node,
 } from 'react';
-import type { Props, Provided, StateSnapshot } from './droppable-types';
+import type { Props, Provided } from './droppable-types';
 import useDroppableDimensionPublisher from '../use-droppable-dimension-publisher';
 import Placeholder from '../placeholder';
 import AppContext, { type AppContextValue } from '../context/app-context';
@@ -39,9 +39,7 @@ export default function Droppable(props: Props) {
     isDropDisabled,
     isCombineEnabled,
     // map props
-    isDraggingOver,
-    draggingOverWith,
-    draggingFromThisWith,
+    snapshot,
     // dispatch props
     updateViewportMaxScroll,
   } = props;
@@ -103,15 +101,6 @@ export default function Droppable(props: Props) {
       },
     }),
     [placeholder, setDroppableRef, styleContext],
-  );
-
-  const snapshot: StateSnapshot = useMemo(
-    () => ({
-      isDraggingOver,
-      draggingOverWith,
-      draggingFromThisWith,
-    }),
-    [draggingFromThisWith, draggingOverWith, isDraggingOver],
   );
 
   const droppableContext: ?DroppableContextValue = useMemo(
