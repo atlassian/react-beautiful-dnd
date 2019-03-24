@@ -7,9 +7,9 @@ import {
   resetCallbacks,
 } from './util/callbacks';
 import { getWrapper } from './util/wrappers';
-import { interactiveTagNames } from '../../../../src/view/drag-handle/util/should-allow-dragging-from-target';
-import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-types';
-import type { TagNameMap } from '../../../../src/view/drag-handle/util/should-allow-dragging-from-target';
+import { interactiveTagNames } from '../../../../src/view/use-drag-handle/util/should-allow-dragging-from-target';
+import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
+import type { TagNameMap } from '../../../../src/view/use-drag-handle/util/should-allow-dragging-from-target';
 
 const mixedCase = (map: TagNameMap): string[] => [
   ...Object.keys(map).map((tagName: string) => tagName.toLowerCase()),

@@ -16,6 +16,7 @@ import useTouchSensor, {
   type Args as TouchSensorArgs,
 } from './sensor/use-touch-sensor';
 import usePreviousRef from '../use-previous-ref';
+import { warning } from '../../dev-warning';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
@@ -25,7 +26,7 @@ type Capturing = {|
   abort: () => void,
 |};
 
-export default function useDragHandle(args: Args): DragHandleProps {
+export default function useDragHandle(args: Args): ?DragHandleProps {
   // Capturing
   const capturingRef = useRef<?Capturing>(null);
   const onCaptureStart = useCallback((abort: () => void) => {
@@ -190,12 +191,18 @@ export default function useDragHandle(args: Args): DragHandleProps {
   if (!isEnabled && capturingRef.current) {
     abortCapture();
     if (isDragging) {
+      warning(
+        'You have disabled dragging on a Draggable while it was dragging. The drag has been cancelled',
+      );
       callbacks.onCancel();
     }
   }
 
-  const props: DragHandleProps = useMemo(
-    () => ({
+  const props: ?DragHandleProps = useMemo(() => {
+    if (!isEnabled) {
+      return null;
+    }
+    return {
       onMouseDown,
       onKeyDown,
       onTouchStart,
@@ -208,9 +215,16 @@ export default function useDragHandle(args: Args): DragHandleProps {
       // Opting out of html5 drag and drops
       draggable: false,
       onDragStart: preventHtml5Dnd,
-    }),
-    [onBlur, onFocus, onKeyDown, onMouseDown, onTouchStart, styleContext],
-  );
+    };
+  }, [
+    isEnabled,
+    onBlur,
+    onFocus,
+    onKeyDown,
+    onMouseDown,
+    onTouchStart,
+    styleContext,
+  ]);
 
   return props;
 }
