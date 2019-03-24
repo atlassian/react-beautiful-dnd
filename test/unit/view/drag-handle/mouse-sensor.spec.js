@@ -1005,6 +1005,7 @@ describe('disabled mid drag', () => {
     // lift
     mouseDown(wrapper);
     windowMouseMove({ x: 0, y: sloppyClickThreshold });
+    wrapper.setProps({ isDragging: true });
 
     expect(callbacksCalled(callbacks)({ onLift: 1 })).toBe(true);
 
@@ -1025,6 +1026,7 @@ describe('disabled mid drag', () => {
     // lift
     mouseDown(wrapper);
     windowMouseMove({ x: 0, y: sloppyClickThreshold });
+    wrapper.setProps({ isDragging: true });
     // move
     windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
     requestAnimationFrame.step();
@@ -1051,6 +1053,7 @@ describe('disabled mid drag', () => {
     // lift
     mouseDown(wrapper);
     windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
+    wrapper.setProps({ isDragging: true });
     // move
     windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
     requestAnimationFrame.step();

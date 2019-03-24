@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { useLayoutEffect, useRef, useMemo, useState, useCallback } from 'react';
+import { useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import type { Args, DragHandleProps } from './drag-handle-types';
 import getWindowFromEl from '../window/get-window-from-el';
 import useRequiredContext from '../use-required-context';
@@ -20,23 +20,32 @@ function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
 }
 
+type Capturing = {|
+  abort: () => void,
+|};
+
 export default function useDragHandle(args: Args): DragHandleProps {
   // Capturing
-  const isAnythingCapturingRef = useRef<boolean>(false);
-  const [shouldAbortCapture, setShouldAbortCapture] = useState<boolean>(false);
-  const onCaptureStart = useCallback(() => {
+  const capturingRef = useRef<?Capturing>(null);
+  const onCaptureStart = useCallback((abort: () => void) => {
     invariant(
-      !isAnythingCapturingRef.current,
+      !capturingRef.current,
       'Cannot start capturing while something else is',
     );
-    isAnythingCapturingRef.current = true;
+    capturingRef.current = {
+      abort,
+    };
   }, []);
   const onCaptureEnd = useCallback(() => {
     invariant(
-      isAnythingCapturingRef.current,
+      capturingRef.current,
       'Cannot stop capturing while nothing is capturing',
     );
-    isAnythingCapturingRef.current = false;
+    capturingRef.current = null;
+  }, []);
+  const abortCapture = useCallback(() => {
+    invariant(capturingRef.current, 'Cannot abort capture when there is none');
+    capturingRef.current.abort();
   }, []);
 
   const { canLift, style: styleContext }: AppContextValue = useRequiredContext(
@@ -69,7 +78,7 @@ export default function useDragHandle(args: Args): DragHandleProps {
     (event: Event) => {
       // Something on this element might be capturing but a drag has not started yet
       // We want to prevent anything else from capturing
-      if (isAnythingCapturingRef.current) {
+      if (capturingRef.current) {
         return false;
       }
       // Do not drag if anything else in the system is dragging
@@ -92,7 +101,6 @@ export default function useDragHandle(args: Args): DragHandleProps {
       onCaptureStart,
       onCaptureEnd,
       getShouldRespectForceTouch,
-      shouldAbortCapture,
     }),
     [
       callbacks,
@@ -102,7 +110,6 @@ export default function useDragHandle(args: Args): DragHandleProps {
       onCaptureStart,
       onCaptureEnd,
       getShouldRespectForceTouch,
-      shouldAbortCapture,
     ],
   );
   const onMouseDown = useMouseSensor(mouseArgs);
@@ -113,7 +120,6 @@ export default function useDragHandle(args: Args): DragHandleProps {
       getDraggableRef,
       getWindow,
       canStartCapturing,
-      shouldAbortCapture,
       onCaptureStart,
       onCaptureEnd,
     }),
@@ -124,7 +130,6 @@ export default function useDragHandle(args: Args): DragHandleProps {
       getWindow,
       onCaptureEnd,
       onCaptureStart,
-      shouldAbortCapture,
     ],
   );
   const onKeyDown = useKeyboardSensor(keyboardArgs);
@@ -136,7 +141,6 @@ export default function useDragHandle(args: Args): DragHandleProps {
       getWindow,
       canStartCapturing,
       getShouldRespectForceTouch,
-      shouldAbortCapture,
       onCaptureStart,
       onCaptureEnd,
     }),
@@ -146,7 +150,6 @@ export default function useDragHandle(args: Args): DragHandleProps {
       getWindow,
       canStartCapturing,
       getShouldRespectForceTouch,
-      shouldAbortCapture,
       onCaptureStart,
       onCaptureEnd,
     ],
@@ -157,27 +160,18 @@ export default function useDragHandle(args: Args): DragHandleProps {
   useLayoutEffect(() => {});
 
   // handle aborting
-  useLayoutEffect(() => {
-    // No longer dragging but still capturing: need to abort
-    if (!isDragging && isAnythingCapturingRef.current) {
-      setShouldAbortCapture(true);
-    }
-  }, [isDragging]);
+  // No longer dragging but still capturing: need to abort
+  if (!isDragging && capturingRef.current) {
+    abortCapture();
+  }
 
-  // handle is being disabled
-  useLayoutEffect(() => {
-    // No longer enabled but still capturing: need to abort
-    if (!isEnabled && isAnythingCapturingRef.current) {
-      setShouldAbortCapture(true);
+  // No longer enabled but still capturing: need to abort and cancel if needed
+  if (!isEnabled && capturingRef.current) {
+    abortCapture();
+    if (isDragging) {
+      callbacks.onCancel();
     }
-  }, [isEnabled]);
-
-  // flip the abort capture flag back to true after use
-  useLayoutEffect(() => {
-    if (shouldAbortCapture) {
-      setShouldAbortCapture(false);
-    }
-  }, [shouldAbortCapture]);
+  }
 
   const props: DragHandleProps = useMemo(
     () => ({

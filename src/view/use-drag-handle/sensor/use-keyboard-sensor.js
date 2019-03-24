@@ -16,8 +16,7 @@ export type Args = {|
   getDraggableRef: () => ?HTMLElement,
   getWindow: () => HTMLElement,
   canStartCapturing: (event: Event) => boolean,
-  shouldAbortCapture: boolean,
-  onCaptureStart: () => void,
+  onCaptureStart: (abort: () => void) => void,
   onCaptureEnd: () => void,
 |};
 export type OnKeyDown = (event: KeyboardEvent) => void;
@@ -40,7 +39,6 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
     canStartCapturing,
     getWindow,
     callbacks,
-    shouldAbortCapture,
     onCaptureStart,
     onCaptureEnd,
     getDraggableRef,
@@ -68,11 +66,6 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
     isDraggingRef.current = false;
     onCaptureEnd();
   }, [getIsDragging, onCaptureEnd, schedule]);
-
-  // instructed to stop capturing
-  if (shouldAbortCapture && getIsDragging()) {
-    stop();
-  }
 
   const cancel = useCallback(() => {
     const wasDragging: boolean = isDraggingRef.current;
@@ -166,7 +159,7 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
     invariant(ref, 'Cannot start a keyboard drag without a draggable ref');
     isDraggingRef.current = true;
 
-    onCaptureStart();
+    onCaptureStart(stop);
     bindWindowEvents();
 
     const center: Position = getBorderBoxCenterPosition(ref);
@@ -174,7 +167,7 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
       clientSelection: center,
       movementMode: 'SNAP',
     });
-  }, [bindWindowEvents, callbacks, getDraggableRef, onCaptureStart]);
+  }, [bindWindowEvents, callbacks, getDraggableRef, onCaptureStart, stop]);
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {

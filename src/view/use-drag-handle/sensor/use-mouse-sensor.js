@@ -1,6 +1,6 @@
 // @flow
 import type { Position } from 'css-box-model';
-import { useRef, useLayoutEffect } from 'react';
+import { useRef, useLayoutEffect, useCallback, useMemo } from 'react';
 import invariant from 'tiny-invariant';
 import type { EventBinding } from '../util/event-types';
 import createEventMarshal, {
@@ -17,18 +17,16 @@ import createPostDragEventPreventer, {
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
 import type { Callbacks } from '../drag-handle-types';
-import useMemoOne from '../../use-custom-memo/use-memo-one';
-import useCallbackOne from '../../use-custom-memo/use-callback-one';
+// import useMemo from '../../use-custom-memo/use-memo-one';
 
 export type Args = {|
   callbacks: Callbacks,
-  onCaptureStart: () => void,
+  onCaptureStart: (abort: Function) => void,
   onCaptureEnd: () => void,
   getDraggableRef: () => ?HTMLElement,
   getWindow: () => HTMLElement,
   canStartCapturing: (event: Event) => boolean,
   getShouldRespectForceTouch: () => boolean,
-  shouldAbortCapture: boolean,
 |};
 
 export type OnMouseDown = (event: MouseEvent) => void;
@@ -50,7 +48,6 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     canStartCapturing,
     getWindow,
     callbacks,
-    shouldAbortCapture,
     getShouldRespectForceTouch,
     onCaptureStart,
     onCaptureEnd,
@@ -58,12 +55,12 @@ export default function useMouseSensor(args: Args): OnMouseDown {
   const pendingRef = useRef<?Position>(null);
   const isDraggingRef = useRef<boolean>(false);
   const unbindWindowEventsRef = useRef<() => void>(noop);
-  const getIsCapturing = useCallbackOne(
+  const getIsCapturing = useCallback(
     () => Boolean(pendingRef.current || isDraggingRef.current),
     [],
   );
 
-  const schedule = useMemoOne(() => {
+  const schedule = useMemo(() => {
     invariant(
       !getIsCapturing(),
       'Should not recreate scheduler while capturing',
@@ -71,12 +68,12 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     return createScheduler(callbacks);
   }, [callbacks, getIsCapturing]);
 
-  const postDragEventPreventer: EventPreventer = useMemoOne(
+  const postDragEventPreventer: EventPreventer = useMemo(
     () => createPostDragEventPreventer(getWindow),
     [getWindow],
   );
 
-  const stop = useCallbackOne(() => {
+  const stop = useCallback(() => {
     if (!getIsCapturing()) {
       return;
     }
@@ -90,20 +87,15 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     if (shouldBlockClick) {
       postDragEventPreventer.preventNext();
     }
-    // resettting refs
+    // resetting refs
     pendingRef.current = null;
     isDraggingRef.current = false;
 
     // releasing the capture
     onCaptureEnd();
-  }, [getIsCapturing, postDragEventPreventer, schedule]);
+  }, [getIsCapturing, onCaptureEnd, postDragEventPreventer, schedule]);
 
-  // instructed to stop capturing
-  if (shouldAbortCapture && getIsCapturing()) {
-    stop();
-  }
-
-  const cancel = useCallbackOne(() => {
+  const cancel = useCallback(() => {
     const wasDragging: boolean = isDraggingRef.current;
     stop();
 
@@ -112,7 +104,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     }
   }, [callbacks, stop]);
 
-  const startDragging = useCallbackOne(() => {
+  const startDragging = useCallback(() => {
     invariant(!isDraggingRef.current, 'Cannot start a drag while dragging');
     const pending: ?Position = pendingRef.current;
     invariant(pending, 'Cannot start a drag without a pending drag');
@@ -126,7 +118,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     });
   }, [callbacks]);
 
-  const windowBindings: EventBinding[] = useMemoOne(() => {
+  const windowBindings: EventBinding[] = useMemo(() => {
     invariant(
       !getIsCapturing(),
       'Should not recreate window bindings while capturing',
@@ -304,7 +296,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     getShouldRespectForceTouch,
   ]);
 
-  const bindWindowEvents = useCallbackOne(() => {
+  const bindWindowEvents = useCallback(() => {
     const win: HTMLElement = getWindow();
     const options = { capture: true };
 
@@ -315,17 +307,17 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     bindEvents(win, windowBindings, options);
   }, [getWindow, windowBindings]);
 
-  const startPendingDrag = useCallbackOne(
+  const startPendingDrag = useCallback(
     (point: Position) => {
       invariant(!pendingRef.current, 'Expected there to be no pending drag');
       pendingRef.current = point;
-      onCaptureStart();
+      onCaptureStart(stop);
       bindWindowEvents();
     },
-    [bindWindowEvents],
+    [bindWindowEvents, onCaptureStart, stop],
   );
 
-  const onMouseDown = useCallbackOne(
+  const onMouseDown = useCallback(
     (event: MouseEvent) => {
       if (mouseDownMarshal.isHandled()) {
         return;

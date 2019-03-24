@@ -58,6 +58,13 @@ function WithDragHandle(props: WithDragHandleProps) {
   return props.children(result);
 }
 
+class PassThrough extends React.Component<*> {
+  render() {
+    const { children, ...rest } = this.props;
+    return children(rest);
+  }
+}
+
 export const getWrapper = (
   callbacks: Callbacks,
   appContext?: AppContextValue = basicContext,
@@ -65,22 +72,30 @@ export const getWrapper = (
 ): ReactWrapper<*> => {
   const ref = createRef();
 
+  // stopping this from creating a new reference and breaking the memoization during a drag
+  const getShouldRespectForceTouch = () => shouldRespectForceTouch;
+
   return mount(
-    <AppContext.Provider value={appContext}>
-      <WithDragHandle
-        draggableId="draggable"
-        callbacks={callbacks}
-        isDragging={false}
-        isDropAnimating={false}
-        isEnabled
-        getDraggableRef={ref.getRef}
-        canDragInteractiveElements={false}
-        getShouldRespectForceTouch={() => shouldRespectForceTouch}
-      >
-        {(dragHandleProps: ?DragHandleProps) => (
-          <Child dragHandleProps={dragHandleProps} innerRef={ref.setRef} />
-        )}
-      </WithDragHandle>
-    </AppContext.Provider>,
+    <PassThrough>
+      {(outer: any) => (
+        <AppContext.Provider value={appContext}>
+          <WithDragHandle
+            draggableId="draggable"
+            callbacks={callbacks}
+            isDragging={false}
+            isDropAnimating={false}
+            isEnabled
+            getDraggableRef={ref.getRef}
+            canDragInteractiveElements={false}
+            getShouldRespectForceTouch={getShouldRespectForceTouch}
+            {...outer}
+          >
+            {(dragHandleProps: ?DragHandleProps) => (
+              <Child dragHandleProps={dragHandleProps} innerRef={ref.setRef} />
+            )}
+          </WithDragHandle>
+        </AppContext.Provider>
+      )}
+    </PassThrough>,
   );
 };

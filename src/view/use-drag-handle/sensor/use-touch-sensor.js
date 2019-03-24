@@ -21,8 +21,7 @@ export type Args = {|
   getWindow: () => HTMLElement,
   canStartCapturing: (event: Event) => boolean,
   getShouldRespectForceTouch: () => boolean,
-  shouldAbortCapture: boolean,
-  onCaptureStart: () => void,
+  onCaptureStart: (abort: () => void) => void,
   onCaptureEnd: () => void,
 |};
 export type OnTouchStart = (event: TouchEvent) => void;
@@ -113,7 +112,6 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     getShouldRespectForceTouch,
     onCaptureStart,
     onCaptureEnd,
-    shouldAbortCapture,
   } = args;
   const pendingRef = useRef<?PendingDrag>(null);
   const isDraggingRef = useRef<boolean>(false);
@@ -170,11 +168,6 @@ export default function useTouchSensor(args: Args): OnTouchStart {
       callbacks.onCancel();
     }
   }, [callbacks, stop]);
-
-  // instructed to stop capturing
-  if (shouldAbortCapture && getIsCapturing()) {
-    stop();
-  }
 
   const windowBindings: EventBinding[] = useMemo(() => {
     invariant(
@@ -402,10 +395,10 @@ export default function useTouchSensor(args: Args): OnTouchStart {
       };
 
       pendingRef.current = pending;
-      onCaptureStart();
+      onCaptureStart(stop);
       bindWindowEvents();
     },
-    [bindWindowEvents, onCaptureStart, startDragging],
+    [bindWindowEvents, onCaptureStart, startDragging, stop],
   );
 
   const onTouchStart = (event: TouchEvent) => {
