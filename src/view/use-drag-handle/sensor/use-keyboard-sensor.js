@@ -169,7 +169,7 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
     });
   }, [bindWindowEvents, callbacks, getDraggableRef, onCaptureStart, stop]);
 
-  const onKeyDown = useCallback(
+  const onKeyDown: OnKeyDown = useCallback(
     (event: KeyboardEvent) => {
       // not dragging yet
       if (!getIsDragging()) {
@@ -257,11 +257,6 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
       stop,
     ],
   );
-
-  // When unmounting - cancel
-  useLayoutEffect(() => {
-    return cancel;
-  }, [cancel]);
 
   return onKeyDown;
 }

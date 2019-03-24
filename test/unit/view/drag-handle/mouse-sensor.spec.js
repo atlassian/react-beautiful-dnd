@@ -1137,6 +1137,7 @@ describe('unmounted mid drag', () => {
   beforeEach(() => {
     mouseDown(wrapper);
     windowMouseMove({ x: 0, y: sloppyClickThreshold });
+    wrapper.setProps({ isDragging: true });
     wrapper.unmount();
   });
 

@@ -429,10 +429,5 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     startPendingDrag(event);
   };
 
-  // When unmounting - cancel
-  useLayoutEffect(() => {
-    return cancel;
-  }, [cancel]);
-
   return onTouchStart;
 }

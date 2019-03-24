@@ -1,7 +1,9 @@
 // @flow
 import { useRef, useEffect } from 'react';
 
-export default function usePrevious<T>(current: T): T {
+// Should return MutableRefObject<T> but I cannot import this type from 'react';
+// $ExpectError - MutableRefObject I want you
+export default function usePrevious<T>(current: T): MutableRefObject<T> {
   const ref = useRef<T>(current);
 
   // will be updated on the next render
@@ -10,5 +12,5 @@ export default function usePrevious<T>(current: T): T {
   });
 
   // return the existing current (pre render)
-  return ref.current;
+  return ref;
 }

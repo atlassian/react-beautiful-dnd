@@ -15,6 +15,7 @@ import useKeyboardSensor, {
 import useTouchSensor, {
   type Args as TouchSensorArgs,
 } from './sensor/use-touch-sensor';
+import usePreviousRef from '../use-previous-ref';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
@@ -76,11 +77,16 @@ export default function useDragHandle(args: Args): DragHandleProps {
 
   const canStartCapturing = useCallback(
     (event: Event) => {
+      // Cannot lift when disabled
+      if (!isEnabled) {
+        return false;
+      }
       // Something on this element might be capturing but a drag has not started yet
       // We want to prevent anything else from capturing
       if (capturingRef.current) {
         return false;
       }
+
       // Do not drag if anything else in the system is dragging
       if (!canLift(draggableId)) {
         return false;
@@ -89,7 +95,7 @@ export default function useDragHandle(args: Args): DragHandleProps {
       // Check if we are dragging an interactive element
       return shouldAllowDraggingFromTarget(event, canDragInteractiveElements);
     },
-    [canDragInteractiveElements, canLift, draggableId],
+    [canDragInteractiveElements, canLift, draggableId, isEnabled],
   );
 
   const mouseArgs: MouseSensorArgs = useMemo(
@@ -156,8 +162,23 @@ export default function useDragHandle(args: Args): DragHandleProps {
   );
   const onTouchStart = useTouchSensor(touchArgs);
 
-  // mounting focus retention
-  useLayoutEffect(() => {});
+  // aborting on unmount
+  const lastArgsRef = usePreviousRef(args);
+  useLayoutEffect(() => {
+    // only when unmounting
+    return () => {
+      if (!capturingRef.current) {
+        return;
+      }
+      abortCapture();
+
+      if (lastArgsRef.current.isDragging) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        lastArgsRef.current.callbacks.onCancel();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // handle aborting
   // No longer dragging but still capturing: need to abort

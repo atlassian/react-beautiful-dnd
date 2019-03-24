@@ -369,9 +369,9 @@ export default function useMouseSensor(args: Args): OnMouseDown {
   );
 
   // When unmounting - cancel
-  useLayoutEffect(() => {
-    return cancel;
-  }, [cancel]);
+  // useLayoutEffect(() => {
+  //   return cancel;
+  // }, [cancel]);
 
   return onMouseDown;
 }
