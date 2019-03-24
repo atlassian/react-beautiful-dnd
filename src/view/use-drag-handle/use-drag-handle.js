@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import { useLayoutEffect, useRef, useMemo, useState, useCallback } from 'react';
 import type { Args, DragHandleProps } from './drag-handle-types';
 import getWindowFromEl from '../window/get-window-from-el';
@@ -23,10 +24,19 @@ export default function useDragHandle(args: Args): DragHandleProps {
   // Capturing
   const isAnythingCapturingRef = useRef<boolean>(false);
   const [shouldAbortCapture, setShouldAbortCapture] = useState<boolean>(false);
-  const recordCapture = useCallback((isCapturingList: boolean[]) => {
-    isAnythingCapturingRef.current = isCapturingList.some(
-      (isCapturing: boolean) => isCapturing,
+  const onCaptureStart = useCallback(() => {
+    invariant(
+      !isAnythingCapturingRef.current,
+      'Cannot start capturing while something else is',
     );
+    isAnythingCapturingRef.current = true;
+  }, []);
+  const onCaptureEnd = useCallback(() => {
+    invariant(
+      isAnythingCapturingRef.current,
+      'Cannot stop capturing while nothing is capturing',
+    );
+    isAnythingCapturingRef.current = false;
   }, []);
 
   const { canLift, style: styleContext }: AppContextValue = useRequiredContext(
@@ -79,21 +89,23 @@ export default function useDragHandle(args: Args): DragHandleProps {
       getDraggableRef,
       getWindow,
       canStartCapturing,
+      onCaptureStart,
+      onCaptureEnd,
       getShouldRespectForceTouch,
       shouldAbortCapture,
     }),
     [
-      shouldAbortCapture,
       callbacks,
-      canStartCapturing,
       getDraggableRef,
-      getShouldRespectForceTouch,
       getWindow,
+      canStartCapturing,
+      onCaptureStart,
+      onCaptureEnd,
+      getShouldRespectForceTouch,
+      shouldAbortCapture,
     ],
   );
-  const { isCapturing: isMouseCapturing, onMouseDown } = useMouseSensor(
-    mouseArgs,
-  );
+  const onMouseDown = useMouseSensor(mouseArgs);
 
   const keyboardArgs: KeyboardSensorArgs = useMemo(
     () => ({
@@ -102,18 +114,21 @@ export default function useDragHandle(args: Args): DragHandleProps {
       getWindow,
       canStartCapturing,
       shouldAbortCapture,
+      onCaptureStart,
+      onCaptureEnd,
     }),
     [
       callbacks,
       canStartCapturing,
       getDraggableRef,
       getWindow,
+      onCaptureEnd,
+      onCaptureStart,
       shouldAbortCapture,
     ],
   );
-  const { isCapturing: isKeyboardCapturing, onKeyDown } = useKeyboardSensor(
-    keyboardArgs,
-  );
+  const onKeyDown = useKeyboardSensor(keyboardArgs);
+
   const touchArgs: TouchSensorArgs = useMemo(
     () => ({
       callbacks,
@@ -122,20 +137,21 @@ export default function useDragHandle(args: Args): DragHandleProps {
       canStartCapturing,
       getShouldRespectForceTouch,
       shouldAbortCapture,
+      onCaptureStart,
+      onCaptureEnd,
     }),
     [
-      shouldAbortCapture,
       callbacks,
-      canStartCapturing,
       getDraggableRef,
-      getShouldRespectForceTouch,
       getWindow,
+      canStartCapturing,
+      getShouldRespectForceTouch,
+      shouldAbortCapture,
+      onCaptureStart,
+      onCaptureEnd,
     ],
   );
-  const { isCapturing: isTouchCapturing, onTouchStart } = useTouchSensor(
-    touchArgs,
-  );
-  recordCapture([isMouseCapturing, isKeyboardCapturing, isTouchCapturing]);
+  const onTouchStart = useTouchSensor(touchArgs);
 
   // mounting focus retention
   useLayoutEffect(() => {});

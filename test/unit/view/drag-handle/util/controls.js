@@ -1,7 +1,7 @@
 // @flow
 import type { ReactWrapper } from 'enzyme';
-import { sloppyClickThreshold } from '../../../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
-import { timeForLongPress } from '../../../../../src/view/drag-handle/sensor/create-touch-sensor';
+import { sloppyClickThreshold } from '../../../../../src/view/use-drag-handle/util/is-sloppy-click-threshold-exceeded';
+import { timeForLongPress } from '../../../../../src/view/use-drag-handle/sensor/create-touch-sensor';
 import {
   primaryButton,
   touchStart,

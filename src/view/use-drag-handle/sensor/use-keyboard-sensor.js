@@ -17,11 +17,10 @@ export type Args = {|
   getWindow: () => HTMLElement,
   canStartCapturing: (event: Event) => boolean,
   shouldAbortCapture: boolean,
+  onCaptureStart: () => void,
+  onCaptureEnd: () => void,
 |};
-export type Result = {
-  onKeyDown: (event: KeyboardEvent) => void,
-  isCapturing: boolean,
-};
+export type OnKeyDown = (event: KeyboardEvent) => void;
 
 type KeyMap = {
   [key: number]: true,
@@ -36,12 +35,14 @@ const scrollJumpKeys: KeyMap = {
 
 function noop() {}
 
-export default function useKeyboardSensor(args: Args): Result {
+export default function useKeyboardSensor(args: Args): OnKeyDown {
   const {
     canStartCapturing,
     getWindow,
     callbacks,
     shouldAbortCapture,
+    onCaptureStart,
+    onCaptureEnd,
     getDraggableRef,
   } = args;
   const isDraggingRef = useRef<boolean>(false);
@@ -65,7 +66,8 @@ export default function useKeyboardSensor(args: Args): Result {
     schedule.cancel();
     unbindWindowEventsRef.current();
     isDraggingRef.current = false;
-  }, [getIsDragging, schedule]);
+    onCaptureEnd();
+  }, [getIsDragging, onCaptureEnd, schedule]);
 
   // instructed to stop capturing
   if (shouldAbortCapture && getIsDragging()) {
@@ -164,6 +166,7 @@ export default function useKeyboardSensor(args: Args): Result {
     invariant(ref, 'Cannot start a keyboard drag without a draggable ref');
     isDraggingRef.current = true;
 
+    onCaptureStart();
     bindWindowEvents();
 
     const center: Position = getBorderBoxCenterPosition(ref);
@@ -171,7 +174,7 @@ export default function useKeyboardSensor(args: Args): Result {
       clientSelection: center,
       movementMode: 'SNAP',
     });
-  }, [bindWindowEvents, callbacks, getDraggableRef]);
+  }, [bindWindowEvents, callbacks, getDraggableRef, onCaptureStart]);
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -267,8 +270,5 @@ export default function useKeyboardSensor(args: Args): Result {
     return cancel;
   }, [cancel]);
 
-  return {
-    onKeyDown,
-    isCapturing: getIsDragging(),
-  };
+  return onKeyDown;
 }

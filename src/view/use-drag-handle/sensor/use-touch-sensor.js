@@ -22,11 +22,10 @@ export type Args = {|
   canStartCapturing: (event: Event) => boolean,
   getShouldRespectForceTouch: () => boolean,
   shouldAbortCapture: boolean,
+  onCaptureStart: () => void,
+  onCaptureEnd: () => void,
 |};
-export type Result = {
-  onTouchStart: (event: TouchEvent) => void,
-  isCapturing: boolean,
-};
+export type OnTouchStart = (event: TouchEvent) => void;
 
 type PendingDrag = {|
   longPressTimerId: TimeoutID,
@@ -106,12 +105,14 @@ const webkitHack: WebkitHack = (() => {
   return { preventTouchMove, releaseTouchMove };
 })();
 
-export default function useTouchSensor(args: Args): Result {
+export default function useTouchSensor(args: Args): OnTouchStart {
   const {
     callbacks,
     getWindow,
     canStartCapturing,
     getShouldRespectForceTouch,
+    onCaptureStart,
+    onCaptureEnd,
     shouldAbortCapture,
   } = args;
   const pendingRef = useRef<?PendingDrag>(null);
@@ -145,6 +146,7 @@ export default function useTouchSensor(args: Args): Result {
     touchStartMarshal.reset();
     webkitHack.releaseTouchMove();
     hasMovedRef.current = false;
+    onCaptureEnd();
 
     // if dragging - prevent the next click
     if (isDraggingRef.current) {
@@ -158,7 +160,7 @@ export default function useTouchSensor(args: Args): Result {
 
     clearTimeout(pending.longPressTimerId);
     pendingRef.current = null;
-  }, [getIsCapturing, postDragClickPreventer, schedule]);
+  }, [getIsCapturing, onCaptureEnd, postDragClickPreventer, schedule]);
 
   const cancel = useCallback(() => {
     const wasDragging: boolean = isDraggingRef.current;
@@ -400,9 +402,10 @@ export default function useTouchSensor(args: Args): Result {
       };
 
       pendingRef.current = pending;
+      onCaptureStart();
       bindWindowEvents();
     },
-    [bindWindowEvents, startDragging],
+    [bindWindowEvents, onCaptureStart, startDragging],
   );
 
   const onTouchStart = (event: TouchEvent) => {
@@ -438,8 +441,5 @@ export default function useTouchSensor(args: Args): Result {
     return cancel;
   }, [cancel]);
 
-  return {
-    onTouchStart,
-    isCapturing: getIsCapturing(),
-  };
+  return onTouchStart;
 }

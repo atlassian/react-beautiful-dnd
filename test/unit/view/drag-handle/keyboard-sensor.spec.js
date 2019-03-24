@@ -30,7 +30,7 @@ import {
   windowMouseMove,
 } from './util/events';
 import { getWrapper } from './util/wrappers';
-import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
 
 const origin: Position = { x: 0, y: 0 };
 

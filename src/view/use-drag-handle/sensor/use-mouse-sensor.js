@@ -22,16 +22,16 @@ import useCallbackOne from '../../use-custom-memo/use-callback-one';
 
 export type Args = {|
   callbacks: Callbacks,
+  onCaptureStart: () => void,
+  onCaptureEnd: () => void,
   getDraggableRef: () => ?HTMLElement,
   getWindow: () => HTMLElement,
   canStartCapturing: (event: Event) => boolean,
   getShouldRespectForceTouch: () => boolean,
   shouldAbortCapture: boolean,
 |};
-export type Result = {
-  onMouseDown: (event: MouseEvent) => void,
-  isCapturing: boolean,
-};
+
+export type OnMouseDown = (event: MouseEvent) => void;
 
 // Custom event format for force press inputs
 type MouseForceChangedEvent = MouseEvent & {
@@ -45,13 +45,15 @@ const noop = () => {};
 // shared management of mousedown without needing to call preventDefault()
 const mouseDownMarshal: EventMarshal = createEventMarshal();
 
-export default function useMouseSensor(args: Args): Result {
+export default function useMouseSensor(args: Args): OnMouseDown {
   const {
     canStartCapturing,
     getWindow,
     callbacks,
     shouldAbortCapture,
     getShouldRespectForceTouch,
+    onCaptureStart,
+    onCaptureEnd,
   } = args;
   const pendingRef = useRef<?Position>(null);
   const isDraggingRef = useRef<boolean>(false);
@@ -91,6 +93,9 @@ export default function useMouseSensor(args: Args): Result {
     // resettting refs
     pendingRef.current = null;
     isDraggingRef.current = false;
+
+    // releasing the capture
+    onCaptureEnd();
   }, [getIsCapturing, postDragEventPreventer, schedule]);
 
   // instructed to stop capturing
@@ -314,6 +319,7 @@ export default function useMouseSensor(args: Args): Result {
     (point: Position) => {
       invariant(!pendingRef.current, 'Expected there to be no pending drag');
       pendingRef.current = point;
+      onCaptureStart();
       bindWindowEvents();
     },
     [bindWindowEvents],
@@ -375,8 +381,5 @@ export default function useMouseSensor(args: Args): Result {
     return cancel;
   }, [cancel]);
 
-  return {
-    onMouseDown,
-    isCapturing: getIsCapturing(),
-  };
+  return onMouseDown;
 }

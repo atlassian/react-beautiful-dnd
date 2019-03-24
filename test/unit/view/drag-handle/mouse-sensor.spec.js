@@ -1,8 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
 import { type ReactWrapper } from 'enzyme';
-import { canLiftKey, styleKey } from '../../../../src/view/context-keys';
-import { sloppyClickThreshold } from '../../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
+import { sloppyClickThreshold } from '../../../../src/view/use-drag-handle/util/is-sloppy-click-threshold-exceeded';
 import * as keyCodes from '../../../../src/view/key-codes';
 import getWindowScroll from '../../../../src/view/window/get-window-scroll';
 import setWindowScroll from '../../../utils/set-window-scroll';
@@ -37,7 +36,9 @@ import {
   windowTab,
 } from './util/events';
 import { getWrapper } from './util/wrappers';
-import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
+import type { AppContextValue } from '../../../../src/view/context/app-context';
+import basicContext from './util/app-context';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -83,7 +84,7 @@ describe('initiation', () => {
         windowMouseMove(point);
 
         expect(customCallbacks.onLift).toHaveBeenCalledWith({
-          clientSelection: point,
+          clientSelection: origin,
           movementMode: 'FLUID',
         });
 
@@ -202,9 +203,9 @@ describe('initiation', () => {
 
   it('should not start a drag if the state says that a drag cannot start', () => {
     const customCallbacks: Callbacks = getStubCallbacks();
-    const customContext = {
-      [styleKey]: 'hello',
-      [canLiftKey]: () => false,
+    const customContext: AppContextValue = {
+      ...basicContext,
+      canLift: () => false,
     };
     const customWrapper = getWrapper(customCallbacks, customContext);
     const mock: MockEvent = createMockEvent();

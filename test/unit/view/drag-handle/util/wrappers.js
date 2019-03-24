@@ -1,12 +1,16 @@
 // @flow
 import React, { type Node } from 'react';
 import { mount, type ReactWrapper } from 'enzyme';
-import DragHandle from '../../../../../src/view/drag-handle/drag-handle';
+import useDragHandle from '../../../../../src/view/use-drag-handle';
 import type {
+  Args,
   Callbacks,
   DragHandleProps,
-} from '../../../../../src/view/drag-handle/drag-handle-types';
-import basicContext from './basic-context';
+} from '../../../../../src/view/use-drag-handle/drag-handle-types';
+import basicContext from './app-context';
+import AppContext, {
+  type AppContextValue,
+} from '../../../../../src/view/context/app-context';
 
 type ChildProps = {|
   dragHandleProps: ?DragHandleProps,
@@ -42,28 +46,41 @@ export const createRef = () => {
   return { ref, setRef, getRef };
 };
 
+type WithDragHandleProps = {|
+  ...Args,
+  children: (value: ?DragHandleProps) => Node | null,
+|};
+
+function WithDragHandle(props: WithDragHandleProps) {
+  // strip the children prop out
+  const { children, ...args } = props;
+  const result: ?DragHandleProps = useDragHandle(args);
+  return props.children(result);
+}
+
 export const getWrapper = (
   callbacks: Callbacks,
-  context?: Object = basicContext,
+  appContext?: AppContextValue = basicContext,
   shouldRespectForceTouch?: boolean = true,
 ): ReactWrapper<*> => {
   const ref = createRef();
 
   return mount(
-    <DragHandle
-      draggableId="draggable"
-      callbacks={callbacks}
-      isDragging={false}
-      isDropAnimating={false}
-      isEnabled
-      getDraggableRef={ref.getRef}
-      canDragInteractiveElements={false}
-      getShouldRespectForceTouch={() => shouldRespectForceTouch}
-    >
-      {(dragHandleProps: ?DragHandleProps) => (
-        <Child dragHandleProps={dragHandleProps} innerRef={ref.setRef} />
-      )}
-    </DragHandle>,
-    { context },
+    <AppContext.Provider value={appContext}>
+      <WithDragHandle
+        draggableId="draggable"
+        callbacks={callbacks}
+        isDragging={false}
+        isDropAnimating={false}
+        isEnabled
+        getDraggableRef={ref.getRef}
+        canDragInteractiveElements={false}
+        getShouldRespectForceTouch={() => shouldRespectForceTouch}
+      >
+        {(dragHandleProps: ?DragHandleProps) => (
+          <Child dragHandleProps={dragHandleProps} innerRef={ref.setRef} />
+        )}
+      </WithDragHandle>
+    </AppContext.Provider>,
   );
 };
