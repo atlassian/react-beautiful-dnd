@@ -17,6 +17,7 @@ import useTouchSensor, {
 } from './sensor/use-touch-sensor';
 import usePreviousRef from '../use-previous-ref';
 import { warning } from '../../dev-warning';
+import useValidation from './use-validation';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
@@ -63,6 +64,8 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     canDragInteractiveElements,
   } = args;
 
+  useValidation(getDraggableRef);
+
   const getWindow = useCallback(
     (): HTMLElement => getWindowFromEl(getDraggableRef()),
     [getDraggableRef],
@@ -82,7 +85,8 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       if (!isEnabled) {
         return false;
       }
-      // Something on this element might be capturing but a drag has not started yet
+      // Something on this element might be capturing.
+      // A drag might not have started yet
       // We want to prevent anything else from capturing
       if (capturingRef.current) {
         return false;

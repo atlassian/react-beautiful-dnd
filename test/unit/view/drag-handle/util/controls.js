@@ -28,7 +28,19 @@ export type Control = {|
 
 // using the class rather than the attribute as the attribute will not be present when disabled
 const getDragHandle = (wrapper: ReactWrapper<*>) =>
-  wrapper.find('.drag-handle');
+  // using div. as it can return a component with the classname prop
+  // using .first in case there is nested handles
+  wrapper.find('div.drag-handle').first();
+
+const trySetIsDragging = (wrapper: ReactWrapper<*>) => {
+  // sometimes we are dragging a wrapper that is not the root.
+  // this will throw an error
+  // So we are only setting the prop if the component would support it
+
+  if (wrapper.props().draggableId) {
+    wrapper.setProps({ isDragging: true });
+  }
+};
 
 export const touch: Control = {
   name: 'touch',
@@ -38,7 +50,7 @@ export const touch: Control = {
     touchStart(getDragHandle(wrapper), { x: 0, y: 0 }, 0, options),
   lift: (wrapper: ReactWrapper<*>) => {
     jest.runTimersToTime(timeForLongPress);
-    wrapper.setProps({ isDragging: true });
+    trySetIsDragging(wrapper);
   },
   move: () => {
     windowTouchMove({ x: 100, y: 200 });
@@ -59,7 +71,7 @@ export const keyboard: Control = {
   preLift: () => {},
   lift: (wrap: ReactWrapper<*>, options?: Object = {}) => {
     pressSpacebar(getDragHandle(wrap), options);
-    wrap.setProps({ isDragging: true });
+    trySetIsDragging(wrap);
   },
   move: (wrap: ReactWrapper<*>) => {
     pressArrowDown(getDragHandle(wrap));
@@ -83,7 +95,7 @@ export const mouse: Control = {
   },
   lift: (wrap: ReactWrapper<*>) => {
     windowMouseMove({ x: 0, y: sloppyClickThreshold });
-    wrap.setProps({ isDragging: true });
+    trySetIsDragging(wrap);
   },
   move: () => {
     windowMouseMove({ x: 100, y: 200 });

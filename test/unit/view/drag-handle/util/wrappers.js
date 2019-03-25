@@ -51,14 +51,14 @@ type WithDragHandleProps = {|
   children: (value: ?DragHandleProps) => Node | null,
 |};
 
-function WithDragHandle(props: WithDragHandleProps) {
+export function WithDragHandle(props: WithDragHandleProps) {
   // strip the children prop out
   const { children, ...args } = props;
   const result: ?DragHandleProps = useDragHandle(args);
   return props.children(result);
 }
 
-class PassThrough extends React.Component<*> {
+export class PassThrough extends React.Component<*> {
   render() {
     const { children, ...rest } = this.props;
     return children(rest);

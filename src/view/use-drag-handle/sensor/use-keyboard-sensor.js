@@ -1,6 +1,6 @@
 // @flow
 import type { Position } from 'css-box-model';
-import { useRef, useCallback, useMemo, useLayoutEffect } from 'react';
+import { useRef, useCallback, useMemo } from 'react';
 import invariant from 'tiny-invariant';
 import type { EventBinding } from '../util/event-types';
 import { bindEvents, unbindEvents } from '../util/bind-events';
