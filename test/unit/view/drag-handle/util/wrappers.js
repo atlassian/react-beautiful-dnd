@@ -80,7 +80,7 @@ export const getWrapper = (
       {(outer: any) => (
         <AppContext.Provider value={appContext}>
           <WithDragHandle
-            draggableId="draggable"
+            draggableId="my-draggable"
             callbacks={callbacks}
             isDragging={false}
             isDropAnimating={false}

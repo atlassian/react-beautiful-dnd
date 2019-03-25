@@ -178,7 +178,7 @@ describe('responders integration', () => {
 
     const stop = () => {
       windowMouseUp();
-      // tell enzyme the onTransitionEnd prop has changed
+      // tell enzyme the onTransitionEnd prop has chan`ged
       wrapper.update();
       tryFlushDropAnimation();
     };

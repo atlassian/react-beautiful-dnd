@@ -2,6 +2,7 @@
 import type { ReactWrapper } from 'enzyme';
 import { sloppyClickThreshold } from '../../../../../src/view/use-drag-handle/util/is-sloppy-click-threshold-exceeded';
 import { timeForLongPress } from '../../../../../src/view/use-drag-handle/sensor/create-touch-sensor';
+import * as attributes from '../../../../../src/view/data-attributes';
 import {
   primaryButton,
   touchStart,
@@ -40,12 +41,15 @@ const trySetIsDragging = (wrapper: ReactWrapper<*>) => {
   wrapper.setProps({ isDragging: true });
 };
 
+const getDragHandle = (wrapper: ReactWrapper<*>) =>
+  wrapper.find(`[${attributes.dragHandle}]`);
+
 export const touch: Control = {
   name: 'touch',
   hasPostDragClickBlocking: true,
   hasPreLift: true,
   preLift: (wrapper: ReactWrapper<*>, options?: Object = {}) =>
-    touchStart(wrapper, { x: 0, y: 0 }, 0, options),
+    touchStart(getDragHandle(wrapper), { x: 0, y: 0 }, 0, options),
   lift: (wrapper: ReactWrapper<*>) => {
     jest.runTimersToTime(timeForLongPress);
     trySetIsDragging(wrapper);
@@ -68,16 +72,16 @@ export const keyboard: Control = {
   // no pre lift required
   preLift: () => {},
   lift: (wrap: ReactWrapper<*>, options?: Object = {}) => {
-    pressSpacebar(wrap, options);
+    pressSpacebar(getDragHandle(wrap), options);
     trySetIsDragging(wrap);
   },
   move: (wrap: ReactWrapper<*>) => {
-    pressArrowDown(wrap);
+    pressArrowDown(getDragHandle(wrap));
   },
   drop: (wrap: ReactWrapper<*>) => {
     // only want to fire the event if dragging - otherwise it might start a drag
     if (wrap.props().isDragging) {
-      pressSpacebar(wrap);
+      pressSpacebar(getDragHandle(wrap));
     }
   },
   // no cleanup required
@@ -88,8 +92,9 @@ export const mouse: Control = {
   name: 'mouse',
   hasPostDragClickBlocking: true,
   hasPreLift: true,
-  preLift: (wrap: ReactWrapper<*>, options?: Object = {}) =>
-    mouseDown(wrap, { x: 0, y: 0 }, primaryButton, options),
+  preLift: (wrap: ReactWrapper<*>, options?: Object = {}) => {
+    mouseDown(getDragHandle(wrap), { x: 0, y: 0 }, primaryButton, options);
+  },
   lift: (wrap: ReactWrapper<*>) => {
     windowMouseMove({ x: 0, y: sloppyClickThreshold });
     trySetIsDragging(wrap);
@@ -108,7 +113,7 @@ export const mouse: Control = {
 export const controls: Control[] = [mouse, keyboard, touch];
 
 export const forEach = (fn: (control: Control) => void) => {
-  controls.forEach((control: Control) => {
+  controls.slice(0).forEach((control: Control) => {
     describe(`with: ${control.name}`, () => {
       beforeEach(() => {
         jest.useFakeTimers();

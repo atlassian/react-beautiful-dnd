@@ -1,5 +1,5 @@
 // @flow
-import type { Callbacks } from '../../../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks } from '../../../../../src/view/use-drag-handle/drag-handle-types';
 
 export const getStubCallbacks = (): Callbacks => ({
   onLift: jest.fn(),
