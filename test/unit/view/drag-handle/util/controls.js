@@ -35,10 +35,11 @@ const getDragHandle = (wrapper: ReactWrapper<*>) =>
 const trySetIsDragging = (wrapper: ReactWrapper<*>) => {
   // sometimes we are dragging a wrapper that is not the root.
   // this will throw an error
-  // So we are only setting the prop if the component would support it
 
-  if (wrapper.props().draggableId) {
+  try {
     wrapper.setProps({ isDragging: true });
+  } catch (e) {
+    // ignoring error
   }
 };
 
@@ -108,7 +109,8 @@ export const mouse: Control = {
   },
 };
 
-export const controls: Control[] = [mouse, keyboard, touch];
+// export const controls: Control[] = [mouse, keyboard, touch];
+export const controls: Control[] = [keyboard];
 
 export const forEach = (fn: (control: Control) => void) => {
   controls.forEach((control: Control) => {

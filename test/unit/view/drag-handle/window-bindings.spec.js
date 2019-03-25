@@ -101,6 +101,13 @@ forEach((control: Control) => {
     // unmounting while dragging
     wrapper.unmount();
 
+    if (control.hasPostDragClickBlocking) {
+      // cleanup is still bound
+      expect(getAddCount()).toBeGreaterThan(getRemoveCount());
+      // cleanup performed
+      control.cleanup();
+    }
+
     expect(getAddCount()).toBe(getRemoveCount());
   });
 

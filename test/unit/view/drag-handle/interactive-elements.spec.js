@@ -122,7 +122,6 @@ forEach((control: Control) => {
 
         control.preLift(wrapper, options);
         control.lift(wrapper, options);
-        control.drop(wrapper);
 
         expect(
           callbacksCalled(callbacks)({
@@ -149,7 +148,6 @@ forEach((control: Control) => {
 
         control.preLift(wrapper, options);
         control.lift(wrapper, options);
-        control.drop(wrapper);
 
         expect(
           callbacksCalled(callbacks)({
