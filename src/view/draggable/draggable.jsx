@@ -166,7 +166,7 @@ export default function Draggable(props: Props) {
     ],
   );
 
-  const dragHandleProps: DragHandleProps = useDragHandle(dragHandleArgs);
+  const dragHandleProps: ?DragHandleProps = useDragHandle(dragHandleArgs);
 
   const onMoveEnd = useCallback(
     (event: TransitionEvent) => {

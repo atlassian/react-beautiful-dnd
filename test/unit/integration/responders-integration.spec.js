@@ -49,14 +49,21 @@ describe('responders integration', () => {
 
   const getMountedApp = () => {
     // Both list and item will have the same dimensions
-    jest
-      .spyOn(Element.prototype, 'getBoundingClientRect')
-      .mockImplementation(() => borderBox);
 
-    // Stubbing out totally - not including margins in this
-    jest
-      .spyOn(window, 'getComputedStyle')
-      .mockImplementation(() => getComputedSpacing({}));
+    const setRefDimensions = (ref: ?HTMLElement) => {
+      if (!ref) {
+        return;
+      }
+
+      jest
+        .spyOn(ref, 'getBoundingClientRect')
+        .mockImplementation(() => borderBox);
+
+      // Stubbing out totally - not including margins in this
+      jest
+        .spyOn(window, 'getComputedStyle')
+        .mockImplementation(() => getComputedSpacing({}));
+    };
 
     return mount(
       <DragDropContext
@@ -68,7 +75,10 @@ describe('responders integration', () => {
         <Droppable droppableId={droppableId}>
           {(droppableProvided: DroppableProvided) => (
             <div
-              ref={droppableProvided.innerRef}
+              ref={(ref: ?HTMLElement) => {
+                setRefDimensions(ref);
+                droppableProvided.innerRef(ref);
+              }}
               {...droppableProvided.droppableProps}
             >
               <h2>Droppable</h2>
@@ -76,7 +86,10 @@ describe('responders integration', () => {
                 {(draggableProvided: DraggableProvided) => (
                   <div
                     className="drag-handle"
-                    ref={draggableProvided.innerRef}
+                    ref={(ref: ?HTMLElement) => {
+                      setRefDimensions(ref);
+                      draggableProvided.innerRef(ref);
+                    }}
                     {...draggableProvided.draggableProps}
                     {...draggableProvided.dragHandleProps}
                   >
@@ -143,30 +156,37 @@ describe('responders integration', () => {
     const move = () => {
       windowMouseMove({
         x: dragMove.x,
-        y: dragMove.y + sloppyClickThreshold + 1,
+        y: dragMove.y,
       });
-      // movements are scheduled with setTimeout
+      // movements are scheduled in an animation frame
+      requestAnimationFrame.step();
+      // responder updates are scheduled with setTimeout
       jest.runOnlyPendingTimers();
     };
 
     const waitForReturnToHome = () => {
-      // cheating
-      console.log(
-        'find',
-        wrapper.find('[data-react-beautiful-dnd-draggable]').length,
-      );
-      wrapper
+      // could not get this right just using window events
+      const props = wrapper
         .find('[data-react-beautiful-dnd-draggable]')
-        .simulate('onMoveEnd');
+        .first()
+        .props();
+
+      if (props.onTransitionEnd) {
+        props.onTransitionEnd({ propertyName: 'transform' });
+      }
     };
 
     const stop = () => {
       windowMouseUp();
+      // tell enzyme the onTransitionEnd prop has changed
+      wrapper.update();
       waitForReturnToHome();
     };
 
     const cancel = () => {
       cancelWithKeyboard();
+      // tell enzyme the onTransitionEnd prop has changed
+      wrapper.update();
       waitForReturnToHome();
     };
 

@@ -101,10 +101,13 @@ export default function useStyleMarshal(uniqueId: number) {
     },
     [setDynamicStyle, styles.dropAnimating, styles.userCancel],
   );
-  const resting = useCallback(() => setDynamicStyle(styles.resting), [
-    setDynamicStyle,
-    styles.resting,
-  ]);
+  const resting = useCallback(() => {
+    // Can be called defensively
+    if (!dynamicRef.current) {
+      return;
+    }
+    setDynamicStyle(styles.resting);
+  }, [setDynamicStyle, styles.resting]);
 
   const marshal: StyleMarshal = useMemo(
     () => ({
