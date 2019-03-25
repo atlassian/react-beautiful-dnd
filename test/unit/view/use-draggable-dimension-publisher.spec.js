@@ -1,9 +1,9 @@
 // @flow
-import React, { Component } from 'react';
+import React, { useRef, useCallback, type Node } from 'react';
 import invariant from 'tiny-invariant';
 import { type Spacing, type Rect } from 'css-box-model';
 import { mount, type ReactWrapper } from 'enzyme';
-import DraggableDimensionPublisher from '../../../src/view/draggable-dimension-publisher/draggable-dimension-publisher';
+import useDraggableDimensionPublisher from '../../../src/view/use-draggable-dimension-publisher';
 import {
   getPreset,
   getDraggableDimension,
@@ -13,7 +13,6 @@ import type {
   DimensionMarshal,
   GetDraggableDimensionFn,
 } from '../../../src/state/dimension-marshal/dimension-marshal-types';
-import { withDimensionMarshal } from '../../utils/get-context-options';
 import forceUpdate from '../../utils/force-update';
 import tryCleanPrototypeStubs from '../../utils/try-clean-prototype-stubs';
 import { getMarshalStub } from '../../utils/dimension-marshal';
@@ -22,39 +21,73 @@ import type {
   DraggableDimension,
   DraggableDescriptor,
 } from '../../../src/types';
+import AppContext, {
+  type AppContextValue,
+} from '../../../src/view/context/app-context';
+import DroppableContext, {
+  type DroppableContextValue,
+} from '../../../src/view/context/droppable-context';
 
 const preset = getPreset();
 const noComputedSpacing = getComputedSpacing({});
 
-type Props = {|
-  index?: number,
-  draggableId?: DraggableId,
+type ItemProps = {|
+  index: number,
+  draggableId: DraggableId,
 |};
 
-class Item extends Component<Props> {
-  /* eslint-disable react/sort-comp */
+type AppProps = {|
+  marshal: DimensionMarshal,
+  index?: number,
+  draggableId?: DraggableId,
+  Component?: any,
+|};
 
-  ref: ?HTMLElement;
+function Item(props: ItemProps) {
+  const ref = useRef<?HTMLElement>(null);
+  const setRef = useCallback((value: ?HTMLElement) => {
+    ref.current = value;
+  }, []);
+  const getRef = useCallback((): ?HTMLElement => ref.current, []);
 
-  setRef = (ref: ?HTMLElement) => {
-    this.ref = ref;
+  useDraggableDimensionPublisher({
+    draggableId: props.draggableId,
+    index: props.index,
+    getDraggableRef: getRef,
+  });
+
+  return <div ref={setRef}>hi</div>;
+}
+
+function App({
+  marshal,
+  draggableId = preset.inHome1.descriptor.id,
+  index = preset.inHome1.descriptor.index,
+  Component = Item,
+}: AppProps) {
+  const appContext: AppContextValue = {
+    marshal,
+    style: '1',
+    canLift: () => true,
+    isMovementAllowed: () => true,
+  };
+  const droppableContext: DroppableContextValue = {
+    type: preset.inHome1.descriptor.type,
+    droppableId: preset.inHome1.descriptor.droppableId,
   };
 
-  getRef = (): ?HTMLElement => this.ref;
+  const itemProps: ItemProps = {
+    draggableId,
+    index,
+  };
 
-  render() {
-    return (
-      <DraggableDimensionPublisher
-        draggableId={this.props.draggableId || preset.inHome1.descriptor.id}
-        index={this.props.index || preset.inHome1.descriptor.index}
-        droppableId={preset.inHome1.descriptor.droppableId}
-        type={preset.inHome1.descriptor.type}
-        getDraggableRef={this.getRef}
-      >
-        <div ref={this.setRef}>hi</div>
-      </DraggableDimensionPublisher>
-    );
-  }
+  return (
+    <AppContext.Provider value={appContext}>
+      <DroppableContext.Provider value={droppableContext}>
+        <Component {...itemProps} />
+      </DroppableContext.Provider>
+    </AppContext.Provider>
+  );
 }
 
 beforeEach(() => {
@@ -72,7 +105,7 @@ describe('dimension registration', () => {
   it('should register itself when mounting', () => {
     const marshal: DimensionMarshal = getMarshalStub();
 
-    mount(<Item />, withDimensionMarshal(marshal));
+    mount(<App marshal={marshal} />);
 
     expect(marshal.registerDraggable).toHaveBeenCalledTimes(1);
     expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(
@@ -83,7 +116,7 @@ describe('dimension registration', () => {
   it('should unregister itself when unmounting', () => {
     const marshal: DimensionMarshal = getMarshalStub();
 
-    const wrapper = mount(<Item />, withDimensionMarshal(marshal));
+    const wrapper = mount(<App marshal={marshal} />);
     expect(marshal.registerDraggable).toHaveBeenCalled();
     expect(marshal.unregisterDraggable).not.toHaveBeenCalled();
 
@@ -97,7 +130,7 @@ describe('dimension registration', () => {
   it('should update its registration when a descriptor property changes', () => {
     const marshal: DimensionMarshal = getMarshalStub();
 
-    const wrapper = mount(<Item />, withDimensionMarshal(marshal));
+    const wrapper = mount(<App marshal={marshal} />);
     // asserting shape of original publish
     expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(
       preset.inHome1.descriptor,
@@ -111,8 +144,13 @@ describe('dimension registration', () => {
       ...preset.inHome1.descriptor,
       index: 1000,
     };
-    expect(marshal.updateDraggable).toHaveBeenCalledWith(
+
+    // Old descriptor unregistered
+    expect(marshal.unregisterDraggable).toHaveBeenCalledWith(
       preset.inHome1.descriptor,
+    );
+    // New descriptor registered
+    expect(marshal.registerDraggable).toHaveBeenCalledWith(
       newDescriptor,
       expect.any(Function),
     );
@@ -121,7 +159,7 @@ describe('dimension registration', () => {
   it('should not update its registration when a descriptor property does not change on an update', () => {
     const marshal: DimensionMarshal = getMarshalStub();
 
-    const wrapper = mount(<Item />, withDimensionMarshal(marshal));
+    const wrapper = mount(<App marshal={marshal} />);
     expect(marshal.registerDraggable).toHaveBeenCalledTimes(1);
 
     forceUpdate(wrapper);
@@ -133,7 +171,7 @@ describe('dimension publishing', () => {
   // we are doing this rather than spying on the prototype.
   // Sometimes setRef was being provided with an element that did not have the mocked prototype :|
   const setBoundingClientRect = (wrapper: ReactWrapper<*>, borderBox: Rect) => {
-    const ref: ?HTMLElement = wrapper.instance().getRef();
+    const ref: ?HTMLElement = wrapper.getDOMNode();
     invariant(ref);
 
     // $FlowFixMe - normally a read only thing. Muhaha
@@ -162,11 +200,11 @@ describe('dimension publishing', () => {
     const marshal: DimensionMarshal = getMarshalStub();
 
     const wrapper: ReactWrapper<*> = mount(
-      <Item
+      <App
+        marshal={marshal}
         draggableId={expected.descriptor.id}
         index={expected.descriptor.index}
       />,
-      withDimensionMarshal(marshal),
     );
 
     setBoundingClientRect(wrapper, expected.client.borderBox);
@@ -208,11 +246,11 @@ describe('dimension publishing', () => {
     const marshal: DimensionMarshal = getMarshalStub();
 
     const wrapper: ReactWrapper<*> = mount(
-      <Item
+      <App
+        marshal={marshal}
         draggableId={expected.descriptor.id}
         index={expected.descriptor.index}
       />,
-      withDimensionMarshal(marshal),
     );
 
     setBoundingClientRect(wrapper, expected.client.borderBox);
@@ -248,11 +286,11 @@ describe('dimension publishing', () => {
       .mockImplementation(() => noComputedSpacing);
 
     const wrapper: ReactWrapper<*> = mount(
-      <Item
+      <App
         draggableId={expected.descriptor.id}
         index={expected.descriptor.index}
+        marshal={marshal}
       />,
-      withDimensionMarshal(marshal),
     );
 
     setBoundingClientRect(wrapper, expected.client.borderBox);
@@ -267,35 +305,27 @@ describe('dimension publishing', () => {
   });
 
   it('should throw an error if no ref is provided when attempting to get a dimension', () => {
-    class NoRefItem extends Component<*> {
-      render() {
-        return (
-          <DraggableDimensionPublisher
-            draggableId={preset.inHome1.descriptor.id}
-            droppableId={preset.inHome1.descriptor.droppableId}
-            type={preset.inHome1.descriptor.type}
-            index={preset.inHome1.descriptor.index}
-            getDraggableRef={() => undefined}
-          >
-            <div>hi</div>
-          </DraggableDimensionPublisher>
-        );
-      }
+    function NoRefItem(props: ItemProps) {
+      const ref = useRef<?HTMLElement>(null);
+      const getRef = useCallback((): ?HTMLElement => ref.current, []);
+
+      useDraggableDimensionPublisher({
+        draggableId: props.draggableId,
+        index: props.index,
+        getDraggableRef: getRef,
+      });
+
+      return <div>hi</div>;
     }
     const marshal: DimensionMarshal = getMarshalStub();
-
     const wrapper: ReactWrapper<*> = mount(
-      <NoRefItem />,
-      withDimensionMarshal(marshal),
+      <App marshal={marshal} Component={NoRefItem} />,
     );
-
     // pull the get dimension function out
     const getDimension: GetDraggableDimensionFn =
       marshal.registerDraggable.mock.calls[0][1];
-
     // when we call the get dimension function without a ref things will explode
     expect(getDimension).toThrow();
-
     wrapper.unmount();
   });
 });

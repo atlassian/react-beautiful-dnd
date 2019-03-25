@@ -6,26 +6,32 @@ import type {
   DraggableDescriptor,
   DraggableDimension,
   DraggableId,
-  DroppableId,
-  TypeId,
 } from '../../types';
 import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 import useRequiredContext from '../use-required-context';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import getDimension from './get-dimension';
+import DroppableContext, {
+  type DroppableContextValue,
+} from '../context/droppable-context';
 
 export type Args = {|
   draggableId: DraggableId,
-  droppableId: DroppableId,
-  type: TypeId,
   index: number,
   getDraggableRef: () => ?HTMLElement,
 |};
 
 export default function useDraggableDimensionPublisher(args: Args) {
-  const { draggableId, droppableId, type, index, getDraggableRef } = args;
+  const { draggableId, index, getDraggableRef } = args;
+  // App context
   const appContext: AppContextValue = useRequiredContext(AppContext);
   const marshal: DimensionMarshal = appContext.marshal;
+
+  // Droppable context
+  const droppableContext: DroppableContextValue = useRequiredContext(
+    DroppableContext,
+  );
+  const { droppableId, type } = droppableContext;
 
   const descriptor: DraggableDescriptor = useMemo(() => {
     const result = {
@@ -34,7 +40,6 @@ export default function useDraggableDimensionPublisher(args: Args) {
       type,
       index,
     };
-    // console.log('creating new descriptor', result);
     return result;
   }, [draggableId, droppableId, index, type]);
 

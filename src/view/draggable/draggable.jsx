@@ -19,9 +19,6 @@ import getWindowScroll from '../window/get-window-scroll';
 // import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 // import checkOwnProps from './check-own-props';
 import AppContext, { type AppContextValue } from '../context/app-context';
-import DroppableContext, {
-  type DroppableContextValue,
-} from '../context/droppable-context';
 import useRequiredContext from '../use-required-context';
 import useValidation from './use-validation';
 
@@ -35,9 +32,6 @@ export default function Draggable(props: Props) {
 
   // context
   const appContext: AppContextValue = useRequiredContext(AppContext);
-  const droppableContext: DroppableContextValue = useRequiredContext(
-    DroppableContext,
-  );
 
   // Validating props and innerRef
   useValidation(props, getRef);
@@ -71,18 +65,10 @@ export default function Draggable(props: Props) {
   const forPublisher: DimensionPublisherArgs = useMemo(
     () => ({
       draggableId,
-      droppableId: droppableContext.droppableId,
-      type: droppableContext.type,
       index,
       getDraggableRef: getRef,
     }),
-    [
-      draggableId,
-      droppableContext.droppableId,
-      droppableContext.type,
-      getRef,
-      index,
-    ],
+    [draggableId, getRef, index],
   );
   useDraggableDimensionPublisher(forPublisher);
 
