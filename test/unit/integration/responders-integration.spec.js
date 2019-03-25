@@ -164,7 +164,7 @@ describe('responders integration', () => {
       jest.runOnlyPendingTimers();
     };
 
-    const waitForReturnToHome = () => {
+    const tryFlushDropAnimation = () => {
       // could not get this right just using window events
       const props = wrapper
         .find('[data-react-beautiful-dnd-draggable]')
@@ -180,14 +180,14 @@ describe('responders integration', () => {
       windowMouseUp();
       // tell enzyme the onTransitionEnd prop has changed
       wrapper.update();
-      waitForReturnToHome();
+      tryFlushDropAnimation();
     };
 
     const cancel = () => {
       cancelWithKeyboard();
       // tell enzyme the onTransitionEnd prop has changed
       wrapper.update();
-      waitForReturnToHome();
+      tryFlushDropAnimation();
     };
 
     const perform = () => {
