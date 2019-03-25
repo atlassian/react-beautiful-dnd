@@ -1,10 +1,7 @@
 // @flow
-import React from 'react';
-import { mount } from 'enzyme';
-import type { DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
 import { forEach, type Control } from './util/controls';
 import { getStubCallbacks, callbacksCalled } from './util/callbacks';
-import { Child, createRef, getWrapper } from './util/wrappers';
+import { getWrapper } from './util/wrappers';
 import type { AppContextValue } from '../../../../src/view/context/app-context';
 import basicContext from './util/app-context';
 

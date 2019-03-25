@@ -181,21 +181,21 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // handle aborting
-  // No longer dragging but still capturing: need to abort
-  if (!isDragging && capturingRef.current) {
-    abortCapture();
-  }
-
   // No longer enabled but still capturing: need to abort and cancel if needed
   if (!isEnabled && capturingRef.current) {
     abortCapture();
-    if (isDragging) {
+    if (lastArgsRef.current.isDragging) {
       warning(
         'You have disabled dragging on a Draggable while it was dragging. The drag has been cancelled',
       );
       callbacks.onCancel();
     }
+  }
+
+  // handle aborting
+  // No longer dragging but still capturing: need to abort
+  if (!isDragging && capturingRef.current) {
+    abortCapture();
   }
 
   const props: ?DragHandleProps = useMemo(() => {
