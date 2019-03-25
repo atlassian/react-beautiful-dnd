@@ -19,12 +19,9 @@ https://github.com/atlassian/react-beautiful-dnd/issues?utf8=%E2%9C%93&q=is%3Aop
 <!--
 ## Feature request
 
-This is not a general purpose drag and drop library and is attempting
-to create an experience that is more physical than standard drag and drop
-interactions on the web.
+This is not a general purpose drag and drop library and is attempting to create an experience that is more physical than standard drag and drop interactions on the web.
 
-Before raising a new feature please ensure that it falls within the philosophy
-of the library.
+Before raising a new feature please ensure that it falls within the philosophy of the library.
 
 https://github.com/atlassian/react-beautiful-dnd#driving-philosophy-physicality
 
