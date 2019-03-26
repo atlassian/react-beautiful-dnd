@@ -22,12 +22,13 @@ export type PlaceholderStyle = {|
   pointerEvents: 'none',
   transition: string,
 |};
-type Props = {|
+export type Props = {|
   placeholder: PlaceholderType,
   animate: InOutAnimationMode,
   onClose: () => void,
   innerRef?: () => ?HTMLElement,
   onTransitionEnd: () => void,
+  styleContext: string,
 |};
 
 type Size = {|
@@ -110,7 +111,7 @@ const getStyle = ({
 };
 
 function Placeholder(props: Props): Node {
-  const { animate, onTransitionEnd, onClose } = props;
+  const { animate, onTransitionEnd, onClose, styleContext } = props;
   const [isAnimatingOpenOnMount, setIsAnimatingOpenOnMount] = useState<boolean>(
     props.animate === 'open',
   );
@@ -149,9 +150,12 @@ function Placeholder(props: Props): Node {
 
   return React.createElement(props.placeholder.tagName, {
     style,
+    'data-react-beautiful-dnd-placeholder': styleContext,
     onTransitionEnd: onSizeChangeEnd,
     ref: props.innerRef,
   });
 }
 
 export default React.memo<Props>(Placeholder);
+// enzyme does not work well with memo, so exporting the non-memo version
+export const WithoutMemo = Placeholder;

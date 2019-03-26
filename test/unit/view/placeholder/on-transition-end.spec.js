@@ -1,12 +1,10 @@
 // @flow
 import React from 'react';
 import { mount, type ReactWrapper } from 'enzyme';
-import Placeholder from '../../../../src/view/placeholder';
+import Placeholder from './util/placeholder-with-class';
 import { expectIsFull } from './util/expect';
 import getPlaceholderStyle from './util/get-placeholder-style';
 import { placeholder } from './util/data';
-
-jest.useFakeTimers();
 
 it('should only fire a single transitionend event a single time when transitioning multiple properties', () => {
   const onTransitionEnd = jest.fn();
@@ -18,9 +16,9 @@ it('should only fire a single transitionend event a single time when transitioni
       placeholder={placeholder}
       onClose={onClose}
       onTransitionEnd={onTransitionEnd}
+      styleContext="hey"
     />,
   );
-  jest.runOnlyPendingTimers();
   // let enzyme know that the react tree has changed due to the set state
   wrapper.update();
   expectIsFull(getPlaceholderStyle(wrapper));

@@ -88,6 +88,7 @@ export default function Droppable(props: Props) {
       onClose={instruction.onClose}
       innerRef={setPlaceholderRef}
       animate={instruction.animate}
+      styleContext={styleContext}
       onTransitionEnd={onPlaceholderTransitionEnd}
     />
   ) : null;
