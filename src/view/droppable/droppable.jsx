@@ -14,11 +14,12 @@ import AppContext, { type AppContextValue } from '../context/app-context';
 import DroppableContext, {
   type DroppableContextValue,
 } from '../context/droppable-context';
-import useAnimateInOut, {
-  type AnimateProvided,
-} from '../use-animate-in-out/use-animate-in-out';
+// import useAnimateInOut from '../use-animate-in-out/use-animate-in-out';
 import getMaxWindowScroll from '../window/get-max-window-scroll';
 import useValidation from './use-validation';
+import AnimateInOut, {
+  type AnimateProvided,
+} from '../animate-in-out/animate-in-out';
 
 export default function Droppable(props: Props) {
   const appContext: ?AppContextValue = useContext<?AppContextValue>(AppContext);
@@ -77,21 +78,39 @@ export default function Droppable(props: Props) {
     getPlaceholderRef,
   });
 
-  const instruction: ?AnimateProvided = useAnimateInOut({
-    on: props.placeholder,
-    shouldAnimate: props.shouldAnimatePlaceholder,
-  });
+  // const instruction: ?AnimateProvided = useAnimateInOut({
+  //   on: props.placeholder,
+  //   shouldAnimate: props.shouldAnimatePlaceholder,
+  // });
 
-  const placeholder: Node | null = instruction ? (
-    <Placeholder
-      placeholder={(instruction.data: any)}
-      onClose={instruction.onClose}
-      innerRef={setPlaceholderRef}
-      animate={instruction.animate}
-      styleContext={styleContext}
-      onTransitionEnd={onPlaceholderTransitionEnd}
-    />
-  ) : null;
+  const placeholder: Node = (
+    <AnimateInOut
+      on={props.placeholder}
+      shouldAnimate={props.shouldAnimatePlaceholder}
+    >
+      {({ onClose, data, animate }: AnimateProvided) => (
+        <Placeholder
+          placeholder={(data: any)}
+          onClose={onClose}
+          innerRef={setPlaceholderRef}
+          animate={animate}
+          styleContext={styleContext}
+          onTransitionEnd={onPlaceholderTransitionEnd}
+        />
+      )}
+    </AnimateInOut>
+  );
+
+  // const placeholder: Node | null = instruction ? (
+  //   <Placeholder
+  //     placeholder={(instruction.data: any)}
+  //     onClose={instruction.onClose}
+  //     innerRef={setPlaceholderRef}
+  //     animate={instruction.animate}
+  //     styleContext={styleContext}
+  //     onTransitionEnd={onPlaceholderTransitionEnd}
+  //   />
+  // ) : null;
 
   const provided: Provided = useMemo(
     (): Provided => ({
@@ -117,7 +136,7 @@ export default function Droppable(props: Props) {
     getDroppableRef: () => droppableRef.current,
     // Not checking on the first placement :(
     // The droppable placeholder is not set yet as the useLayoutEffect + setState has not finished
-    shouldCheckPlaceholder: Boolean(instruction),
+    shouldCheckPlaceholder: true,
     getPlaceholderRef: () => placeholderRef.current,
   });
 

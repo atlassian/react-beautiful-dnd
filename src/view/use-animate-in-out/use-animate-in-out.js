@@ -25,7 +25,7 @@ export default function useAnimateInOut(args: Args): ?AnimateProvided {
   // Instant changes
   useLayoutEffect(() => {
     const shouldChangeInstantly: boolean = !args.shouldAnimate;
-    if (!shouldChangeInstantly) {
+    if (shouldChangeInstantly) {
       return;
     }
     setIsVisible(Boolean(args.on));

@@ -8,6 +8,8 @@ import type {
 import { transitions } from '../../animation';
 import { noSpacing } from '../../state/spacing';
 
+function noop() {}
+
 export type PlaceholderStyle = {|
   display: string,
   boxSizing: 'border-box',
@@ -56,6 +58,7 @@ const getSize = ({
   animate,
 }: HelperArgs): Size => {
   if (isAnimatingOpenOnMount) {
+    console.log('returning empty style');
     return empty;
   }
 
@@ -63,6 +66,7 @@ const getSize = ({
     return empty;
   }
 
+  console.log('returning full style');
   return {
     height: placeholder.client.borderBox.height,
     width: placeholder.client.borderBox.width,
@@ -118,9 +122,24 @@ function Placeholder(props: Props): Node {
 
   // will run after a render is flushed
   useEffect(() => {
-    if (isAnimatingOpenOnMount) {
-      setIsAnimatingOpenOnMount(false);
+    if (!isAnimatingOpenOnMount) {
+      return noop;
     }
+    let timerId: ?TimeoutID = setTimeout(() => {
+      timerId = null;
+      if (!isAnimatingOpenOnMount) {
+        return;
+      }
+      setIsAnimatingOpenOnMount(false);
+    });
+
+    // clear the timer if needed
+    return () => {
+      if (timerId) {
+        clearTimeout(timerId);
+        timerId = null;
+      }
+    };
   }, [isAnimatingOpenOnMount]);
 
   const onSizeChangeEnd = useCallback(
@@ -147,6 +166,8 @@ function Placeholder(props: Props): Node {
     animate: props.animate,
     placeholder: props.placeholder,
   });
+
+  console.log('style', style);
 
   return React.createElement(props.placeholder.tagName, {
     style,
