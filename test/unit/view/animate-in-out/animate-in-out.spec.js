@@ -106,7 +106,7 @@ it('should animate open if requested', () => {
   wrapper.unmount();
 });
 
-it.only('should close instantly if required', () => {
+it('should close instantly if required', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
@@ -132,7 +132,8 @@ it.only('should close instantly if required', () => {
     on: null,
   });
   expect(child).toHaveBeenCalledWith(null);
-  expect(child).toHaveBeenCalledTimes(1);
+  // Currently does a x3 render for the x3 state
+  expect(child).toHaveBeenCalledTimes(3);
 });
 
 it('should animate closed if required', () => {
@@ -170,15 +171,18 @@ it('should animate closed if required', () => {
     onClose: expect.any(Function),
   };
   expect(child).toHaveBeenCalledWith(second);
+  expect(child).toHaveBeenCalledTimes(1);
 
   // telling AnimateInOut that the animation is finished
   const provided: AnimateProvided = child.mock.calls[0][0];
   child.mockClear();
   // this will trigger a setState that will stop rendering the child
+  console.log('calling on close');
   provided.onClose();
   // tell enzyme to reconcile the react tree due to the setState
   wrapper.update();
 
   expect(child).toHaveBeenCalledWith(null);
-  expect(child).toHaveBeenCalledTimes(1);
+  // Currently does a x3 render for the x3 state
+  expect(child).toHaveBeenCalledTimes(3);
 });

@@ -1,6 +1,5 @@
 // @flow
 import { useMemo, useCallback, useLayoutEffect, useState } from 'react';
-import { unstable_batchedUpdates as batch } from 'react-dom';
 import type { InOutAnimationMode } from '../../types';
 
 export type AnimateProvided = {|
@@ -23,7 +22,6 @@ export default function useAnimateInOut(args: Args): ?AnimateProvided {
 
   useLayoutEffect(() => {
     if (!args.shouldAnimate) {
-      console.log('settings state');
       setIsVisible(Boolean(args.on));
       setData(args.on);
       setAnimate('none');
@@ -32,12 +30,9 @@ export default function useAnimateInOut(args: Args): ?AnimateProvided {
 
     // need to animate in
     if (args.on) {
-      console.log('lets do this');
-      batch(() => {
-        setIsVisible(true);
-        setData(args.on);
-        setAnimate('open');
-      });
+      setIsVisible(true);
+      setData(args.on);
+      setAnimate('open');
       return;
     }
 
@@ -62,9 +57,11 @@ export default function useAnimateInOut(args: Args): ?AnimateProvided {
 
   const onClose = useCallback(() => {
     if (animate !== 'close') {
+      console.log('no need to close');
       return;
     }
 
+    console.log('setting is visible to false');
     setIsVisible(false);
   }, [animate]);
 
