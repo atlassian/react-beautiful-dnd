@@ -196,11 +196,15 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     }
   }
 
-  // handle aborting
+  // Handle aborting
   // No longer dragging but still capturing: need to abort
-  if (!isDragging && capturingRef.current) {
-    abortCapture();
-  }
+  // Using a layout effect to ensure that there is a flip from isDragging => !isDragging
+  // When there is a pending drag !isDragging will always be true
+  useLayoutEffect(() => {
+    if (!isDragging && capturingRef.current) {
+      abortCapture();
+    }
+  }, [abortCapture, isDragging]);
 
   const props: ?DragHandleProps = useMemo(() => {
     if (!isEnabled) {

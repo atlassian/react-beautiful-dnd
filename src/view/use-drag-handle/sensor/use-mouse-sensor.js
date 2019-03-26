@@ -313,6 +313,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
       pendingRef.current = point;
       onCaptureStart(stop);
       bindWindowEvents();
+      console.log('starting pending drag');
     },
     [bindWindowEvents, onCaptureStart, stop],
   );

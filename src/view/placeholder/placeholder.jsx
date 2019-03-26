@@ -120,17 +120,20 @@ function Placeholder(props: Props): Node {
     props.animate === 'open',
   );
 
-  // will run after a render is flushed
+  // Will run after a render is flushed
+  // Still need to wait a timeout to ensure that the
+  // update is completely applied to the DOM
   useEffect(() => {
+    // No need to do anything
     if (!isAnimatingOpenOnMount) {
       return noop;
     }
+
     let timerId: ?TimeoutID = setTimeout(() => {
       timerId = null;
-      if (!isAnimatingOpenOnMount) {
-        return;
+      if (isAnimatingOpenOnMount) {
+        setIsAnimatingOpenOnMount(false);
       }
-      setIsAnimatingOpenOnMount(false);
     });
 
     // clear the timer if needed
@@ -166,8 +169,6 @@ function Placeholder(props: Props): Node {
     animate: props.animate,
     placeholder: props.placeholder,
   });
-
-  console.log('style', style);
 
   return React.createElement(props.placeholder.tagName, {
     style,
