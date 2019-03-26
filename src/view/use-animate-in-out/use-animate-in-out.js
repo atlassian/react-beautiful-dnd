@@ -14,54 +14,58 @@ export type Args = {|
 |};
 
 export default function useAnimateInOut(args: Args): ?AnimateProvided {
-  const [isVisible, setIsVisible] = useState<boolean>(Boolean(args.on));
-  const [data, setData] = useState<mixed>(args.on);
-  const [animate, setAnimate] = useState<InOutAnimationMode>(
+  console.log('args.on', args.on);
+  const [isVisible, setIsVisible] = useState<boolean>(() => Boolean(args.on));
+  const [data, setData] = useState<mixed>(() => args.on);
+  const [animate, setAnimate] = useState<InOutAnimationMode>(() =>
     args.shouldAnimate && args.on ? 'open' : 'none',
   );
+  console.log('render', { isVisible, data, animate });
 
+  // Instant changes
   useLayoutEffect(() => {
-    if (!args.shouldAnimate) {
-      setIsVisible(Boolean(args.on));
-      setData(args.on);
-      setAnimate('none');
+    const shouldChangeInstantly: boolean = !args.shouldAnimate;
+    if (!shouldChangeInstantly) {
       return;
     }
+    setIsVisible(Boolean(args.on));
+    setData(args.on);
+    setAnimate('none');
+  }, [args.on, args.shouldAnimate]);
 
-    // need to animate in
-    if (args.on) {
-      setIsVisible(true);
-      setData(args.on);
+  // We have data and need to either animate in or not
+  useLayoutEffect(() => {
+    const shouldShowWithAnimation: boolean =
+      Boolean(args.on) && args.shouldAnimate;
+
+    if (!shouldShowWithAnimation) {
+      return;
+    }
+    // first swap over to having data
+    // if we previously had data, we can just use the last value
+    if (!data) {
+      console.log('opening');
       setAnimate('open');
-      return;
     }
 
-    // need to animate out if there was data
+    setIsVisible(true);
+    setData(args.on);
+  }, [animate, args.on, args.shouldAnimate, data]);
 
-    if (isVisible) {
+  // Animating out
+  useLayoutEffect(() => {
+    const shouldAnimateOut: boolean =
+      args.shouldAnimate && !args.on && isVisible;
+
+    if (shouldAnimateOut) {
       setAnimate('close');
-      return;
     }
-
-    // content is no longer visible
-    // 1. animate closed if there was previous data
-    // 2. instantly close if there was no previous data
-    setIsVisible(false);
-    if (data) {
-      setAnimate('close');
-    } else {
-      setAnimate('none');
-    }
-    setData(null);
-  });
+  }, [args.on, args.shouldAnimate, isVisible]);
 
   const onClose = useCallback(() => {
     if (animate !== 'close') {
-      console.log('no need to close');
       return;
     }
-
-    console.log('setting is visible to false');
     setIsVisible(false);
   }, [animate]);
 

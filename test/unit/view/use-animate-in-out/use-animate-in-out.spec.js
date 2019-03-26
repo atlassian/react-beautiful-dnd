@@ -1,5 +1,6 @@
 // @flow
 import React, { type Node } from 'react';
+import { act } from 'react-dom/test-utils';
 import { mount, type ReactWrapper } from 'enzyme';
 import useAnimateInOut, {
   type AnimateProvided,
@@ -132,8 +133,8 @@ it('should close instantly if required', () => {
     on: null,
   });
   expect(child).toHaveBeenCalledWith(null);
-  // Currently does a x3 render for the x3 state
-  expect(child).toHaveBeenCalledTimes(3);
+  // Currently does a x2 render: once with old state, and a layout effect for new state
+  expect(child).toHaveBeenCalledTimes(2);
 });
 
 it('should animate closed if required', () => {
@@ -171,18 +172,20 @@ it('should animate closed if required', () => {
     onClose: expect.any(Function),
   };
   expect(child).toHaveBeenCalledWith(second);
-  expect(child).toHaveBeenCalledTimes(1);
+  expect(child).toHaveBeenCalledTimes(2);
 
   // telling AnimateInOut that the animation is finished
-  const provided: AnimateProvided = child.mock.calls[0][0];
+  // $FlowFixMe - untyped mock
+  const provided: AnimateProvided =
+    child.mock.calls[child.mock.calls.length - 1][0];
   child.mockClear();
   // this will trigger a setState that will stop rendering the child
-  console.log('calling on close');
-  provided.onClose();
+  act(() => {
+    provided.onClose();
+  });
   // tell enzyme to reconcile the react tree due to the setState
   wrapper.update();
 
   expect(child).toHaveBeenCalledWith(null);
-  // Currently does a x3 render for the x3 state
-  expect(child).toHaveBeenCalledTimes(3);
+  expect(child).toHaveBeenCalledTimes(1);
 });
