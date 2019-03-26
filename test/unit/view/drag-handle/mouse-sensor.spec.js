@@ -39,6 +39,7 @@ import { getWrapper } from './util/wrappers';
 import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
 import type { AppContextValue } from '../../../../src/view/context/app-context';
 import basicContext from './util/app-context';
+import forceUpdate from '../../../utils/force-update';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -1090,6 +1091,22 @@ describe('disabled mid drag', () => {
 });
 
 describe('cancelled elsewhere in the app mid drag', () => {
+  it('should not abort a drag if a render occurs during a pending drag', () => {
+    // lift
+    mouseDown(wrapper);
+    forceUpdate(wrapper);
+
+    windowMouseMove({ x: 0, y: sloppyClickThreshold });
+
+    expect(
+      callbacksCalled(callbacks)({
+        onLift: 1,
+        onMove: 0,
+        onCancel: 0,
+      }),
+    ).toBe(true);
+  });
+
   it('should end a current drag without firing the onCancel callback', () => {
     // lift
     mouseDown(wrapper);

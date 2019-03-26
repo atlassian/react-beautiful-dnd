@@ -29,6 +29,7 @@ import { getWrapper } from './util/wrappers';
 import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
 import type { AppContextValue } from '../../../../src/view/context/app-context';
 import basicContext from './util/app-context';
+import forceUpdate from '../../../utils/force-update';
 
 const origin: Position = { x: 0, y: 0 };
 let callbacks: Callbacks;
@@ -465,6 +466,33 @@ describe('disabling a draggable during a drag', () => {
   });
 
   describe('cancelled elsewhere in the app', () => {
+    it('should not abort a drag if a render occurs during a pending drag', () => {
+      // killing other wrapper
+      wrapper.unmount();
+
+      // lift
+      const customCallbacks = getStubCallbacks();
+      const customWrapper = getWrapper(customCallbacks);
+      // pending drag started
+      touchStart(customWrapper, origin);
+
+      // render should not kill a drag start
+      forceUpdate(customWrapper);
+
+      // should still start a drag
+      jest.runTimersToTime(timeForLongPress);
+
+      expect(
+        callbacksCalled(customCallbacks)({
+          onLift: 1,
+          onMove: 0,
+          onCancel: 0,
+        }),
+      ).toBe(true);
+
+      customWrapper.unmount();
+    });
+
     it('should end the drag without firing the onCancel callback', () => {
       wrapper.setProps({
         isDragging: true,
