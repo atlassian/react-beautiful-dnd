@@ -1,5 +1,6 @@
 // @flow
 import { useMemo, useCallback, useLayoutEffect, useState } from 'react';
+import { unstable_batchedUpdates as batch } from 'react-dom';
 import type { InOutAnimationMode } from '../../types';
 
 export type AnimateProvided = {|
@@ -8,7 +9,7 @@ export type AnimateProvided = {|
   data: mixed,
 |};
 
-type Args = {|
+export type Args = {|
   on: mixed,
   shouldAnimate: boolean,
 |};
@@ -22,6 +23,7 @@ export default function useAnimateInOut(args: Args): ?AnimateProvided {
 
   useLayoutEffect(() => {
     if (!args.shouldAnimate) {
+      console.log('settings state');
       setIsVisible(Boolean(args.on));
       setData(args.on);
       setAnimate('none');
@@ -30,9 +32,12 @@ export default function useAnimateInOut(args: Args): ?AnimateProvided {
 
     // need to animate in
     if (args.on) {
-      setIsVisible(true);
-      setData(args.on);
-      setAnimate('open');
+      console.log('lets do this');
+      batch(() => {
+        setIsVisible(true);
+        setData(args.on);
+        setAnimate('open');
+      });
       return;
     }
 
@@ -43,10 +48,15 @@ export default function useAnimateInOut(args: Args): ?AnimateProvided {
       return;
     }
 
-    // close animation no longer visible
-
+    // content is no longer visible
+    // 1. animate closed if there was previous data
+    // 2. instantly close if there was no previous data
     setIsVisible(false);
-    setAnimate('close');
+    if (data) {
+      setAnimate('close');
+    } else {
+      setAnimate('none');
+    }
     setData(null);
   });
 
@@ -67,9 +77,5 @@ export default function useAnimateInOut(args: Args): ?AnimateProvided {
     [animate, data, onClose],
   );
 
-  if (!isVisible) {
-    return null;
-  }
-
-  return provided;
+  return isVisible ? provided : null;
 }

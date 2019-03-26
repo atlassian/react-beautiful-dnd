@@ -1,44 +1,56 @@
 // @flow
-import React from 'react';
+import React, { type Node } from 'react';
 import { mount, type ReactWrapper } from 'enzyme';
-import AnimateInOut, {
+import useAnimateInOut, {
   type AnimateProvided,
-} from '../../../../src/view/animate-in-out/animate-in-out';
+  type Args,
+} from '../../../../src/view/use-animate-in-out/use-animate-in-out';
+
+type WithUseAnimateInOutProps = {|
+  ...Args,
+  children: (provided: ?AnimateProvided) => Node,
+|};
+
+function WithUseAnimateInOut(props: WithUseAnimateInOutProps) {
+  const { children, ...rest } = props;
+  const provided: ?AnimateProvided = useAnimateInOut(rest);
+  return props.children(provided);
+}
 
 it('should allow children not to be rendered (no animation allowed)', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
 
-  const wrapper: ReactWrapper<*> = mount(
-    <AnimateInOut on={null} shouldAnimate={false}>
+  mount(
+    <WithUseAnimateInOut on={null} shouldAnimate={false}>
       {child}
-    </AnimateInOut>,
+    </WithUseAnimateInOut>,
   );
 
-  expect(wrapper.children()).toHaveLength(0);
-  expect(child).not.toHaveBeenCalled();
+  expect(child).toHaveBeenCalledWith(null);
+  expect(child).toHaveBeenCalledTimes(1);
 });
 
 it('should allow children not to be rendered (even when animation is allowed)', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
 
-  const wrapper: ReactWrapper<*> = mount(
-    <AnimateInOut on={null} shouldAnimate>
+  mount(
+    <WithUseAnimateInOut on={null} shouldAnimate>
       {child}
-    </AnimateInOut>,
+    </WithUseAnimateInOut>,
   );
 
-  expect(wrapper.children()).toHaveLength(0);
-  expect(child).not.toHaveBeenCalled();
+  expect(child).toHaveBeenCalledWith(null);
+  expect(child).toHaveBeenCalledTimes(1);
 });
 
 it('should pass data through to children', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
-  const wrapper: ReactWrapper<*> = mount(
-    <AnimateInOut on={data} shouldAnimate={false}>
+  mount(
+    <WithUseAnimateInOut on={data} shouldAnimate={false}>
       {child}
-    </AnimateInOut>,
+    </WithUseAnimateInOut>,
   );
 
   const expected: AnimateProvided = {
@@ -47,9 +59,9 @@ it('should pass data through to children', () => {
     // $ExpectError - wrong type
     onClose: expect.any(Function),
   };
-  expect(child).toHaveBeenCalledWith(expected);
 
-  wrapper.unmount();
+  expect(child).toHaveBeenCalledWith(expected);
+  expect(child).toHaveBeenCalledTimes(1);
 });
 
 it('should open instantly if required', () => {
@@ -57,9 +69,9 @@ it('should open instantly if required', () => {
   const data = { hello: 'world' };
 
   const wrapper: ReactWrapper<*> = mount(
-    <AnimateInOut on={data} shouldAnimate={false}>
+    <WithUseAnimateInOut on={data} shouldAnimate={false}>
       {child}
-    </AnimateInOut>,
+    </WithUseAnimateInOut>,
   );
 
   const expected: AnimateProvided = {
@@ -78,9 +90,9 @@ it('should animate open if requested', () => {
   const data = { hello: 'world' };
 
   const wrapper: ReactWrapper<*> = mount(
-    <AnimateInOut on={data} shouldAnimate>
+    <WithUseAnimateInOut on={data} shouldAnimate>
       {child}
-    </AnimateInOut>,
+    </WithUseAnimateInOut>,
   );
 
   const expected: AnimateProvided = {
@@ -94,14 +106,14 @@ it('should animate open if requested', () => {
   wrapper.unmount();
 });
 
-it('should close instantly if required', () => {
+it.only('should close instantly if required', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
   const wrapper: ReactWrapper<*> = mount(
-    <AnimateInOut on={data} shouldAnimate={false}>
+    <WithUseAnimateInOut on={data} shouldAnimate={false}>
       {child}
-    </AnimateInOut>,
+    </WithUseAnimateInOut>,
   );
 
   const initial: AnimateProvided = {
@@ -111,6 +123,7 @@ it('should close instantly if required', () => {
     onClose: expect.any(Function),
   };
   expect(child).toHaveBeenCalledWith(initial);
+  expect(child).toHaveBeenCalledTimes(1);
   child.mockClear();
 
   // start closing
@@ -118,8 +131,8 @@ it('should close instantly if required', () => {
     // data is gone! this should trigger a close
     on: null,
   });
-  expect(wrapper.children()).toHaveLength(0);
-  expect(child).not.toHaveBeenCalled();
+  expect(child).toHaveBeenCalledWith(null);
+  expect(child).toHaveBeenCalledTimes(1);
 });
 
 it('should animate closed if required', () => {
@@ -127,9 +140,9 @@ it('should animate closed if required', () => {
   const data = { hello: 'world' };
 
   const wrapper: ReactWrapper<*> = mount(
-    <AnimateInOut on={data} shouldAnimate={false}>
+    <WithUseAnimateInOut on={data} shouldAnimate={false}>
       {child}
-    </AnimateInOut>,
+    </WithUseAnimateInOut>,
   );
 
   const initial: AnimateProvided = {
@@ -166,6 +179,6 @@ it('should animate closed if required', () => {
   // tell enzyme to reconcile the react tree due to the setState
   wrapper.update();
 
-  expect(wrapper.children()).toHaveLength(0);
-  expect(child).not.toHaveBeenCalled();
+  expect(child).toHaveBeenCalledWith(null);
+  expect(child).toHaveBeenCalledTimes(1);
 });
