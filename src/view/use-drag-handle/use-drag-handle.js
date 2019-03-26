@@ -31,7 +31,6 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
   // Capturing
   const capturingRef = useRef<?Capturing>(null);
   const onCaptureStart = useCallback((abort: () => void) => {
-    console.log('capture starting');
     invariant(
       !capturingRef.current,
       'Cannot start capturing while something else is',

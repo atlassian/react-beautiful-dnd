@@ -1,5 +1,11 @@
 // @flow
-import React, { useState, useCallback, useEffect, type Node } from 'react';
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  type Node,
+} from 'react';
 import type { Spacing } from 'css-box-model';
 import type {
   Placeholder as PlaceholderType,
@@ -58,7 +64,6 @@ const getSize = ({
   animate,
 }: HelperArgs): Size => {
   if (isAnimatingOpenOnMount) {
-    console.log('returning empty style');
     return empty;
   }
 
@@ -66,7 +71,6 @@ const getSize = ({
     return empty;
   }
 
-  console.log('returning full style');
   return {
     height: placeholder.client.borderBox.height,
     width: placeholder.client.borderBox.width,
@@ -115,6 +119,16 @@ const getStyle = ({
 };
 
 function Placeholder(props: Props): Node {
+  const animateOpenTimerRef = useRef<?TimeoutID>(null);
+
+  const tryClearAnimateOpenTimer = useCallback(() => {
+    if (!animateOpenTimerRef.current) {
+      return;
+    }
+    clearTimeout(animateOpenTimerRef.current);
+    animateOpenTimerRef.current = null;
+  }, []);
+
   const { animate, onTransitionEnd, onClose, styleContext } = props;
   const [isAnimatingOpenOnMount, setIsAnimatingOpenOnMount] = useState<boolean>(
     props.animate === 'open',
@@ -129,21 +143,26 @@ function Placeholder(props: Props): Node {
       return noop;
     }
 
-    let timerId: ?TimeoutID = setTimeout(() => {
-      timerId = null;
-      if (isAnimatingOpenOnMount) {
-        setIsAnimatingOpenOnMount(false);
-      }
+    // might need to clear the timer
+    if (animate !== 'open') {
+      tryClearAnimateOpenTimer();
+      setIsAnimatingOpenOnMount(false);
+      return noop;
+    }
+
+    // timer already pending
+    if (animateOpenTimerRef.current) {
+      return noop;
+    }
+
+    animateOpenTimerRef.current = setTimeout(() => {
+      animateOpenTimerRef.current = null;
+      setIsAnimatingOpenOnMount(false);
     });
 
     // clear the timer if needed
-    return () => {
-      if (timerId) {
-        clearTimeout(timerId);
-        timerId = null;
-      }
-    };
-  }, [isAnimatingOpenOnMount]);
+    return tryClearAnimateOpenTimer;
+  }, [animate, isAnimatingOpenOnMount, tryClearAnimateOpenTimer]);
 
   const onSizeChangeEnd = useCallback(
     (event: TransitionEvent) => {
