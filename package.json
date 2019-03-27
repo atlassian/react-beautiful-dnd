@@ -56,12 +56,12 @@
   "dependencies": {
     "@babel/runtime-corejs2": "^7.4.2",
     "css-box-model": "^1.1.1",
-    "memoize-one": "^5.0.0",
+    "memoize-one": "^5.0.1",
     "prop-types": "^15.6.1",
     "raf-schd": "^4.0.0",
     "react-redux": "^5.0.7",
     "redux": "^4.0.1",
-    "tiny-invariant": "^1.0.3"
+    "tiny-invariant": "^1.0.4"
   },
   "devDependencies": {
     "@atlaskit/css-reset": "^3.0.6",
