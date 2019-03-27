@@ -164,30 +164,30 @@ export default (callbacks: Callbacks) => {
     invariant(!collection, 'Cannot add a Droppable during a drag');
   };
 
-  const updateDroppable = (
-    previous: DroppableDescriptor,
-    descriptor: DroppableDescriptor,
-    droppableCallbacks: DroppableCallbacks,
-  ) => {
-    invariant(
-      entries.droppables[previous.id],
-      'Cannot update droppable registration as no previous registration was found',
-    );
+  // const updateDroppable = (
+  //   previous: DroppableDescriptor,
+  //   descriptor: DroppableDescriptor,
+  //   droppableCallbacks: DroppableCallbacks,
+  // ) => {
+  //   invariant(
+  //     entries.droppables[previous.id],
+  //     'Cannot update droppable registration as no previous registration was found',
+  //   );
 
-    // The id might have changed, so we are removing the old entry
-    delete entries.droppables[previous.id];
+  //   // The id might have changed, so we are removing the old entry
+  //   delete entries.droppables[previous.id];
 
-    const entry: DroppableEntry = {
-      descriptor,
-      callbacks: droppableCallbacks,
-    };
-    entries.droppables[descriptor.id] = entry;
+  //   const entry: DroppableEntry = {
+  //     descriptor,
+  //     callbacks: droppableCallbacks,
+  //   };
+  //   entries.droppables[descriptor.id] = entry;
 
-    invariant(
-      !collection,
-      'You are not able to update the id or type of a droppable during a drag',
-    );
-  };
+  //   invariant(
+  //     !collection,
+  //     'You are not able to update the id or type of a droppable during a drag',
+  //   );
+  // };
 
   const unregisterDroppable = (descriptor: DroppableDescriptor) => {
     const entry: ?DroppableEntry = entries.droppables[descriptor.id];
@@ -328,7 +328,7 @@ export default (callbacks: Callbacks) => {
     updateDraggable,
     unregisterDraggable,
     registerDroppable,
-    updateDroppable,
+    // updateDroppable,
     unregisterDroppable,
 
     // droppable changes

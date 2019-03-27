@@ -60,6 +60,8 @@ export default function useDroppableDimensionPublisher(args: Props) {
       type: args.type,
     };
   }, [args.droppableId, args.type]);
+  // const lastDescriptorRef = usePreviousRef(descriptor);
+  // console.log('lastDescriptorREF.CURRENT', lastDescriptorRef.current);
 
   const memoizedUpdateScroll = useCallback(
     (x: number, y: number) => {
@@ -158,7 +160,6 @@ export default function useDroppableDimensionPublisher(args: Props) {
   );
   const recollect = useCallback(
     (options: RecollectDroppableOptions): DroppableDimension => {
-      console.log('creating recollect');
       const dragging: ?WhileDragging = whileDraggingRef.current;
       const closest: ?Element = getClosestScrollableFromDrag(dragging);
       invariant(
@@ -235,13 +236,17 @@ export default function useDroppableDimensionPublisher(args: Props) {
   // - any descriptor changes
   // - when it unmounts
   useLayoutEffect(() => {
+    console.log('registering', descriptor);
     marshal.registerDroppable(descriptor, callbacks);
 
     return () => {
       if (whileDraggingRef.current) {
-        warning('Unmounting Droppable while a drag is occurring');
+        warning(
+          'Unsupported: changing the droppableId or type of a Droppable during a drag',
+        );
         dragStopped();
       }
+      console.log('goodbye droppable', descriptor);
 
       marshal.unregisterDroppable(descriptor);
     };

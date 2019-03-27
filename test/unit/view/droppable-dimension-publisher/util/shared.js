@@ -1,7 +1,7 @@
 // @flow
 /* eslint-disable react/no-multi-comp */
 import { createBox, type Spacing, type BoxModel } from 'css-box-model';
-import React, { Component } from 'react';
+import React, { useMemo, type Node } from 'react';
 import useDroppableDimensionPublisher from '../../../../../src/view/use-droppable-dimension-publisher/use-droppable-dimension-publisher';
 import { getComputedSpacing, getPreset } from '../../../../utils/dimension';
 import { type DimensionMarshal } from '../../../../../src/state/dimension-marshal/dimension-marshal-types';
@@ -11,6 +11,10 @@ import type {
   DroppableDescriptor,
   TypeId,
 } from '../../../../../src/types';
+import createRef from '../../../../utils/create-ref';
+import AppContext, {
+  type AppContextValue,
+} from '../../../../../src/view/context/app-context';
 
 export const scheduled: ScrollOptions = {
   shouldPublishImmediately: false,
@@ -67,75 +71,131 @@ const withSpacing = getComputedSpacing({ padding, margin, border });
 
 export const descriptor: DroppableDescriptor = preset.home.descriptor;
 
-type ScrollableItemProps = {|
-  // scrollable item prop (default: false)
-  isScrollable: boolean,
-  isDropDisabled: boolean,
-  isCombineEnabled: boolean,
-  droppableId: DroppableId,
-  type: TypeId,
+// static defaultProps = {
+//   isScrollable: true,
+//   type: descriptor.type,
+//   droppableId: descriptor.id,
+//   isDropDisabled: false,
+//   isCombineEnabled: false,
+// };
+
+type WithAppContextProps = {|
   marshal: DimensionMarshal,
+  children: Node,
 |};
 
-function ScrollableItem(props: ScrollableItemProps) {
-  const
+export function WithAppContext(props: WithAppContextProps) {
+  const context: AppContextValue = useMemo(
+    () => ({
+      marshal: props.marshal,
+      style: 'fake',
+      canLift: () => true,
+      isMovementAllowed: () => true,
+    }),
+    [props.marshal],
+  );
+
+  return (
+    <AppContext.Provider value={context}>{props.children}</AppContext.Provider>
+  );
 }
 
+type ScrollableItemProps = {|
+  type?: TypeId,
+  isScrollable?: boolean,
+  isDropDisabled?: boolean,
+  isCombineEnabled?: boolean,
+  droppableId?: DroppableId,
+|};
 
-export class ScrollableItem extends React.Component<ScrollableItemProps> {
-  static defaultProps = {
-    isScrollable: true,
-    type: descriptor.type,
-    droppableId: descriptor.id,
-    isDropDisabled: false,
-    isCombineEnabled: false,
-  };
-  /* eslint-disable react/sort-comp */
-  ref: ?HTMLElement;
-  placeholderRef: ?HTMLElement;
+export function ScrollableItem(props: ScrollableItemProps) {
+  const droppableRef = createRef();
+  const placeholderRef = createRef();
 
-  setRef = (ref: ?HTMLElement) => {
-    this.ref = ref;
-  };
+  useDroppableDimensionPublisher({
+    droppableId: props.droppableId || descriptor.id,
+    type: props.type || descriptor.type,
+    direction: preset.home.axis.direction,
+    isDropDisabled: props.isDropDisabled || false,
+    ignoreContainerClipping: false,
+    getDroppableRef: droppableRef.getRef,
+    getPlaceholderRef: placeholderRef.getRef,
+    isCombineEnabled: props.isCombineEnabled || false,
+  });
 
-  setPlaceholderRef = (ref: ?HTMLElement) => {
-    this.placeholderRef = ref;
-  };
-
-  getRef = (): ?HTMLElement => this.ref;
-  getPlaceholderRef = (): ?HTMLElement => this.placeholderRef;
-
-  render() {
-    return (
-      <DroppableDimensionPublisher
-        droppableId={this.props.droppableId}
-        type={this.props.type}
-        direction={preset.home.axis.direction}
-        isDropDisabled={this.props.isDropDisabled}
-        ignoreContainerClipping={false}
-        getDroppableRef={this.getRef}
-        getPlaceholderRef={this.getPlaceholderRef}
-        isCombineEnabled={this.props.isCombineEnabled}
-      >
-        <div
-          className="scroll-container"
-          style={{
-            boxSizing: 'border-box',
-            height: bigClient.borderBox.height,
-            width: bigClient.borderBox.width,
-            ...withSpacing,
-            overflowX: this.props.isScrollable ? 'scroll' : 'visible',
-            overflowY: this.props.isScrollable ? 'scroll' : 'visible',
-          }}
-          ref={this.setRef}
-        >
-          hi
-          <div className="placeholder" ref={this.setPlaceholderRef} />
-        </div>
-      </DroppableDimensionPublisher>
-    );
-  }
+  return (
+    <div
+      className="scroll-container"
+      style={{
+        boxSizing: 'border-box',
+        height: bigClient.borderBox.height,
+        width: bigClient.borderBox.width,
+        ...withSpacing,
+        overflowX: props.isScrollable ? 'scroll' : 'visible',
+        overflowY: props.isScrollable ? 'scroll' : 'visible',
+      }}
+      ref={droppableRef.setRef}
+    >
+      hi
+      <div className="placeholder" ref={placeholderRef.setRef} />
+    </div>
+  );
 }
+
+// export class ScrollableItem extends React.Component<ScrollableItemProps> {
+//   static defaultProps = {
+//     isScrollable: true,
+//     type: descriptor.type,
+//     droppableId: descriptor.id,
+//     isDropDisabled: false,
+//     isCombineEnabled: false,
+//   };
+//   /* eslint-disable react/sort-comp */
+//   ref: ?HTMLElement;
+//   placeholderRef: ?HTMLElement;
+
+//   setRef = (ref: ?HTMLElement) => {
+//     this.ref = ref;
+//   };
+
+//   setPlaceholderRef = (ref: ?HTMLElement) => {
+//     this.placeholderRef = ref;
+//   };
+
+//   getRef = (): ?HTMLElement => this.ref;
+//   getPlaceholderRef = (): ?HTMLElement => this.placeholderRef;
+
+//   render() {
+//     return (
+//       <DroppableDimensionPublisher
+//         droppableId={this.props.droppableId}
+//         type={this.props.type}
+//         direction={preset.home.axis.direction}
+//         isDropDisabled={this.props.isDropDisabled}
+//         ignoreContainerClipping={false}
+//         getDroppableRef={this.getRef}
+//         getPlaceholderRef={this.getPlaceholderRef}
+//         isCombineEnabled={this.props.isCombineEnabled}
+//       >
+//         <div
+//           className="scroll-container"
+//           style={{
+//             boxSizing: 'border-box',
+//             height: bigClient.borderBox.height,
+//             width: bigClient.borderBox.width,
+//             ...withSpacing,
+//             overflowX: this.props.isScrollable ? 'scroll' : 'visible',
+//             overflowY: this.props.isScrollable ? 'scroll' : 'visible',
+//           }}
+//           ref={this.setRef}
+//         >
+//           hi
+//           <div className="placeholder" ref={this.setPlaceholderRef} />
+//         </div>
+//       </DroppableDimensionPublisher>
+//     );
+//   }
+// }
 
 type AppProps = {|
   droppableIsScrollable: boolean,
@@ -144,7 +204,7 @@ type AppProps = {|
   showPlaceholder: boolean,
 |};
 
-export class App extends Component<AppProps> {
+export class App extends React.Component<AppProps> {
   ref: ?HTMLElement;
   placeholderRef: ?HTMLElement;
 
