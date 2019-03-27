@@ -26,6 +26,7 @@ import withoutPlaceholder from './without-placeholder';
 import { warning } from '../../dev-warning';
 import getListenerOptions from './get-listener-options';
 import useRequiredContext from '../use-required-context';
+import usePreviousRef from '../use-previous-ref';
 
 type Props = {|
   droppableId: DroppableId,
@@ -52,25 +53,13 @@ export default function useDroppableDimensionPublisher(args: Props) {
   const whileDraggingRef = useRef<?WhileDragging>(null);
   const appContext: AppContextValue = useRequiredContext(AppContext);
   const marshal: DimensionMarshal = appContext.marshal;
-
-  const {
-    direction,
-    droppableId,
-    type,
-    isDropDisabled,
-    isCombineEnabled,
-    ignoreContainerClipping,
-    getDroppableRef,
-    getPlaceholderRef,
-  } = args;
-
-  const descriptor: DroppableDescriptor = useMemo(
-    (): DroppableDescriptor => ({
-      id: droppableId,
-      type,
-    }),
-    [droppableId, type],
-  );
+  const previousRef: { current: Props } = usePreviousRef(args);
+  const descriptor: DroppableDescriptor = useMemo((): DroppableDescriptor => {
+    return {
+      id: args.droppableId,
+      type: args.type,
+    };
+  }, [args.droppableId, args.type]);
 
   const memoizedUpdateScroll = useCallback(
     (x: number, y: number) => {
@@ -98,9 +87,9 @@ export default function useDroppableDimensionPublisher(args: Props) {
     memoizedUpdateScroll(scroll.x, scroll.y);
   }, [getClosestScroll, memoizedUpdateScroll]);
 
-  const scheduleScrollUpdate = useCallback(() => {
-    rafSchedule(updateScroll);
-  }, [updateScroll]);
+  const scheduleScrollUpdate = useMemo(() => rafSchedule(updateScroll), [
+    updateScroll,
+  ]);
 
   const onClosestScroll = useCallback(() => {
     const dragging: ?WhileDragging = whileDraggingRef.current;
@@ -124,7 +113,8 @@ export default function useDroppableDimensionPublisher(args: Props) {
         !whileDraggingRef.current,
         'Cannot collect a droppable while a drag is occurring',
       );
-      const ref: ?HTMLElement = getDroppableRef();
+      const previous: Props = previousRef.current;
+      const ref: ?HTMLElement = previous.getDroppableRef();
       invariant(ref, 'Cannot collect without a droppable ref');
       const env: Env = getEnv(ref);
 
@@ -142,10 +132,10 @@ export default function useDroppableDimensionPublisher(args: Props) {
         descriptor,
         env,
         windowScroll,
-        direction,
-        isDropDisabled,
-        isCombineEnabled,
-        shouldClipSubject: !ignoreContainerClipping,
+        direction: previous.direction,
+        isDropDisabled: previous.isDropDisabled,
+        isCombineEnabled: previous.isCombineEnabled,
+        shouldClipSubject: !previous.ignoreContainerClipping,
       });
 
       if (env.closestScrollable) {
@@ -164,18 +154,11 @@ export default function useDroppableDimensionPublisher(args: Props) {
 
       return dimension;
     },
-    [
-      descriptor,
-      direction,
-      getDroppableRef,
-      ignoreContainerClipping,
-      isCombineEnabled,
-      isDropDisabled,
-      onClosestScroll,
-    ],
+    [descriptor, onClosestScroll, previousRef],
   );
   const recollect = useCallback(
     (options: RecollectDroppableOptions): DroppableDimension => {
+      console.log('creating recollect');
       const dragging: ?WhileDragging = whileDraggingRef.current;
       const closest: ?Element = getClosestScrollableFromDrag(dragging);
       invariant(
@@ -183,31 +166,27 @@ export default function useDroppableDimensionPublisher(args: Props) {
         'Can only recollect Droppable client for Droppables that have a scroll container',
       );
 
+      const previous: Props = previousRef.current;
+
       const execute = (): DroppableDimension =>
         getDimension({
           ref: dragging.ref,
           descriptor: dragging.descriptor,
           env: dragging.env,
           windowScroll: origin,
-          direction,
-          isDropDisabled,
-          isCombineEnabled,
-          shouldClipSubject: !ignoreContainerClipping,
+          direction: previous.direction,
+          isDropDisabled: previous.isDropDisabled,
+          isCombineEnabled: previous.isCombineEnabled,
+          shouldClipSubject: !previous.ignoreContainerClipping,
         });
 
       if (!options.withoutPlaceholder) {
         return execute();
       }
 
-      return withoutPlaceholder(getPlaceholderRef(), execute);
+      return withoutPlaceholder(previous.getPlaceholderRef(), execute);
     },
-    [
-      direction,
-      getPlaceholderRef,
-      ignoreContainerClipping,
-      isCombineEnabled,
-      isDropDisabled,
-    ],
+    [previousRef],
   );
   const dragStopped = useCallback(() => {
     const dragging: ?WhileDragging = whileDraggingRef.current;
@@ -243,6 +222,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
   }, []);
 
   const callbacks: DroppableCallbacks = useMemo(() => {
+    console.log('recreating callbacks');
     return {
       getDimensionAndWatchScroll,
       recollect,
@@ -266,4 +246,17 @@ export default function useDroppableDimensionPublisher(args: Props) {
       marshal.unregisterDroppable(descriptor);
     };
   }, [callbacks, descriptor, dragStopped, marshal]);
+
+  // update is enabled with the marshal
+  useLayoutEffect(() => {
+    marshal.updateDroppableIsEnabled(descriptor.id, !args.isDropDisabled);
+  }, [args.isDropDisabled, descriptor.id, marshal]);
+
+  // update is combine enabled with the marshal
+  useLayoutEffect(() => {
+    marshal.updateDroppableIsCombineEnabled(
+      descriptor.id,
+      args.isCombineEnabled,
+    );
+  }, [args.isCombineEnabled, descriptor.id, marshal]);
 }
