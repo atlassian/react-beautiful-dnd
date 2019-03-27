@@ -11,6 +11,7 @@ import basicContext from './app-context';
 import AppContext, {
   type AppContextValue,
 } from '../../../../../src/view/context/app-context';
+import createRef from '../../../../utils/create-ref';
 
 type ChildProps = {|
   dragHandleProps: ?DragHandleProps,
