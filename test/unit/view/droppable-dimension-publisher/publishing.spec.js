@@ -12,11 +12,11 @@ import { negate } from '../../../../src/state/position';
 import { offsetByPosition } from '../../../../src/state/spacing';
 import { getDroppableDimension } from '../../../utils/dimension';
 import { getMarshalStub } from '../../../utils/dimension-marshal';
-import { withDimensionMarshal } from '../../../utils/get-context-options';
 import setWindowScroll from '../../../utils/set-window-scroll';
 import {
   App,
   ScrollableItem,
+  WithAppContext,
   scheduled,
   immediate,
   preset,
@@ -29,6 +29,7 @@ import {
 } from './util/shared';
 import { setViewport } from '../../../utils/viewport';
 import tryCleanPrototypeStubs from '../../../utils/try-clean-prototype-stubs';
+import PassThroughProps from '../../../utils/pass-through-props';
 
 beforeEach(() => {
   setViewport(preset.viewport);
@@ -38,7 +39,7 @@ afterEach(() => {
   tryCleanPrototypeStubs();
 });
 
-it('should publish the dimensions of the target', () => {
+it.only('should publish the dimensions of the target', () => {
   const marshal: DimensionMarshal = getMarshalStub();
   const expected: DroppableDimension = getDroppableDimension({
     descriptor: {
@@ -52,14 +53,15 @@ it('should publish the dimensions of the target', () => {
     windowScroll: { x: 0, y: 0 },
   });
   const wrapper: ReactWrapper<*> = mount(
-    <ScrollableItem
-      droppableId={expected.descriptor.id}
-      type={expected.descriptor.type}
-      isScrollable={false}
-    />,
-    withDimensionMarshal(marshal),
+    <WithAppContext marshal={marshal}>
+      <ScrollableItem
+        droppableId={expected.descriptor.id}
+        type={expected.descriptor.type}
+        isScrollable={false}
+      />
+    </WithAppContext>,
   );
-  const el: ?HTMLElement = wrapper.instance().getRef();
+  const el: ?HTMLElement = wrapper.getDOMNode();
   invariant(el);
   jest
     .spyOn(el, 'getBoundingClientRect')
@@ -81,7 +83,7 @@ it('should publish the dimensions of the target', () => {
   expect(result.client.padding).toEqual(padding);
 });
 
-it('should consider the window scroll when calculating dimensions', () => {
+it.only('should consider the window scroll when calculating dimensions', () => {
   const marshal: DimensionMarshal = getMarshalStub();
   const windowScroll: Position = {
     x: 500,
@@ -101,14 +103,15 @@ it('should consider the window scroll when calculating dimensions', () => {
   });
 
   const wrapper: ReactWrapper<*> = mount(
-    <ScrollableItem
-      droppableId={expected.descriptor.id}
-      type={expected.descriptor.type}
-      isScrollable={false}
-    />,
-    withDimensionMarshal(marshal),
+    <WithAppContext marshal={marshal}>
+      <ScrollableItem
+        droppableId={expected.descriptor.id}
+        type={expected.descriptor.type}
+        isScrollable={false}
+      />
+    </WithAppContext>,
   );
-  const el: ?HTMLElement = wrapper.instance().getRef();
+  const el: ?HTMLElement = wrapper.getDOMNode();
   invariant(el);
   jest
     .spyOn(el, 'getBoundingClientRect')
@@ -127,7 +130,7 @@ it('should consider the window scroll when calculating dimensions', () => {
 });
 
 describe('no closest scrollable', () => {
-  it('should return null for the closest scrollable if there is no scroll container', () => {
+  it.only('should return null for the closest scrollable if there is no scroll container', () => {
     const expected: DroppableDimension = getDroppableDimension({
       descriptor,
       borderBox: bigClient.borderBox,
@@ -138,10 +141,11 @@ describe('no closest scrollable', () => {
     });
     const marshal: DimensionMarshal = getMarshalStub();
     const wrapper = mount(
-      <App parentIsScrollable={false} />,
-      withDimensionMarshal(marshal),
+      <WithAppContext marshal={marshal}>
+        <App parentIsScrollable={false} />
+      </WithAppContext>,
     );
-    const el: ?HTMLElement = wrapper.instance().getRef();
+    const el: ?HTMLElement = wrapper.getDOMNode();
     invariant(el);
     jest
       .spyOn(el, 'getBoundingClientRect')
