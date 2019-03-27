@@ -1,12 +1,11 @@
-// flow-typed signature: 9e8bdbb7ab7d8c430b492854e079b001
-// flow-typed version: 3aba3ed2b8/enzyme_v3.x.x/flow_>=v0.53.x
+// flow-typed signature: f6bad512110ebc6da85b1ddda297fe3d
+// flow-typed version: f04d291d8b/enzyme_v3.x.x/flow_>=v0.53.x
 
 declare module "enzyme" {
   declare type PredicateFunction<T: Wrapper<*>> = (
     wrapper: T,
     index: number
   ) => boolean;
-  declare type NodeOrNodes = React$Node | Array<React$Node>;
   declare type UntypedSelector = string | {[key: string]: number|string|boolean};
   declare type EnzymeSelector = UntypedSelector | React$ElementType;
 
@@ -15,6 +14,7 @@ declare module "enzyme" {
   declare type CheerioWrapper = any;
 
   declare class Wrapper<RootComponent> {
+    equals(node: React$Element<any>): boolean,
     find(selector: UntypedSelector): this,
     find<T: React$ElementType>(selector: T): ReactWrapper<T>,
     findWhere(predicate: PredicateFunction<this>): this,
@@ -22,10 +22,10 @@ declare module "enzyme" {
     filter<T: React$ElementType>(selector: T): ReactWrapper<T>,
     filterWhere(predicate: PredicateFunction<this>): this,
     hostNodes(): this,
-    contains(nodeOrNodes: NodeOrNodes): boolean,
+    contains(nodes: React$Node): boolean,
     containsMatchingElement(node: React$Node): boolean,
-    containsAllMatchingElements(nodes: NodeOrNodes): boolean,
-    containsAnyMatchingElements(nodes: NodeOrNodes): boolean,
+    containsAllMatchingElements(nodes: React$Node): boolean,
+    containsAnyMatchingElements(nodes: React$Node): boolean,
     dive(option?: { context?: Object }): this,
     exists(selector?: EnzymeSelector): boolean,
     isEmptyRender(): boolean,
