@@ -1,5 +1,5 @@
 // @flow
-import React, { useRef, useCallback, type Node } from 'react';
+import React, { useRef, useCallback } from 'react';
 import invariant from 'tiny-invariant';
 import { type Spacing, type Rect } from 'css-box-model';
 import { mount, type ReactWrapper } from 'enzyme';
@@ -135,6 +135,8 @@ describe('dimension registration', () => {
     expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(
       preset.inHome1.descriptor,
     );
+    marshal.registerDraggable.mockClear();
+    marshal.registerDroppable.mockClear();
 
     // updating the index
     wrapper.setProps({
@@ -145,15 +147,15 @@ describe('dimension registration', () => {
       index: 1000,
     };
 
-    // Old descriptor unregistered
-    expect(marshal.unregisterDraggable).toHaveBeenCalledWith(
+    // Descriptor updated
+    expect(marshal.updateDraggable).toHaveBeenCalledWith(
       preset.inHome1.descriptor,
-    );
-    // New descriptor registered
-    expect(marshal.registerDraggable).toHaveBeenCalledWith(
       newDescriptor,
       expect.any(Function),
     );
+    // Nothing else changed
+    expect(marshal.registerDraggable).not.toHaveBeenCalled();
+    expect(marshal.unregisterDraggable).not.toHaveBeenCalled();
   });
 
   it('should not update its registration when a descriptor property does not change on an update', () => {

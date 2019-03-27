@@ -2,20 +2,11 @@
 /* eslint-disable react/no-multi-comp */
 import { mount } from 'enzyme';
 import React from 'react';
-import type {
-  DimensionMarshal,
-  DroppableCallbacks,
-} from '../../../../src/state/dimension-marshal/dimension-marshal-types';
+import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import type { DroppableDescriptor } from '../../../../src/types';
-import getWindowScroll from '../../../../src/view/window/get-window-scroll';
 import { getMarshalStub } from '../../../utils/dimension-marshal';
 import forceUpdate from '../../../utils/force-update';
-import {
-  preset,
-  scheduled,
-  ScrollableItem,
-  WithAppContext,
-} from './util/shared';
+import { preset, ScrollableItem, WithAppContext } from './util/shared';
 import { setViewport } from '../../../utils/viewport';
 import PassThroughProps from '../../../utils/pass-through-props';
 

@@ -1,5 +1,5 @@
 // @flow
-import { useMemo, useCallback, useLayoutEffect } from 'react';
+import { useMemo, useRef, useCallback, useLayoutEffect } from 'react';
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import type {
@@ -43,19 +43,34 @@ export default function useDraggableDimensionPublisher(args: Args) {
     return result;
   }, [draggableId, droppableId, index, type]);
 
+  const publishedDescriptorRef = useRef<DraggableDescriptor>(descriptor);
+
   const makeDimension = useCallback(
     (windowScroll?: Position): DraggableDimension => {
+      const latest: DraggableDescriptor = publishedDescriptorRef.current;
       const el: ?HTMLElement = getDraggableRef();
       invariant(el, 'Cannot get dimension when no ref is set');
-      return getDimension(descriptor, el, windowScroll);
+      return getDimension(latest, el, windowScroll);
     },
-    [descriptor, getDraggableRef],
+    [getDraggableRef],
   );
 
-  // Communicate with the marshal
-  // TODO: should it be an "update"?
+  // handle mounting / unmounting
   useLayoutEffect(() => {
-    marshal.registerDraggable(descriptor, makeDimension);
-    return () => marshal.unregisterDraggable(descriptor);
+    marshal.registerDraggable(publishedDescriptorRef.current, makeDimension);
+    return () => marshal.unregisterDraggable(publishedDescriptorRef.current);
+  }, [makeDimension, marshal]);
+
+  // handle updates to descriptor
+  useLayoutEffect(() => {
+    // this will happen when mounting
+    if (publishedDescriptorRef.current === descriptor) {
+      return;
+    }
+
+    const previous: DraggableDescriptor = publishedDescriptorRef.current;
+    publishedDescriptorRef.current = descriptor;
+
+    marshal.updateDraggable(previous, descriptor, makeDimension);
   }, [descriptor, makeDimension, marshal]);
 }

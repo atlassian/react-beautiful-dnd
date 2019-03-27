@@ -60,8 +60,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
       type: args.type,
     };
   }, [args.droppableId, args.type]);
-  // const lastDescriptorRef = usePreviousRef(descriptor);
-  // console.log('lastDescriptorREF.CURRENT', lastDescriptorRef.current);
+  const publishedDescriptorRef = useRef<DroppableDescriptor>(descriptor);
 
   const memoizedUpdateScroll = useCallback(
     (x: number, y: number) => {
@@ -236,7 +235,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
   // - any descriptor changes
   // - when it unmounts
   useLayoutEffect(() => {
-    console.log('registering', descriptor);
+    publishedDescriptorRef.current = descriptor;
     marshal.registerDroppable(descriptor, callbacks);
 
     return () => {
@@ -254,14 +253,17 @@ export default function useDroppableDimensionPublisher(args: Props) {
 
   // update is enabled with the marshal
   useLayoutEffect(() => {
-    marshal.updateDroppableIsEnabled(descriptor.id, !args.isDropDisabled);
-  }, [args.isDropDisabled, descriptor.id, marshal]);
+    marshal.updateDroppableIsEnabled(
+      publishedDescriptorRef.current.id,
+      !args.isDropDisabled,
+    );
+  }, [args.isDropDisabled, marshal]);
 
   // update is combine enabled with the marshal
   useLayoutEffect(() => {
     marshal.updateDroppableIsCombineEnabled(
-      descriptor.id,
+      publishedDescriptorRef.current.id,
       args.isCombineEnabled,
     );
-  }, [args.isCombineEnabled, descriptor.id, marshal]);
+  }, [args.isCombineEnabled, marshal]);
 }
