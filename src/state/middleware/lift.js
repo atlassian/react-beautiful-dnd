@@ -13,6 +13,7 @@ export default (marshal: DimensionMarshal) => ({
     next(action);
     return;
   }
+  console.log('LIFT action');
 
   const { id, clientSelection, movementMode } = action.payload;
   const initial: State = getState();

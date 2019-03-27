@@ -2,8 +2,9 @@
 /* eslint-disable react/no-multi-comp */
 import { createBox, type Spacing, type BoxModel } from 'css-box-model';
 import React, { Component } from 'react';
-import DroppableDimensionPublisher from '../../../../../src/view/droppable-dimension-publisher/droppable-dimension-publisher';
+import useDroppableDimensionPublisher from '../../../../../src/view/use-droppable-dimension-publisher/use-droppable-dimension-publisher';
 import { getComputedSpacing, getPreset } from '../../../../utils/dimension';
+import { type DimensionMarshal } from '../../../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   ScrollOptions,
   DroppableId,
@@ -73,7 +74,13 @@ type ScrollableItemProps = {|
   isCombineEnabled: boolean,
   droppableId: DroppableId,
   type: TypeId,
+  marshal: DimensionMarshal,
 |};
+
+function ScrollableItem(props: ScrollableItemProps) {
+  const
+}
+
 
 export class ScrollableItem extends React.Component<ScrollableItemProps> {
   static defaultProps = {

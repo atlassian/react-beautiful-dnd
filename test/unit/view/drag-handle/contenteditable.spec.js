@@ -3,7 +3,8 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { forEach, type Control } from './util/controls';
 import type { DragHandleProps } from '../../../../src/view/use-drag-handle/drag-handle-types';
-import { createRef, WithDragHandle } from './util/wrappers';
+import { WithDragHandle } from './util/wrappers';
+import createRef from '../../../utils/create-ref';
 import {
   getStubCallbacks,
   callbacksCalled,

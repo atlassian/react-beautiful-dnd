@@ -10,7 +10,6 @@ import type { DroppableDimension } from '../../../../src/types';
 import getWindowScroll from '../../../../src/view/window/get-window-scroll';
 import { getMarshalStub } from '../../../utils/dimension-marshal';
 import forceUpdate from '../../../utils/force-update';
-import { withDimensionMarshal } from '../../../utils/get-context-options';
 import { preset, scheduled, ScrollableItem } from './util/shared';
 import { setViewport } from '../../../utils/viewport';
 
@@ -19,7 +18,7 @@ setViewport(preset.viewport);
 it('should register itself when mounting', () => {
   const marshal: DimensionMarshal = getMarshalStub();
 
-  mount(<ScrollableItem />, withDimensionMarshal(marshal));
+  mount(<ScrollableItem marshal={marshal} />);
 
   expect(marshal.registerDroppable).toHaveBeenCalledTimes(1);
   expect(marshal.registerDroppable.mock.calls[0][0]).toEqual(

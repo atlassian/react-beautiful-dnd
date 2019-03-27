@@ -8,7 +8,8 @@ import type {
   Callbacks,
   DragHandleProps,
 } from '../../../../src/view/use-drag-handle/drag-handle-types';
-import { createRef, Child, WithDragHandle } from './util/wrappers';
+import { Child, WithDragHandle } from './util/wrappers';
+import createRef from '../../../utils/create-ref';
 import AppContext from '../../../../src/view/context/app-context';
 
 const getNestedWrapper = (

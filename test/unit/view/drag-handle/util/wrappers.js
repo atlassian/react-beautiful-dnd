@@ -34,18 +34,6 @@ export class Child extends React.Component<ChildProps> {
   }
 }
 
-export const createRef = () => {
-  let ref: ?HTMLElement = null;
-
-  const setRef = (supplied: ?HTMLElement) => {
-    ref = supplied;
-  };
-
-  const getRef = (): ?HTMLElement => ref;
-
-  return { ref, setRef, getRef };
-};
-
 type WithDragHandleProps = {|
   ...Args,
   children: (value: ?DragHandleProps) => Node | null,
