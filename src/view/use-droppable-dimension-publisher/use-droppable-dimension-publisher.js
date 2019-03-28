@@ -222,7 +222,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
   }, []);
 
   const callbacks: DroppableCallbacks = useMemo(() => {
-    console.log('recreating callbacks');
+    console.log('creating callbacks');
     return {
       getDimensionAndWatchScroll,
       recollect,
