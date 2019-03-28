@@ -3,6 +3,7 @@ import { useCallback, useMemo, useLayoutEffect, useRef } from 'react';
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import rafSchedule from 'raf-schd';
+import memoizeOne from 'memoize-one';
 import checkForNestedScrollContainers from './check-for-nested-scroll-container';
 import { origin } from '../../state/position';
 import getScroll from './get-scroll';
@@ -62,15 +63,16 @@ export default function useDroppableDimensionPublisher(args: Props) {
   }, [args.droppableId, args.type]);
   const publishedDescriptorRef = useRef<DroppableDescriptor>(descriptor);
 
-  const memoizedUpdateScroll = useCallback(
-    (x: number, y: number) => {
-      invariant(
-        whileDraggingRef.current,
-        'Can only update scroll when dragging',
-      );
-      const scroll: Position = { x, y };
-      marshal.updateDroppableScroll(descriptor.id, scroll);
-    },
+  const memoizedUpdateScroll = useMemo(
+    () =>
+      memoizeOne((x: number, y: number) => {
+        invariant(
+          whileDraggingRef.current,
+          'Can only update scroll when dragging',
+        );
+        const scroll: Position = { x, y };
+        marshal.updateDroppableScroll(descriptor.id, scroll);
+      }),
     [descriptor.id, marshal],
   );
 
@@ -222,7 +224,6 @@ export default function useDroppableDimensionPublisher(args: Props) {
   }, []);
 
   const callbacks: DroppableCallbacks = useMemo(() => {
-    console.log('creating callbacks');
     return {
       getDimensionAndWatchScroll,
       recollect,
@@ -245,7 +246,6 @@ export default function useDroppableDimensionPublisher(args: Props) {
         );
         dragStopped();
       }
-      console.log('goodbye droppable', descriptor);
 
       marshal.unregisterDroppable(descriptor);
     };

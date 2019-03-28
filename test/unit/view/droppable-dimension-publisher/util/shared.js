@@ -71,14 +71,6 @@ const withSpacing = getComputedSpacing({ padding, margin, border });
 
 export const descriptor: DroppableDescriptor = preset.home.descriptor;
 
-// static defaultProps = {
-//   isScrollable: true,
-//   type: descriptor.type,
-//   droppableId: descriptor.id,
-//   isDropDisabled: false,
-//   isCombineEnabled: false,
-// };
-
 type WithAppContextProps = {|
   marshal: DimensionMarshal,
   children: Node,
@@ -111,6 +103,8 @@ type ScrollableItemProps = {|
 export function ScrollableItem(props: ScrollableItemProps) {
   const droppableRef = createRef();
   const placeholderRef = createRef();
+  // originally tests where made with this as the default
+  const isScrollable: boolean = props.isScrollable !== false;
 
   useDroppableDimensionPublisher({
     droppableId: props.droppableId || descriptor.id,
@@ -131,8 +125,8 @@ export function ScrollableItem(props: ScrollableItemProps) {
         height: bigClient.borderBox.height,
         width: bigClient.borderBox.width,
         ...withSpacing,
-        overflowX: props.isScrollable ? 'scroll' : 'visible',
-        overflowY: props.isScrollable ? 'scroll' : 'visible',
+        overflowX: isScrollable ? 'scroll' : 'visible',
+        overflowY: isScrollable ? 'scroll' : 'visible',
       }}
       ref={droppableRef.setRef}
     >
