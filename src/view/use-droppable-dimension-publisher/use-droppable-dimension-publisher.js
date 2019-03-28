@@ -252,7 +252,11 @@ export default function useDroppableDimensionPublisher(args: Props) {
   }, [callbacks, descriptor, dragStopped, marshal]);
 
   // update is enabled with the marshal
+  // only need to update when there is a drag
   useLayoutEffect(() => {
+    if (!whileDraggingRef.current) {
+      return;
+    }
     marshal.updateDroppableIsEnabled(
       publishedDescriptorRef.current.id,
       !args.isDropDisabled,
@@ -260,7 +264,11 @@ export default function useDroppableDimensionPublisher(args: Props) {
   }, [args.isDropDisabled, marshal]);
 
   // update is combine enabled with the marshal
+  // only need to update when there is a drag
   useLayoutEffect(() => {
+    if (!whileDraggingRef.current) {
+      return;
+    }
     marshal.updateDroppableIsCombineEnabled(
       publishedDescriptorRef.current.id,
       args.isCombineEnabled,
