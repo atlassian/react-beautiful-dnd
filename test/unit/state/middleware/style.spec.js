@@ -20,8 +20,6 @@ const getMarshalStub = (): StyleMarshal => ({
   dragging: jest.fn(),
   dropping: jest.fn(),
   resting: jest.fn(),
-  mount: jest.fn(),
-  unmount: jest.fn(),
   styleContext: 'why hello there',
 });
 
