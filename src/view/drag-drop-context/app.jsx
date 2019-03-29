@@ -1,5 +1,5 @@
 // @flow
-import React, { useEffect, useLayoutEffect, useRef, type Node } from 'react';
+import React, { useEffect, useRef, type Node } from 'react';
 import { bindActionCreators } from 'redux';
 import { Provider } from 'react-redux';
 import createStore from '../../state/create-store';
@@ -33,6 +33,7 @@ import useStartupValidation from './use-startup-validation';
 import useMemoOne from '../use-custom-memo/use-memo-one';
 import useCallbackOne from '../use-custom-memo/use-callback-one';
 import { useConstant, useConstantFn } from '../use-constant';
+import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 
 type Props = {|
   ...Responders,
@@ -141,11 +142,11 @@ export default function App(props: Props) {
     }
   });
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     setOnError(tryResetStore);
   }, [setOnError, tryResetStore]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     tryResetStore();
   }, [tryResetStore]);
 

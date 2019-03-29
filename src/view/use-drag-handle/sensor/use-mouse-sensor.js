@@ -1,6 +1,6 @@
 // @flow
 import type { Position } from 'css-box-model';
-import { useRef, useLayoutEffect, useCallback, useMemo } from 'react';
+import { useRef, useCallback, useMemo } from 'react';
 import invariant from 'tiny-invariant';
 import type { EventBinding } from '../util/event-types';
 import createEventMarshal, {
@@ -367,11 +367,6 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     },
     [canStartCapturing, getIsCapturing, startPendingDrag],
   );
-
-  // When unmounting - cancel
-  // useLayoutEffect(() => {
-  //   return cancel;
-  // }, [cancel]);
 
   return onMouseDown;
 }

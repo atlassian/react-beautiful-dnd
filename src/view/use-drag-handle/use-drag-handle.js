@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { useLayoutEffect, useRef, useMemo, useCallback } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import type { Args, DragHandleProps } from './drag-handle-types';
 import getWindowFromEl from '../window/get-window-from-el';
 import useRequiredContext from '../use-required-context';
@@ -19,6 +19,7 @@ import usePreviousRef from '../use-previous-ref';
 import { warning } from '../../dev-warning';
 import useValidation from './use-validation';
 import useFocusRetainer from './use-focus-retainer';
+import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
@@ -165,7 +166,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
 
   // aborting on unmount
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     // only when unmounting
     return () => {
       if (!capturingRef.current) {
@@ -196,7 +197,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
   // No longer dragging but still capturing: need to abort
   // Using a layout effect to ensure that there is a flip from isDragging => !isDragging
   // When there is a pending drag !isDragging will always be true
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!isDragging && capturingRef.current) {
       abortCapture();
     }

@@ -1,10 +1,11 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { useRef, useCallback, useLayoutEffect } from 'react';
+import { useRef, useCallback } from 'react';
 import type { Args } from './drag-handle-types';
 import usePrevious from '../use-previous-ref';
 import focusRetainer from './util/focus-retainer';
 import getDragHandleRef from './util/get-drag-handle-ref';
+import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 
 export type Result = {|
   onBlur: () => void,
@@ -25,7 +26,7 @@ export default function useFocusRetainer(args: Args): Result {
     isFocusedRef.current = false;
   }, []);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     // mounting: try to restore focus
     const first: Args = lastArgsRef.current;
     if (!first.isEnabled) {
@@ -63,7 +64,7 @@ export default function useFocusRetainer(args: Args): Result {
 
   const lastDraggableRef = useRef<?HTMLElement>(getDraggableRef());
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const draggableRef: ?HTMLElement = getDraggableRef();
 
     // Cannot focus on nothing
@@ -84,7 +85,7 @@ export default function useFocusRetainer(args: Args): Result {
     // Doing our own should run check
   });
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     lastDraggableRef.current = getDraggableRef();
   });
 

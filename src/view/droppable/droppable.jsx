@@ -134,9 +134,6 @@ export default function Droppable(props: Props) {
   useValidation({
     props,
     getDroppableRef: () => droppableRef.current,
-    // Not checking on the first placement :(
-    // The droppable placeholder is not set yet as the useLayoutEffect + setState has not finished
-    shouldCheckPlaceholder: true,
     getPlaceholderRef: () => placeholderRef.current,
   });
 

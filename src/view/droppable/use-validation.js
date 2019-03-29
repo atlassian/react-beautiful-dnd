@@ -42,14 +42,12 @@ function checkPlaceholderRef(props: Props, placeholderEl: ?HTMLElement) {
 type Args = {|
   props: Props,
   getDroppableRef: () => ?HTMLElement,
-  shouldCheckPlaceholder: boolean,
   getPlaceholderRef: () => ?HTMLElement,
 |};
 
 export default function useValidation({
   props,
   getDroppableRef,
-  shouldCheckPlaceholder,
   getPlaceholderRef,
 }: Args) {
   // Running on every update
@@ -60,8 +58,6 @@ export default function useValidation({
 
     checkOwnProps(props);
     checkIsValidInnerRef(getDroppableRef());
-    if (shouldCheckPlaceholder) {
-      checkPlaceholderRef(props, getPlaceholderRef());
-    }
+    checkPlaceholderRef(props, getPlaceholderRef());
   });
 }

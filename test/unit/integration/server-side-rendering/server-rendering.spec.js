@@ -1,8 +1,7 @@
-// @flow
 /**
  * @jest-environment node
  */
-/* eslint-disable no-console */
+// @flow
 import React from 'react';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import invariant from 'tiny-invariant';
@@ -21,13 +20,15 @@ beforeEach(() => {
 
 afterEach(() => {
   consoleFunctions.forEach((name: string) => {
+    // eslint-disable-next-line no-console
     console[name].mockRestore();
   });
 });
 
 const expectConsoleNotCalled = () => {
   consoleFunctions.forEach((name: string) => {
-    console[name].not.toHaveBeenCalled();
+    // eslint-disable-next-line no-console
+    expect(console[name]).not.toHaveBeenCalled();
   });
 };
 
