@@ -18,6 +18,7 @@ import useTouchSensor, {
 import usePreviousRef from '../use-previous-ref';
 import { warning } from '../../dev-warning';
 import useValidation from './use-validation';
+import useFocusRetainer from './use-focus-retainer';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
@@ -63,6 +64,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     getShouldRespectForceTouch,
     canDragInteractiveElements,
   } = args;
+  const lastArgsRef = usePreviousRef(args);
 
   useValidation(getDraggableRef);
 
@@ -70,14 +72,6 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     (): HTMLElement => getWindowFromEl(getDraggableRef()),
     [getDraggableRef],
   );
-
-  const isFocusedRef = useRef<boolean>(false);
-  const onFocus = useCallback(() => {
-    isFocusedRef.current = true;
-  }, []);
-  const onBlur = useCallback(() => {
-    isFocusedRef.current = false;
-  }, []);
 
   const canStartCapturing = useCallback(
     (event: Event) => {
@@ -102,6 +96,8 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     },
     [canDragInteractiveElements, canLift, draggableId, isEnabled],
   );
+
+  const { onBlur, onFocus } = useFocusRetainer(args);
 
   const mouseArgs: MouseSensorArgs = useMemo(
     () => ({
@@ -168,7 +164,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
   const onTouchStart = useTouchSensor(touchArgs);
 
   // aborting on unmount
-  const lastArgsRef = usePreviousRef(args);
+
   useLayoutEffect(() => {
     // only when unmounting
     return () => {

@@ -75,6 +75,7 @@ class PortalAwareItem extends Component<ItemProps> {
     );
 
     if (!usePortal) {
+      console.warn('rendering out of portal');
       return child;
     }
 
@@ -149,6 +150,7 @@ export default class PortalApp extends Component<AppProps, AppState> {
                   )}
                 </Draggable>
               ))}
+              {droppableProvided.placeholder}
             </Container>
           )}
         </Droppable>

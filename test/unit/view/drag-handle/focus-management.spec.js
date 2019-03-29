@@ -1,30 +1,26 @@
 // @flow
 import React, { type Node } from 'react';
+import invariant from 'tiny-invariant';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
 import { mount } from 'enzyme';
 import type { ReactWrapper } from 'enzyme';
-import DragHandle from '../../../../src/view/drag-handle';
-import { styleKey, canLiftKey } from '../../../../src/view/context-keys';
-import type { DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
+import type { DragHandleProps } from '../../../../src/view/use-drag-handle/drag-handle-types';
 import { getStubCallbacks } from './util/callbacks';
-
-const options = {
-  context: {
-    [styleKey]: 'hello',
-    [canLiftKey]: () => true,
-  },
-  childContextTypes: {
-    [styleKey]: PropTypes.string.isRequired,
-    [canLiftKey]: PropTypes.func.isRequired,
-  },
-};
+import { WithDragHandle } from './util/wrappers';
+import { getMarshalStub } from '../../../utils/dimension-marshal';
+import AppContext, {
+  type AppContextValue,
+} from '../../../../src/view/context/app-context';
 
 const body: ?HTMLElement = document.body;
+invariant(body, 'Cannot find body');
 
-if (!body) {
-  throw new Error('document.body not found');
-}
+const appContext: AppContextValue = {
+  marshal: getMarshalStub(),
+  style: 'fake style context',
+  canLift: () => true,
+  isMovementAllowed: () => true,
+};
 
 describe('Portal usage (ref changing while mounted)', () => {
   type ChildProps = {|
@@ -51,7 +47,11 @@ describe('Portal usage (ref changing while mounted)', () => {
 
     render() {
       const child: Node = (
-        <div {...this.props.dragHandleProps} ref={this.props.setRef}>
+        <div
+          {...this.props.dragHandleProps}
+          ref={this.props.setRef}
+          className="drag-handle"
+        >
           Drag me!
         </div>
       );
@@ -75,35 +75,34 @@ describe('Portal usage (ref changing while mounted)', () => {
 
     render() {
       return (
-        <DragHandle
-          draggableId="child"
-          callbacks={getStubCallbacks()}
-          isDragging={false}
-          isDropAnimating={false}
-          isEnabled
-          getDraggableRef={() => this.ref}
-          canDragInteractiveElements={false}
-          getShouldRespectForceTouch={() => true}
-        >
-          {(dragHandleProps: ?DragHandleProps) => (
-            <Child
-              usePortal={this.props.usePortal}
-              dragHandleProps={dragHandleProps}
-              setRef={this.setRef}
-            />
-          )}
-        </DragHandle>
+        <AppContext.Provider value={appContext}>
+          <WithDragHandle
+            draggableId="child"
+            callbacks={getStubCallbacks()}
+            isDragging={false}
+            isDropAnimating={false}
+            isEnabled
+            getDraggableRef={() => this.ref}
+            canDragInteractiveElements={false}
+            getShouldRespectForceTouch={() => true}
+          >
+            {(dragHandleProps: ?DragHandleProps) => (
+              <Child
+                usePortal={this.props.usePortal}
+                dragHandleProps={dragHandleProps}
+                setRef={this.setRef}
+              />
+            )}
+          </WithDragHandle>
+        </AppContext.Provider>
       );
     }
   }
 
   it('should retain focus if draggable ref is changing and had focus', () => {
-    const wrapper = mount(
-      <WithParentRefAndPortalChild usePortal={false} />,
-      options,
-    );
+    const wrapper = mount(<WithParentRefAndPortalChild usePortal={false} />);
 
-    const original: HTMLElement = wrapper.getDOMNode();
+    const original: HTMLElement = wrapper.find('.drag-handle').getDOMNode();
     expect(original).not.toBe(document.activeElement);
 
     // giving it focus
@@ -116,17 +115,14 @@ describe('Portal usage (ref changing while mounted)', () => {
       usePortal: true,
     });
 
-    const inPortal: HTMLElement = wrapper.getDOMNode();
+    const inPortal: HTMLElement = wrapper.find('.drag-handle').getDOMNode();
     expect(inPortal).toBe(document.activeElement);
     expect(inPortal).not.toBe(original);
     expect(original).not.toBe(document.activeElement);
   });
 
   it('should not retain focus if draggable ref is changing and did not have focus', () => {
-    const wrapper = mount(
-      <WithParentRefAndPortalChild usePortal={false} />,
-      options,
-    );
+    const wrapper = mount(<WithParentRefAndPortalChild usePortal={false} />);
 
     const original: HTMLElement = wrapper.getDOMNode();
     expect(original).not.toBe(document.activeElement);
@@ -165,39 +161,45 @@ describe('Focus retention moving between lists (focus retention between mounts)'
 
     render() {
       return (
-        <DragHandle
-          draggableId={this.props.draggableId || 'draggable'}
-          callbacks={getStubCallbacks()}
-          isDragging={this.props.isDragging || false}
-          isDropAnimating={this.props.isDropAnimating || false}
-          isEnabled
-          getDraggableRef={() => this.ref}
-          canDragInteractiveElements={false}
-          getShouldRespectForceTouch={() => true}
-        >
-          {(dragHandleProps: ?DragHandleProps) => (
-            <div ref={this.setRef} {...dragHandleProps}>
-              Drag me!
-            </div>
-          )}
-        </DragHandle>
+        <AppContext.Provider value={appContext}>
+          <WithDragHandle
+            draggableId={this.props.draggableId || 'draggable'}
+            callbacks={getStubCallbacks()}
+            isDragging={this.props.isDragging || false}
+            isDropAnimating={this.props.isDropAnimating || false}
+            isEnabled
+            getDraggableRef={() => this.ref}
+            canDragInteractiveElements={false}
+            getShouldRespectForceTouch={() => true}
+          >
+            {(dragHandleProps: ?DragHandleProps) => (
+              <div
+                ref={this.setRef}
+                {...dragHandleProps}
+                className="drag-handle"
+              >
+                Drag me!
+              </div>
+            )}
+          </WithDragHandle>
+        </AppContext.Provider>
       );
     }
   }
 
   it('should maintain focus if unmounting while dragging', () => {
-    const first: ReactWrapper<*> = mount(<WithParentRef isDragging />, options);
+    const first: ReactWrapper<*> = mount(<WithParentRef isDragging />);
     const original: HTMLElement = first.getDOMNode();
     expect(original).not.toBe(document.activeElement);
 
     // get focus
     original.focus();
-    first.find(DragHandle).simulate('focus');
+    first.find('.drag-handle').simulate('focus');
     expect(original).toBe(document.activeElement);
 
     first.unmount();
 
-    const second: ReactWrapper<*> = mount(<WithParentRef />, options);
+    const second: ReactWrapper<*> = mount(<WithParentRef />);
     const latest: HTMLElement = second.getDOMNode();
     expect(latest).toBe(document.activeElement);
     // validation
@@ -209,21 +211,18 @@ describe('Focus retention moving between lists (focus retention between mounts)'
   });
 
   it('should maintain focus if unmounting while drop animating', () => {
-    const first: ReactWrapper<*> = mount(
-      <WithParentRef isDropAnimating />,
-      options,
-    );
+    const first: ReactWrapper<*> = mount(<WithParentRef isDropAnimating />);
     const original: HTMLElement = first.getDOMNode();
     expect(original).not.toBe(document.activeElement);
 
     // get focus
     original.focus();
-    first.find(DragHandle).simulate('focus');
+    first.find('.drag-handle').simulate('focus');
     expect(original).toBe(document.activeElement);
 
     first.unmount();
 
-    const second: ReactWrapper<*> = mount(<WithParentRef />, options);
+    const second: ReactWrapper<*> = mount(<WithParentRef />);
     const latest: HTMLElement = second.getDOMNode();
     expect(latest).toBe(document.activeElement);
     // validation
@@ -238,20 +237,19 @@ describe('Focus retention moving between lists (focus retention between mounts)'
   it('should not maintain focus if the item was not dragging or drop animating', () => {
     const first: ReactWrapper<*> = mount(
       <WithParentRef isDragging={false} isDropAnimating={false} />,
-      options,
     );
     const original: HTMLElement = first.getDOMNode();
     expect(original).not.toBe(document.activeElement);
 
     // get focus
     original.focus();
-    first.find(DragHandle).simulate('focus');
+    first.find('.drag-handle').simulate('focus');
     expect(original).toBe(document.activeElement);
 
     first.unmount();
 
     // will not get focus as it was not previously dragging or drop animating
-    const second: ReactWrapper<*> = mount(<WithParentRef />, options);
+    const second: ReactWrapper<*> = mount(<WithParentRef />);
     const latest: HTMLElement = second.getDOMNode();
     expect(latest).not.toBe(document.activeElement);
     // validation
@@ -260,13 +258,13 @@ describe('Focus retention moving between lists (focus retention between mounts)'
   });
 
   it('should not give focus to something that was not previously focused', () => {
-    const first: ReactWrapper<*> = mount(<WithParentRef isDragging />, options);
+    const first: ReactWrapper<*> = mount(<WithParentRef isDragging />);
     const original: HTMLElement = first.getDOMNode();
 
     expect(original).not.toBe(document.activeElement);
     first.unmount();
 
-    const second: ReactWrapper<*> = mount(<WithParentRef />, options);
+    const second: ReactWrapper<*> = mount(<WithParentRef />);
     const latest: HTMLElement = second.getDOMNode();
     expect(latest).not.toBe(document.activeElement);
     // validation
@@ -280,30 +278,25 @@ describe('Focus retention moving between lists (focus retention between mounts)'
   it('should maintain focus if another component is mounted before the focused component', () => {
     const first: ReactWrapper<*> = mount(
       <WithParentRef draggableId="first" isDragging />,
-      options,
     );
     const original: HTMLElement = first.getDOMNode();
     expect(original).not.toBe(document.activeElement);
 
     // get focus
     original.focus();
-    first.find(DragHandle).simulate('focus');
+    first.find('.drag-handle').simulate('focus');
     expect(original).toBe(document.activeElement);
 
     // unmounting the first
     first.unmount();
 
     // mounting something with a different id
-    const other: ReactWrapper<*> = mount(
-      <WithParentRef draggableId="other" />,
-      options,
-    );
+    const other: ReactWrapper<*> = mount(<WithParentRef draggableId="other" />);
     expect(other.getDOMNode()).not.toBe(document.activeElement);
 
     // mounting something with the same id as the first
     const second: ReactWrapper<*> = mount(
       <WithParentRef draggableId="first" />,
-      options,
     );
     const latest: HTMLElement = second.getDOMNode();
     expect(latest).toBe(document.activeElement);
@@ -314,22 +307,19 @@ describe('Focus retention moving between lists (focus retention between mounts)'
   });
 
   it('should only maintain focus once', () => {
-    const first: ReactWrapper<*> = mount(
-      <WithParentRef isDropAnimating />,
-      options,
-    );
+    const first: ReactWrapper<*> = mount(<WithParentRef isDropAnimating />);
     const original: HTMLElement = first.getDOMNode();
     expect(original).not.toBe(document.activeElement);
 
     // get focus
     original.focus();
-    first.find(DragHandle).simulate('focus');
+    first.find('.drag-handle').simulate('focus');
     expect(original).toBe(document.activeElement);
 
     first.unmount();
 
     // obtaining focus on first remount
-    const second: ReactWrapper<*> = mount(<WithParentRef />, options);
+    const second: ReactWrapper<*> = mount(<WithParentRef />);
     const latest: HTMLElement = second.getDOMNode();
     expect(latest).toBe(document.activeElement);
     // validation
@@ -339,7 +329,7 @@ describe('Focus retention moving between lists (focus retention between mounts)'
     second.unmount();
 
     // should not obtain focus on the second remount
-    const third: ReactWrapper<*> = mount(<WithParentRef />, options);
+    const third: ReactWrapper<*> = mount(<WithParentRef />);
     expect(third.getDOMNode()).not.toBe(document.activeElement);
 
     // cleanup
@@ -350,16 +340,13 @@ describe('Focus retention moving between lists (focus retention between mounts)'
     // eslint-disable-next-line react/button-has-type
     const button: HTMLElement = document.createElement('button');
     body.appendChild(button);
-    const first: ReactWrapper<*> = mount(
-      <WithParentRef isDropAnimating />,
-      options,
-    );
+    const first: ReactWrapper<*> = mount(<WithParentRef isDropAnimating />);
     const original: HTMLElement = first.getDOMNode();
     expect(original).not.toBe(document.activeElement);
 
     // get focus
     original.focus();
-    first.find(DragHandle).simulate('focus');
+    first.find('.drag-handle').simulate('focus');
     expect(original).toBe(document.activeElement);
 
     first.unmount();
@@ -369,7 +356,7 @@ describe('Focus retention moving between lists (focus retention between mounts)'
     expect(button).toBe(document.activeElement);
 
     // remount should now not claim focus
-    const second: ReactWrapper<*> = mount(<WithParentRef />, options);
+    const second: ReactWrapper<*> = mount(<WithParentRef />);
     expect(second.getDOMNode()).not.toBe(document.activeElement);
     // focus maintained on button
     expect(button).toBe(document.activeElement);
