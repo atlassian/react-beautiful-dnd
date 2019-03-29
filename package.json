@@ -111,7 +111,7 @@
     "raf-stub": "^2.0.2",
     "react": "16.8.6",
     "react-dom": "16.8.6",
-    "react-test-renderer": "16.8.5",
+    "react-test-renderer": "16.8.6",
     "rimraf": "^2.6.3",
     "rollup": "^1.7.3",
     "rollup-plugin-babel": "^4.3.2",
