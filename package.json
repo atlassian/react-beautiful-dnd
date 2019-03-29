@@ -109,7 +109,7 @@
     "markdown-it": "^8.4.2",
     "prettier": "^1.16.4",
     "raf-stub": "^2.0.2",
-    "react": "16.8.5",
+    "react": "16.8.6",
     "react-dom": "16.8.5",
     "react-test-renderer": "16.8.5",
     "rimraf": "^2.6.3",
