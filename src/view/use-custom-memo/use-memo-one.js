@@ -9,7 +9,7 @@ export default function useMemoOne<T>(
   inputs?: mixed[] = [],
 ): T {
   const isFirstCallRef = useRef<boolean>(true);
-  const lastInputsRef = useRef<any[]>(inputs);
+  const lastInputsRef = useRef<mixed[]>(inputs);
   // Cannot lazy create a ref value, so setting to null
   // $ExpectError - T is not null
   const resultRef = useRef<T>(null);
