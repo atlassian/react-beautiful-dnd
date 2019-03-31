@@ -1,11 +1,12 @@
 // @flow
-import { useRef, useCallback, useEffect, useMemo } from 'react';
-import invariant from 'tiny-invariant';
+import { useRef, useCallback, useMemo } from 'react';
 import memoizeOne from 'memoize-one';
-import getStyles, { type Styles } from './get-styles';
-import { prefix } from '../data-attributes';
+import invariant from 'tiny-invariant';
 import type { StyleMarshal } from './style-marshal-types';
 import type { DropReason } from '../../types';
+import getStyles, { type Styles } from './get-styles';
+import { prefix } from '../data-attributes';
+import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 
 const getHead = (): HTMLHeadElement => {
   const head: ?HTMLHeadElement = document.querySelector('head');
@@ -43,7 +44,8 @@ export default function useStyleMarshal(uniqueId: number) {
     el.textContent = proposed;
   }, []);
 
-  useEffect(() => {
+  // using layout effect as programatic dragging might start straight away (such as for cypress)
+  useIsomorphicLayoutEffect(() => {
     invariant(
       !alwaysRef.current && !dynamicRef.current,
       'style elements already mounted',
