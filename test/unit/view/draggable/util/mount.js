@@ -9,7 +9,6 @@ import type {
   Provided,
   StateSnapshot,
 } from '../../../../../src/view/draggable/draggable-types';
-import type { StyleMarshal } from '../../../../../src/view/use-style-marshal/style-marshal-types';
 import {
   atRestMapProps,
   getDispatchPropsStub,

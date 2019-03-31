@@ -75,7 +75,6 @@ class PortalAwareItem extends Component<ItemProps> {
     );
 
     if (!usePortal) {
-      console.warn('rendering out of portal');
       return child;
     }
 

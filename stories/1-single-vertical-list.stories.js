@@ -7,7 +7,7 @@ import { quotes, getQuotes } from './src/data';
 import { grid } from './src/constants';
 
 const data = {
-  small: quotes.slice(0, 2),
+  small: quotes,
   medium: getQuotes(40),
   large: getQuotes(500),
 };
