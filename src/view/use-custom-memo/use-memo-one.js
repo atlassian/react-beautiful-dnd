@@ -26,7 +26,8 @@ export default function useMemoOne<T>(
     return resultRef.current;
   }
 
-  lastInputsRef.current = inputs;
+  // try to generate result first in case it throws
   resultRef.current = getResult();
+  lastInputsRef.current = inputs;
   return resultRef.current;
 }
