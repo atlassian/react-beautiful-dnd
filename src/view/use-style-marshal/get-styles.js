@@ -115,13 +115,6 @@ export default (uniqueContext: string): Styles => {
     };
   })();
 
-  const placeholder: Rule = {
-    selector: getSelector(attributes.placeholder),
-    styles: {
-      always: noPointerEvents,
-    },
-  };
-
   // ## Droppable styles
 
   // overflow-anchor: none;
@@ -166,7 +159,7 @@ export default (uniqueContext: string): Styles => {
     },
   };
 
-  const rules: Rule[] = [draggable, dragHandle, droppable, body, placeholder];
+  const rules: Rule[] = [draggable, dragHandle, droppable, body];
 
   return {
     always: getStyles(rules, 'always'),
