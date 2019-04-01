@@ -43,13 +43,13 @@ const getCode = async ({ mode }): Promise<string> => {
 
   const inputOptions = {
     input: './src/index.js',
-    external: ['react'],
+    external: ['react', 'react-dom'],
     plugins,
   };
   const outputOptions = {
     format: 'umd',
     name: 'ReactBeautifulDnd',
-    globals: { react: 'React' },
+    globals: { react: 'React', 'react-dom': 'ReactDOM' },
   };
   const bundle = await rollup(inputOptions);
   const result = await bundle.generate(outputOptions);
