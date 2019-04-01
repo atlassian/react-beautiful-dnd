@@ -7,7 +7,7 @@ import setWindowScroll from '../../../utils/set-window-scroll';
 import {
   timeForLongPress,
   forcePressThreshold,
-} from '../../../../src/view/use-drag-handle/sensor/create-touch-sensor';
+} from '../../../../src/view/use-drag-handle/sensor/use-touch-sensor';
 import {
   dispatchWindowEvent,
   dispatchWindowKeyDownEvent,
