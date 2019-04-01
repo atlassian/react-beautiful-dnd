@@ -1,11 +1,12 @@
 // @flow
 import type { Position } from 'css-box-model';
-import { useRef, useCallback, useMemo } from 'react';
+import { useRef } from 'react';
 import invariant from 'tiny-invariant';
 import type { EventBinding } from '../util/event-types';
 import createEventMarshal, {
   type EventMarshal,
 } from '../util/create-event-marshal';
+import type { Callbacks } from '../drag-handle-types';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import createScheduler from '../util/create-scheduler';
 import { warning } from '../../../dev-warning';
@@ -16,8 +17,8 @@ import createPostDragEventPreventer, {
 } from '../util/create-post-drag-event-preventer';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
-import type { Callbacks } from '../drag-handle-types';
-// import useMemo from '../../use-custom-memo/use-memo-one';
+import useCallbackOne from '../../use-custom-memo/use-callback-one';
+import useMemoOne from '../../use-custom-memo/use-memo-one';
 
 export type Args = {|
   callbacks: Callbacks,
@@ -55,12 +56,12 @@ export default function useMouseSensor(args: Args): OnMouseDown {
   const pendingRef = useRef<?Position>(null);
   const isDraggingRef = useRef<boolean>(false);
   const unbindWindowEventsRef = useRef<() => void>(noop);
-  const getIsCapturing = useCallback(
+  const getIsCapturing = useCallbackOne(
     () => Boolean(pendingRef.current || isDraggingRef.current),
     [],
   );
 
-  const schedule = useMemo(() => {
+  const schedule = useMemoOne(() => {
     invariant(
       !getIsCapturing(),
       'Should not recreate scheduler while capturing',
@@ -68,12 +69,12 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     return createScheduler(callbacks);
   }, [callbacks, getIsCapturing]);
 
-  const postDragEventPreventer: EventPreventer = useMemo(
+  const postDragEventPreventer: EventPreventer = useMemoOne(
     () => createPostDragEventPreventer(getWindow),
     [getWindow],
   );
 
-  const stop = useCallback(() => {
+  const stop = useCallbackOne(() => {
     if (!getIsCapturing()) {
       return;
     }
@@ -95,7 +96,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     onCaptureEnd();
   }, [getIsCapturing, onCaptureEnd, postDragEventPreventer, schedule]);
 
-  const cancel = useCallback(() => {
+  const cancel = useCallbackOne(() => {
     const wasDragging: boolean = isDraggingRef.current;
     stop();
 
@@ -104,7 +105,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     }
   }, [callbacks, stop]);
 
-  const startDragging = useCallback(() => {
+  const startDragging = useCallbackOne(() => {
     invariant(!isDraggingRef.current, 'Cannot start a drag while dragging');
     const pending: ?Position = pendingRef.current;
     invariant(pending, 'Cannot start a drag without a pending drag');
@@ -118,7 +119,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     });
   }, [callbacks]);
 
-  const windowBindings: EventBinding[] = useMemo(() => {
+  const windowBindings: EventBinding[] = useMemoOne(() => {
     invariant(
       !getIsCapturing(),
       'Should not recreate window bindings while capturing',
@@ -296,7 +297,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     getShouldRespectForceTouch,
   ]);
 
-  const bindWindowEvents = useCallback(() => {
+  const bindWindowEvents = useCallbackOne(() => {
     const win: HTMLElement = getWindow();
     const options = { capture: true };
 
@@ -307,7 +308,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     bindEvents(win, windowBindings, options);
   }, [getWindow, windowBindings]);
 
-  const startPendingDrag = useCallback(
+  const startPendingDrag = useCallbackOne(
     (point: Position) => {
       invariant(!pendingRef.current, 'Expected there to be no pending drag');
       pendingRef.current = point;
@@ -317,7 +318,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     [bindWindowEvents, onCaptureStart, stop],
   );
 
-  const onMouseDown = useCallback(
+  const onMouseDown = useCallbackOne(
     (event: MouseEvent) => {
       if (mouseDownMarshal.isHandled()) {
         return;

@@ -1,5 +1,5 @@
 // @flow
-import { useMemo, useRef, useCallback } from 'react';
+import { useRef } from 'react';
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import getStyle from './get-style';
@@ -21,14 +21,16 @@ import getWindowScroll from '../window/get-window-scroll';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useRequiredContext from '../use-required-context';
 import useValidation from './use-validation';
+import useCallbackOne from '../use-custom-memo/use-callback-one';
+import useMemoOne from '../use-custom-memo/use-memo-one';
 
 export default function Draggable(props: Props) {
   // reference to DOM node
   const ref = useRef<?HTMLElement>(null);
-  const setRef = useCallback((el: ?HTMLElement) => {
+  const setRef = useCallbackOne((el: ?HTMLElement) => {
     ref.current = el;
   }, []);
-  const getRef = useCallback((): ?HTMLElement => ref.current, []);
+  const getRef = useCallbackOne((): ?HTMLElement => ref.current, []);
 
   // context
   const appContext: AppContextValue = useRequiredContext(AppContext);
@@ -62,7 +64,7 @@ export default function Draggable(props: Props) {
   } = props;
 
   // The dimension publisher: talks to the marshal
-  const forPublisher: DimensionPublisherArgs = useMemo(
+  const forPublisher: DimensionPublisherArgs = useMemoOne(
     () => ({
       draggableId,
       index,
@@ -74,7 +76,7 @@ export default function Draggable(props: Props) {
 
   // The Drag handle
 
-  const onLift = useCallback(
+  const onLift = useCallbackOne(
     (options: { clientSelection: Position, movementMode: MovementMode }) => {
       timings.start('LIFT');
       const el: ?HTMLElement = ref.current;
@@ -92,12 +94,12 @@ export default function Draggable(props: Props) {
     [draggableId, isDragDisabled, liftAction],
   );
 
-  const getShouldRespectForceTouch = useCallback(
+  const getShouldRespectForceTouch = useCallbackOne(
     () => shouldRespectForceTouch,
     [shouldRespectForceTouch],
   );
 
-  const callbacks: DragHandleCallbacks = useMemo(
+  const callbacks: DragHandleCallbacks = useMemoOne(
     () => ({
       onLift,
       onMove: (clientSelection: Position) =>
@@ -129,7 +131,7 @@ export default function Draggable(props: Props) {
   const isDropAnimating: boolean =
     mapped.type === 'DRAGGING' && Boolean(mapped.dropping);
 
-  const dragHandleArgs: DragHandleArgs = useMemo(
+  const dragHandleArgs: DragHandleArgs = useMemoOne(
     () => ({
       draggableId,
       isDragging,
@@ -154,7 +156,7 @@ export default function Draggable(props: Props) {
 
   const dragHandleProps: ?DragHandleProps = useDragHandle(dragHandleArgs);
 
-  const onMoveEnd = useCallback(
+  const onMoveEnd = useCallbackOne(
     (event: TransitionEvent) => {
       if (mapped.type !== 'DRAGGING') {
         return;
@@ -175,7 +177,7 @@ export default function Draggable(props: Props) {
     [dropAnimationFinishedAction, mapped],
   );
 
-  const provided: Provided = useMemo(() => {
+  const provided: Provided = useMemoOne(() => {
     const style: DraggableStyle = getStyle(mapped);
     const onTransitionEnd =
       mapped.type === 'DRAGGING' && mapped.dropping ? onMoveEnd : null;

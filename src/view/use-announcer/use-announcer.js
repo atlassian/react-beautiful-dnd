@@ -1,9 +1,11 @@
 // @flow
-import { useRef, useMemo, useEffect, useCallback } from 'react';
+import { useRef, useEffect } from 'react';
 import invariant from 'tiny-invariant';
 import type { Announce } from '../../types';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';
+import useMemoOne from '../use-custom-memo/use-memo-one';
+import useCallbackOne from '../use-custom-memo/use-callback-one';
 
 // https://allyjs.io/tutorials/hiding-elements.html
 // Element is visually hidden but is readable by screen readers
@@ -24,7 +26,7 @@ export const getId = (uniqueId: number): string =>
   `react-beautiful-dnd-announcement-${uniqueId}`;
 
 export default function useAnnouncer(uniqueId: number): Announce {
-  const id: string = useMemo(() => getId(uniqueId), [uniqueId]);
+  const id: string = useMemoOne(() => getId(uniqueId), [uniqueId]);
   const ref = useRef<?HTMLElement>(null);
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export default function useAnnouncer(uniqueId: number): Announce {
     };
   }, [id]);
 
-  const announce: Announce = useCallback((message: string): void => {
+  const announce: Announce = useCallbackOne((message: string): void => {
     const el: ?HTMLElement = ref.current;
     if (el) {
       el.textContent = message;

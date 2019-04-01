@@ -1,11 +1,5 @@
 // @flow
-import React, {
-  useState,
-  useRef,
-  useCallback,
-  useEffect,
-  type Node,
-} from 'react';
+import React, { useState, useRef, useEffect, type Node } from 'react';
 import type { Spacing } from 'css-box-model';
 import type {
   Placeholder as PlaceholderType,
@@ -13,6 +7,7 @@ import type {
 } from '../../types';
 import { transitions } from '../../animation';
 import { noSpacing } from '../../state/spacing';
+import useCallbackOne from '../use-custom-memo/use-callback-one';
 
 function noop() {}
 
@@ -121,7 +116,7 @@ const getStyle = ({
 function Placeholder(props: Props): Node {
   const animateOpenTimerRef = useRef<?TimeoutID>(null);
 
-  const tryClearAnimateOpenTimer = useCallback(() => {
+  const tryClearAnimateOpenTimer = useCallbackOne(() => {
     if (!animateOpenTimerRef.current) {
       return;
     }
@@ -164,7 +159,7 @@ function Placeholder(props: Props): Node {
     return tryClearAnimateOpenTimer;
   }, [animate, isAnimatingOpenOnMount, tryClearAnimateOpenTimer]);
 
-  const onSizeChangeEnd = useCallback(
+  const onSizeChangeEnd = useCallbackOne(
     (event: TransitionEvent) => {
       // We transition height, width and margin
       // each of those transitions will independently call this callback

@@ -1,11 +1,12 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { useRef, useCallback } from 'react';
+import { useRef } from 'react';
 import type { Args } from './drag-handle-types';
 import usePrevious from '../use-previous-ref';
 import focusRetainer from './util/focus-retainer';
 import getDragHandleRef from './util/get-drag-handle-ref';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
+import useCallbackOne from '../use-custom-memo/use-callback-one';
 
 export type Result = {|
   onBlur: () => void,
@@ -19,10 +20,10 @@ export default function useFocusRetainer(args: Args): Result {
   const lastArgsRef = usePrevious<Args>(args);
   const { getDraggableRef } = args;
 
-  const onFocus = useCallback(() => {
+  const onFocus = useCallbackOne(() => {
     isFocusedRef.current = true;
   }, []);
-  const onBlur = useCallback(() => {
+  const onBlur = useCallbackOne(() => {
     isFocusedRef.current = false;
   }, []);
 

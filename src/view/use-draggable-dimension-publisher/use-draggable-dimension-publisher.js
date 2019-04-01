@@ -1,5 +1,5 @@
 // @flow
-import { useMemo, useRef, useCallback } from 'react';
+import { useRef } from 'react';
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import type {
@@ -15,6 +15,8 @@ import DroppableContext, {
   type DroppableContextValue,
 } from '../context/droppable-context';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
+import useMemoOne from '../use-custom-memo/use-memo-one';
+import useCallbackOne from '../use-custom-memo/use-callback-one';
 
 export type Args = {|
   draggableId: DraggableId,
@@ -34,7 +36,7 @@ export default function useDraggableDimensionPublisher(args: Args) {
   );
   const { droppableId, type } = droppableContext;
 
-  const descriptor: DraggableDescriptor = useMemo(() => {
+  const descriptor: DraggableDescriptor = useMemoOne(() => {
     const result = {
       id: draggableId,
       droppableId,
@@ -46,7 +48,7 @@ export default function useDraggableDimensionPublisher(args: Args) {
 
   const publishedDescriptorRef = useRef<DraggableDescriptor>(descriptor);
 
-  const makeDimension = useCallback(
+  const makeDimension = useCallbackOne(
     (windowScroll?: Position): DraggableDimension => {
       const latest: DraggableDescriptor = publishedDescriptorRef.current;
       const el: ?HTMLElement = getDraggableRef();

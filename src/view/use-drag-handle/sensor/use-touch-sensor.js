@@ -1,11 +1,12 @@
 // @flow
 import type { Position } from 'css-box-model';
-import { useRef, useCallback, useMemo } from 'react';
+import { useRef } from 'react';
 import invariant from 'tiny-invariant';
 import type { EventBinding } from '../util/event-types';
 import createEventMarshal, {
   type EventMarshal,
 } from '../util/create-event-marshal';
+import type { Callbacks } from '../drag-handle-types';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import createScheduler from '../util/create-scheduler';
 import * as keyCodes from '../../key-codes';
@@ -13,7 +14,8 @@ import supportedPageVisibilityEventName from '../util/supported-page-visibility-
 import createPostDragEventPreventer, {
   type EventPreventer,
 } from '../util/create-post-drag-event-preventer';
-import type { Callbacks } from '../drag-handle-types';
+import useCallbackOne from '../../use-custom-memo/use-callback-one';
+import useMemoOne from '../../use-custom-memo/use-memo-one';
 
 export type Args = {|
   callbacks: Callbacks,
@@ -117,16 +119,16 @@ export default function useTouchSensor(args: Args): OnTouchStart {
   const isDraggingRef = useRef<boolean>(false);
   const hasMovedRef = useRef<boolean>(false);
   const unbindWindowEventsRef = useRef<() => void>(noop);
-  const getIsCapturing = useCallback(
+  const getIsCapturing = useCallbackOne(
     () => Boolean(pendingRef.current || isDraggingRef.current),
     [],
   );
-  const postDragClickPreventer: EventPreventer = useMemo(
+  const postDragClickPreventer: EventPreventer = useMemoOne(
     () => createPostDragEventPreventer(getWindow),
     [getWindow],
   );
 
-  const schedule = useMemo(() => {
+  const schedule = useMemoOne(() => {
     invariant(
       !getIsCapturing(),
       'Should not recreate scheduler while capturing',
@@ -134,7 +136,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     return createScheduler(callbacks);
   }, [callbacks, getIsCapturing]);
 
-  const stop = useCallback(() => {
+  const stop = useCallbackOne(() => {
     if (!getIsCapturing()) {
       return;
     }
@@ -160,7 +162,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     pendingRef.current = null;
   }, [getIsCapturing, onCaptureEnd, postDragClickPreventer, schedule]);
 
-  const cancel = useCallback(() => {
+  const cancel = useCallbackOne(() => {
     const wasDragging: boolean = isDraggingRef.current;
     stop();
 
@@ -169,7 +171,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     }
   }, [callbacks, stop]);
 
-  const windowBindings: EventBinding[] = useMemo(() => {
+  const windowBindings: EventBinding[] = useMemoOne(() => {
     invariant(
       !getIsCapturing(),
       'Should not recreate window bindings while capturing',
@@ -350,7 +352,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     stop,
   ]);
 
-  const bindWindowEvents = useCallback(() => {
+  const bindWindowEvents = useCallbackOne(() => {
     const win: HTMLElement = getWindow();
     const options = { capture: true };
 
@@ -361,7 +363,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     bindEvents(win, windowBindings, options);
   }, [getWindow, windowBindings]);
 
-  const startDragging = useCallback(() => {
+  const startDragging = useCallbackOne(() => {
     const pending: ?PendingDrag = pendingRef.current;
     invariant(pending, 'Cannot start a drag without a pending drag');
 
@@ -375,7 +377,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     });
   }, [callbacks]);
 
-  const startPendingDrag = useCallback(
+  const startPendingDrag = useCallbackOne(
     (event: TouchEvent) => {
       invariant(!pendingRef.current, 'Expected there to be no pending drag');
       const touch: Touch = event.touches[0];

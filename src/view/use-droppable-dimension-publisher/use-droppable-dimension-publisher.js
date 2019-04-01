@@ -1,5 +1,5 @@
 // @flow
-import { useCallback, useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import rafSchedule from 'raf-schd';
@@ -29,6 +29,8 @@ import getListenerOptions from './get-listener-options';
 import useRequiredContext from '../use-required-context';
 import usePreviousRef from '../use-previous-ref';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
+import useMemoOne from '../use-custom-memo/use-memo-one';
+import useCallbackOne from '../use-custom-memo/use-callback-one';
 
 type Props = {|
   droppableId: DroppableId,
@@ -56,7 +58,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
   const appContext: AppContextValue = useRequiredContext(AppContext);
   const marshal: DimensionMarshal = appContext.marshal;
   const previousRef: { current: Props } = usePreviousRef(args);
-  const descriptor: DroppableDescriptor = useMemo((): DroppableDescriptor => {
+  const descriptor: DroppableDescriptor = useMemoOne((): DroppableDescriptor => {
     return {
       id: args.droppableId,
       type: args.type,
@@ -64,7 +66,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
   }, [args.droppableId, args.type]);
   const publishedDescriptorRef = useRef<DroppableDescriptor>(descriptor);
 
-  const memoizedUpdateScroll = useMemo(
+  const memoizedUpdateScroll = useMemoOne(
     () =>
       memoizeOne((x: number, y: number) => {
         invariant(
@@ -77,7 +79,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
     [descriptor.id, marshal],
   );
 
-  const getClosestScroll = useCallback((): Position => {
+  const getClosestScroll = useCallbackOne((): Position => {
     const dragging: ?WhileDragging = whileDraggingRef.current;
     if (!dragging || !dragging.env.closestScrollable) {
       return origin;
@@ -86,16 +88,16 @@ export default function useDroppableDimensionPublisher(args: Props) {
     return getScroll(dragging.env.closestScrollable);
   }, []);
 
-  const updateScroll = useCallback(() => {
+  const updateScroll = useCallbackOne(() => {
     const scroll: Position = getClosestScroll();
     memoizedUpdateScroll(scroll.x, scroll.y);
   }, [getClosestScroll, memoizedUpdateScroll]);
 
-  const scheduleScrollUpdate = useMemo(() => rafSchedule(updateScroll), [
+  const scheduleScrollUpdate = useMemoOne(() => rafSchedule(updateScroll), [
     updateScroll,
   ]);
 
-  const onClosestScroll = useCallback(() => {
+  const onClosestScroll = useCallbackOne(() => {
     const dragging: ?WhileDragging = whileDraggingRef.current;
     const closest: ?Element = getClosestScrollableFromDrag(dragging);
 
@@ -111,7 +113,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
     scheduleScrollUpdate();
   }, [scheduleScrollUpdate, updateScroll]);
 
-  const getDimensionAndWatchScroll = useCallback(
+  const getDimensionAndWatchScroll = useCallbackOne(
     (windowScroll: Position, options: ScrollOptions) => {
       invariant(
         !whileDraggingRef.current,
@@ -160,7 +162,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
     },
     [descriptor, onClosestScroll, previousRef],
   );
-  const recollect = useCallback(
+  const recollect = useCallbackOne(
     (options: RecollectDroppableOptions): DroppableDimension => {
       const dragging: ?WhileDragging = whileDraggingRef.current;
       const closest: ?Element = getClosestScrollableFromDrag(dragging);
@@ -191,7 +193,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
     },
     [previousRef],
   );
-  const dragStopped = useCallback(() => {
+  const dragStopped = useCallbackOne(() => {
     const dragging: ?WhileDragging = whileDraggingRef.current;
     invariant(dragging, 'Cannot stop drag when no active drag');
     const closest: ?Element = getClosestScrollableFromDrag(dragging);
@@ -212,7 +214,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
     );
   }, [onClosestScroll, scheduleScrollUpdate]);
 
-  const scroll = useCallback((change: Position) => {
+  const scroll = useCallbackOne((change: Position) => {
     // arrange
     const dragging: ?WhileDragging = whileDraggingRef.current;
     invariant(dragging, 'Cannot scroll when there is no drag');
@@ -224,7 +226,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
     closest.scrollLeft += change.x;
   }, []);
 
-  const callbacks: DroppableCallbacks = useMemo(() => {
+  const callbacks: DroppableCallbacks = useMemoOne(() => {
     return {
       getDimensionAndWatchScroll,
       recollect,

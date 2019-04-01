@@ -20,6 +20,9 @@ export function resetServerContext() {
 
 export default function DragDropContext(props: Props) {
   const uniqueId: number = useMemoOne(() => instanceCount++, []);
+
+  // We need the error boundary to be on the outside of App
+  // so that it can catch any errors caused by App
   return (
     <ErrorBoundary>
       {setOnError => (

@@ -1,12 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import React, {
-  useMemo,
-  useRef,
-  useCallback,
-  useContext,
-  type Node,
-} from 'react';
+import React, { useRef, useContext, type Node } from 'react';
 import type { Props, Provided } from './droppable-types';
 import useDroppableDimensionPublisher from '../use-droppable-dimension-publisher';
 import Placeholder from '../placeholder';
@@ -20,6 +14,8 @@ import useValidation from './use-validation';
 import AnimateInOut, {
   type AnimateProvided,
 } from '../animate-in-out/animate-in-out';
+import useCallbackOne from '../use-custom-memo/use-callback-one';
+import useMemoOne from '../use-custom-memo/use-memo-one';
 
 export default function Droppable(props: Props) {
   const appContext: ?AppContextValue = useContext<?AppContextValue>(AppContext);
@@ -45,22 +41,22 @@ export default function Droppable(props: Props) {
     updateViewportMaxScroll,
   } = props;
 
-  const getDroppableRef = useCallback(
+  const getDroppableRef = useCallbackOne(
     (): ?HTMLElement => droppableRef.current,
     [],
   );
-  const getPlaceholderRef = useCallback(
+  const getPlaceholderRef = useCallbackOne(
     (): ?HTMLElement => placeholderRef.current,
     [],
   );
-  const setDroppableRef = useCallback((value: ?HTMLElement) => {
+  const setDroppableRef = useCallbackOne((value: ?HTMLElement) => {
     droppableRef.current = value;
   }, []);
-  const setPlaceholderRef = useCallback((value: ?HTMLElement) => {
+  const setPlaceholderRef = useCallbackOne((value: ?HTMLElement) => {
     placeholderRef.current = value;
   }, []);
 
-  const onPlaceholderTransitionEnd = useCallback(() => {
+  const onPlaceholderTransitionEnd = useCallbackOne(() => {
     // A placeholder change can impact the window's max scroll
     if (isMovementAllowed()) {
       updateViewportMaxScroll({ maxScroll: getMaxWindowScroll() });
@@ -101,7 +97,7 @@ export default function Droppable(props: Props) {
     </AnimateInOut>
   );
 
-  const provided: Provided = useMemo(
+  const provided: Provided = useMemoOne(
     (): Provided => ({
       innerRef: setDroppableRef,
       placeholder,
@@ -112,7 +108,7 @@ export default function Droppable(props: Props) {
     [placeholder, setDroppableRef, styleContext],
   );
 
-  const droppableContext: ?DroppableContextValue = useMemo(
+  const droppableContext: ?DroppableContextValue = useMemoOne(
     () => ({
       droppableId,
       type,
