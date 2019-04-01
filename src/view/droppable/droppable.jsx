@@ -101,17 +101,6 @@ export default function Droppable(props: Props) {
     </AnimateInOut>
   );
 
-  // const placeholder: Node | null = instruction ? (
-  //   <Placeholder
-  //     placeholder={(instruction.data: any)}
-  //     onClose={instruction.onClose}
-  //     innerRef={setPlaceholderRef}
-  //     animate={instruction.animate}
-  //     styleContext={styleContext}
-  //     onTransitionEnd={onPlaceholderTransitionEnd}
-  //   />
-  // ) : null;
-
   const provided: Provided = useMemo(
     (): Provided => ({
       innerRef: setDroppableRef,

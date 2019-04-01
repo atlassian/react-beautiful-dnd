@@ -90,11 +90,6 @@ export type DimensionMarshal = {|
     descriptor: DroppableDescriptor,
     callbacks: DroppableCallbacks,
   ) => void,
-  // updateDroppable: (
-  //   previous: DroppableDescriptor,
-  //   descriptor: DroppableDescriptor,
-  //   callbacks: DroppableCallbacks,
-  // ) => void,
   // it is possible for a droppable to change whether it is enabled during a drag
   updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
   // it is also possible to update whether combining is enabled

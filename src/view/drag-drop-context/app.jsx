@@ -32,8 +32,8 @@ import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
 import useMemoOne from '../use-custom-memo/use-memo-one';
 import useCallbackOne from '../use-custom-memo/use-callback-one';
-import { useConstant, useConstantFn } from '../use-constant';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
+import usePrevious from '../use-previous-ref';
 
 type Props = {|
   ...Responders,
@@ -59,25 +59,22 @@ export default function App(props: Props) {
   useStartupValidation();
 
   // lazy collection of responders using a ref - update on ever render
-  const lastPropsRef = useRef<Props>(props);
-  useEffect(() => {
-    lastPropsRef.current = props;
-  });
+  const lastPropsRef = usePrevious<Props>(props);
 
-  const getResponders: () => Responders = useConstantFn(() => {
+  const getResponders: () => Responders = useCallbackOne(() => {
     return createResponders(lastPropsRef.current);
   });
 
   const announce: Announce = useAnnouncer(uniqueId);
   const styleMarshal: StyleMarshal = useStyleMarshal(uniqueId);
 
-  const lazyDispatch: Action => void = useConstantFn(
+  const lazyDispatch: Action => void = useCallbackOne(
     (action: Action): void => {
       storeRef.current.dispatch(action);
     },
   );
 
-  const callbacks: DimensionMarshalCallbacks = useConstant(() =>
+  const callbacks: DimensionMarshalCallbacks = useMemoOne(() =>
     bindActionCreators(
       {
         publishWhileDragging,
@@ -90,11 +87,11 @@ export default function App(props: Props) {
       lazyDispatch,
     ),
   );
-  const dimensionMarshal: DimensionMarshal = useConstant<DimensionMarshal>(() =>
+  const dimensionMarshal: DimensionMarshal = useMemoOne<DimensionMarshal>(() =>
     createDimensionMarshal(callbacks),
   );
 
-  const autoScroller: AutoScroller = useConstant<AutoScroller>(() =>
+  const autoScroller: AutoScroller = useMemoOne<AutoScroller>(() =>
     createAutoScroller({
       scrollWindow,
       scrollDroppable: dimensionMarshal.scrollDroppable,
@@ -108,7 +105,7 @@ export default function App(props: Props) {
     }),
   );
 
-  const store: Store = useConstant<Store>(() =>
+  const store: Store = useMemoOne<Store>(() =>
     createStore({
       dimensionMarshal,
       styleMarshal,

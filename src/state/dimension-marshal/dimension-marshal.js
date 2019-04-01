@@ -303,7 +303,6 @@ export default (callbacks: Callbacks) => {
     updateDraggable,
     unregisterDraggable,
     registerDroppable,
-    // updateDroppable,
     unregisterDroppable,
 
     // droppable changes
