@@ -52,12 +52,11 @@ export default function useValidation({
 }: Args) {
   // Running on every update
   useEffect(() => {
-    if (process.env.NODE_ENV === 'production') {
-      return;
+    // wrapping entire block for better minification
+    if (process.env.NODE_ENV !== 'production') {
+      checkOwnProps(props);
+      checkIsValidInnerRef(getDroppableRef());
+      checkPlaceholderRef(props, getPlaceholderRef());
     }
-
-    checkOwnProps(props);
-    checkIsValidInnerRef(getDroppableRef());
-    checkPlaceholderRef(props, getPlaceholderRef());
   });
 }

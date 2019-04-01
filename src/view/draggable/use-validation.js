@@ -23,10 +23,10 @@ export default function useValidation(
 ) {
   // running after every update in development
   useEffect(() => {
-    if (process.env.NODE_ENV === 'production') {
-      return;
+    // wrapping entire block for better minification
+    if (process.env.NODE_ENV !== 'production') {
+      checkOwnProps(props);
+      checkIsValidInnerRef(getRef());
     }
-    checkOwnProps(props);
-    checkIsValidInnerRef(getRef());
   });
 }
