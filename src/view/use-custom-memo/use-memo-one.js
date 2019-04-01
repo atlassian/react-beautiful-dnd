@@ -1,6 +1,11 @@
 // @flow
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import areInputsEqual from './are-inputs-equal';
+
+type Result<T> = {|
+  inputs: mixed[],
+  result: T,
+|};
 
 export default function useMemoOne<T>(
   // getResult changes on every call,
@@ -8,26 +13,28 @@ export default function useMemoOne<T>(
   // the inputs array changes on every call
   inputs?: mixed[] = [],
 ): T {
-  const isFirstCallRef = useRef<boolean>(true);
-  const lastInputsRef = useRef<mixed[]>(inputs);
-  // Cannot lazy create a ref value, so setting to null
-  // $ExpectError - T is not null
-  const resultRef = useRef<T>(null);
+  // using useState to generate initial value as it is lazy
+  const initial: Result<T> = useState(() => ({
+    inputs,
+    result: getResult(),
+  }))[0];
 
-  // on first call return the initial result
-  if (isFirstCallRef.current) {
-    isFirstCallRef.current = false;
-    resultRef.current = getResult();
-    return resultRef.current;
+  const uncommitted = useRef<Result<T>>(initial);
+  const committed = useRef<Result<T>>(initial);
+
+  // persist any uncommitted changes after they have been committed
+  useEffect(() => {
+    committed.current = uncommitted.current;
+  });
+
+  if (areInputsEqual(inputs, committed.current.inputs)) {
+    return committed.current.result;
   }
 
-  // Don't recalculate result if the inputs have not changed
-  if (areInputsEqual(inputs, lastInputsRef.current)) {
-    return resultRef.current;
-  }
+  uncommitted.current = {
+    inputs,
+    result: getResult(),
+  };
 
-  // try to generate result first in case it throws
-  resultRef.current = getResult();
-  lastInputsRef.current = inputs;
-  return resultRef.current;
+  return uncommitted.current.result;
 }
