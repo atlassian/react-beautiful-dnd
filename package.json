@@ -105,7 +105,7 @@
     "globby": "^9.1.0",
     "jest": "^24.5.0",
     "jest-junit": "^6.3.0",
-    "jest-watch-typeahead": "^0.2.1",
+    "jest-watch-typeahead": "^0.3.0",
     "markdown-it": "^8.4.2",
     "prettier": "^1.16.4",
     "raf-stub": "^2.0.2",
