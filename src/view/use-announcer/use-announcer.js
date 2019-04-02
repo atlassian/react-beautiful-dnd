@@ -1,11 +1,10 @@
 // @flow
 import { useRef, useEffect } from 'react';
 import invariant from 'tiny-invariant';
+import { useMemoOne, useCallbackOne } from 'use-memo-one';
 import type { Announce } from '../../types';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';
-import useMemoOne from '../use-custom-memo/use-memo-one';
-import useCallbackOne from '../use-custom-memo/use-callback-one';
 
 // https://allyjs.io/tutorials/hiding-elements.html
 // Element is visually hidden but is readable by screen readers

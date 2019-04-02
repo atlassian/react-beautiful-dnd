@@ -2,6 +2,7 @@
 import type { Position } from 'css-box-model';
 import { useRef } from 'react';
 import invariant from 'tiny-invariant';
+import { useMemoOne, useCallbackOne } from 'use-memo-one';
 import type { EventBinding } from '../util/event-types';
 import createEventMarshal, {
   type EventMarshal,
@@ -17,8 +18,6 @@ import createPostDragEventPreventer, {
 } from '../util/create-post-drag-event-preventer';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
-import useCallbackOne from '../../use-custom-memo/use-callback-one';
-import useMemoOne from '../../use-custom-memo/use-memo-one';
 
 export type Args = {|
   callbacks: Callbacks,

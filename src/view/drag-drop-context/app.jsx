@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, type Node } from 'react';
 import { bindActionCreators } from 'redux';
 import { Provider } from 'react-redux';
+import { useMemoOne, useCallbackOne } from 'use-memo-one';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import canStartDrag from '../../state/can-start-drag';
@@ -30,8 +31,6 @@ import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
-import useMemoOne from '../use-custom-memo/use-memo-one';
-import useCallbackOne from '../use-custom-memo/use-callback-one';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 import usePrevious from '../use-previous-ref';
 

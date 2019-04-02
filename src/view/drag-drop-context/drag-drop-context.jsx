@@ -1,9 +1,9 @@
 // @flow
 import React, { type Node } from 'react';
+import { useMemoOne } from 'use-memo-one';
 import type { Responders } from '../../types';
 import ErrorBoundary from '../error-boundary';
 import App from './app';
-import useMemoOne from '../use-custom-memo/use-memo-one';
 
 type Props = {|
   ...Responders,

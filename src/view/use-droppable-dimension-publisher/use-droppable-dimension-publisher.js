@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import rafSchedule from 'raf-schd';
+import { useMemoOne, useCallbackOne } from 'use-memo-one';
 import memoizeOne from 'memoize-one';
 import checkForNestedScrollContainers from './check-for-nested-scroll-container';
 import { origin } from '../../state/position';
@@ -29,8 +30,6 @@ import getListenerOptions from './get-listener-options';
 import useRequiredContext from '../use-required-context';
 import usePreviousRef from '../use-previous-ref';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
-import useMemoOne from '../use-custom-memo/use-memo-one';
-import useCallbackOne from '../use-custom-memo/use-callback-one';
 
 type Props = {|
   droppableId: DroppableId,

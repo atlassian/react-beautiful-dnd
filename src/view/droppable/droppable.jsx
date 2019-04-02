@@ -1,5 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
+import { useMemoOne, useCallbackOne } from 'use-memo-one';
 import React, { useRef, useContext, type Node } from 'react';
 import type { Props, Provided } from './droppable-types';
 import useDroppableDimensionPublisher from '../use-droppable-dimension-publisher';
@@ -14,8 +15,6 @@ import useValidation from './use-validation';
 import AnimateInOut, {
   type AnimateProvided,
 } from '../animate-in-out/animate-in-out';
-import useCallbackOne from '../use-custom-memo/use-callback-one';
-import useMemoOne from '../use-custom-memo/use-memo-one';
 
 export default function Droppable(props: Props) {
   const appContext: ?AppContextValue = useContext<?AppContextValue>(AppContext);

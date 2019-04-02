@@ -1,12 +1,12 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { useRef } from 'react';
+import { useCallbackOne } from 'use-memo-one';
 import type { Args } from './drag-handle-types';
 import usePrevious from '../use-previous-ref';
 import focusRetainer from './util/focus-retainer';
 import getDragHandleRef from './util/get-drag-handle-ref';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
-import useCallbackOne from '../use-custom-memo/use-callback-one';
 
 export type Result = {|
   onBlur: () => void,

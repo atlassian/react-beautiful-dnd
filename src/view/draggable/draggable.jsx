@@ -2,6 +2,7 @@
 import { useRef } from 'react';
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
+import { useMemoOne, useCallbackOne } from 'use-memo-one';
 import getStyle from './get-style';
 import useDragHandle from '../use-drag-handle/use-drag-handle';
 import type {
@@ -21,8 +22,6 @@ import getWindowScroll from '../window/get-window-scroll';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useRequiredContext from '../use-required-context';
 import useValidation from './use-validation';
-import useCallbackOne from '../use-custom-memo/use-callback-one';
-import useMemoOne from '../use-custom-memo/use-memo-one';
 
 export default function Draggable(props: Props) {
   // reference to DOM node

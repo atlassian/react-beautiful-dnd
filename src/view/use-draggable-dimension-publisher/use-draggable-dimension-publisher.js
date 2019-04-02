@@ -2,6 +2,7 @@
 import { useRef } from 'react';
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
+import { useMemoOne, useCallbackOne } from 'use-memo-one';
 import type {
   DraggableDescriptor,
   DraggableDimension,
@@ -15,8 +16,6 @@ import DroppableContext, {
   type DroppableContextValue,
 } from '../context/droppable-context';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
-import useMemoOne from '../use-custom-memo/use-memo-one';
-import useCallbackOne from '../use-custom-memo/use-callback-one';
 
 export type Args = {|
   draggableId: DraggableId,

@@ -1,6 +1,7 @@
 // @flow
 import type { Position } from 'css-box-model';
 import { useRef } from 'react';
+import { useMemoOne, useCallbackOne } from 'use-memo-one';
 import invariant from 'tiny-invariant';
 import type { EventBinding } from '../util/event-types';
 import { bindEvents, unbindEvents } from '../util/bind-events';
@@ -10,8 +11,6 @@ import supportedPageVisibilityEventName from '../util/supported-page-visibility-
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
 import type { Callbacks } from '../drag-handle-types';
 import getBorderBoxCenterPosition from '../../get-border-box-center-position';
-import useCallbackOne from '../../use-custom-memo/use-callback-one';
-import useMemoOne from '../../use-custom-memo/use-memo-one';
 
 export type Args = {|
   callbacks: Callbacks,

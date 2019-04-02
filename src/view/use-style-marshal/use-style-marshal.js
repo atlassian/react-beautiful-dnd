@@ -1,14 +1,13 @@
 // @flow
 import { useRef } from 'react';
 import memoizeOne from 'memoize-one';
+import { useMemoOne, useCallbackOne } from 'use-memo-one';
 import invariant from 'tiny-invariant';
 import type { StyleMarshal } from './style-marshal-types';
 import type { DropReason } from '../../types';
 import getStyles, { type Styles } from './get-styles';
 import { prefix } from '../data-attributes';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
-import useMemoOne from '../use-custom-memo/use-memo-one';
-import useCallbackOne from '../use-custom-memo/use-callback-one';
 
 const getHead = (): HTMLHeadElement => {
   const head: ?HTMLHeadElement = document.querySelector('head');

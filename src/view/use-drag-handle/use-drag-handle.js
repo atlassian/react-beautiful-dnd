@@ -1,6 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { useRef } from 'react';
+import { useMemoOne, useCallbackOne } from 'use-memo-one';
 import type { Args, DragHandleProps } from './drag-handle-types';
 import getWindowFromEl from '../window/get-window-from-el';
 import useRequiredContext from '../use-required-context';
@@ -20,8 +21,6 @@ import { warning } from '../../dev-warning';
 import useValidation from './use-validation';
 import useFocusRetainer from './use-focus-retainer';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
-import useCallbackOne from '../use-custom-memo/use-callback-one';
-import useMemoOne from '../use-custom-memo/use-memo-one';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
