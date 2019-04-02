@@ -62,7 +62,7 @@ export default function App(props: Props) {
 
   const getResponders: () => Responders = useCallbackOne(() => {
     return createResponders(lastPropsRef.current);
-  });
+  }, []);
 
   const announce: Announce = useAnnouncer(uniqueId);
   const styleMarshal: StyleMarshal = useStyleMarshal(uniqueId);
@@ -71,72 +71,85 @@ export default function App(props: Props) {
     (action: Action): void => {
       storeRef.current.dispatch(action);
     },
+    [],
   );
 
-  const callbacks: DimensionMarshalCallbacks = useMemoOne(() =>
-    bindActionCreators(
-      {
-        publishWhileDragging,
-        updateDroppableScroll,
-        updateDroppableIsEnabled,
-        updateDroppableIsCombineEnabled,
-        collectionStarting,
-      },
-      // $FlowFixMe - not sure why this is wrong
-      lazyDispatch,
-    ),
-  );
-  const dimensionMarshal: DimensionMarshal = useMemoOne<DimensionMarshal>(() =>
-    createDimensionMarshal(callbacks),
-  );
-
-  const autoScroller: AutoScroller = useMemoOne<AutoScroller>(() =>
-    createAutoScroller({
-      scrollWindow,
-      scrollDroppable: dimensionMarshal.scrollDroppable,
-      ...bindActionCreators(
+  const callbacks: DimensionMarshalCallbacks = useMemoOne(
+    () =>
+      bindActionCreators(
         {
-          move,
+          publishWhileDragging,
+          updateDroppableScroll,
+          updateDroppableIsEnabled,
+          updateDroppableIsCombineEnabled,
+          collectionStarting,
         },
         // $FlowFixMe - not sure why this is wrong
         lazyDispatch,
       ),
-    }),
+    [],
+  );
+  const dimensionMarshal: DimensionMarshal = useMemoOne<DimensionMarshal>(
+    () => createDimensionMarshal(callbacks),
+    [],
   );
 
-  const store: Store = useMemoOne<Store>(() =>
-    createStore({
-      dimensionMarshal,
-      styleMarshal,
-      announce,
-      autoScroller,
-      getResponders,
-    }),
+  const autoScroller: AutoScroller = useMemoOne<AutoScroller>(
+    () =>
+      createAutoScroller({
+        scrollWindow,
+        scrollDroppable: dimensionMarshal.scrollDroppable,
+        ...bindActionCreators(
+          {
+            move,
+          },
+          // $FlowFixMe - not sure why this is wrong
+          lazyDispatch,
+        ),
+      }),
+    [],
+  );
+
+  const store: Store = useMemoOne<Store>(
+    () =>
+      createStore({
+        dimensionMarshal,
+        styleMarshal,
+        announce,
+        autoScroller,
+        getResponders,
+      }),
+    [],
   );
 
   storeRef = useRef<Store>(store);
 
-  const getCanLift = useCallbackOne((id: DraggableId) =>
-    canStartDrag(storeRef.current.getState(), id),
+  const getCanLift = useCallbackOne(
+    (id: DraggableId) => canStartDrag(storeRef.current.getState(), id),
+    [],
   );
 
-  const getIsMovementAllowed = useCallbackOne(() =>
-    isMovementAllowed(storeRef.current.getState()),
+  const getIsMovementAllowed = useCallbackOne(
+    () => isMovementAllowed(storeRef.current.getState()),
+    [],
   );
 
-  const appContext: AppContextValue = useMemoOne(() => ({
-    marshal: dimensionMarshal,
-    style: styleMarshal.styleContext,
-    canLift: getCanLift,
-    isMovementAllowed: getIsMovementAllowed,
-  }));
+  const appContext: AppContextValue = useMemoOne(
+    () => ({
+      marshal: dimensionMarshal,
+      style: styleMarshal.styleContext,
+      canLift: getCanLift,
+      isMovementAllowed: getIsMovementAllowed,
+    }),
+    [],
+  );
 
   const tryResetStore = useCallbackOne(() => {
     const state: State = storeRef.current.getState();
     if (state.phase !== 'IDLE') {
       store.dispatch(clean({ shouldFlush: true }));
     }
-  });
+  }, []);
 
   useIsomorphicLayoutEffect(() => {
     setOnError(tryResetStore);
