@@ -310,6 +310,12 @@ export default function useTouchSensor(args: Args): OnTouchStart {
       {
         eventName: 'touchforcechange',
         fn: (event: TouchEvent) => {
+          // Not respecting force touches - prevent the event
+          if (!getShouldRespectForcePress()) {
+            event.preventDefault();
+            return;
+          }
+
           // A force push action will no longer fire after a touchmove
           if (hasMovedRef.current) {
             // This is being super safe. While this situation should not occur we
@@ -319,12 +325,6 @@ export default function useTouchSensor(args: Args): OnTouchStart {
           }
 
           // A drag could be pending or has already started but no movement has occurred
-
-          // Not respecting force touches - prevent the event
-          if (!getShouldRespectForcePress()) {
-            event.preventDefault();
-            return;
-          }
 
           const touch: TouchWithForce = (event.touches[0]: any);
 
