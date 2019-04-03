@@ -19,7 +19,7 @@ const ownProps: OwnProps = {
   index: preset.inHome2.descriptor.index,
   isDragDisabled: false,
   disableInteractiveElementBlocking: true,
-  shouldRespectForceTouch: true,
+  shouldRespectForcePress: true,
   children: () => null,
 };
 

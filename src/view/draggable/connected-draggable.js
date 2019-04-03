@@ -312,8 +312,9 @@ const defaultProps = ({
   isDragDisabled: false,
   // Cannot drag interactive elements by default
   disableInteractiveElementBlocking: false,
-  // Respecting browser force touch interaction by default
-  shouldRespectForceTouch: true,
+  // Not respecting browser force touch interaction
+  // by default for a more consistent experience
+  shouldRespectForcePress: false,
 }: DefaultProps);
 
 // Abstract class allows to specify props and defaults to component.

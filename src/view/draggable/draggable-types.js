@@ -141,7 +141,7 @@ export type ChildrenFn = (Provided, StateSnapshot) => Node | null;
 export type DefaultProps = {|
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
-  shouldRespectForceTouch: boolean,
+  shouldRespectForcePress: boolean,
 |};
 
 export type OwnProps = {|

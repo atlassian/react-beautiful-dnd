@@ -21,7 +21,7 @@ export type Args = {|
   getDraggableRef: () => ?HTMLElement,
   getWindow: () => HTMLElement,
   canStartCapturing: (event: Event) => boolean,
-  getShouldRespectForceTouch: () => boolean,
+  getShouldRespectForcePress: () => boolean,
   onCaptureStart: (abort: () => void) => void,
   onCaptureEnd: () => void,
 |};
@@ -110,7 +110,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     callbacks,
     getWindow,
     canStartCapturing,
-    getShouldRespectForceTouch,
+    getShouldRespectForcePress,
     onCaptureStart,
     onCaptureEnd,
   } = args;
@@ -321,7 +321,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
           // A drag could be pending or has already started but no movement has occurred
 
           // Not respecting force touches - prevent the event
-          if (!getShouldRespectForceTouch()) {
+          if (!getShouldRespectForcePress()) {
             event.preventDefault();
             return;
           }
@@ -346,7 +346,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     callbacks,
     cancel,
     getIsCapturing,
-    getShouldRespectForceTouch,
+    getShouldRespectForcePress,
     schedule,
     stop,
   ]);
