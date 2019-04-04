@@ -33,10 +33,13 @@ const snapshotArgs =
 
 const commonjsArgs = {
   include: 'node_modules/**',
-  // needed for react-is via react-redux v5.1
+  // needed for react-is via react-redux
   // https://stackoverflow.com/questions/50080893/rollup-error-isvalidelementtype-is-not-exported-by-node-modules-react-is-inde/50098540
   namedExports: {
-    'node_modules/react-is/index.js': ['isValidElementType'],
+    'node_modules/react-redux/node_modules/react-is/index.js': [
+      'isValidElementType',
+      'isContextConsumer',
+    ],
   },
 };
 
@@ -50,10 +53,10 @@ export default [
       file: 'dist/react-beautiful-dnd.js',
       format: 'umd',
       name: 'ReactBeautifulDnd',
-      globals: { react: 'React' },
+      globals: { react: 'React', 'react-dom': 'ReactDOM' },
     },
     // Only deep dependency required is React
-    external: ['react'],
+    external: ['react', 'react-dom'],
     plugins: [
       json(),
       babel(getBabelOptions({ useESModules: true })),
@@ -71,10 +74,10 @@ export default [
       file: 'dist/react-beautiful-dnd.min.js',
       format: 'umd',
       name: 'ReactBeautifulDnd',
-      globals: { react: 'React' },
+      globals: { react: 'React', 'react-dom': 'ReactDOM' },
     },
     // Only deep dependency required is React
-    external: ['react'],
+    external: ['react', 'react-dom'],
     plugins: [
       json(),
       babel(getBabelOptions({ useESModules: true })),

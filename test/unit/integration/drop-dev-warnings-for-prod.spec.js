@@ -25,10 +25,14 @@ const getCode = async ({ mode }): Promise<string> => {
     resolve({ extensions }),
     commonjs({
       include: 'node_modules/**',
-      // needed for react-is via react-redux v5.1
+      // needed for react-is via react-redux
       // https://stackoverflow.com/questions/50080893/rollup-error-isvalidelementtype-is-not-exported-by-node-modules-react-is-inde/50098540
       namedExports: {
-        'node_modules/react-is/index.js': ['isValidElementType'],
+        'node_modules/react-redux/node_modules/react-is/index.js': [
+          'isValidElementType',
+          'isContextConsumer',
+        ],
+        'node_modules/react-dom/index.js': ['unstable_batchedUpdates'],
       },
     }),
   ];
@@ -39,13 +43,13 @@ const getCode = async ({ mode }): Promise<string> => {
 
   const inputOptions = {
     input: './src/index.js',
-    external: ['react'],
+    external: ['react', 'react-dom'],
     plugins,
   };
   const outputOptions = {
     format: 'umd',
     name: 'ReactBeautifulDnd',
-    globals: { react: 'React' },
+    globals: { react: 'React', 'react-dom': 'ReactDOM' },
   };
   const bundle = await rollup(inputOptions);
   const result = await bundle.generate(outputOptions);

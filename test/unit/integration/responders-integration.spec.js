@@ -4,7 +4,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { getRect, type Rect, type Position } from 'css-box-model';
 import { DragDropContext, Draggable, Droppable } from '../../../src';
-import { sloppyClickThreshold } from '../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
+import { sloppyClickThreshold } from '../../../src/view/use-drag-handle/util/is-sloppy-click-threshold-exceeded';
 import {
   dispatchWindowMouseEvent,
   dispatchWindowKeyDownEvent,
@@ -49,14 +49,21 @@ describe('responders integration', () => {
 
   const getMountedApp = () => {
     // Both list and item will have the same dimensions
-    jest
-      .spyOn(Element.prototype, 'getBoundingClientRect')
-      .mockImplementation(() => borderBox);
 
-    // Stubbing out totally - not including margins in this
-    jest
-      .spyOn(window, 'getComputedStyle')
-      .mockImplementation(() => getComputedSpacing({}));
+    const setRefDimensions = (ref: ?HTMLElement) => {
+      if (!ref) {
+        return;
+      }
+
+      jest
+        .spyOn(ref, 'getBoundingClientRect')
+        .mockImplementation(() => borderBox);
+
+      // Stubbing out totally - not including margins in this
+      jest
+        .spyOn(window, 'getComputedStyle')
+        .mockImplementation(() => getComputedSpacing({}));
+    };
 
     return mount(
       <DragDropContext
@@ -68,7 +75,10 @@ describe('responders integration', () => {
         <Droppable droppableId={droppableId}>
           {(droppableProvided: DroppableProvided) => (
             <div
-              ref={droppableProvided.innerRef}
+              ref={(ref: ?HTMLElement) => {
+                setRefDimensions(ref);
+                droppableProvided.innerRef(ref);
+              }}
               {...droppableProvided.droppableProps}
             >
               <h2>Droppable</h2>
@@ -76,7 +86,10 @@ describe('responders integration', () => {
                 {(draggableProvided: DraggableProvided) => (
                   <div
                     className="drag-handle"
-                    ref={draggableProvided.innerRef}
+                    ref={(ref: ?HTMLElement) => {
+                      setRefDimensions(ref);
+                      draggableProvided.innerRef(ref);
+                    }}
                     {...draggableProvided.draggableProps}
                     {...draggableProvided.dragHandleProps}
                   >
@@ -143,25 +156,38 @@ describe('responders integration', () => {
     const move = () => {
       windowMouseMove({
         x: dragMove.x,
-        y: dragMove.y + sloppyClickThreshold + 1,
+        y: dragMove.y,
       });
-      // movements are scheduled with setTimeout
+      // movements are scheduled in an animation frame
+      requestAnimationFrame.step();
+      // responder updates are scheduled with setTimeout
       jest.runOnlyPendingTimers();
     };
 
-    const waitForReturnToHome = () => {
-      // cheating
-      wrapper.find(Draggable).simulate('transitionEnd');
+    const tryFlushDropAnimation = () => {
+      // could not get this right just using window events
+      const props = wrapper
+        .find('[data-react-beautiful-dnd-draggable]')
+        .first()
+        .props();
+
+      if (props.onTransitionEnd) {
+        props.onTransitionEnd({ propertyName: 'transform' });
+      }
     };
 
     const stop = () => {
       windowMouseUp();
-      waitForReturnToHome();
+      // tell enzyme the onTransitionEnd prop has chan`ged
+      wrapper.update();
+      tryFlushDropAnimation();
     };
 
     const cancel = () => {
       cancelWithKeyboard();
-      waitForReturnToHome();
+      // tell enzyme the onTransitionEnd prop has changed
+      wrapper.update();
+      tryFlushDropAnimation();
     };
 
     const perform = () => {

@@ -1,37 +1,29 @@
 // @flow
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
-import {
-  combine,
-  withStore,
-  withDroppableId,
-  withDroppableType,
-  withDimensionMarshal,
-  withStyleContext,
-  withCanLift,
-} from '../../../utils/get-context-options';
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import {
   getMarshalStub,
   getDroppableCallbacks,
 } from '../../../utils/dimension-marshal';
+import { DragDropContext } from '../../../../src';
 import { getPreset } from '../../../utils/dimension';
 import forceUpdate from '../../../utils/force-update';
 import Draggable from '../../../../src/view/draggable/connected-draggable';
 import type { Provided } from '../../../../src/view/draggable/draggable-types';
+import DroppableContext, {
+  type DroppableContextValue,
+} from '../../../../src/view/context/droppable-context';
 
 const preset = getPreset();
 // creating our own marshal so we can publish a droppable
 // so that the draggable can publish itself
 const marshal: DimensionMarshal = getMarshalStub();
-const options: Object = combine(
-  withStore(),
-  withDroppableId(preset.home.descriptor.id),
-  withDroppableType(preset.home.descriptor.type),
-  withDimensionMarshal(marshal),
-  withStyleContext(),
-  withCanLift(),
-);
+
+const droppableContext: DroppableContextValue = {
+  type: preset.home.descriptor.type,
+  droppableId: preset.home.descriptor.id,
+};
 
 // registering a fake droppable so that when a draggable
 // registers itself the marshal can find its parent
@@ -58,11 +50,15 @@ class Person extends Component<{ name: string, provided: Provided }> {
 class App extends Component<{ currentUser: string }> {
   render() {
     return (
-      <Draggable draggableId="drag-1" index={0}>
-        {(dragProvided: Provided) => (
-          <Person name={this.props.currentUser} provided={dragProvided} />
-        )}
-      </Draggable>
+      <DragDropContext onDragEnd={() => {}}>
+        <DroppableContext.Provider value={droppableContext}>
+          <Draggable draggableId="drag-1" index={0}>
+            {(dragProvided: Provided) => (
+              <Person name={this.props.currentUser} provided={dragProvided} />
+            )}
+          </Draggable>
+        </DroppableContext.Provider>
+      </DragDropContext>
     );
   }
 }
@@ -76,7 +72,7 @@ afterEach(() => {
 });
 
 it('should render the child function when the parent renders', () => {
-  const wrapper = mount(<App currentUser="Jake" />, options);
+  const wrapper = mount(<App currentUser="Jake" />);
 
   expect(Person.prototype.render).toHaveBeenCalledTimes(1);
   expect(wrapper.find(Person).props().name).toBe('Jake');
@@ -85,7 +81,7 @@ it('should render the child function when the parent renders', () => {
 });
 
 it('should render the child function when the parent re-renders', () => {
-  const wrapper = mount(<App currentUser="Jake" />, options);
+  const wrapper = mount(<App currentUser="Jake" />);
 
   forceUpdate(wrapper);
 
@@ -96,7 +92,7 @@ it('should render the child function when the parent re-renders', () => {
 });
 
 it('should render the child function when the parents props changes that cause a re-render', () => {
-  const wrapper = mount(<App currentUser="Jake" />, options);
+  const wrapper = mount(<App currentUser="Jake" />);
 
   wrapper.setProps({
     currentUser: 'Finn',

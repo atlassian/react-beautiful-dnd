@@ -6,18 +6,28 @@ import type {
   DroppableCallbacks,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import { getMarshalStub } from '../../../utils/dimension-marshal';
-import { withDimensionMarshal } from '../../../utils/get-context-options';
 import { setViewport } from '../../../utils/viewport';
-import { preset, scheduled, ScrollableItem } from './util/shared';
+import {
+  preset,
+  scheduled,
+  ScrollableItem,
+  WithAppContext,
+} from './util/shared';
 import forceUpdate from '../../../utils/force-update';
+import PassThroughProps from '../../../utils/pass-through-props';
 
 setViewport(preset.viewport);
 
 it('should publish updates to the enabled state when dragging', () => {
   const marshal: DimensionMarshal = getMarshalStub();
   const wrapper = mount(
-    <ScrollableItem isCombineEnabled />,
-    withDimensionMarshal(marshal),
+    <PassThroughProps>
+      {extra => (
+        <WithAppContext marshal={marshal}>
+          <ScrollableItem isCombineEnabled {...extra} />
+        </WithAppContext>
+      )}
+    </PassThroughProps>,
   );
   // not called yet
   expect(marshal.updateDroppableIsCombineEnabled).not.toHaveBeenCalled();
@@ -51,8 +61,13 @@ it('should publish updates to the enabled state when dragging', () => {
 it('should not publish updates to the enabled state when there is no drag', () => {
   const marshal: DimensionMarshal = getMarshalStub();
   const wrapper = mount(
-    <ScrollableItem isCombineEnabled />,
-    withDimensionMarshal(marshal),
+    <PassThroughProps>
+      {extra => (
+        <WithAppContext marshal={marshal}>
+          <ScrollableItem isCombineEnabled {...extra} />,
+        </WithAppContext>
+      )}
+    </PassThroughProps>,
   );
 
   // not called yet
@@ -70,8 +85,13 @@ it('should not publish updates to the enabled state when there is no drag', () =
 it('should not publish updates when there is no change', () => {
   const marshal: DimensionMarshal = getMarshalStub();
   const wrapper = mount(
-    <ScrollableItem isCombineEnabled />,
-    withDimensionMarshal(marshal),
+    <PassThroughProps>
+      {extra => (
+        <WithAppContext marshal={marshal}>
+          <ScrollableItem isCombineEnabled {...extra} />,
+        </WithAppContext>
+      )}
+    </PassThroughProps>,
   );
 
   // not called yet

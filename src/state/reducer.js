@@ -60,7 +60,10 @@ const idle: IdleState = { phase: 'IDLE', completed: null, shouldFlush: false };
 
 export default (state: State = idle, action: Action): State => {
   if (action.type === 'CLEAN') {
-    return idle;
+    return {
+      ...idle,
+      shouldFlush: action.payload.shouldFlush,
+    };
   }
 
   if (action.type === 'INITIAL_PUBLISH') {

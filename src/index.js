@@ -30,14 +30,14 @@ export type {
   OnDragEndResponder,
 } from './types';
 
-// Droppable
+// Droppable types
 export type {
   Provided as DroppableProvided,
   StateSnapshot as DroppableStateSnapshot,
   DroppableProps,
 } from './view/droppable/droppable-types';
 
-// Draggable
+// Draggable types
 export type {
   Provided as DraggableProvided,
   StateSnapshot as DraggableStateSnapshot,
@@ -48,5 +48,5 @@ export type {
   NotDraggingStyle,
 } from './view/draggable/draggable-types';
 
-// DragHandle
-export type { DragHandleProps } from './view/drag-handle/drag-handle-types';
+// DragHandle types
+export type { DragHandleProps } from './view/use-drag-handle/drag-handle-types';

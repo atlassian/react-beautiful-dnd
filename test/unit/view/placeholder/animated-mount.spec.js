@@ -1,13 +1,32 @@
 // @flow
 import React from 'react';
 import { mount, type ReactWrapper } from 'enzyme';
+import { act } from 'react-dom/test-utils';
+import Placeholder from './util/placeholder-with-class';
 import type { PlaceholderStyle } from '../../../../src/view/placeholder/placeholder-types';
-import Placeholder from '../../../../src/view/placeholder';
 import { expectIsEmpty, expectIsFull } from './util/expect';
 import { placeholder } from './util/data';
 import getPlaceholderStyle from './util/get-placeholder-style';
+import * as attributes from '../../../../src/view/data-attributes';
 
 jest.useFakeTimers();
+const styleContext: string = 'hello-there';
+
+let spy;
+
+beforeEach(() => {
+  spy = jest.spyOn(React, 'createElement');
+});
+
+afterEach(() => {
+  spy.mockRestore();
+});
+
+const getCreatePlaceholderCalls = () => {
+  return spy.mock.calls.filter(call => {
+    return call[1] && call[1][attributes.placeholder] === styleContext;
+  });
+};
 
 it('should animate a mount', () => {
   const wrapper: ReactWrapper<*> = mount(
@@ -16,13 +35,22 @@ it('should animate a mount', () => {
       placeholder={placeholder}
       onClose={jest.fn()}
       onTransitionEnd={jest.fn()}
+      styleContext={styleContext}
     />,
   );
+
+  expect(getCreatePlaceholderCalls().length).toBe(1);
+
+  // first call had an empty size
   const onMount: PlaceholderStyle = getPlaceholderStyle(wrapper);
   expectIsEmpty(onMount);
 
-  jest.runOnlyPendingTimers();
-  // let enzyme know that the react tree has changed due to the set state
+  // Will trigger a .setState
+  act(() => {
+    jest.runOnlyPendingTimers();
+  });
+
+  // tell enzyme that something has changed
   wrapper.update();
 
   const postMount: PlaceholderStyle = getPlaceholderStyle(wrapper);
@@ -30,25 +58,28 @@ it('should animate a mount', () => {
 });
 
 it('should not animate a mount if interrupted', () => {
-  jest.spyOn(Placeholder.prototype, 'render');
-
   const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="open"
       placeholder={placeholder}
       onClose={jest.fn()}
       onTransitionEnd={jest.fn()}
+      styleContext={styleContext}
     />,
   );
   const onMount: PlaceholderStyle = getPlaceholderStyle(wrapper);
   expectIsEmpty(onMount);
-  expect(Placeholder.prototype.render).toHaveBeenCalledTimes(1);
+
+  expect(getCreatePlaceholderCalls()).toHaveLength(1);
 
   // interrupting animation
   wrapper.setProps({
     animate: 'none',
   });
-  expect(Placeholder.prototype.render).toHaveBeenCalledTimes(2);
+  // render 1: normal
+  // render 2: useEffect calling setState
+  // render 3: result of setState
+  expect(getCreatePlaceholderCalls()).toHaveLength(3);
 
   // no timers are run
   // let enzyme know that the react tree has changed due to the set state
@@ -58,13 +89,11 @@ it('should not animate a mount if interrupted', () => {
   expectIsFull(postMount);
 
   // validation - no further updates
-  Placeholder.prototype.render.mockClear();
+  spy.mockClear();
   jest.runOnlyPendingTimers();
   wrapper.update();
   expectIsFull(getPlaceholderStyle(wrapper));
-  expect(Placeholder.prototype.render).not.toHaveBeenCalled();
-
-  Placeholder.prototype.render.mockRestore();
+  expect(getCreatePlaceholderCalls()).toHaveLength(0);
 });
 
 it('should not animate in if unmounted', () => {
@@ -76,6 +105,7 @@ it('should not animate in if unmounted', () => {
       placeholder={placeholder}
       onClose={jest.fn()}
       onTransitionEnd={jest.fn()}
+      styleContext={styleContext}
     />,
   );
   expectIsEmpty(getPlaceholderStyle(wrapper));

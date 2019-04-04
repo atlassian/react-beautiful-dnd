@@ -1,7 +1,6 @@
 // @flow
 import { getRect, type Position } from 'css-box-model';
 import { type ReactWrapper } from 'enzyme';
-import { canLiftKey, styleKey } from '../../../../src/view/context-keys';
 import * as keyCodes from '../../../../src/view/key-codes';
 import { withKeyboard } from '../../../utils/user-input-util';
 import {
@@ -30,7 +29,9 @@ import {
   windowMouseMove,
 } from './util/events';
 import { getWrapper } from './util/wrappers';
-import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
+import type { AppContextValue } from '../../../../src/view/context/app-context';
+import basicContext from './util/app-context';
 
 const origin: Position = { x: 0, y: 0 };
 
@@ -131,9 +132,9 @@ describe('initiation', () => {
 
   it('should not lift if the state does not currently allow lifting', () => {
     const customCallbacks: Callbacks = getStubCallbacks();
-    const customContext = {
-      [styleKey]: 'hello',
-      [canLiftKey]: () => false,
+    const customContext: AppContextValue = {
+      ...basicContext,
+      canLift: () => false,
     };
     const customWrapper = getWrapper(customCallbacks, customContext);
     const mock: MockEvent = createMockEvent();
@@ -519,6 +520,7 @@ describe('cancel', () => {
 describe('disabled mid drag', () => {
   it('should cancel the current drag', () => {
     pressSpacebar(wrapper);
+    wrapper.setProps({ isDragging: true });
 
     wrapper.setProps({
       isEnabled: false,
@@ -535,6 +537,8 @@ describe('disabled mid drag', () => {
   it('should drop any pending movements', () => {
     // lift
     pressSpacebar(wrapper);
+    wrapper.setProps({ isDragging: true });
+    wrapper.setProps({ isDragging: true });
     expect(callbacks.onLift).toHaveBeenCalledTimes(1);
 
     pressArrowUp(wrapper);
@@ -566,6 +570,7 @@ describe('disabled mid drag', () => {
   it('should stop preventing default action on events', () => {
     // setup
     pressSpacebar(wrapper);
+    wrapper.setProps({ isDragging: true });
     wrapper.setProps({
       isEnabled: false,
     });
@@ -633,6 +638,7 @@ describe('cancelled elsewhere in the app mid drag', () => {
 
 it('should call the onCancel prop if unmounted mid drag', () => {
   pressSpacebar(wrapper);
+  wrapper.setProps({ isDragging: true });
 
   wrapper.unmount();
 
