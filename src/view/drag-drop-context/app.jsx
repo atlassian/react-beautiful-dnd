@@ -31,7 +31,6 @@ import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
-import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 import usePrevious from '../use-previous-ref';
 
 type Props = {|
