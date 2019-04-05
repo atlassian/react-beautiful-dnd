@@ -49,7 +49,6 @@ it('should avoid clashes with parent redux applications', () => {
                         {...draggableProvided.dragHandleProps}
                         {...draggableProvided.draggableProps}
                       >
-                        {/* $FlowFixMe - not sure why this requires foo */}
                         <Connected />
                       </div>
                     )}
@@ -87,7 +86,6 @@ it('should avoid clashes with child redux applications', () => {
                       {...draggableProvided.draggableProps}
                     >
                       <Provider store={store}>
-                        {/* $FlowFixMe - not sure why this requires foo */}
                         <Connected />
                       </Provider>
                     </div>
