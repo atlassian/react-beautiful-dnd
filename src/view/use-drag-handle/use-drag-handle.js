@@ -63,7 +63,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     draggableId,
     callbacks,
     getDraggableRef,
-    getShouldRespectForceTouch,
+    getShouldRespectForcePress,
     canDragInteractiveElements,
   } = args;
   const lastArgsRef = usePreviousRef(args);
@@ -109,7 +109,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       canStartCapturing,
       onCaptureStart,
       onCaptureEnd,
-      getShouldRespectForceTouch,
+      getShouldRespectForcePress,
     }),
     [
       callbacks,
@@ -118,7 +118,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       canStartCapturing,
       onCaptureStart,
       onCaptureEnd,
-      getShouldRespectForceTouch,
+      getShouldRespectForcePress,
     ],
   );
   const onMouseDown = useMouseSensor(mouseArgs);
@@ -149,7 +149,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       getDraggableRef,
       getWindow,
       canStartCapturing,
-      getShouldRespectForceTouch,
+      getShouldRespectForcePress,
       onCaptureStart,
       onCaptureEnd,
     }),
@@ -158,7 +158,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       getDraggableRef,
       getWindow,
       canStartCapturing,
-      getShouldRespectForceTouch,
+      getShouldRespectForcePress,
       onCaptureStart,
       onCaptureEnd,
     ],

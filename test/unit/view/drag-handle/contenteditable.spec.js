@@ -37,7 +37,7 @@ forEach((control: Control) => {
             isEnabled
             getDraggableRef={ref.getRef}
             canDragInteractiveElements={false}
-            getShouldRespectForceTouch={() => true}
+            getShouldRespectForcePress={() => true}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div
@@ -81,7 +81,7 @@ forEach((control: Control) => {
             isEnabled
             getDraggableRef={ref.getRef}
             canDragInteractiveElements={false}
-            getShouldRespectForceTouch={() => true}
+            getShouldRespectForcePress={() => true}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div
@@ -125,7 +125,7 @@ forEach((control: Control) => {
             isEnabled
             getDraggableRef={ref.getRef}
             canDragInteractiveElements={false}
-            getShouldRespectForceTouch={() => true}
+            getShouldRespectForcePress={() => true}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div
@@ -176,7 +176,7 @@ forEach((control: Control) => {
             isEnabled
             getDraggableRef={ref.getRef}
             canDragInteractiveElements={false}
-            getShouldRespectForceTouch={() => true}
+            getShouldRespectForcePress={() => true}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div
@@ -227,7 +227,7 @@ forEach((control: Control) => {
             isDropAnimating={false}
             isEnabled
             getDraggableRef={ref.getRef}
-            getShouldRespectForceTouch={() => true}
+            getShouldRespectForcePress={() => true}
             // stating that we can drag
             canDragInteractiveElements
           >
@@ -275,7 +275,7 @@ forEach((control: Control) => {
             isDropAnimating={false}
             isEnabled
             getDraggableRef={ref.getRef}
-            getShouldRespectForceTouch={() => true}
+            getShouldRespectForcePress={() => true}
             // stating that we can drag
             canDragInteractiveElements
           >

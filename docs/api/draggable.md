@@ -33,7 +33,7 @@ type Props = {|
   // optional
   isDragDisabled: ?boolean,
   disableInteractiveElementBlocking: ?boolean,
-  shouldRespectForceTouch: ?boolean,
+  shouldRespectForcePress: ?boolean,
 |};
 ```
 
@@ -66,7 +66,7 @@ type Props = {|
 
 - `isDragDisabled`: A flag to control whether or not the `<Draggable />` is permitted to drag. You can use this to implement your own conditional drag logic. It will default to `false`.
 - `disableInteractiveElementBlocking`: A flag to opt out of blocking a drag from interactive elements. For more information refer to the section _Interactive child elements within a `<Draggable />`_
-- `shouldRespectForceTouch`: Whether or not the _drag handle_ should respect force touch interactions. This defaults to `true` in order to play as nicely as possible with browsers. However, heavy presses can cancel a drag. This can be frustrating for users. By setting `shouldRespectForceTouch` to `false`, force touch interactions will have `event.preventDefault()` called on them and the user will be able to use any amount of pressure for a touch drag.
+- `shouldRespectForcePress`: Whether or not the _drag handle_ should respect force press interactions. See [Force press](#force-press).
 
 ## Children function (render props / function as child)
 
@@ -152,6 +152,28 @@ It is a contract of this library that it owns the positioning logic of the dragg
 `react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `<Draggable />` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue.
 
 To get around this you can use [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html). We do not enable this functionality by default as it has performance problems. We have a [using a portal guide](/docs/patterns/using-a-portal.md) explaining the performance problem in more detail and how you can set up your own `ReactDOM.createPortal` if you want to.
+
+#### Force press
+
+> Safari only
+
+In Safari, it is possible for a user to perform a force press action. This is possible with a touch device (`touchforcechange`) and with a mouse (`webkitmouseforcechanged`).
+
+We have found that in order to give the most consistent drag and drop experience we need to _opt out_ of force press interactions on a _drag handle_. However, it is possible to have `react-beautiful-dnd` work while also respecting force press interactions. The trade off is that if we register a force press interaction a drag will be cancelled.
+
+In order to control this behaviour you set the `shouldRespectForcePress` prop on a `<Draggable />`. By default we set this value to `false` to prevent heavy presses from cancelling a drag.
+
+##### Enabling `shouldRespectForcePress`
+
+If you set `shouldRespectForcePress` to `true` then the following will occur:
+
+###### Touch dragging
+
+If the user force presses on the element before they have moved the element (even if a drag has already started) then the drag is cancelled and the standard force press action occurs. For an anchor this is a website preview.
+
+###### Mouse dragging
+
+Any force press action will cancel an existing or pending drag
 
 #### Focus retention when moving between lists
 

@@ -57,12 +57,12 @@ export class PassThrough extends React.Component<*> {
 export const getWrapper = (
   callbacks: Callbacks,
   appContext?: AppContextValue = basicContext,
-  shouldRespectForceTouch?: boolean = true,
+  shouldRespectForcePress?: boolean = true,
 ): ReactWrapper<*> => {
   const ref = createRef();
 
   // stopping this from creating a new reference and breaking the memoization during a drag
-  const getShouldRespectForceTouch = () => shouldRespectForceTouch;
+  const getShouldRespectForcePress = () => shouldRespectForcePress;
 
   return mount(
     <PassThrough>
@@ -76,7 +76,7 @@ export const getWrapper = (
             isEnabled
             getDraggableRef={ref.getRef}
             canDragInteractiveElements={false}
-            getShouldRespectForceTouch={getShouldRespectForceTouch}
+            getShouldRespectForcePress={getShouldRespectForcePress}
             {...outer}
           >
             {(dragHandleProps: ?DragHandleProps) => (
