@@ -3,7 +3,7 @@ import * as keyCodes from '../../src/view/key-codes';
 import { timings } from '../../src/animation';
 
 beforeEach(() => {
-  cy.visit('/iframe.html?selectedKind=board&selectedStory=simple');
+  cy.visit('/iframe.html?id=board--simple');
 });
 
 it('should move between lists', () => {

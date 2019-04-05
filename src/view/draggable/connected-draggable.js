@@ -5,7 +5,6 @@ import { Component } from 'react';
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import Draggable from './draggable';
-import { storeKey } from '../context-keys';
 import { origin } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
 import { curves, combine } from '../../animation';
@@ -44,6 +43,7 @@ import type {
   DropAnimation,
 } from './draggable-types';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
+import StoreContext from '../context/store-context';
 import whatIsDraggedOverFromResult from '../../state/droppable/what-is-dragged-over-from-result';
 
 const getCombineWithFromResult = (result: DropResult): ?DraggableId => {
@@ -328,6 +328,7 @@ class DraggableType extends Component<OwnProps> {
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Draggable`
+// $ExpectError - incorrect flowtype for react-redux version
 const ConnectedDraggable: typeof DraggableType = (connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
@@ -336,10 +337,8 @@ const ConnectedDraggable: typeof DraggableType = (connect(
   null,
   // options
   {
-    // Using our own store key.
-    // This allows consumers to also use redux
-    // Note: the default store key is 'store'
-    storeKey,
+    // Using our own context for the store to avoid clashing with consumers
+    context: StoreContext,
     // Default value, but being really clear
     pure: true,
     // When pure, compares the result of mapStateToProps to its previous value.

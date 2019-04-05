@@ -149,6 +149,7 @@ export default class PortalApp extends Component<AppProps, AppState> {
                   )}
                 </Draggable>
               ))}
+              {droppableProvided.placeholder}
             </Container>
           )}
         </Droppable>

@@ -6,6 +6,7 @@ export default (store: Store) => (next: Action => mixed) => (
   action: Action,
 ): any => {
   console.group(`action: ${action.type}`);
+  console.log('action payload', action.payload);
   console.log('state before', store.getState());
 
   const result: mixed = next(action);

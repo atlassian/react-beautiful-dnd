@@ -229,14 +229,20 @@ export const moveLeft = (): MoveLeftAction => ({
   payload: null,
 });
 
-type CleanAction = {|
-  type: 'CLEAN',
-  payload: null,
+type CleanActionArgs = {|
+  shouldFlush: boolean,
 |};
 
-export const clean = (): CleanAction => ({
+type CleanAction = {|
   type: 'CLEAN',
-  payload: null,
+  payload: CleanActionArgs,
+|};
+
+export const clean = (
+  args?: CleanActionArgs = { shouldFlush: false },
+): CleanAction => ({
+  type: 'CLEAN',
+  payload: args,
 });
 
 export type AnimateDropArgs = {|

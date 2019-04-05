@@ -1,6 +1,6 @@
 {
   "name": "react-beautiful-dnd",
-  "version": "10.1.1",
+  "version": "11.0.0-beta",
   "description": "Beautiful and accessible drag and drop for lists with React",
   "author": "Alex Reardon <areardon@atlassian.com>",
   "keywords": [
@@ -57,11 +57,11 @@
     "@babel/runtime-corejs2": "^7.4.2",
     "css-box-model": "^1.1.1",
     "memoize-one": "^5.0.1",
-    "prop-types": "^15.6.1",
     "raf-schd": "^4.0.0",
-    "react-redux": "^5.0.7",
+    "react-redux": "7.0.0-beta.0",
     "redux": "^4.0.1",
-    "tiny-invariant": "^1.0.4"
+    "tiny-invariant": "^1.0.4",
+    "use-memo-one": "^1.0.0"
   },
   "devDependencies": {
     "@atlaskit/css-reset": "^3.0.6",
@@ -134,7 +134,7 @@
     "webpack": "^4.29.6"
   },
   "peerDependencies": {
-    "react": "^16.3.1"
+    "react": "^16.8.0"
   },
   "license": "Apache-2.0",
   "jest-junit": {

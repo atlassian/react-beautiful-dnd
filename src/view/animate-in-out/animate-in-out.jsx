@@ -20,6 +20,10 @@ type State = {|
   animate: InOutAnimationMode,
 |};
 
+// Using a class here rather than hooks because
+// getDerivedStateFromProps results in far less renders.
+// Using hooks to implement this was quite messy and resulted in lots of additional renders
+
 export default class AnimateInOut extends React.PureComponent<Props, State> {
   state: State = {
     isVisible: Boolean(this.props.on),

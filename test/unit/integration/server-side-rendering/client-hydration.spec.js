@@ -19,7 +19,19 @@ invariant(
 
 it('should support hydrating a server side rendered application', () => {
   // would be done server side
+  // we need to mock out the warnings caused by useLayoutEffect
+  // This will not happen on the client as the string is rendered
+  // on the server
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+
   const serverHTML: string = ReactDOMServer.renderToString(<App />);
+
+  console.error.mock.calls.forEach(call => {
+    expect(
+      call[0].includes('Warning: useLayoutEffect does nothing on the server'),
+    ).toBe(true);
+  });
+  console.error.mockRestore();
 
   // would be done client side
   // would have a fresh server context on the client

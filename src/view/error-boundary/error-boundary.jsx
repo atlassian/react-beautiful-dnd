@@ -1,10 +1,9 @@
 // @flow
 import React, { type Node } from 'react';
-import { getFormattedMessage } from '../../dev-warning';
+import { getFormattedMessage, warning } from '../../dev-warning';
 
 type Props = {|
-  onError: () => void,
-  children: Node | null,
+  children: (setOnError: Function) => Node,
 |};
 
 function printFatalError(error: Error) {
@@ -27,6 +26,9 @@ function printFatalError(error: Error) {
 }
 
 export default class ErrorBoundary extends React.Component<Props> {
+  // eslint-disable-next-line react/sort-comp
+  recover: ?() => void;
+
   componentDidMount() {
     window.addEventListener('error', this.onFatalError);
   }
@@ -34,9 +36,18 @@ export default class ErrorBoundary extends React.Component<Props> {
     window.removeEventListener('error', this.onFatalError);
   }
 
+  setOnError = (onError: () => void) => {
+    this.recover = onError;
+  };
+
   onFatalError = (error: Error) => {
     printFatalError(error);
-    this.props.onError();
+
+    if (this.recover) {
+      this.recover();
+    } else {
+      warning('Could not find recovering function');
+    }
 
     // If the failure was due to an invariant failure - then we handle the error
     if (error.message.indexOf('Invariant failed') !== -1) {
@@ -53,6 +64,6 @@ export default class ErrorBoundary extends React.Component<Props> {
   }
 
   render() {
-    return this.props.children;
+    return this.props.children(this.setOnError);
   }
 }

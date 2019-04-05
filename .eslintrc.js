@@ -64,6 +64,20 @@ module.exports = {
       },
     ],
 
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: 'react',
+            importNames: ['useMemo', 'useCallback'],
+            message:
+              'useMemo and useCallback are subject to cache busting. Please use useMemoOne and useCallbackOne',
+          },
+        ],
+      },
+    ],
+
     // Allowing jsx in files with any file extension (old components have jsx but not the extension)
     'react/jsx-filename-extension': 'off',
 

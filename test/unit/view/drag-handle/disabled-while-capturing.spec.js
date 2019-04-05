@@ -3,7 +3,7 @@ import type { ReactWrapper } from 'enzyme';
 import { forEach, type Control } from './util/controls';
 import { getWrapper } from './util/wrappers';
 import { getStubCallbacks, callbacksCalled } from './util/callbacks';
-import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
 
 const expectMidDragDisabledWarning = (fn: Function) => {
   // arrange
