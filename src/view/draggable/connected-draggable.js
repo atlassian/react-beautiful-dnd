@@ -329,7 +329,6 @@ class DraggableType extends Component<OwnProps> {
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Draggable`
-// $ExpectError - incorrect flowtype for react-redux version
 const ConnectedDraggable: typeof DraggableType = (connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
