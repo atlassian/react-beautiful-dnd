@@ -31,7 +31,6 @@ import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
-import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 import usePrevious from '../use-previous-ref';
 
 type Props = {|
@@ -124,6 +123,17 @@ export default function App(props: Props) {
 
   storeRef = useRef<Store>(store);
 
+  const tryResetStore = useCallbackOne(() => {
+    const state: State = storeRef.current.getState();
+    if (state.phase !== 'IDLE') {
+      store.dispatch(clean({ shouldFlush: true }));
+    }
+  }, []);
+
+  // doing this in render rather than a side effect so any errors on the
+  // initial mount are caught
+  setOnError(tryResetStore);
+
   const getCanLift = useCallbackOne(
     (id: DraggableId) => canStartDrag(storeRef.current.getState(), id),
     [],
@@ -143,21 +153,6 @@ export default function App(props: Props) {
     }),
     [],
   );
-
-  const tryResetStore = useCallbackOne(() => {
-    const state: State = storeRef.current.getState();
-    if (state.phase !== 'IDLE') {
-      store.dispatch(clean({ shouldFlush: true }));
-    }
-  }, []);
-
-  useIsomorphicLayoutEffect(() => {
-    setOnError(tryResetStore);
-  }, [setOnError, tryResetStore]);
-
-  useIsomorphicLayoutEffect(() => {
-    tryResetStore();
-  }, [tryResetStore]);
 
   // Clean store when unmounting
   useEffect(() => {
