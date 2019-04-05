@@ -43,7 +43,7 @@ export default function Draggable(props: Props) {
     children,
     draggableId,
     isDragDisabled,
-    shouldRespectForceTouch,
+    shouldRespectForcePress,
     disableInteractiveElementBlocking: canDragInteractiveElements,
     index,
 
@@ -93,9 +93,9 @@ export default function Draggable(props: Props) {
     [draggableId, isDragDisabled, liftAction],
   );
 
-  const getShouldRespectForceTouch = useCallbackOne(
-    () => shouldRespectForceTouch,
-    [shouldRespectForceTouch],
+  const getShouldRespectForcePress = useCallbackOne(
+    () => shouldRespectForcePress,
+    [shouldRespectForcePress],
   );
 
   const callbacks: DragHandleCallbacks = useMemoOne(
@@ -139,14 +139,14 @@ export default function Draggable(props: Props) {
       callbacks,
       getDraggableRef: getRef,
       canDragInteractiveElements,
-      getShouldRespectForceTouch,
+      getShouldRespectForcePress,
     }),
     [
       callbacks,
       canDragInteractiveElements,
       draggableId,
       getRef,
-      getShouldRespectForceTouch,
+      getShouldRespectForcePress,
       isDragDisabled,
       isDragging,
       isDropAnimating,

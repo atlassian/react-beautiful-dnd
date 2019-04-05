@@ -26,7 +26,7 @@ export type Args = {|
   getDraggableRef: () => ?HTMLElement,
   getWindow: () => HTMLElement,
   canStartCapturing: (event: Event) => boolean,
-  getShouldRespectForceTouch: () => boolean,
+  getShouldRespectForcePress: () => boolean,
 |};
 
 export type OnMouseDown = (event: MouseEvent) => void;
@@ -48,7 +48,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     canStartCapturing,
     getWindow,
     callbacks,
-    getShouldRespectForceTouch,
+    getShouldRespectForcePress,
     onCaptureStart,
     onCaptureEnd,
   } = args;
@@ -266,7 +266,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
             event.webkitForce >= forcePressThreshold;
 
           // New behaviour
-          if (!getShouldRespectForceTouch()) {
+          if (!getShouldRespectForcePress()) {
             event.preventDefault();
             return;
           }
@@ -293,7 +293,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     stop,
     callbacks,
     getWindow,
-    getShouldRespectForceTouch,
+    getShouldRespectForcePress,
   ]);
 
   const bindWindowEvents = useCallbackOne(() => {

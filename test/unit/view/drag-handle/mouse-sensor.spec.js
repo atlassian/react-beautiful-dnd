@@ -1378,11 +1378,11 @@ describe('webkit force press', () => {
 
     it('should not cancel a drag if force press is not being respected', () => {
       // arrange
-      const shouldRespectForceTouch: boolean = false;
+      const shouldRespectForcePress: boolean = false;
       const customWrapper = getWrapper(
         callbacks,
         undefined,
-        shouldRespectForceTouch,
+        shouldRespectForcePress,
       );
 
       // start the drag
