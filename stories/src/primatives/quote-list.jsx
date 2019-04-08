@@ -65,7 +65,7 @@ const Container = styled.div``;
 /* stylelint-enable */
 
 type Props = {|
-  listId: string,
+  listId?: string,
   listType?: string,
   quotes: Quote[],
   title?: string,
