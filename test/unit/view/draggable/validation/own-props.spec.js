@@ -1,7 +1,7 @@
 // @flow
-import type { OwnProps } from '../../../../src/view/draggable/draggable-types';
-import mount from './util/mount';
-import { defaultOwnProps } from './util/get-props';
+import type { OwnProps } from '../../../../../src/view/draggable/draggable-types';
+import mount from '../util/mount';
+import { defaultOwnProps } from '../util/get-props';
 
 beforeAll(() => {
   jest.spyOn(console, 'error').mockImplementation(() => {});

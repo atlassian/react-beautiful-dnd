@@ -68,7 +68,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
   } = args;
   const lastArgsRef = usePreviousRef(args);
 
-  useValidation(getDraggableRef);
+  useValidation({ isEnabled, getDraggableRef });
 
   const getWindow = useCallbackOne(
     (): HTMLElement => getWindowFromEl(getDraggableRef()),
