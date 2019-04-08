@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, { useRef } from 'react';
 import invariant from 'tiny-invariant';
 import { mount, type ReactWrapper } from 'enzyme';
 import DragDropContext from '../../../../src/view/drag-drop-context';
@@ -129,4 +129,24 @@ it('should not reset the application state an exception occurs and throw it', ()
   expect(willThrough.length).toBeTruthy();
   // no longer dragging
   expect(willThrough.props().snapshot).toEqual(whenIdle);
+});
+
+it('should recover from an error on mount', () => {
+  function ThrowOnce() {
+    const isFirstRenderRef = useRef(true);
+
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false;
+      invariant(false, 'error on first render');
+    }
+    return null;
+  }
+  // This is lame. enzyme is bubbling up errors that where caught in componentDidCatch to the window
+  expect(() =>
+    mount(
+      <DragDropContext onDragEnd={() => {}}>
+        <ThrowOnce />
+      </DragDropContext>,
+    ),
+  ).toThrow();
 });
