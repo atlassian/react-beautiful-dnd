@@ -3,10 +3,12 @@ import { useEffect } from 'react';
 import invariant from 'tiny-invariant';
 import getDragHandleRef from './util/get-drag-handle-ref';
 
-export default function useValidation(
+type Args = {|
   isEnabled: boolean,
   getDraggableRef: () => ?HTMLElement,
-) {
+|};
+
+export default function useValidation({ isEnabled, getDraggableRef }: Args) {
   // validate ref on mount
   useEffect(() => {
     // wrapping entire block for better minification
