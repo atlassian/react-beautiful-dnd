@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
-import type { Provided } from '../../../../src/view/draggable/draggable-types';
-import mount from './util/mount';
+import type { Provided } from '../../../../../src/view/draggable/draggable-types';
+import mount from '../util/mount';
 
 jest.spyOn(console, 'error').mockImplementation(() => {});
 
