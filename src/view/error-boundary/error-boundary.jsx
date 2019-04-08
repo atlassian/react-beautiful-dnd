@@ -25,9 +25,14 @@ function printFatalError(error: Error) {
   console.error('raw', error);
 }
 
+// Not the best marker, but using invariant as a signal for when to try to recover from an error
+function shouldRecover(error: Error): boolean {
+  return error.message.indexOf('Invariant failed') !== -1;
+}
+
 export default class ErrorBoundary extends React.Component<Props> {
   // eslint-disable-next-line react/sort-comp
-  recover: ?() => void;
+  onError: ?() => void;
 
   componentDidMount() {
     window.addEventListener('error', this.onFatalError);
@@ -36,31 +41,31 @@ export default class ErrorBoundary extends React.Component<Props> {
     window.removeEventListener('error', this.onFatalError);
   }
 
-  setOnError = (onError: () => void) => {
-    this.recover = onError;
+  setOnError = (fn: () => void) => {
+    this.onError = fn;
   };
 
   onFatalError = (error: Error) => {
     printFatalError(error);
 
-    if (this.recover) {
-      this.recover();
+    if (this.onError) {
+      this.onError();
     } else {
       warning('Could not find recovering function');
     }
 
     // If the failure was due to an invariant failure - then we handle the error
-    if (error.message.indexOf('Invariant failed') !== -1) {
+    if (shouldRecover(error)) {
       this.setState({});
-      return;
     }
-
-    // Error is more serious and we throw it
-    throw error;
   };
 
   componentDidCatch(error: Error) {
     this.onFatalError(error);
+    // if it was not an invariant - throw
+    if (!shouldRecover(error)) {
+      throw error;
+    }
   }
 
   render() {
