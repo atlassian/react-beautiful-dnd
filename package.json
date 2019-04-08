@@ -56,12 +56,12 @@
   "dependencies": {
     "@babel/runtime-corejs2": "^7.4.3",
     "css-box-model": "^1.1.1",
-    "memoize-one": "^5.0.2",
+    "memoize-one": "^5.0.4",
     "raf-schd": "^4.0.0",
     "react-redux": "7.0.0-beta.1",
     "redux": "^4.0.1",
     "tiny-invariant": "^1.0.4",
-    "use-memo-one": "^1.0.0"
+    "use-memo-one": "^1.0.1"
   },
   "devDependencies": {
     "@atlaskit/css-reset": "^3.0.7",
@@ -87,7 +87,7 @@
     "cypress": "^3.2.0",
     "emotion-theming": "^10.0.10",
     "enzyme": "^3.9.0",
-    "enzyme-adapter-react-16": "^1.11.2",
+    "enzyme-adapter-react-16": "^1.12.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-prettier": "^4.1.0",
@@ -113,11 +113,11 @@
     "react-dom": "^16.8.6",
     "react-test-renderer": "^16.8.6",
     "rimraf": "^2.6.3",
-    "rollup": "^1.8.0",
+    "rollup": "^1.9.0",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-node-resolve": "^4.2.1",
     "rollup-plugin-replace": "^2.1.1",
     "rollup-plugin-size-snapshot": "^0.8.0",
     "rollup-plugin-strip": "^1.2.1",
