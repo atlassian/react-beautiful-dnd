@@ -129,29 +129,29 @@ const QuoteId = styled.small`
 // Need to be super sure we are not relying on PureComponent here for
 // things we should be doing in the selector as we do not know if consumers
 // will be using PureComponent
-export default class QuoteItem extends React.PureComponent<Props> {
-  render() {
-    const { quote, isDragging, isGroupedOver, provided } = this.props;
+function QuoteItem(props: Props) {
+  const { quote, isDragging, isGroupedOver, provided } = props;
 
-    return (
-      <Container
-        href={quote.author.url}
-        isDragging={isDragging}
-        isGroupedOver={isGroupedOver}
-        colors={quote.author.colors}
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-      >
-        <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
-        <Content>
-          <BlockQuote>{quote.content}</BlockQuote>
-          <Footer>
-            <Author colors={quote.author.colors}>{quote.author.name}</Author>
-            <QuoteId>id:{quote.id}</QuoteId>
-          </Footer>
-        </Content>
-      </Container>
-    );
-  }
+  return (
+    <Container
+      href={quote.author.url}
+      isDragging={isDragging}
+      isGroupedOver={isGroupedOver}
+      colors={quote.author.colors}
+      ref={provided.innerRef}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+    >
+      <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
+      <Content>
+        <BlockQuote>{quote.content}</BlockQuote>
+        <Footer>
+          <Author colors={quote.author.colors}>{quote.author.name}</Author>
+          <QuoteId>id:{quote.id}</QuoteId>
+        </Footer>
+      </Content>
+    </Container>
+  );
 }
+
+export default React.memo<Props>(QuoteItem);
