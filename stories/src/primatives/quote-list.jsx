@@ -82,34 +82,26 @@ type QuoteListProps = {|
   quotes: Quote[],
 |};
 
-class InnerQuoteList extends React.Component<QuoteListProps> {
-  shouldComponentUpdate(nextProps: QuoteListProps) {
-    if (nextProps.quotes !== this.props.quotes) {
-      return true;
-    }
-
-    return false;
-  }
-
-  render() {
-    return this.props.quotes.map((quote: Quote, index: number) => (
-      <Draggable key={quote.id} draggableId={quote.id} index={index}>
-        {(
-          dragProvided: DraggableProvided,
-          dragSnapshot: DraggableStateSnapshot,
-        ) => (
-          <QuoteItem
-            key={quote.id}
-            quote={quote}
-            isDragging={dragSnapshot.isDragging}
-            isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
-            provided={dragProvided}
-          />
-        )}
-      </Draggable>
-    ));
-  }
-}
+const InnerQuoteList = React.memo(function InnerQuoteList(
+  props: QuoteListProps,
+) {
+  return props.quotes.map((quote: Quote, index: number) => (
+    <Draggable key={quote.id} draggableId={quote.id} index={index}>
+      {(
+        dragProvided: DraggableProvided,
+        dragSnapshot: DraggableStateSnapshot,
+      ) => (
+        <QuoteItem
+          key={quote.id}
+          quote={quote}
+          isDragging={dragSnapshot.isDragging}
+          isGroupedOver={Boolean(dragSnapshot.combineTargetFor)}
+          provided={dragProvided}
+        />
+      )}
+    </Draggable>
+  ));
+});
 
 type InnerListProps = {|
   dropProvided: DroppableProvided,
@@ -117,78 +109,71 @@ type InnerListProps = {|
   title: ?string,
 |};
 
-class InnerList extends React.Component<InnerListProps> {
-  render() {
-    const { quotes, dropProvided } = this.props;
-    const title = this.props.title ? <Title>{this.props.title}</Title> : null;
+function InnerList(props: InnerListProps) {
+  const { quotes, dropProvided } = props;
+  const title = props.title ? <Title>{props.title}</Title> : null;
 
-    return (
-      <Container>
-        {title}
-        <DropZone ref={dropProvided.innerRef}>
-          <InnerQuoteList quotes={quotes} />
-          {dropProvided.placeholder}
-        </DropZone>
-      </Container>
-    );
-  }
+  return (
+    <Container>
+      {title}
+      <DropZone ref={dropProvided.innerRef}>
+        <InnerQuoteList quotes={quotes} />
+        {dropProvided.placeholder}
+      </DropZone>
+    </Container>
+  );
 }
 
-export default class QuoteList extends React.Component<Props> {
-  static defaultProps = {
-    listId: 'LIST',
-  };
-  render() {
-    const {
-      ignoreContainerClipping,
-      internalScroll,
-      scrollContainerStyle,
-      isDropDisabled,
-      isCombineEnabled,
-      listId,
-      listType,
-      style,
-      quotes,
-      title,
-    } = this.props;
+export default function QuoteList(props: Props) {
+  const {
+    ignoreContainerClipping,
+    internalScroll,
+    scrollContainerStyle,
+    isDropDisabled,
+    isCombineEnabled,
+    listId = 'LIST',
+    listType,
+    style,
+    quotes,
+    title,
+  } = props;
 
-    return (
-      <Droppable
-        droppableId={listId}
-        type={listType}
-        ignoreContainerClipping={ignoreContainerClipping}
-        isDropDisabled={isDropDisabled}
-        isCombineEnabled={isCombineEnabled}
-      >
-        {(
-          dropProvided: DroppableProvided,
-          dropSnapshot: DroppableStateSnapshot,
-        ) => (
-          <Wrapper
-            style={style}
-            isDraggingOver={dropSnapshot.isDraggingOver}
-            isDropDisabled={isDropDisabled}
-            isDraggingFrom={Boolean(dropSnapshot.draggingFromThisWith)}
-            {...dropProvided.droppableProps}
-          >
-            {internalScroll ? (
-              <ScrollContainer style={scrollContainerStyle}>
-                <InnerList
-                  quotes={quotes}
-                  title={title}
-                  dropProvided={dropProvided}
-                />
-              </ScrollContainer>
-            ) : (
+  return (
+    <Droppable
+      droppableId={listId}
+      type={listType}
+      ignoreContainerClipping={ignoreContainerClipping}
+      isDropDisabled={isDropDisabled}
+      isCombineEnabled={isCombineEnabled}
+    >
+      {(
+        dropProvided: DroppableProvided,
+        dropSnapshot: DroppableStateSnapshot,
+      ) => (
+        <Wrapper
+          style={style}
+          isDraggingOver={dropSnapshot.isDraggingOver}
+          isDropDisabled={isDropDisabled}
+          isDraggingFrom={Boolean(dropSnapshot.draggingFromThisWith)}
+          {...dropProvided.droppableProps}
+        >
+          {internalScroll ? (
+            <ScrollContainer style={scrollContainerStyle}>
               <InnerList
                 quotes={quotes}
                 title={title}
                 dropProvided={dropProvided}
               />
-            )}
-          </Wrapper>
-        )}
-      </Droppable>
-    );
-  }
+            </ScrollContainer>
+          ) : (
+            <InnerList
+              quotes={quotes}
+              title={title}
+              dropProvided={dropProvided}
+            />
+          )}
+        </Wrapper>
+      )}
+    </Droppable>
+  );
 }
