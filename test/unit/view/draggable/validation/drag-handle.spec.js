@@ -2,6 +2,7 @@
 import React from 'react';
 import type { Provided } from '../../../../../src/view/draggable/draggable-types';
 import mount from '../util/mount';
+import { defaultOwnProps } from '../util/get-props';
 
 jest.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -19,4 +20,15 @@ it('should throw if no drag handle is applied', () => {
   }
 
   expect(() => mount({ WrappedComponent: NoHandle })).toThrow();
+});
+
+it('should not throw if draggable is disabled as there will be no drag handle', () => {
+  expect(() =>
+    mount({
+      ownProps: {
+        ...defaultOwnProps,
+        isDragDisabled: true,
+      },
+    }),
+  ).not.toThrow();
 });
