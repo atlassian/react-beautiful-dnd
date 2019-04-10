@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { useCallbackOne, useMemoOne } from 'use-memo-one';
 import invariant from 'tiny-invariant';
 import type { Responders, DroppableId } from '../../types';
+import type { DroppableResponderRegistration } from './droppable-responders-types';
 
 type GetResponders = () => Responders;
 
@@ -11,8 +12,7 @@ type DroppableResponderCache = {
 };
 
 export type Result = {|
-  register: (id: DroppableId, getResponders: GetResponders) => void,
-  unregister: (id: DroppableId) => void,
+  registration: DroppableResponderRegistration,
   getDroppableResponders: (id: DroppableId) => Responders,
 |};
 
@@ -30,6 +30,14 @@ export default function useDroppableResponders() {
     delete cacheRef.current[id];
   }, []);
 
+  const registration: DroppableResponderRegistration = useMemoOne(
+    () => ({
+      register,
+      unregister,
+    }),
+    [register, unregister],
+  );
+
   const getDroppableResponders = useCallbackOne((id: DroppableId) => {
     const getResponders: ?GetResponders = cacheRef.current[id];
 
@@ -40,11 +48,10 @@ export default function useDroppableResponders() {
 
   const result: Result = useMemoOne(
     () => ({
-      register,
-      unregister,
+      registration,
       getDroppableResponders,
     }),
-    [],
+    [registration, getDroppableResponders],
   );
 
   return result;

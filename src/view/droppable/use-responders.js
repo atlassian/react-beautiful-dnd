@@ -2,22 +2,18 @@
 import { useCallbackOne } from 'use-memo-one';
 import type { Props } from './droppable-types';
 import type { Responders } from '../../types';
+import type { DroppableResponderRegistration } from '../use-droppable-responders/droppable-responders-types';
 import usePrevious from '../use-previous-ref';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 import useRequiredContext from '../use-required-context';
-import DroppableRespondersContext, {
-  type DroppableRespondersContextValue,
-} from '../context/droppable-responders-context';
+import AppContext, { type AppContextValue } from '../context/app-context';
 
 export default function useResponders(props: Props) {
   const { droppableId } = props;
   const previousRef = usePrevious<Props>(props);
-  const {
-    register,
-    unregister,
-  }: DroppableRespondersContextValue = useRequiredContext(
-    DroppableRespondersContext,
-  );
+  const context: AppContextValue = useRequiredContext(AppContext);
+  const registration: DroppableResponderRegistration =
+    context.droppableResponderRegistration;
 
   const getResponders = useCallbackOne(
     (): Responders => ({
@@ -30,7 +26,7 @@ export default function useResponders(props: Props) {
   );
 
   useIsomorphicLayoutEffect(() => {
-    register(droppableId, getResponders);
-    return () => unregister(droppableId);
-  }, [droppableId, getResponders]);
+    registration.register(droppableId, getResponders);
+    return () => registration.unregister(droppableId);
+  }, [droppableId, getResponders, registration]);
 }

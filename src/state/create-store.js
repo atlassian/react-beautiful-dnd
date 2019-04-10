@@ -13,7 +13,7 @@ import pendingDrop from './middleware/pending-drop';
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
 import type { StyleMarshal } from '../view/use-style-marshal/style-marshal-types';
 import type { AutoScroller } from './auto-scroller/auto-scroller-types';
-import type { Responders, Announce } from '../types';
+import type { Responders, Announce, DroppableId } from '../types';
 import type { Store } from './store-types';
 
 // We are checking if window is available before using it.
@@ -29,7 +29,8 @@ const composeEnhancers =
 type Args = {|
   dimensionMarshal: DimensionMarshal,
   styleMarshal: StyleMarshal,
-  getResponders: () => Responders,
+  getDragDropContextResponders: () => Responders,
+  getDroppableResponders: (id: DroppableId) => Responders,
   announce: Announce,
   autoScroller: AutoScroller,
 |};
@@ -37,9 +38,10 @@ type Args = {|
 export default ({
   dimensionMarshal,
   styleMarshal,
-  getResponders,
   announce,
   autoScroller,
+  getDragDropContextResponders,
+  getDroppableResponders,
 }: Args): Store =>
   createStore(
     reducer,
@@ -80,7 +82,11 @@ export default ({
         pendingDrop,
         autoScroll(autoScroller),
         // Fire responders for consumers (after update to store)
-        responders(getResponders, announce),
+        responders(
+          getDragDropContextResponders,
+          getDroppableResponders,
+          announce,
+        ),
       ),
     ),
   );

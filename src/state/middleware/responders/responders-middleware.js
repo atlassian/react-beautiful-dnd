@@ -6,6 +6,7 @@ import type {
   Responders,
   Critical,
   Announce,
+  DroppableId,
 } from '../../../types';
 import type {
   Action,
@@ -15,12 +16,14 @@ import type {
 } from '../../store-types';
 
 export default (
-  getResponders: () => Responders,
+  getDragDropContextResponders: () => Responders,
+  getDroppableResponders: (id: DroppableId) => Responders,
   announce: Announce,
 ): Middleware => {
   const publisher = getPublisher(
-    (getResponders: () => Responders),
-    (announce: Announce),
+    getDragDropContextResponders,
+    getDroppableResponders,
+    announce,
   );
 
   return (store: MiddlewareStore) => (next: Dispatch) => (

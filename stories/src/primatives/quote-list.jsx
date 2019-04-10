@@ -145,6 +145,7 @@ export default function QuoteList(props: Props) {
       ignoreContainerClipping={ignoreContainerClipping}
       isDropDisabled={isDropDisabled}
       isCombineEnabled={isCombineEnabled}
+      onBeforeDragStart={value => console.log('onBeforeDragStart', value)}
     >
       {(
         dropProvided: DroppableProvided,

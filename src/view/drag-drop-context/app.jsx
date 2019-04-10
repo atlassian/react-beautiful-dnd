@@ -32,6 +32,7 @@ import useAnnouncer from '../use-announcer';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
 import usePrevious from '../use-previous-ref';
+import useDroppableResponders from '../use-droppable-responders';
 
 type Props = {|
   ...Responders,
@@ -59,9 +60,10 @@ export default function App(props: Props) {
   // lazy collection of responders using a ref - update on ever render
   const lastPropsRef = usePrevious<Props>(props);
 
-  const getResponders: () => Responders = useCallbackOne(() => {
+  const getDragDropContextResponders: () => Responders = useCallbackOne(() => {
     return createResponders(lastPropsRef.current);
   }, []);
+  const droppableResponders = useDroppableResponders();
 
   const announce: Announce = useAnnouncer(uniqueId);
   const styleMarshal: StyleMarshal = useStyleMarshal(uniqueId);
@@ -116,7 +118,8 @@ export default function App(props: Props) {
         styleMarshal,
         announce,
         autoScroller,
-        getResponders,
+        getDragDropContextResponders,
+        getDroppableResponders: droppableResponders.getDroppableResponders,
       }),
     [],
   );
@@ -150,6 +153,7 @@ export default function App(props: Props) {
       style: styleMarshal.styleContext,
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
+      droppableResponderRegistration: droppableResponders.registration,
     }),
     [],
   );
