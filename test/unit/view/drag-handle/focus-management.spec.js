@@ -8,6 +8,7 @@ import type { DragHandleProps } from '../../../../src/view/use-drag-handle/drag-
 import { getStubCallbacks } from './util/callbacks';
 import { WithDragHandle } from './util/wrappers';
 import { getMarshalStub } from '../../../utils/dimension-marshal';
+import forceUpdate from '../../../utils/force-update';
 import AppContext, {
   type AppContextValue,
 } from '../../../../src/view/context/app-context';
@@ -98,6 +99,29 @@ describe('Portal usage (ref changing while mounted)', () => {
       );
     }
   }
+
+  it('should not try to retain focus if the ref has not changed', () => {
+    const wrapper = mount(<WithParentRefAndPortalChild usePortal={false} />);
+
+    const original: HTMLElement = wrapper.find('.drag-handle').getDOMNode();
+    expect(original).not.toBe(document.activeElement);
+
+    // giving it focus
+    original.focus();
+    wrapper.simulate('focus');
+    expect(original).toBe(document.activeElement);
+    jest.spyOn(original, 'focus');
+
+    // force render to run focus detection tests
+    forceUpdate(wrapper);
+
+    // element still has focus
+    expect(original).toBe(document.activeElement);
+    // should not manually call focus on element if there is no change
+    expect(original.focus).not.toHaveBeenCalled();
+
+    original.focus.mockRestore();
+  });
 
   it('should retain focus if draggable ref is changing and had focus', () => {
     const wrapper = mount(<WithParentRefAndPortalChild usePortal={false} />);

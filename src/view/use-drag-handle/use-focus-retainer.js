@@ -61,7 +61,7 @@ export default function useFocusRetainer(args: Args): Result {
         focusRetainer.retain(last.draggableId);
       }
     };
-  }, [getDraggableRef, lastArgsRef]);
+  }, [getDraggableRef]);
 
   const lastDraggableRef = useRef<?HTMLElement>(getDraggableRef());
 
@@ -74,7 +74,7 @@ export default function useFocusRetainer(args: Args): Result {
     }
 
     // no change in ref
-    if (draggableRef === lastArgsRef.current.draggableId) {
+    if (draggableRef === lastDraggableRef.current) {
       return;
     }
 
