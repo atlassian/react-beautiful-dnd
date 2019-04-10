@@ -55,6 +55,17 @@ module.exports = {
     // Allowing ++ on numbers
     'no-plusplus': 'off',
 
+    // Disabling the use of !! to cast to boolean
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector:
+          'UnaryExpression[operator="!"] > UnaryExpression[operator="!"]',
+        message:
+          '!! to cast to boolean relies on a double negative. Use Boolean() instead',
+      },
+    ],
+
     // Allowing Math.pow rather than forcing `**`
     'no-restricted-properties': [
       'off',
