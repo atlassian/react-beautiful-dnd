@@ -7,6 +7,7 @@ import type {
   Direction,
   Placeholder,
   State,
+  Responders,
 } from '../../types';
 import { updateViewportMaxScroll } from '../../state/action-creators';
 
@@ -55,8 +56,9 @@ export type DispatchProps = {|
 
 export type OwnProps = {|
   ...DefaultProps,
-  children: (Provided, StateSnapshot) => Node,
+  ...Responders,
   droppableId: DroppableId,
+  children: (Provided, StateSnapshot) => Node,
 |};
 
 export type Props = {|

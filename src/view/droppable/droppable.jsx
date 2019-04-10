@@ -15,6 +15,7 @@ import useValidation from './use-validation';
 import AnimateInOut, {
   type AnimateProvided,
 } from '../animate-in-out/animate-in-out';
+import useResponders from './use-responders';
 
 export default function Droppable(props: Props) {
   const appContext: ?AppContextValue = useContext<?AppContextValue>(AppContext);
@@ -39,6 +40,9 @@ export default function Droppable(props: Props) {
     // dispatch props
     updateViewportMaxScroll,
   } = props;
+
+  // side effect: register responders on the context
+  useResponders(props);
 
   const getDroppableRef = useCallbackOne(
     (): ?HTMLElement => droppableRef.current,
