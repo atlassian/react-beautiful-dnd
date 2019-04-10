@@ -182,6 +182,8 @@ Object.assign(table.style, {
   margin: '0',
   padding: '0',
   border: '0',
+  height: '0',
+  width: '0',
 });
 const tbody: HTMLElement = document.createElement('tbody');
 table.appendChild(tbody);
@@ -388,6 +390,7 @@ export default class TableApp extends Component<AppProps, AppState> {
                         )}
                       </Draggable>
                     ))}
+                    {droppableProvided.placeholder}
                   </TBody>
                 )}
               </Droppable>

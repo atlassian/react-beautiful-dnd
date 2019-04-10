@@ -302,6 +302,7 @@ export default class TableApp extends Component<AppProps, AppState> {
                         )}
                       </Draggable>
                     ))}
+                    {droppableProvided.placeholder}
                   </TBody>
                 )}
               </Droppable>
