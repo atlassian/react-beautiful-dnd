@@ -134,7 +134,7 @@
     "webpack": "^4.29.6"
   },
   "peerDependencies": {
-    "react": "^16.8.4"
+    "react": "^16.8.0"
   },
   "license": "Apache-2.0",
   "jest-junit": {
