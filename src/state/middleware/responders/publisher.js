@@ -23,6 +23,9 @@ import type {
   DroppableId,
 } from '../../../types';
 import { isCombineEqual, isCriticalEqual, areLocationsEqual } from './is-equal';
+import whatIsDraggedOverFromResult from '../../droppable/what-is-dragged-over-from-result';
+import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
+import { noMovement } from '../../no-impact';
 
 const withTimings = (key: string, fn: Function) => {
   timings.start(key);
@@ -92,24 +95,15 @@ export default (
     );
     withTimings('onBeforeDragStart', () => {
       // No use of screen reader for this responder
-      const fn1: ?OnBeforeDragStartResponder = getDragDropContextResponders()
-        .onBeforeDragStart;
-      if (fn1) {
-        fn1(getDragStart(critical, mode));
-      }
+      const act = (responder: ?OnBeforeDragStartResponder) => {
+        if (responder) {
+          responder(getDragStart(critical, mode));
+        }
+      };
 
-      const fn2: ?OnBeforeDragStartResponder = getDroppableResponders(
-        critical.droppable.id,
-      ).onBeforeDragStart;
-
-      console.log(
-        'droppable responders',
-        getDroppableResponders(critical.droppable.id),
-      );
-
-      if (fn2) {
-        fn2(getDragStart(critical, mode));
-      }
+      // Drag drop context responders before droppable
+      act(getDragDropContextResponders().onBeforeDragStart);
+      act(getDroppableResponders(critical.droppable.id).onBeforeDragStart);
     });
   };
 
@@ -128,14 +122,16 @@ export default (
 
     // we will flush this frame if we receive any responder updates
     asyncMarshal.add(() => {
-      withTimings('onDragStart', () =>
-        execute(
-          getDragDropContextResponders().onDragStart,
-          data,
-          announce,
-          messagePreset.onDragStart,
-        ),
-      );
+      withTimings('onDragStart', () => {
+        const act = (responder: ?OnDragStartResponder) => {
+          if (responder) {
+            execute(responder, data, announce, messagePreset.onDragStart);
+          }
+        };
+
+        act(getDragDropContextResponders().onDragStart);
+        act(getDroppableResponders(critical.droppable.id).onDragStart);
+      });
     });
   };
 
@@ -147,6 +143,7 @@ export default (
       dragging,
       'Cannot fire onDragMove when onDragStart has not been called',
     );
+    const previous: WhileDragging = { ...dragging };
 
     // Has the critical changed? Will result in a source change
     const hasCriticalChanged: boolean = !isCriticalEqual(
@@ -185,14 +182,44 @@ export default (
     };
 
     asyncMarshal.add(() => {
-      withTimings('onDragUpdate', () =>
-        execute(
-          getDragDropContextResponders().onDragUpdate,
-          data,
-          announce,
-          messagePreset.onDragUpdate,
-        ),
-      );
+      withTimings('onDragUpdate', () => {
+        const act = (responder: ?OnDragUpdateResponder) => {
+          if (responder) {
+            execute(responder, data, announce, messagePreset.onDragUpdate);
+          }
+        };
+
+        act(getDragDropContextResponders().onDragUpdate);
+
+        // update home droppable
+        const homeId: DroppableId = critical.droppable.id;
+        act(getDroppableResponders(homeId).onDragUpdate);
+
+        // update a foreign droppable if over
+        const isOver: ?DroppableId = whatIsDraggedOver(impact);
+
+        // currently over a foreign
+        if (isOver && isOver !== homeId) {
+          act(getDroppableResponders(isOver).onDragUpdate);
+        }
+
+        // update a foreign droppable if no longer over
+        const wasOver: ?DroppableId = (() => {
+          if (previous.lastLocation) {
+            return previous.lastLocation.droppableId;
+          }
+          if (previous.lastCombine) {
+            return previous.lastCombine.droppableId;
+          }
+          return null;
+        })();
+
+        // update a droppable if we were over a foreign list that we
+        // are no longer over
+        if (wasOver && wasOver !== homeId && wasOver !== isOver) {
+          act(getDroppableResponders(wasOver).onDragUpdate);
+        }
+      });
     });
   };
 
@@ -209,14 +236,27 @@ export default (
     dragging = null;
     // not adding to frame marshal - we want this to be done in the same render pass
     // we also want the consumers reorder logic to be in the same render pass
-    withTimings('onDragEnd', () =>
-      execute(
-        getDragDropContextResponders().onDragEnd,
-        result,
-        announce,
-        messagePreset.onDragEnd,
-      ),
-    );
+    withTimings('onDragEnd', () => {
+      const act = (responder: ?OnDragEndResponder) => {
+        if (responder) {
+          execute(responder, result, announce, messagePreset.onDragEnd);
+        }
+      };
+      act(getDragDropContextResponders().onDragEnd);
+      // fire critical droppable responders
+      const homeId: DroppableId = result.source.droppableId;
+      act(getDroppableResponders(homeId).onDragEnd);
+
+      const overId: ?DroppableId = whatIsDraggedOverFromResult(result);
+
+      // if over nothing, or over home, there is nothing to do
+      if (!overId || overId === homeId) {
+        return;
+      }
+
+      // over foreign list: call the onDragEnd
+      act(getDroppableResponders(overId).onDragEnd);
+    });
   };
 
   // A non user initiated cancel

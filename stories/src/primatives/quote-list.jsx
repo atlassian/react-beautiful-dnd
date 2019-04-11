@@ -146,6 +146,9 @@ export default function QuoteList(props: Props) {
       isDropDisabled={isDropDisabled}
       isCombineEnabled={isCombineEnabled}
       onBeforeDragStart={value => console.log('onBeforeDragStart', value)}
+      onDragStart={value => console.log('onDragStart', value)}
+      onDragUpdate={value => console.log('onDragUpdate', value)}
+      onDragEnd={value => console.log('onDragEnd', value)}
     >
       {(
         dropProvided: DroppableProvided,

@@ -15,15 +15,15 @@ export default function useResponders(props: Props) {
   const registration: DroppableResponderRegistration =
     context.droppableResponderRegistration;
 
-  const getResponders = useCallbackOne(
-    (): Responders => ({
-      onBeforeDragStart: previousRef.onBeforeDragStart,
-      onDragStart: previousRef.onDragStart,
-      onDragUpdate: previousRef.onDragUpdate,
-      onDragEnd: previousRef.onDragEnd,
-    }),
-    [],
-  );
+  const getResponders = useCallbackOne((): Responders => {
+    const previous: Props = previousRef.current;
+    return {
+      onBeforeDragStart: previous.onBeforeDragStart,
+      onDragStart: previous.onDragStart,
+      onDragUpdate: previous.onDragUpdate,
+      onDragEnd: previous.onDragEnd,
+    };
+  }, []);
 
   useIsomorphicLayoutEffect(() => {
     registration.register(droppableId, getResponders);
