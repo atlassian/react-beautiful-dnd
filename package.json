@@ -123,7 +123,7 @@
     "rollup-plugin-strip": "^1.2.1",
     "rollup-plugin-uglify": "^6.0.2",
     "styled-components": "3.x",
-    "stylelint": "^9.10.1",
+    "stylelint": "^10.0.0",
     "stylelint-config-prettier": "^5.0.0",
     "stylelint-config-recommended": "^2.1.0",
     "stylelint-config-standard": "^18.2.0",
