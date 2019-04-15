@@ -1,7 +1,7 @@
 // @flow
 import type { ReactWrapper } from 'enzyme';
-import { sloppyClickThreshold } from '../../../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
-import { timeForLongPress } from '../../../../../src/view/drag-handle/sensor/create-touch-sensor';
+import { sloppyClickThreshold } from '../../../../../src/view/use-drag-handle/util/is-sloppy-click-threshold-exceeded';
+import { timeForLongPress } from '../../../../../src/view/use-drag-handle/sensor/use-touch-sensor';
 import {
   primaryButton,
   touchStart,
@@ -26,18 +26,21 @@ export type Control = {|
   cleanup: () => void,
 |};
 
-const trySetIsDragging = (wrapper: ReactWrapper<*>) => {
-  // potentially not looking at the root wrapper
-  if (!wrapper.props().callbacks) {
-    return;
-  }
+// using the class rather than the attribute as the attribute will not be present when disabled
+const getDragHandle = (wrapper: ReactWrapper<*>) =>
+  // using div. as it can return a component with the classname prop
+  // using .first in case there is nested handles
+  wrapper.find('div.drag-handle').first();
 
-  // lift was not successful - this can happen when not allowed to lift
-  if (!wrapper.props().callbacks.onLift.mock.calls.length) {
-    return;
+const trySetIsDragging = (wrapper: ReactWrapper<*>) => {
+  // sometimes we are dragging a wrapper that is not the root.
+  // this will throw an error
+
+  try {
+    wrapper.setProps({ isDragging: true });
+  } catch (e) {
+    // ignoring error
   }
-  // would be set during a drag
-  wrapper.setProps({ isDragging: true });
 };
 
 export const touch: Control = {
@@ -45,7 +48,7 @@ export const touch: Control = {
   hasPostDragClickBlocking: true,
   hasPreLift: true,
   preLift: (wrapper: ReactWrapper<*>, options?: Object = {}) =>
-    touchStart(wrapper, { x: 0, y: 0 }, 0, options),
+    touchStart(getDragHandle(wrapper), { x: 0, y: 0 }, 0, options),
   lift: (wrapper: ReactWrapper<*>) => {
     jest.runTimersToTime(timeForLongPress);
     trySetIsDragging(wrapper);
@@ -68,16 +71,16 @@ export const keyboard: Control = {
   // no pre lift required
   preLift: () => {},
   lift: (wrap: ReactWrapper<*>, options?: Object = {}) => {
-    pressSpacebar(wrap, options);
+    pressSpacebar(getDragHandle(wrap), options);
     trySetIsDragging(wrap);
   },
   move: (wrap: ReactWrapper<*>) => {
-    pressArrowDown(wrap);
+    pressArrowDown(getDragHandle(wrap));
   },
   drop: (wrap: ReactWrapper<*>) => {
     // only want to fire the event if dragging - otherwise it might start a drag
     if (wrap.props().isDragging) {
-      pressSpacebar(wrap);
+      pressSpacebar(getDragHandle(wrap));
     }
   },
   // no cleanup required
@@ -88,8 +91,9 @@ export const mouse: Control = {
   name: 'mouse',
   hasPostDragClickBlocking: true,
   hasPreLift: true,
-  preLift: (wrap: ReactWrapper<*>, options?: Object = {}) =>
-    mouseDown(wrap, { x: 0, y: 0 }, primaryButton, options),
+  preLift: (wrap: ReactWrapper<*>, options?: Object = {}) => {
+    mouseDown(getDragHandle(wrap), { x: 0, y: 0 }, primaryButton, options);
+  },
   lift: (wrap: ReactWrapper<*>) => {
     windowMouseMove({ x: 0, y: sloppyClickThreshold });
     trySetIsDragging(wrap);
@@ -105,7 +109,8 @@ export const mouse: Control = {
   },
 };
 
-export const controls: Control[] = [mouse, keyboard, touch];
+// export const controls: Control[] = [mouse, keyboard, touch];
+export const controls: Control[] = [keyboard];
 
 export const forEach = (fn: (control: Control) => void) => {
   controls.forEach((control: Control) => {

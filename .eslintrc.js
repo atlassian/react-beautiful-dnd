@@ -55,12 +55,37 @@ module.exports = {
     // Allowing ++ on numbers
     'no-plusplus': 'off',
 
+    // Disabling the use of !! to cast to boolean
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector:
+          'UnaryExpression[operator="!"] > UnaryExpression[operator="!"]',
+        message:
+          '!! to cast to boolean relies on a double negative. Use Boolean() instead',
+      },
+    ],
+
     // Allowing Math.pow rather than forcing `**`
     'no-restricted-properties': [
       'off',
       {
         object: 'Math',
         property: 'pow',
+      },
+    ],
+
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: 'react',
+            importNames: ['useMemo', 'useCallback'],
+            message:
+              'useMemo and useCallback are subject to cache busting. Please use useMemoOne and useCallbackOne',
+          },
+        ],
       },
     ],
 

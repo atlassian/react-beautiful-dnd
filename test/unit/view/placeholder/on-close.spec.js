@@ -1,12 +1,12 @@
 // @flow
 import React from 'react';
 import { mount, type ReactWrapper } from 'enzyme';
-import Placeholder from '../../../../src/view/placeholder';
+import Placeholder from './util/placeholder-with-class';
 import { expectIsFull } from './util/expect';
 import getPlaceholderStyle from './util/get-placeholder-style';
 import { placeholder } from './util/data';
 
-jest.useFakeTimers();
+const styleContext: string = 'yolo';
 
 it('should only fire a single onClose event', () => {
   const onClose = jest.fn();
@@ -17,6 +17,7 @@ it('should only fire a single onClose event', () => {
       placeholder={placeholder}
       onClose={onClose}
       onTransitionEnd={jest.fn()}
+      styleContext={styleContext}
     />,
   );
   expectIsFull(getPlaceholderStyle(wrapper));
@@ -57,6 +58,7 @@ it('should not fire an onClose if not closing when a transitionend occurs', () =
       placeholder={placeholder}
       onClose={onClose}
       onTransitionEnd={jest.fn()}
+      styleContext={styleContext}
     />,
   );
   const assert = () => {

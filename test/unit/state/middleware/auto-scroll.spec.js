@@ -38,7 +38,7 @@ const getScrollerStub = (): AutoScroller => ({
 shouldCancelPending.forEach((action: Action) => {
   it(`should cancel a pending scroll when a ${action.type} is fired`, () => {
     const scroller: AutoScroller = getScrollerStub();
-    const store: Store = createStore(middleware(() => scroller));
+    const store: Store = createStore(middleware(scroller));
 
     store.dispatch(initialPublish(initialPublishArgs));
     expect(store.getState().phase).toBe('DRAGGING');
@@ -53,7 +53,7 @@ shouldCancelPending.forEach((action: Action) => {
 shouldStop.forEach((action: Action) => {
   it(`should stop the auto scroller when a ${action.type} is fired`, () => {
     const scroller: AutoScroller = getScrollerStub();
-    const store: Store = createStore(middleware(() => scroller));
+    const store: Store = createStore(middleware(scroller));
 
     store.dispatch(initialPublish(initialPublishArgs));
     expect(store.getState().phase).toBe('DRAGGING');
@@ -66,7 +66,7 @@ shouldStop.forEach((action: Action) => {
 
 it('should fire a scroll when there is an update', () => {
   const scroller: AutoScroller = getScrollerStub();
-  const store: Store = createStore(middleware(() => scroller));
+  const store: Store = createStore(middleware(scroller));
 
   store.dispatch(initialPublish(initialPublishArgs));
   expect(scroller.start).toHaveBeenCalledWith(store.getState());

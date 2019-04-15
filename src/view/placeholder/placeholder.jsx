@@ -1,5 +1,6 @@
 // @flow
-import React, { PureComponent } from 'react';
+import React, { useState, useRef, useEffect, type Node } from 'react';
+import { useCallbackOne } from 'use-memo-one';
 import type { Spacing } from 'css-box-model';
 import type {
   Placeholder as PlaceholderType,
@@ -7,6 +8,8 @@ import type {
 } from '../../types';
 import { transitions } from '../../animation';
 import { noSpacing } from '../../state/spacing';
+
+function noop() {}
 
 export type PlaceholderStyle = {|
   display: string,
@@ -22,12 +25,13 @@ export type PlaceholderStyle = {|
   pointerEvents: 'none',
   transition: string,
 |};
-type Props = {|
+export type Props = {|
   placeholder: PlaceholderType,
   animate: InOutAnimationMode,
   onClose: () => void,
   innerRef?: () => ?HTMLElement,
   onTransitionEnd: () => void,
+  styleContext: string,
 |};
 
 type Size = {|
@@ -37,9 +41,10 @@ type Size = {|
   margin: Spacing,
 |};
 
-type State = {|
+type HelperArgs = {|
   isAnimatingOpenOnMount: boolean,
-  // useEmpty: boolean,
+  placeholder: PlaceholderType,
+  animate: InOutAnimationMode,
 |};
 
 const empty: Size = {
@@ -48,129 +53,145 @@ const empty: Size = {
   margin: noSpacing,
 };
 
-export default class Placeholder extends PureComponent<Props, State> {
-  mountTimerId: ?TimeoutID = null;
-
-  state: State = {
-    isAnimatingOpenOnMount: this.props.animate === 'open',
-  };
-
-  // called before render() on initial mount and updates
-  static getDerivedStateFromProps(props: Props, state: State): State {
-    // An animated open is no longer relevant.
-    if (state.isAnimatingOpenOnMount && props.animate !== 'open') {
-      return {
-        isAnimatingOpenOnMount: false,
-      };
-    }
-
-    return state;
+const getSize = ({
+  isAnimatingOpenOnMount,
+  placeholder,
+  animate,
+}: HelperArgs): Size => {
+  if (isAnimatingOpenOnMount) {
+    return empty;
   }
 
-  componentDidMount() {
-    if (!this.state.isAnimatingOpenOnMount) {
+  if (animate === 'close') {
+    return empty;
+  }
+
+  return {
+    height: placeholder.client.borderBox.height,
+    width: placeholder.client.borderBox.width,
+    margin: placeholder.client.margin,
+  };
+};
+
+const getStyle = ({
+  isAnimatingOpenOnMount,
+  placeholder,
+  animate,
+}: HelperArgs): PlaceholderStyle => {
+  const size: Size = getSize({ isAnimatingOpenOnMount, placeholder, animate });
+
+  return {
+    display: placeholder.display,
+    // ## Recreating the box model
+    // We created the borderBox and then apply the margins directly
+    // this is to maintain any margin collapsing behaviour
+
+    // creating borderBox
+    // background: 'green',
+    boxSizing: 'border-box',
+    width: size.width,
+    height: size.height,
+    // creating marginBox
+    marginTop: size.margin.top,
+    marginRight: size.margin.right,
+    marginBottom: size.margin.bottom,
+    marginLeft: size.margin.left,
+
+    // ## Avoiding collapsing
+    // Avoiding the collapsing or growing of this element when pushed by flex child siblings.
+    // We have already taken a snapshot the current dimensions we do not want this element
+    // to recalculate its dimensions
+    // It is okay for these properties to be applied on elements that are not flex children
+    flexShrink: '0',
+    flexGrow: '0',
+    // Just a little performance optimisation: avoiding the browser needing
+    // to worry about pointer events for this element
+    pointerEvents: 'none',
+
+    // Animate the placeholder size and margin
+    transition: transitions.placeholder,
+  };
+};
+
+function Placeholder(props: Props): Node {
+  const animateOpenTimerRef = useRef<?TimeoutID>(null);
+
+  const tryClearAnimateOpenTimer = useCallbackOne(() => {
+    if (!animateOpenTimerRef.current) {
       return;
     }
+    clearTimeout(animateOpenTimerRef.current);
+    animateOpenTimerRef.current = null;
+  }, []);
 
-    // Ensuring there is one browser update with an empty size
-    // .setState in componentDidMount will cause two react renders
-    // but only a single browser update
-    // https://reactjs.org/docs/react-component.html#componentdidmount
-    this.mountTimerId = setTimeout(() => {
-      this.mountTimerId = null;
+  const { animate, onTransitionEnd, onClose, styleContext } = props;
+  const [isAnimatingOpenOnMount, setIsAnimatingOpenOnMount] = useState<boolean>(
+    props.animate === 'open',
+  );
 
-      if (this.state.isAnimatingOpenOnMount) {
-        this.setState({
-          isAnimatingOpenOnMount: false,
-        });
+  // Will run after a render is flushed
+  // Still need to wait a timeout to ensure that the
+  // update is completely applied to the DOM
+  useEffect(() => {
+    // No need to do anything
+    if (!isAnimatingOpenOnMount) {
+      return noop;
+    }
+
+    // might need to clear the timer
+    if (animate !== 'open') {
+      tryClearAnimateOpenTimer();
+      setIsAnimatingOpenOnMount(false);
+      return noop;
+    }
+
+    // timer already pending
+    if (animateOpenTimerRef.current) {
+      return noop;
+    }
+
+    animateOpenTimerRef.current = setTimeout(() => {
+      animateOpenTimerRef.current = null;
+      setIsAnimatingOpenOnMount(false);
+    });
+
+    // clear the timer if needed
+    return tryClearAnimateOpenTimer;
+  }, [animate, isAnimatingOpenOnMount, tryClearAnimateOpenTimer]);
+
+  const onSizeChangeEnd = useCallbackOne(
+    (event: TransitionEvent) => {
+      // We transition height, width and margin
+      // each of those transitions will independently call this callback
+      // Because they all have the same duration we can just respond to one of them
+      // 'height' was chosen for no particular reason :D
+      if (event.propertyName !== 'height') {
+        return;
       }
-    });
-  }
 
-  componentWillUnmount() {
-    if (!this.mountTimerId) {
-      return;
-    }
-    clearTimeout(this.mountTimerId);
-    this.mountTimerId = null;
-  }
+      onTransitionEnd();
 
-  onTransitionEnd = (event: TransitionEvent) => {
-    // We transition height, width and margin
-    // each of those transitions will independently call this callback
-    // Because they all have the same duration we can just respond to one of them
-    // 'height' was chosen for no particular reason :D
-    if (event.propertyName !== 'height') {
-      return;
-    }
+      if (animate === 'close') {
+        onClose();
+      }
+    },
+    [animate, onClose, onTransitionEnd],
+  );
 
-    this.props.onTransitionEnd();
+  const style: PlaceholderStyle = getStyle({
+    isAnimatingOpenOnMount,
+    animate: props.animate,
+    placeholder: props.placeholder,
+  });
 
-    if (this.props.animate === 'close') {
-      this.props.onClose();
-    }
-  };
-
-  getSize(): Size {
-    if (this.state.isAnimatingOpenOnMount) {
-      return empty;
-    }
-
-    if (this.props.animate === 'close') {
-      return empty;
-    }
-
-    const placeholder: PlaceholderType = this.props.placeholder;
-    return {
-      height: placeholder.client.borderBox.height,
-      width: placeholder.client.borderBox.width,
-      margin: placeholder.client.margin,
-    };
-  }
-
-  render() {
-    const placeholder: PlaceholderType = this.props.placeholder;
-    const size: Size = this.getSize();
-    const { display, tagName } = placeholder;
-
-    // The goal of the placeholder is to take up the same amount of space
-    // as the original draggable
-    const style: PlaceholderStyle = {
-      display,
-      // ## Recreating the box model
-      // We created the borderBox and then apply the margins directly
-      // this is to maintain any margin collapsing behaviour
-
-      // creating borderBox
-      // background: 'green',
-      boxSizing: 'border-box',
-      width: size.width,
-      height: size.height,
-      // creating marginBox
-      marginTop: size.margin.top,
-      marginRight: size.margin.right,
-      marginBottom: size.margin.bottom,
-      marginLeft: size.margin.left,
-
-      // ## Avoiding collapsing
-      // Avoiding the collapsing or growing of this element when pushed by flex child siblings.
-      // We have already taken a snapshot the current dimensions we do not want this element
-      // to recalculate its dimensions
-      // It is okay for these properties to be applied on elements that are not flex children
-      flexShrink: '0',
-      flexGrow: '0',
-      // Just a little performance optimisation: avoiding the browser needing
-      // to worry about pointer events for this element
-      pointerEvents: 'none',
-
-      // Animate the placeholder size and margin
-      transition: transitions.placeholder,
-    };
-
-    return React.createElement(tagName, {
-      style,
-      onTransitionEnd: this.onTransitionEnd,
-      ref: this.props.innerRef,
-    });
-  }
+  return React.createElement(props.placeholder.tagName, {
+    style,
+    'data-react-beautiful-dnd-placeholder': styleContext,
+    onTransitionEnd: onSizeChangeEnd,
+    ref: props.innerRef,
+  });
 }
+
+export default React.memo<Props>(Placeholder);
+// enzyme does not work well with memo, so exporting the non-memo version
+export const WithoutMemo = Placeholder;

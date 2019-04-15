@@ -1,6 +1,6 @@
 // @flow
 import type { ReactWrapper } from 'enzyme';
-import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
 import { forEach, type Control } from './util/controls';
 import { getWrapper } from './util/wrappers';
 import { getStubCallbacks } from './util/callbacks';
@@ -100,6 +100,13 @@ forEach((control: Control) => {
 
     // unmounting while dragging
     wrapper.unmount();
+
+    if (control.hasPostDragClickBlocking) {
+      // cleanup is still bound
+      expect(getAddCount()).toBeGreaterThan(getRemoveCount());
+      // cleanup performed
+      control.cleanup();
+    }
 
     expect(getAddCount()).toBe(getRemoveCount());
   });

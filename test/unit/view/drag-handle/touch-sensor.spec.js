@@ -1,14 +1,13 @@
 // @flow
 import { type Position } from 'css-box-model';
 import { type ReactWrapper } from 'enzyme';
-import { canLiftKey, styleKey } from '../../../../src/view/context-keys';
 import * as keyCodes from '../../../../src/view/key-codes';
 import getWindowScroll from '../../../../src/view/window/get-window-scroll';
 import setWindowScroll from '../../../utils/set-window-scroll';
 import {
   timeForLongPress,
   forcePressThreshold,
-} from '../../../../src/view/drag-handle/sensor/create-touch-sensor';
+} from '../../../../src/view/use-drag-handle/sensor/use-touch-sensor';
 import {
   dispatchWindowEvent,
   dispatchWindowKeyDownEvent,
@@ -27,7 +26,10 @@ import {
   windowTouchStart,
 } from './util/events';
 import { getWrapper } from './util/wrappers';
-import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
+import type { AppContextValue } from '../../../../src/view/context/app-context';
+import basicContext from './util/app-context';
+import forceUpdate from '../../../utils/force-update';
 
 const origin: Position = { x: 0, y: 0 };
 let callbacks: Callbacks;
@@ -57,6 +59,7 @@ afterEach(() => {
 const start = () => {
   touchStart(wrapper, origin);
   jest.runTimersToTime(timeForLongPress);
+  wrapper.setProps({ isDragging: true });
 };
 const end = () => windowTouchEnd();
 const move = (point?: Position = { x: 5, y: 20 }) => {
@@ -90,9 +93,9 @@ describe('initiation', () => {
 
   it('should not start a drag if the application state does not allow it', () => {
     const customCallbacks: Callbacks = getStubCallbacks();
-    const customContext = {
-      [styleKey]: 'hello',
-      [canLiftKey]: () => false,
+    const customContext: AppContextValue = {
+      ...basicContext,
+      canLift: () => false,
     };
     const customWrapper = getWrapper(customCallbacks, customContext);
     const mock: MockEvent = createMockEvent();
@@ -463,6 +466,33 @@ describe('disabling a draggable during a drag', () => {
   });
 
   describe('cancelled elsewhere in the app', () => {
+    it('should not abort a drag if a render occurs during a pending drag', () => {
+      // killing other wrapper
+      wrapper.unmount();
+
+      // lift
+      const customCallbacks = getStubCallbacks();
+      const customWrapper = getWrapper(customCallbacks);
+      // pending drag started
+      touchStart(customWrapper, origin);
+
+      // render should not kill a drag start
+      forceUpdate(customWrapper);
+
+      // should still start a drag
+      jest.runTimersToTime(timeForLongPress);
+
+      expect(
+        callbacksCalled(customCallbacks)({
+          onLift: 1,
+          onMove: 0,
+          onCancel: 0,
+        }),
+      ).toBe(true);
+
+      customWrapper.unmount();
+    });
+
     it('should end the drag without firing the onCancel callback', () => {
       wrapper.setProps({
         isDragging: true,

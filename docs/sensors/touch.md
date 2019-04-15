@@ -29,11 +29,7 @@ If we detect a `touchmove` before the long press timer expires we cancel the pen
 
 ## Force press support
 
-> Safari only
-
-If the user force presses on the element before they have moved the element (even if a drag has already started) then the drag is cancelled and the standard force press action occurs. For an anchor this is a website preview.
-
-Unfortunately, heavy presses can cancel a drag. It can be tricky at times to get the right amount of pressure to correctly use touch dragging. This can be frustrating for users. If you want to opt-out of respecting force touch for the element to allow a more consistent touch dragging experience you can set `shouldRespectForceTouch` to `false` on a `<Draggable />`. [More information](/docs/api/draggable.md)
+> See our [force press guide](/docs/api/draggable.md)
 
 ## Vibration
 

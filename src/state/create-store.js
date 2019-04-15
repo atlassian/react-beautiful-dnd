@@ -11,7 +11,7 @@ import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
 import autoScroll from './middleware/auto-scroll';
 import pendingDrop from './middleware/pending-drop';
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
-import type { StyleMarshal } from '../view/style-marshal/style-marshal-types';
+import type { StyleMarshal } from '../view/use-style-marshal/style-marshal-types';
 import type { AutoScroller } from './auto-scroller/auto-scroller-types';
 import type { Responders, Announce } from '../types';
 import type { Store } from './store-types';
@@ -27,19 +27,19 @@ const composeEnhancers =
     : compose;
 
 type Args = {|
-  getDimensionMarshal: () => DimensionMarshal,
+  dimensionMarshal: DimensionMarshal,
   styleMarshal: StyleMarshal,
   getResponders: () => Responders,
   announce: Announce,
-  getScroller: () => AutoScroller,
+  autoScroller: AutoScroller,
 |};
 
 export default ({
-  getDimensionMarshal,
+  dimensionMarshal,
   styleMarshal,
   getResponders,
   announce,
-  getScroller,
+  autoScroller,
 }: Args): Store =>
   createStore(
     reducer,
@@ -50,7 +50,7 @@ export default ({
         // > uncomment to use
         // debugging logger
         // require('../debug/middleware/log').default,
-        // user timing api
+        // // user timing api
         // require('../debug/middleware/user-timing').default,
         // debugging timer
         // require('../debug/middleware/action-timing').default,
@@ -71,14 +71,14 @@ export default ({
         // when moving into a phase where collection is no longer needed.
         // We need to stop the marshal before responders fire as responders can cause
         // dimension registration changes in response to reordering
-        dimensionMarshalStopper(getDimensionMarshal),
+        dimensionMarshalStopper(dimensionMarshal),
         // Fire application responders in response to drag changes
-        lift(getDimensionMarshal),
+        lift(dimensionMarshal),
         drop,
         // When a drop animation finishes - fire a drop complete
         dropAnimationFinish,
         pendingDrop,
-        autoScroll(getScroller),
+        autoScroll(autoScroller),
         // Fire responders for consumers (after update to store)
         responders(getResponders, announce),
       ),

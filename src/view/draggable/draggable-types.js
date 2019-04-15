@@ -19,7 +19,7 @@ import {
   drop,
   dropAnimationFinished,
 } from '../../state/action-creators';
-import type { DragHandleProps } from '../drag-handle/drag-handle-types';
+import type { DragHandleProps } from '../use-drag-handle/drag-handle-types';
 
 export type DraggingStyle = {|
   position: 'fixed',
@@ -141,7 +141,7 @@ export type ChildrenFn = (Provided, StateSnapshot) => Node | null;
 export type DefaultProps = {|
   isDragDisabled: boolean,
   disableInteractiveElementBlocking: boolean,
-  shouldRespectForceTouch: boolean,
+  shouldRespectForcePress: boolean,
 |};
 
 export type OwnProps = {|

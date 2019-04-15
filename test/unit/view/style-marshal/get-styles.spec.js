@@ -2,7 +2,7 @@
 import stylelint from 'stylelint';
 import getStyles, {
   type Styles,
-} from '../../../../src/view/style-marshal/get-styles';
+} from '../../../../src/view/use-style-marshal/get-styles';
 
 const styles: Styles = getStyles('hey');
 
