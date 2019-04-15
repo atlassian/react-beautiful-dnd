@@ -3,7 +3,6 @@ import type { ReactWrapper } from 'enzyme';
 import mount from './util/mount';
 import { homeOwnProps, isOverHome, isNotOverHome } from './util/get-props';
 import type { DispatchProps } from '../../../../src/view/droppable/droppable-types';
-import Placeholder from '../../../../src/view/placeholder';
 import getMaxWindowScroll from '../../../../src/view/window/get-max-window-scroll';
 
 it('should update when a placeholder animation finishes', () => {
@@ -18,7 +17,7 @@ it('should update when a placeholder animation finishes', () => {
   });
 
   wrapper
-    .find(Placeholder)
+    .find('Placeholder')
     .props()
     .onTransitionEnd();
 
@@ -39,7 +38,7 @@ it('should update when a placeholder finishes and the list is not dragged over',
   });
 
   wrapper
-    .find(Placeholder)
+    .find('Placeholder')
     .props()
     .onTransitionEnd();
 
@@ -61,7 +60,7 @@ it('should not update when dropping', () => {
   });
 
   wrapper
-    .find(Placeholder)
+    .find('Placeholder')
     .props()
     .onTransitionEnd();
 

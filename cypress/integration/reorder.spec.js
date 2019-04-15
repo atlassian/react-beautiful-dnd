@@ -3,9 +3,7 @@ import * as keyCodes from '../../src/view/key-codes';
 import { timings } from '../../src/animation';
 
 beforeEach(() => {
-  cy.visit(
-    '/iframe.html?selectedKind=single%20vertical%20list&selectedStory=basic',
-  );
+  cy.visit('/iframe.html?id=single-vertical-list--basic');
 });
 
 it('should reorder a list', () => {

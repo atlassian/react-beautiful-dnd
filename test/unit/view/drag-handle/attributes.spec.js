@@ -1,8 +1,7 @@
 // @flow
 import { getWrapper, Child } from './util/wrappers';
 import { getStubCallbacks } from './util/callbacks';
-import basicContext from './util/basic-context';
-import { styleKey } from '../../../../src/view/context-keys';
+import basicContext from './util/app-context';
 
 it('should apply the style context to a data-attribute', () => {
   expect(
@@ -10,7 +9,7 @@ it('should apply the style context to a data-attribute', () => {
       .find(Child)
       .getDOMNode()
       .getAttribute('data-react-beautiful-dnd-drag-handle'),
-  ).toEqual(basicContext[styleKey]);
+  ).toEqual(basicContext.style);
 });
 
 it('should apply a default aria roledescription containing lift instructions', () => {

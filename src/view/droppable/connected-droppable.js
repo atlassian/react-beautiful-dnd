@@ -21,11 +21,11 @@ import type {
   DispatchProps,
   StateSnapshot,
 } from './droppable-types';
-import { storeKey } from '../context-keys';
 import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../state/action-creators';
+import StoreContext from '../context/store-context';
 import whatIsDraggedOverFromResult from '../../state/droppable/what-is-dragged-over-from-result';
 
 const isMatchingType = (type: TypeId, critical: Critical): boolean =>
@@ -157,6 +157,12 @@ export const makeMapStateToProps = (): Selector => {
       );
     }
 
+    // An error occurred and we need to clear everything
+    // TODO: validate and add test
+    if (state.phase === 'IDLE' && !state.completed && state.shouldFlush) {
+      return idleWithoutAnimation;
+    }
+
     if (state.phase === 'IDLE' && state.completed) {
       const completed: CompletedDrag = state.completed;
       if (!isMatchingType(type, completed.critical)) {
@@ -222,10 +228,8 @@ const ConnectedDroppable: typeof DroppableType = (connect(
   // mergeProps - using default
   null,
   {
-    // Using our own store key.
-    // This allows consumers to also use redux
-    // Note: the default store key is 'store'
-    storeKey,
+    // Ensuring our context does not clash with consumers
+    context: StoreContext,
     // pure: true is default value, but being really clear
     pure: true,
     // When pure, compares the result of mapStateToProps to its previous value.

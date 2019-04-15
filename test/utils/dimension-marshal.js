@@ -48,7 +48,6 @@ export const getMarshalStub = (): DimensionMarshal => ({
   updateDraggable: jest.fn(),
   unregisterDraggable: jest.fn(),
   registerDroppable: jest.fn(),
-  updateDroppable: jest.fn(),
   unregisterDroppable: jest.fn(),
   updateDroppableScroll: jest.fn(),
   updateDroppableIsEnabled: jest.fn(),

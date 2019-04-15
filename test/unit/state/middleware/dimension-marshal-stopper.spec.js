@@ -28,9 +28,7 @@ const getMarshal = (stopPublishing: Function): DimensionMarshal => {
 
 it('should stop a collection if a drag is aborted', () => {
   const stopPublishing = jest.fn();
-  const store: Store = createStore(
-    middleware(() => getMarshal(stopPublishing)),
-  );
+  const store: Store = createStore(middleware(getMarshal(stopPublishing)));
 
   store.dispatch(initialPublish(initialPublishArgs));
 
@@ -42,7 +40,7 @@ it('should stop a collection if a drag is aborted', () => {
 it('should not stop a collection if a drop is pending', () => {
   const stopPublishing = jest.fn();
   const store: Store = createStore(
-    middleware(() => getMarshal(stopPublishing)),
+    middleware(getMarshal(stopPublishing)),
     // will convert the drop into a drop pending
     dropMiddleware,
   );
@@ -62,7 +60,7 @@ it('should not stop a collection if a drop is pending', () => {
 it('should stop a collection if a drag is complete', () => {
   const stopPublishing = jest.fn();
   const store: Store = createStore(
-    middleware(() => getMarshal(stopPublishing)),
+    middleware(getMarshal(stopPublishing)),
     // will convert the drop into a drop pending
     dropMiddleware,
   );
@@ -80,7 +78,7 @@ it('should stop a collection if a drag is complete', () => {
 it('should stop a collection if a drop animation starts', () => {
   const stopPublishing = jest.fn();
   const store: Store = createStore(
-    middleware(() => getMarshal(stopPublishing)),
+    middleware(getMarshal(stopPublishing)),
     // will convert the drop into a drop pending
     dropMiddleware,
   );

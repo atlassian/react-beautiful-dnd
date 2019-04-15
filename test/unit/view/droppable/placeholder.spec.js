@@ -10,7 +10,6 @@ import {
   homeAtRest,
   isNotOverForeign,
 } from './util/get-props';
-import Placeholder from '../../../../src/view/placeholder';
 
 describe('home list', () => {
   it('should not render a placeholder when not dragging', () => {
@@ -19,7 +18,7 @@ describe('home list', () => {
       mapProps: homeAtRest,
     });
 
-    expect(wrapper.find(Placeholder)).toHaveLength(0);
+    expect(wrapper.find('Placeholder')).toHaveLength(0);
   });
 
   it('should render a placeholder when dragging over', () => {
@@ -28,7 +27,7 @@ describe('home list', () => {
       mapProps: isOverHome,
     });
 
-    expect(wrapper.find(Placeholder)).toHaveLength(1);
+    expect(wrapper.find('Placeholder')).toHaveLength(1);
   });
 
   it('should render a placeholder when dragging over nothing', () => {
@@ -37,7 +36,7 @@ describe('home list', () => {
       mapProps: isNotOverHome,
     });
 
-    expect(wrapper.find(Placeholder)).toHaveLength(1);
+    expect(wrapper.find('Placeholder')).toHaveLength(1);
   });
 
   it('should render a placeholder when dragging over a foreign list', () => {
@@ -46,7 +45,7 @@ describe('home list', () => {
       mapProps: isOverForeign,
     });
 
-    expect(wrapper.find(Placeholder)).toHaveLength(1);
+    expect(wrapper.find('Placeholder')).toHaveLength(1);
   });
 });
 
@@ -57,7 +56,7 @@ describe('foreign', () => {
       mapProps: homeAtRest,
     });
 
-    expect(wrapper.find(Placeholder)).toHaveLength(0);
+    expect(wrapper.find('Placeholder')).toHaveLength(0);
   });
 
   it('should render a placeholder when dragging over', () => {
@@ -66,7 +65,7 @@ describe('foreign', () => {
       mapProps: isOverForeign,
     });
 
-    expect(wrapper.find(Placeholder)).toHaveLength(1);
+    expect(wrapper.find('Placeholder')).toHaveLength(1);
   });
 
   it('should not render a placeholder when over nothing', () => {
@@ -75,6 +74,6 @@ describe('foreign', () => {
       mapProps: isNotOverForeign,
     });
 
-    expect(wrapper.find(Placeholder)).toHaveLength(0);
+    expect(wrapper.find('Placeholder')).toHaveLength(0);
   });
 });

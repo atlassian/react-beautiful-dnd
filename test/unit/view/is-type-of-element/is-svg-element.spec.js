@@ -38,3 +38,11 @@ it('should not allow html elements from another window', () => {
 
   expect(isSvgElement(anchor)).toBe(false);
 });
+
+it('should not crash if the environment does not support SVGElement', () => {
+  const other = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
+  const anchor: HTMLElement = other.window.document.createElement('a');
+  anchor.ownerDocument.defaultView.SVGElement = undefined;
+
+  expect(isSvgElement(anchor)).toBe(false);
+});

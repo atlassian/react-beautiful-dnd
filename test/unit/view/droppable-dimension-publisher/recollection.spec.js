@@ -9,7 +9,6 @@ import type {
 import type { DroppableDimension } from '../../../../src/types';
 import { getDroppableDimension } from '../../../utils/dimension';
 import { getMarshalStub } from '../../../utils/dimension-marshal';
-import { withDimensionMarshal } from '../../../utils/get-context-options';
 import tryCleanPrototypeStubs from '../../../utils/try-clean-prototype-stubs';
 import { setViewport } from '../../../utils/viewport';
 import {
@@ -22,6 +21,7 @@ import {
   padding,
   preset,
   smallFrameClient,
+  WithAppContext,
 } from './util/shared';
 
 beforeEach(() => {
@@ -61,10 +61,11 @@ it('should recollect a dimension if requested', () => {
   const marshal: DimensionMarshal = getMarshalStub();
   // both the droppable and the parent are scrollable
   const wrapper = mount(
-    <App droppableIsScrollable />,
-    withDimensionMarshal(marshal),
+    <WithAppContext marshal={marshal}>
+      <App droppableIsScrollable />
+    </WithAppContext>,
   );
-  const el: ?HTMLElement = wrapper.instance().getRef();
+  const el: ?HTMLElement = wrapper.find('.droppable').getDOMNode();
   invariant(el);
   // returning smaller border box as this is what occurs when the element is scrollable
   jest
@@ -102,12 +103,13 @@ it('should hide any placeholder when recollecting dimensions if requested', () =
   const marshal: DimensionMarshal = getMarshalStub();
   // both the droppable and the parent are scrollable
   const wrapper = mount(
-    <App droppableIsScrollable showPlaceholder />,
-    withDimensionMarshal(marshal),
+    <WithAppContext marshal={marshal}>
+      <App droppableIsScrollable showPlaceholder />
+    </WithAppContext>,
   );
-  const el: ?HTMLElement = wrapper.instance().getRef();
-  const placeholderEl: ?HTMLElement = wrapper.instance().getPlaceholderRef();
+  const el: ?HTMLElement = wrapper.find('.droppable').getDOMNode();
   invariant(el);
+  const placeholderEl: ?HTMLElement = wrapper.find('.placeholder').getDOMNode();
   invariant(placeholderEl);
   // returning smaller border box as this is what occurs when the element is scrollable
   jest
@@ -142,12 +144,13 @@ it('should not hide any placeholder when recollecting dimensions if requested', 
   const marshal: DimensionMarshal = getMarshalStub();
   // both the droppable and the parent are scrollable
   const wrapper = mount(
-    <App droppableIsScrollable showPlaceholder />,
-    withDimensionMarshal(marshal),
+    <WithAppContext marshal={marshal}>
+      <App droppableIsScrollable showPlaceholder />
+    </WithAppContext>,
   );
-  const el: ?HTMLElement = wrapper.instance().getRef();
-  const placeholderEl: ?HTMLElement = wrapper.instance().getPlaceholderRef();
+  const el: ?HTMLElement = wrapper.find('.droppable').getDOMNode();
   invariant(el);
+  const placeholderEl: ?HTMLElement = wrapper.find('.placeholder').getDOMNode();
   invariant(placeholderEl);
   // returning smaller border box as this is what occurs when the element is scrollable
   jest
@@ -179,8 +182,9 @@ it('should throw if there is no drag occurring when a recollection is requested'
   const marshal: DimensionMarshal = getMarshalStub();
   // both the droppable and the parent are scrollable
   mount(
-    <App droppableIsScrollable showPlaceholder />,
-    withDimensionMarshal(marshal),
+    <WithAppContext marshal={marshal}>
+      <App droppableIsScrollable showPlaceholder />
+    </WithAppContext>,
   );
 
   const callbacks: DroppableCallbacks =
@@ -192,7 +196,11 @@ it('should throw if there is no drag occurring when a recollection is requested'
 it('should throw if there if recollecting from droppable that is not a scroll container', () => {
   const marshal: DimensionMarshal = getMarshalStub();
   // both the droppable and the parent are scrollable
-  mount(<App />, withDimensionMarshal(marshal));
+  mount(
+    <WithAppContext marshal={marshal}>
+      <App />
+    </WithAppContext>,
+  );
 
   const callbacks: DroppableCallbacks =
     marshal.registerDroppable.mock.calls[0][1];

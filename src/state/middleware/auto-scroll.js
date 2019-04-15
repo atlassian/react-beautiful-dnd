@@ -12,17 +12,17 @@ const shouldEnd = (action: Action): boolean =>
 const shouldCancelPending = (action: Action): boolean =>
   action.type === 'COLLECTION_STARTING';
 
-export default (getScroller: () => AutoScroller) => (
-  store: MiddlewareStore,
-) => (next: Dispatch) => (action: Action): any => {
+export default (autoScroller: AutoScroller) => (store: MiddlewareStore) => (
+  next: Dispatch,
+) => (action: Action): any => {
   if (shouldEnd(action)) {
-    getScroller().stop();
+    autoScroller.stop();
     next(action);
     return;
   }
 
   if (shouldCancelPending(action)) {
-    getScroller().cancelPending();
+    autoScroller.cancelPending();
     next(action);
     return;
   }
@@ -35,12 +35,12 @@ export default (getScroller: () => AutoScroller) => (
       state.phase === 'DRAGGING',
       'Expected phase to be DRAGGING after INITIAL_PUBLISH',
     );
-    getScroller().start(state);
+    autoScroller.start(state);
     return;
   }
 
   // auto scroll happens in response to state changes
   // releasing all actions to the reducer first
   next(action);
-  getScroller().scroll(store.getState());
+  autoScroller.scroll(store.getState());
 };

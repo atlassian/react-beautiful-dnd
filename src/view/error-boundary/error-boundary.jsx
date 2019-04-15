@@ -1,10 +1,9 @@
 // @flow
 import React, { type Node } from 'react';
-import { getFormattedMessage } from '../../dev-warning';
+import { getFormattedMessage, warning } from '../../dev-warning';
 
 type Props = {|
-  onError: () => void,
-  children: Node | null,
+  children: (setOnError: Function) => Node,
 |};
 
 function printFatalError(error: Error) {
@@ -26,7 +25,15 @@ function printFatalError(error: Error) {
   console.error('raw', error);
 }
 
+// Not the best marker, but using invariant as a signal for when to try to recover from an error
+function shouldRecover(error: Error): boolean {
+  return error.message.indexOf('Invariant failed') !== -1;
+}
+
 export default class ErrorBoundary extends React.Component<Props> {
+  // eslint-disable-next-line react/sort-comp
+  onError: ?() => void;
+
   componentDidMount() {
     window.addEventListener('error', this.onFatalError);
   }
@@ -34,25 +41,34 @@ export default class ErrorBoundary extends React.Component<Props> {
     window.removeEventListener('error', this.onFatalError);
   }
 
+  setOnError = (fn: () => void) => {
+    this.onError = fn;
+  };
+
   onFatalError = (error: Error) => {
     printFatalError(error);
-    this.props.onError();
 
-    // If the failure was due to an invariant failure - then we handle the error
-    if (error.message.indexOf('Invariant failed') !== -1) {
-      this.setState({});
-      return;
+    if (this.onError) {
+      this.onError();
+    } else {
+      warning('Could not find recovering function');
     }
 
-    // Error is more serious and we throw it
-    throw error;
+    // If the failure was due to an invariant failure - then we handle the error
+    if (shouldRecover(error)) {
+      this.setState({});
+    }
   };
 
   componentDidCatch(error: Error) {
     this.onFatalError(error);
+    // if it was not an invariant - throw
+    if (!shouldRecover(error)) {
+      throw error;
+    }
   }
 
   render() {
-    return this.props.children;
+    return this.props.children(this.setOnError);
   }
 }
