@@ -2,7 +2,7 @@
 import type { Position } from 'css-box-model';
 import { useRef } from 'react';
 import invariant from 'tiny-invariant';
-import { useMemoOne, useCallbackOne } from 'use-memo-one';
+import { useMemo, useCallback } from 'use-memo-one';
 import type { EventBinding } from '../util/event-types';
 import createEventMarshal, {
   type EventMarshal,
@@ -118,16 +118,16 @@ export default function useTouchSensor(args: Args): OnTouchStart {
   const isDraggingRef = useRef<boolean>(false);
   const hasMovedRef = useRef<boolean>(false);
   const unbindWindowEventsRef = useRef<() => void>(noop);
-  const getIsCapturing = useCallbackOne(
+  const getIsCapturing = useCallback(
     () => Boolean(pendingRef.current || isDraggingRef.current),
     [],
   );
-  const postDragClickPreventer: EventPreventer = useMemoOne(
+  const postDragClickPreventer: EventPreventer = useMemo(
     () => createPostDragEventPreventer(getWindow),
     [getWindow],
   );
 
-  const schedule = useMemoOne(() => {
+  const schedule = useMemo(() => {
     invariant(
       !getIsCapturing(),
       'Should not recreate scheduler while capturing',
@@ -135,7 +135,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     return createScheduler(callbacks);
   }, [callbacks, getIsCapturing]);
 
-  const stop = useCallbackOne(() => {
+  const stop = useCallback(() => {
     if (!getIsCapturing()) {
       return;
     }
@@ -161,7 +161,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     pendingRef.current = null;
   }, [getIsCapturing, onCaptureEnd, postDragClickPreventer, schedule]);
 
-  const cancel = useCallbackOne(() => {
+  const cancel = useCallback(() => {
     const wasDragging: boolean = isDraggingRef.current;
     stop();
 
@@ -170,7 +170,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     }
   }, [callbacks, stop]);
 
-  const windowBindings: EventBinding[] = useMemoOne(() => {
+  const windowBindings: EventBinding[] = useMemo(() => {
     invariant(
       !getIsCapturing(),
       'Should not recreate window bindings while capturing',
@@ -351,7 +351,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     stop,
   ]);
 
-  const bindWindowEvents = useCallbackOne(() => {
+  const bindWindowEvents = useCallback(() => {
     const win: HTMLElement = getWindow();
     const options = { capture: true };
 
@@ -362,7 +362,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     bindEvents(win, windowBindings, options);
   }, [getWindow, windowBindings]);
 
-  const startDragging = useCallbackOne(() => {
+  const startDragging = useCallback(() => {
     const pending: ?PendingDrag = pendingRef.current;
     invariant(pending, 'Cannot start a drag without a pending drag');
 
@@ -376,7 +376,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     });
   }, [callbacks]);
 
-  const startPendingDrag = useCallbackOne(
+  const startPendingDrag = useCallback(
     (event: TouchEvent) => {
       invariant(!pendingRef.current, 'Expected there to be no pending drag');
       const touch: Touch = event.touches[0];

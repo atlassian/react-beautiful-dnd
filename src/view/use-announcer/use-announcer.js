@@ -1,7 +1,7 @@
 // @flow
 import { useRef, useEffect } from 'react';
 import invariant from 'tiny-invariant';
-import { useMemoOne, useCallbackOne } from 'use-memo-one';
+import { useMemo, useCallback } from 'use-memo-one';
 import type { Announce } from '../../types';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';
@@ -25,7 +25,7 @@ export const getId = (uniqueId: number): string =>
   `react-beautiful-dnd-announcement-${uniqueId}`;
 
 export default function useAnnouncer(uniqueId: number): Announce {
-  const id: string = useMemoOne(() => getId(uniqueId), [uniqueId]);
+  const id: string = useMemo(() => getId(uniqueId), [uniqueId]);
   const ref = useRef<?HTMLElement>(null);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function useAnnouncer(uniqueId: number): Announce {
     };
   }, [id]);
 
-  const announce: Announce = useCallbackOne((message: string): void => {
+  const announce: Announce = useCallback((message: string): void => {
     const el: ?HTMLElement = ref.current;
     if (el) {
       el.textContent = message;

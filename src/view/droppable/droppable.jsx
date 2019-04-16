@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { useMemoOne, useCallbackOne } from 'use-memo-one';
+import { useMemo, useCallback } from 'use-memo-one';
 import React, { useRef, useContext, type Node } from 'react';
 import type { Props, Provided } from './droppable-types';
 import useDroppableDimensionPublisher from '../use-droppable-dimension-publisher';
@@ -40,22 +40,22 @@ export default function Droppable(props: Props) {
     updateViewportMaxScroll,
   } = props;
 
-  const getDroppableRef = useCallbackOne(
+  const getDroppableRef = useCallback(
     (): ?HTMLElement => droppableRef.current,
     [],
   );
-  const getPlaceholderRef = useCallbackOne(
+  const getPlaceholderRef = useCallback(
     (): ?HTMLElement => placeholderRef.current,
     [],
   );
-  const setDroppableRef = useCallbackOne((value: ?HTMLElement) => {
+  const setDroppableRef = useCallback((value: ?HTMLElement) => {
     droppableRef.current = value;
   }, []);
-  const setPlaceholderRef = useCallbackOne((value: ?HTMLElement) => {
+  const setPlaceholderRef = useCallback((value: ?HTMLElement) => {
     placeholderRef.current = value;
   }, []);
 
-  const onPlaceholderTransitionEnd = useCallbackOne(() => {
+  const onPlaceholderTransitionEnd = useCallback(() => {
     // A placeholder change can impact the window's max scroll
     if (isMovementAllowed()) {
       updateViewportMaxScroll({ maxScroll: getMaxWindowScroll() });
@@ -96,7 +96,7 @@ export default function Droppable(props: Props) {
     </AnimateInOut>
   );
 
-  const provided: Provided = useMemoOne(
+  const provided: Provided = useMemo(
     (): Provided => ({
       innerRef: setDroppableRef,
       placeholder,
@@ -107,7 +107,7 @@ export default function Droppable(props: Props) {
     [placeholder, setDroppableRef, styleContext],
   );
 
-  const droppableContext: ?DroppableContextValue = useMemoOne(
+  const droppableContext: ?DroppableContextValue = useMemo(
     () => ({
       droppableId,
       type,

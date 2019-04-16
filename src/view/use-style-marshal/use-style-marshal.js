@@ -1,7 +1,7 @@
 // @flow
 import { useRef } from 'react';
 import memoizeOne from 'memoize-one';
-import { useMemoOne, useCallbackOne } from 'use-memo-one';
+import { useMemo, useCallback } from 'use-memo-one';
 import invariant from 'tiny-invariant';
 import type { StyleMarshal } from './style-marshal-types';
 import type { DropReason } from '../../types';
@@ -22,14 +22,14 @@ const createStyleEl = (): HTMLStyleElement => {
 };
 
 export default function useStyleMarshal(uniqueId: number) {
-  const uniqueContext: string = useMemoOne(() => `${uniqueId}`, [uniqueId]);
-  const styles: Styles = useMemoOne(() => getStyles(uniqueContext), [
+  const uniqueContext: string = useMemo(() => `${uniqueId}`, [uniqueId]);
+  const styles: Styles = useMemo(() => getStyles(uniqueContext), [
     uniqueContext,
   ]);
   const alwaysRef = useRef<?HTMLStyleElement>(null);
   const dynamicRef = useRef<?HTMLStyleElement>(null);
 
-  const setDynamicStyle = useCallbackOne(
+  const setDynamicStyle = useCallback(
     // Using memoizeOne to prevent frequent updates to textContext
     memoizeOne((proposed: string) => {
       const el: ?HTMLStyleElement = dynamicRef.current;
@@ -39,7 +39,7 @@ export default function useStyleMarshal(uniqueId: number) {
     [],
   );
 
-  const setAlwaysStyle = useCallbackOne((proposed: string) => {
+  const setAlwaysStyle = useCallback((proposed: string) => {
     const el: ?HTMLStyleElement = alwaysRef.current;
     invariant(el, 'Cannot set dynamic style element if it is not set');
     el.textContent = proposed;
@@ -90,11 +90,11 @@ export default function useStyleMarshal(uniqueId: number) {
     uniqueContext,
   ]);
 
-  const dragging = useCallbackOne(() => setDynamicStyle(styles.dragging), [
+  const dragging = useCallback(() => setDynamicStyle(styles.dragging), [
     setDynamicStyle,
     styles.dragging,
   ]);
-  const dropping = useCallbackOne(
+  const dropping = useCallback(
     (reason: DropReason) => {
       if (reason === 'DROP') {
         setDynamicStyle(styles.dropAnimating);
@@ -104,7 +104,7 @@ export default function useStyleMarshal(uniqueId: number) {
     },
     [setDynamicStyle, styles.dropAnimating, styles.userCancel],
   );
-  const resting = useCallbackOne(() => {
+  const resting = useCallback(() => {
     // Can be called defensively
     if (!dynamicRef.current) {
       return;
@@ -112,7 +112,7 @@ export default function useStyleMarshal(uniqueId: number) {
     setDynamicStyle(styles.resting);
   }, [setDynamicStyle, styles.resting]);
 
-  const marshal: StyleMarshal = useMemoOne(
+  const marshal: StyleMarshal = useMemo(
     () => ({
       dragging,
       dropping,
