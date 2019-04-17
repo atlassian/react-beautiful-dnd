@@ -127,8 +127,9 @@ export default function App(props: Props) {
     [announce, autoScroller, dimensionMarshal, getResponders, styleMarshal],
   );
 
+  // Checking for unexpected store changes
   if (process.env.NODE_ENV !== 'production') {
-    if (getStore(lazyStoreRef) !== store) {
+    if (lazyStoreRef.current && lazyStoreRef.current !== store) {
       warning('unexpected store change');
     }
   }
