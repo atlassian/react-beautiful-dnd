@@ -2,7 +2,7 @@
 import { useRef } from 'react';
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import { useMemoOne, useCallbackOne } from 'use-memo-one';
+import { useMemo, useCallback } from 'use-memo-one';
 import type {
   DraggableDescriptor,
   DraggableDimension,
@@ -35,7 +35,7 @@ export default function useDraggableDimensionPublisher(args: Args) {
   );
   const { droppableId, type } = droppableContext;
 
-  const descriptor: DraggableDescriptor = useMemoOne(() => {
+  const descriptor: DraggableDescriptor = useMemo(() => {
     const result = {
       id: draggableId,
       droppableId,
@@ -47,7 +47,7 @@ export default function useDraggableDimensionPublisher(args: Args) {
 
   const publishedDescriptorRef = useRef<DraggableDescriptor>(descriptor);
 
-  const makeDimension = useCallbackOne(
+  const makeDimension = useCallback(
     (windowScroll?: Position): DraggableDimension => {
       const latest: DraggableDescriptor = publishedDescriptorRef.current;
       const el: ?HTMLElement = getDraggableRef();

@@ -1,8 +1,9 @@
 // @flow
 import React, { useEffect, useRef, type Node } from 'react';
+import invariant from 'tiny-invariant';
 import { bindActionCreators } from 'redux';
 import { Provider } from 'react-redux';
-import { useMemoOne, useCallbackOne } from 'use-memo-one';
+import { useMemo, useCallback } from 'use-memo-one';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import canStartDrag from '../../state/can-start-drag';
@@ -32,6 +33,7 @@ import useAnnouncer from '../use-announcer';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
 import usePrevious from '../use-previous-ref';
+import { warning } from '../../dev-warning';
 
 type Props = {|
   ...Responders,
@@ -48,32 +50,36 @@ const createResponders = (props: Props): Responders => ({
   onDragUpdate: props.onDragUpdate,
 });
 
+// flow does not support MutableRefObject
+// type LazyStoreRef = MutableRefObject<?Store>;
+type LazyStoreRef = {| current: ?Store |};
+
+function getStore(lazyRef: LazyStoreRef): Store {
+  invariant(lazyRef.current, 'Could not find store from lazy ref');
+  return lazyRef.current;
+}
+
 export default function App(props: Props) {
   const { uniqueId, setOnError } = props;
-  // flow does not support MutableRefObject
-  // let storeRef: MutableRefObject<Store>;
-  let storeRef;
+  const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
 
   // lazy collection of responders using a ref - update on ever render
   const lastPropsRef = usePrevious<Props>(props);
 
-  const getResponders: () => Responders = useCallbackOne(() => {
+  const getResponders: () => Responders = useCallback(() => {
     return createResponders(lastPropsRef.current);
-  }, []);
+  }, [lastPropsRef]);
 
   const announce: Announce = useAnnouncer(uniqueId);
   const styleMarshal: StyleMarshal = useStyleMarshal(uniqueId);
 
-  const lazyDispatch: Action => void = useCallbackOne(
-    (action: Action): void => {
-      storeRef.current.dispatch(action);
-    },
-    [],
-  );
+  const lazyDispatch: Action => void = useCallback((action: Action): void => {
+    getStore(lazyStoreRef).dispatch(action);
+  }, []);
 
-  const callbacks: DimensionMarshalCallbacks = useMemoOne(
+  const callbacks: DimensionMarshalCallbacks = useMemo(
     () =>
       bindActionCreators(
         {
@@ -86,14 +92,14 @@ export default function App(props: Props) {
         // $FlowFixMe - not sure why this is wrong
         lazyDispatch,
       ),
-    [],
+    [lazyDispatch],
   );
-  const dimensionMarshal: DimensionMarshal = useMemoOne<DimensionMarshal>(
+  const dimensionMarshal: DimensionMarshal = useMemo<DimensionMarshal>(
     () => createDimensionMarshal(callbacks),
-    [],
+    [callbacks],
   );
 
-  const autoScroller: AutoScroller = useMemoOne<AutoScroller>(
+  const autoScroller: AutoScroller = useMemo<AutoScroller>(
     () =>
       createAutoScroller({
         scrollWindow,
@@ -106,10 +112,10 @@ export default function App(props: Props) {
           lazyDispatch,
         ),
       }),
-    [],
+    [dimensionMarshal.scrollDroppable, lazyDispatch],
   );
 
-  const store: Store = useMemoOne<Store>(
+  const store: Store = useMemo<Store>(
     () =>
       createStore({
         dimensionMarshal,
@@ -118,15 +124,24 @@ export default function App(props: Props) {
         autoScroller,
         getResponders,
       }),
-    [],
+    [announce, autoScroller, dimensionMarshal, getResponders, styleMarshal],
   );
 
-  storeRef = useRef<Store>(store);
+  // Checking for unexpected store changes
+  if (process.env.NODE_ENV !== 'production') {
+    if (lazyStoreRef.current && lazyStoreRef.current !== store) {
+      warning('unexpected store change');
+    }
+  }
 
-  const tryResetStore = useCallbackOne(() => {
-    const state: State = storeRef.current.getState();
+  // assigning lazy store ref
+  lazyStoreRef.current = store;
+
+  const tryResetStore = useCallback(() => {
+    const current: Store = getStore(lazyStoreRef);
+    const state: State = current.getState();
     if (state.phase !== 'IDLE') {
-      store.dispatch(clean({ shouldFlush: true }));
+      current.dispatch(clean({ shouldFlush: true }));
     }
   }, []);
 
@@ -134,24 +149,29 @@ export default function App(props: Props) {
   // initial mount are caught
   setOnError(tryResetStore);
 
-  const getCanLift = useCallbackOne(
-    (id: DraggableId) => canStartDrag(storeRef.current.getState(), id),
+  const getCanLift = useCallback(
+    (id: DraggableId) => canStartDrag(getStore(lazyStoreRef).getState(), id),
     [],
   );
 
-  const getIsMovementAllowed = useCallbackOne(
-    () => isMovementAllowed(storeRef.current.getState()),
+  const getIsMovementAllowed = useCallback(
+    () => isMovementAllowed(getStore(lazyStoreRef).getState()),
     [],
   );
 
-  const appContext: AppContextValue = useMemoOne(
+  const appContext: AppContextValue = useMemo(
     () => ({
       marshal: dimensionMarshal,
       style: styleMarshal.styleContext,
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
     }),
-    [],
+    [
+      dimensionMarshal,
+      getCanLift,
+      getIsMovementAllowed,
+      styleMarshal.styleContext,
+    ],
   );
 
   // Clean store when unmounting
@@ -161,7 +181,7 @@ export default function App(props: Props) {
 
   return (
     <AppContext.Provider value={appContext}>
-      <Provider context={StoreContext} store={storeRef.current}>
+      <Provider context={StoreContext} store={store}>
         {props.children}
       </Provider>
     </AppContext.Provider>
