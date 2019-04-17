@@ -1,7 +1,7 @@
 // @flow
 import type { Position } from 'css-box-model';
 import { useRef } from 'react';
-import { useMemoOne, useCallbackOne } from 'use-memo-one';
+import { useMemo, useCallback } from 'use-memo-one';
 import invariant from 'tiny-invariant';
 import type { EventBinding } from '../util/event-types';
 import { bindEvents, unbindEvents } from '../util/bind-events';
@@ -47,9 +47,9 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
   const isDraggingRef = useRef<boolean>(false);
   const unbindWindowEventsRef = useRef<() => void>(noop);
 
-  const getIsDragging = useCallbackOne(() => isDraggingRef.current, []);
+  const getIsDragging = useCallback(() => isDraggingRef.current, []);
 
-  const schedule = useMemoOne(() => {
+  const schedule = useMemo(() => {
     invariant(
       !getIsDragging(),
       'Should not recreate scheduler while capturing',
@@ -57,7 +57,7 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
     return createScheduler(callbacks);
   }, [callbacks, getIsDragging]);
 
-  const stop = useCallbackOne(() => {
+  const stop = useCallback(() => {
     if (!getIsDragging()) {
       return;
     }
@@ -68,7 +68,7 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
     onCaptureEnd();
   }, [getIsDragging, onCaptureEnd, schedule]);
 
-  const cancel = useCallbackOne(() => {
+  const cancel = useCallback(() => {
     const wasDragging: boolean = isDraggingRef.current;
     stop();
 
@@ -77,7 +77,7 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
     }
   }, [callbacks, stop]);
 
-  const windowBindings: EventBinding[] = useMemoOne(() => {
+  const windowBindings: EventBinding[] = useMemo(() => {
     invariant(
       !getIsDragging(),
       'Should not recreate window bindings when dragging',
@@ -142,7 +142,7 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
     ];
   }, [callbacks, cancel, getIsDragging, getWindow]);
 
-  const bindWindowEvents = useCallbackOne(() => {
+  const bindWindowEvents = useCallback(() => {
     const win: HTMLElement = getWindow();
     const options = { capture: true };
 
@@ -153,7 +153,7 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
     bindEvents(win, windowBindings, options);
   }, [getWindow, windowBindings]);
 
-  const startDragging = useCallbackOne(() => {
+  const startDragging = useCallback(() => {
     invariant(!isDraggingRef.current, 'Cannot start a drag while dragging');
 
     const ref: ?HTMLElement = getDraggableRef();
@@ -170,7 +170,7 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
     });
   }, [bindWindowEvents, callbacks, getDraggableRef, onCaptureStart, stop]);
 
-  const onKeyDown: OnKeyDown = useCallbackOne(
+  const onKeyDown: OnKeyDown = useCallback(
     (event: KeyboardEvent) => {
       // not dragging yet
       if (!getIsDragging()) {

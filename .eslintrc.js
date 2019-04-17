@@ -55,14 +55,22 @@ module.exports = {
     // Allowing ++ on numbers
     'no-plusplus': 'off',
 
-    // Disabling the use of !! to cast to boolean
+    // Nicer booleans
     'no-restricted-syntax': [
+      // Disabling the use of !! to cast to boolean
       'error',
       {
         selector:
           'UnaryExpression[operator="!"] > UnaryExpression[operator="!"]',
         message:
           '!! to cast to boolean relies on a double negative. Use Boolean() instead',
+      },
+      // Avoiding accidental `new Boolean()` calls
+      // (also covered by `no-new-wrappers` but i am having fun)
+      {
+        selector: 'NewExpression[callee.name="Boolean"]',
+        message:
+          'Avoid using constructor: `new Boolean(value)` as it creates a Boolean object. Did you mean `Boolean(value)`?',
       },
     ],
 
@@ -79,11 +87,19 @@ module.exports = {
       'error',
       {
         paths: [
+          // Forcing use of useMemoOne
           {
             name: 'react',
             importNames: ['useMemo', 'useCallback'],
             message:
-              'useMemo and useCallback are subject to cache busting. Please use useMemoOne and useCallbackOne',
+              '`useMemo` and `useCallback` are subject to cache busting. Please use `useMemoOne`',
+          },
+          // Forcing use aliased imports from useMemoOne
+          {
+            name: 'use-memo-one',
+            importNames: ['useMemoOne', 'useCallbackOne'],
+            message:
+              'use-memo-one exports `useMemo` and `useCallback` which work nicer with `eslint-plugin-react-hooks`',
           },
         ],
       },

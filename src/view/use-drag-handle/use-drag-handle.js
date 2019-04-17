@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { useRef } from 'react';
-import { useMemoOne, useCallbackOne } from 'use-memo-one';
+import { useMemo, useCallback } from 'use-memo-one';
 import type { Args, DragHandleProps } from './drag-handle-types';
 import getWindowFromEl from '../window/get-window-from-el';
 import useRequiredContext from '../use-required-context';
@@ -33,7 +33,7 @@ type Capturing = {|
 export default function useDragHandle(args: Args): ?DragHandleProps {
   // Capturing
   const capturingRef = useRef<?Capturing>(null);
-  const onCaptureStart = useCallbackOne((abort: () => void) => {
+  const onCaptureStart = useCallback((abort: () => void) => {
     invariant(
       !capturingRef.current,
       'Cannot start capturing while something else is',
@@ -42,14 +42,14 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       abort,
     };
   }, []);
-  const onCaptureEnd = useCallbackOne(() => {
+  const onCaptureEnd = useCallback(() => {
     invariant(
       capturingRef.current,
       'Cannot stop capturing while nothing is capturing',
     );
     capturingRef.current = null;
   }, []);
-  const abortCapture = useCallbackOne(() => {
+  const abortCapture = useCallback(() => {
     invariant(capturingRef.current, 'Cannot abort capture when there is none');
     capturingRef.current.abort();
   }, []);
@@ -70,12 +70,12 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
 
   useValidation({ isEnabled, getDraggableRef });
 
-  const getWindow = useCallbackOne(
+  const getWindow = useCallback(
     (): HTMLElement => getWindowFromEl(getDraggableRef()),
     [getDraggableRef],
   );
 
-  const canStartCapturing = useCallbackOne(
+  const canStartCapturing = useCallback(
     (event: Event) => {
       // Cannot lift when disabled
       if (!isEnabled) {
@@ -101,7 +101,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
 
   const { onBlur, onFocus } = useFocusRetainer(args);
 
-  const mouseArgs: MouseSensorArgs = useMemoOne(
+  const mouseArgs: MouseSensorArgs = useMemo(
     () => ({
       callbacks,
       getDraggableRef,
@@ -123,7 +123,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
   );
   const onMouseDown = useMouseSensor(mouseArgs);
 
-  const keyboardArgs: KeyboardSensorArgs = useMemoOne(
+  const keyboardArgs: KeyboardSensorArgs = useMemo(
     () => ({
       callbacks,
       getDraggableRef,
@@ -143,7 +143,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
   );
   const onKeyDown = useKeyboardSensor(keyboardArgs);
 
-  const touchArgs: TouchSensorArgs = useMemoOne(
+  const touchArgs: TouchSensorArgs = useMemo(
     () => ({
       callbacks,
       getDraggableRef,
@@ -204,7 +204,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     }
   }, [abortCapture, isDragging]);
 
-  const props: ?DragHandleProps = useMemoOne(() => {
+  const props: ?DragHandleProps = useMemo(() => {
     if (!isEnabled) {
       return null;
     }
