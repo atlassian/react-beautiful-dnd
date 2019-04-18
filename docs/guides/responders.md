@@ -151,6 +151,8 @@ type DropReason = 'DROP' | 'CANCEL';
 - `...DragUpdate`: _see above_
 - `result.reason`: the reason a drop occurred. This information can be helpful in crafting more useful messaging in the `ResponderProvided` > `announce` function.
 
+In the event of a cancelled drag, any `destination` or `combine` is set to `null`.
+
 ## Secondary: `onBeforeDragStart`
 
 > The use cases for this responder is super limited
