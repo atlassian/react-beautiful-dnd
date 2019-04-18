@@ -19,6 +19,10 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - [Dragging React performance forward](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33)
 - [Grabbing the flame 🔥](https://medium.com/@alexandereardon/grabbing-the-flame-290c794fe852)
 
+## React ecosystem
+
+- [Deep Sea Fishing with React Hooks](https://www.youtube.com/watch?v=MVi17tk3VsI)
+
 ## Podcasts
 
 - [React podcast: Fast, Accessible, and Beautiful Drag and Drop with Alex Reardon](https://reactpodcast.simplecast.fm/17)
