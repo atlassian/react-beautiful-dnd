@@ -32,11 +32,11 @@ type DropAnimation = {|
 You can use the `DraggableDroppingState` to build up your own `transform` and `transition` properties during a drop.
 
 ```js
-const getStyle = (style, snapshot):  => {
+function getStyle(style, snapshot) {
   if (!snapshot.isDropAnimating) {
     return style;
   }
-  const {moveTo, curve, duration} = snapshot.dropAnimation;
+  const { moveTo, curve, duration } = snapshot.dropAnimation;
   // move to the right spot
   const translate = `translate(${moveTo.x}px, ${moveTo.y}px)`;
   // add a bit of turn for fun
@@ -49,27 +49,25 @@ const getStyle = (style, snapshot):  => {
     // slowing down the drop because we can
     transition: `all ${curve} ${duration + 1}s`,
   };
-};
+}
 
-class TaskItem extends React.Component {
-  render() {
-    const task = this.props.task;
-    return (
-      <Draggable draggableId={task.id} index={this.props.index}>
-        {(provided, snapshot) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            isDragging={snapshot.isDragging && !snapshot.isDropAnimating}
-            style={getStyle(provided.draggableProps.style, snapshot)}
-          >
-            {task.content}
-          </div>
-        )}
-      </Draggable>
-    );
-  }
+function TaskItem(props) {
+  const { task, index } = props;
+  return (
+    <Draggable draggableId={task.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          isDragging={snapshot.isDragging && !snapshot.isDropAnimating}
+          style={getStyle(provided.draggableProps.style, snapshot)}
+        >
+          {task.content}
+        </div>
+      )}
+    </Draggable>
+  );
 }
 ```
 
@@ -84,7 +82,7 @@ If you do have use case where it makes sense to remove the drop animation you wi
 Do not make the `transition-duration` actually `0s`. It should be set at a near `0s` value such as `0.001s`. The reason for this is that if you set `transition-duration` to `0s` then a `onTransitionEnd` event will not fire - and we use that to know when the drop animation is finished.
 
 ```js
-const getStyle = (style, snapshot): ?Object => {
+function getStyle(style, snapshot) {
   if (!snapshot.isDropAnimating) {
     return style;
   }
@@ -93,26 +91,24 @@ const getStyle = (style, snapshot): ?Object => {
     // cannot be 0, but make it super tiny
     transitionDuration: `0.001s`,
   };
-};
+}
 
-class TaskItem extends React.Component {
-  render() {
-    const task = this.props.task;
-    return (
-      <Draggable draggableId={task.id} index={this.props.index}>
-        {(provided, snapshot) => (
-          <div
-            innerRef={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-            style={getStyle(provided.draggableProps.style, snapshot)}
-          >
-            {task.content}
-          </div>
-        )}
-      </Draggable>
-    );
-  }
+function TaskItem(props) {
+  const { task, index } = props;
+  return (
+    <Draggable draggableId={task.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          innerRef={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={getStyle(provided.draggableProps.style, snapshot)}
+        >
+          {task.content}
+        </div>
+      )}
+    </Draggable>
+  );
 }
 ```
 
