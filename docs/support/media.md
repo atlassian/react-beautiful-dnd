@@ -29,7 +29,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - PonyFoo [issue 99](https://ponyfoo.com/weekly/99/react-across-the-universe-typography-load-balancing-and-javascript-frameworks)
 - PonyFoo [issue 141](https://ponyfoo.com/weekly/141/http-3-bgp-leaks-react-as-native-dom-typescript-tensorflow-and-all-things-performance)
 - JavaScript Weekly [issue 369](http://javascriptweekly.com/issues/369)
-- JavasScript Weekly [issue 369](https://javascriptweekly.com/issues/369)
+- JavaScript Weekly [issue 369](https://javascriptweekly.com/issues/369)
 - JavaScript Weekly [issue 412](https://javascriptweekly.com/issues/412)
 - Weekend JavaScript [issue 125](https://www.weekendjs.com/issues/125-webassembly-null-vs-undefined-the-ultimage-guide-to-js-frameworks-and-more)
 - React Newsletter [issue 81](http://reactjsnewsletter.com/issues/81?m=web#X4GMoSn)
@@ -37,10 +37,13 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - React Newsletter [issue 102](http://reactjsnewsletter.com/issues/102?#start)
 - React Newsletter [issue 124](http://reactjsnewsletter.com/issues/124?#start)
 - React Newsletter [issue 139](http://reactjsnewsletter.com/issues/139?m=web&#5nGfyf)
+- React Newsletter [issue 153](http://reactjsnewsletter.com/issues/153?#start)
 - React Status [issue 49](https://react.statuscode.com/issues/49)
 - React Status [issue 63](https://react.statuscode.com/issues/63)
 - React Status [issue 71](https://react.statuscode.com/issues/71)
 - React Status [issue 114](https://react.statuscode.com/issues/114)
+- React Status [issue 129](https://react.statuscode.com/issues/129)
+- React Status [issue 134](https://react.statuscode.com/issues/134)
 - Fullstack React [issue 72](http://newsletter.fullstackreact.com/issues/72)
 - HashBang Weekly [issue 52](http://hashbangweekly.okgrow.com/2018/01/22/issue-52)
 - CSS Animation Weekly [issue 60](http://weekly.cssanimation.rocks/issues/css-animation-weekly-60-working-with-animations-skeleton-screens-and-rethinking-drag-and-drop-73446)
@@ -52,7 +55,9 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 
 ## Articles and blogs
 
-- [Dynamically Update Positions During Drag Using react-beautiful-dnd](https://medium.com/@egiblin88/dynamically-update-positions-during-drag-using-react-beautiful-dnd-4a986d704c2e)
+- [Building a Drag-and-Drop Game with react-beautiful-dnd](https://able.bio/drenther/building-a-drag-and-drop-game-with-react-beautiful-dnd--094r3g8)
+- [Let's Create a Trello Clone with React + Redux](https://www.youtube.com/watch?v=RDQGPs7StNA)
+- [Dynamically Update Positions During Drag Using react-beautiful-dnd](https://itnext.io/dynamically-update-positions-during-drag-using-react-beautiful-dnd-4a986d704c2e)
 - [Want To Recruit Better Engineers? Open Source Your Code](https://angel.co/blog/want-to-recruit-better-engineers-open-source-your-code)
 - [How To Implement Better Drag and Drop in your React App](https://blog.bitsrc.io/implement-better-drag-and-drop-in-your-react-app-beafc4451599)
 - [Beautiful drag and drop with React — The beginner’s guide](https://medium.com/@AlejandroSobko/7798e3928290)
