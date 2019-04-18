@@ -200,7 +200,7 @@ const getBackgroundColor = (snapshot: DroppableStateSnapshot): string => {
 
 When a user drags over, or stops dragging over, a `<Droppable />` we re-render the `<Droppable />` with an updated `DroppableStateSnapshot > isDraggingOver` value. This is useful for styling the `<Droppable />`. However, by default this will cause a render of all of the children of the `<Droppable />` - which might be 100's of `<Draggable />`s! This can result in a noticeable frame rate drop. To avoid this problem we recommend that you create a component that is the child of a `<Droppable />` who's responsibility it is to avoid rendering children if it is not required.
 
-Here is an example of how you could do this:
+Here is an example of how you could do this using `class` components:
 
 ```js
 import React, { Component } from 'react';
@@ -229,7 +229,7 @@ class InnerList extends Component<{ students: Person[] }> {
   }
 }
 
-class Students extends Component {
+class Students extends Component<{ students: Person[] }> {
   render() {
     return (
       <Droppable droppableId="list">
@@ -251,7 +251,44 @@ class Students extends Component {
 }
 ```
 
-By using the approach you are able to make style changes to a `<Droppable />` when it is being dragged over, but you avoid re-rendering all of the children unnecessarily. Keep in mind that if you are using `React.PureComponent` that your component will [not respond to changes in the context with the legacy context API](https://github.com/facebook/react/issues/2517).
+Here is an example of how you could do this using `function` components:
+
+```js
+import React from 'react';
+
+function Student (props: { student: Person }) {
+  // Renders out a draggable student
+}
+
+// do not re-render if the students list reference has not changed
+const InnerList = React.memo(function InnerList(props: students: Person[]) {
+  return props.students.map((student: Person) => (
+    <Student student={student} />
+  ));
+});
+
+function Students(props: { students: Person[] }) {
+  return (
+    <Droppable droppableId="list">
+      {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
+        <div
+          ref={provided.innerRef}
+          style={{
+            backgroundColor: provided.isDragging ? 'green' : 'lightblue',
+          }}
+          {...provided.droppableProps}
+        >
+          {/* only re-render if the students array reference changes */}
+          <InnerList students={props.students} />
+          {provided.placeholder}
+        </div>
+      )}
+    </Droppable>
+  );
+}
+```
+
+By using the approach you are able to make style changes to a `<Droppable />` when it is being dragged over, but you avoid re-rendering all of the children unnecessarily.
 
 When moving into a new list, the visible `Draggables` will have their `render` function called directly even with this optimisation. This is because we need to move those `Draggables` out of the way. The `InnerList` optimisation will prevent the `<Droppable />` from calling `render` on the whole list from the top down. This optimisation will prevent the non-visible `Draggables` from having their render function called.
 

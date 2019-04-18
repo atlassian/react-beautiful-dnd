@@ -53,8 +53,8 @@ You can use the UMD to run `react-beautiful-dnd` directly in the browser.
   const ReactDOM = window.ReactDOM;
   const { DragDropContext, Draggable, Droppable } = window.ReactBeautifulDnd;
 
-  class App extends React.Component {
-    //...
+  function App() {
+    // ...
   }
 
   // You can use JSX if your environment supports it

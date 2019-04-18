@@ -95,24 +95,14 @@ A `combine` result might signify different operations depending on your problem 
 When combining, a simple operation is to just remove the item that was dragging
 
 ```js
-class App extends React.Component {
-  onDragEnd = result => {
-    // combining item
-    if (result.combine) {
-      // super simple: just removing the dragging item
-      const items: Quote[] = [...this.state.items];
-      items.splice(result.source.index, 1);
-      this.setState({ items });
-      return;
-    }
-  };
-
-  render() {
-    return (
-      <DragDropContext onDragEnd={this.onDragEnd}>
-        {this.props.children}
-      </DragDropContext>
-    );
+function onDragEnd(result) {
+  // combining item
+  if (result.combine) {
+    // super simple: just removing the dragging item
+    const items: Quote[] = [...this.state.items];
+    items.splice(result.source.index, 1);
+    setState({ items });
+    return;
   }
 }
 ```
