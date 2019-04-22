@@ -56,9 +56,11 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - Web Design Weekly [issue 288](http://email.jakebresnehan.com/t/ViewEmail/r/54BEACFB4B9F50C82540EF23F30FEDED/05178437DEDE86556B5BE456C00C2519)
 - sidebar.io - [28/8/16](https://sidebar.io/?after=2017-08-21&before=2017-08-21)
 - Best of JS [issue 25](https://weekly.bestofjs.org/issues/25/)
+- BxJS Weekly [episode 59](https://dev.to/yamalight/bxjs-weekly-episode-59-javascript-news-podcast-b28)
 
-## Articles and blogs
+## Articles, tutorials and blogs
 
+- [React Drag and Drop - Multiple Horizontal Lists](https://www.youtube.com/watch?v=RI9kA09Egas)
 - [Building a Drag-and-Drop Game with react-beautiful-dnd](https://able.bio/drenther/building-a-drag-and-drop-game-with-react-beautiful-dnd--094r3g8)
 - [Let's Create a Trello Clone with React + Redux](https://www.youtube.com/watch?v=RDQGPs7StNA)
 - [Dynamically Update Positions During Drag Using react-beautiful-dnd](https://itnext.io/dynamically-update-positions-during-drag-using-react-beautiful-dnd-4a986d704c2e)
