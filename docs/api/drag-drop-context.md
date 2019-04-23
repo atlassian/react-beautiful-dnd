@@ -96,7 +96,7 @@ function App() {
 }
 ```
 
-## `Responder`s
+## `Responders`
 
 > `Responders` were previously known as `Hooks`
 
