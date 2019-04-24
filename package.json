@@ -1,6 +1,6 @@
 {
   "name": "react-beautiful-dnd",
-  "version": "11.0.0",
+  "version": "11.0.1",
   "description": "Beautiful and accessible drag and drop for lists with React",
   "author": "Alex Reardon <areardon@atlassian.com>",
   "keywords": [
