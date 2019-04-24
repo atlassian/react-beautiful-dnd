@@ -2,6 +2,7 @@
 import React, { type Node } from 'react';
 import invariant from 'tiny-invariant';
 import ReactDOM from 'react-dom';
+import { Simulate } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 import type { ReactWrapper } from 'enzyme';
 import type { DragHandleProps } from '../../../../src/view/use-drag-handle/drag-handle-types';
@@ -12,6 +13,7 @@ import forceUpdate from '../../../utils/force-update';
 import AppContext, {
   type AppContextValue,
 } from '../../../../src/view/context/app-context';
+import createRef from '../../../utils/create-ref';
 
 const body: ?HTMLElement = document.body;
 invariant(body, 'Cannot find body');
@@ -384,5 +386,54 @@ describe('Focus retention moving between lists (focus retention between mounts)'
     expect(second.getDOMNode()).not.toBe(document.activeElement);
     // focus maintained on button
     expect(button).toBe(document.activeElement);
+  });
+
+  it('should not steal focus from an element with auto focus on mount', () => {
+    function App() {
+      const ref = createRef();
+      return (
+        <AppContext.Provider value={appContext}>
+          <WithDragHandle
+            draggableId="draggable"
+            callbacks={getStubCallbacks()}
+            isDragging={false}
+            isDropAnimating={false}
+            isEnabled
+            getDraggableRef={ref.getRef}
+            canDragInteractiveElements={false}
+            getShouldRespectForcePress={() => true}
+          >
+            {(dragHandleProps: ?DragHandleProps) => (
+              <div
+                ref={ref.setRef}
+                {...dragHandleProps}
+                className="drag-handle"
+              >
+                Drag me!
+                {/* autoFocus attribute does give focus, but does not trigger onFocus callback */}
+                <textarea
+                  ref={(el: ?HTMLElement) => {
+                    // Replicating auto focus
+                    // by leveraging the ref function.
+                    invariant(
+                      el instanceof HTMLElement,
+                      'Expected el to be a html element',
+                    );
+                    el.focus();
+                    // letting react know about it
+                    Simulate.focus(el);
+                  }}
+                />
+              </div>
+            )}
+          </WithDragHandle>
+        </AppContext.Provider>
+      );
+    }
+
+    const wrapper: ReactWrapper<*> = mount(<App />);
+
+    // asserting drag handle did not steal focus
+    expect(wrapper.find('textarea').getDOMNode()).toBe(document.activeElement);
   });
 });
