@@ -27,6 +27,9 @@ export default function useFocusRetainer(args: Args): Result {
     isFocusedRef.current = false;
   }, []);
 
+  // This effect handles:
+  // - giving focus on mount
+  // - registering focus on unmount
   useIsomorphicLayoutEffect(() => {
     // mounting: try to restore focus
     const first: Args = lastArgsRef.current;
@@ -63,9 +66,19 @@ export default function useFocusRetainer(args: Args): Result {
     };
   }, [getDraggableRef]);
 
-  const lastDraggableRef = useRef<?HTMLElement>(getDraggableRef());
+  // will always be null on the first render as nothing has mounted yet
+  const lastDraggableRef = useRef<?HTMLElement>(null);
 
+  // This effect restores focus to an element when a
+  // ref changes while a component is still mounted.
+  // This can happen when a drag handle is moved into a portal
   useIsomorphicLayoutEffect(() => {
+    // this can happen on the first mount - no draggable ref is set
+    // this effect is not handling initial mounting
+    if (!lastDraggableRef.current) {
+      return;
+    }
+
     const draggableRef: ?HTMLElement = getDraggableRef();
 
     // Cannot focus on nothing
