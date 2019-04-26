@@ -56,7 +56,7 @@ module.exports = {
     'no-plusplus': 'off',
 
     'no-restricted-syntax': [
-      // Nicer booleans #2
+      // Nicer booleans #1
       // Disabling the use of !! to cast to boolean
       'error',
       {
@@ -73,12 +73,14 @@ module.exports = {
         message:
           'Avoid using constructor: `new Boolean(value)` as it creates a Boolean object. Did you mean `Boolean(value)`?',
       },
-      // want to use `import useLayoutEffect from './use-isomorphic-layout-effect' for linting
-      // if use use `import useIsomorphicLayoutEffect from '...'` then no linting will occur
+      // We are using a useLayoutEffect / useEffect switch to avoid SSR warnings for useLayoutEffect
+      // We want to ensure we use `import useEffect from '*use-isomorphic-layout-effect'`
+      // to ensure we still get the benefits of `eslint-plugin-react-hooks`
       {
         selector:
           'ImportDeclaration[source.value=/use-isomorphic-layout-effect/] > ImportDefaultSpecifier[local.name!="useLayoutEffect"]',
-        message: 'WIP',
+        message:
+          'Must use `useLayoutEffect` as the name of the import from `*use-isomorphic-layout-effect` to leverage `eslint-plugin-react-hooks`',
       },
     ],
 
