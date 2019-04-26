@@ -20,7 +20,7 @@ If you are not sure if your `package.json` version satisfies `16.3.1` have a rea
 
 More information: [identifiers guide](/docs/guides/identifiers.md)
 
-## `<Draggable/>` indexes
+## `<Draggable />` indexes
 
 Rules:
 
@@ -30,15 +30,15 @@ Rules:
 
 [More information](/docs/api/draggable.md#draggable-props)
 
-## No margin collapsing between `<Draggable/>`s
+## No margin collapsing between `<Draggable />`s
 
 This can happen if you have a `margin-top` as well as a `margin-bottom` on a `<Draggable />`.
 
 [More information](/docs/api/draggable.md#unsupported-margin-setups)
 
-## `key`s for a list of `<Draggable/>`
+## `key`s for a list of `<Draggable />`
 
-If you are rendering a list of `<Draggable/>`s then it is important that you add a [`key`](https://reactjs.org/docs/lists-and-keys.html) prop to each `<Draggable/>`.
+If you are rendering a list of `<Draggable />`s then it is important that you add a [`key`](https://reactjs.org/docs/lists-and-keys.html) prop to each `<Draggable />`.
 
 ```js
 return items.map((item, index) => (

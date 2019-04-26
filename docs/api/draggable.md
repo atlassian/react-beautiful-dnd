@@ -147,9 +147,9 @@ export type DraggableProps = {|
 // Note: this will not work directly as we are not applying dragHandleProps
 ```
 
-#### `key`s for a list of `<Draggable/>`
+#### `key`s for a list of `<Draggable />`
 
-If you are rendering a list of `<Draggable/>`s then it is important that you add a `key` prop to each `<Draggable/>`.
+If you are rendering a list of `<Draggable />`s then it is important that you add a `key` prop to each `<Draggable />`.
 
 ```js
 return items.map((item, index) => (
