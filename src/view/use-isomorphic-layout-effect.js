@@ -1,4 +1,5 @@
 // @flow
+// eslint-disable-next-line no-restricted-imports
 import { useLayoutEffect, useEffect } from 'react';
 
 // https://github.com/reduxjs/react-redux/blob/v7-beta/src/components/connectAdvanced.js#L35

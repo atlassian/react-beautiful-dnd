@@ -15,7 +15,7 @@ import getDimension from './get-dimension';
 import DroppableContext, {
   type DroppableContextValue,
 } from '../context/droppable-context';
-import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
+import useLayoutEffect from '../use-isomorphic-layout-effect';
 
 export type Args = {|
   draggableId: DraggableId,
@@ -58,13 +58,13 @@ export default function useDraggableDimensionPublisher(args: Args) {
   );
 
   // handle mounting / unmounting
-  useIsomorphicLayoutEffect(() => {
+  useLayoutEffect(() => {
     marshal.registerDraggable(publishedDescriptorRef.current, makeDimension);
     return () => marshal.unregisterDraggable(publishedDescriptorRef.current);
   }, [makeDimension, marshal]);
 
   // handle updates to descriptor
-  useIsomorphicLayoutEffect(() => {
+  useLayoutEffect(() => {
     // this will happen when mounting
     if (publishedDescriptorRef.current === descriptor) {
       return;

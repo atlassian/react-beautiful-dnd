@@ -7,7 +7,7 @@ import type { StyleMarshal } from './style-marshal-types';
 import type { DropReason } from '../../types';
 import getStyles, { type Styles } from './get-styles';
 import { prefix } from '../data-attributes';
-import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
+import useLayoutEffect from '../use-isomorphic-layout-effect';
 
 const getHead = (): HTMLHeadElement => {
   const head: ?HTMLHeadElement = document.querySelector('head');
@@ -46,7 +46,7 @@ export default function useStyleMarshal(uniqueId: number) {
   }, []);
 
   // using layout effect as programatic dragging might start straight away (such as for cypress)
-  useIsomorphicLayoutEffect(() => {
+  useLayoutEffect(() => {
     invariant(
       !alwaysRef.current && !dynamicRef.current,
       'style elements already mounted',
