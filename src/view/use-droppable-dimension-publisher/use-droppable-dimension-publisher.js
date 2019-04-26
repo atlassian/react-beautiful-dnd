@@ -29,7 +29,7 @@ import { warning } from '../../dev-warning';
 import getListenerOptions from './get-listener-options';
 import useRequiredContext from '../use-required-context';
 import usePreviousRef from '../use-previous-ref';
-import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
+import useLayoutEffect from '../use-isomorphic-layout-effect';
 
 type Props = {|
   droppableId: DroppableId,
@@ -237,7 +237,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
   // Register with the marshal and let it know of:
   // - any descriptor changes
   // - when it unmounts
-  useIsomorphicLayoutEffect(() => {
+  useLayoutEffect(() => {
     publishedDescriptorRef.current = descriptor;
     marshal.registerDroppable(descriptor, callbacks);
 
@@ -255,7 +255,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
 
   // update is enabled with the marshal
   // only need to update when there is a drag
-  useIsomorphicLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (!whileDraggingRef.current) {
       return;
     }
@@ -267,7 +267,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
 
   // update is combine enabled with the marshal
   // only need to update when there is a drag
-  useIsomorphicLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (!whileDraggingRef.current) {
       return;
     }

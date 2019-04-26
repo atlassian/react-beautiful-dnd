@@ -101,6 +101,13 @@ module.exports = {
             message:
               'use-memo-one exports `useMemo` and `useCallback` which work nicer with `eslint-plugin-react-hooks`',
           },
+          // Disabling using of useLayoutEffect from react
+          {
+            name: 'react',
+            importNames: ['useLayoutEffect'],
+            message:
+              '`useLayoutEffect` causes a warning in SSR. Use `useIsomorphicLayoutEffect`',
+          },
         ],
       },
     ],
