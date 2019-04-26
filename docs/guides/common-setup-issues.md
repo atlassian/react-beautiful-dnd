@@ -38,7 +38,7 @@ This can happen if you have a `margin-top` as well as a `margin-bottom` on a `<D
 
 ## `key`s for a list of `<Draggable/>`
 
-If you are rendering a list of `<Draggable/>`s then it is important that you add a [`key`](https://reactjs.org/docs/lists-and-keys.html) prop to each `Draggable`.
+If you are rendering a list of `<Draggable/>`s then it is important that you add a [`key`](https://reactjs.org/docs/lists-and-keys.html) prop to each `<Draggable/>`.
 
 ```js
 return items.map((item, index) => (
