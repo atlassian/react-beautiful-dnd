@@ -113,6 +113,8 @@ Everything within the _provided_ object must be applied for the `<Draggable />` 
 <Draggable draggableId="draggable-1" index={0}>
   {(provided, snapshot) => <div ref={provided.innerRef}>Drag me!</div>}
 </Draggable>
+
+// Note: this will not work directly as we are not applying draggableProps or dragHandleProps
 ```
 
 - `provided.draggableProps (DraggableProps)`: This is an Object that contains a `data` attribute and an inline `style`. This Object needs to be applied to the same node that you apply `provided.innerRef` to. This controls the movement of the draggable when it is dragging and not dragging. You are welcome to add your own styles to `DraggableProps.style` – but please do not remove or replace any of the properties.
@@ -141,7 +143,38 @@ export type DraggableProps = {|
     </div>
   )}
 </Draggable>
+
+// Note: this will not work directly as we are not applying dragHandleProps
 ```
+
+#### `key`s for a list of `<Draggable />`
+
+If you are rendering a list of `<Draggable />`s then it is important that you add a `key` prop to each `<Draggable />`.
+
+```js
+return items.map((item, index) => (
+  <Draggable
+    // adding a key is important!
+    key={item.id}
+    draggableId={item.id}
+    index={index}
+  >
+    {(provided, snapshot) => (
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+      >
+        {item.content}
+      </div>
+    )}
+  </Draggable>
+));
+```
+
+`React` will warn you if you are not using `keys` correctly. Not using `keys` correctly will cause really bad times 💥
+
+[`React` docs about `keys`](https://reactjs.org/docs/lists-and-keys.html)
 
 #### Positioning ownership
 
