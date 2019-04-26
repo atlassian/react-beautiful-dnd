@@ -55,8 +55,8 @@ module.exports = {
     // Allowing ++ on numbers
     'no-plusplus': 'off',
 
-    // Nicer booleans
     'no-restricted-syntax': [
+      // Nicer booleans #2
       // Disabling the use of !! to cast to boolean
       'error',
       {
@@ -65,12 +65,20 @@ module.exports = {
         message:
           '!! to cast to boolean relies on a double negative. Use Boolean() instead',
       },
+      // Nicer booleans #2
       // Avoiding accidental `new Boolean()` calls
       // (also covered by `no-new-wrappers` but i am having fun)
       {
         selector: 'NewExpression[callee.name="Boolean"]',
         message:
           'Avoid using constructor: `new Boolean(value)` as it creates a Boolean object. Did you mean `Boolean(value)`?',
+      },
+      // want to use `import useLayoutEffect from './use-isomorphic-layout-effect' for linting
+      // if use use `import useIsomorphicLayoutEffect from '...'` then no linting will occur
+      {
+        selector:
+          'ImportDeclaration[source.value=/use-isomorphic-layout-effect/] > ImportDefaultSpecifier[local.name!="useLayoutEffect"]',
+        message: 'WIP',
       },
     ],
 
