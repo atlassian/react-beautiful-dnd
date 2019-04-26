@@ -20,7 +20,7 @@ import usePreviousRef from '../use-previous-ref';
 import { warning } from '../../dev-warning';
 import useValidation from './use-validation';
 import useFocusRetainer from './use-focus-retainer';
-import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
+import useLayoutEffect from '../use-isomorphic-layout-effect';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
@@ -167,7 +167,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
 
   // aborting on unmount
 
-  useIsomorphicLayoutEffect(() => {
+  useLayoutEffect(() => {
     // only when unmounting
     return () => {
       if (!capturingRef.current) {
@@ -198,7 +198,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
   // No longer dragging but still capturing: need to abort
   // Using a layout effect to ensure that there is a flip from isDragging => !isDragging
   // When there is a pending drag !isDragging will always be true
-  useIsomorphicLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (!isDragging && capturingRef.current) {
       abortCapture();
     }

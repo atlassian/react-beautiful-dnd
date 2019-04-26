@@ -55,8 +55,8 @@ module.exports = {
     // Allowing ++ on numbers
     'no-plusplus': 'off',
 
-    // Nicer booleans
     'no-restricted-syntax': [
+      // Nicer booleans #1
       // Disabling the use of !! to cast to boolean
       'error',
       {
@@ -65,12 +65,22 @@ module.exports = {
         message:
           '!! to cast to boolean relies on a double negative. Use Boolean() instead',
       },
+      // Nicer booleans #2
       // Avoiding accidental `new Boolean()` calls
       // (also covered by `no-new-wrappers` but i am having fun)
       {
         selector: 'NewExpression[callee.name="Boolean"]',
         message:
           'Avoid using constructor: `new Boolean(value)` as it creates a Boolean object. Did you mean `Boolean(value)`?',
+      },
+      // We are using a useLayoutEffect / useEffect switch to avoid SSR warnings for useLayoutEffect
+      // We want to ensure we use `import useEffect from '*use-isomorphic-layout-effect'`
+      // to ensure we still get the benefits of `eslint-plugin-react-hooks`
+      {
+        selector:
+          'ImportDeclaration[source.value=/use-isomorphic-layout-effect/] > ImportDefaultSpecifier[local.name!="useLayoutEffect"]',
+        message:
+          'Must use `useLayoutEffect` as the name of the import from `*use-isomorphic-layout-effect` to leverage `eslint-plugin-react-hooks`',
       },
     ],
 
@@ -100,6 +110,13 @@ module.exports = {
             importNames: ['useMemoOne', 'useCallbackOne'],
             message:
               'use-memo-one exports `useMemo` and `useCallback` which work nicer with `eslint-plugin-react-hooks`',
+          },
+          // Disabling using of useLayoutEffect from react
+          {
+            name: 'react',
+            importNames: ['useLayoutEffect'],
+            message:
+              '`useLayoutEffect` causes a warning in SSR. Use `useIsomorphicLayoutEffect`',
           },
         ],
       },
