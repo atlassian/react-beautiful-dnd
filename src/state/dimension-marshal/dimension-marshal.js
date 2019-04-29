@@ -93,17 +93,24 @@ export default (callbacks: Callbacks) => {
   };
 
   const updateDraggable = (
-    previous: DraggableDescriptor,
+    published: DraggableDescriptor,
     descriptor: DraggableDescriptor,
     getDimension: GetDraggableDimensionFn,
   ) => {
+    const existing: ?DraggableEntry = entries.draggables[published.id];
+
     invariant(
-      entries.draggables[previous.id],
-      'Cannot update draggable registration as no previous registration was found',
+      existing,
+      'Cannot update draggable registration as no published registration was found',
     );
 
-    // id might have changed so we are removing the old entry
-    delete entries.draggables[previous.id];
+    // If consumers are not using keys correctly then there can be timing issues
+    // Note: there will still be a crash if starting a drag during the drop animation
+    if (existing.descriptor === published) {
+      // id might have changed so we are removing the old entry
+      delete entries.draggables[published.id];
+    }
+
     // adding new entry
     const entry: DraggableEntry = {
       descriptor,
