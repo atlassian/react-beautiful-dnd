@@ -172,9 +172,16 @@ return items.map((item, index) => (
 ));
 ```
 
-Your `key` should not contain the `index` of the item. It should be unique to the item: something like `id`. Usually you will want to just use the `draggableId` as the `key`.
+Rules:
 
-`React` will warn you if your list is missing `keys`. Not using `keys` correctly will cause really bad times 💥
+- Your `key` needs to be unique within the list
+- Your `key` should not include the `index` of the item
+
+Usually you will want to just use the `draggableId` as the `key`
+
+`React` will warn you if your list is missing `keys`. It will not warn you if you are using `index` as a part of your `key`.
+
+Not using `keys` correctly will cause really bad times 💥
 
 [`React` docs about `keys`](https://reactjs.org/docs/lists-and-keys.html)
 
