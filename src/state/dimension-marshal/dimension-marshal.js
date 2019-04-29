@@ -120,6 +120,8 @@ export default (callbacks: Callbacks) => {
         - Unique for each Draggable in a list
         - Not be based on the index of the Draggable
 
+        Usually you want your 'key' to just be the 'draggableId'
+
         More information: https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/api/draggable.md#keys-for-a-list-of-draggable-
       `);
     }
