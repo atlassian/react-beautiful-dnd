@@ -172,7 +172,16 @@ return items.map((item, index) => (
 ));
 ```
 
-`React` will warn you if you are not using `keys` correctly. Not using `keys` correctly will cause really bad times 💥
+Rules:
+
+- Your `key` needs to be unique within the list
+- Your `key` should not include the `index` of the item
+
+Usually you will want to just use the `draggableId` as the `key`
+
+`React` will warn you if your list is missing `keys`. It will not warn you if you are using `index` as a part of your `key`.
+
+Not using `keys` correctly will cause really bad times 💥
 
 [`React` docs about `keys`](https://reactjs.org/docs/lists-and-keys.html)
 
