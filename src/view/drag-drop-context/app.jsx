@@ -170,7 +170,7 @@ export default function App(props: Props) {
     [contextId, dimensionMarshal, getCanLift, getIsMovementAllowed],
   );
 
-  useSensorMarshal(contextId, getCanLift);
+  useSensorMarshal(contextId, store);
 
   // Clean store when unmounting
   useEffect(() => {
