@@ -5,7 +5,7 @@ import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
 import type { DraggableId, MovementMode } from '../../types';
 import type { Store } from '../../state/store-types';
-import type { SensorHookArgs, SensorHook } from './sensor-types';
+import type { Phase, SensorHook } from './sensor-types';
 import getClosestDragHandle from './get-closest-drag-handle';
 import canStartDrag from '../../state/can-start-drag';
 import {
@@ -22,15 +22,14 @@ import {
 import getWindowScroll from '../window/get-window-scroll';
 import useMouseSensor from './sensors/use-mouse-sensor';
 
-let isCapturing: boolean = false;
-function onCaptureStart() {
-  invariant(!isCapturing, 'Cannot start capturing when already capturing');
-  isCapturing = true;
+let capturingFor: ?DraggableId = null;
+function startCapture(id: DraggableId) {
+  invariant(!capturingFor, 'Cannot start capturing when already capturing');
+  capturingFor = id;
 }
-
-function onCaptureEnd() {
-  invariant(isCapturing, 'Cannot end capturing when not capturing');
-  isCapturing = false;
+function stopCapture() {
+  invariant(capturingFor, 'Cannot stop capturing when not already capturing');
+  capturingFor = null;
 }
 
 export default function useSensorMarshal(
@@ -42,7 +41,7 @@ export default function useSensorMarshal(
   const canStartCapturing = useCallback(
     function canStartCapturing(id: DraggableId) {
       // Something else is capturing
-      if (isCapturing) {
+      if (capturingFor != null) {
         return false;
       }
 
@@ -76,37 +75,92 @@ export default function useSensorMarshal(
     [canStartCapturing, contextId],
   );
 
-  const args: SensorHookArgs = useMemo(
-    () => ({
-      // Capturing
-      canStartCapturing,
-      canStartCapturingFromEvent,
-      onCaptureStart,
-      onCaptureEnd,
+  const tryStartCapturing = useCallback(
+    function tryStartCapturing(event: Event): boolean {
+      if (capturingFor != null) {
+        return false;
+      }
 
-      // Movement
-      onLift: (options: LiftArgs) => store.dispatch(liftAction(options)),
-      onMove: (clientSelection: Position) =>
-        store.dispatch(moveAction({ client: clientSelection })),
-      onWindowScroll: () =>
-        store.dispatch(
-          windowScrollAction({
-            newScroll: getWindowScroll(),
-          }),
-        ),
-      onMoveUp: () => store.dispatch(moveUpAction()),
-      onMoveDown: () => store.dispatch(moveDownAction()),
-      onMoveRight: () => store.dispatch(moveRightAction()),
-      onMoveLeft: () => store.dispatch(moveLeftAction()),
-      onDrop: () => store.dispatch(dropAction({ reason: 'DROP' })),
-      onCancel: () => store.dispatch(dropAction({ reason: 'CANCEL' })),
-    }),
-    [canStartCapturing, canStartCapturingFromEvent, store],
+      if (event.defaultPrevented) {
+        return false;
+      }
+
+      const target: EventTarget = event.target;
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+
+      const id: ?DraggableId = getClosestDragHandle(contextId, target);
+
+      if (id == null) {
+        return false;
+      }
+
+      if (!canStartDrag(store.getState(), id)) {
+        return false;
+      }
+
+      startCapture(id);
+      return true;
+    },
+    [contextId, store],
+  );
+
+  const getPhase = useCallback(
+    function getPhase(): Phase {
+      if (capturingFor == null) {
+        return {
+          type: 'IDLE',
+          callbacks: {
+            tryStartCapturing,
+          },
+        };
+      }
+
+      return {
+        type: 'CAPTURING',
+        callbacks: {
+          getDragHandleRef: () => null,
+          getDraggableRef: () => null,
+          onLift: (options: LiftArgs) => store.dispatch(liftAction(options)),
+          onMove: (clientSelection: Position) =>
+            store.dispatch(moveAction({ client: clientSelection })),
+          onWindowScroll: () => {
+            store.dispatch(
+              windowScrollAction({
+                newScroll: getWindowScroll(),
+              }),
+            );
+          },
+          onMoveUp: () => {
+            store.dispatch(moveUpAction());
+          },
+          onMoveDown: () => {
+            store.dispatch(moveDownAction());
+          },
+          onMoveRight: () => {
+            store.dispatch(moveRightAction());
+          },
+          onMoveLeft: () => {
+            store.dispatch(moveLeftAction());
+          },
+          onDrop: () => {
+            stopCapture();
+            store.dispatch(dropAction({ reason: 'DROP' }));
+          },
+          onCancel: () => {
+            stopCapture();
+            store.dispatch(dropAction({ reason: 'CANCEL' }));
+          },
+        },
+      };
+    },
+    [store, tryStartCapturing],
   );
 
   // TODO: validate length of sensor hooks has not changed from mount
 
   // Bad ass
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  useSensorHooks.forEach((useSensor: SensorHook) => useSensor(args));
+  useSensorHooks.forEach((useSensor: SensorHook) => useSensor(getPhase));
 }
