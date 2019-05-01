@@ -19,7 +19,7 @@ import AnimateInOut, {
 export default function Droppable(props: Props) {
   const appContext: ?AppContextValue = useContext<?AppContextValue>(AppContext);
   invariant(appContext, 'Could not find app context');
-  const { style: styleContext, isMovementAllowed } = appContext;
+  const { contextId, isMovementAllowed } = appContext;
   const droppableRef = useRef<?HTMLElement>(null);
   const placeholderRef = useRef<?HTMLElement>(null);
 
@@ -73,11 +73,6 @@ export default function Droppable(props: Props) {
     getPlaceholderRef,
   });
 
-  // const instruction: ?AnimateProvided = useAnimateInOut({
-  //   on: props.placeholder,
-  //   shouldAnimate: props.shouldAnimatePlaceholder,
-  // });
-
   const placeholder: Node = (
     <AnimateInOut
       on={props.placeholder}
@@ -89,7 +84,7 @@ export default function Droppable(props: Props) {
           onClose={onClose}
           innerRef={setPlaceholderRef}
           animate={animate}
-          styleContext={styleContext}
+          contextId={contextId}
           onTransitionEnd={onPlaceholderTransitionEnd}
         />
       )}
@@ -101,10 +96,10 @@ export default function Droppable(props: Props) {
       innerRef: setDroppableRef,
       placeholder,
       droppableProps: {
-        'data-react-beautiful-dnd-droppable': styleContext,
+        'data-react-beautiful-dnd-droppable': contextId,
       },
     }),
-    [placeholder, setDroppableRef, styleContext],
+    [contextId, placeholder, setDroppableRef],
   );
 
   const droppableContext: ?DroppableContextValue = useMemo(

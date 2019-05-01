@@ -19,14 +19,14 @@ export function resetServerContext() {
 }
 
 export default function DragDropContext(props: Props) {
-  const uniqueId: number = useMemo(() => instanceCount++, []);
+  const contextId: string = useMemo(() => `${instanceCount++}`, []);
 
   // We need the error boundary to be on the outside of App
   // so that it can catch any errors caused by App
   return (
     <ErrorBoundary>
       {setOnError => (
-        <App setOnError={setOnError} uniqueId={uniqueId} {...props}>
+        <App setOnError={setOnError} contextId={contextId} {...props}>
           {props.children}
         </App>
       )}

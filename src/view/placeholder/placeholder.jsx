@@ -31,7 +31,7 @@ export type Props = {|
   onClose: () => void,
   innerRef?: () => ?HTMLElement,
   onTransitionEnd: () => void,
-  styleContext: string,
+  contextId: string,
 |};
 
 type Size = {|
@@ -124,7 +124,7 @@ function Placeholder(props: Props): Node {
     animateOpenTimerRef.current = null;
   }, []);
 
-  const { animate, onTransitionEnd, onClose, styleContext } = props;
+  const { animate, onTransitionEnd, onClose, contextId } = props;
   const [isAnimatingOpenOnMount, setIsAnimatingOpenOnMount] = useState<boolean>(
     props.animate === 'open',
   );
@@ -186,7 +186,7 @@ function Placeholder(props: Props): Node {
 
   return React.createElement(props.placeholder.tagName, {
     style,
-    'data-react-beautiful-dnd-placeholder': styleContext,
+    'data-react-beautiful-dnd-placeholder': contextId,
     onTransitionEnd: onSizeChangeEnd,
     ref: props.innerRef,
   });

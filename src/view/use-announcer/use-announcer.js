@@ -21,11 +21,11 @@ const visuallyHidden: Object = {
   'clip-path': 'inset(100%)',
 };
 
-export const getId = (uniqueId: number): string =>
-  `react-beautiful-dnd-announcement-${uniqueId}`;
+export const getId = (contextId: string): string =>
+  `react-beautiful-dnd-announcement-${contextId}`;
 
-export default function useAnnouncer(uniqueId: number): Announce {
-  const id: string = useMemo(() => getId(uniqueId), [uniqueId]);
+export default function useAnnouncer(contextId: string): Announce {
+  const id: string = useMemo(() => getId(contextId), [contextId]);
   const ref = useRef<?HTMLElement>(null);
 
   useEffect(() => {

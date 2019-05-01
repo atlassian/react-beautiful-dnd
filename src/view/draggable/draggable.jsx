@@ -184,7 +184,7 @@ export default function Draggable(props: Props) {
     const result: Provided = {
       innerRef: setRef,
       draggableProps: {
-        'data-react-beautiful-dnd-draggable': appContext.style,
+        'data-react-beautiful-dnd-draggable': appContext.contextId,
         style,
         onTransitionEnd,
       },
@@ -192,7 +192,7 @@ export default function Draggable(props: Props) {
     };
 
     return result;
-  }, [appContext.style, dragHandleProps, mapped, onMoveEnd, setRef]);
+  }, [appContext.contextId, dragHandleProps, mapped, onMoveEnd, setRef]);
 
   return children(provided, mapped.snapshot);
 }

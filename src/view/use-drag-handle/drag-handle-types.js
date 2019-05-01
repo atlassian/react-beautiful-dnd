@@ -29,8 +29,10 @@ export type DragHandleProps = {|
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
 
-  // Control styling from style marshal
+  // What DragDropContext the drag handle is in
   'data-react-beautiful-dnd-drag-handle': string,
+  // The DraggableId associated with the drag handle
+  'data-react-beautiful-dnd-drag-handle-id': string,
 
   // Aria role (nicer screen reader text)
   'aria-roledescription': string,

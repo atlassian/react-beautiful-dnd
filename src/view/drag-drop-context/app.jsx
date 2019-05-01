@@ -37,7 +37,7 @@ import { warning } from '../../dev-warning';
 
 type Props = {|
   ...Responders,
-  uniqueId: number,
+  contextId: string,
   setOnError: (onError: Function) => void,
   // we do not technically need any children for this component
   children: Node | null,
@@ -60,7 +60,7 @@ function getStore(lazyRef: LazyStoreRef): Store {
 }
 
 export default function App(props: Props) {
-  const { uniqueId, setOnError } = props;
+  const { contextId, setOnError } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
@@ -72,8 +72,8 @@ export default function App(props: Props) {
     return createResponders(lastPropsRef.current);
   }, [lastPropsRef]);
 
-  const announce: Announce = useAnnouncer(uniqueId);
-  const styleMarshal: StyleMarshal = useStyleMarshal(uniqueId);
+  const announce: Announce = useAnnouncer(contextId);
+  const styleMarshal: StyleMarshal = useStyleMarshal(contextId);
 
   const lazyDispatch: Action => void = useCallback((action: Action): void => {
     getStore(lazyStoreRef).dispatch(action);
@@ -162,16 +162,11 @@ export default function App(props: Props) {
   const appContext: AppContextValue = useMemo(
     () => ({
       marshal: dimensionMarshal,
-      style: styleMarshal.styleContext,
+      contextId,
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
     }),
-    [
-      dimensionMarshal,
-      getCanLift,
-      getIsMovementAllowed,
-      styleMarshal.styleContext,
-    ],
+    [contextId, dimensionMarshal, getCanLift, getIsMovementAllowed],
   );
 
   // Clean store when unmounting

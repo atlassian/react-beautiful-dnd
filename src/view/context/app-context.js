@@ -5,7 +5,7 @@ import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-m
 
 export type AppContextValue = {|
   marshal: DimensionMarshal,
-  style: string,
+  contextId: string,
   canLift: (id: DraggableId) => boolean,
   isMovementAllowed: () => boolean,
 |};

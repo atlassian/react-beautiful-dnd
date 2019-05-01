@@ -21,8 +21,8 @@ const createStyleEl = (): HTMLStyleElement => {
   return el;
 };
 
-export default function useStyleMarshal(uniqueId: number) {
-  const uniqueContext: string = useMemo(() => `${uniqueId}`, [uniqueId]);
+export default function useStyleMarshal(contextId: string) {
+  const uniqueContext: string = useMemo(() => `${contextId}`, [contextId]);
   const styles: Styles = useMemo(() => getStyles(uniqueContext), [
     uniqueContext,
   ]);
