@@ -9,6 +9,8 @@ export type SensorHookArgs = {|
   onCaptureStart: (abort: () => void) => void,
   onCaptureEnd: () => void,
 
+  // Can only call after capturing has started
+
   // Drag movement
   onLift: ({|
     id: DraggableId,
