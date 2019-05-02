@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import { useEffect, useRef } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
-import type { Phase } from '../sensor-types';
+import type { MovementCallbacks } from '../sensor-types';
 import type { EventBinding, EventOptions } from './util/event-types';
 import { bindEvents, unbindEvents } from './util/bind-events';
 import createScheduler from '../../use-drag-handle/util/create-scheduler';
@@ -12,15 +12,18 @@ import createScheduler from '../../use-drag-handle/util/create-scheduler';
 const primaryButton: number = 0;
 function noop() {}
 
-export default function useMouseSensor(getPhase: () => Phase) {
+export default function useMouseSensor(
+  tryStartCapturing: (event: Event) => ?MovementCallbacks,
+) {
   const unbindWindowEventsRef = useRef<() => void>(noop);
+  const movementRef = useRef<?MovementCallbacks>(null);
 
   const stop = useCallback(() => {}, []);
 
-  const startPendingDrag = useCallback(
-    function startPendingDrag(point: Position) {},
-    [],
-  );
+  const startPendingDrag = useCallback(function startPendingDrag(
+    point: Position,
+  ) {},
+  []);
 
   const startCaptureBinding: EventBinding = useMemo(
     () => ({
@@ -35,12 +38,10 @@ export default function useMouseSensor(getPhase: () => Phase) {
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
           return;
         }
-        const phase: Phase = getPhase();
 
-        const isCapturing: boolean =
-          phase.type === 'IDLE' && phase.callbacks.tryStartCapturing(event);
+        const callbacks: ?MovementCallbacks = tryStartCapturing(event);
 
-        if (!isCapturing) {
+        if (!callbacks) {
           return;
         }
 
@@ -54,10 +55,11 @@ export default function useMouseSensor(getPhase: () => Phase) {
         // unbind this listener
         unbindWindowEventsRef.current();
 
+        movementRef.current = callbacks;
         startPendingDrag(point);
       },
     }),
-    [getPhase, startPendingDrag],
+    [startPendingDrag, tryStartCapturing],
   );
 
   const listenForCapture = useCallback(

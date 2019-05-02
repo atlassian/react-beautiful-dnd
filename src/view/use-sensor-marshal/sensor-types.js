@@ -27,33 +27,24 @@ export type SensorHookArgsOld = {|
   onCancel: () => mixed,
 |};
 
-type IdlePhase = {|
-  type: 'IDLE',
-  callbacks: {|
-    tryStartCapturing: (event: Event) => boolean,
-  |},
+export type MovementCallbacks = {|
+  // getDragHandleRef: () => HTMLElement,
+  // getDraggableRef: () => HTMLElement,
+  onLift: ({
+    clientSelection: Position,
+    movementMode: MovementMode,
+  }) => void,
+  onMove: (point: Position) => void,
+  onWindowScroll: () => void,
+  onMoveUp: () => void,
+  onMoveDown: () => void,
+  onMoveRight: () => void,
+  onMoveLeft: () => void,
+  onDrop: () => void,
+  onCancel: () => void,
+  onAbort: () => void,
 |};
 
-type CapturingPhase = {|
-  type: 'CAPTURING',
-  callbacks: {|
-    getDragHandleRef: () => HTMLElement,
-    getDraggableRef: () => HTMLElement,
-    onLift: ({|
-      clientSelection: Position,
-      movementMode: MovementMode,
-    |}) => void,
-    onMove: (point: Position) => void,
-    onWindowScroll: () => void,
-    onMoveUp: () => void,
-    onMoveDown: () => void,
-    onMoveRight: () => void,
-    onMoveLeft: () => void,
-    onDrop: () => void,
-    onCancel: () => void,
-  |},
-|};
-
-export type Phase = IdlePhase | CapturingPhase;
-
-export type SensorHook = (getPhase: () => Phase) => void;
+export type SensorHook = (
+  tryStartCapturing: (event: Event) => ?MovementCallbacks,
+) => void;
