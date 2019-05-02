@@ -1,12 +1,15 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { useEffect } from 'react';
 import rafSchd from 'raf-schd';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
 import type { DraggableId, MovementMode } from '../../types';
 import type { Store } from '../../state/store-types';
-import type { MovementCallbacks, SensorHook } from './sensor-types';
+import type {
+  MovementCallbacks,
+  SensorHook,
+  CaptureEndOptions,
+} from './sensor-types';
 import getClosestDragHandle, {
   getDraggableId,
 } from './get-closest-drag-handle';
@@ -34,6 +37,10 @@ function startCapture(id: DraggableId) {
 function stopCapture() {
   invariant(capturingFor, 'Cannot stop capturing when not already capturing');
   capturingFor = null;
+}
+
+function preventDefault(event: Event) {
+  event.preventDefault();
 }
 
 function tryStartCapturing(
@@ -88,9 +95,18 @@ function tryStartCapturing(
   const onMoveLeft = rafSchd(() => {
     store.dispatch(moveLeftAction());
   });
-  const finish = () => {
+  const finish = ({ shouldBlockNextClick }: CaptureEndOptions) => {
     // stopping capture
     stopCapture();
+
+    // block next click if requested
+    if (shouldBlockNextClick) {
+      window.addEventListener('click', preventDefault, {
+        once: true,
+        passive: false,
+        capture: true,
+      });
+    }
 
     // cancel any pending request animation frames
     onMove.cancel();
@@ -119,15 +135,15 @@ function tryStartCapturing(
     onMoveDown,
     onMoveRight,
     onMoveLeft,
-    onDrop: () => {
-      finish();
+    onDrop: (args: CaptureEndOptions) => {
+      finish(args);
       store.dispatch(dropAction({ reason: 'DROP' }));
     },
-    onCancel: () => {
-      finish();
+    onCancel: (args: CaptureEndOptions) => {
+      finish(args);
       store.dispatch(dropAction({ reason: 'CANCEL' }));
     },
-    onAbort: finish,
+    onAbort: () => finish({ shouldBlockNextClick: false }),
   };
 }
 
@@ -142,8 +158,6 @@ export default function useSensorMarshal(
       tryStartCapturing(contextId, store, event),
     [contextId, store],
   );
-
-  // TODO: validate length of sensor hooks has not changed from mount
 
   // Bad ass
   useValidateSensorHooks(useSensorHooks);

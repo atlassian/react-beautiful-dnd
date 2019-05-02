@@ -95,8 +95,9 @@ function getCaptureBindings(
         if (phase.type === 'DRAGGING') {
           // preventing default as we are using this event
           event.preventDefault();
-          phase.callbacks.onDrop();
+          phase.callbacks.onDrop({ shouldBlockNextClick: true });
         }
+
         stop();
       },
     },
@@ -154,12 +155,12 @@ function getCaptureBindings(
           return;
         }
 
-        // stop a pending drag
         const phase: Phase = getPhase();
         if (phase.type === 'DRAGGING') {
           phase.callbacks.onWindowScroll();
           return;
         }
+        // stop a pending drag
         stop();
       },
     },
@@ -240,9 +241,12 @@ export default function useMouseSensor(
 
         // unbind this listener
         unbindWindowEventsRef.current();
+        // using this function before it is defined as their is a circular usage pattern
+        // eslint-disable-next-line no-use-before-define
         startPendingDrag(callbacks, point);
       },
     }),
+    // not including startPendingDrag as it is not defined initially
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [tryStartCapturing],
   );
@@ -264,7 +268,8 @@ export default function useMouseSensor(
   );
 
   const stop = useCallback(() => {
-    if (phaseRef.current.type === 'IDLE') {
+    const current: Phase = phaseRef.current;
+    if (current.type === 'IDLE') {
       return;
     }
 
@@ -272,19 +277,16 @@ export default function useMouseSensor(
     unbindWindowEventsRef.current();
 
     listenForCapture();
-    // const shouldBlockClick: boolean = isDraggingRef.current;
-
-    // mouseDownMarshal.reset();
-    // if (shouldBlockClick) {
-    //   postDragEventPreventer.preventNext();
-    // }
   }, [listenForCapture]);
 
   const cancel = useCallback(() => {
     const phase: Phase = phaseRef.current;
     stop();
     if (phase.type === 'DRAGGING') {
-      phase.callbacks.onCancel();
+      phase.callbacks.onCancel({ shouldBlockNextClick: true });
+    }
+    if (phase.type === 'PENDING') {
+      phase.callbacks.onAbort();
     }
   }, [stop]);
 

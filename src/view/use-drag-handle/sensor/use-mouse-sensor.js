@@ -319,9 +319,12 @@ export default function useMouseSensor(args: Args): OnMouseDown {
 
   const onMouseDown = useCallback(
     (event: MouseEvent) => {
-      return;
+      // skipping for now to allow virtual
+      if (true) {
+        return;
+      }
       if (mouseDownMarshal.isHandled()) {
-        
+        return;
       }
 
       invariant(
