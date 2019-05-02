@@ -5,7 +5,7 @@ import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
 import type { MovementCallbacks } from '../sensor-types';
 import type { EventBinding, EventOptions } from './util/event-types';
-import { bindEvents, unbindEvents } from './util/bind-events';
+import bindEvents from './util/bind-events';
 import isSloppyClickThresholdExceeded from './util/is-sloppy-click-threshold-exceeded';
 import * as keyCodes from '../../key-codes';
 import preventStandardKeyEvents from './util/prevent-standard-key-events';
@@ -254,10 +254,11 @@ export default function useMouseSensor(
         capture: true,
       };
 
-      bindEvents(window, [startCaptureBinding], options);
-      // setup unbind
-      unbindWindowEventsRef.current = () =>
-        unbindEvents(window, [startCaptureBinding], options);
+      unbindWindowEventsRef.current = bindEvents(
+        window,
+        [startCaptureBinding],
+        options,
+      );
     },
     [startCaptureBinding],
   );
@@ -299,9 +300,7 @@ export default function useMouseSensor(
         },
       );
 
-      bindEvents(window, bindings, options);
-      unbindWindowEventsRef.current = () =>
-        unbindEvents(window, bindings, options);
+      unbindWindowEventsRef.current = bindEvents(window, bindings, options);
     },
     [cancel, stop],
   );

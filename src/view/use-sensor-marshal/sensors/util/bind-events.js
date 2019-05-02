@@ -9,19 +9,7 @@ const getOptions = (
   ...fromBinding,
 });
 
-export const bindEvents = (
-  el: HTMLElement,
-  bindings: EventBinding[],
-  sharedOptions?: EventOptions,
-) => {
-  bindings.forEach((binding: EventBinding) => {
-    const options: Object = getOptions(sharedOptions, binding.options);
-
-    el.addEventListener(binding.eventName, binding.fn, options);
-  });
-};
-
-export const unbindEvents = (
+const unbindEvents = (
   el: HTMLElement,
   bindings: EventBinding[],
   sharedOptions?: EventOptions,
@@ -32,3 +20,18 @@ export const unbindEvents = (
     el.removeEventListener(binding.eventName, binding.fn, options);
   });
 };
+
+export default function bindEvents(
+  el: HTMLElement,
+  bindings: EventBinding[],
+  sharedOptions?: EventOptions,
+): Function {
+  bindings.forEach((binding: EventBinding) => {
+    const options: Object = getOptions(sharedOptions, binding.options);
+
+    el.addEventListener(binding.eventName, binding.fn, options);
+  });
+
+  // Return a function to unbind events
+  return () => unbindEvents(el, bindings, sharedOptions);
+}
