@@ -1,7 +1,6 @@
 // @flow
 import { useEffect } from 'react';
 import { useCallback } from 'use-memo-one';
-import { getBox, type BoxModel } from 'css-box-model';
 import type { MovementCallbacks } from '../view/use-sensor-marshal/sensor-types';
 
 function delay(fn: Function, time?: number = 300) {
@@ -32,12 +31,10 @@ export default function useDemoSensor(
       console.log('unable to start drag');
       return;
     }
-    const box: BoxModel = getBox(handle);
 
     // TODO: this is a bit lame as a programatic api
     callbacks.onLift({
-      clientSelection: box.borderBox.center,
-      movementMode: 'SNAP',
+      mode: 'SNAP',
     });
 
     Promise.resolve()
@@ -47,7 +44,8 @@ export default function useDemoSensor(
       .then(() => delay(callbacks.onMoveDown))
       .then(() => delay(callbacks.onMoveDown))
       .then(() => delay(callbacks.onMoveUp))
-      .then(() => delay(callbacks.onMoveUp));
+      .then(() => delay(callbacks.onMoveUp))
+      .then(() => delay(callbacks.onDrop));
   }, [tryStartCapturing]);
 
   useEffect(() => {

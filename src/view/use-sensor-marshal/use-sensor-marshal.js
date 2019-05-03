@@ -3,12 +3,13 @@ import invariant from 'tiny-invariant';
 import rafSchd from 'raf-schd';
 import { useCallback } from 'use-memo-one';
 import type { Position } from 'css-box-model';
-import type { ContextId, DraggableId, MovementMode } from '../../types';
+import type { ContextId, DraggableId } from '../../types';
 import type { Store } from '../../state/store-types';
 import type {
   MovementCallbacks,
   SensorHook,
   CaptureEndOptions,
+  OnLiftArgs,
 } from './sensor-types';
 import { getClosestDragHandle, getClosestDraggable } from './get-closest';
 import canStartDrag from '../../state/can-start-drag';
@@ -28,6 +29,9 @@ import useValidateSensorHooks from './use-validate-sensor-hooks';
 import isHandleInInteractiveElement from './is-handle-in-interactive-element';
 import getOptionsFromDraggable from './get-options-from-draggable';
 import useDemoSensor from '../../debug/use-demo-sensor';
+import getBorderBoxCenterPosition from '../get-border-box-center-position';
+import { warning } from '../../dev-warning';
+import isHtmlElement from '../is-type-of-element/is-html-element';
 
 let capturingFor: ?DraggableId = null;
 function startCapture(id: DraggableId) {
@@ -77,17 +81,18 @@ function tryStartCapturing({
   const target: ?Element = getTarget(source);
 
   // Must be a HTMLElement
-  if (!(target instanceof HTMLElement)) {
+  if (!isHtmlElement(target)) {
+    warning('Expected target to be a HTMLElement');
     return null;
   }
 
-  const handle: ?Element = getClosestDragHandle(contextId, target);
+  const handle: ?HTMLElement = getClosestDragHandle(contextId, target);
 
   if (handle == null) {
     return null;
   }
 
-  const draggable: Element = getClosestDraggable(contextId, handle);
+  const draggable: HTMLElement = getClosestDraggable(contextId, handle);
   const {
     id,
     shouldRespectForcePress,
@@ -130,12 +135,14 @@ function tryStartCapturing({
   const onMoveLeft = () => {
     store.dispatch(moveLeftAction());
   };
-  const finish = ({ shouldBlockNextClick }: CaptureEndOptions) => {
+  const finish = (
+    options?: CaptureEndOptions = { shouldBlockNextClick: false },
+  ) => {
     // stopping capture
     stopCapture();
 
     // block next click if requested
-    if (shouldBlockNextClick) {
+    if (options.shouldBlockNextClick) {
       window.addEventListener('click', preventDefault, {
         // only blocking a single click
         once: true,
@@ -151,16 +158,21 @@ function tryStartCapturing({
 
   return {
     shouldRespectForcePress: (): boolean => shouldRespectForcePress,
-    onLift: (options: {
-      clientSelection: Position,
-      movementMode: MovementMode,
-    }) => {
-      store.dispatch(
-        liftAction({
-          ...options,
-          id,
-        }),
-      );
+    onLift: (args: OnLiftArgs) => {
+      const actionArgs =
+        args.mode === 'FLUID'
+          ? {
+              clientSelection: args.clientSelection,
+              movementMode: 'FLUID',
+              id,
+            }
+          : {
+              movementMode: 'SNAP',
+              clientSelection: getBorderBoxCenterPosition(draggable),
+              id,
+            };
+
+      store.dispatch(liftAction(actionArgs));
     },
     onMove,
     onWindowScroll,
@@ -168,15 +180,15 @@ function tryStartCapturing({
     onMoveDown,
     onMoveRight,
     onMoveLeft,
-    onDrop: (args: CaptureEndOptions) => {
+    onDrop: (args?: CaptureEndOptions) => {
       finish(args);
       store.dispatch(dropAction({ reason: 'DROP' }));
     },
-    onCancel: (args: CaptureEndOptions) => {
+    onCancel: (args?: CaptureEndOptions) => {
       finish(args);
       store.dispatch(dropAction({ reason: 'CANCEL' }));
     },
-    onAbort: () => finish({ shouldBlockNextClick: false }),
+    onAbort: () => finish(),
   };
 }
 

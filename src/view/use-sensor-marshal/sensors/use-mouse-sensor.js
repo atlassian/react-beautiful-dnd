@@ -88,7 +88,7 @@ function getCaptureBindings(
 
         phase.callbacks.onLift({
           clientSelection: pending,
-          movementMode: 'FLUID',
+          mode: 'FLUID',
         });
       },
     },
