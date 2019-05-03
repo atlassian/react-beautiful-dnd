@@ -1,4 +1,5 @@
 // @flow
+import type { ContextId } from '../../types';
 import { transitions } from '../../animation';
 import * as attributes from '../data-attributes';
 
@@ -40,8 +41,8 @@ const getStyles = (rules: Rule[], property: string): string =>
 
 const noPointerEvents: string = 'pointer-events: none;';
 
-export default (uniqueContext: string): Styles => {
-  const getSelector = makeGetSelector(uniqueContext);
+export default (contextId: ContextId): Styles => {
+  const getSelector = makeGetSelector(contextId);
 
   // ## Drag handle styles
 
@@ -124,7 +125,7 @@ export default (uniqueContext: string): Styles => {
   // When we drop a Draggable it already has the correct scroll applied.
 
   const droppable: Rule = {
-    selector: getSelector(attributes.droppable),
+    selector: getSelector(attributes.droppable.contextId),
     styles: {
       always: `overflow-anchor: none;`,
       // need pointer events on the droppable to allow manual scrolling

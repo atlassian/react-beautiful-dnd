@@ -22,7 +22,7 @@ const visuallyHidden: Object = {
 };
 
 export const getId = (contextId: ContextId): string =>
-  `react-beautiful-dnd-announcement-${contextId}`;
+  `rbd-announcement-${contextId}`;
 
 export default function useAnnouncer(contextId: ContextId): Announce {
   const id: string = useMemo(() => getId(contextId), [contextId]);

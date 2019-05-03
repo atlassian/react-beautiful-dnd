@@ -96,7 +96,7 @@ export default function Droppable(props: Props) {
       innerRef: setDroppableRef,
       placeholder,
       droppableProps: {
-        'data-react-beautiful-dnd-droppable': contextId,
+        'data-rbd-droppable-context-id': contextId,
       },
     }),
     [contextId, placeholder, setDroppableRef],

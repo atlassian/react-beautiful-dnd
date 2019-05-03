@@ -7,12 +7,13 @@ import type {
   Direction,
   Placeholder,
   State,
+  ContextId,
 } from '../../types';
 import { updateViewportMaxScroll } from '../../state/action-creators';
 
 export type DroppableProps = {|
   // used for shared global styles
-  'data-react-beautiful-dnd-droppable': string,
+  'data-rbd-droppable-context-id': ContextId,
 |};
 
 export type Provided = {|
