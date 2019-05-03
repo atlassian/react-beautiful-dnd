@@ -27,6 +27,7 @@ import useMouseSensor from './sensors/use-mouse-sensor';
 import useValidateSensorHooks from './use-validate-sensor-hooks';
 import isHandleInInteractiveElement from './is-handle-in-interactive-element';
 import getOptionsFromDraggable from './get-options-from-draggable';
+import useDemoSensor from '../../debug/use-demo-sensor';
 
 let capturingFor: ?DraggableId = null;
 function startCapture(id: DraggableId) {
@@ -45,23 +46,37 @@ function preventDefault(event: Event) {
 type TryStartCapturingArgs = {|
   contextId: ContextId,
   store: Store,
-  event: Event,
+  source: Event | Element,
 |};
+
+function getTarget(source: Event | Element): ?Element {
+  if (source instanceof Element) {
+    return source;
+  }
+  // source is an event
+
+  // Event is already used: do not start a drag
+  if (source.defaultPrevented) {
+    return null;
+  }
+
+  // Only interested if the target is an Element
+  const target: EventTarget = source.target;
+  return target instanceof Element ? target : null;
+}
 
 function tryStartCapturing({
   contextId,
   store,
-  event,
+  source,
 }: TryStartCapturingArgs): ?MovementCallbacks {
   if (capturingFor != null) {
     return null;
   }
 
-  if (event.defaultPrevented) {
-    return null;
-  }
+  const target: ?Element = getTarget(source);
 
-  const target: EventTarget = event.target;
+  // Must be a HTMLElement
   if (!(target instanceof HTMLElement)) {
     return null;
   }
@@ -103,18 +118,18 @@ function tryStartCapturing({
       }),
     );
   });
-  const onMoveUp = rafSchd(() => {
+  const onMoveUp = () => {
     store.dispatch(moveUpAction());
-  });
-  const onMoveDown = rafSchd(() => {
+  };
+  const onMoveDown = () => {
     store.dispatch(moveDownAction());
-  });
-  const onMoveRight = rafSchd(() => {
+  };
+  const onMoveRight = () => {
     store.dispatch(moveRightAction());
-  });
-  const onMoveLeft = rafSchd(() => {
+  };
+  const onMoveLeft = () => {
     store.dispatch(moveLeftAction());
-  });
+  };
   const finish = ({ shouldBlockNextClick }: CaptureEndOptions) => {
     // stopping capture
     stopCapture();
@@ -132,10 +147,6 @@ function tryStartCapturing({
     // cancel any pending request animation frames
     onMove.cancel();
     onWindowScroll.cancel();
-    onMoveUp.cancel();
-    onMoveRight.cancel();
-    onMoveDown.cancel();
-    onMoveLeft.cancel();
   };
 
   return {
@@ -178,14 +189,14 @@ type SensorMarshalArgs = {|
 export default function useSensorMarshal({
   contextId,
   store,
-  useSensorHooks = [useMouseSensor],
+  useSensorHooks = [useMouseSensor /* useDemoSensor */],
 }: SensorMarshalArgs) {
   const tryStartCapture = useCallback(
-    (event: Event): ?MovementCallbacks =>
+    (source: Event | Element): ?MovementCallbacks =>
       tryStartCapturing({
         contextId,
         store,
-        event,
+        source,
       }),
     [contextId, store],
   );

@@ -26,5 +26,5 @@ export type MovementCallbacks = {|
 |};
 
 export type SensorHook = (
-  tryStartCapturing: (event: Event) => ?MovementCallbacks,
+  tryStartCapturing: (source: Event | Element) => ?MovementCallbacks,
 ) => void;
