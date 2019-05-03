@@ -5,7 +5,9 @@ import type { MovementMode } from '../../types';
 export type CaptureEndOptions = {|
   shouldBlockNextClick: boolean,
 |};
+
 export type MovementCallbacks = {|
+  shouldRespectForcePress: () => boolean,
   // getDragHandleRef: () => HTMLElement,
   // getDraggableRef: () => HTMLElement,
   onLift: ({

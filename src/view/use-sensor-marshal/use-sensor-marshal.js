@@ -1,18 +1,16 @@
 // @flow
 import invariant from 'tiny-invariant';
 import rafSchd from 'raf-schd';
-import { useCallback, useMemo } from 'use-memo-one';
+import { useCallback } from 'use-memo-one';
 import type { Position } from 'css-box-model';
-import type { DraggableId, MovementMode } from '../../types';
+import type { ContextId, DraggableId, MovementMode } from '../../types';
 import type { Store } from '../../state/store-types';
 import type {
   MovementCallbacks,
   SensorHook,
   CaptureEndOptions,
 } from './sensor-types';
-import getClosestDragHandle, {
-  getDraggableId,
-} from './get-closest-drag-handle';
+import { getClosestDragHandle, getClosestDraggable } from './get-closest';
 import canStartDrag from '../../state/can-start-drag';
 import {
   move as moveAction,
@@ -23,11 +21,12 @@ import {
   moveLeft as moveLeftAction,
   drop as dropAction,
   lift as liftAction,
-  type LiftArgs,
 } from '../../state/action-creators';
 import getWindowScroll from '../window/get-window-scroll';
 import useMouseSensor from './sensors/use-mouse-sensor';
 import useValidateSensorHooks from './use-validate-sensor-hooks';
+import isHandleInInteractiveElement from './is-handle-in-interactive-element';
+import getOptionsFromDraggable from './get-options-from-draggable';
 
 let capturingFor: ?DraggableId = null;
 function startCapture(id: DraggableId) {
@@ -43,11 +42,17 @@ function preventDefault(event: Event) {
   event.preventDefault();
 }
 
-function tryStartCapturing(
-  contextId: string,
+type TryStartCapturingArgs = {|
+  contextId: ContextId,
   store: Store,
   event: Event,
-): ?MovementCallbacks {
+|};
+
+function tryStartCapturing({
+  contextId,
+  store,
+  event,
+}: TryStartCapturingArgs): ?MovementCallbacks {
   if (capturingFor != null) {
     return null;
   }
@@ -61,9 +66,24 @@ function tryStartCapturing(
     return null;
   }
 
-  const id: ?DraggableId = getClosestDragHandle(contextId, target);
+  const handle: ?Element = getClosestDragHandle(contextId, target);
 
-  if (id == null) {
+  if (handle == null) {
+    return null;
+  }
+
+  const draggable: Element = getClosestDraggable(contextId, handle);
+  const {
+    id,
+    shouldRespectForcePress,
+    canDragInteractiveElements,
+  } = getOptionsFromDraggable(draggable);
+
+  // do not allow dragging from interactive elements
+  if (
+    !canDragInteractiveElements &&
+    isHandleInInteractiveElement(draggable, handle)
+  ) {
     return null;
   }
 
@@ -102,6 +122,7 @@ function tryStartCapturing(
     // block next click if requested
     if (shouldBlockNextClick) {
       window.addEventListener('click', preventDefault, {
+        // only blocking a single click
         once: true,
         passive: false,
         capture: true,
@@ -118,6 +139,7 @@ function tryStartCapturing(
   };
 
   return {
+    shouldRespectForcePress: (): boolean => shouldRespectForcePress,
     onLift: (options: {
       clientSelection: Position,
       movementMode: MovementMode,
@@ -147,15 +169,24 @@ function tryStartCapturing(
   };
 }
 
-export default function useSensorMarshal(
-  contextId: string,
+type SensorMarshalArgs = {|
+  contextId: ContextId,
   store: Store,
-  // TODO: expose ability to create own sensor :O
-  useSensorHooks?: SensorHook[] = [useMouseSensor],
-) {
+  useSensorHooks?: SensorHook[],
+|};
+
+export default function useSensorMarshal({
+  contextId,
+  store,
+  useSensorHooks = [useMouseSensor],
+}: SensorMarshalArgs) {
   const tryStartCapture = useCallback(
     (event: Event): ?MovementCallbacks =>
-      tryStartCapturing(contextId, store, event),
+      tryStartCapturing({
+        contextId,
+        store,
+        event,
+      }),
     [contextId, store],
   );
 

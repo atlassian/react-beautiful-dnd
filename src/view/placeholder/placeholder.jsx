@@ -5,6 +5,7 @@ import type { Spacing } from 'css-box-model';
 import type {
   Placeholder as PlaceholderType,
   InOutAnimationMode,
+  ContextId,
 } from '../../types';
 import { transitions } from '../../animation';
 import { noSpacing } from '../../state/spacing';
@@ -31,7 +32,7 @@ export type Props = {|
   onClose: () => void,
   innerRef?: () => ?HTMLElement,
   onTransitionEnd: () => void,
-  contextId: string,
+  contextId: ContextId,
 |};
 
 type Size = {|

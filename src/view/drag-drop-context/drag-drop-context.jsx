@@ -1,7 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import { useMemo } from 'use-memo-one';
-import type { Responders } from '../../types';
+import type { Responders, ContextId } from '../../types';
 import ErrorBoundary from '../error-boundary';
 import App from './app';
 
@@ -19,7 +19,7 @@ export function resetServerContext() {
 }
 
 export default function DragDropContext(props: Props) {
-  const contextId: string = useMemo(() => `${instanceCount++}`, []);
+  const contextId: ContextId = useMemo(() => `${instanceCount++}`, []);
 
   // We need the error boundary to be on the outside of App
   // so that it can catch any errors caused by App

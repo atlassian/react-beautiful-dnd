@@ -10,10 +10,15 @@ import isSloppyClickThresholdExceeded from './util/is-sloppy-click-threshold-exc
 import * as keyCodes from '../../key-codes';
 import preventStandardKeyEvents from './util/prevent-standard-key-events';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
+import { warning } from '../../../dev-warning';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 const primaryButton: number = 0;
 function noop() {}
+
+type MouseForceChangedEvent = MouseEvent & {
+  webkitForce?: number,
+};
 
 type Idle = {|
   type: 'IDLE',
@@ -167,37 +172,40 @@ function getCaptureBindings(
     // Need to opt out of dragging if the user is a force press
     // Only for safari which has decided to introduce its own custom way of doing things
     // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
-    // {
-    //   eventName: 'webkitmouseforcechanged',
-    //   fn: (event: MouseForceChangedEvent) => {
-    //     if (
-    //       event.webkitForce == null ||
-    //       (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
-    //     ) {
-    //       warning(
-    //         'handling a mouse force changed event when it is not supported',
-    //       );
-    //       return;
-    //     }
+    {
+      eventName: 'webkitmouseforcechanged',
+      fn: (event: MouseForceChangedEvent) => {
+        if (
+          event.webkitForce == null ||
+          (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
+        ) {
+          warning(
+            'handling a mouse force changed event when it is not supported',
+          );
+          return;
+        }
 
-    //     const forcePressThreshold: number = (MouseEvent: any)
-    //       .WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
-    //     const isForcePressing: boolean =
-    //       event.webkitForce >= forcePressThreshold;
+        const forcePressThreshold: number = (MouseEvent: any)
+          .WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
+        const isForcePressing: boolean =
+          event.webkitForce >= forcePressThreshold;
 
-    //     // New behaviour
-    //     if (!getShouldRespectForcePress()) {
-    //       event.preventDefault();
-    //       return;
-    //     }
+        const phase: Phase = getPhase();
+        invariant(phase.type !== 'IDLE', 'Unexpected phase');
 
-    //     if (isForcePressing) {
-    //       // it is considered a indirect cancel so we do not
-    //       // prevent default in any situation.
-    //       cancel();
-    //     }
-    //   },
-    // },
+        // might not be respecting force press
+        if (!phase.callbacks.shouldRespectForcePress()) {
+          event.preventDefault();
+          return;
+        }
+
+        if (isForcePressing) {
+          // it is considered a indirect cancel so we do not
+          // prevent default in any situation.
+          cancel();
+        }
+      },
+    },
     // Cancel on page visibility change
     {
       eventName: supportedPageVisibilityEventName,

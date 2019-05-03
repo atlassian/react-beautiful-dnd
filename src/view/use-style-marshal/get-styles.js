@@ -78,7 +78,7 @@ export default (uniqueContext: string): Styles => {
       cursor: grab;
     `;
     return {
-      selector: getSelector(attributes.dragHandle),
+      selector: getSelector(attributes.dragHandle.contextId),
       styles: {
         always: `
           -webkit-touch-callout: none;
@@ -106,7 +106,7 @@ export default (uniqueContext: string): Styles => {
       transition: ${transitions.outOfTheWay};
     `;
     return {
-      selector: getSelector(attributes.draggable),
+      selector: getSelector(attributes.draggable.contextId),
       styles: {
         dragging: transition,
         dropAnimating: transition,

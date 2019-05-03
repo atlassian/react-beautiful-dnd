@@ -215,8 +215,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       onFocus,
       onBlur,
       tabIndex: 0,
-      'data-react-beautiful-dnd-drag-handle': contextId,
-      'data-react-beautiful-dnd-drag-handle-id': draggableId,
+      'data-rbd-drag-handle-context-id': contextId,
       // English default. Consumers are welcome to add their own start instruction
       'aria-roledescription': 'Draggable item. Press space bar to lift',
       // Opting out of html5 drag and drops
@@ -225,7 +224,6 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     };
   }, [
     contextId,
-    draggableId,
     isEnabled,
     onBlur,
     onFocus,

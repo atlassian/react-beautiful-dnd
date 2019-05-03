@@ -4,7 +4,7 @@ import { dragHandle } from '../../data-attributes';
 import isSvgElement from '../../is-type-of-element/is-svg-element';
 import isHtmlElement from '../../is-type-of-element/is-html-element';
 
-const selector: string = `[${dragHandle}]`;
+const selector: string = `[${dragHandle.contextId}]`;
 
 const throwIfSVG = (el: mixed) => {
   invariant(
@@ -18,7 +18,7 @@ const throwIfSVG = (el: mixed) => {
 // If called when the component is disabled then the data
 // attribute will not be present
 const getDragHandleRef = (draggableRef: HTMLElement): HTMLElement => {
-  if (draggableRef.hasAttribute(dragHandle)) {
+  if (draggableRef.hasAttribute(dragHandle.contextId)) {
     throwIfSVG(draggableRef);
     return draggableRef;
   }

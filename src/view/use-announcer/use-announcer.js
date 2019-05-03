@@ -2,7 +2,7 @@
 import { useRef, useEffect } from 'react';
 import invariant from 'tiny-invariant';
 import { useMemo, useCallback } from 'use-memo-one';
-import type { Announce } from '../../types';
+import type { Announce, ContextId } from '../../types';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';
 
@@ -21,10 +21,10 @@ const visuallyHidden: Object = {
   'clip-path': 'inset(100%)',
 };
 
-export const getId = (contextId: string): string =>
+export const getId = (contextId: ContextId): string =>
   `react-beautiful-dnd-announcement-${contextId}`;
 
-export default function useAnnouncer(contextId: string): Announce {
+export default function useAnnouncer(contextId: ContextId): Announce {
   const id: string = useMemo(() => getId(contextId), [contextId]);
   const ref = useRef<?HTMLElement>(null);
 
