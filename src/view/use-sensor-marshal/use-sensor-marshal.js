@@ -15,7 +15,6 @@ import { getClosestDragHandle, getClosestDraggable } from './get-closest';
 import canStartDrag from '../../state/can-start-drag';
 import {
   move as moveAction,
-  moveByWindowScroll as windowScrollAction,
   moveUp as moveUpAction,
   moveRight as moveRightAction,
   moveDown as moveDownAction,
@@ -23,7 +22,6 @@ import {
   drop as dropAction,
   lift as liftAction,
 } from '../../state/action-creators';
-import getWindowScroll from '../window/get-window-scroll';
 import useMouseSensor from './sensors/use-mouse-sensor';
 import useValidateSensorHooks from './use-validate-sensor-hooks';
 import isHandleInInteractiveElement from './is-handle-in-interactive-element';
@@ -113,26 +111,19 @@ function tryStartCapturing({
 
   startCapture(id);
 
-  const onMove = rafSchd((clientSelection: Position) => {
+  const move = rafSchd((clientSelection: Position) => {
     store.dispatch(moveAction({ client: clientSelection }));
   });
-  const onWindowScroll = rafSchd(() => {
-    store.dispatch(
-      windowScrollAction({
-        newScroll: getWindowScroll(),
-      }),
-    );
-  });
-  const onMoveUp = () => {
+  const moveUp = () => {
     store.dispatch(moveUpAction());
   };
-  const onMoveDown = () => {
+  const moveDown = () => {
     store.dispatch(moveDownAction());
   };
-  const onMoveRight = () => {
+  const moveRight = () => {
     store.dispatch(moveRightAction());
   };
-  const onMoveLeft = () => {
+  const moveLeft = () => {
     store.dispatch(moveLeftAction());
   };
   const finish = (
@@ -152,13 +143,12 @@ function tryStartCapturing({
     }
 
     // cancel any pending request animation frames
-    onMove.cancel();
-    onWindowScroll.cancel();
+    move.cancel();
   };
 
   return {
     shouldRespectForcePress: (): boolean => shouldRespectForcePress,
-    onLift: (args: OnLiftArgs) => {
+    lift: (args: OnLiftArgs) => {
       const actionArgs =
         args.mode === 'FLUID'
           ? {
@@ -174,21 +164,20 @@ function tryStartCapturing({
 
       store.dispatch(liftAction(actionArgs));
     },
-    onMove,
-    onWindowScroll,
-    onMoveUp,
-    onMoveDown,
-    onMoveRight,
-    onMoveLeft,
-    onDrop: (args?: CaptureEndOptions) => {
+    move,
+    moveUp,
+    moveDown,
+    moveRight,
+    moveLeft,
+    drop: (args?: CaptureEndOptions) => {
       finish(args);
       store.dispatch(dropAction({ reason: 'DROP' }));
     },
-    onCancel: (args?: CaptureEndOptions) => {
+    cancel: (args?: CaptureEndOptions) => {
       finish(args);
       store.dispatch(dropAction({ reason: 'CANCEL' }));
     },
-    onAbort: () => finish(),
+    abort: () => finish(),
   };
 }
 

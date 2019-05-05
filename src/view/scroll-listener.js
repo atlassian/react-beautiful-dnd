@@ -52,6 +52,7 @@ export default function getScrollListener({ onWindowScroll }: Args): Result {
     unbind = bindEvents(window, [binding]);
   }
   function stop() {
+    scheduled.cancel();
     unbind();
     unbind = noop;
   }

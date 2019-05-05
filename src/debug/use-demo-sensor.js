@@ -15,42 +15,44 @@ function delay(fn: Function, time?: number = 300) {
 export default function useDemoSensor(
   tryStartCapturing: (source: Event | Element) => ?MovementCallbacks,
 ) {
-  const start = useCallback(() => {
-    // grabbing the first drag handle we can
-    const handle: ?HTMLElement = document.querySelector(
-      '[data-rbd-drag-handle-context-id]',
-    );
-    if (!handle) {
-      console.log('could not find drag handle');
-      return;
-    }
+  const start = useCallback(
+    async function start() {
+      // grabbing the first drag handle we can
+      const handle: ?HTMLElement = document.querySelector(
+        '[data-rbd-drag-handle-context-id]',
+      );
+      if (!handle) {
+        console.log('could not find drag handle');
+        return;
+      }
 
-    const callbacks: ?MovementCallbacks = tryStartCapturing(handle);
+      // handle.scrollIntoView();
 
-    if (!callbacks) {
-      console.log('unable to start drag');
-      return;
-    }
+      const callbacks: ?MovementCallbacks = tryStartCapturing(handle);
 
-    // TODO: this is a bit lame as a programatic api
-    callbacks.onLift({
-      mode: 'SNAP',
-    });
+      if (!callbacks) {
+        console.log('unable to start drag');
+        return;
+      }
 
-    Promise.resolve()
-      .then(() => delay(callbacks.onMoveDown))
-      .then(() => delay(callbacks.onMoveDown))
-      .then(() => delay(callbacks.onMoveDown))
-      .then(() => delay(callbacks.onMoveDown))
-      .then(() => delay(callbacks.onMoveDown))
-      .then(() => delay(callbacks.onMoveDown))
-      .then(() => delay(callbacks.onMoveDown))
-      .then(() => delay(callbacks.onMoveDown))
-      .then(() => delay(callbacks.onMoveDown))
-      .then(() => delay(callbacks.onMoveUp))
-      .then(() => delay(callbacks.onMoveUp))
-      .then(() => delay(callbacks.onDrop));
-  }, [tryStartCapturing]);
+      const { lift, moveDown, moveUp, drop } = callbacks;
+
+      lift({
+        mode: 'SNAP',
+      });
+
+      await delay(moveDown);
+      await delay(moveDown);
+      await delay(moveDown);
+      await delay(moveDown);
+      await delay(moveDown);
+      await delay(moveDown);
+      await delay(moveUp);
+      await delay(moveUp);
+      await delay(drop);
+    },
+    [tryStartCapturing],
+  );
 
   useEffect(() => {
     start();

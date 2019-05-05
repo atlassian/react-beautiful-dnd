@@ -1,6 +1,5 @@
 // @flow
 import type { Position } from 'css-box-model';
-import type { MovementMode } from '../../types';
 
 export type CaptureEndOptions = {|
   shouldBlockNextClick: boolean,
@@ -21,16 +20,15 @@ export type MovementCallbacks = {|
   shouldRespectForcePress: () => boolean,
   // getDragHandleRef: () => HTMLElement,
   // getDraggableRef: () => HTMLElement,
-  onLift: (args: OnLiftArgs) => void,
-  onMove: (point: Position) => void,
-  onWindowScroll: () => void,
-  onMoveUp: () => void,
-  onMoveDown: () => void,
-  onMoveRight: () => void,
-  onMoveLeft: () => void,
-  onDrop: (args?: CaptureEndOptions) => void,
-  onCancel: (args?: CaptureEndOptions) => void,
-  onAbort: () => void,
+  lift: (args: OnLiftArgs) => void,
+  move: (point: Position) => void,
+  moveUp: () => void,
+  moveDown: () => void,
+  moveRight: () => void,
+  moveLeft: () => void,
+  drop: (args?: CaptureEndOptions) => void,
+  cancel: (args?: CaptureEndOptions) => void,
+  abort: () => void,
 |};
 
 export type SensorHook = (

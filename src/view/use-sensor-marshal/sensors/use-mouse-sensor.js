@@ -68,7 +68,7 @@ function getCaptureBindings(
         if (phase.type === 'DRAGGING') {
           // preventing default as we are using this event
           event.preventDefault();
-          phase.callbacks.onMove(point);
+          phase.callbacks.move(point);
           return;
         }
 
@@ -89,7 +89,7 @@ function getCaptureBindings(
           callbacks: phase.callbacks,
         });
 
-        phase.callbacks.onLift({
+        phase.callbacks.lift({
           clientSelection: pending,
           mode: 'FLUID',
         });
@@ -103,7 +103,7 @@ function getCaptureBindings(
         if (phase.type === 'DRAGGING') {
           // preventing default as we are using this event
           event.preventDefault();
-          phase.callbacks.onDrop({ shouldBlockNextClick: true });
+          phase.callbacks.drop({ shouldBlockNextClick: true });
         }
 
         stop();
@@ -277,10 +277,10 @@ export default function useMouseSensor(
     const phase: Phase = phaseRef.current;
     stop();
     if (phase.type === 'DRAGGING') {
-      phase.callbacks.onCancel({ shouldBlockNextClick: true });
+      phase.callbacks.cancel({ shouldBlockNextClick: true });
     }
     if (phase.type === 'PENDING') {
-      phase.callbacks.onAbort();
+      phase.callbacks.abort();
     }
   }, [stop]);
 
