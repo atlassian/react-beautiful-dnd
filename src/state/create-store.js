@@ -5,6 +5,7 @@ import reducer from './reducer';
 import lift from './middleware/lift';
 import style from './middleware/style';
 import drop from './middleware/drop/drop-middleware';
+import scrollListener from './middleware/scroll-listener';
 import responders from './middleware/responders/responders-middleware';
 import dropAnimationFinish from './middleware/drop-animation-finish';
 import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
@@ -79,6 +80,7 @@ export default ({
         dropAnimationFinish,
         pendingDrop,
         autoScroll(autoScroller),
+        scrollListener,
         // Fire responders for consumers (after update to store)
         responders(getResponders, announce),
       ),

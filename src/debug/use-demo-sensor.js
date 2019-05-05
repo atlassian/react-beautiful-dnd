@@ -43,6 +43,10 @@ export default function useDemoSensor(
       .then(() => delay(callbacks.onMoveDown))
       .then(() => delay(callbacks.onMoveDown))
       .then(() => delay(callbacks.onMoveDown))
+      .then(() => delay(callbacks.onMoveDown))
+      .then(() => delay(callbacks.onMoveDown))
+      .then(() => delay(callbacks.onMoveDown))
+      .then(() => delay(callbacks.onMoveDown))
       .then(() => delay(callbacks.onMoveUp))
       .then(() => delay(callbacks.onMoveUp))
       .then(() => delay(callbacks.onDrop));

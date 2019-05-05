@@ -4,8 +4,11 @@ import { useEffect, useRef } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
 import type { MovementCallbacks } from '../sensor-types';
-import type { EventBinding, EventOptions } from './util/event-types';
-import bindEvents from './util/bind-events';
+import type {
+  EventBinding,
+  EventOptions,
+} from '../../event-bindings/event-types';
+import bindEvents from '../../event-bindings/bind-events';
 import isSloppyClickThresholdExceeded from './util/is-sloppy-click-threshold-exceeded';
 import * as keyCodes from '../../key-codes';
 import preventStandardKeyEvents from './util/prevent-standard-key-events';
@@ -144,29 +147,12 @@ function getCaptureBindings(
     },
     {
       eventName: 'scroll',
-      // ## Passive: true
-      // Eventual consistency is fine because we use position: fixed on the item
-      // ## Capture: false
-      // Scroll events on elements do not bubble, but they go through the capture phase
-      // https://twitter.com/alexandereardon/status/985994224867819520
-      // Using capture: false here as we want to avoid intercepting droppable scroll requests
-      // TODO: can result in awkward drop position
+      // kill a pending drag if there is a window scroll
       options: { passive: true, capture: false },
-      fn: (event: UIEvent) => {
-        // IE11 fix:
-        // Scrollable events still bubble up and are caught by this handler in ie11.
-        // We can ignore this event
-        if (event.currentTarget !== window) {
-          return;
+      fn: () => {
+        if (getPhase().type === 'PENDING') {
+          stop();
         }
-
-        const phase: Phase = getPhase();
-        if (phase.type === 'DRAGGING') {
-          phase.callbacks.onWindowScroll();
-          return;
-        }
-        // stop a pending drag
-        stop();
       },
     },
     // Need to opt out of dragging if the user is a force press

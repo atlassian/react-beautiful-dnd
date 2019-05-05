@@ -201,7 +201,7 @@ type SensorMarshalArgs = {|
 export default function useSensorMarshal({
   contextId,
   store,
-  useSensorHooks = [useMouseSensor /* useDemoSensor */],
+  useSensorHooks = [useMouseSensor, useDemoSensor],
 }: SensorMarshalArgs) {
   const tryStartCapture = useCallback(
     (source: Event | Element): ?MovementCallbacks =>
