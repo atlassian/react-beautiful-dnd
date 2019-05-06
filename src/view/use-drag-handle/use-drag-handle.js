@@ -6,9 +6,6 @@ import type { Args, DragHandleProps } from './drag-handle-types';
 import getWindowFromEl from '../window/get-window-from-el';
 import useRequiredContext from '../use-required-context';
 import AppContext, { type AppContextValue } from '../context/app-context';
-import useMouseSensor, {
-  type Args as MouseSensorArgs,
-} from './sensor/use-mouse-sensor';
 import shouldAllowDraggingFromTarget from './util/should-allow-dragging-from-target';
 import useKeyboardSensor, {
   type Args as KeyboardSensorArgs,
@@ -101,28 +98,6 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
 
   const { onBlur, onFocus } = useFocusRetainer(args);
 
-  const mouseArgs: MouseSensorArgs = useMemo(
-    () => ({
-      callbacks,
-      getDraggableRef,
-      getWindow,
-      canStartCapturing,
-      onCaptureStart,
-      onCaptureEnd,
-      getShouldRespectForcePress,
-    }),
-    [
-      callbacks,
-      getDraggableRef,
-      getWindow,
-      canStartCapturing,
-      onCaptureStart,
-      onCaptureEnd,
-      getShouldRespectForcePress,
-    ],
-  );
-  const onMouseDown = useMouseSensor(mouseArgs);
-
   const keyboardArgs: KeyboardSensorArgs = useMemo(
     () => ({
       callbacks,
@@ -209,7 +184,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       return null;
     }
     return {
-      onMouseDown,
+      onMouseDown: () => {},
       onKeyDown,
       onTouchStart,
       onFocus,
@@ -222,15 +197,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       draggable: false,
       onDragStart: preventHtml5Dnd,
     };
-  }, [
-    contextId,
-    isEnabled,
-    onBlur,
-    onFocus,
-    onKeyDown,
-    onMouseDown,
-    onTouchStart,
-  ]);
+  }, [contextId, isEnabled, onBlur, onFocus, onKeyDown, onTouchStart]);
 
   return props;
 }
