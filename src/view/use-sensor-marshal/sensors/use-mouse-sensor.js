@@ -210,7 +210,7 @@ function getCaptureBindings({
 }
 
 export default function useMouseSensor(
-  tryStartCapturing: (event: Event) => ?MovementCallbacks,
+  tryStartCapturing: (event: Event, abort: () => void) => ?MovementCallbacks,
 ) {
   const phaseRef = useRef<Phase>(idle);
   const unbindEventsRef = useRef<() => void>(noop);
@@ -229,7 +229,9 @@ export default function useMouseSensor(
           return;
         }
 
-        const callbacks: ?MovementCallbacks = tryStartCapturing(event);
+        // stop is defined later
+        // eslint-disable-next-line no-use-before-define
+        const callbacks: ?MovementCallbacks = tryStartCapturing(event, stop);
 
         if (!callbacks) {
           console.log('cannot start a capture');

@@ -12,8 +12,10 @@ function delay(fn: Function, time?: number = 300) {
   });
 }
 
+function noop() {}
+
 export default function useDemoSensor(
-  tryStartCapturing: (source: Event | Element) => ?MovementCallbacks,
+  tryStartCapturing: (source: Event | Element, noop) => ?MovementCallbacks,
 ) {
   const start = useCallback(
     async function start() {
@@ -41,6 +43,9 @@ export default function useDemoSensor(
         mode: 'SNAP',
       });
 
+      await delay(moveDown);
+      await delay(moveDown);
+      await delay(moveDown);
       await delay(moveDown);
       await delay(moveDown);
       await delay(moveDown);

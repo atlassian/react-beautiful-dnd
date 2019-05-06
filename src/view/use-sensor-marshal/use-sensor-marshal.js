@@ -1,9 +1,10 @@
 // @flow
 import invariant from 'tiny-invariant';
 import rafSchd from 'raf-schd';
+import { useEffect } from 'react';
 import { useCallback } from 'use-memo-one';
 import type { Position } from 'css-box-model';
-import type { ContextId, DraggableId } from '../../types';
+import type { ContextId, DraggableId, State } from '../../types';
 import type { Store } from '../../state/store-types';
 import type {
   MovementCallbacks,
@@ -31,14 +32,20 @@ import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
 import isHtmlElement from '../is-type-of-element/is-html-element';
 
-let capturingFor: ?DraggableId = null;
-function startCapture(id: DraggableId) {
-  invariant(!capturingFor, 'Cannot start capturing when already capturing');
-  capturingFor = id;
+type Capturing = {|
+  id: DraggableId,
+  abort: () => void,
+|};
+
+let capturing: ?Capturing = null;
+
+function startCapture(id: DraggableId, abort: () => void) {
+  invariant(!capturing, 'Cannot start capturing when already capturing');
+  capturing = { id, abort };
 }
 function stopCapture() {
-  invariant(capturingFor, 'Cannot stop capturing when not already capturing');
-  capturingFor = null;
+  invariant(capturing, 'Cannot stop capturing when not already capturing');
+  capturing = null;
 }
 
 function preventDefault(event: Event) {
@@ -49,6 +56,7 @@ type TryStartCapturingArgs = {|
   contextId: ContextId,
   store: Store,
   source: Event | Element,
+  abort: () => void,
 |};
 
 function getTarget(source: Event | Element): ?Element {
@@ -71,8 +79,9 @@ function tryStartCapturing({
   contextId,
   store,
   source,
+  abort,
 }: TryStartCapturingArgs): ?MovementCallbacks {
-  if (capturingFor != null) {
+  if (capturing != null) {
     return null;
   }
 
@@ -109,9 +118,10 @@ function tryStartCapturing({
     return null;
   }
 
-  startCapture(id);
+  startCapture(id, abort);
 
   const move = rafSchd((clientSelection: Position) => {
+    // TODO: isCOmpleted?/
     store.dispatch(moveAction({ client: clientSelection }));
   });
   const moveUp = () => {
@@ -181,6 +191,13 @@ function tryStartCapturing({
   };
 }
 
+function tryAbortCapture() {
+  if (capturing) {
+    capturing.abort();
+    capturing = null;
+  }
+}
+
 type SensorMarshalArgs = {|
   contextId: ContextId,
   store: Store,
@@ -190,14 +207,33 @@ type SensorMarshalArgs = {|
 export default function useSensorMarshal({
   contextId,
   store,
-  useSensorHooks = [useMouseSensor /*useDemoSensor */],
+  useSensorHooks = [useMouseSensor /* useDemoSensor */],
 }: SensorMarshalArgs) {
+  // We need to abort any capturing if there is no longer a drag
+  useEffect(
+    function listen() {
+      let previous: State = store.getState();
+      const unsubscribe = store.subscribe(() => {
+        const current: State = store.getState();
+
+        if (previous.isDragging && !current.isDragging) {
+          tryAbortCapture();
+        }
+
+        previous = current;
+      });
+      return unsubscribe;
+    },
+    [store],
+  );
+
   const tryStartCapture = useCallback(
-    (source: Event | Element): ?MovementCallbacks =>
+    (source: Event | Element, abort: () => void): ?MovementCallbacks =>
       tryStartCapturing({
         contextId,
         store,
         source,
+        abort,
       }),
     [contextId, store],
   );
