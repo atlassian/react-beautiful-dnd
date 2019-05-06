@@ -15,7 +15,10 @@ function delay(fn: Function, time?: number = 300) {
 function noop() {}
 
 export default function useDemoSensor(
-  tryStartCapturing: (source: Event | Element, noop) => ?MovementCallbacks,
+  tryStartCapturing: (
+    source: Event | Element,
+    abort: () => void,
+  ) => ?MovementCallbacks,
 ) {
   const start = useCallback(
     async function start() {
@@ -30,7 +33,7 @@ export default function useDemoSensor(
 
       // handle.scrollIntoView();
 
-      const callbacks: ?MovementCallbacks = tryStartCapturing(handle);
+      const callbacks: ?MovementCallbacks = tryStartCapturing(handle, noop);
 
       if (!callbacks) {
         console.log('unable to start drag');
