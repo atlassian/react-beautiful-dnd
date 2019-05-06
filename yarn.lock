@@ -20,10 +20,10 @@
     exenv "^1.2.2"
     prop-types "^15.5.10"
 
-"@atlaskit/theme@^8.1.4":
-  version "8.1.4"
-  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-8.1.4.tgz#ebe33b2ed53f438e7324cef65067dcadd0c91e56"
-  integrity sha512-fJObPb5RVuA5+db3I7uI+kXlDqhucruaq9I4Ky6zpXKjirXlfHEKy0z151KvdqqPD2eY6XDy8c6q3KcDI9b1og==
+"@atlaskit/theme@^9.0.0":
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-9.0.0.tgz#09eee5433a6084dfd506d8f303fd1913bdf6e5c5"
+  integrity sha512-FxPubfXMBidzyG3YrzH4T1MstpxJXg6CsW09aBvW25tmafrAlrj+gSnd5/ky9Oa4zKgXk4itZNSCdefxgwqs7w==
   dependencies:
     "@babel/runtime" "^7.0.0"
     exenv "^1.2.2"
