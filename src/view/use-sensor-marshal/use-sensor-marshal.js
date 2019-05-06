@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useCallback } from 'use-memo-one';
 import type { Position } from 'css-box-model';
 import type { ContextId, DraggableId, State } from '../../types';
-import type { Store } from '../../state/store-types';
+import type { Store, Action } from '../../state/store-types';
 import type {
   MovementCallbacks,
   SensorHook,
@@ -119,28 +119,65 @@ function tryStartCapturing({
   }
 
   startCapture(id, abort);
+  let isCapturing: boolean = true;
+
+  function ifCapturing(maybe: Function) {
+    if (isCapturing) {
+      maybe();
+      return;
+    }
+    warning(
+      'Trying to perform operation when no longer responsible for capturing',
+    );
+  }
+
+  const tryDispatch = (getAction: () => Action): void => {
+    if (!isCapturing) {
+      warning(
+        'Trying to perform operation when no longer responsible for capturing',
+      );
+      return;
+    }
+    store.dispatch(getAction());
+  };
+  const moveUp = () => tryDispatch(moveUpAction);
+  const moveDown = () => tryDispatch(moveDownAction);
+  const moveRight = () => tryDispatch(moveRightAction);
+  const moveLeft = () => tryDispatch(moveLeftAction);
 
   const move = rafSchd((clientSelection: Position) => {
-    // TODO: isCOmpleted?/
-    store.dispatch(moveAction({ client: clientSelection }));
+    ifCapturing(() => store.dispatch(moveAction({ client: clientSelection })));
   });
-  const moveUp = () => {
-    store.dispatch(moveUpAction());
-  };
-  const moveDown = () => {
-    store.dispatch(moveDownAction());
-  };
-  const moveRight = () => {
-    store.dispatch(moveRightAction());
-  };
-  const moveLeft = () => {
-    store.dispatch(moveLeftAction());
-  };
+
+  function lift(args: OnLiftArgs) {
+    const actionArgs =
+      args.mode === 'FLUID'
+        ? {
+            clientSelection: args.clientSelection,
+            movementMode: 'FLUID',
+            id,
+          }
+        : {
+            movementMode: 'SNAP',
+            clientSelection: getBorderBoxCenterPosition(draggable),
+            id,
+          };
+
+    tryDispatch(() => liftAction(actionArgs));
+  }
+
   const finish = (
     options?: CaptureEndOptions = { shouldBlockNextClick: false },
+    action?: Action,
   ) => {
+    if (!isCapturing) {
+      warning('Cannot finish a drag when not capturing');
+      return;
+    }
+
     // stopping capture
     stopCapture();
+    isCapturing = false;
 
     // block next click if requested
     if (options.shouldBlockNextClick) {
@@ -154,38 +191,25 @@ function tryStartCapturing({
 
     // cancel any pending request animation frames
     move.cancel();
+
+    if (action) {
+      store.dispatch(action);
+    }
   };
 
   return {
     shouldRespectForcePress: (): boolean => shouldRespectForcePress,
-    lift: (args: OnLiftArgs) => {
-      const actionArgs =
-        args.mode === 'FLUID'
-          ? {
-              clientSelection: args.clientSelection,
-              movementMode: 'FLUID',
-              id,
-            }
-          : {
-              movementMode: 'SNAP',
-              clientSelection: getBorderBoxCenterPosition(draggable),
-              id,
-            };
-
-      store.dispatch(liftAction(actionArgs));
-    },
+    lift,
     move,
     moveUp,
     moveDown,
     moveRight,
     moveLeft,
     drop: (args?: CaptureEndOptions) => {
-      finish(args);
-      store.dispatch(dropAction({ reason: 'DROP' }));
+      finish(args, dropAction({ reason: 'DROP' }));
     },
     cancel: (args?: CaptureEndOptions) => {
-      finish(args);
-      store.dispatch(dropAction({ reason: 'CANCEL' }));
+      finish(args, dropAction({ reason: 'CANCEL' }));
     },
     abort: () => finish(),
   };
