@@ -42,12 +42,19 @@ type Phase = Idle | Pending | Dragging;
 
 const idle: Idle = { type: 'IDLE' };
 
-function getCaptureBindings(
+type GetCaptureArgs = {|
   cancel: () => void,
   completed: () => void,
   getPhase: () => Phase,
   setPhase: (phase: Phase) => void,
-): EventBinding[] {
+|};
+
+function getCaptureBindings({
+  cancel,
+  completed,
+  getPhase,
+  setPhase,
+}: GetCaptureArgs): EventBinding[] {
   return [
     {
       eventName: 'mousemove',
@@ -206,7 +213,7 @@ export default function useMouseSensor(
   tryStartCapturing: (event: Event) => ?MovementCallbacks,
 ) {
   const phaseRef = useRef<Phase>(idle);
-  const unbindWindowEventsRef = useRef<() => void>(noop);
+  const unbindEventsRef = useRef<() => void>(noop);
 
   const startCaptureBinding: EventBinding = useMemo(
     () => ({
@@ -237,7 +244,7 @@ export default function useMouseSensor(
         };
 
         // unbind this listener
-        unbindWindowEventsRef.current();
+        unbindEventsRef.current();
         // using this function before it is defined as their is a circular usage pattern
         // eslint-disable-next-line no-use-before-define
         startPendingDrag(callbacks, point);
@@ -255,7 +262,7 @@ export default function useMouseSensor(
         capture: true,
       };
 
-      unbindWindowEventsRef.current = bindEvents(
+      unbindEventsRef.current = bindEvents(
         window,
         [startCaptureBinding],
         options,
@@ -272,7 +279,7 @@ export default function useMouseSensor(
     }
 
     phaseRef.current = idle;
-    unbindWindowEventsRef.current();
+    unbindEventsRef.current();
 
     listenForCapture();
   }, [listenForCapture]);
@@ -291,16 +298,16 @@ export default function useMouseSensor(
   const bindCapturingEvents = useCallback(
     function bindCapturingEvents() {
       const options = { capture: true, passive: false };
-      const bindings: EventBinding[] = getCaptureBindings(
+      const bindings: EventBinding[] = getCaptureBindings({
         cancel,
-        stop,
-        () => phaseRef.current,
-        (phase: Phase) => {
+        completed: stop,
+        getPhase: () => phaseRef.current,
+        setPhase: (phase: Phase) => {
           phaseRef.current = phase;
         },
-      );
+      });
 
-      unbindWindowEventsRef.current = bindEvents(window, bindings, options);
+      unbindEventsRef.current = bindEvents(window, bindings, options);
     },
     [cancel, stop],
   );
@@ -326,7 +333,7 @@ export default function useMouseSensor(
 
     // kill any pending window events when unmounting
     return () => {
-      unbindWindowEventsRef.current();
+      unbindEventsRef.current();
     };
   }, [listenForCapture]);
 }
