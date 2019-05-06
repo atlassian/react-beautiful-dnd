@@ -26,6 +26,7 @@ export function getClosestDraggable(
 
   const draggable: ?Element = closest(handle, selector);
   invariant(draggable, 'expected drag handle to have draggable');
+  invariant(isHtmlElement(draggable), 'expected draggable to be a HTMLElement');
 
-  return draggable && isHtmlElement(draggable) ? draggable : null;
+  return draggable;
 }

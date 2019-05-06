@@ -43,8 +43,8 @@ type Phase = Idle | Pending | Dragging;
 const idle: Idle = { type: 'IDLE' };
 
 function getCaptureBindings(
-  stop: () => void,
   cancel: () => void,
+  completed: () => void,
   getPhase: () => Phase,
   setPhase: (phase: Phase) => void,
 ): EventBinding[] {
@@ -100,13 +100,15 @@ function getCaptureBindings(
       fn: (event: MouseEvent) => {
         const phase: Phase = getPhase();
 
-        if (phase.type === 'DRAGGING') {
-          // preventing default as we are using this event
-          event.preventDefault();
-          phase.callbacks.drop({ shouldBlockNextClick: true });
+        if (phase.type !== 'DRAGGING') {
+          cancel();
+          return;
         }
 
-        stop();
+        // preventing default as we are using this event
+        event.preventDefault();
+        phase.callbacks.drop({ shouldBlockNextClick: true });
+        completed();
       },
     },
     {
@@ -127,7 +129,7 @@ function getCaptureBindings(
         const phase: Phase = getPhase();
         // Abort if any keystrokes while a drag is pending
         if (phase.type === 'PENDING') {
-          stop();
+          cancel();
           return;
         }
 
@@ -151,7 +153,7 @@ function getCaptureBindings(
       options: { passive: true, capture: false },
       fn: () => {
         if (getPhase().type === 'PENDING') {
-          stop();
+          cancel();
         }
       },
     },
@@ -223,6 +225,7 @@ export default function useMouseSensor(
         const callbacks: ?MovementCallbacks = tryStartCapturing(event);
 
         if (!callbacks) {
+          console.log('cannot start a capture');
           return;
         }
 
@@ -262,6 +265,7 @@ export default function useMouseSensor(
   );
 
   const stop = useCallback(() => {
+    console.log('trying to stop');
     const current: Phase = phaseRef.current;
     if (current.type === 'IDLE') {
       return;
@@ -288,8 +292,8 @@ export default function useMouseSensor(
     function bindCapturingEvents() {
       const options = { capture: true, passive: false };
       const bindings: EventBinding[] = getCaptureBindings(
-        stop,
         cancel,
+        stop,
         () => phaseRef.current,
         (phase: Phase) => {
           phaseRef.current = phase;
