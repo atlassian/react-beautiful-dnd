@@ -1,11 +1,6 @@
 // @flow
-import React, {
-  useRef,
-  createRef,
-  useEffect,
-  useState,
-  useCallback,
-} from 'react';
+/* eslint-disable no-console */
+import React, { useRef, createRef, useState, useCallback } from 'react';
 import styled from '@emotion/styled';
 import type { Quote } from '../types';
 import type { DropResult } from '../../../src/types';
@@ -13,7 +8,7 @@ import type { MovementCallbacks } from '../../../src/view/use-sensor-marshal/sen
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import reorder from '../reorder';
-import { grid } from '../constants';
+import { grid, borderRadius } from '../constants';
 
 type ControlProps = {|
   quotes: Quote[],
@@ -23,6 +18,56 @@ type ControlProps = {|
 |};
 
 function noop() {}
+
+const ControlBox = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const ArrowBox = styled.div`
+  margin-top: ${grid * 4}px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Button = styled.button`
+  --off-white: hsla(60, 100%, 98%, 1);
+  --dark-off-white: #efefe3;
+  --darker-off-white: #d6d6cb;
+  --border-width: 4px;
+
+  background: var(--off-white);
+  border-radius: ${borderRadius}px;
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+  font-size: 16px;
+  position: relative;
+  box-sizing: border-box;
+  border: var(--border-width) solid var(--dark-off-white);
+  box-shadow: 0 0 0 1px var(--darker-off-white);
+  margin: 2px;
+
+  ::before {
+    position: absolute;
+    content: ' ';
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border: 1px solid var(--dark-off-white);
+  }
+
+  :active {
+    border-width: 3px;
+  }
+`;
+
+const ArrowButton = styled(Button)`
+  width: 40px;
+  height: 40px;
+`;
+
+const ActionButton = styled(Button)``;
 
 function Controls(props: ControlProps) {
   const { quotes, canLift, isDragging, lift } = props;
@@ -37,7 +82,7 @@ function Controls(props: ControlProps) {
   }
 
   return (
-    <div>
+    <ControlBox>
       <select disabled={!canLift} ref={selectRef}>
         {quotes.map((quote: Quote) => (
           <option key={quote.id} value={quote.id}>
@@ -45,7 +90,7 @@ function Controls(props: ControlProps) {
           </option>
         ))}
       </select>
-      <button
+      <ActionButton
         type="button"
         disabled={!canLift}
         onClick={() => {
@@ -57,27 +102,9 @@ function Controls(props: ControlProps) {
           callbacksRef.current = lift(select.value);
         }}
       >
-        Lift
-      </button>
-      <button
-        type="button"
-        onClick={() =>
-          maybe((callbacks: MovementCallbacks) => callbacks.moveUp())
-        }
-        disabled={!isDragging}
-      >
-        Up
-      </button>
-      <button
-        type="button"
-        onClick={() =>
-          maybe((callbacks: MovementCallbacks) => callbacks.moveDown())
-        }
-        disabled={!isDragging}
-      >
-        Down
-      </button>
-      <button
+        Lift 🏋️‍♀️
+      </ActionButton>
+      <ActionButton
         type="button"
         onClick={() =>
           maybe((callbacks: MovementCallbacks) => {
@@ -87,11 +114,50 @@ function Controls(props: ControlProps) {
         }
         disabled={!isDragging}
       >
-        Drop
-      </button>
-    </div>
+        Drop 🤾‍♂️
+      </ActionButton>
+      <ArrowBox>
+        <ArrowButton
+          type="button"
+          onClick={() =>
+            maybe((callbacks: MovementCallbacks) => callbacks.moveUp())
+          }
+          disabled={!isDragging}
+          label="up"
+        >
+          ↑
+        </ArrowButton>
+        <div>
+          <ArrowButton type="button" disabled={!isDragging} label="left">
+            ←
+          </ArrowButton>
+          <ArrowButton
+            type="button"
+            onClick={() =>
+              maybe((callbacks: MovementCallbacks) => callbacks.moveDown())
+            }
+            disabled={!isDragging}
+            label="down"
+          >
+            ↓
+          </ArrowButton>
+          <ArrowButton type="button" disabled={!isDragging} label="right">
+            →
+          </ArrowButton>
+        </div>
+      </ArrowBox>
+    </ControlBox>
   );
 }
+
+const Layout = styled.div`
+  display: flex;
+  justify-content: center;
+
+  > * {
+    margin: ${grid}px;
+  }
+`;
 
 type Props = {|
   initial: Quote[],
@@ -166,13 +232,15 @@ export default function QuoteApp(props: Props) {
         },
       ]}
     >
-      <QuoteList listId="list" quotes={quotes} />
-      <Controls
-        quotes={quotes}
-        canLift={!isDragging}
-        isDragging={isControlDragging}
-        lift={lift}
-      />
+      <Layout>
+        <QuoteList listId="list" quotes={quotes} />
+        <Controls
+          quotes={quotes}
+          canLift={!isDragging}
+          isDragging={isControlDragging}
+          lift={lift}
+        />
+      </Layout>
     </DragDropContext>
   );
 }
