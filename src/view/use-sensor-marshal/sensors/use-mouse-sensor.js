@@ -219,13 +219,21 @@ export default function useMouseSensor(
     () => ({
       eventName: 'mousedown',
       fn: function onMouseDown(event: MouseEvent) {
+        console.log('on mouse down');
+        // Event already used
+        if (event.defaultPrevented) {
+          console.log('default prevented');
+          return;
+        }
         // only starting a drag if dragging with the primary mouse button
         if (event.button !== primaryButton) {
+          console.log('bye');
           return;
         }
 
         // Do not start a drag if any modifier key is pressed
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+          console.log('special key');
           return;
         }
 
@@ -238,6 +246,7 @@ export default function useMouseSensor(
           return;
         }
 
+        console.log('calling prevent default');
         event.preventDefault();
 
         const point: Position = {
@@ -249,6 +258,7 @@ export default function useMouseSensor(
         unbindEventsRef.current();
         // using this function before it is defined as their is a circular usage pattern
         // eslint-disable-next-line no-use-before-define
+        console.log('starting pending');
         startPendingDrag(callbacks, point);
       },
     }),

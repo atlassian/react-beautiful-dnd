@@ -67,6 +67,8 @@ const ArrowButton = styled(Button)`
   height: 40px;
 `;
 
+// locking the height so that the border width change
+// does not change the size of the button
 const ActionButton = styled(Button)`
   height: 40px;
 `;

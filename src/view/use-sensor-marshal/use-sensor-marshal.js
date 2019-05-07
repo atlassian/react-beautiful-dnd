@@ -31,6 +31,7 @@ import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
 import isHtmlElement from '../is-type-of-element/is-html-element';
 import useKeyboardSensor from './sensors/use-keyboard-sensor';
+import useLayoutEffect from '../use-isomorphic-layout-effect';
 
 type Capturing = {|
   id: DraggableId,
@@ -257,6 +258,11 @@ export default function useSensorMarshal({
     },
     [store],
   );
+
+  // abort any captures on unmount
+  useLayoutEffect(() => {
+    return tryAbortCapture;
+  }, []);
 
   const tryStartCapture = useCallback(
     (source: Event | Element, abort: () => void): ?MovementCallbacks =>

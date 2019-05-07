@@ -143,10 +143,8 @@ export default function useKeyboardSensor(
   const startCaptureBinding: EventBinding = useMemo(
     () => ({
       eventName: 'keydown',
-      fn: function onMouseDown(event: KeyboardEvent) {
-        // We may already be lifting on a child draggable.
-        // We do not need to use an EventMarshal here as
-        // we always call preventDefault on the first input
+      fn: function onKeyDown(event: KeyboardEvent) {
+        // Event already used
         if (event.defaultPrevented) {
           return;
         }
