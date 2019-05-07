@@ -27,10 +27,10 @@ import useMouseSensor from './sensors/use-mouse-sensor';
 import useValidateSensorHooks from './use-validate-sensor-hooks';
 import isHandleInInteractiveElement from './is-handle-in-interactive-element';
 import getOptionsFromDraggable from './get-options-from-draggable';
-import useDemoSensor from '../../debug/use-demo-sensor';
 import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
 import isHtmlElement from '../is-type-of-element/is-html-element';
+import useKeyboardSensor from './sensors/use-keyboard-sensor';
 
 type Capturing = {|
   id: DraggableId,
@@ -225,14 +225,21 @@ function tryAbortCapture() {
 type SensorMarshalArgs = {|
   contextId: ContextId,
   store: Store,
-  useSensorHooks?: SensorHook[],
+  customSensors: ?(SensorHook[]),
 |};
+
+const defaultSensors: SensorHook[] = [useMouseSensor, useKeyboardSensor];
 
 export default function useSensorMarshal({
   contextId,
   store,
-  useSensorHooks = [useMouseSensor /* useDemoSensor */],
+  customSensors,
 }: SensorMarshalArgs) {
+  const useSensors: SensorHook[] = [
+    ...defaultSensors,
+    ...(customSensors || []),
+  ];
+
   // We need to abort any capturing if there is no longer a drag
   useEffect(
     function listen() {
@@ -263,8 +270,8 @@ export default function useSensorMarshal({
   );
 
   // Bad ass
-  useValidateSensorHooks(useSensorHooks);
-  for (let i = 0; i < useSensorHooks.length; i++) {
-    useSensorHooks[i](tryStartCapture);
+  useValidateSensorHooks(useSensors);
+  for (let i = 0; i < useSensors.length; i++) {
+    useSensors[i](tryStartCapture);
   }
 }

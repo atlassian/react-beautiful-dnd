@@ -2,6 +2,7 @@
 import React, { type Node } from 'react';
 import { useMemo } from 'use-memo-one';
 import type { Responders, ContextId } from '../../types';
+import type { SensorHook } from '../use-sensor-marshal/sensor-types';
 import ErrorBoundary from '../error-boundary';
 import App from './app';
 
@@ -9,6 +10,8 @@ type Props = {|
   ...Responders,
   // we do not technically need any children for this component
   children: Node | null,
+
+  __unstableSensors?: SensorHook[],
 |};
 
 let instanceCount: number = 0;

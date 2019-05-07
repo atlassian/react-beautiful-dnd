@@ -12,6 +12,7 @@ import createAutoScroller from '../../state/auto-scroller';
 import useStyleMarshal from '../use-style-marshal/use-style-marshal';
 import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
 import type { StyleMarshal } from '../use-style-marshal/style-marshal-types';
+import type { SensorHook } from '../use-sensor-marshal/sensor-types';
 import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
@@ -42,6 +43,7 @@ type Props = {|
   setOnError: (onError: Function) => void,
   // we do not technically need any children for this component
   children: Node | null,
+  __unstableSensors?: SensorHook[],
 |};
 
 const createResponders = (props: Props): Responders => ({
@@ -61,7 +63,7 @@ function getStore(lazyRef: LazyStoreRef): Store {
 }
 
 export default function App(props: Props) {
-  const { contextId, setOnError } = props;
+  const { contextId, setOnError, __unstableSensors } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
@@ -173,6 +175,7 @@ export default function App(props: Props) {
   useSensorMarshal({
     contextId,
     store,
+    customSensors: __unstableSensors,
   });
 
   // Clean store when unmounting

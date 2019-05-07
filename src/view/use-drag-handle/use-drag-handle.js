@@ -185,7 +185,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     }
     return {
       onMouseDown: () => {},
-      onKeyDown,
+      onKeyDown: () => {},
       onTouchStart,
       onFocus,
       onBlur,
@@ -197,7 +197,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       draggable: false,
       onDragStart: preventHtml5Dnd,
     };
-  }, [contextId, isEnabled, onBlur, onFocus, onKeyDown, onTouchStart]);
+  }, [contextId, isEnabled, onBlur, onFocus, onTouchStart]);
 
   return props;
 }
