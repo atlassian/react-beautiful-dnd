@@ -67,7 +67,9 @@ const ArrowButton = styled(Button)`
   height: 40px;
 `;
 
-const ActionButton = styled(Button)``;
+const ActionButton = styled(Button)`
+  height: 40px;
+`;
 
 function Controls(props: ControlProps) {
   const { quotes, canLift, isDragging, lift } = props;
@@ -153,6 +155,7 @@ function Controls(props: ControlProps) {
 const Layout = styled.div`
   display: flex;
   justify-content: center;
+  margin-top: ${grid * 4}px;
 
   > * {
     margin: ${grid}px;
