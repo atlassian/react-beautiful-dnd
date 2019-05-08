@@ -226,8 +226,9 @@ export default function useMouseSensor(
           return;
         }
         // only starting a drag if dragging with the primary mouse button
+        console.log('button', event.button);
         if (event.button !== primaryButton) {
-          console.log('bye');
+          console.log('not using the primary button');
           return;
         }
 

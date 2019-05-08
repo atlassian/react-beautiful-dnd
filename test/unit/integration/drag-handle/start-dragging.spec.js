@@ -1,11 +1,29 @@
 // @flow
+import invariant from 'tiny-invariant';
 import React from 'react';
 import type { Position } from 'css-box-model';
 import { render, fireEvent } from 'react-testing-library';
 import { sloppyClickThreshold } from '../../../../src/view/use-sensor-marshal/sensors/util/is-sloppy-click-threshold-exceeded';
+import * as keyCodes from '../../../../src/view/key-codes';
 import App from './app';
 
 const primaryButton: number = 0;
+
+function simpleLift(handle: HTMLElement) {
+  fireEvent.mouseDown(handle);
+  fireEvent.mouseMove(handle, {
+    clientX: 0,
+    clientY: sloppyClickThreshold,
+  });
+}
+
+// blocking announcement messages
+jest.spyOn(console, 'warn').mockImplementation((message: string) => {
+  invariant(
+    message.includes('Message not passed to screen reader'),
+    `Unexpected console.warn("${message}")`,
+  );
+});
 
 function isDragging(el: HTMLElement): boolean {
   return el.getAttribute('data-is-dragging') === 'true';
@@ -69,7 +87,7 @@ it('should start a drag after sufficient movement', () => {
 });
 
 it('should allow standard click events', () => {
-  const { getByText, unmount } = render(<App />);
+  const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
   const click: MouseEvent = new MouseEvent('click', {
@@ -80,12 +98,10 @@ it('should allow standard click events', () => {
   fireEvent(handle, click);
 
   expect(click.defaultPrevented).toBe(false);
-
-  unmount();
 });
 
 it('should not call preventDefault on mouse movements while we are not sure if a drag is starting', () => {
-  const { getByText, unmount } = render(<App />);
+  const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
   // start pending
@@ -106,12 +122,10 @@ it('should not call preventDefault on mouse movements while we are not sure if a
 
   expect(isDragging(handle)).toBe(false);
   expect(mouseMove.defaultPrevented).toBe(false);
-
-  unmount();
 });
 
 it('should call preventDefault on the initial mousedown event to prevent the element gaining focus', () => {
-  const { getByText, unmount } = render(<App />);
+  const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
   const mouseDown: MouseEvent = new MouseEvent('mousedown', {
@@ -124,12 +138,10 @@ it('should call preventDefault on the initial mousedown event to prevent the ele
   fireEvent(handle, mouseDown);
 
   expect(mouseDown.defaultPrevented).toBe(true);
-
-  unmount();
 });
 
 it('should allow multiple false starts', () => {
-  const { getByText, unmount } = render(<App />);
+  const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
   Array.from({ length: 5 }).forEach(() => {
@@ -146,6 +158,84 @@ it('should allow multiple false starts', () => {
   });
 
   expect(isDragging(handle)).toBe(true);
+});
 
-  unmount();
+it('should not start a drag if there was too little mouse movement while mouse was pressed', () => {
+  const { getByText } = render(<App />);
+  const handle: HTMLElement = getByText('item: 0');
+
+  fireEvent.mouseDown(handle, getStartingMouseDown());
+  fireEvent.mouseMove(handle, {
+    clientX: 0,
+    clientY: sloppyClickThreshold - 1,
+  });
+
+  expect(isDragging(handle)).toBe(false);
+});
+
+it('should not start a drag if not using the primary mouse button', () => {
+  const { getByText } = render(<App />);
+  const handle: HTMLElement = getByText('item: 0');
+
+  fireEvent(
+    handle,
+    new MouseEvent('mousedown', {
+      clientX: 0,
+      clientY: 0,
+      cancelable: true,
+      bubbles: true,
+      button: primaryButton + 1,
+    }),
+  );
+  fireEvent.mouseMove(handle, {
+    clientX: 0,
+    clientY: sloppyClickThreshold,
+  });
+
+  expect(isDragging(handle)).toBe(false);
+});
+
+it('should not start a drag if a modifier key was used while pressing the mouse down', () => {
+  // if any drag is started with these keys pressed then we do not start a drag
+  const keys: string[] = ['ctrlKey', 'altKey', 'shiftKey', 'metaKey'];
+  const { getByText } = render(<App />);
+  const handle: HTMLElement = getByText('item: 0');
+
+  keys.forEach((key: string) => {
+    const mouseDown: MouseEvent = new MouseEvent('mousedown', {
+      clientX: 0,
+      clientY: 0,
+      cancelable: true,
+      bubbles: true,
+      button: primaryButton,
+      [key]: true,
+    });
+    fireEvent(handle, mouseDown);
+    fireEvent.mouseMove(handle, {
+      clientX: 0,
+      clientY: sloppyClickThreshold,
+    });
+
+    expect(isDragging(handle)).toBe(false);
+  });
+});
+
+it('should not start a drag if another sensor is capturing', () => {
+  let tryCapture;
+  function greedy(tryStartCapture) {
+    tryCapture = tryStartCapture;
+  }
+  const { getByText } = render(<App sensors={[greedy]} />);
+  const handle: HTMLElement = getByText('item: 0');
+
+  invariant(tryCapture, 'Expected function to be set');
+  tryCapture(handle);
+
+  // touch will now be capturing
+  // fireEvent.keyDown(handle, { keyCode: keyCodes.space });
+
+  // lift
+  simpleLift(handle);
+
+  expect(isDragging(handle)).toBe(false);
 });
