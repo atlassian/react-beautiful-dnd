@@ -181,7 +181,8 @@ export default function useTouchSensor(args: Args): OnTouchStart {
         eventName: 'touchmove',
         // Opting out of passive touchmove (default) so as to prevent scrolling while moving
         // Not worried about performance as effect of move is throttled in requestAnimationFrame
-        options: { passive: false },
+        // Using `capture: false` due to a recent horrible firefox bug: https://twitter.com/alexandereardon/status/1125904207184187393
+        options: { passive: false, capture: false },
         fn: (event: TouchEvent) => {
           // Drag has not yet started and we are waiting for a long press.
           if (!isDraggingRef.current) {
