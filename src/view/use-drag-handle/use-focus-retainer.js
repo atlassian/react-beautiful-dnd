@@ -45,6 +45,7 @@ export default function useFocusRetainer(args: Args): Result {
 
     // unmounting: try to retain focus
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       const last: Args = lastArgsRef.current;
       const shouldRetainFocus = ((): boolean => {
         // will not restore if not enabled

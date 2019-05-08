@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable react/sort-comp */
 import React, { Component, Fragment, type Node } from 'react';
 import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
@@ -58,7 +59,6 @@ type SnapshotMap = {
 const snapshotMap: SnapshotMap = {};
 
 class TableCell extends React.Component<TableCellProps> {
-  // eslint-disable-next-line react/sort-comp
   ref: ?HTMLElement;
 
   componentDidMount() {

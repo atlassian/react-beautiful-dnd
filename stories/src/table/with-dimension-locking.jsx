@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable react/sort-comp */
 import React, { Component, Fragment, type Node } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@atlaskit/theme';
@@ -48,7 +49,6 @@ type TableCellSnapshot = {|
   height: number,
 |};
 class TableCell extends React.Component<TableCellProps> {
-  // eslint-disable-next-line react/sort-comp
   ref: ?HTMLElement;
 
   getSnapshotBeforeUpdate(prevProps: TableCellProps): ?TableCellSnapshot {
