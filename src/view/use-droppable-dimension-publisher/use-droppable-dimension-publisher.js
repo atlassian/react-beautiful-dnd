@@ -56,8 +56,8 @@ export default function useDroppableDimensionPublisher(args: Props) {
   const whileDraggingRef = useRef<?WhileDragging>(null);
   const appContext: AppContextValue = useRequiredContext(AppContext);
   const marshal: DimensionMarshal = appContext.marshal;
-  const previousRef: { current: Props } = usePreviousRef(args);
-  const descriptor: DroppableDescriptor = useMemo((): DroppableDescriptor => {
+  const previousRef = usePreviousRef(args);
+  const descriptor = useMemo<DroppableDescriptor>(() => {
     return {
       id: args.droppableId,
       type: args.type,
