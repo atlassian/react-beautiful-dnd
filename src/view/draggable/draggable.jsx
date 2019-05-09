@@ -61,6 +61,7 @@ export default function Draggable(props: Props) {
     lift: liftAction,
     dropAnimationFinished: dropAnimationFinishedAction,
   } = props;
+  const isEnabled: boolean = !isDragDisabled;
 
   // The dimension publisher: talks to the marshal
   const forPublisher: DimensionPublisherArgs = useMemo(
@@ -80,7 +81,7 @@ export default function Draggable(props: Props) {
       timings.start('LIFT');
       const el: ?HTMLElement = ref.current;
       invariant(el);
-      invariant(!isDragDisabled, 'Cannot lift a Draggable when it is disabled');
+      invariant(isEnabled, 'Cannot lift a Draggable when it is disabled');
       const { clientSelection, movementMode } = options;
 
       liftAction({
@@ -90,7 +91,7 @@ export default function Draggable(props: Props) {
       });
       timings.finish('LIFT');
     },
-    [draggableId, isDragDisabled, liftAction],
+    [draggableId, isEnabled, liftAction],
   );
 
   const getShouldRespectForcePress = useCallback(
@@ -135,7 +136,7 @@ export default function Draggable(props: Props) {
       draggableId,
       isDragging,
       isDropAnimating,
-      isEnabled: !isDragDisabled,
+      isEnabled,
       callbacks,
       getDraggableRef: getRef,
       canDragInteractiveElements,
@@ -147,9 +148,9 @@ export default function Draggable(props: Props) {
       draggableId,
       getRef,
       getShouldRespectForcePress,
-      isDragDisabled,
       isDragging,
       isDropAnimating,
+      isEnabled,
     ],
   );
 
@@ -189,6 +190,7 @@ export default function Draggable(props: Props) {
         'data-rbd-draggable-options': JSON.stringify({
           canDragInteractiveElements,
           shouldRespectForcePress,
+          isEnabled,
         }),
         style,
         onTransitionEnd,
@@ -202,6 +204,7 @@ export default function Draggable(props: Props) {
     canDragInteractiveElements,
     dragHandleProps,
     draggableId,
+    isEnabled,
     mapped,
     onMoveEnd,
     setRef,

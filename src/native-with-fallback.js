@@ -14,6 +14,7 @@ export function values<T>(map: Map<T>): T[] {
 // Could also extend to pass index and list
 type PredicateFn<T> = (value: T) => boolean;
 
+// TODO: swap order
 export function findIndex<T>(
   list: Array<T>,
   predicate: PredicateFn<T>,
@@ -32,6 +33,7 @@ export function findIndex<T>(
   return -1;
 }
 
+// TODO: swap order
 export function find<T>(list: Array<T>, predicate: PredicateFn<T>): ?T {
   if (list.find) {
     return list.find(predicate);
