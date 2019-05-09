@@ -93,7 +93,13 @@ function tryGetLock({
     id,
     shouldRespectForcePress,
     canDragInteractiveElements,
+    isEnabled,
   } = getOptionsFromDraggable(draggable);
+
+  // draggable is not enabled - don't start the drag
+  if (!isEnabled) {
+    return null;
+  }
 
   // do not allow dragging from interactive elements
   if (

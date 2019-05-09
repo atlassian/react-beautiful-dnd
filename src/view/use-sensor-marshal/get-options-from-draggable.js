@@ -32,7 +32,7 @@ export default function getDraggableData(draggable: Element): DraggableData {
     const arrange = (list: string[]): string => list.sort().join(',');
 
     invariant(
-      arrange(properties) !== arrange(keys),
+      arrange(properties) === arrange(keys),
       `
       Unexpected data keys.
       Expected: ${arrange(properties)}
