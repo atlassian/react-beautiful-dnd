@@ -1,11 +1,11 @@
 // @flow
 import invariant from 'tiny-invariant';
 import { useEffect } from 'react';
-import type { SensorHook } from './sensor-types';
+import type { Sensor } from '../../types';
 import usePreviousRef from '../use-previous-ref';
 
-export default function useValidateSensorHooks(sensorHooks: SensorHook[]) {
-  const previousRef = usePreviousRef<SensorHook[]>(sensorHooks);
+export default function useValidateSensorHooks(sensorHooks: Sensor[]) {
+  const previousRef = usePreviousRef<Sensor[]>(sensorHooks);
 
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') {

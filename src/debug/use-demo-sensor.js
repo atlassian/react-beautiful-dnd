@@ -1,7 +1,7 @@
 // @flow
 import { useEffect } from 'react';
 import { useCallback } from 'use-memo-one';
-import type { MovementCallbacks } from '../view/use-sensor-marshal/sensor-types';
+import type { ActionLock } from '../types';
 
 function delay(fn: Function, time?: number = 300) {
   return new Promise(resolve => {
@@ -15,10 +15,7 @@ function delay(fn: Function, time?: number = 300) {
 function noop() {}
 
 export default function useDemoSensor(
-  tryStartCapturing: (
-    source: Event | Element,
-    abort: () => void,
-  ) => ?MovementCallbacks,
+  tryGetActionLock: (source: Event | Element, abort: () => void) => ?ActionLock,
 ) {
   const start = useCallback(
     async function start() {
@@ -33,7 +30,7 @@ export default function useDemoSensor(
 
       // handle.scrollIntoView();
 
-      const callbacks: ?MovementCallbacks = tryStartCapturing(handle, noop);
+      const callbacks: ?ActionLock = tryGetActionLock(handle, noop);
 
       if (!callbacks) {
         console.log('unable to start drag');
@@ -59,7 +56,7 @@ export default function useDemoSensor(
       await delay(moveUp);
       await delay(drop);
     },
-    [tryStartCapturing],
+    [tryGetActionLock],
   );
 
   useEffect(() => {

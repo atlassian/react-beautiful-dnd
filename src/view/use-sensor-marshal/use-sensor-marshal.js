@@ -1,17 +1,18 @@
 // @flow
-import invariant from 'tiny-invariant';
 import rafSchd from 'raf-schd';
 import { useEffect } from 'react';
 import { useCallback } from 'use-memo-one';
 import type { Position } from 'css-box-model';
-import type { ContextId, DraggableId, State } from '../../types';
-import type { Store, Action } from '../../state/store-types';
 import type {
-  MovementCallbacks,
-  SensorHook,
-  CaptureEndOptions,
-  OnLiftArgs,
-} from './sensor-types';
+  ContextId,
+  State,
+  Sensor,
+  SensorLift,
+  ActionLock,
+  ReleaseLockOptions,
+} from '../../types';
+import { getLock, obtainLock, releaseLock, tryAbortLock } from './lock';
+import type { Store, Action } from '../../state/store-types';
 import { getClosestDragHandle, getClosestDraggable } from './get-closest';
 import canStartDrag from '../../state/can-start-drag';
 import {
@@ -33,31 +34,17 @@ import isHtmlElement from '../is-type-of-element/is-html-element';
 import useKeyboardSensor from './sensors/use-keyboard-sensor';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 
-type Capturing = {|
-  id: DraggableId,
-  abort: () => void,
-|};
-
-let capturing: ?Capturing = null;
-
-function startCapture(id: DraggableId, abort: () => void) {
-  invariant(!capturing, 'Cannot start capturing when already capturing');
-  capturing = { id, abort };
-}
-function stopCapture() {
-  invariant(capturing, 'Cannot stop capturing when not already capturing');
-  capturing = null;
-}
-
 function preventDefault(event: Event) {
   event.preventDefault();
 }
 
-type TryStartCapturingArgs = {|
+function noop() {}
+
+type TryGetLockArgs = {|
   contextId: ContextId,
   store: Store,
   source: Event | Element,
-  abort: () => void,
+  forceSensorStop: () => void,
 |};
 
 function getTarget(source: Event | Element): ?Element {
@@ -76,13 +63,14 @@ function getTarget(source: Event | Element): ?Element {
   return target instanceof Element ? target : null;
 }
 
-function tryStartCapturing({
+function tryGetLock({
   contextId,
   store,
   source,
-  abort,
-}: TryStartCapturingArgs): ?MovementCallbacks {
-  if (capturing != null) {
+  forceSensorStop,
+}: TryGetLockArgs): ?ActionLock {
+  // there is already a lock - cannot start
+  if (getLock() != null) {
     return null;
   }
 
@@ -119,38 +107,38 @@ function tryStartCapturing({
     return null;
   }
 
-  startCapture(id, abort);
-  let isCapturing: boolean = true;
+  // TODO: what if a sensor does not call .abort
+  let hasLock: boolean = true;
 
-  function ifCapturing(maybe: Function) {
-    if (isCapturing) {
+  function ifHasLock(maybe: Function) {
+    if (hasLock) {
       maybe();
       return;
     }
     warning(
-      'Trying to perform operation when no longer responsible for capturing',
+      'Trying to perform operation when no longer owner of sensor action lock',
     );
   }
 
-  const tryDispatch = (getAction: () => Action): void => {
-    if (!isCapturing) {
+  function tryDispatch(getAction: () => Action): void {
+    if (!hasLock) {
       warning(
         'Trying to perform operation when no longer responsible for capturing',
       );
       return;
     }
     store.dispatch(getAction());
-  };
+  }
   const moveUp = () => tryDispatch(moveUpAction);
   const moveDown = () => tryDispatch(moveDownAction);
   const moveRight = () => tryDispatch(moveRightAction);
   const moveLeft = () => tryDispatch(moveLeftAction);
 
   const move = rafSchd((clientSelection: Position) => {
-    ifCapturing(() => store.dispatch(moveAction({ client: clientSelection })));
+    ifHasLock(() => store.dispatch(moveAction({ client: clientSelection })));
   });
 
-  function lift(args: OnLiftArgs) {
+  function lift(args: SensorLift) {
     const actionArgs =
       args.mode === 'FLUID'
         ? {
@@ -167,18 +155,21 @@ function tryStartCapturing({
     tryDispatch(() => liftAction(actionArgs));
   }
 
-  const finish = (
-    options?: CaptureEndOptions = { shouldBlockNextClick: false },
+  function finish(
+    options?: ReleaseLockOptions = { shouldBlockNextClick: false },
     action?: Action,
-  ) => {
-    if (!isCapturing) {
-      warning('Cannot finish a drag when not capturing');
+  ) {
+    if (!hasLock) {
+      warning('Cannot finish a drag when there is no lock');
       return;
     }
 
-    // stopping capture
-    stopCapture();
-    isCapturing = false;
+    // cancel any pending request animation frames
+    move.cancel();
+
+    // release the lock and record that we no longer have it
+    hasLock = false;
+    releaseLock();
 
     // block next click if requested
     if (options.shouldBlockNextClick) {
@@ -190,13 +181,15 @@ function tryStartCapturing({
       });
     }
 
-    // cancel any pending request animation frames
-    move.cancel();
-
     if (action) {
       store.dispatch(action);
     }
-  };
+  }
+
+  obtainLock(id, function abort() {
+    forceSensorStop();
+    finish();
+  });
 
   return {
     shouldRespectForcePress: (): boolean => shouldRespectForcePress,
@@ -206,54 +199,45 @@ function tryStartCapturing({
     moveDown,
     moveRight,
     moveLeft,
-    drop: (args?: CaptureEndOptions) => {
+    drop: (args?: ReleaseLockOptions) => {
       finish(args, dropAction({ reason: 'DROP' }));
     },
-    cancel: (args?: CaptureEndOptions) => {
+    cancel: (args?: ReleaseLockOptions) => {
       finish(args, dropAction({ reason: 'CANCEL' }));
     },
     abort: () => finish(),
   };
 }
 
-function tryAbortCapture() {
-  if (capturing) {
-    capturing.abort();
-    capturing = null;
-  }
-}
-
 type SensorMarshalArgs = {|
   contextId: ContextId,
   store: Store,
-  customSensors: ?(SensorHook[]),
+  customSensors: ?(Sensor[]),
 |};
 
-const defaultSensors: SensorHook[] = [useMouseSensor, useKeyboardSensor];
+const defaultSensors: Sensor[] = [useMouseSensor, useKeyboardSensor];
 
 export default function useSensorMarshal({
   contextId,
   store,
   customSensors,
 }: SensorMarshalArgs) {
-  const useSensors: SensorHook[] = [
-    ...defaultSensors,
-    ...(customSensors || []),
-  ];
+  const useSensors: Sensor[] = [...defaultSensors, ...(customSensors || [])];
 
   // We need to abort any capturing if there is no longer a drag
   useEffect(
-    function listen() {
+    function listenToStore() {
       let previous: State = store.getState();
       const unsubscribe = store.subscribe(() => {
         const current: State = store.getState();
 
         if (previous.isDragging && !current.isDragging) {
-          tryAbortCapture();
+          tryAbortLock();
         }
 
         previous = current;
       });
+
       return unsubscribe;
     },
     [store],
@@ -261,16 +245,16 @@ export default function useSensorMarshal({
 
   // abort any captures on unmount
   useLayoutEffect(() => {
-    return tryAbortCapture;
+    return tryAbortLock;
   }, []);
 
-  const tryStartCapture = useCallback(
-    (source: Event | Element, abort: () => void): ?MovementCallbacks =>
-      tryStartCapturing({
+  const wrapper = useCallback(
+    (source: Event | Element, forceStop?: () => void = noop): ?ActionLock =>
+      tryGetLock({
         contextId,
         store,
         source,
-        abort,
+        forceSensorStop: forceStop,
       }),
     [contextId, store],
   );
@@ -278,6 +262,6 @@ export default function useSensorMarshal({
   // Bad ass
   useValidateSensorHooks(useSensors);
   for (let i = 0; i < useSensors.length; i++) {
-    useSensors[i](tryStartCapture);
+    useSensors[i](wrapper);
   }
 }

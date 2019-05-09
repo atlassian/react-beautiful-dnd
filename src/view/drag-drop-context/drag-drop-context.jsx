@@ -1,8 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import { useMemo } from 'use-memo-one';
-import type { Responders, ContextId } from '../../types';
-import type { SensorHook } from '../use-sensor-marshal/sensor-types';
+import type { Responders, ContextId, Sensor } from '../../types';
 import ErrorBoundary from '../error-boundary';
 import App from './app';
 
@@ -11,7 +10,7 @@ type Props = {|
   // we do not technically need any children for this component
   children: Node | null,
 
-  __unstableSensors?: SensorHook[],
+  __unstableSensors?: Sensor[],
 |};
 
 let instanceCount: number = 0;

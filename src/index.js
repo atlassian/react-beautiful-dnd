@@ -28,10 +28,8 @@ export type {
   OnDragStartResponder,
   OnDragUpdateResponder,
   OnDragEndResponder,
+  Sensor,
 } from './types';
-
-// TODO: should this be in types.js?
-export type { SensorHook } from './view/use-sensor-marshal/sensor-types';
 
 // Droppable types
 export type {

@@ -3,8 +3,7 @@
 import React, { useRef, createRef, useState, useCallback } from 'react';
 import styled from '@emotion/styled';
 import type { Quote } from '../types';
-import type { DropResult } from '../../../src/types';
-import type { MovementCallbacks } from '../../../src/view/use-sensor-marshal/sensor-types';
+import type { DropResult, ActionLock } from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import reorder from '../reorder';
@@ -14,7 +13,7 @@ type ControlProps = {|
   quotes: Quote[],
   canLift: boolean,
   isDragging: boolean,
-  lift: (quoteId: string) => ?MovementCallbacks,
+  lift: (quoteId: string) => ?ActionLock,
 |};
 
 function noop() {}
@@ -75,11 +74,11 @@ const ActionButton = styled(Button)`
 
 function Controls(props: ControlProps) {
   const { quotes, canLift, isDragging, lift } = props;
-  const callbacksRef = useRef<?MovementCallbacks>(null);
+  const callbacksRef = useRef<?ActionLock>(null);
 
   const selectRef = createRef();
 
-  function maybe(fn: (callbacks: MovementCallbacks) => void) {
+  function maybe(fn: (callbacks: ActionLock) => void) {
     if (callbacksRef.current) {
       fn(callbacksRef.current);
     }
@@ -172,8 +171,8 @@ export default function QuoteApp(props: Props) {
   const [quotes, setQuotes] = useState(props.initial);
   const [isDragging, setIsDragging] = useState(false);
   const [isControlDragging, setIsControlDragging] = useState(false);
-  const tryStartCapturingRef = useRef<
-    (el: Element, abort: () => void) => ?MovementCallbacks,
+  const tryGetActionLock = useRef<
+    (el: Element, stop: () => void) => ?ActionLock,
   >(() => null);
 
   const onDragEnd = useCallback(
@@ -200,7 +199,7 @@ export default function QuoteApp(props: Props) {
     [quotes],
   );
 
-  function lift(quoteId: string): ?MovementCallbacks {
+  function lift(quoteId: string): ?ActionLock {
     if (isDragging) {
       return null;
     }
@@ -211,10 +210,7 @@ export default function QuoteApp(props: Props) {
       return null;
     }
 
-    const callbacks: ?MovementCallbacks = tryStartCapturingRef.current(
-      handle,
-      noop,
-    );
+    const callbacks: ?ActionLock = tryGetActionLock.current(handle, noop);
 
     if (!callbacks) {
       console.log('unable to start capturing');
@@ -232,8 +228,8 @@ export default function QuoteApp(props: Props) {
       onDragStart={() => setIsDragging(true)}
       onDragEnd={onDragEnd}
       __unstableSensors={[
-        tryCapture => {
-          tryStartCapturingRef.current = tryCapture;
+        tryGetLock => {
+          tryGetActionLock.current = tryGetLock;
         },
       ]}
     >

@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import { useEffect, useRef } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
-import type { MovementCallbacks } from '../sensor-types';
+import type { ActionLock } from '../../../types';
 import type {
   EventBinding,
   EventOptions,
@@ -30,12 +30,12 @@ type Idle = {|
 type Pending = {|
   type: 'PENDING',
   point: Position,
-  callbacks: MovementCallbacks,
+  callbacks: ActionLock,
 |};
 
 type Dragging = {|
   type: 'DRAGGING',
-  callbacks: MovementCallbacks,
+  callbacks: ActionLock,
 |};
 
 type Phase = Idle | Pending | Dragging;
@@ -210,7 +210,7 @@ function getCaptureBindings({
 }
 
 export default function useMouseSensor(
-  tryStartCapturing: (event: Event, abort: () => void) => ?MovementCallbacks,
+  tryStartCapturing: (event: Event, abort: () => void) => ?ActionLock,
 ) {
   const phaseRef = useRef<Phase>(idle);
   const unbindEventsRef = useRef<() => void>(noop);
@@ -219,35 +219,29 @@ export default function useMouseSensor(
     () => ({
       eventName: 'mousedown',
       fn: function onMouseDown(event: MouseEvent) {
-        console.log('on mouse down');
         // Event already used
         if (event.defaultPrevented) {
-          console.log('default prevented');
           return;
         }
         // only starting a drag if dragging with the primary mouse button
-        console.log('button', event.button);
         if (event.button !== primaryButton) {
-          console.log('not using the primary button');
           return;
         }
 
         // Do not start a drag if any modifier key is pressed
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
-          console.log('special key');
           return;
         }
 
         // stop is defined later
         // eslint-disable-next-line no-use-before-define
-        const callbacks: ?MovementCallbacks = tryStartCapturing(event, stop);
+        const callbacks: ?ActionLock = tryStartCapturing(event, stop);
 
         if (!callbacks) {
-          console.log('cannot start a capture');
           return;
         }
 
-        console.log('calling prevent default');
+        // consuming the event
         event.preventDefault();
 
         const point: Position = {
@@ -259,7 +253,6 @@ export default function useMouseSensor(
         unbindEventsRef.current();
         // using this function before it is defined as their is a circular usage pattern
         // eslint-disable-next-line no-use-before-define
-        console.log('starting pending');
         startPendingDrag(callbacks, point);
       },
     }),
@@ -326,7 +319,7 @@ export default function useMouseSensor(
   );
 
   const startPendingDrag = useCallback(
-    function startPendingDrag(callbacks: MovementCallbacks, point: Position) {
+    function startPendingDrag(callbacks: ActionLock, point: Position) {
       invariant(
         phaseRef.current.type === 'IDLE',
         'Expected to move from IDLE to PENDING drag',

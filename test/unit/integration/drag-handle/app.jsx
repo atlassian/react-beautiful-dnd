@@ -7,7 +7,7 @@ import {
   type DroppableProvided,
   type DraggableProvided,
   type DraggableStateSnapshot,
-  type SensorHook,
+  type Sensor,
 } from '../../../../src';
 
 type Item = {|
@@ -17,15 +17,15 @@ type Item = {|
 type Props = {|
   onDragStart?: Function,
   onDragEnd?: Function,
-  sensors?: [SensorHook],
+  sensors?: [Sensor],
 |};
 
 function noop() {}
 
 export default function App(props?: Props) {
   const onDragStart = (props && props.onDragStart) || noop;
-  console.log('on drag start', onDragStart);
   const onDragEnd = (props && props.onDragStart) || noop;
+  const sensors: Sensor[] = [...((props && props.sensors) || [])];
 
   const [items] = useState(() =>
     Array.from(
@@ -35,8 +35,6 @@ export default function App(props?: Props) {
       }),
     ),
   );
-
-  const sensors: SensorHook[] = (props && props.sensors) || [];
 
   return (
     <DragDropContext

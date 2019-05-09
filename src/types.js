@@ -395,3 +395,41 @@ export type Responders = {|
   // always required
   onDragEnd: OnDragEndResponder,
 |};
+
+// ## Sensors
+export type ReleaseLockOptions = {|
+  shouldBlockNextClick: boolean,
+|};
+
+type SensorSnapLift = {|
+  mode: 'SNAP',
+|};
+
+type SensorFluidLift = {|
+  mode: 'FLUID',
+  clientSelection: Position,
+|};
+
+export type SensorLift = SensorSnapLift | SensorFluidLift;
+
+export type ActionLock = {|
+  shouldRespectForcePress: () => boolean,
+  // getDragHandleRef: () => HTMLElement,
+  // getDraggableRef: () => HTMLElement,
+  lift: (args: SensorLift) => void,
+  move: (point: Position) => void,
+  moveUp: () => void,
+  moveDown: () => void,
+  moveRight: () => void,
+  moveLeft: () => void,
+  drop: (args?: ReleaseLockOptions) => void,
+  cancel: (args?: ReleaseLockOptions) => void,
+  abort: () => void,
+|};
+
+export type Sensor = (
+  tryGetActionLock: (
+    source: Event | Element,
+    forceStop?: () => void,
+  ) => ?ActionLock,
+) => void;
