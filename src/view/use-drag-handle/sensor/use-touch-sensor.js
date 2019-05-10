@@ -41,7 +41,7 @@ type WebkitHack = {|
   releaseTouchMove: () => void,
 |};
 
-export const timeForLongPress: number = 150;
+// export const timeForLongPress: number = 150;
 export const forcePressThreshold: number = 0.15;
 const touchStartMarshal: EventMarshal = createEventMarshal();
 const noop = (): void => {};
@@ -113,6 +113,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     getShouldRespectForcePress,
     onCaptureStart,
     onCaptureEnd,
+    timeForLongPress,
   } = args;
   const pendingRef = useRef<?PendingDrag>(null);
   const isDraggingRef = useRef<boolean>(false);

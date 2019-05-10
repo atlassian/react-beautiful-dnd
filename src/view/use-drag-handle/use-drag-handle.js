@@ -65,6 +65,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     getDraggableRef,
     getShouldRespectForcePress,
     canDragInteractiveElements,
+    timeForLongPress,
   } = args;
   const lastArgsRef = usePreviousRef(args);
 
@@ -152,6 +153,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       getShouldRespectForcePress,
       onCaptureStart,
       onCaptureEnd,
+      timeForLongPress,
     }),
     [
       callbacks,
@@ -161,6 +163,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       getShouldRespectForcePress,
       onCaptureStart,
       onCaptureEnd,
+      timeForLongPress,
     ],
   );
   const onTouchStart = useTouchSensor(touchArgs);
