@@ -58,4 +58,5 @@ export type Args = {|
   canDragInteractiveElements: boolean,
   // whether force press interactions should be respected
   getShouldRespectForcePress: () => boolean,
+  timeForLongPress: number,
 |};

@@ -24,6 +24,7 @@ export type Args = {|
   getShouldRespectForcePress: () => boolean,
   onCaptureStart: (abort: () => void) => void,
   onCaptureEnd: () => void,
+  timeForLongPress: number,
 |};
 export type OnTouchStart = (event: TouchEvent) => void;
 
@@ -400,7 +401,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
       onCaptureStart(stop);
       bindWindowEvents();
     },
-    [bindWindowEvents, onCaptureStart, startDragging, stop],
+    [bindWindowEvents, onCaptureStart, startDragging, stop, timeForLongPress],
   );
 
   const onTouchStart = (event: TouchEvent) => {
