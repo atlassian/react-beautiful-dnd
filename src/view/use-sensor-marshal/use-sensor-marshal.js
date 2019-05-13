@@ -56,6 +56,54 @@ type TryGetLockArgs = {|
   forceSensorStop: () => void,
 |};
 
+type IsActiveArgs = {|
+  expected: LockPhase,
+  phase: LockPhase,
+  lock: Lock,
+  shouldWarn: boolean,
+|};
+
+function isActive({
+  expected,
+  phase,
+  lock,
+  shouldWarn,
+}: IsActiveArgs): boolean {
+  // lock is no longer active
+  if (!isLockActive(lock)) {
+    if (shouldWarn) {
+      warning(`
+        Cannot perform action.
+        The sensor no longer has an action lock.
+
+        Tips:
+
+        - Throw away your action handlers when forceStop() is called
+        - Check actions.isActive() if you really need to
+      `);
+    }
+    return false;
+  }
+  // wrong phase
+  if (expected !== phase) {
+    if (shouldWarn) {
+      warning(`
+        Cannot perform action.
+        The actions you used belong to an outdated phase
+
+        Current phase: ${expected}
+        You called an action from outdated phase: ${phase}
+
+        Tips:
+
+        - Do not use preDragActions actions after calling preDragActions.lift()
+      `);
+    }
+    return false;
+  }
+  return true;
+}
+
 function getTarget(source: Event | Element): ?Element {
   if (source instanceof Element) {
     return source;
@@ -71,20 +119,6 @@ function getTarget(source: Event | Element): ?Element {
   const target: EventTarget = source.target;
   return target instanceof Element ? target : null;
 }
-
-const tryDispatch = (dispatch: Dispatch, isActive: () => boolean) => (
-  getAction: () => Action,
-): void => {
-  if (!isActive()) {
-    warning(
-      `Cannot perform action. This can occur when actions are outdated or lock is expired.
-
-      Lost: ${JSON.stringify(getAction())}`,
-    );
-    return;
-  }
-  dispatch(getAction());
-};
 
 function tryGetLock({
   contextId,
@@ -142,12 +176,14 @@ function tryGetLock({
   const lock: Lock = claim(forceSensorStop);
   let phase: LockPhase = 'PRE_DRAG';
 
-  function isPreDragActive() {
-    return phase === 'PRE_DRAG' && isLockActive(lock);
-  }
-
   function getShouldRespectForcePress(): boolean {
     return shouldRespectForcePress;
+  }
+
+  function tryDispatch(expected: LockPhase, getAction: () => Action): void {
+    if (isActive({ expected, phase, lock, shouldWarn: true })) {
+      store.dispatch(getAction());
+    }
   }
 
   function lift(args: SensorLift): DragActions {
@@ -165,15 +201,12 @@ function tryGetLock({
           };
 
     // Do lift operation
-    tryDispatch(store.dispatch, isPreDragActive)(() => liftAction(actionArgs));
+    tryDispatch('PRE_DRAG', () => liftAction(actionArgs));
 
     // We are now in the DRAGGING phase
     phase = 'DRAGGING';
 
-    function isDraggingActive() {
-      return phase === 'DRAGGING' && isLockActive(lock);
-    }
-    const execute = tryDispatch(store.dispatch, isDraggingActive);
+    const execute = tryDispatch.bind(this, 'DRAGGING');
 
     // Setup DragActions
     const moveUp = () => execute(moveUpAction);
@@ -189,11 +222,6 @@ function tryGetLock({
       reason: 'CANCEL' | 'DROP',
       options?: StopDragOptions = { shouldBlockNextClick: false },
     ) {
-      if (!isDraggingActive()) {
-        warning('Cannot finish a drag when there is no lock');
-        return;
-      }
-
       // Cancel any pending request animation frames
       move.cancel();
 
@@ -216,7 +244,14 @@ function tryGetLock({
     }
 
     return {
-      isActive: isDraggingActive,
+      isActive: () =>
+        isActive({
+          expected: 'DRAGGING',
+          phase,
+          lock,
+          // Do not want to want warnings for boolean checks
+          shouldWarn: false,
+        }),
       shouldRespectForcePress: getShouldRespectForcePress,
       move,
       moveUp,
@@ -229,15 +264,27 @@ function tryGetLock({
   }
 
   function abortPreDrag() {
-    if (!isPreDragActive()) {
-      warning('Cannot abort pre drag when no longer active');
-      return;
+    const shouldRelease: boolean = isActive({
+      expected: 'PRE_DRAG',
+      phase,
+      lock,
+      shouldWarn: true,
+    });
+
+    if (shouldRelease) {
+      release();
     }
-    release();
   }
 
   const preDrag: PreDragActions = {
-    isActive: isPreDragActive,
+    isActive: () =>
+      isActive({
+        expected: 'PRE_DRAG',
+        phase,
+        lock,
+        // Do not want to want warnings for boolean checks
+        shouldWarn: false,
+      }),
     shouldRespectForcePress: getShouldRespectForcePress,
     lift,
     abort: abortPreDrag,

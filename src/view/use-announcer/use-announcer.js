@@ -52,12 +52,14 @@ export default function useAnnouncer(contextId: ContextId): Announce {
     getBodyElement().appendChild(el);
 
     return () => {
-      const toBeRemoved: ?HTMLElement = ref.current;
-      invariant(toBeRemoved, 'Cannot unmount announcement node');
+      setTimeout(function remove() {
+        const toBeRemoved: ?HTMLElement = ref.current;
+        invariant(toBeRemoved, 'Cannot unmount announcement node');
 
-      // Remove from body
-      getBodyElement().removeChild(toBeRemoved);
-      ref.current = null;
+        // Remove from body
+        getBodyElement().removeChild(toBeRemoved);
+        ref.current = null;
+      });
     };
   }, [id]);
 
