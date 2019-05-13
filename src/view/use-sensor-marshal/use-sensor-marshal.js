@@ -115,6 +115,7 @@ function tryGetLock({
 
   // TODO: what if a sensor does not call .abort
   let hasLock: boolean = true;
+  let isLifted: boolean = false;
 
   function ifHasLock(maybe: Function) {
     if (hasLock) {
@@ -128,6 +129,7 @@ function tryGetLock({
 
   function tryDispatch(getAction: () => Action): void {
     if (!hasLock) {
+      console.log('BOOM');
       warning(
         'Trying to perform operation when no longer responsible for capturing',
       );
@@ -163,7 +165,7 @@ function tryGetLock({
 
   function finish(
     options?: ReleaseLockOptions = { shouldBlockNextClick: false },
-    action?: Action,
+    reason?: 'CANCEL' | 'DROP' = 'CANCEL',
   ) {
     if (!hasLock) {
       warning('Cannot finish a drag when there is no lock');
@@ -172,10 +174,6 @@ function tryGetLock({
 
     // cancel any pending request animation frames
     move.cancel();
-
-    // release the lock and record that we no longer have it
-    hasLock = false;
-    releaseLock();
 
     // block next click if requested
     if (options.shouldBlockNextClick) {
@@ -187,9 +185,14 @@ function tryGetLock({
       });
     }
 
-    if (action) {
-      store.dispatch(action);
+    if (isLifted) {
+      store.dispatch(dropAction({ reason }));
     }
+
+    // release the lock and record that we no longer have it
+    isLifted = false;
+    hasLock = false;
+    releaseLock();
   }
 
   obtainLock(id, function abort() {
@@ -198,6 +201,7 @@ function tryGetLock({
   });
 
   return {
+    isActive: (): boolean => hasLock,
     shouldRespectForcePress: (): boolean => shouldRespectForcePress,
     lift,
     move,
@@ -206,11 +210,13 @@ function tryGetLock({
     moveRight,
     moveLeft,
     drop: (args?: ReleaseLockOptions) => {
-      finish(args, dropAction({ reason: 'DROP' }));
+      finish(args, 'DROP');
     },
     cancel: (args?: ReleaseLockOptions) => {
-      finish(args, dropAction({ reason: 'CANCEL' }));
+      finish(args);
     },
+    // TODO: can this leave a drag forever unfished?
+    // Should this be a cancel?
     abort: () => finish(),
   };
 }

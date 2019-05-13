@@ -3,9 +3,9 @@ import invariant from 'tiny-invariant';
 import React from 'react';
 import type { Position } from 'css-box-model';
 import { render, fireEvent } from 'react-testing-library';
-import { sloppyClickThreshold } from '../../../../src/view/use-sensor-marshal/sensors/util/is-sloppy-click-threshold-exceeded';
-import * as keyCodes from '../../../../src/view/key-codes';
-import App from './app';
+import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/util/is-sloppy-click-threshold-exceeded';
+import { isDragging } from '../util';
+import App, { type Item } from '../app';
 
 const primaryButton: number = 0;
 
@@ -24,10 +24,6 @@ jest.spyOn(console, 'warn').mockImplementation((message: string) => {
     `Unexpected console.warn("${message}")`,
   );
 });
-
-function isDragging(el: HTMLElement): boolean {
-  return el.getAttribute('data-is-dragging') === 'true';
-}
 
 function getStartingMouseDown(): MouseEvent {
   return new MouseEvent('mousedown', {
@@ -239,3 +235,18 @@ it('should not start a drag if another sensor is capturing', () => {
 
   expect(isDragging(handle)).toBe(false);
 });
+
+it('should not start a drag if disabled', () => {
+  const items: Item[] = [{ id: '0', isEnabled: false }];
+
+  const { getByText } = render(<App items={items} />);
+  const handle: HTMLElement = getByText('item: 0');
+
+  // lift
+  simpleLift(handle);
+
+  // not lifting as is disabled
+  expect(isDragging(handle)).toBe(false);
+});
+
+describe('cancel during pending drag', () => {});

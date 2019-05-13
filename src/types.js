@@ -413,6 +413,7 @@ type SensorFluidLift = {|
 export type SensorLift = SensorSnapLift | SensorFluidLift;
 
 export type ActionLock = {|
+  isActive: () => boolean,
   shouldRespectForcePress: () => boolean,
   // getDragHandleRef: () => HTMLElement,
   // getDraggableRef: () => HTMLElement,
@@ -427,9 +428,9 @@ export type ActionLock = {|
   abort: () => void,
 |};
 
-export type Sensor = (
-  tryGetActionLock: (
-    source: Event | Element,
-    forceStop?: () => void,
-  ) => ?ActionLock,
-) => void;
+export type TryGetActionLock = (
+  source: Event | Element,
+  forceStop?: () => void,
+) => ?ActionLock;
+
+export type Sensor = (tryGetActionLock: TryGetActionLock) => void;

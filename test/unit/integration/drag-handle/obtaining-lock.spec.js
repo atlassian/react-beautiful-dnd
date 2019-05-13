@@ -1,0 +1,131 @@
+// @flow
+import invariant from 'tiny-invariant';
+import React from 'react';
+import { render } from 'react-testing-library';
+import type {
+  TryGetActionLock,
+  ActionLock,
+  Sensor,
+} from '../../../../src/types';
+import App from './app';
+import { isDragging, isDropAnimating } from './util';
+
+function noop() {}
+
+it('should allow an exclusive lock for drag actions', () => {
+  let first: TryGetActionLock;
+  let second: TryGetActionLock;
+
+  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+    first = tryGetLock;
+  };
+  const b: Sensor = (tryGetLock: TryGetActionLock) => {
+    second = tryGetLock;
+  };
+
+  const { getByText } = render(<App sensors={[a, b]} />);
+  invariant(first, 'expected first to be set');
+  invariant(second, 'expected second to be set');
+  const item0: HTMLElement = getByText('item: 0');
+  const item1: HTMLElement = getByText('item: 1');
+
+  // first can get a lock
+  expect(first(item0)).toBeTruthy();
+
+  // second cannot get a lock
+  expect(second(item0)).toBe(null);
+
+  // first cannot get another lock on the same element
+  expect(first(item0)).toBe(null);
+
+  // nothing cannot get lock on a different element
+  expect(first(item1)).toBe(null);
+  expect(second(item1)).toBe(null);
+});
+
+it('should allow a lock to be released', () => {
+  let tryGet: TryGetActionLock;
+  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+    tryGet = tryGetLock;
+  };
+
+  const { getByText } = render(<App sensors={[a]} />);
+  invariant(tryGet, 'expected getter to be set');
+  const handle: HTMLElement = getByText('item: 0');
+
+  Array.from({ length: 4 }).forEach(() => {
+    // get the lock
+    const lock: ?ActionLock = tryGet(handle, noop);
+    expect(lock).toBeTruthy();
+    invariant(lock, 'Expected lock to be set');
+
+    // cannot get another lock
+    expect(tryGet(handle)).toBe(null);
+
+    // release the lock
+    lock.abort();
+  });
+});
+
+it('should not allow a sensor to obtain a on a dropping item, but can claim one on something else while dragging', () => {
+  let tryGet: TryGetActionLock;
+  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+    tryGet = tryGetLock;
+  };
+  const { getByText } = render(<App sensors={[a]} />);
+  invariant(tryGet, 'expected getter to be set');
+  const handle: HTMLElement = getByText('item: 0');
+
+  const lock: ?ActionLock = tryGet(handle, noop);
+  invariant(lock, 'Expected to get lock');
+
+  // drag not started yet
+  expect(isDragging(handle)).toBe(false);
+  // start a drag
+  lock.lift({ mode: 'FLUID', clientSelection: { x: 0, y: 0 } });
+  expect(isDragging(handle)).toBe(true);
+
+  // release the movement
+  lock.move({ x: 100, y: 100 });
+  requestAnimationFrame.flush();
+
+  lock.drop();
+  expect(isDropAnimating(handle)).toBe(true);
+
+  // lock is no longer active
+  expect(lock.isActive()).toBe(false);
+
+  // cannot get a new lock while still dropping
+  expect(tryGet(handle, noop)).toBe(null);
+
+  // can get a lock on a handle that is not dropping - while the other is dropping
+  expect(tryGet(getByText('item: 1'), noop)).toBeTruthy();
+});
+
+it('should release a lock on an "abort", "cancel" or "drop"', () => {
+  let tryGet: TryGetActionLock;
+  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+    tryGet = tryGetLock;
+  };
+  const { getByText } = render(<App sensors={[a]} />);
+  invariant(tryGet, 'expected getter to be set');
+  const handle0: HTMLElement = getByText('item: 0');
+  const handle1: HTMLElement = getByText('item: 1');
+
+  ['drop', 'cancel', 'abort'].forEach((key: string) => {
+    const lock: ?ActionLock = tryGet(handle0, noop);
+    invariant(lock, 'Expected to get lock');
+    expect(lock.isActive()).toBe(true);
+    // should release the lock
+    lock[key]();
+    expect(lock.isActive()).toBe(false);
+
+    // can get another lock
+    const second: ?ActionLock = tryGet(handle1, noop);
+    expect(second).toBeTruthy();
+    invariant(second);
+    // need to release this one :)
+    second.abort();
+    expect(second.isActive()).toBe(false);
+  });
+});
