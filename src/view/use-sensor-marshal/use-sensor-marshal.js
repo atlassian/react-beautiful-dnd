@@ -15,12 +15,12 @@ import type {
 import {
   isClaimed,
   claim,
-  isActive,
+  isActive as isLockActive,
   type Lock,
   release,
   tryAbandon,
 } from './lock';
-import type { Store, Action } from '../../state/store-types';
+import type { Store, Action, Dispatch } from '../../state/store-types';
 import { getClosestDragHandle, getClosestDraggable } from './get-closest';
 import canStartDrag from '../../state/can-start-drag';
 import {
@@ -48,6 +48,7 @@ function preventDefault(event: Event) {
 
 function noop() {}
 
+type LockPhase = 'PRE_DRAG' | 'DRAGGING' | 'FINISHED';
 type TryGetLockArgs = {|
   contextId: ContextId,
   store: Store,
@@ -70,6 +71,20 @@ function getTarget(source: Event | Element): ?Element {
   const target: EventTarget = source.target;
   return target instanceof Element ? target : null;
 }
+
+const tryDispatch = (dispatch: Dispatch, isActive: () => boolean) => (
+  getAction: () => Action,
+): void => {
+  if (!isActive()) {
+    warning(
+      `Cannot perform action. This can occur when actions are outdated or lock is expired.
+
+      Lost: ${JSON.stringify(getAction())}`,
+    );
+    return;
+  }
+  dispatch(getAction());
+};
 
 function tryGetLock({
   contextId,
@@ -125,23 +140,10 @@ function tryGetLock({
 
   // claiming lock
   const lock: Lock = claim(forceSensorStop);
+  let phase: LockPhase = 'PRE_DRAG';
 
-  function abortPreDrag() {
-    if (isActive(lock)) {
-      release();
-    }
-  }
-
-  function tryDispatch(getAction: () => Action): void {
-    if (!isActive(lock)) {
-      warning('Cannot perform action when no longer the owner of the lock');
-      return;
-    }
-    store.dispatch(getAction());
-  }
-
-  function isLockActive() {
-    return isActive(lock);
+  function isPreDragActive() {
+    return phase === 'PRE_DRAG' && isLockActive(lock);
   }
 
   function getShouldRespectForcePress(): boolean {
@@ -163,23 +165,31 @@ function tryGetLock({
           };
 
     // Do lift operation
-    tryDispatch(() => liftAction(actionArgs));
+    tryDispatch(store.dispatch, isPreDragActive)(() => liftAction(actionArgs));
+
+    // We are now in the DRAGGING phase
+    phase = 'DRAGGING';
+
+    function isDraggingActive() {
+      return phase === 'DRAGGING' && isLockActive(lock);
+    }
+    const execute = tryDispatch(store.dispatch, isDraggingActive);
 
     // Setup DragActions
-    const moveUp = () => tryDispatch(moveUpAction);
-    const moveDown = () => tryDispatch(moveDownAction);
-    const moveRight = () => tryDispatch(moveRightAction);
-    const moveLeft = () => tryDispatch(moveLeftAction);
+    const moveUp = () => execute(moveUpAction);
+    const moveDown = () => execute(moveDownAction);
+    const moveRight = () => execute(moveRightAction);
+    const moveLeft = () => execute(moveLeftAction);
 
     const move = rafSchd((clientSelection: Position) => {
-      tryDispatch(() => moveAction({ client: clientSelection }));
+      execute(() => moveAction({ client: clientSelection }));
     });
 
     function finish(
       reason: 'CANCEL' | 'DROP',
       options?: StopDragOptions = { shouldBlockNextClick: false },
     ) {
-      if (!isLockActive()) {
+      if (!isDraggingActive()) {
         warning('Cannot finish a drag when there is no lock');
         return;
       }
@@ -197,13 +207,16 @@ function tryGetLock({
         });
       }
 
+      // We are no longer dragging
+      phase = 'FINISHED';
+
       // releasing lock first so that a tryAbort will not run due to useEffect
       release();
       store.dispatch(dropAction({ reason }));
     }
 
     return {
-      isActive: isLockActive,
+      isActive: isDraggingActive,
       shouldRespectForcePress: getShouldRespectForcePress,
       move,
       moveUp,
@@ -215,8 +228,16 @@ function tryGetLock({
     };
   }
 
+  function abortPreDrag() {
+    if (!isPreDragActive()) {
+      warning('Cannot abort pre drag when no longer active');
+      return;
+    }
+    release();
+  }
+
   const preDrag: PreDragActions = {
-    isActive: isLockActive,
+    isActive: isPreDragActive,
     shouldRespectForcePress: getShouldRespectForcePress,
     lift,
     abort: abortPreDrag,
