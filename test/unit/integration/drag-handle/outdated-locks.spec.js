@@ -83,3 +83,22 @@ it('should not allow drag actions after a drop', () => {
     expect.stringContaining('Cannot perform action'),
   );
 });
+
+it('should not allow drag actions after lock lost', () => {
+  let first: TryGetActionLock;
+  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+    first = tryGetLock;
+  };
+  const { getByText, unmount } = render(<App sensors={[a]} />);
+  invariant(first, 'expected first to be set');
+  const item: HTMLElement = getByText('item: 0');
+
+  const preDrag: ?PreDragActions = first(item);
+  invariant(preDrag);
+  expect(preDrag.isActive()).toBe(true);
+
+  // will cause all lock to be lost
+  unmount();
+
+  expect(preDrag.isActive()).toBe(false);
+});
