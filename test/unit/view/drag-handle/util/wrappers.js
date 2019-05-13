@@ -58,6 +58,7 @@ export const getWrapper = (
   callbacks: Callbacks,
   appContext?: AppContextValue = basicContext,
   shouldRespectForcePress?: boolean = true,
+  timeForLongPress?: number = 150,
 ): ReactWrapper<*> => {
   const ref = createRef();
 
@@ -77,6 +78,7 @@ export const getWrapper = (
             getDraggableRef={ref.getRef}
             canDragInteractiveElements={false}
             getShouldRespectForcePress={getShouldRespectForcePress}
+            timeForLongPress={timeForLongPress}
             {...outer}
           >
             {(dragHandleProps: ?DragHandleProps) => (

@@ -42,7 +42,7 @@ beforeEach(() => {
   jest.spyOn(console, 'warn').mockImplementation(() => {});
   jest.spyOn(console, 'error').mockImplementation(() => {});
   callbacks = getStubCallbacks();
-  wrapper = getWrapper(callbacks);
+  wrapper = getWrapper(callbacks, undefined, undefined, timeForLongPress);
 });
 
 afterEach(() => {
@@ -57,7 +57,7 @@ afterEach(() => {
 const start = () => {
   touchStart(wrapper, origin);
   jest.runTimersToTime(timeForLongPress);
-  wrapper.setProps({ isDragging: true, timeForLongPress });
+  wrapper.setProps({ isDragging: true });
 };
 const end = () => windowTouchEnd();
 const move = (point?: Position = { x: 5, y: 20 }) => {
@@ -470,7 +470,12 @@ describe('disabling a draggable during a drag', () => {
 
       // lift
       const customCallbacks = getStubCallbacks();
-      const customWrapper = getWrapper(customCallbacks);
+      const customWrapper = getWrapper(
+        customCallbacks,
+        undefined,
+        undefined,
+        timeForLongPress,
+      );
       // pending drag started
       touchStart(customWrapper, origin);
 
