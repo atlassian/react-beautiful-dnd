@@ -1,7 +1,7 @@
 // @flow
 import { useEffect } from 'react';
 import { useCallback } from 'use-memo-one';
-import type { ActionLock } from '../types';
+import type { PreDragActions, DragActions } from '../types';
 
 function delay(fn: Function, time?: number = 300) {
   return new Promise(resolve => {
@@ -15,7 +15,10 @@ function delay(fn: Function, time?: number = 300) {
 function noop() {}
 
 export default function useDemoSensor(
-  tryGetActionLock: (source: Event | Element, abort: () => void) => ?ActionLock,
+  tryGetActionLock: (
+    source: Event | Element,
+    abort: () => void,
+  ) => ?PreDragActions,
 ) {
   const start = useCallback(
     async function start() {
@@ -30,18 +33,17 @@ export default function useDemoSensor(
 
       // handle.scrollIntoView();
 
-      const callbacks: ?ActionLock = tryGetActionLock(handle, noop);
+      const preDrag: ?PreDragActions = tryGetActionLock(handle, noop);
 
-      if (!callbacks) {
+      if (!preDrag) {
         console.log('unable to start drag');
         return;
       }
 
-      const { lift, moveDown, moveUp, drop } = callbacks;
-
-      lift({
+      const actions: DragActions = preDrag.lift({
         mode: 'SNAP',
       });
+      const { moveDown, moveUp, drop } = actions;
 
       await delay(moveDown);
       await delay(moveDown);

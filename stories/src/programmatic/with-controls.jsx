@@ -3,7 +3,11 @@
 import React, { useRef, createRef, useState, useCallback } from 'react';
 import styled from '@emotion/styled';
 import type { Quote } from '../types';
-import type { DropResult, ActionLock } from '../../../src/types';
+import type {
+  DropResult,
+  PreDragActions,
+  DragActions,
+} from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import reorder from '../reorder';
@@ -13,7 +17,7 @@ type ControlProps = {|
   quotes: Quote[],
   canLift: boolean,
   isDragging: boolean,
-  lift: (quoteId: string) => ?ActionLock,
+  lift: (quoteId: string) => ?DragActions,
 |};
 
 function noop() {}
@@ -74,13 +78,13 @@ const ActionButton = styled(Button)`
 
 function Controls(props: ControlProps) {
   const { quotes, canLift, isDragging, lift } = props;
-  const callbacksRef = useRef<?ActionLock>(null);
+  const actionsRef = useRef<?DragActions>(null);
 
   const selectRef = createRef();
 
-  function maybe(fn: (callbacks: ActionLock) => void) {
-    if (callbacksRef.current) {
-      fn(callbacksRef.current);
+  function maybe(fn: (callbacks: DragActions) => void) {
+    if (actionsRef.current) {
+      fn(actionsRef.current);
     }
   }
 
@@ -102,7 +106,7 @@ function Controls(props: ControlProps) {
             return;
           }
 
-          callbacksRef.current = lift(select.value);
+          actionsRef.current = lift(select.value);
         }}
       >
         Lift 🏋️‍♀️
@@ -110,8 +114,8 @@ function Controls(props: ControlProps) {
       <ActionButton
         type="button"
         onClick={() =>
-          maybe((callbacks: MovementCallbacks) => {
-            callbacksRef.current = null;
+          maybe((callbacks: DragActions) => {
+            actionsRef.current = null;
             callbacks.drop();
           })
         }
@@ -122,9 +126,7 @@ function Controls(props: ControlProps) {
       <ArrowBox>
         <ArrowButton
           type="button"
-          onClick={() =>
-            maybe((callbacks: MovementCallbacks) => callbacks.moveUp())
-          }
+          onClick={() => maybe((callbacks: DragActions) => callbacks.moveUp())}
           disabled={!isDragging}
           label="up"
         >
@@ -137,7 +139,7 @@ function Controls(props: ControlProps) {
           <ArrowButton
             type="button"
             onClick={() =>
-              maybe((callbacks: MovementCallbacks) => callbacks.moveDown())
+              maybe((callbacks: DragActions) => callbacks.moveDown())
             }
             disabled={!isDragging}
             label="down"
@@ -172,7 +174,7 @@ export default function QuoteApp(props: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [isControlDragging, setIsControlDragging] = useState(false);
   const tryGetActionLock = useRef<
-    (el: Element, stop: () => void) => ?ActionLock,
+    (el: Element, stop: () => void) => ?PreDragActions,
   >(() => null);
 
   const onDragEnd = useCallback(
@@ -199,7 +201,7 @@ export default function QuoteApp(props: Props) {
     [quotes],
   );
 
-  function lift(quoteId: string): ?ActionLock {
+  function lift(quoteId: string): ?DragActions {
     if (isDragging) {
       return null;
     }
@@ -210,17 +212,14 @@ export default function QuoteApp(props: Props) {
       return null;
     }
 
-    const callbacks: ?ActionLock = tryGetActionLock.current(handle, noop);
+    const preDrag: ?PreDragActions = tryGetActionLock.current(handle, noop);
 
-    if (!callbacks) {
+    if (!preDrag) {
       console.log('unable to start capturing');
       return null;
     }
-    console.log('capture started');
-    callbacks.lift({ mode: 'SNAP' });
     setIsControlDragging(true);
-
-    return callbacks;
+    return preDrag.lift({ mode: 'SNAP' });
   }
 
   return (
