@@ -1,6 +1,6 @@
 // @flow
 import rafSchd from 'raf-schd';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useCallback } from 'use-memo-one';
 import type { Position } from 'css-box-model';
 import type {
@@ -12,15 +12,8 @@ import type {
   PreDragActions,
   DragActions,
 } from '../../types';
-import {
-  isClaimed,
-  claim,
-  isActive as isLockActive,
-  type Lock,
-  release,
-  tryAbandon,
-} from './lock';
-import type { Store, Action, Dispatch } from '../../state/store-types';
+import create, { type Lock, type LockAPI } from './lock';
+import type { Store, Action } from '../../state/store-types';
 import { getClosestDragHandle, getClosestDraggable } from './get-closest';
 import canStartDrag from '../../state/can-start-drag';
 import {
@@ -50,6 +43,7 @@ function noop() {}
 
 type LockPhase = 'PRE_DRAG' | 'DRAGGING' | 'FINISHED';
 type TryGetLockArgs = {|
+  lockAPI: LockAPI,
   contextId: ContextId,
   store: Store,
   source: Event | Element,
@@ -59,18 +53,18 @@ type TryGetLockArgs = {|
 type IsActiveArgs = {|
   expected: LockPhase,
   phase: LockPhase,
-  lock: Lock,
+  isLockActive: () => boolean,
   shouldWarn: boolean,
 |};
 
 function isActive({
   expected,
   phase,
-  lock,
+  isLockActive,
   shouldWarn,
 }: IsActiveArgs): boolean {
   // lock is no longer active
-  if (!isLockActive(lock)) {
+  if (!isLockActive()) {
     if (shouldWarn) {
       warning(`
         Cannot perform action.
@@ -121,13 +115,14 @@ function getTarget(source: Event | Element): ?Element {
 }
 
 function tryGetLock({
+  lockAPI,
   contextId,
   store,
   source,
   forceSensorStop,
 }: TryGetLockArgs): ?PreDragActions {
   // lock is already claimed - cannot start
-  if (isClaimed()) {
+  if (lockAPI.isClaimed()) {
     return null;
   }
 
@@ -173,15 +168,19 @@ function tryGetLock({
   }
 
   // claiming lock
-  const lock: Lock = claim(forceSensorStop);
+  const lock: Lock = lockAPI.claim(forceSensorStop);
   let phase: LockPhase = 'PRE_DRAG';
 
   function getShouldRespectForcePress(): boolean {
     return shouldRespectForcePress;
   }
 
+  function isLockActive(): boolean {
+    return lockAPI.isActive(lock);
+  }
+
   function tryDispatch(expected: LockPhase, getAction: () => Action): void {
-    if (isActive({ expected, phase, lock, shouldWarn: true })) {
+    if (isActive({ expected, phase, isLockActive, shouldWarn: true })) {
       store.dispatch(getAction());
     }
   }
@@ -239,7 +238,7 @@ function tryGetLock({
       phase = 'FINISHED';
 
       // releasing lock first so that a tryAbort will not run due to useEffect
-      release();
+      lockAPI.release();
       store.dispatch(dropAction({ reason }));
     }
 
@@ -248,7 +247,7 @@ function tryGetLock({
         isActive({
           expected: 'DRAGGING',
           phase,
-          lock,
+          isLockActive,
           // Do not want to want warnings for boolean checks
           shouldWarn: false,
         }),
@@ -267,12 +266,12 @@ function tryGetLock({
     const shouldRelease: boolean = isActive({
       expected: 'PRE_DRAG',
       phase,
-      lock,
+      isLockActive,
       shouldWarn: true,
     });
 
     if (shouldRelease) {
-      release();
+      lockAPI.release();
     }
   }
 
@@ -281,7 +280,7 @@ function tryGetLock({
       isActive({
         expected: 'PRE_DRAG',
         phase,
-        lock,
+        isLockActive,
         // Do not want to want warnings for boolean checks
         shouldWarn: false,
       }),
@@ -307,6 +306,7 @@ export default function useSensorMarshal({
   customSensors,
 }: SensorMarshalArgs) {
   const useSensors: Sensor[] = [...defaultSensors, ...(customSensors || [])];
+  const lockAPI: LockAPI = useState(() => create())[0];
 
   // We need to abort any capturing if there is no longer a drag
   useEffect(
@@ -316,7 +316,7 @@ export default function useSensorMarshal({
         const current: State = store.getState();
 
         if (previous.isDragging && !current.isDragging) {
-          tryAbandon();
+          lockAPI.tryAbandon();
         }
 
         previous = current;
@@ -325,23 +325,24 @@ export default function useSensorMarshal({
       // unsubscribe from store when unmounting
       return unsubscribe;
     },
-    [store],
+    [lockAPI, store],
   );
 
   // abort any lock on unmount
   useLayoutEffect(() => {
-    return tryAbandon;
-  }, []);
+    return lockAPI.tryAbandon;
+  }, [lockAPI.tryAbandon]);
 
   const wrapper = useCallback(
     (source: Event | Element, forceStop?: () => void = noop): ?PreDragActions =>
       tryGetLock({
+        lockAPI,
         contextId,
         store,
         source,
         forceSensorStop: forceStop,
       }),
-    [contextId, store],
+    [contextId, lockAPI, store],
   );
 
   // Bad ass
