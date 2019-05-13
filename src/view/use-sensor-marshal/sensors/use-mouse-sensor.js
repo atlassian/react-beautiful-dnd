@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import { useEffect, useRef } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
-import type { ActionLock } from '../../../types';
+import type { PreDragActions, DragActions } from '../../../types';
 import type {
   EventBinding,
   EventOptions,
@@ -30,12 +30,12 @@ type Idle = {|
 type Pending = {|
   type: 'PENDING',
   point: Position,
-  callbacks: ActionLock,
+  actions: PreDragActions,
 |};
 
 type Dragging = {|
   type: 'DRAGGING',
-  callbacks: ActionLock,
+  actions: DragActions,
 |};
 
 type Phase = Idle | Pending | Dragging;
@@ -75,7 +75,7 @@ function getCaptureBindings({
         if (phase.type === 'DRAGGING') {
           // preventing default as we are using this event
           event.preventDefault();
-          phase.callbacks.move(point);
+          phase.actions.move(point);
           return;
         }
 
@@ -91,14 +91,14 @@ function getCaptureBindings({
         // preventing default as we are using this event
         event.preventDefault();
 
-        setPhase({
-          type: 'DRAGGING',
-          callbacks: phase.callbacks,
-        });
-
-        phase.callbacks.lift({
+        const actions: DragActions = phase.actions.lift({
           clientSelection: pending,
           mode: 'FLUID',
+        });
+
+        setPhase({
+          type: 'DRAGGING',
+          actions,
         });
       },
     },
@@ -114,7 +114,7 @@ function getCaptureBindings({
 
         // preventing default as we are using this event
         event.preventDefault();
-        phase.callbacks.drop({ shouldBlockNextClick: true });
+        phase.actions.drop({ shouldBlockNextClick: true });
         completed();
       },
     },
@@ -189,7 +189,7 @@ function getCaptureBindings({
         invariant(phase.type !== 'IDLE', 'Unexpected phase');
 
         // might not be respecting force press
-        if (!phase.callbacks.shouldRespectForcePress()) {
+        if (!phase.actions.shouldRespectForcePress()) {
           event.preventDefault();
           return;
         }
@@ -210,7 +210,7 @@ function getCaptureBindings({
 }
 
 export default function useMouseSensor(
-  tryStartCapturing: (event: Event, abort: () => void) => ?ActionLock,
+  tryStartCapturing: (event: Event, abort: () => void) => ?PreDragActions,
 ) {
   const phaseRef = useRef<Phase>(idle);
   const unbindEventsRef = useRef<() => void>(noop);
@@ -235,9 +235,9 @@ export default function useMouseSensor(
 
         // stop is defined later
         // eslint-disable-next-line no-use-before-define
-        const callbacks: ?ActionLock = tryStartCapturing(event, stop);
+        const actions: ?PreDragActions = tryStartCapturing(event, stop);
 
-        if (!callbacks) {
+        if (!actions) {
           return;
         }
 
@@ -253,7 +253,7 @@ export default function useMouseSensor(
         unbindEventsRef.current();
         // using this function before it is defined as their is a circular usage pattern
         // eslint-disable-next-line no-use-before-define
-        startPendingDrag(callbacks, point);
+        startPendingDrag(actions, point);
       },
     }),
     // not including startPendingDrag as it is not defined initially
@@ -278,7 +278,6 @@ export default function useMouseSensor(
   );
 
   const stop = useCallback(() => {
-    console.log('trying to stop');
     const current: Phase = phaseRef.current;
     if (current.type === 'IDLE') {
       return;
@@ -294,10 +293,10 @@ export default function useMouseSensor(
     const phase: Phase = phaseRef.current;
     stop();
     if (phase.type === 'DRAGGING') {
-      phase.callbacks.cancel({ shouldBlockNextClick: true });
+      phase.actions.cancel({ shouldBlockNextClick: true });
     }
     if (phase.type === 'PENDING') {
-      phase.callbacks.abort();
+      phase.actions.abort();
     }
   }, [stop]);
 
@@ -319,7 +318,7 @@ export default function useMouseSensor(
   );
 
   const startPendingDrag = useCallback(
-    function startPendingDrag(callbacks: ActionLock, point: Position) {
+    function startPendingDrag(actions: PreDragActions, point: Position) {
       invariant(
         phaseRef.current.type === 'IDLE',
         'Expected to move from IDLE to PENDING drag',
@@ -327,7 +326,7 @@ export default function useMouseSensor(
       phaseRef.current = {
         type: 'PENDING',
         point,
-        callbacks,
+        actions,
       };
       bindCapturingEvents();
     },

@@ -1,32 +1,36 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { DraggableId } from '../../types';
-import { warning } from '../../dev-warning';
 
-type Lock = {|
-  id: DraggableId,
-  abort: () => void,
+export type Lock = {|
+  abandon: () => void,
 |};
 
 let lock: ?Lock = null;
 
-export function getLock(): ?Lock {
-  return lock;
+export function isClaimed(): boolean {
+  return Boolean(lock);
 }
 
-export function obtainLock(id: DraggableId, abort: () => void) {
-  invariant(!lock, 'Cannot claim lock as it is already claimed');
-  lock = { id, abort };
+export function isActive(value: Lock): boolean {
+  return value === lock;
 }
-export function releaseLock() {
+
+export function claim(abandon: () => void): Lock {
+  invariant(!lock, 'Cannot claim lock as it is already claimed');
+  const newLock: Lock = { abandon };
+  // update singleton
+  lock = newLock;
+  // return lock
+  return newLock;
+}
+export function release() {
   invariant(lock, 'Cannot release lock when there is no lock');
   lock = null;
 }
-export function tryAbortLock() {
+
+export function tryAbandon() {
   if (lock) {
-    lock.abort();
-    if (lock != null) {
-      warning('aborting lock did not clear it');
-    }
+    lock.abandon();
+    release();
   }
 }

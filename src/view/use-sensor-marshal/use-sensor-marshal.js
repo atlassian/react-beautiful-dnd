@@ -8,10 +8,18 @@ import type {
   State,
   Sensor,
   SensorLift,
-  ActionLock,
-  ReleaseLockOptions,
+  StopDragOptions,
+  PreDragActions,
+  DragActions,
 } from '../../types';
-import { getLock, obtainLock, releaseLock, tryAbortLock } from './lock';
+import {
+  isClaimed,
+  claim,
+  isActive,
+  type Lock,
+  release,
+  tryAbandon,
+} from './lock';
 import type { Store, Action } from '../../state/store-types';
 import { getClosestDragHandle, getClosestDraggable } from './get-closest';
 import canStartDrag from '../../state/can-start-drag';
@@ -68,9 +76,9 @@ function tryGetLock({
   store,
   source,
   forceSensorStop,
-}: TryGetLockArgs): ?ActionLock {
-  // there is already a lock - cannot start
-  if (getLock() != null) {
+}: TryGetLockArgs): ?PreDragActions {
+  // lock is already claimed - cannot start
+  if (isClaimed()) {
     return null;
   }
 
@@ -84,6 +92,7 @@ function tryGetLock({
 
   const handle: ?HTMLElement = getClosestDragHandle(contextId, target);
 
+  // event did not contain a drag handle parent - cannot start
   if (handle == null) {
     return null;
   }
@@ -96,7 +105,7 @@ function tryGetLock({
     isEnabled,
   } = getOptionsFromDraggable(draggable);
 
-  // draggable is not enabled - don't start the drag
+  // draggable is not enabled - cannot start
   if (!isEnabled) {
     return null;
   }
@@ -109,44 +118,37 @@ function tryGetLock({
     return null;
   }
 
+  // Application might now allow dragging right now
   if (!canStartDrag(store.getState(), id)) {
     return null;
   }
 
-  // TODO: what if a sensor does not call .abort
-  let hasLock: boolean = true;
-  let isLifted: boolean = false;
+  // claiming lock
+  const lock: Lock = claim(forceSensorStop);
 
-  function ifHasLock(maybe: Function) {
-    if (hasLock) {
-      maybe();
-      return;
+  function abortPreDrag() {
+    if (isActive(lock)) {
+      release();
     }
-    warning(
-      'Trying to perform operation when no longer owner of sensor action lock',
-    );
   }
 
   function tryDispatch(getAction: () => Action): void {
-    if (!hasLock) {
-      console.log('BOOM');
-      warning(
-        'Trying to perform operation when no longer responsible for capturing',
-      );
+    if (!isActive(lock)) {
+      warning('Cannot perform action when no longer the owner of the lock');
       return;
     }
     store.dispatch(getAction());
   }
-  const moveUp = () => tryDispatch(moveUpAction);
-  const moveDown = () => tryDispatch(moveDownAction);
-  const moveRight = () => tryDispatch(moveRightAction);
-  const moveLeft = () => tryDispatch(moveLeftAction);
 
-  const move = rafSchd((clientSelection: Position) => {
-    ifHasLock(() => store.dispatch(moveAction({ client: clientSelection })));
-  });
+  function isLockActive() {
+    return isActive(lock);
+  }
 
-  function lift(args: SensorLift) {
+  function getShouldRespectForcePress(): boolean {
+    return shouldRespectForcePress;
+  }
+
+  function lift(args: SensorLift): DragActions {
     const actionArgs =
       args.mode === 'FLUID'
         ? {
@@ -160,65 +162,67 @@ function tryGetLock({
             id,
           };
 
+    // Do lift operation
     tryDispatch(() => liftAction(actionArgs));
-  }
 
-  function finish(
-    options?: ReleaseLockOptions = { shouldBlockNextClick: false },
-    reason?: 'CANCEL' | 'DROP' = 'CANCEL',
-  ) {
-    if (!hasLock) {
-      warning('Cannot finish a drag when there is no lock');
-      return;
-    }
+    // Setup DragActions
+    const moveUp = () => tryDispatch(moveUpAction);
+    const moveDown = () => tryDispatch(moveDownAction);
+    const moveRight = () => tryDispatch(moveRightAction);
+    const moveLeft = () => tryDispatch(moveLeftAction);
 
-    // cancel any pending request animation frames
-    move.cancel();
+    const move = rafSchd((clientSelection: Position) => {
+      tryDispatch(() => moveAction({ client: clientSelection }));
+    });
 
-    // block next click if requested
-    if (options.shouldBlockNextClick) {
-      window.addEventListener('click', preventDefault, {
-        // only blocking a single click
-        once: true,
-        passive: false,
-        capture: true,
-      });
-    }
+    function finish(
+      reason: 'CANCEL' | 'DROP',
+      options?: StopDragOptions = { shouldBlockNextClick: false },
+    ) {
+      if (!isLockActive()) {
+        warning('Cannot finish a drag when there is no lock');
+        return;
+      }
 
-    if (isLifted) {
+      // Cancel any pending request animation frames
+      move.cancel();
+
+      // block next click if requested
+      if (options.shouldBlockNextClick) {
+        window.addEventListener('click', preventDefault, {
+          // only blocking a single click
+          once: true,
+          passive: false,
+          capture: true,
+        });
+      }
+
+      // releasing lock first so that a tryAbort will not run due to useEffect
+      release();
       store.dispatch(dropAction({ reason }));
     }
 
-    // release the lock and record that we no longer have it
-    isLifted = false;
-    hasLock = false;
-    releaseLock();
+    return {
+      isActive: isLockActive,
+      shouldRespectForcePress: getShouldRespectForcePress,
+      move,
+      moveUp,
+      moveDown,
+      moveRight,
+      moveLeft,
+      drop: (options?: StopDragOptions) => finish('DROP', options),
+      cancel: (options?: StopDragOptions) => finish('CANCEL', options),
+    };
   }
 
-  obtainLock(id, function abort() {
-    forceSensorStop();
-    finish();
-  });
-
-  return {
-    isActive: (): boolean => hasLock,
-    shouldRespectForcePress: (): boolean => shouldRespectForcePress,
+  const preDrag: PreDragActions = {
+    isActive: isLockActive,
+    shouldRespectForcePress: getShouldRespectForcePress,
     lift,
-    move,
-    moveUp,
-    moveDown,
-    moveRight,
-    moveLeft,
-    drop: (args?: ReleaseLockOptions) => {
-      finish(args, 'DROP');
-    },
-    cancel: (args?: ReleaseLockOptions) => {
-      finish(args);
-    },
-    // TODO: can this leave a drag forever unfished?
-    // Should this be a cancel?
-    abort: () => finish(),
+    abort: abortPreDrag,
   };
+
+  return preDrag;
 }
 
 type SensorMarshalArgs = {|
@@ -244,24 +248,25 @@ export default function useSensorMarshal({
         const current: State = store.getState();
 
         if (previous.isDragging && !current.isDragging) {
-          tryAbortLock();
+          tryAbandon();
         }
 
         previous = current;
       });
 
+      // unsubscribe from store when unmounting
       return unsubscribe;
     },
     [store],
   );
 
-  // abort any captures on unmount
+  // abort any lock on unmount
   useLayoutEffect(() => {
-    return tryAbortLock;
+    return tryAbandon;
   }, []);
 
   const wrapper = useCallback(
-    (source: Event | Element, forceStop?: () => void = noop): ?ActionLock =>
+    (source: Event | Element, forceStop?: () => void = noop): ?PreDragActions =>
       tryGetLock({
         contextId,
         store,

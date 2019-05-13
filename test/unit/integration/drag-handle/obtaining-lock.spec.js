@@ -4,7 +4,8 @@ import React from 'react';
 import { render } from 'react-testing-library';
 import type {
   TryGetActionLock,
-  ActionLock,
+  PreDragActions,
+  DragActions,
   Sensor,
 } from '../../../../src/types';
 import App from './app';
@@ -55,7 +56,7 @@ it('should allow a lock to be released', () => {
 
   Array.from({ length: 4 }).forEach(() => {
     // get the lock
-    const lock: ?ActionLock = tryGet(handle, noop);
+    const lock: ?PreDragActions = tryGet(handle, noop);
     expect(lock).toBeTruthy();
     invariant(lock, 'Expected lock to be set');
 
@@ -76,24 +77,28 @@ it('should not allow a sensor to obtain a on a dropping item, but can claim one 
   invariant(tryGet, 'expected getter to be set');
   const handle: HTMLElement = getByText('item: 0');
 
-  const lock: ?ActionLock = tryGet(handle, noop);
-  invariant(lock, 'Expected to get lock');
+  const preDrag: ?PreDragActions = tryGet(handle, noop);
+  invariant(preDrag, 'Expected to get lock');
 
   // drag not started yet
   expect(isDragging(handle)).toBe(false);
   // start a drag
-  lock.lift({ mode: 'FLUID', clientSelection: { x: 0, y: 0 } });
+  const actions: DragActions = preDrag.lift({
+    mode: 'FLUID',
+    clientSelection: { x: 0, y: 0 },
+  });
   expect(isDragging(handle)).toBe(true);
 
   // release the movement
-  lock.move({ x: 100, y: 100 });
+  actions.move({ x: 100, y: 100 });
   requestAnimationFrame.flush();
 
-  lock.drop();
+  actions.drop();
   expect(isDropAnimating(handle)).toBe(true);
 
   // lock is no longer active
-  expect(lock.isActive()).toBe(false);
+  expect(actions.isActive()).toBe(false);
+  expect(preDrag.isActive()).toBe(false);
 
   // cannot get a new lock while still dropping
   expect(tryGet(handle, noop)).toBe(null);
@@ -102,7 +107,7 @@ it('should not allow a sensor to obtain a on a dropping item, but can claim one 
   expect(tryGet(getByText('item: 1'), noop)).toBeTruthy();
 });
 
-it('should release a lock on an "abort", "cancel" or "drop"', () => {
+it('should release a lock when aborting a pre drag', () => {
   let tryGet: TryGetActionLock;
   const a: Sensor = (tryGetLock: TryGetActionLock) => {
     tryGet = tryGetLock;
@@ -112,20 +117,52 @@ it('should release a lock on an "abort", "cancel" or "drop"', () => {
   const handle0: HTMLElement = getByText('item: 0');
   const handle1: HTMLElement = getByText('item: 1');
 
-  ['drop', 'cancel', 'abort'].forEach((key: string) => {
-    const lock: ?ActionLock = tryGet(handle0, noop);
-    invariant(lock, 'Expected to get lock');
-    expect(lock.isActive()).toBe(true);
-    // should release the lock
-    lock[key]();
-    expect(lock.isActive()).toBe(false);
+  const preDrag: ?PreDragActions = tryGet(handle0, noop);
+  invariant(preDrag, 'Expected to get lock');
+  expect(preDrag.isActive()).toBe(true);
+  // should release the lock
+  preDrag.abort();
+  expect(preDrag.isActive()).toBe(false);
 
-    // can get another lock
-    const second: ?ActionLock = tryGet(handle1, noop);
-    expect(second).toBeTruthy();
-    invariant(second);
-    // need to release this one :)
-    second.abort();
-    expect(second.isActive()).toBe(false);
+  // can get another lock
+  const second: ?PreDragActions = tryGet(handle1, noop);
+  expect(second).toBeTruthy();
+  invariant(second);
+  // need to release this one :)
+  second.abort();
+  expect(second.isActive()).toBe(false);
+});
+
+it('should release a lock when cancelling or dropping a drag', () => {
+  let tryGet: TryGetActionLock;
+  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+    tryGet = tryGetLock;
+  };
+  const { getByText } = render(<App sensors={[a]} />);
+  invariant(tryGet, 'expected getter to be set');
+  const handle0: HTMLElement = getByText('item: 0');
+  const handle1: HTMLElement = getByText('item: 1');
+
+  ['cancel', 'drop'].forEach((property: string) => {
+    const preDrag: ?PreDragActions = tryGet(handle0, noop);
+    invariant(preDrag, 'Expected to get lock');
+    expect(preDrag.isActive()).toBe(true);
+
+    const drag: DragActions = preDrag.lift({ mode: 'SNAP' });
+    expect(drag.isActive()).toBe(true);
+
+    // cannot get another lock
+    const second: ?PreDragActions = tryGet(handle1, noop);
+    expect(second).toBe(null);
+
+    // calling canel or drop
+    drag[property]();
+
+    // can now get another lock
+    const third: ?PreDragActions = tryGet(handle1, noop);
+    expect(third).toBeTruthy();
+    // need to try to release it
+    invariant(third);
+    third.abort();
   });
 });

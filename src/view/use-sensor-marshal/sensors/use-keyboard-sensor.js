@@ -2,7 +2,7 @@
 import invariant from 'tiny-invariant';
 import { useRef, useEffect } from 'react';
 import { useMemo, useCallback } from 'use-memo-one';
-import type { MovementCallbacks } from '../sensor-types';
+import type { PreDragActions, DragActions } from '../../../types';
 import type {
   EventBinding,
   EventOptions,
@@ -26,17 +26,17 @@ const scrollJumpKeys: KeyMap = {
 };
 
 function getDraggingBindings(
-  callbacks: MovementCallbacks,
+  actions: DragActions,
   stop: () => void,
 ): EventBinding[] {
   function cancel() {
     stop();
-    callbacks.cancel();
+    actions.cancel();
   }
 
   function drop() {
     stop();
-    callbacks.drop();
+    actions.drop();
   }
 
   return [
@@ -61,25 +61,25 @@ function getDraggingBindings(
 
         if (event.keyCode === keyCodes.arrowDown) {
           event.preventDefault();
-          callbacks.moveDown();
+          actions.moveDown();
           return;
         }
 
         if (event.keyCode === keyCodes.arrowUp) {
           event.preventDefault();
-          callbacks.moveUp();
+          actions.moveUp();
           return;
         }
 
         if (event.keyCode === keyCodes.arrowRight) {
           event.preventDefault();
-          callbacks.moveRight();
+          actions.moveRight();
           return;
         }
 
         if (event.keyCode === keyCodes.arrowLeft) {
           event.preventDefault();
-          callbacks.moveLeft();
+          actions.moveLeft();
           return;
         }
 
@@ -136,7 +136,7 @@ export default function useKeyboardSensor(
   tryStartCapturing: (
     source: Event | Element,
     abort: () => void,
-  ) => ?MovementCallbacks,
+  ) => ?PreDragActions,
 ) {
   const unbindEventsRef = useRef<() => void>(noop);
 
@@ -156,10 +156,10 @@ export default function useKeyboardSensor(
 
         // abort function not defined yet
         // eslint-disable-next-line no-use-before-define
-        const callbacks: ?MovementCallbacks = tryStartCapturing(event, stop);
+        const preDrag: ?PreDragActions = tryStartCapturing(event, stop);
 
         // Cannot start capturing at this time
-        if (!callbacks) {
+        if (!preDrag) {
           return;
         }
 
@@ -169,7 +169,7 @@ export default function useKeyboardSensor(
 
         // There is no pending period for a keyboard drag
         // We can lift immediately
-        callbacks.lift({
+        const actions: DragActions = preDrag.lift({
           mode: 'SNAP',
         });
 
@@ -194,7 +194,7 @@ export default function useKeyboardSensor(
         // bind dragging listeners
         unbindEventsRef.current = bindEvents(
           window,
-          getDraggingBindings(callbacks, stop),
+          getDraggingBindings(actions, stop),
           { capture: true, passive: false },
         );
       },
