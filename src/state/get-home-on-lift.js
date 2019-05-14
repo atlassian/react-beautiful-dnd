@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import getHomeLocation from './get-home-location';
 import type {
   DraggableDimension,
@@ -41,8 +42,13 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
     draggables,
   );
 
+  // in a list that does not start at 0 the descriptor.index might be different from the index in the list
+  // eg a list could be: [2,3,4]. A descriptor.index of '2' would actually be in index '0' of the list
+  const rawIndex: number = insideHome.indexOf(draggable);
+  invariant(rawIndex !== -1, 'Expected draggable to be inside home list');
+
   const originallyDisplaced: DraggableDimension[] = insideHome.slice(
-    draggable.descriptor.index + 1,
+    rawIndex + 1,
   );
   const wasDisplaced: DraggableIdMap = originallyDisplaced.reduce(
     (previous: DraggableIdMap, item: DraggableDimension): DraggableIdMap => {

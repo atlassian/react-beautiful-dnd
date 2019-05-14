@@ -88,7 +88,7 @@ export default ({
     pageBorderBoxCenterWithDroppableScrollChange,
     destination,
     draggable,
-    insideDestinationWithoutDraggable,
+    insideDestination,
     previousImpact,
     viewport,
     userDirection,

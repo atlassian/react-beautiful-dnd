@@ -17,12 +17,13 @@ import getDisplacementMap from '../get-displacement-map';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
+import removeDraggableFromList from '../remove-draggable-from-list';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
   draggable: DraggableDimension,
   destination: DroppableDimension,
-  insideDestinationWithoutDraggable: DraggableDimension[],
+  insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
   viewport: Viewport,
   userDirection: UserDirection,
@@ -33,7 +34,7 @@ export default ({
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
   draggable,
   destination,
-  insideDestinationWithoutDraggable,
+  insideDestination,
   previousImpact,
   viewport,
   userDirection,
@@ -50,6 +51,11 @@ export default ({
   );
   const targetCenter: number = currentCenter[axis.line];
   const displacement: number = displacedBy.value;
+
+  const insideDestinationWithoutDraggable = removeDraggableFromList(
+    draggable,
+    insideDestination,
+  );
 
   const displaced: Displacement[] = insideDestinationWithoutDraggable
     .filter(
@@ -99,8 +105,12 @@ export default ({
         }),
     );
 
-  const newIndex: number =
-    insideDestinationWithoutDraggable.length - displaced.length;
+  // This is needed as we support lists with indexes that do not start from 0
+  const rawIndexOfLastItem: number = insideDestination.length
+    ? insideDestination[insideDestination.length - 1].descriptor.index
+    : 0;
+
+  const newIndex: number = rawIndexOfLastItem - displaced.length;
 
   const movement: DragMovement = {
     displacedBy,
