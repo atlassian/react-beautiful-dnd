@@ -44,7 +44,6 @@ export default ({
       return fromReorder({
         isMovingForward,
         isInHomeList,
-        draggable,
         location: previousImpact.destination,
         insideDestination,
       });
@@ -84,17 +83,28 @@ export default ({
     }
 
     if (isMovingForward) {
+      console.log('remove closest');
       return removeClosest(lastDisplaced);
     }
 
     // moving backwards - will increase the amount of displaced items
-
     const withoutDraggable: DraggableDimension[] = removeDraggableFromList(
       draggable,
       insideDestination,
     );
 
-    const atProposedIndex: DraggableDimension = withoutDraggable[proposedIndex];
+    console.log('trying to add at logical index');
+    const startIndex: number = insideDestination[0].descriptor.index;
+    const atProposedIndex: ?DraggableDimension =
+      withoutDraggable[proposedIndex - startIndex];
+    invariant(
+      atProposedIndex,
+      `Could not find item at proposed index ${proposedIndex}`,
+    );
+    console.log('add closest', {
+      proposedIndex,
+      item: atProposedIndex.descriptor,
+    });
     return addClosest(atProposedIndex, lastDisplaced);
   })();
 

@@ -18,6 +18,7 @@ import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
 import removeDraggableFromList from '../remove-draggable-from-list';
+import isHomeOf from '../droppable/is-home-of';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
@@ -106,9 +107,19 @@ export default ({
     );
 
   // This is needed as we support lists with indexes that do not start from 0
-  const rawIndexOfLastItem: number = insideDestination.length
-    ? insideDestination[insideDestination.length - 1].descriptor.index
-    : 0;
+  const rawIndexOfLastItem: number = (() => {
+    if (!insideDestination.length) {
+      return 0;
+    }
+
+    const indexOfLastItem: number =
+      insideDestination[insideDestination.length - 1].descriptor.index;
+
+    // When in a foreign list there will be an additional one item in the list
+    return isHomeOf(draggable, destination)
+      ? indexOfLastItem
+      : indexOfLastItem + 1;
+  })();
 
   const newIndex: number = rawIndexOfLastItem - displaced.length;
 

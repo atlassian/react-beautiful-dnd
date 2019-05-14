@@ -90,28 +90,43 @@ export default ({
       moveRelativeTo.page.borderBox.center[destination.axis.line],
   );
 
-  // Moving to a populated list
-  const targetIndex: number = insideDestination.indexOf(moveRelativeTo);
-  invariant(targetIndex !== -1, 'Cannot find target in list');
-
   const proposedIndex: number = (() => {
-    // TODO: is this logic correct?
+    const relativeTo: number = moveRelativeTo.descriptor.index;
+
     if (moveRelativeTo.descriptor.id === draggable.descriptor.id) {
-      return targetIndex;
+      return relativeTo;
     }
 
     if (isGoingBeforeTarget) {
-      return targetIndex;
+      return relativeTo;
     }
 
-    return targetIndex + 1;
+    return relativeTo + 1;
   })();
+
+  const sliceFrom: number = (() => {
+    const firstIndex: number = insideDestination[0].descriptor.index;
+    return proposedIndex - firstIndex;
+  })();
+
+  console.log(
+    {
+      moveRelativeTo: moveRelativeTo.descriptor.id,
+      sliceFrom,
+      proposedIndex,
+      // isGoingBeforeTarget,
+    },
+    {
+      droppableId: destination.descriptor.id,
+      index: proposedIndex,
+    },
+  );
 
   const displaced: Displacement[] = removeDraggableFromList(
     draggable,
     insideDestination,
   )
-    .slice(proposedIndex)
+    .slice(sliceFrom)
     .map(
       (dimension: DraggableDimension): Displacement =>
         getDisplacement({
