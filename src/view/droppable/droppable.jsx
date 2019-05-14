@@ -106,6 +106,7 @@ export default function Droppable(props: Props) {
     () => ({
       droppableId,
       type,
+      usingCloneWhenDragging: true,
     }),
     [droppableId, type],
   );

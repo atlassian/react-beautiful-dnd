@@ -1,5 +1,5 @@
 // @flow
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import { useMemo, useCallback } from 'use-memo-one';
@@ -20,6 +20,9 @@ import getWindowScroll from '../window/get-window-scroll';
 // import throwIfRefIsInvalid from '../throw-if-invalid-inner-ref';
 // import checkOwnProps from './check-own-props';
 import AppContext, { type AppContextValue } from '../context/app-context';
+import DroppableContext, {
+  type DroppableContextValue,
+} from '../context/droppable-context';
 import useRequiredContext from '../use-required-context';
 import useValidation from './use-validation';
 
@@ -33,6 +36,10 @@ export default function Draggable(props: Props) {
 
   // context
   const appContext: AppContextValue = useRequiredContext(AppContext);
+  const droppableContext: DroppableContextValue = useRequiredContext(
+    DroppableContext,
+  );
+  const { usingCloneWhenDragging } = droppableContext;
 
   // Validating props and innerRef
   useValidation(props, getRef);
@@ -210,6 +217,27 @@ export default function Draggable(props: Props) {
     setRef,
     shouldRespectForcePress,
   ]);
+
+  if (isDragging && usingCloneWhenDragging) {
+    return (
+      <div
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        style={{
+          ...provided.draggableProps.style,
+          backgroundColor: 'pink',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 80,
+        }}
+      >
+        <span role="img" aria-label="rock on">
+          🤘
+        </span>
+      </div>
+    );
+  }
 
   return children(provided, mapped.snapshot);
 }

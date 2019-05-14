@@ -36,7 +36,11 @@ export default function useValidation(
     if (process.env.NODE_ENV !== 'production') {
       checkOwnProps(props);
       checkForOutdatedProps(props);
-      checkIsValidInnerRef(getRef());
+
+      // TODO: run check when virtual?
+      if (props.mapped.type !== 'DRAGGING') {
+        checkIsValidInnerRef(getRef());
+      }
     }
   });
 }
