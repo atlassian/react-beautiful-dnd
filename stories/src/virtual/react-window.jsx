@@ -11,8 +11,10 @@ import {
   type DraggableProvided,
   type DraggableStateSnapshot,
   type DraggableLocation,
+  type DropResult,
 } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
+import reorder from '../reorder';
 
 type Props = {|
   initial: Quote[],
@@ -64,10 +66,26 @@ const Row = React.memo(({ data: quotes, index, style }) => {
 }, areEqual);
 
 function App(props: Props) {
-  const quotes: Quote[] = useState(() => props.initial)[0];
+  const [quotes, setQuotes] = useState(() => props.initial);
+
+  function onDragEnd(result: DropResult) {
+    if (!result.destination) {
+      return;
+    }
+    if (result.source.index === result.destination.index) {
+      return;
+    }
+
+    const newQuotes: Quote[] = reorder(
+      quotes,
+      result.source.index,
+      result.destination.index,
+    );
+    setQuotes(newQuotes);
+  }
 
   return (
-    <DragDropContext onDragEnd={() => {}}>
+    <DragDropContext onDragEnd={onDragEnd}>
       <Droppable
         droppableId="droppable"
         whenDraggingClone={(

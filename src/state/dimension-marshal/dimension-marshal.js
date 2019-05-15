@@ -158,10 +158,10 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    invariant(
-      collection.critical.draggable.id !== descriptor.id,
-      'Cannot remove the dragging item during a drag',
-    );
+    // invariant(
+    //   collection.critical.draggable.id !== descriptor.id,
+    //   'Cannot remove the dragging item during a drag',
+    // );
 
     throwIfAddOrRemoveOfWrongType(collection, descriptor);
 

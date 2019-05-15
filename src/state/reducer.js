@@ -31,6 +31,7 @@ import update from './post-reducer/when-moving/update';
 import refreshSnap from './post-reducer/when-moving/refresh-snap';
 import getHomeOnLift from './get-home-on-lift';
 import patchDimensionMap from './patch-dimension-map';
+import publishWhileDraggingInVirtual from './publish-while-dragging-in-virtual';
 
 const isSnapping = (state: StateWhenUpdatesAllowed): boolean =>
   state.movementMode === 'SNAP';
@@ -161,7 +162,7 @@ export default (state: State = idle, action: Action): State => {
       `Unexpected ${action.type} received in phase ${state.phase}`,
     );
 
-    return publishWhileDragging({
+    return publishWhileDraggingInVirtual({
       state,
       published: action.payload,
     });
