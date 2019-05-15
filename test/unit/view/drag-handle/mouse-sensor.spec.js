@@ -4,6 +4,7 @@ import { type ReactWrapper } from 'enzyme';
 import { sloppyClickThreshold } from '../../../../src/view/use-drag-handle/util/is-sloppy-click-threshold-exceeded';
 import * as keyCodes from '../../../../src/view/key-codes';
 import getWindowScroll from '../../../../src/view/window/get-window-scroll';
+import * as getWindowFromEl from '../../../../src/view/window/get-window-from-el';
 import setWindowScroll from '../../../utils/set-window-scroll';
 import {
   dispatchWindowEvent,
@@ -603,7 +604,7 @@ describe('window scroll during drag', () => {
     ).toBe(true);
   });
 
-  it('should not fire an onWindowScroll if it is not the window scrolling (ie11 bug)', () => {
+  it('should not fire an onWindowScroll if the scroll event was not dispatched from window (ie11 bug)', () => {
     // start the lift
     mouseDown(wrapper);
     windowMouseMove({ x: 0, y: sloppyClickThreshold });
@@ -612,17 +613,25 @@ describe('window scroll during drag', () => {
     // trigger scroll event
     const scrollable: HTMLElement = document.createElement('div');
     const fakeEvent: Event = new Event('scroll');
+    const fakeWindow: HTMLElement = document.createElement('div');
+    const getWindowSpy = jest
+      .spyOn(getWindowFromEl, 'default')
+      .mockImplementation(() => fakeWindow);
     Object.defineProperties(fakeEvent, {
-      currentTarget: {
+      target: {
         writable: true,
         value: scrollable,
       },
+      currentTarget: {
+        writable: true,
+        value: fakeWindow,
+      },
     });
     window.dispatchEvent(fakeEvent);
-    // ensuring any events would be published
-    requestAnimationFrame.flush();
 
     expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
+
+    getWindowSpy.mockRestore();
   });
 });
 

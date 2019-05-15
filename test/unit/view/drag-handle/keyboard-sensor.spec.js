@@ -2,6 +2,7 @@
 import { getRect, type Position } from 'css-box-model';
 import { type ReactWrapper } from 'enzyme';
 import * as keyCodes from '../../../../src/view/key-codes';
+import * as getWindowFromEl from '../../../../src/view/window/get-window-from-el';
 import { withKeyboard } from '../../../utils/user-input-util';
 import {
   callbacksCalled,
@@ -202,22 +203,32 @@ describe('progress', () => {
     expect(event.defaultPrevented).toBe(false);
   });
 
-  it('should not fire an onWindowScroll if it is not the window scrolling (ie11 bug)', () => {
+  it('should not fire an onWindowScroll if the scroll event was not dispatched from window (ie11 bug)', () => {
     // start the lift
     pressSpacebar(wrapper);
 
     // trigger scroll event
     const scrollable: HTMLElement = document.createElement('div');
     const fakeEvent: Event = new Event('scroll');
+    const fakeWindow: HTMLElement = document.createElement('div');
+    const getWindowSpy = jest
+      .spyOn(getWindowFromEl, 'default')
+      .mockImplementation(() => fakeWindow);
     Object.defineProperties(fakeEvent, {
-      currentTarget: {
+      target: {
         writable: true,
         value: scrollable,
+      },
+      currentTarget: {
+        writable: true,
+        value: fakeWindow,
       },
     });
     window.dispatchEvent(fakeEvent);
 
     expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
+
+    getWindowSpy.mockRestore();
   });
 
   it('should prevent using keyboard keys that modify scroll', () => {

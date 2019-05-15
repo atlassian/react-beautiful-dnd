@@ -127,7 +127,8 @@ export default function useKeyboardSensor(args: Args): OnKeyDown {
           // IE11 fix:
           // Scrollable events still bubble up and are caught by this handler in ie11.
           // We can ignore this event
-          if (event.currentTarget !== getWindow()) {
+          const window = getWindow();
+          if (event.currentTarget === window && event.target !== window) {
             return;
           }
 
