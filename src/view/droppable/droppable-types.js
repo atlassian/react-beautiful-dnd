@@ -27,9 +27,16 @@ export type Provided = {|
   droppableProps: DroppableProps,
 |};
 
-export type DraggingFromThisWith = {|
-  id: DraggableId,
+export type RenderClone = (
+  provided: DraggableProvided,
+  snapshot: DraggableStateSnapshot,
   source: DraggableLocation,
+) => Node;
+
+export type UseClone = {|
+  draggableId: DraggableId,
+  source: DraggableLocation,
+  render: RenderClone,
 |};
 
 export type StateSnapshot = {|
@@ -39,7 +46,7 @@ export type StateSnapshot = {|
   draggingOverWith: ?DraggableId,
   // What is the id of the draggable that is dragging from this list?
   // Useful for styling the home list when not being dragged over
-  draggingFromThisWith: ?DraggingFromThisWith,
+  draggingFromThisWith: ?DraggableId,
 |};
 
 export type MapProps = {|
@@ -50,6 +57,7 @@ export type MapProps = {|
   shouldAnimatePlaceholder: boolean,
   // snapshot based on redux state to be provided to consumers
   snapshot: StateSnapshot,
+  useClone: ?UseClone,
 |};
 
 export type DefaultProps = {|
@@ -70,11 +78,7 @@ export type OwnProps = {|
   children: (Provided, StateSnapshot) => Node,
   droppableId: DroppableId,
   // TODO: hoist these types up?
-  whenDraggingClone?: (
-    provided: DraggableProvided,
-    snapshot: DraggableStateSnapshot,
-    source: DraggableLocation,
-  ) => Node,
+  whenDraggingClone?: RenderClone,
 |};
 
 export type Props = {|

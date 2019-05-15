@@ -21,7 +21,8 @@ import type {
   Selector,
   DispatchProps,
   StateSnapshot,
-  DraggingFromThisWith,
+  UseClone,
+  RenderClone,
 } from './droppable-types';
 import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
@@ -29,6 +30,7 @@ import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../state/action-creators';
 import StoreContext from '../context/store-context';
 import whatIsDraggedOverFromResult from '../../state/droppable/what-is-dragged-over-from-result';
+import getHomeLocation from '../../state/get-home-location';
 
 const isMatchingType = (type: TypeId, critical: Critical): boolean =>
   type === critical.droppable.type;
@@ -49,6 +51,7 @@ export const makeMapStateToProps = (): Selector => {
       draggingOverWith: null,
       draggingFromThisWith: null,
     },
+    useClone: null,
   };
 
   const idleWithoutAnimation = {
@@ -62,14 +65,24 @@ export const makeMapStateToProps = (): Selector => {
       isDraggingOver: boolean,
       dragging: DraggableDimension,
       snapshot: StateSnapshot,
+      whenDraggingClone: ?RenderClone,
     ): MapProps => {
       const isHome: boolean = dragging.descriptor.droppableId === id;
 
       if (isHome) {
+        const useClone: ?UseClone = whenDraggingClone
+          ? {
+              render: whenDraggingClone,
+              draggableId: dragging.descriptor.id,
+              source: getHomeLocation(dragging.descriptor),
+            }
+          : null;
+
         return {
           placeholder: dragging.placeholder,
           shouldAnimatePlaceholder: false,
           snapshot,
+          useClone,
         };
       }
 
@@ -83,6 +96,7 @@ export const makeMapStateToProps = (): Selector => {
         // Animating placeholder in foreign list
         shouldAnimatePlaceholder: true,
         snapshot,
+        useClone: null,
       };
     },
   );
@@ -98,16 +112,7 @@ export const makeMapStateToProps = (): Selector => {
       const draggingOverWith: ?DraggableId = isDraggingOver
         ? draggableId
         : null;
-      const draggingFromThisWith: ?DraggingFromThisWith = isHome
-        ? {
-            id: draggableId,
-            source: { index: dragging.descriptor.index, droppableId: id },
-          }
-        : null;
-      console.log(
-        'draggingFromThisWith',
-        draggingFromThisWith ? draggingFromThisWith.source : null,
-      );
+      const draggingFromThisWith: ?DraggableId = isHome ? draggableId : null;
 
       return {
         isDraggingOver,
@@ -122,6 +127,7 @@ export const makeMapStateToProps = (): Selector => {
 
     const id: DroppableId = ownProps.droppableId;
     const type: TypeId = ownProps.type;
+    const whenDraggingClone: ?RenderClone = ownProps.whenDraggingClone;
 
     if (state.isDragging) {
       const critical: Critical = state.critical;
@@ -137,7 +143,13 @@ export const makeMapStateToProps = (): Selector => {
 
       // Snapshot based on current impact
       const snapshot: StateSnapshot = getSnapshot(id, isDraggingOver, dragging);
-      return getMapProps(id, isDraggingOver, dragging, snapshot);
+      return getMapProps(
+        id,
+        isDraggingOver,
+        dragging,
+        snapshot,
+        whenDraggingClone,
+      );
     }
 
     if (state.phase === 'DROP_ANIMATING') {
@@ -165,6 +177,7 @@ export const makeMapStateToProps = (): Selector => {
         whatIsDraggedOver(completed.impact) === id,
         dragging,
         snapshot,
+        whenDraggingClone,
       );
     }
 

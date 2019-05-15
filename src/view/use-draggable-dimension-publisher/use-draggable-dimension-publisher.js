@@ -20,17 +20,11 @@ import useLayoutEffect from '../use-isomorphic-layout-effect';
 export type Args = {|
   draggableId: DraggableId,
   index: number,
-  isClone: boolean,
   getDraggableRef: () => ?HTMLElement,
 |};
 
 export default function useDraggableDimensionPublisher(args: Args) {
-  const { isClone, draggableId, index, getDraggableRef } = args;
-
-  // TODO: breaks the rules of hooks
-  if (isClone) {
-    return;
-  }
+  const { draggableId, index, getDraggableRef } = args;
 
   // App context
   const appContext: AppContextValue = useRequiredContext(AppContext);

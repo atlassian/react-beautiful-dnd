@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import ReactDOM from 'react-dom';
 import { useMemo, useCallback } from 'use-memo-one';
 import React, { useRef, useContext, type Node } from 'react';
-import type { Props, Provided, DraggingFromThisWith } from './droppable-types';
+import type { Props, Provided, UseClone } from './droppable-types';
 import useDroppableDimensionPublisher from '../use-droppable-dimension-publisher';
 import Placeholder from '../placeholder';
 import AppContext, { type AppContextValue } from '../context/app-context';
@@ -42,12 +42,13 @@ export default function Droppable(props: Props) {
     isCombineEnabled,
     // map props
     snapshot,
+    useClone,
     // dispatch props
     updateViewportMaxScroll,
 
     // clone (ownProps)
     whenDraggingClone,
-    getPortalForClone,
+    getContainerForClone,
   } = props;
 
   const getDroppableRef = useCallback(
@@ -130,27 +131,21 @@ export default function Droppable(props: Props) {
   });
 
   function getClone(): ?Node {
-    if (!whenDraggingClone) {
+    if (!useClone) {
       return null;
     }
-    const draggingFromThisWith: ?DraggingFromThisWith =
-      snapshot.draggingFromThisWith;
-    if (!draggingFromThisWith) {
-      return null;
-    }
-    const { id, source } = draggingFromThisWith;
-    console.log('source', source);
+    const { draggableId, source, render } = useClone;
 
     const item: Node = (
-      <Draggable draggableId={id} index={source.index} isClone>
+      <Draggable draggableId={draggableId} index={source.index} isClone>
         {(
           draggableProvided: DraggableProvided,
           draggableSnapshot: DraggableStateSnapshot,
-        ) => whenDraggingClone(draggableProvided, draggableSnapshot, source)}
+        ) => render(draggableProvided, draggableSnapshot, source)}
       </Draggable>
     );
 
-    return ReactDOM.createPortal(item, props.getContainerForClone());
+    return ReactDOM.createPortal(item, getContainerForClone());
   }
 
   return (

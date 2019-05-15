@@ -71,17 +71,21 @@ export default function Draggable(props: Props) {
   } = props;
   const isEnabled: boolean = !isDragDisabled;
 
+  // TODO: is this the right approach?
   // The dimension publisher: talks to the marshal
-  const forPublisher: DimensionPublisherArgs = useMemo(
-    () => ({
-      draggableId,
-      index,
-      getDraggableRef: getRef,
-      isClone,
-    }),
-    [draggableId, getRef, index, isClone],
-  );
-  useDraggableDimensionPublisher(forPublisher);
+  // We are violating the rules of hooks here: conditional hooks.
+  // In this specific use case it is okay as an item will always either be a clone or not for it's whole lifecycle
+  if (!isClone) {
+    const forPublisher: DimensionPublisherArgs = useMemo(
+      () => ({
+        draggableId,
+        index,
+        getDraggableRef: getRef,
+      }),
+      [draggableId, getRef, index],
+    );
+    useDraggableDimensionPublisher(forPublisher);
+  }
 
   // The Drag handle
 
@@ -196,6 +200,7 @@ export default function Draggable(props: Props) {
       draggableProps: {
         'data-rbd-draggable-context-id': appContext.contextId,
         'data-rbd-draggable-id': draggableId,
+        // TODO: create helper
         'data-rbd-draggable-options': JSON.stringify({
           canDragInteractiveElements,
           shouldRespectForcePress,
