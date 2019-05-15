@@ -11,6 +11,7 @@ type Props = {
   isDragging: boolean,
   provided: DraggableProvided,
   isGroupedOver?: boolean,
+  style?: Object,
 };
 
 const getBackgroundColor = (
@@ -40,6 +41,7 @@ const Container = styled.a`
     getBackgroundColor(props.isDragging, props.isGroupedOver, props.colors)};
   box-shadow: ${({ isDragging }) =>
     isDragging ? `2px 2px 1px ${colors.N70}` : 'none'};
+  box-sizing: border-box;
   padding: ${grid}px;
   min-height: 40px;
   margin-bottom: ${grid}px;
@@ -122,6 +124,17 @@ const QuoteId = styled.small`
   text-align: right;
 `;
 
+function getStyle(provided: DraggableProvided, style: ?Object) {
+  if (!style) {
+    return provided.draggableProps.style;
+  }
+
+  return {
+    ...provided.draggableProps.style,
+    ...style,
+  };
+}
+
 // Previously this extended React.Component
 // That was a good thing, because using React.PureComponent can hide
 // issues with the selectors. However, moving it over does can considerable
@@ -130,7 +143,7 @@ const QuoteId = styled.small`
 // things we should be doing in the selector as we do not know if consumers
 // will be using PureComponent
 function QuoteItem(props: Props) {
-  const { quote, isDragging, isGroupedOver, provided } = props;
+  const { quote, isDragging, isGroupedOver, provided, style } = props;
 
   return (
     <Container
@@ -141,6 +154,7 @@ function QuoteItem(props: Props) {
       ref={provided.innerRef}
       {...provided.draggableProps}
       {...provided.dragHandleProps}
+      style={getStyle(provided, style)}
     >
       <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
       <Content>
