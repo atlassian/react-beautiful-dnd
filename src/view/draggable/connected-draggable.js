@@ -309,6 +309,7 @@ const mapDispatchToProps: DispatchProps = {
 };
 
 const defaultProps = ({
+  isClone: false,
   isDragDisabled: false,
   // Cannot drag interactive elements by default
   disableInteractiveElementBlocking: false,

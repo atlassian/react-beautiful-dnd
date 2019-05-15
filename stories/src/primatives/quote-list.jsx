@@ -86,7 +86,7 @@ const InnerQuoteList = React.memo(function InnerQuoteList(
   props: QuoteListProps,
 ) {
   return props.quotes.map((quote: Quote, index: number) => (
-    <Draggable key={quote.id} draggableId={quote.id} index={index + 1}>
+    <Draggable key={quote.id} draggableId={quote.id} index={index}>
       {(
         dragProvided: DraggableProvided,
         dragSnapshot: DraggableStateSnapshot,
@@ -145,6 +145,13 @@ export default function QuoteList(props: Props) {
       ignoreContainerClipping={ignoreContainerClipping}
       isDropDisabled={isDropDisabled}
       isCombineEnabled={isCombineEnabled}
+      whenDraggingClone={(provided, snapshot, source) => (
+        <QuoteItem
+          quote={quotes[source.index]}
+          provided={provided}
+          isDragging={snapshot.isDragging}
+        />
+      )}
     >
       {(
         dropProvided: DroppableProvided,

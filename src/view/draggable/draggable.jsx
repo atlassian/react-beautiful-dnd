@@ -53,6 +53,7 @@ export default function Draggable(props: Props) {
     shouldRespectForcePress,
     disableInteractiveElementBlocking: canDragInteractiveElements,
     index,
+    isClone,
 
     // mapProps
     mapped,
@@ -76,8 +77,9 @@ export default function Draggable(props: Props) {
       draggableId,
       index,
       getDraggableRef: getRef,
+      isClone,
     }),
-    [draggableId, getRef, index],
+    [draggableId, getRef, index, isClone],
   );
   useDraggableDimensionPublisher(forPublisher);
 
@@ -218,25 +220,26 @@ export default function Draggable(props: Props) {
     shouldRespectForcePress,
   ]);
 
-  if (isDragging && usingCloneWhenDragging) {
-    return (
-      <div
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-        style={{
-          ...provided.draggableProps.style,
-          backgroundColor: 'pink',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 80,
-        }}
-      >
-        <span role="img" aria-label="rock on">
-          🤘
-        </span>
-      </div>
-    );
+  if (isDragging && usingCloneWhenDragging && !isClone) {
+    return null;
+    // return (
+    //   <div
+    //     {...provided.draggableProps}
+    //     {...provided.dragHandleProps}
+    //     style={{
+    //       ...provided.draggableProps.style,
+    //       backgroundColor: 'pink',
+    //       display: 'flex',
+    //       alignItems: 'center',
+    //       justifyContent: 'center',
+    //       fontSize: 80,
+    //     }}
+    //   >
+    //     <span role="img" aria-label="rock on">
+    //       🤘
+    //     </span>
+    //   </div>
+    // );
   }
 
   return children(provided, mapped.snapshot);

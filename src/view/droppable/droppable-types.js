@@ -8,7 +8,12 @@ import type {
   Placeholder,
   State,
   ContextId,
+  DraggableLocation,
 } from '../../types';
+import type {
+  StateSnapshot as DraggableStateSnapshot,
+  Provided as DraggableProvided,
+} from '../draggable/draggable-types';
 import { updateViewportMaxScroll } from '../../state/action-creators';
 
 export type DroppableProps = {|
@@ -22,6 +27,11 @@ export type Provided = {|
   droppableProps: DroppableProps,
 |};
 
+export type DraggingFromThisWith = {|
+  id: DraggableId,
+  source: DraggableLocation,
+|};
+
 export type StateSnapshot = {|
   // Is the Droppable being dragged over?
   isDraggingOver: boolean,
@@ -29,7 +39,7 @@ export type StateSnapshot = {|
   draggingOverWith: ?DraggableId,
   // What is the id of the draggable that is dragging from this list?
   // Useful for styling the home list when not being dragged over
-  draggingFromThisWith: ?DraggableId,
+  draggingFromThisWith: ?DraggingFromThisWith,
 |};
 
 export type MapProps = {|
@@ -48,6 +58,7 @@ export type DefaultProps = {|
   isCombineEnabled: boolean,
   direction: Direction,
   ignoreContainerClipping: boolean,
+  getContainerForClone: () => HTMLElement,
 |};
 
 export type DispatchProps = {|
@@ -58,6 +69,12 @@ export type OwnProps = {|
   ...DefaultProps,
   children: (Provided, StateSnapshot) => Node,
   droppableId: DroppableId,
+  // TODO: hoist these types up?
+  whenDraggingClone?: (
+    provided: DraggableProvided,
+    snapshot: DraggableStateSnapshot,
+    source: DraggableLocation,
+  ) => Node,
 |};
 
 export type Props = {|

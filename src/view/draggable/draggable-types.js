@@ -142,6 +142,7 @@ export type ChildrenFn = (Provided, StateSnapshot) => Node | null;
 
 export type DefaultProps = {|
   isDragDisabled: boolean,
+  isClone: boolean,
   disableInteractiveElementBlocking: boolean,
   shouldRespectForcePress: boolean,
 |};

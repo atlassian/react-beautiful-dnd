@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 // eslint-disable-next-line no-unused-vars
 import { Component } from 'react';
 import { connect } from 'react-redux';
@@ -20,6 +21,7 @@ import type {
   Selector,
   DispatchProps,
   StateSnapshot,
+  DraggingFromThisWith,
 } from './droppable-types';
 import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
@@ -96,7 +98,16 @@ export const makeMapStateToProps = (): Selector => {
       const draggingOverWith: ?DraggableId = isDraggingOver
         ? draggableId
         : null;
-      const draggingFromThisWith: ?DraggableId = isHome ? draggableId : null;
+      const draggingFromThisWith: ?DraggingFromThisWith = isHome
+        ? {
+            id: draggableId,
+            source: { index: dragging.descriptor.index, droppableId: id },
+          }
+        : null;
+      console.log(
+        'draggingFromThisWith',
+        draggingFromThisWith ? draggingFromThisWith.source : null,
+      );
 
       return {
         isDraggingOver,
@@ -200,12 +211,18 @@ const mapDispatchToProps: DispatchProps = {
   updateViewportMaxScroll: updateViewportMaxScrollAction,
 };
 
+function getBody(): HTMLElement {
+  invariant(document.body, 'document.body is not ready');
+  return document.body;
+}
+
 const defaultProps = ({
   type: 'DEFAULT',
   direction: 'vertical',
   isDropDisabled: false,
   isCombineEnabled: false,
   ignoreContainerClipping: false,
+  getContainerForClone: getBody,
 }: DefaultProps);
 
 // Abstract class allows to specify props and defaults to component.

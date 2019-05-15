@@ -17,7 +17,6 @@ export default function useValidation({ isEnabled, getDraggableRef }: Args) {
       if (!isEnabled) {
         return;
       }
-
       const draggableRef: ?HTMLElement = getDraggableRef();
       invariant(draggableRef, 'Drag handle was unable to find draggable ref');
       getDragHandleRef(draggableRef);
