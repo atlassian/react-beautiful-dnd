@@ -1,6 +1,7 @@
 // @flow
+import type { DropResult } from '../../types';
 import type { Action, Dispatch } from '../store-types';
-import type { FocusMarshal } from '../focus-marshal';
+import type { FocusMarshal } from '../../view/use-focus-marshal/focus-marshal-types';
 
 export default (marshal: FocusMarshal) => {
   let isWatching: boolean = false;
@@ -21,9 +22,20 @@ export default (marshal: FocusMarshal) => {
       return;
     }
 
-    // on end - focus after timeout
-    if (action.type === 'DROP_COMPLETE' || action.type === 'CLEAN') {
+    if (action.type === 'CLEAN') {
       isWatching = false;
+      marshal.tryRestoreFocusRecorded();
+      return;
+    }
+
+    if (action.type === 'DROP_COMPLETE') {
+      isWatching = false;
+      const result: DropResult = action.payload.completed.result;
+
+      // give focus to the combine target when combining
+      if (result.combine) {
+        marshal.tryShiftRecord(result.draggableId, result.combine.draggableId);
+      }
       marshal.tryRestoreFocusRecorded();
     }
   };

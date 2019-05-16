@@ -2,8 +2,7 @@
 import { useRef } from 'react';
 import { useMemo, useCallback } from 'use-memo-one';
 import type { DraggableId, ContextId } from '../../types';
-import type { FocusMarshal } from './focus-marshal-types';
-// TODO: move out of state?
+import type { FocusMarshal, Unregister } from './focus-marshal-types';
 import { dragHandle as dragHandleAttr } from '../data-attributes';
 import { warning } from '../../dev-warning';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
@@ -86,6 +85,16 @@ export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
     [contextId],
   );
 
+  const tryShiftRecord = useCallback(function tryShiftRecord(
+    previous: DraggableId,
+    redirectTo: DraggableId,
+  ) {
+    if (recordRef.current === previous) {
+      recordRef.current = redirectTo;
+    }
+  },
+  []);
+
   const tryRestoreFocusRecorded = useCallback(
     function tryRestoreFocusRecorded() {
       restoreFocusFrameRef.current = requestAnimationFrame(() => {
@@ -132,9 +141,9 @@ export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
       register,
       tryRecordFocus,
       tryRestoreFocusRecorded,
-      tryGiveFocus,
+      tryShiftRecord,
     }),
-    [register, tryGiveFocus, tryRestoreFocusRecorded],
+    [register, tryRestoreFocusRecorded, tryShiftRecord],
   );
 
   return marshal;
