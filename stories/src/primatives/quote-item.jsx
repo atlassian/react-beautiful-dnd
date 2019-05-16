@@ -35,6 +35,8 @@ const getBackgroundColor = (
 const getBorderColor = (isDragging: boolean, authorColors: AuthorColors) =>
   isDragging ? authorColors.hard : 'transparent';
 
+const imageSize: number = 40;
+
 const CloneBadge = styled.div`
   background: ${colors.G100};
   bottom: ${grid / 2}px;
@@ -44,9 +46,11 @@ const CloneBadge = styled.div`
   content: 'clone';
   font-size: 10px;
   position: absolute;
+  right: -${imageSize / 3}px;
+  top: -${imageSize / 3}px;
 
-  height: 40px;
-  width: 40px;
+  height: ${imageSize}px;
+  width: ${imageSize}px;
 
   display: flex;
   justify-content: center;
@@ -63,7 +67,7 @@ const Container = styled.a`
     isDragging ? `2px 2px 1px ${colors.N70}` : 'none'};
   box-sizing: border-box;
   padding: ${grid}px;
-  min-height: 40px;
+  min-height: ${imageSize}px;
   margin-bottom: ${grid}px;
   user-select: none;
 
@@ -87,8 +91,8 @@ const Container = styled.a`
 `;
 
 const Avatar = styled.img`
-  width: 40px;
-  height: 40px;
+  width: ${imageSize}px;
+  height: ${imageSize}px;
   border-radius: 50%;
   margin-right: ${grid}px;
   flex-shrink: 0;
