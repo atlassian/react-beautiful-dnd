@@ -9,11 +9,8 @@ import type {
   EventOptions,
 } from '../../event-bindings/event-types';
 import bindEvents from '../../event-bindings/bind-events';
-import isSloppyClickThresholdExceeded from './util/is-sloppy-click-threshold-exceeded';
 import * as keyCodes from '../../key-codes';
-import preventStandardKeyEvents from './util/prevent-standard-key-events';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
-import { warning } from '../../../dev-warning';
 import { noop } from '../../../empty';
 
 type TouchWithForce = Touch & {
@@ -60,8 +57,9 @@ function getCaptureBindings({
       // Opting out of passive touchmove (default) so as to prevent scrolling while moving
       // Not worried about performance as effect of move is throttled in requestAnimationFrame
       // Using `capture: false` due to a recent horrible firefox bug: https://twitter.com/alexandereardon/status/1125904207184187393
-      options: { passive: false, capture: false },
+      options: { capture: false },
       fn: (event: TouchEvent) => {
+        console.log('touch move');
         const phase: Phase = getPhase();
         // Drag has not yet started and we are waiting for a long press.
         if (phase.type !== 'DRAGGING') {
@@ -83,6 +81,7 @@ function getCaptureBindings({
         // Also because we are using it as part of a drag we prevent the default action
         // as a sign that we are using the event
         event.preventDefault();
+        console.log('moving');
         phase.actions.move(point);
       },
     },
@@ -138,6 +137,7 @@ function getCaptureBindings({
     {
       eventName: 'contextmenu',
       fn: (event: Event) => {
+        console.log('context menu opt out');
         // always opting out of context menu events
         event.preventDefault();
       },
@@ -197,6 +197,11 @@ function getCaptureBindings({
           cancel();
         }
       },
+    },
+    // Cancel on page visibility change
+    {
+      eventName: supportedPageVisibilityEventName,
+      fn: cancel,
     },
   ];
 }
@@ -281,6 +286,7 @@ export default function useMouseSensor(
       clearTimeout(current.longPressTimerId);
     }
 
+    console.log('STOPPING');
     setPhase(idle);
     unbindEventsRef.current();
 
@@ -325,6 +331,7 @@ export default function useMouseSensor(
         mode: 'FLUID',
       });
 
+      console.log('in dragging phase');
       setPhase({
         type: 'DRAGGING',
         actions,

@@ -26,13 +26,14 @@ import {
   lift as liftAction,
 } from '../../state/action-creators';
 import useMouseSensor from './sensors/use-mouse-sensor';
+import useKeyboardSensor from './sensors/use-keyboard-sensor';
+import useTouchSensor from './sensors/use-touch-sensor';
 import useValidateSensorHooks from './use-validate-sensor-hooks';
 import isHandleInInteractiveElement from './is-handle-in-interactive-element';
 import getOptionsFromDraggable from './get-options-from-draggable';
 import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
 import isHtmlElement from '../is-type-of-element/is-html-element';
-import useKeyboardSensor from './sensors/use-keyboard-sensor';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 
 function preventDefault(event: Event) {
@@ -298,7 +299,11 @@ type SensorMarshalArgs = {|
   customSensors: ?(Sensor[]),
 |};
 
-const defaultSensors: Sensor[] = [useMouseSensor, useKeyboardSensor];
+const defaultSensors: Sensor[] = [
+  useMouseSensor,
+  useKeyboardSensor,
+  // useTouchSensor,
+];
 
 export default function useSensorMarshal({
   contextId,
