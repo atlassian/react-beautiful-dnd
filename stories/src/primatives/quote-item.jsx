@@ -35,26 +35,23 @@ const getBackgroundColor = (
 const getBorderColor = (isDragging: boolean, authorColors: AuthorColors) =>
   isDragging ? authorColors.hard : 'transparent';
 
-function getCloneStyle(isClone: boolean): string {
-  if (!isClone) {
-    return '';
-  }
+const CloneBadge = styled.div`
+  background: ${colors.G100};
+  bottom: ${grid / 2}px;
+  border: 2px solid ${colors.G200};
+  border-radius: 50%;
+  box-sizing: border-box;
+  content: 'clone';
+  font-size: 10px;
+  position: absolute;
 
-  // will be over the top of the avatar
-  return `
-    &::after {
-      position: absolute;
-      content: 'clone';
-      background: lightgreen;
-      height: 40px;
-      width: 40px;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-  `;
-}
+  height: 40px;
+  width: 40px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const Container = styled.a`
   border-radius: ${borderRadius}px;
@@ -72,8 +69,6 @@ const Container = styled.a`
 
   /* anchor overrides */
   color: ${colors.N900};
-
-  ${props => getCloneStyle(Boolean(props.isClone))}
 
   &:hover,
   &:active {
@@ -188,6 +183,7 @@ function QuoteItem(props: Props) {
       style={getStyle(provided, style)}
     >
       <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
+      {isClone ? <CloneBadge>Clone</CloneBadge> : null}
       <Content>
         <BlockQuote>{quote.content}</BlockQuote>
         <Footer>
