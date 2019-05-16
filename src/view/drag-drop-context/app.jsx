@@ -10,9 +10,8 @@ import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../window/scroll-window';
 import createAutoScroller from '../../state/auto-scroller';
 import useStyleMarshal from '../use-style-marshal/use-style-marshal';
-import createFocusMarshal, {
-  type FocusMarshal,
-} from '../../state/focus-marshal';
+import useFocusMarshal from '../use-focus-marshal';
+import type { FocusMarshal } from '../use-focus-marshal/focus-marshal-types';
 import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
 import type { StyleMarshal } from '../use-style-marshal/style-marshal-types';
 import type {
@@ -126,10 +125,7 @@ export default function App(props: Props) {
     [dimensionMarshal.scrollDroppable, lazyDispatch],
   );
 
-  const focusMarshal: FocusMarshal = useMemo<FocusMarshal>(
-    () => createFocusMarshal(contextId),
-    [contextId],
-  );
+  const focusMarshal: FocusMarshal = useFocusMarshal(contextId);
 
   const store: Store = useMemo<Store>(
     () =>
