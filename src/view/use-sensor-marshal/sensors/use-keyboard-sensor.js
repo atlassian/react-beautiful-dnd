@@ -45,6 +45,8 @@ function getDraggingBindings(
       fn: (event: KeyboardEvent) => {
         if (event.keyCode === keyCodes.escape) {
           event.preventDefault();
+          // Needed to stop focus loss :(
+          event.stopPropagation();
           cancel();
           return;
         }

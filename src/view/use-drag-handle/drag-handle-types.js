@@ -1,6 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
-import type { MovementMode, DraggableId } from '../../types';
+import type { MovementMode, DraggableId, ContextId } from '../../types';
 
 export type Callbacks = {|
   onLift: ({
@@ -21,16 +21,19 @@ export type DragHandleProps = {|
   // If a consumer is using a portal then the item will lose focus
   // when moving to the portal. This breaks keyboard dragging.
   // To get around this we manually apply focus if needed when mounting
-  onFocus: () => void,
-  onBlur: () => void,
+  // onFocus: () => void,
+  // onBlur: () => void,
 
-  // Used to initiate dragging
-  onMouseDown: (event: MouseEvent) => void,
-  onKeyDown: (event: KeyboardEvent) => void,
-  onTouchStart: (event: TouchEvent) => void,
+  // // Used to initiate dragging
+  // onMouseDown: (event: MouseEvent) => void,
+  // onKeyDown: (event: KeyboardEvent) => void,
+  // onTouchStart: (event: TouchEvent) => void,
+
+  // what draggable the handle belongs to
+  'data-rbd-drag-handle-draggable-id': DraggableId,
 
   // What DragDropContext the drag handle is in
-  'data-rbd-drag-handle-context-id': string,
+  'data-rbd-drag-handle-context-id': ContextId,
 
   // Aria role (nicer screen reader text)
   'aria-roledescription': string,

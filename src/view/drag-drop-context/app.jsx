@@ -10,6 +10,9 @@ import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../window/scroll-window';
 import createAutoScroller from '../../state/auto-scroller';
 import useStyleMarshal from '../use-style-marshal/use-style-marshal';
+import createFocusMarshal, {
+  type FocusMarshal,
+} from '../../state/focus-marshal';
 import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
 import type { StyleMarshal } from '../use-style-marshal/style-marshal-types';
 import type {
@@ -123,16 +126,29 @@ export default function App(props: Props) {
     [dimensionMarshal.scrollDroppable, lazyDispatch],
   );
 
+  const focusMarshal: FocusMarshal = useMemo<FocusMarshal>(
+    () => createFocusMarshal(contextId),
+    [contextId],
+  );
+
   const store: Store = useMemo<Store>(
     () =>
       createStore({
         dimensionMarshal,
+        focusMarshal,
         styleMarshal,
         announce,
         autoScroller,
         getResponders,
       }),
-    [announce, autoScroller, dimensionMarshal, getResponders, styleMarshal],
+    [
+      announce,
+      autoScroller,
+      dimensionMarshal,
+      focusMarshal,
+      getResponders,
+      styleMarshal,
+    ],
   );
 
   // Checking for unexpected store changes
@@ -170,11 +186,18 @@ export default function App(props: Props) {
   const appContext: AppContextValue = useMemo(
     () => ({
       marshal: dimensionMarshal,
+      focus: focusMarshal,
       contextId,
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
     }),
-    [contextId, dimensionMarshal, getCanLift, getIsMovementAllowed],
+    [
+      contextId,
+      dimensionMarshal,
+      focusMarshal,
+      getCanLift,
+      getIsMovementAllowed,
+    ],
   );
 
   useSensorMarshal({

@@ -16,8 +16,9 @@ import useTouchSensor, {
 import usePreviousRef from '../use-previous-ref';
 import { warning } from '../../dev-warning';
 import useValidation from './use-validation';
-import useFocusRetainer from './use-focus-retainer';
+// import useFocusRetainer from './use-focus-retainer';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
+import getDragHandleRef from './util/get-drag-handle-ref';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
@@ -51,7 +52,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     capturingRef.current.abort();
   }, []);
 
-  const { canLift, contextId }: AppContextValue = useRequiredContext(
+  const { canLift, contextId, focus }: AppContextValue = useRequiredContext(
     AppContext,
   );
   const {
@@ -96,7 +97,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     [canDragInteractiveElements, canLift, draggableId, isEnabled],
   );
 
-  const { onBlur, onFocus } = useFocusRetainer(args);
+  // const { onBlur, onFocus } = useFocusRetainer(args);
 
   const keyboardArgs: KeyboardSensorArgs = useMemo(
     () => ({
@@ -169,6 +170,20 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     }
   }
 
+  const focusOnHandle = useCallback(() => {
+    const draggableRef: ?HTMLElement = getDraggableRef();
+    if (!draggableRef) {
+      warning(`Cannot find draggable ref from drag handle`);
+      return;
+    }
+    getDragHandleRef(draggableRef).focus();
+  }, [getDraggableRef]);
+
+  useLayoutEffect(() => {
+    const unregister = focus.register(draggableId, focusOnHandle);
+    return unregister;
+  }, [draggableId, focus, focusOnHandle]);
+
   // Handle aborting
   // No longer dragging but still capturing: need to abort
   // Using a layout effect to ensure that there is a flip from isDragging => !isDragging
@@ -184,12 +199,13 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       return null;
     }
     return {
-      onMouseDown: () => {},
-      onKeyDown: () => {},
-      onTouchStart,
-      onFocus,
-      onBlur,
+      // onMouseDown: () => {},
+      // onKeyDown: () => {},
+      // onTouchStart,
+      // onFocus,
+      // onBlur,
       tabIndex: 0,
+      'data-rbd-drag-handle-draggable-id': draggableId,
       'data-rbd-drag-handle-context-id': contextId,
       // English default. Consumers are welcome to add their own start instruction
       'aria-roledescription': 'Draggable item. Press space bar to lift',
@@ -197,7 +213,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       draggable: false,
       onDragStart: preventHtml5Dnd,
     };
-  }, [contextId, isEnabled, onBlur, onFocus, onTouchStart]);
+  }, [contextId, draggableId, isEnabled]);
 
   return props;
 }

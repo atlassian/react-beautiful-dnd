@@ -5,6 +5,7 @@ export const dragHandle = (() => {
 
   return {
     base,
+    draggableId: `${base}-draggable-id`,
     contextId: `${base}-context-id`,
   };
 })();
