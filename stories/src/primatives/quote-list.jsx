@@ -150,6 +150,7 @@ export default function QuoteList(props: Props) {
           quote={quotes[source.index]}
           provided={provided}
           isDragging={snapshot.isDragging}
+          isClone
         />
       )}
     >

@@ -85,15 +85,17 @@ export default function create(contextId: ContextId): FocusMarshal {
   }
 
   function tryRestoreFocusRecorded() {
-    if (!hadFocus) {
-      return;
-    }
-
-    console.log('tryRestoreFocusRecorded');
-    tryGiveFocus(hadFocus);
+    requestAnimationFrame(() => {
+      if (hadFocus) {
+        tryGiveFocus(hadFocus);
+      }
+    });
   }
 
   function tryRecordFocus(id: DraggableId) {
+    // clear any existing record
+    hadFocus = null;
+
     const focused: ?Element = document.activeElement;
 
     // no item focused so it cannot be our item

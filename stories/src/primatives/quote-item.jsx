@@ -5,11 +5,13 @@ import { colors } from '@atlaskit/theme';
 import { borderRadius, grid } from '../constants';
 import type { Quote, AuthorColors } from '../types';
 import type { DraggableProvided } from '../../../src';
+import useLayoutEffect from '../../../src/view/use-isomorphic-layout-effect';
 
 type Props = {
   quote: Quote,
   isDragging: boolean,
   provided: DraggableProvided,
+  isClone?: boolean,
   isGroupedOver?: boolean,
   style?: Object,
 };
@@ -33,6 +35,27 @@ const getBackgroundColor = (
 const getBorderColor = (isDragging: boolean, authorColors: AuthorColors) =>
   isDragging ? authorColors.hard : 'transparent';
 
+function getCloneStyle(isClone: boolean): string {
+  if (!isClone) {
+    return '';
+  }
+
+  // will be over the top of the avatar
+  return `
+    &::after {
+      position: absolute;
+      content: 'clone';
+      background: lightgreen;
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  `;
+}
+
 const Container = styled.a`
   border-radius: ${borderRadius}px;
   border: 2px solid transparent;
@@ -49,6 +72,8 @@ const Container = styled.a`
 
   /* anchor overrides */
   color: ${colors.N900};
+
+  ${props => getCloneStyle(Boolean(props.isClone))}
 
   &:hover,
   &:active {
@@ -143,13 +168,19 @@ function getStyle(provided: DraggableProvided, style: ?Object) {
 // things we should be doing in the selector as we do not know if consumers
 // will be using PureComponent
 function QuoteItem(props: Props) {
-  const { quote, isDragging, isGroupedOver, provided, style } = props;
+  const { quote, isDragging, isGroupedOver, provided, style, isClone } = props;
+
+  useLayoutEffect(() => {
+    console.log('mounting', quote.id);
+    return () => console.log('unmounting', quote.id);
+  }, [quote.id]);
 
   return (
     <Container
       href={quote.author.url}
       isDragging={isDragging}
       isGroupedOver={isGroupedOver}
+      isClone={isClone}
       colors={quote.author.colors}
       ref={provided.innerRef}
       {...provided.draggableProps}
