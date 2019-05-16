@@ -262,7 +262,7 @@ export default function useMouseSensor(
   );
 
   const listenForCapture = useCallback(
-    function tryStartCapture() {
+    function listenForCapture() {
       const options: EventOptions = {
         passive: false,
         capture: true,
