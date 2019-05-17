@@ -37,7 +37,9 @@ import isHtmlElement from '../is-type-of-element/is-html-element';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 
 function preventDefault(event: Event) {
+  console.log('preventing click');
   event.preventDefault();
+  console.log('prevented?', event);
 }
 
 function noop() {}
@@ -227,6 +229,7 @@ function tryGetLock({
 
       // block next click if requested
       if (options.shouldBlockNextClick) {
+        console.log('adding handler');
         window.addEventListener('click', preventDefault, {
           // only blocking a single click
           once: true,

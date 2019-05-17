@@ -7,8 +7,8 @@ import type {
   PreDragActions,
   DragActions,
   Sensor,
-} from '../../../../src/types';
-import App from './app';
+} from '../../../../../src/types';
+import App from '../app';
 
 function noop() {}
 

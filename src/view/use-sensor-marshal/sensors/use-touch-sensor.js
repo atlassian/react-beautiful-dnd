@@ -399,6 +399,7 @@ export default function useMouseSensor(
       // remove any existing listeners
       unbindEventsRef.current();
 
+      // need to kill any pending drag start timer
       const phase: Phase = getPhase();
       if (phase.type === 'PENDING') {
         clearTimeout(phase.longPressTimerId);

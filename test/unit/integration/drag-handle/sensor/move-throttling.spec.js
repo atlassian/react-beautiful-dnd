@@ -8,10 +8,10 @@ import type {
   PreDragActions,
   DragActions,
   Sensor,
-} from '../../../../src/types';
-import App from './app';
-import { getOffset } from './util';
-import { add } from '../../../../src/state/position';
+} from '../../../../../src/types';
+import App from '../app';
+import { getOffset } from '../util';
+import { add } from '../../../../../src/state/position';
 
 function noop() {}
 

@@ -7,9 +7,9 @@ import type {
   PreDragActions,
   DragActions,
   Sensor,
-} from '../../../../src/types';
-import App from './app';
-import { isDragging, isDropAnimating } from './util';
+} from '../../../../../src/types';
+import App from '../app';
+import { isDragging, isDropAnimating } from '../util';
 
 function noop() {}
 

@@ -2,8 +2,8 @@
 import invariant from 'tiny-invariant';
 import React from 'react';
 import { render } from 'react-testing-library';
-import type { TryGetActionLock, Sensor } from '../../../../src/types';
-import App from './app';
+import type { TryGetActionLock, Sensor } from '../../../../../src/types';
+import App from '../app';
 
 it('should allow different locks in different DragDropContexts', () => {
   let first: TryGetActionLock;
