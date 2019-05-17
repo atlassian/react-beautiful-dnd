@@ -6,10 +6,11 @@ import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal
 import App from '../app';
 import { isDragging } from '../util';
 import { getStartingMouseDown } from './util';
+import supportedEventName from '../../../../../src/view/use-sensor-marshal/sensors/util/supported-page-visibility-event-name';
 
-Object.keys(keyCodes).forEach((keyCode: string) => {
-  it(`should cancel a pending drag with keydown: ${keyCode}`, () => {
-    const { getByText } = render(<App />);
+it(`should cancel a pending drag with keydown`, () => {
+  Object.keys(keyCodes).forEach((keyCode: string) => {
+    const { getByText, unmount } = render(<App />);
     const handle: HTMLElement = getByText('item: 0');
 
     fireEvent.mouseDown(handle, getStartingMouseDown());
@@ -32,6 +33,8 @@ Object.keys(keyCodes).forEach((keyCode: string) => {
     expect(isDragging(handle)).toBe(false);
     // default behaviour not prevented on keypress
     expect(event.defaultPrevented).toBe(false);
+
+    unmount();
   });
 });
 
@@ -58,4 +61,55 @@ it('should cancel when resize is fired', () => {
   expect(isDragging(handle)).toBe(false);
   // default behaviour not prevented on keypress
   expect(event.defaultPrevented).toBe(false);
+});
+
+it('should abort when there is a visibility change', () => {
+  const { getByText } = render(<App />);
+  const handle: HTMLElement = getByText('item: 0');
+
+  fireEvent.mouseDown(handle, getStartingMouseDown());
+
+  // abort
+  const event: Event = new Event(supportedEventName, {
+    bubbles: true,
+    cancelable: true,
+  });
+  fireEvent(handle, event);
+
+  // would normally start
+  fireEvent.mouseMove(handle, {
+    clientX: 0,
+    clientY: sloppyClickThreshold,
+  });
+
+  // event not consumed as it is an indirect cancel
+  expect(event.defaultPrevented).toBe(false);
+  // drag not started
+  expect(isDragging(handle)).toBe(false);
+});
+
+it('should abort when there is a window scroll', () => {
+  const { getByText } = render(<App />);
+  const handle: HTMLElement = getByText('item: 0');
+
+  fireEvent.mouseDown(handle, getStartingMouseDown());
+
+  // abort
+  const event: Event = new Event('scroll', {
+    target: window,
+    bubbles: true,
+    cancelable: true,
+  });
+  fireEvent(window, event);
+
+  // would normally start
+  fireEvent.mouseMove(handle, {
+    clientX: 0,
+    clientY: sloppyClickThreshold,
+  });
+
+  // event not consumed as it is an indirect cancel
+  expect(event.defaultPrevented).toBe(false);
+  // drag not started
+  expect(isDragging(handle)).toBe(false);
 });
