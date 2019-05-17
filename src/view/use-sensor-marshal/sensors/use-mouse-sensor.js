@@ -337,7 +337,7 @@ export default function useMouseSensor(
     listenForCapture();
 
     // kill any pending window events when unmounting
-    return () => {
+    return function unmount() {
       unbindEventsRef.current();
     };
   }, [listenForCapture]);
