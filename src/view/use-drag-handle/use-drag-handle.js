@@ -19,6 +19,9 @@ import useValidation from './use-validation';
 // import useFocusRetainer from './use-focus-retainer';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 import getDragHandleRef from './util/get-drag-handle-ref';
+import useMouseSensor, {
+  type Args as MouseSensorArgs,
+} from './sensor/use-mouse-sensor';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
@@ -98,6 +101,27 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
   );
 
   // const { onBlur, onFocus } = useFocusRetainer(args);
+  const mouseArgs: MouseSensorArgs = useMemo(
+    () => ({
+      callbacks,
+      getDraggableRef,
+      getWindow,
+      canStartCapturing,
+      getShouldRespectForcePress,
+      onCaptureStart,
+      onCaptureEnd,
+    }),
+    [
+      callbacks,
+      getDraggableRef,
+      getWindow,
+      canStartCapturing,
+      getShouldRespectForcePress,
+      onCaptureStart,
+      onCaptureEnd,
+    ],
+  );
+  const onMouseDown = useMouseSensor(mouseArgs);
 
   const keyboardArgs: KeyboardSensorArgs = useMemo(
     () => ({
@@ -199,7 +223,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       return null;
     }
     return {
-      // onMouseDown: () => {},
+      // onMouseDown,
       // onKeyDown: () => {},
       // onTouchStart,
       // onFocus,
