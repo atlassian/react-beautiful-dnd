@@ -67,7 +67,6 @@ function getWindowBindings({
     {
       eventName: 'contextmenu',
       fn: (event: Event) => {
-        console.log('context menu opt out');
         // always opting out of context menu events
         event.preventDefault();
       },
@@ -100,6 +99,8 @@ function getWindowBindings({
   ];
 }
 
+// All of the touch events get applied to the initial target of the touch interaction
+// This plays well with the target being unmounted during a drag
 function getTargetBindings({
   cancel,
   completed,
@@ -113,7 +114,6 @@ function getTargetBindings({
       // Using `capture: false` due to a recent horrible firefox bug: https://twitter.com/alexandereardon/status/1125904207184187393
       options: { capture: false },
       fn: (event: TouchEvent) => {
-        console.log('touch move');
         const phase: Phase = getPhase();
         // Drag has not yet started and we are waiting for a long press.
         if (phase.type !== 'DRAGGING') {
@@ -135,14 +135,12 @@ function getTargetBindings({
         // Also because we are using it as part of a drag we prevent the default action
         // as a sign that we are using the event
         event.preventDefault();
-        console.log('moving');
         phase.actions.move(point);
       },
     },
     {
       eventName: 'touchend',
       fn: (event: TouchEvent) => {
-        console.log('touch end');
         const phase: Phase = getPhase();
         // drag had not started yet - do not prevent the default action
         if (phase.type !== 'DRAGGING') {
@@ -159,7 +157,6 @@ function getTargetBindings({
     {
       eventName: 'touchcancel',
       fn: (event: TouchEvent) => {
-        console.log('touch cancel');
         // drag had not started yet - do not prevent the default action
         if (getPhase().type !== 'DRAGGING') {
           cancel();
@@ -177,7 +174,6 @@ function getTargetBindings({
     {
       eventName: 'touchforcechange',
       fn: (event: TouchEvent) => {
-        console.log('touch force change');
         const phase: Phase = getPhase();
 
         // needed to use phase.actions
@@ -244,6 +240,7 @@ export default function useMouseSensor(
         // browser interactions as possible.
         // This includes navigation on anchors which we want to preserve
 
+        // eslint-disable-next-line no-use-before-define
         const actions: ?PreDragActions = tryStartCapturing(event, stop);
 
         // could not start a drag
@@ -302,7 +299,6 @@ export default function useMouseSensor(
       clearTimeout(current.longPressTimerId);
     }
 
-    console.log('STOPPING');
     setPhase(idle);
     unbindEventsRef.current();
 
@@ -322,18 +318,23 @@ export default function useMouseSensor(
 
   const bindCapturingEvents = useCallback(
     function bindCapturingEvents(target: HTMLElement) {
-      const options = { capture: true, passive: false };
+      const options: EventOptions = { capture: true, passive: false };
       const args: GetBindingArgs = {
         cancel,
         completed: stop,
         getPhase,
       };
 
+      // When removing a drag handle, such as moving into a portal or clone,
+      // touch events stop being published to the window.
+      // Even though the handle is removed, if you attach events to it they will
+      // continue to fire for the interaction. Strange, but hey - that's the web
+      // https://gist.github.com/parris/dda613e3ae78f14eb2dc9fa0f4bfce3d
+      // https://stackoverflow.com/questions/33298828/touch-move-event-dont-fire-after-touch-start-target-is-removed
       const unbindTarget = bindEvents(target, getTargetBindings(args), options);
       const unbindWindow = bindEvents(window, getWindowBindings(args), options);
 
       unbindEventsRef.current = function unbind() {
-        console.log('unbinding both');
         unbindTarget();
         unbindWindow();
       };
@@ -354,7 +355,6 @@ export default function useMouseSensor(
         mode: 'FLUID',
       });
 
-      console.log('in dragging phase');
       setPhase({
         type: 'DRAGGING',
         actions,
