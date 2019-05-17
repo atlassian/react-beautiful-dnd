@@ -40,87 +40,17 @@ const idle: Idle = { type: 'IDLE' };
 export const timeForLongPress: number = 150;
 export const forcePressThreshold: number = 0.15;
 
-type GetCaptureArgs = {|
+type GetBindingArgs = {|
   cancel: () => void,
   completed: () => void,
   getPhase: () => Phase,
 |};
 
-function getCaptureBindings({
+function getWindowBindings({
   cancel,
-  completed,
   getPhase,
-}: GetCaptureArgs): EventBinding[] {
+}: GetBindingArgs): EventBinding[] {
   return [
-    {
-      eventName: 'touchmove',
-      // Opting out of passive touchmove (default) so as to prevent scrolling while moving
-      // Not worried about performance as effect of move is throttled in requestAnimationFrame
-      // Using `capture: false` due to a recent horrible firefox bug: https://twitter.com/alexandereardon/status/1125904207184187393
-      options: { capture: false },
-      fn: (event: TouchEvent) => {
-        console.log('touch move');
-        const phase: Phase = getPhase();
-        // Drag has not yet started and we are waiting for a long press.
-        if (phase.type !== 'DRAGGING') {
-          cancel();
-          return;
-        }
-
-        // At this point we are dragging
-        phase.hasMoved = true;
-
-        const { clientX, clientY } = event.touches[0];
-
-        const point: Position = {
-          x: clientX,
-          y: clientY,
-        };
-
-        // We need to prevent the default event in order to block native scrolling
-        // Also because we are using it as part of a drag we prevent the default action
-        // as a sign that we are using the event
-        event.preventDefault();
-        console.log('moving');
-        phase.actions.move(point);
-      },
-    },
-    {
-      eventName: 'touchend',
-      fn: (event: TouchEvent) => {
-        const phase: Phase = getPhase();
-        // drag had not started yet - do not prevent the default action
-        if (phase.type !== 'DRAGGING') {
-          cancel();
-          return;
-        }
-
-        // ending the drag
-        event.preventDefault();
-        phase.actions.drop({ shouldBlockNextClick: true });
-        completed();
-      },
-    },
-    {
-      eventName: 'touchcancel',
-      fn: (event: TouchEvent) => {
-        // drag had not started yet - do not prevent the default action
-        if (getPhase().type !== 'DRAGGING') {
-          cancel();
-          return;
-        }
-
-        // already dragging - this event is directly ending a drag
-        event.preventDefault();
-        cancel();
-      },
-    },
-    // another touch start should not happen without a
-    // touchend or touchcancel. However, just being super safe
-    {
-      eventName: 'touchstart',
-      fn: cancel,
-    },
     // If the orientation of the device changes - kill the drag
     // https://davidwalsh.name/orientation-change
     {
@@ -162,12 +92,92 @@ function getCaptureBindings({
         cancel();
       },
     },
+    // Cancel on page visibility change
+    {
+      eventName: supportedPageVisibilityEventName,
+      fn: cancel,
+    },
+  ];
+}
+
+function getTargetBindings({
+  cancel,
+  completed,
+  getPhase,
+}: GetBindingArgs): EventBinding[] {
+  return [
+    {
+      eventName: 'touchmove',
+      // Opting out of passive touchmove (default) so as to prevent scrolling while moving
+      // Not worried about performance as effect of move is throttled in requestAnimationFrame
+      // Using `capture: false` due to a recent horrible firefox bug: https://twitter.com/alexandereardon/status/1125904207184187393
+      options: { capture: false },
+      fn: (event: TouchEvent) => {
+        console.log('touch move');
+        const phase: Phase = getPhase();
+        // Drag has not yet started and we are waiting for a long press.
+        if (phase.type !== 'DRAGGING') {
+          cancel();
+          return;
+        }
+
+        // At this point we are dragging
+        phase.hasMoved = true;
+
+        const { clientX, clientY } = event.touches[0];
+
+        const point: Position = {
+          x: clientX,
+          y: clientY,
+        };
+
+        // We need to prevent the default event in order to block native scrolling
+        // Also because we are using it as part of a drag we prevent the default action
+        // as a sign that we are using the event
+        event.preventDefault();
+        console.log('moving');
+        phase.actions.move(point);
+      },
+    },
+    {
+      eventName: 'touchend',
+      fn: (event: TouchEvent) => {
+        console.log('touch end');
+        const phase: Phase = getPhase();
+        // drag had not started yet - do not prevent the default action
+        if (phase.type !== 'DRAGGING') {
+          cancel();
+          return;
+        }
+
+        // ending the drag
+        event.preventDefault();
+        phase.actions.drop({ shouldBlockNextClick: true });
+        completed();
+      },
+    },
+    {
+      eventName: 'touchcancel',
+      fn: (event: TouchEvent) => {
+        console.log('touch cancel');
+        // drag had not started yet - do not prevent the default action
+        if (getPhase().type !== 'DRAGGING') {
+          cancel();
+          return;
+        }
+
+        // already dragging - this event is directly ending a drag
+        event.preventDefault();
+        cancel();
+      },
+    },
     // Need to opt out of dragging if the user is a force press
     // Only for webkit which has decided to introduce its own custom way of doing things
     // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
     {
       eventName: 'touchforcechange',
       fn: (event: TouchEvent) => {
+        console.log('touch force change');
         const phase: Phase = getPhase();
 
         // needed to use phase.actions
@@ -203,6 +213,7 @@ function getCaptureBindings({
       eventName: supportedPageVisibilityEventName,
       fn: cancel,
     },
+    // Not adding a cancel on touchstart as this handler will pick up the initial touchstart event
   ];
 }
 
@@ -240,18 +251,23 @@ export default function useMouseSensor(
           return;
         }
 
-        // unbind this event handler
-        unbindEventsRef.current();
-
         const touch: Touch = event.touches[0];
         const { clientX, clientY } = touch;
         const point: Position = {
           x: clientX,
           y: clientY,
         };
+        const target: EventTarget = event.target;
+        invariant(
+          target instanceof HTMLElement,
+          'Expected touch target to be an element',
+        );
+
+        // unbind this event handler
+        unbindEventsRef.current();
 
         // eslint-disable-next-line no-use-before-define
-        startPendingDrag(actions, point);
+        startPendingDrag(actions, point, target);
       },
     }),
     // not including stop or startPendingDrag as it is not defined initially
@@ -305,15 +321,22 @@ export default function useMouseSensor(
   }, [stop]);
 
   const bindCapturingEvents = useCallback(
-    function bindCapturingEvents() {
+    function bindCapturingEvents(target: HTMLElement) {
       const options = { capture: true, passive: false };
-      const bindings: EventBinding[] = getCaptureBindings({
+      const args: GetBindingArgs = {
         cancel,
         completed: stop,
         getPhase,
-      });
+      };
 
-      unbindEventsRef.current = bindEvents(window, bindings, options);
+      const unbindTarget = bindEvents(target, getTargetBindings(args), options);
+      const unbindWindow = bindEvents(window, getWindowBindings(args), options);
+
+      unbindEventsRef.current = function unbind() {
+        console.log('unbinding both');
+        unbindTarget();
+        unbindWindow();
+      };
     },
     [cancel, getPhase, stop],
   );
@@ -342,7 +365,11 @@ export default function useMouseSensor(
   );
 
   const startPendingDrag = useCallback(
-    function startPendingDrag(actions: PreDragActions, point: Position) {
+    function startPendingDrag(
+      actions: PreDragActions,
+      point: Position,
+      target: HTMLElement,
+    ) {
       invariant(
         getPhase().type === 'IDLE',
         'Expected to move from IDLE to PENDING drag',
@@ -360,7 +387,7 @@ export default function useMouseSensor(
         longPressTimerId,
       });
 
-      bindCapturingEvents();
+      bindCapturingEvents(target);
     },
     [bindCapturingEvents, getPhase, setPhase, startDragging],
   );

@@ -302,7 +302,7 @@ type SensorMarshalArgs = {|
 const defaultSensors: Sensor[] = [
   useMouseSensor,
   useKeyboardSensor,
-  // useTouchSensor,
+  useTouchSensor,
 ];
 
 export default function useSensorMarshal({

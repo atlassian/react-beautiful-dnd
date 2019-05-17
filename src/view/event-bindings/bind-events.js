@@ -33,5 +33,7 @@ export default function bindEvents(
   });
 
   // Return a function to unbind events
-  return () => unbindEvents(el, bindings, sharedOptions);
+  return function unbind() {
+    unbindEvents(el, bindings, sharedOptions);
+  };
 }

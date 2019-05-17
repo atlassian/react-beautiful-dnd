@@ -201,7 +201,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
     return {
       // onMouseDown: () => {},
       // onKeyDown: () => {},
-      onTouchStart,
+      // onTouchStart,
       // onFocus,
       // onBlur,
       tabIndex: 0,
@@ -213,7 +213,7 @@ export default function useDragHandle(args: Args): ?DragHandleProps {
       draggable: false,
       onDragStart: preventHtml5Dnd,
     };
-  }, [contextId, draggableId, isEnabled, onTouchStart]);
+  }, [contextId, draggableId, isEnabled]);
 
   return props;
 }
