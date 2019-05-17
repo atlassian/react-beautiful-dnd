@@ -1,13 +1,13 @@
 // @flow
-import invariant from 'tiny-invariant';
 import React from 'react';
-import type { Position } from 'css-box-model';
-import { render, fireEvent } from 'react-testing-library';
-import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/util/is-sloppy-click-threshold-exceeded';
-import * as keyCodes from '../../../../../src/view/key-codes';
+import { render } from 'react-testing-library';
 import { isDragging } from '../util';
-import App, { type Item } from '../app';
+import App from '../app';
 import { simpleLift } from './util';
+
+function getCallCount(myMock): number {
+  return myMock.mock.calls.length;
+}
 
 it('should remove all window listeners when unmounting', () => {
   jest.spyOn(window, 'addEventListener');
@@ -17,8 +17,8 @@ it('should remove all window listeners when unmounting', () => {
 
   unmount();
 
-  expect(window.addEventListener.mock.calls.length).toEqual(
-    window.removeEventListener.mock.calls.length,
+  expect(getCallCount(window.addEventListener)).toEqual(
+    getCallCount(window.removeEventListener),
   );
 });
 
@@ -35,7 +35,7 @@ it('should remove all window listeners when unmounting mid drag', () => {
 
   unmount();
 
-  expect(window.addEventListener.mock.calls.length).toEqual(
-    window.removeEventListener.mock.calls.length,
+  expect(getCallCount(window.addEventListener)).toEqual(
+    getCallCount(window.removeEventListener),
   );
 });

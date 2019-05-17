@@ -4,10 +4,9 @@ import React from 'react';
 import type { Position } from 'css-box-model';
 import { render, fireEvent } from 'react-testing-library';
 import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/util/is-sloppy-click-threshold-exceeded';
-import * as keyCodes from '../../../../../src/view/key-codes';
 import { isDragging } from '../util';
 import App, { type Item } from '../app';
-import { simpleLift, primaryButton } from './util';
+import { simpleLift, primaryButton, getStartingMouseDown } from './util';
 
 // blocking announcement messages
 jest.spyOn(console, 'warn').mockImplementation((message: string) => {
@@ -16,16 +15,6 @@ jest.spyOn(console, 'warn').mockImplementation((message: string) => {
     `Unexpected console.warn("${message}")`,
   );
 });
-
-function getStartingMouseDown(): MouseEvent {
-  return new MouseEvent('mousedown', {
-    clientX: 0,
-    clientY: 0,
-    cancelable: true,
-    bubbles: true,
-    button: primaryButton,
-  });
-}
 
 it('should start a drag after sufficient movement', () => {
   const valid: Position[] = [
@@ -250,59 +239,4 @@ it('should not allow starting after the handle is unmounted', () => {
   simpleLift(handle);
 
   expect(isDragging(handle)).toBe(false);
-});
-
-describe('cancel pending drag', () => {
-  Object.keys(keyCodes).forEach((keyCode: string) => {
-    it(`should cancel a pending drag with keydown: ${keyCode}`, () => {
-      const { getByText } = render(<App />);
-      const handle: HTMLElement = getByText('item: 0');
-
-      fireEvent.mouseDown(handle, getStartingMouseDown());
-
-      // abort
-      const event: Event = new KeyboardEvent('keydown', {
-        keyCode,
-        bubbles: true,
-        cancelable: true,
-      });
-      fireEvent(handle, event);
-
-      // would normally start
-      fireEvent.mouseMove(handle, {
-        clientX: 0,
-        clientY: sloppyClickThreshold,
-      });
-
-      // drag not started
-      expect(isDragging(handle)).toBe(false);
-      // default behaviour not prevented on keypress
-      expect(event.defaultPrevented).toBe(false);
-    });
-  });
-
-  it('should cancel when resize is fired', () => {
-    const { getByText } = render(<App />);
-    const handle: HTMLElement = getByText('item: 0');
-
-    fireEvent.mouseDown(handle, getStartingMouseDown());
-
-    // abort
-    const event: Event = new Event('resize', {
-      bubbles: true,
-      cancelable: true,
-    });
-    fireEvent(handle, event);
-
-    // would normally start
-    fireEvent.mouseMove(handle, {
-      clientX: 0,
-      clientY: sloppyClickThreshold,
-    });
-
-    // drag not started
-    expect(isDragging(handle)).toBe(false);
-    // default behaviour not prevented on keypress
-    expect(event.defaultPrevented).toBe(false);
-  });
 });

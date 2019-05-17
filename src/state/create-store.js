@@ -13,7 +13,7 @@ import focus from './middleware/focus';
 import autoScroll from './middleware/auto-scroll';
 import pendingDrop from './middleware/pending-drop';
 import type { DimensionMarshal } from './dimension-marshal/dimension-marshal-types';
-import type { FocusMarshal } from './focus-marshal';
+import type { FocusMarshal } from '../view/use-focus-marshal/focus-marshal-types';
 import type { StyleMarshal } from '../view/use-style-marshal/style-marshal-types';
 import type { AutoScroller } from './auto-scroller/auto-scroller-types';
 import type { Responders, Announce } from '../types';

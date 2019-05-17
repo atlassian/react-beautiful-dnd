@@ -11,3 +11,13 @@ export function simpleLift(handle: HTMLElement) {
     clientY: sloppyClickThreshold,
   });
 }
+
+export function getStartingMouseDown(): MouseEvent {
+  return new MouseEvent('mousedown', {
+    clientX: 0,
+    clientY: 0,
+    cancelable: true,
+    bubbles: true,
+    button: primaryButton,
+  });
+}
