@@ -20,9 +20,15 @@ export const draggable = (() => {
   };
 })();
 
-export const droppable = {
-  contextId: `${prefix}-droppable-context-id`,
-};
+export const droppable = (() => {
+  const base: string = `${prefix}-droppable`;
+  return {
+    base,
+    contextId: `${base}-context-id`,
+    id: `${base}-id`,
+  };
+})();
+
 export const placeholder = {
   contextId: `${prefix}-placeholder-context-id`,
 };

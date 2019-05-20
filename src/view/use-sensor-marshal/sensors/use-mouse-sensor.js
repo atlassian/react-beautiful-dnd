@@ -14,6 +14,7 @@ import * as keyCodes from '../../key-codes';
 import preventStandardKeyEvents from './util/prevent-standard-key-events';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
 import { warning } from '../../../dev-warning';
+import useLayoutEffect from '../../use-isomorphic-layout-effect';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 const primaryButton: number = 0;
@@ -333,7 +334,7 @@ export default function useMouseSensor(
     [bindCapturingEvents],
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     listenForCapture();
 
     // kill any pending window events when unmounting

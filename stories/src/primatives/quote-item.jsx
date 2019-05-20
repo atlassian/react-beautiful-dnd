@@ -185,6 +185,7 @@ function QuoteItem(props: Props) {
       {...provided.draggableProps}
       {...provided.dragHandleProps}
       style={getStyle(provided, style)}
+      data-is-dragging={isDragging}
     >
       <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
       {isClone ? <CloneBadge>Clone</CloneBadge> : null}

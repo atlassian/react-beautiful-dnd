@@ -11,6 +11,7 @@ const data = {
 
 storiesOf('board', module)
   .add('simple', () => <Board initial={authorQuoteMap} />)
+  .add('dragging a clone', () => <Board initial={authorQuoteMap} useClone />)
   .add('medium data set', () => <Board initial={data.medium} />)
   .add('large data set', () => <Board initial={data.large} />)
   .add('long lists in a short container', () => (

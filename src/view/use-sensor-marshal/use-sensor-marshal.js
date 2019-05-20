@@ -317,7 +317,7 @@ export default function useSensorMarshal({
   const lockAPI: LockAPI = useState(() => create())[0];
 
   // We need to abort any capturing if there is no longer a drag
-  useEffect(
+  useLayoutEffect(
     function listenToStore() {
       let previous: State = store.getState();
       const unsubscribe = store.subscribe(() => {

@@ -235,6 +235,7 @@ const defaultProps = ({
   isDropDisabled: false,
   isCombineEnabled: false,
   ignoreContainerClipping: false,
+  whenDraggingClone: null,
   getContainerForClone: getBody,
 }: DefaultProps);
 

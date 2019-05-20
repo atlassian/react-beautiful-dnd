@@ -19,6 +19,8 @@ import { updateViewportMaxScroll } from '../../state/action-creators';
 export type DroppableProps = {|
   // used for shared global styles
   'data-rbd-droppable-context-id': ContextId,
+  // Used to lookup. Currently not used for drag and drop lifecycle
+  'data-rbd-droppable-droppable-id': DroppableId,
 |};
 
 export type Provided = {|
@@ -65,6 +67,7 @@ export type DefaultProps = {|
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
   direction: Direction,
+  whenDraggingClone: ?RenderClone,
   ignoreContainerClipping: boolean,
   getContainerForClone: () => HTMLElement,
 |};
@@ -78,7 +81,7 @@ export type OwnProps = {|
   children: (Provided, StateSnapshot) => Node,
   droppableId: DroppableId,
   // TODO: hoist these types up?
-  whenDraggingClone?: RenderClone,
+  whenDraggingClone: ?RenderClone,
 |};
 
 export type Props = {|

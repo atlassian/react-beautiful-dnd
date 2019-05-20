@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { useMemo, useCallback } from 'use-memo-one';
 import type { PreDragActions, DragActions } from '../../../types';
 import type {
@@ -11,6 +11,7 @@ import * as keyCodes from '../../key-codes';
 import bindEvents from '../../event-bindings/bind-events';
 import preventStandardKeyEvents from './util/prevent-standard-key-events';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
+import useLayoutEffect from '../../use-isomorphic-layout-effect';
 
 function noop() {}
 
@@ -148,11 +149,13 @@ export default function useKeyboardSensor(
       fn: function onKeyDown(event: KeyboardEvent) {
         // Event already used
         if (event.defaultPrevented) {
+          console.log('unable default prevented');
           return;
         }
 
         // Need to start drag with a spacebar press
         if (event.keyCode !== keyCodes.space) {
+          console.log('wrong code to start');
           return;
         }
 
@@ -162,8 +165,11 @@ export default function useKeyboardSensor(
 
         // Cannot start capturing at this time
         if (!preDrag) {
+          console.log('unable to start');
           return;
         }
+
+        console.log('starting drag');
 
         // we are consuming the event
         event.preventDefault();
@@ -222,7 +228,7 @@ export default function useKeyboardSensor(
     [startCaptureBinding],
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     listenForCapture();
 
     // kill any pending window events when unmounting

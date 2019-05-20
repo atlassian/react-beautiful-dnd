@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
 import type { PreDragActions, DragActions } from '../../../types';
@@ -12,6 +12,7 @@ import bindEvents from '../../event-bindings/bind-events';
 import * as keyCodes from '../../key-codes';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
 import { noop } from '../../../empty';
+import useLayoutEffect from '../../use-isomorphic-layout-effect';
 
 type TouchWithForce = Touch & {
   force: number,
@@ -392,7 +393,7 @@ export default function useMouseSensor(
     [bindCapturingEvents, getPhase, setPhase, startDragging],
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     listenForCapture();
 
     return function unmount() {

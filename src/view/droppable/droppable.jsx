@@ -107,10 +107,11 @@ export default function Droppable(props: Props) {
       innerRef: setDroppableRef,
       placeholder,
       droppableProps: {
+        'data-rbd-droppable-droppable-id': droppableId,
         'data-rbd-droppable-context-id': contextId,
       },
     }),
-    [contextId, placeholder, setDroppableRef],
+    [contextId, droppableId, placeholder, setDroppableRef],
   );
 
   const usingCloneWhenDragging: boolean = Boolean(whenDraggingClone);

@@ -32,6 +32,7 @@ type Props = {|
   withScrollableColumns?: boolean,
   isCombineEnabled?: boolean,
   containerHeight?: string,
+  useClone?: boolean,
 |};
 
 type State = {|
@@ -117,7 +118,12 @@ export default class Board extends Component<Props, State> {
   render() {
     const columns: QuoteMap = this.state.columns;
     const ordered: string[] = this.state.ordered;
-    const { containerHeight } = this.props;
+    const {
+      containerHeight,
+      useClone,
+      isCombineEnabled,
+      withScrollableColumns,
+    } = this.props;
 
     const board = (
       <Droppable
@@ -125,7 +131,7 @@ export default class Board extends Component<Props, State> {
         type="COLUMN"
         direction="horizontal"
         ignoreContainerClipping={Boolean(containerHeight)}
-        isCombineEnabled={this.props.isCombineEnabled}
+        isCombineEnabled={isCombineEnabled}
       >
         {(provided: DroppableProvided) => (
           <Container ref={provided.innerRef} {...provided.droppableProps}>
@@ -135,8 +141,9 @@ export default class Board extends Component<Props, State> {
                 index={index}
                 title={key}
                 quotes={columns[key]}
-                isScrollable={this.props.withScrollableColumns}
-                isCombineEnabled={this.props.isCombineEnabled}
+                isScrollable={withScrollableColumns}
+                isCombineEnabled={isCombineEnabled}
+                useClone={useClone}
               />
             ))}
             {provided.placeholder}
