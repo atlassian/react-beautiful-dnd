@@ -2,11 +2,11 @@
 import invariant from 'tiny-invariant';
 import React from 'react';
 import type { Position } from 'css-box-model';
-import { render, fireEvent } from 'react-testing-library';
+import { render, fireEvent, createEvent } from 'react-testing-library';
 import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/util/is-sloppy-click-threshold-exceeded';
 import { isDragging } from '../util';
 import App, { type Item } from '../app';
-import { simpleLift, primaryButton, getStartingMouseDown } from './util';
+import { simpleLift, primaryButton } from './util';
 
 // blocking announcement messages
 jest.spyOn(console, 'warn').mockImplementation((message: string) => {
@@ -29,13 +29,7 @@ it('should start a drag after sufficient movement', () => {
 
     const handle: HTMLElement = getByText('item: 0');
 
-    const mouseDown: MouseEvent = new MouseEvent('mousedown', {
-      clientX: 0,
-      clientY: 0,
-      button: primaryButton,
-      bubbles: true,
-      cancelable: true,
-    });
+    const mouseDown: MouseEvent = createEvent.mouseDown(handle);
 
     fireEvent(handle, mouseDown);
     // important that this is called to prevent focus
@@ -45,12 +39,10 @@ it('should start a drag after sufficient movement', () => {
     expect(isDragging(handle)).toBe(false);
 
     // mouse move to start drag
-    const mouseMove: MouseEvent = new MouseEvent('mousemove', {
-      target: handle,
+
+    const mouseMove: MouseEvent = createEvent.mouseMove(handle, {
       clientX: point.x,
       clientY: point.y,
-      bubbles: true,
-      cancelable: true,
     });
     fireEvent(window, mouseMove);
     // we are using the event - so prevent default is called
@@ -67,11 +59,7 @@ it('should allow standard click events', () => {
   const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
-  const click: MouseEvent = new MouseEvent('click', {
-    target: handle,
-    bubbles: true,
-    cancelable: true,
-  });
+  const click: MouseEvent = createEvent.click(handle);
   fireEvent(handle, click);
 
   expect(click.defaultPrevented).toBe(false);
@@ -89,11 +77,9 @@ it('should not call preventDefault on mouse movements while we are not sure if a
   });
 
   // not dragging yet
-  const mouseMove: MouseEvent = new MouseEvent('mousemove', {
+  const mouseMove: MouseEvent = createEvent.mouseMove(handle, {
     clientX: 0,
     clientY: sloppyClickThreshold - 1,
-    cancelable: true,
-    bubbles: true,
   });
   fireEvent(handle, mouseMove);
 
@@ -105,13 +91,7 @@ it('should call preventDefault on the initial mousedown event to prevent the ele
   const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
-  const mouseDown: MouseEvent = new MouseEvent('mousedown', {
-    clientX: 0,
-    clientY: 0,
-    cancelable: true,
-    bubbles: true,
-    button: primaryButton,
-  });
+  const mouseDown: MouseEvent = createEvent.mouseDown(handle);
   fireEvent(handle, mouseDown);
 
   expect(mouseDown.defaultPrevented).toBe(true);
@@ -122,13 +102,13 @@ it('should allow multiple false starts', () => {
   const handle: HTMLElement = getByText('item: 0');
 
   Array.from({ length: 5 }).forEach(() => {
-    fireEvent.mouseDown(handle, getStartingMouseDown());
+    fireEvent.mouseDown(handle);
     fireEvent.mouseUp(handle);
 
     expect(isDragging(handle)).toBe(false);
   });
 
-  fireEvent.mouseDown(handle, getStartingMouseDown());
+  fireEvent.mouseDown(handle);
   fireEvent.mouseMove(handle, {
     clientX: 0,
     clientY: sloppyClickThreshold,
@@ -141,7 +121,7 @@ it('should not start a drag if there was too little mouse movement while mouse w
   const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
-  fireEvent.mouseDown(handle, getStartingMouseDown());
+  fireEvent.mouseDown(handle);
   fireEvent.mouseMove(handle, {
     clientX: 0,
     clientY: sloppyClickThreshold - 1,
@@ -154,16 +134,10 @@ it('should not start a drag if not using the primary mouse button', () => {
   const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
-  fireEvent(
-    handle,
-    new MouseEvent('mousedown', {
-      clientX: 0,
-      clientY: 0,
-      cancelable: true,
-      bubbles: true,
-      button: primaryButton + 1,
-    }),
-  );
+  const mouseDown: Event = createEvent.mouseDown(handle, {
+    button: primaryButton + 1,
+  });
+  fireEvent(handle, mouseDown);
   fireEvent.mouseMove(handle, {
     clientX: 0,
     clientY: sloppyClickThreshold,
@@ -179,12 +153,7 @@ it('should not start a drag if a modifier key was used while pressing the mouse 
   const handle: HTMLElement = getByText('item: 0');
 
   keys.forEach((key: string) => {
-    const mouseDown: MouseEvent = new MouseEvent('mousedown', {
-      clientX: 0,
-      clientY: 0,
-      cancelable: true,
-      bubbles: true,
-      button: primaryButton,
+    const mouseDown: MouseEvent = createEvent.mouseDown(handle, {
       [key]: true,
     });
     fireEvent(handle, mouseDown);

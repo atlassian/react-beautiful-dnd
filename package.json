@@ -113,7 +113,7 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-test-renderer": "^16.8.6",
-    "react-testing-library": "^7.0.0",
+    "react-testing-library": "^7.0.1",
     "react-window": "^1.8.1",
     "rimraf": "^2.6.3",
     "rollup": "^1.11.3",
