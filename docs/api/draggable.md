@@ -217,14 +217,9 @@ If the user force presses on the element before they have moved the element (eve
 
 Any force press action will cancel an existing or pending drag
 
-#### Focus retention when moving between lists
+#### Focus retention
 
-When moving a `<Draggable />` from one list to another the default browser behaviour is for the _drag handle_ element to lose focus. This is because the old element is being destroyed and a new one is being created. The loss of focus is not good when dragging with a keyboard as the user is then unable to continue to interact with the element. To improve this user experience we automatically give a _drag handle_ focus when:
-
-- It was unmounted at the end of a drag
-- It had focus
-- It is enabled when mounted
-- No other elements have gained browser focus before the drag handle has mounted
+See [/docs/guides/focus.md]
 
 #### Extending `DraggableProps.style`
 

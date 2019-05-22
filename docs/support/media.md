@@ -19,8 +19,9 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - [Dragging React performance forward](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33)
 - [Grabbing the flame 🔥](https://medium.com/@alexandereardon/grabbing-the-flame-290c794fe852)
 
-## React ecosystem
+## Other
 
+- [What does react-beautiful-dnd cost to maintain?](https://dev.to/alexandereardon/what-does-react-beautiful-dnd-cost-to-maintain-52e8)
 - [Deep Sea Fishing with React Hooks](https://www.youtube.com/watch?v=MVi17tk3VsI)
 
 ## Podcasts
@@ -57,6 +58,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - sidebar.io - [28/8/16](https://sidebar.io/?after=2017-08-21&before=2017-08-21)
 - Best of JS [issue 25](https://weekly.bestofjs.org/issues/25/)
 - BxJS Weekly [episode 59](https://dev.to/yamalight/bxjs-weekly-episode-59-javascript-news-podcast-b28)
+- FASination Daily [May 21st](http://opensource.faseidl.com/#/)
 
 ## Articles, tutorials and blogs
 

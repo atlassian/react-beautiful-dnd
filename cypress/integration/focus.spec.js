@@ -82,3 +82,67 @@ it('should maintain focus if dragging a clone', () => {
   // focus maintained
   cy.focused().should('contain', 'id:2');
 });
+
+it('should give focus to a combine target', () => {
+  cy.visit('/iframe.html?id=board--with-combining-and-cloning');
+  cy.get(getHandleSelector('2')).focus();
+  cy.focused().should('contain', 'id:2');
+
+  cy.get(getHandleSelector('2')).trigger('keydown', {
+    keyCode: keyCodes.space,
+  });
+
+  // asserting id:2 is now dragging
+  cy.get(getHandleSelector('2')).should(
+    'have.attr',
+    'data-is-dragging',
+    'true',
+  );
+
+  // focus maintained
+  cy.focused().should('contain', 'id:2');
+
+  cy.get(getHandleSelector('2'))
+    .trigger('keydown', { keyCode: keyCodes.arrowRight, force: true })
+    // combining with item:1
+    .trigger('keydown', { keyCode: keyCodes.arrowUp, force: true })
+    // dropping
+    .trigger('keydown', { keyCode: keyCodes.space, force: true })
+    // clone will be unmounting during drop
+    .should('not.exist');
+
+  // focus giving to item:1 the combine target
+  cy.focused().should('contain', 'id:1');
+});
+
+it('should not give focus to a combine target if source did not have focus at start of drag', () => {
+  cy.visit('/iframe.html?id=board--with-combining-and-cloning');
+  // focusing on something unrelated to the drag
+  cy.get(getHandleSelector('3')).focus();
+
+  cy.get(getHandleSelector('2')).trigger('keydown', {
+    keyCode: keyCodes.space,
+  });
+
+  // asserting id:2 is now dragging
+  cy.get(getHandleSelector('2')).should(
+    'have.attr',
+    'data-is-dragging',
+    'true',
+  );
+
+  // focus not stolen
+  cy.focused().should('contain', 'id:3');
+
+  cy.get(getHandleSelector('2'))
+    .trigger('keydown', { keyCode: keyCodes.arrowRight, force: true })
+    // combining with item:1
+    .trigger('keydown', { keyCode: keyCodes.arrowUp, force: true })
+    // dropping
+    .trigger('keydown', { keyCode: keyCodes.space, force: true })
+    // clone will be unmounting during drop
+    .should('not.exist');
+
+  // focus not given to the combine target
+  cy.focused().should('contain', 'id:3');
+});
