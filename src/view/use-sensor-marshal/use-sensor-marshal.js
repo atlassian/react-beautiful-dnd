@@ -30,7 +30,7 @@ import useKeyboardSensor from './sensors/use-keyboard-sensor';
 import useTouchSensor from './sensors/use-touch-sensor';
 import useValidateSensorHooks from './use-validate-sensor-hooks';
 import isHandleInInteractiveElement from './is-handle-in-interactive-element';
-import getOptionsFromDraggable from './get-options-from-draggable';
+import getDataFromDraggable from './get-data-from-draggable';
 import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
 import isHtmlElement from '../is-type-of-element/is-html-element';
@@ -147,10 +147,10 @@ function tryGetLock({
   const draggable: HTMLElement = getClosestDraggable(contextId, handle);
   const {
     id,
-    shouldRespectForcePress,
-    canDragInteractiveElements,
     isEnabled,
-  } = getOptionsFromDraggable(draggable);
+    canDragInteractiveElements,
+    shouldRespectForcePress,
+  } = getDataFromDraggable(draggable);
 
   // draggable is not enabled - cannot start
   if (!isEnabled) {

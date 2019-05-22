@@ -4,7 +4,6 @@ import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import { useMemo, useCallback } from 'use-memo-one';
 import getStyle from './get-style';
-import useDragHandle from '../use-drag-handle/use-drag-handle';
 import type {
   Args as DragHandleArgs,
   Callbacks as DragHandleCallbacks,
@@ -25,6 +24,11 @@ import DroppableContext, {
 } from '../context/droppable-context';
 import useRequiredContext from '../use-required-context';
 import useValidation from './use-validation';
+import { serialize } from '../draggable-options';
+
+function preventHtml5Dnd(event: DragEvent) {
+  event.preventDefault();
+}
 
 export default function Draggable(props: Props) {
   // reference to DOM node
@@ -167,7 +171,24 @@ export default function Draggable(props: Props) {
     ],
   );
 
-  const dragHandleProps: ?DragHandleProps = useDragHandle(dragHandleArgs);
+  // const dragHandleProps: ?DragHandleProps = useDragHandle(dragHandleArgs);
+
+  const dragHandleProps: ?DragHandleProps = useMemo(
+    () =>
+      isEnabled
+        ? {
+            tabIndex: 0,
+            'data-rbd-drag-handle-draggable-id': draggableId,
+            'data-rbd-drag-handle-context-id': appContext.contextId,
+            // English default. Consumers are welcome to add their own start instruction
+            'aria-roledescription': 'Draggable item. Press space bar to lift',
+            // Opting out of html5 drag and drops
+            draggable: false,
+            onDragStart: preventHtml5Dnd,
+          }
+        : null,
+    [appContext.contextId, draggableId, isEnabled],
+  );
 
   const onMoveEnd = useCallback(
     (event: TransitionEvent) => {
@@ -201,7 +222,7 @@ export default function Draggable(props: Props) {
         'data-rbd-draggable-context-id': appContext.contextId,
         'data-rbd-draggable-id': draggableId,
         // TODO: create helper
-        'data-rbd-draggable-options': JSON.stringify({
+        'data-rbd-draggable-options': serialize({
           canDragInteractiveElements,
           shouldRespectForcePress,
           isEnabled,
