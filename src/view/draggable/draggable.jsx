@@ -221,7 +221,6 @@ export default function Draggable(props: Props) {
       draggableProps: {
         'data-rbd-draggable-context-id': appContext.contextId,
         'data-rbd-draggable-id': draggableId,
-        // TODO: create helper
         'data-rbd-draggable-options': serialize({
           canDragInteractiveElements,
           shouldRespectForcePress,

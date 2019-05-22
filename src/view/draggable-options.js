@@ -21,6 +21,7 @@ export function deserialize(raw: string): DraggableOptions {
     isEnabled: parsed.isEnabled,
   };
 
+  // Some extra validation for non production environments
   if (process.env.NODE_ENV !== 'production') {
     const parsedKeys: string[] = Object.keys(parsed);
     const proposedKeys: string[] = Object.keys(proposed);
