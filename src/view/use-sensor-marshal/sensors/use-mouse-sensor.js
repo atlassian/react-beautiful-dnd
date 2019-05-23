@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
 import type { PreDragActions, DragActions } from '../../../types';
@@ -9,16 +9,26 @@ import type {
   EventOptions,
 } from '../../event-bindings/event-types';
 import bindEvents from '../../event-bindings/bind-events';
-import isSloppyClickThresholdExceeded from './util/is-sloppy-click-threshold-exceeded';
 import * as keyCodes from '../../key-codes';
 import preventStandardKeyEvents from './util/prevent-standard-key-events';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
 import { warning } from '../../../dev-warning';
 import useLayoutEffect from '../../use-isomorphic-layout-effect';
+import { noop } from '../../../empty';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-const primaryButton: number = 0;
-function noop() {}
+export const primaryButton: number = 0;
+export const sloppyClickThreshold: number = 5;
+
+function isSloppyClickThresholdExceeded(
+  original: Position,
+  current: Position,
+): boolean {
+  return (
+    Math.abs(current.x - original.x) >= sloppyClickThreshold ||
+    Math.abs(current.y - original.y) >= sloppyClickThreshold
+  );
+}
 
 type MouseForceChangedEvent = MouseEvent & {
   webkitForce?: number,
