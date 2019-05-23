@@ -80,6 +80,7 @@ export default function App(props: Props) {
           </div>
         )}
       </Droppable>
+      {props.anotherChild || null}
     </DragDropContext>
   );
 }

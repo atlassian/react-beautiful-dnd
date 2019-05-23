@@ -8,7 +8,7 @@ export default (mode?: Mode = 'verbose') => (store: Store) => (
   next: Action => mixed,
 ) => (action: Action): any => {
   if (mode === 'light') {
-    console.log('🏃‍ Action:', action);
+    console.log('🏃‍ Action:', action.type);
     return next(action);
   }
 

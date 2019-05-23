@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import { render } from 'react-testing-library';
-import { isDragging } from './util';
-import { simpleLift } from './mouse-sensor/util';
-import App from './app';
+import { isDragging } from '../util';
+import { simpleLift } from './util';
+import App from '../app';
 
 it('should not abort a drag if a parent render occurs', () => {
   const { getByText, rerender } = render(<App />);
