@@ -54,7 +54,7 @@ export default ({
 
         // > uncomment to use
         // debugging logger
-        // require('../debug/middleware/log').default,
+        require('../debug/middleware/log').default('light'),
         // // user timing api
         // require('../debug/middleware/user-timing').default,
         // debugging timer

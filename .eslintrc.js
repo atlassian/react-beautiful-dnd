@@ -162,6 +162,6 @@ module.exports = {
     // Enforce rules of hooks
     'react-hooks/rules-of-hooks': 'error',
     // Second argument to hook functions
-    'react-hooks/exhaustive-deps': 'warn',
+    'react-hooks/exhaustive-deps': 'error',
   },
 };

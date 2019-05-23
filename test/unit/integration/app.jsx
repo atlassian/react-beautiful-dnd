@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
-import { DragDropContext, Droppable, Draggable } from '../../../../src';
-import type { Provided as DroppableProvided } from '../../../../src/view/droppable/droppable-types';
-import type { Provided as DraggableProvided } from '../../../../src/view/draggable/draggable-types';
+import { DragDropContext, Droppable, Draggable } from '../../../src';
+import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
+import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 
 export default class App extends React.Component<*, *> {
   onDragStart = () => {
