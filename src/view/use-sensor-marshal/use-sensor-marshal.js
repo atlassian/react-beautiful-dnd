@@ -37,9 +37,7 @@ import isHtmlElement from '../is-type-of-element/is-html-element';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 
 function preventDefault(event: Event) {
-  console.log('preventing click');
   event.preventDefault();
-  console.log('prevented?', event);
 }
 
 function noop() {}

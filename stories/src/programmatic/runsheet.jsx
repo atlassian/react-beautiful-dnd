@@ -44,9 +44,10 @@ function useDemoSensor(
       const preDrag: ?PreDragActions = tryGetActionLock(handle, noop);
 
       if (!preDrag) {
-        console.log('unable to start drag');
+        console.warn('unable to start drag');
         return;
       }
+      console.warn('starting drag');
 
       const actions: DragActions = preDrag.lift({
         mode: 'SNAP',
