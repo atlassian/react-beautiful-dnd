@@ -1,39 +1,39 @@
 // @flow
 import type { EventBinding, EventOptions } from './event-types';
 
-const getOptions = (
+type UnbindFn = () => void;
+
+function getOptions(
   shared?: EventOptions,
   fromBinding: ?EventOptions,
-): EventOptions => ({
-  ...shared,
-  ...fromBinding,
-});
-
-const unbindEvents = (
-  el: HTMLElement,
-  bindings: EventBinding[],
-  sharedOptions?: EventOptions,
-) => {
-  bindings.forEach((binding: EventBinding) => {
-    const options: Object = getOptions(sharedOptions, binding.options);
-
-    el.removeEventListener(binding.eventName, binding.fn, options);
-  });
-};
+): EventOptions {
+  return {
+    ...shared,
+    ...fromBinding,
+  };
+}
 
 export default function bindEvents(
   el: HTMLElement,
   bindings: EventBinding[],
   sharedOptions?: EventOptions,
 ): Function {
-  bindings.forEach((binding: EventBinding) => {
-    const options: Object = getOptions(sharedOptions, binding.options);
+  const unbindings: UnbindFn[] = bindings.map(
+    (binding: EventBinding): UnbindFn => {
+      const options: Object = getOptions(sharedOptions, binding.options);
 
-    el.addEventListener(binding.eventName, binding.fn, options);
-  });
+      el.addEventListener(binding.eventName, binding.fn, options);
+
+      return function unbind() {
+        el.removeEventListener(binding.eventName, binding.fn, options);
+      };
+    },
+  );
 
   // Return a function to unbind events
-  return function unbind() {
-    unbindEvents(el, bindings, sharedOptions);
+  return function unbindAll() {
+    unbindings.forEach((unbind: UnbindFn) => {
+      unbind();
+    });
   };
 }
