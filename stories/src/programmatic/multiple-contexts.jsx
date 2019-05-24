@@ -1,5 +1,7 @@
+/* eslint-disable no-await-in-loop */
 // @flow
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createRef } from 'react';
+import invariant from 'tiny-invariant';
 import styled from '@emotion/styled';
 import { useCallback } from 'use-memo-one';
 import type { Quote } from '../types';
@@ -10,9 +12,11 @@ import type {
   Sensor,
 } from '../../../src/types';
 import { quotes as initial } from '../data';
+import * as dataAttr from '../../../src/view/data-attributes';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import reorder from '../reorder';
+import bindEvents from '../../../src/view/event-bindings/bind-events';
 
 function sleep(fn: Function, time?: number = 300) {
   return new Promise(resolve => {
@@ -23,7 +27,7 @@ function sleep(fn: Function, time?: number = 300) {
   });
 }
 
-function getSensor(contextId: string, delay: number) {
+function getSensor(getContextId: () => string, delay: number) {
   return function useCustomSensor(
     tryGetActionLock: (
       source: Event | Element,
@@ -34,7 +38,7 @@ function getSensor(contextId: string, delay: number) {
       async function start() {
         // grabbing the first drag handle we can
         const handle: ?HTMLElement = document.querySelector(
-          `[data-rbd-drag-handle-context-id="${contextId}"]`,
+          `[data-rbd-drag-handle-context-id="${getContextId()}"]`,
         );
         if (!handle) {
           console.log('could not find drag handle');
@@ -52,16 +56,35 @@ function getSensor(contextId: string, delay: number) {
         const actions: DragActions = preDrag.lift({
           mode: 'SNAP',
         });
-        const { moveDown, moveUp, drop } = actions;
+        const { moveDown, moveUp, drop, isActive, cancel } = actions;
 
-        for (let i = 0; i < 100; i++) {
-          await sleep(moveDown, delay);
-          await sleep(moveDown, delay);
-          await sleep(moveUp, delay);
-          await sleep(moveUp, delay);
+        const unbind = bindEvents(window, [
+          {
+            eventName: 'resize',
+            fn: cancel,
+            options: { once: true },
+          },
+        ]);
+
+        for (let i = 0; i < 20 && isActive(); i++) {
+          await sleep(() => {
+            // might no longer be active after delay
+            if (!isActive()) {
+              return;
+            }
+            if (i % 2 === 0) {
+              moveDown();
+            } else {
+              moveUp();
+            }
+          }, delay);
         }
 
-        await sleep(drop, delay);
+        if (isActive()) {
+          await sleep(drop, delay);
+        }
+
+        unbind();
       },
       [tryGetActionLock],
     );
@@ -114,14 +137,53 @@ const Root = styled.div`
   justify-content: space-evenly;
 `;
 
+const Column = styled.div``;
+
+const Title = styled.h3`
+  text-align: center;
+`;
+
+const selector: string = `[${dataAttr.droppable.contextId}]`;
+
+function getContextIdFromEl(el: ?HTMLElement) {
+  invariant(el, 'No ref set');
+  const droppable: ?HTMLElement = el.querySelector(selector);
+  invariant(droppable, 'Could not find droppable');
+  const contextId: ?string = droppable.getAttribute(
+    dataAttr.droppable.contextId,
+  );
+  invariant(contextId, 'Expected data attribute to be set');
+  return contextId;
+}
+
 export default function App() {
-  // This is a pretty basic setup that will not work with hot reloading
-  // would need to manually pull the context id from a data attribute to make it more resiliant
+  const firstRef = createRef();
+  const secondRef = createRef();
+
+  function getContextId(ref) {
+    return () => getContextIdFromEl(ref.current);
+  }
+
   return (
     <Root>
-      <QuoteApp initial={initial} sensors={[getSensor('0', 300)]} />
-      <QuoteApp initial={initial} sensors={[getSensor('1', 400)]} />
-      <QuoteApp initial={initial} />
+      <Column ref={firstRef}>
+        <Title>Programmatic #1</Title>
+        <QuoteApp
+          initial={initial}
+          sensors={[getSensor(getContextId(firstRef), 300)]}
+        />
+      </Column>
+      <Column ref={secondRef}>
+        <Title>Programmatic #2</Title>
+        <QuoteApp
+          initial={initial}
+          sensors={[getSensor(getContextId(secondRef), 400)]}
+        />
+      </Column>
+      <Column>
+        <Title>User controlled</Title>
+        <QuoteApp initial={initial} />
+      </Column>
     </Root>
   );
 }
