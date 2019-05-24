@@ -1,5 +1,5 @@
 // @flow
-import { fireEvent, act } from 'react-testing-library';
+import { createEvent, fireEvent, act } from 'react-testing-library';
 import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
 import { timeForLongPress } from '../../../../../src/view/use-sensor-marshal/sensors/use-touch-sensor';
 import * as keyCodes from '../../../../../src/view/key-codes';
@@ -15,6 +15,16 @@ export type Control = {|
 export function simpleLift(control: Control, handle: HTMLElement) {
   control.preLift(handle);
   control.lift(handle);
+}
+
+function getTransitionEnd(): Event {
+  const event: Event = new Event('transitionend', {
+    bubbles: true,
+    cancelable: true,
+  });
+  // cheating and adding property to event as TransitionEvent constructor does not exist
+  event.propertyName = 'transform';
+  return event;
 }
 
 export const mouse: Control = {
@@ -37,6 +47,7 @@ export const mouse: Control = {
   },
   drop: (handle: HTMLElement) => {
     fireEvent.mouseUp(handle);
+    fireEvent(handle, getTransitionEnd());
   },
 };
 
@@ -53,6 +64,7 @@ export const keyboard: Control = {
   },
   drop: (handle: HTMLElement) => {
     fireEvent.keyDown(handle, { keyCode: keyCodes.space });
+    // no drop animation
   },
 };
 
@@ -77,6 +89,8 @@ export const touch: Control = {
   },
   drop: (handle: HTMLElement) => {
     fireEvent.touchEnd(handle);
+    // allow for drop animation
+    fireEvent(handle, getTransitionEnd());
   },
 };
 
