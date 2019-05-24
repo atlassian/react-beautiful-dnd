@@ -249,6 +249,7 @@ export default function useMouseSensor(
           return;
         }
 
+        console.log('touches', event.touches);
         const touch: Touch = event.touches[0];
         const { clientX, clientY } = touch;
         const point: Position = {
@@ -300,9 +301,11 @@ export default function useMouseSensor(
       clearTimeout(current.longPressTimerId);
     }
 
+    console.log('STOPPing');
     setPhase(idle);
     unbindEventsRef.current();
 
+    console.log('listen for capture');
     listenForCapture();
   }, [listenForCapture, setPhase]);
 
