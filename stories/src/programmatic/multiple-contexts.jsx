@@ -17,6 +17,7 @@ import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import reorder from '../reorder';
 import bindEvents from '../../../src/view/event-bindings/bind-events';
+import { grid } from '../constants';
 
 function sleep(fn: Function, time?: number = 300) {
   return new Promise(resolve => {
@@ -141,6 +142,7 @@ const Column = styled.div``;
 
 const Title = styled.h3`
   text-align: center;
+  padding: ${grid * 2}px;
 `;
 
 const selector: string = `[${dataAttr.droppable.contextId}]`;
@@ -167,21 +169,36 @@ export default function App() {
   return (
     <Root>
       <Column ref={firstRef}>
-        <Title>Programmatic #1</Title>
+        <Title>
+          Programmatic #1{' '}
+          <span role="img" aria-label="controller">
+            🎮
+          </span>
+        </Title>
         <QuoteApp
           initial={initial}
           sensors={[getSensor(getContextId(firstRef), 300)]}
         />
       </Column>
       <Column ref={secondRef}>
-        <Title>Programmatic #2</Title>
+        <Title>
+          Programmatic #2{' '}
+          <span role="img" aria-label="controller">
+            🎮
+          </span>
+        </Title>
         <QuoteApp
           initial={initial}
           sensors={[getSensor(getContextId(secondRef), 400)]}
         />
       </Column>
       <Column>
-        <Title>User controlled</Title>
+        <Title>
+          User controlled{' '}
+          <span role="img" aria-label="hand">
+            🤚
+          </span>
+        </Title>
         <QuoteApp initial={initial} />
       </Column>
     </Root>
