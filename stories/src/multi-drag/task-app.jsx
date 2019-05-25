@@ -26,9 +26,15 @@ const getTasks = (entities: Entities, columnId: Id): Task[] =>
   entities.columns[columnId].taskIds.map(
     (taskId: Id): Task => entities.tasks[taskId],
   );
-const getSelected = (selected: Id[], entities: Entities, columnId: Id): Id[] => {
+const getSelected = (
+  selected: Id[],
+  entities: Entities,
+  columnId: Id,
+): Id[] => {
   const available: Id[] = entities.columns[columnId].taskIds;
-  return selected.filter((selectedId: Id): boolean => available.includes(selectedId));
+  return selected.filter(
+    (selectedId: Id): boolean => available.includes(selectedId),
+  );
 };
 export default class TaskApp extends Component<*, State> {
   state: State = {
