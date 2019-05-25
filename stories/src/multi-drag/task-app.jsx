@@ -26,6 +26,10 @@ const getTasks = (entities: Entities, columnId: Id): Task[] =>
   entities.columns[columnId].taskIds.map(
     (taskId: Id): Task => entities.tasks[taskId],
   );
+const getSelected = (selected: Id[], entities: Entities, columnId: Id): Id[] => {
+  const available: Id[] = entities.columns[columnId].taskIds;
+  return selected.filter((selectedId: Id): boolean => available.includes(selectedId));
+};
 export default class TaskApp extends Component<*, State> {
   state: State = {
     entities: initial,
@@ -196,7 +200,7 @@ export default class TaskApp extends Component<*, State> {
             <Column
               column={entities.columns[columnId]}
               tasks={getTasks(entities, columnId)}
-              selectedTaskIds={selected}
+              selectedTaskIds={getSelected(selected, entities, columnId)}
               key={columnId}
               draggingTaskId={this.state.draggingTaskId}
               toggleSelection={this.toggleSelection}
