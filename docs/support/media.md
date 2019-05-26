@@ -59,6 +59,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - Best of JS [issue 25](https://weekly.bestofjs.org/issues/25/)
 - BxJS Weekly [episode 59](https://dev.to/yamalight/bxjs-weekly-episode-59-javascript-news-podcast-b28)
 - FASination Daily [May 21st](http://opensource.faseidl.com/#/)
+- The Week of React [issue 57](http://www.theweekofreact.com/issues/fold-up-images-in-react-using-webassembly-w-react-react-europe-livestream-more-179542)
 
 ## Articles, tutorials and blogs
 
