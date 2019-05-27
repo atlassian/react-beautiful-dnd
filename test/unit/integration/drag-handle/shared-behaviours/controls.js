@@ -23,6 +23,7 @@ function getTransitionEnd(): Event {
     cancelable: true,
   });
   // cheating and adding property to event as TransitionEvent constructor does not exist
+  // $ExpectError - being amazing
   event.propertyName = 'transform';
   return event;
 }

@@ -11,6 +11,7 @@ type Props = {|
   children: Node | null,
 
   __unstableSensors?: Sensor[],
+  enableDefaultSensors?: ?boolean,
 |};
 
 let instanceCount: number = 0;

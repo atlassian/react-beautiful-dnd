@@ -298,6 +298,7 @@ type SensorMarshalArgs = {|
   contextId: ContextId,
   store: Store,
   customSensors: ?(Sensor[]),
+  enableDefaultSensors: boolean,
 |};
 
 const defaultSensors: Sensor[] = [
@@ -310,8 +311,13 @@ export default function useSensorMarshal({
   contextId,
   store,
   customSensors,
+  enableDefaultSensors,
 }: SensorMarshalArgs) {
-  const useSensors: Sensor[] = [...defaultSensors, ...(customSensors || [])];
+  const useSensors: Sensor[] = [
+    ...(enableDefaultSensors ? defaultSensors : []),
+    ...(customSensors || []),
+  ];
+  console.log('enableDefaultSensors', enableDefaultSensors);
   const lockAPI: LockAPI = useState(() => create())[0];
 
   // We need to abort any capturing if there is no longer a drag

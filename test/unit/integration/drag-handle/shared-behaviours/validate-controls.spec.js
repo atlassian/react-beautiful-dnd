@@ -21,7 +21,6 @@ forEachSensor((control: Control) => {
     expect(isDragging(handle)).toBe(true);
 
     // drop
-    console.log('drop start');
     control.drop(handle);
     expect(isDragging(handle)).toBe(false);
   });

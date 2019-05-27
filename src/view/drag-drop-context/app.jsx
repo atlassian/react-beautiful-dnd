@@ -43,7 +43,6 @@ import useStartupValidation from './use-startup-validation';
 import usePrevious from '../use-previous-ref';
 import { warning } from '../../dev-warning';
 import useSensorMarshal from '../use-sensor-marshal/use-sensor-marshal';
-import useLayoutEffect from '../use-isomorphic-layout-effect';
 
 type Props = {|
   ...Responders,
@@ -51,7 +50,10 @@ type Props = {|
   setOnError: (onError: Function) => void,
   // we do not technically need any children for this component
   children: Node | null,
+
+  // sensors
   __unstableSensors?: Sensor[],
+  enableDefaultSensors?: ?boolean,
 |};
 
 const createResponders = (props: Props): Responders => ({
@@ -201,6 +203,8 @@ export default function App(props: Props) {
     contextId,
     store,
     customSensors: __unstableSensors,
+    // default to 'true' unless 'false' is explicitly passed
+    enableDefaultSensors: props.enableDefaultSensors !== false,
   });
 
   // Clean store when unmounting

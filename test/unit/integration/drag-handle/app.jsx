@@ -18,9 +18,11 @@ export type Item = {|
 type Props = {|
   onDragStart?: Function,
   onDragEnd?: Function,
-  sensors?: Sensor[],
   items?: Item[],
   anotherChild?: Node,
+
+  sensors?: Sensor[],
+  enableDefaultSensors?: boolean,
 |};
 
 function noop() {}
@@ -46,6 +48,7 @@ export default function App(props: Props) {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       __unstableSensors={sensors}
+      enableDefaultSensors={props.enableDefaultSensors}
     >
       <Droppable droppableId="droppable">
         {(droppableProvided: DroppableProvided) => (
