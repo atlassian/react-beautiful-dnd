@@ -425,9 +425,13 @@ export type DragActions = {|
 |};
 
 export type PreDragActions = {|
+  // is lock still active?
   isActive: () => boolean,
+  // whether it has been indicated if force press should be respected
   shouldRespectForcePress: () => boolean,
+  // upgrade lock
   lift: (args: SensorLift) => DragActions,
+  // release the lock
   abort: () => void,
 |};
 
