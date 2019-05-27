@@ -29,13 +29,13 @@ function useMySensor(tryGetActionLock: TryGetActionLock) => void) {
     return;
   }
 
-  preDrag.lift({ mode: 'SNAP' });
+  const drag: DragActions = preDrag.lift({ mode: 'SNAP' });
 
-  preDrag.moveDown();
-  preDrag.moveDown();
-  preDrag.moveDown();
+  drag.moveDown();
+  drag.moveDown();
+  drag.moveDown();
 
-  preDrag.drop();
+  drag.drop();
 }
 
 function App() {
