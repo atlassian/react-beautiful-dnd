@@ -29,7 +29,7 @@ import useMouseSensor from './sensors/use-mouse-sensor';
 import useKeyboardSensor from './sensors/use-keyboard-sensor';
 import useTouchSensor from './sensors/use-touch-sensor';
 import useValidateSensorHooks from './use-validate-sensor-hooks';
-import isHandleInInteractiveElement from './is-handle-in-interactive-element';
+import isTargetInInteractiveElement from './is-target-in-interactive-element';
 import getDataFromDraggable from './get-data-from-draggable';
 import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
@@ -158,7 +158,7 @@ function tryGetLock({
   // do not allow dragging from interactive elements
   if (
     !canDragInteractiveElements &&
-    isHandleInInteractiveElement(draggable, handle)
+    isTargetInInteractiveElement(draggable, target)
   ) {
     return null;
   }
@@ -316,7 +316,6 @@ export default function useSensorMarshal({
     ...(enableDefaultSensors ? defaultSensors : []),
     ...(customSensors || []),
   ];
-  console.log('enableDefaultSensors', enableDefaultSensors);
   const lockAPI: LockAPI = useState(() => create())[0];
 
   // We need to abort any capturing if there is no longer a drag

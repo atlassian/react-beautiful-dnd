@@ -149,13 +149,11 @@ export default function useKeyboardSensor(
       fn: function onKeyDown(event: KeyboardEvent) {
         // Event already used
         if (event.defaultPrevented) {
-          console.log('unable default prevented');
           return;
         }
 
         // Need to start drag with a spacebar press
         if (event.keyCode !== keyCodes.space) {
-          console.log('wrong code to start');
           return;
         }
 
@@ -165,11 +163,8 @@ export default function useKeyboardSensor(
 
         // Cannot start capturing at this time
         if (!preDrag) {
-          console.log('unable to start');
           return;
         }
-
-        console.log('starting drag');
 
         // we are consuming the event
         event.preventDefault();

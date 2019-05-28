@@ -51,7 +51,7 @@ forEachSensor((control: Control) => {
         {...provided.dragHandleProps}
         ref={provided.innerRef}
         data-is-dragging={snapshot.isDragging}
-        data-testid={item.id}
+        data-testid={`handle-${item.id}`}
       >
         <div data-testid={`inner-${item.id}`} contentEditable />
       </div>
@@ -59,10 +59,11 @@ forEachSensor((control: Control) => {
 
     const { getByTestId } = render(<App renderItem={renderItem} />);
     const inner: HTMLElement = getByTestId('inner-0');
+    const handle: HTMLElement = getByTestId('handle-0');
 
     simpleLift(control, inner);
 
-    expect(isDragging(inner)).toBe(false);
+    expect(isDragging(handle)).toBe(false);
   });
 
   it('should block the drag if originated from a child of a child contenteditable', () => {
@@ -75,7 +76,7 @@ forEachSensor((control: Control) => {
         {...provided.dragHandleProps}
         ref={provided.innerRef}
         data-is-dragging={snapshot.isDragging}
-        data-testid={item.id}
+        data-testid={`handle-${item.id}`}
       >
         <div contentEditable>
           <p>hello there</p>
@@ -86,10 +87,11 @@ forEachSensor((control: Control) => {
 
     const { getByTestId } = render(<App renderItem={renderItem} />);
     const inner: HTMLElement = getByTestId('inner-0');
+    const handle: HTMLElement = getByTestId('handle-0');
 
     simpleLift(control, inner);
 
-    expect(isDragging(inner)).toBe(false);
+    expect(isDragging(handle)).toBe(false);
   });
 
   it('should not block if contenteditable is set to false', () => {

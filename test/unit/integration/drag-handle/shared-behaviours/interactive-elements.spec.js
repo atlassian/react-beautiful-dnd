@@ -8,7 +8,7 @@ import {
   type DraggableStateSnapshot,
 } from '../../../../../src';
 import App, { type Item } from '../app';
-import { interactiveTagNames } from '../../../../../src/view/use-sensor-marshal/is-handle-in-interactive-element';
+import { interactiveTagNames } from '../../../../../src/view/use-sensor-marshal/is-target-in-interactive-element';
 
 const mixedCase = (obj: Object): string[] => [
   ...Object.keys(obj).map(s => s.toLowerCase()),
@@ -101,6 +101,7 @@ forEachSensor((control: Control) => {
             {...provided.dragHandleProps}
             ref={provided.innerRef}
             data-is-dragging={snapshot.isDragging}
+            data-testid={`handle-${item.id}`}
           >
             <TagName data-testid={`inner-${item.id}`} />
           </div>
@@ -109,10 +110,11 @@ forEachSensor((control: Control) => {
 
       const { unmount, getByTestId } = render(<App renderItem={renderItem} />);
       const inner: HTMLElement = getByTestId('inner-0');
+      const handle: HTMLElement = getByTestId('handle-0');
 
       simpleLift(control, inner);
 
-      expect(isDragging(inner)).toBe(false);
+      expect(isDragging(handle)).toBe(false);
 
       unmount();
     });
@@ -132,6 +134,7 @@ forEachSensor((control: Control) => {
             {...provided.dragHandleProps}
             ref={provided.innerRef}
             data-is-dragging={snapshot.isDragging}
+            data-testid={`handle-${item.id}`}
           >
             <TagName data-testid={`inner-${item.id}`} />
           </div>
@@ -141,11 +144,12 @@ forEachSensor((control: Control) => {
       const { unmount, getByTestId } = render(
         <App items={items} renderItem={renderItem} />,
       );
+      const handle: HTMLElement = getByTestId('handle-0');
       const inner: HTMLElement = getByTestId('inner-0');
 
       simpleLift(control, inner);
 
-      expect(isDragging(inner)).toBe(true);
+      expect(isDragging(handle)).toBe(true);
 
       unmount();
     });

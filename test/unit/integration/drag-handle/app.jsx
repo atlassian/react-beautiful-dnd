@@ -85,11 +85,10 @@ export default function App(props: Props) {
                 draggableId={item.id}
                 index={index}
                 isDragDisabled={item.isEnabled === false}
-                // default to disabled = true
                 disableInteractiveElementBlocking={
                   typeof item.canDragInteractiveElements === 'boolean'
                     ? item.canDragInteractiveElements
-                    : true
+                    : false
                 }
               >
                 {render(item)}
