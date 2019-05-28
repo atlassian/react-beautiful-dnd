@@ -12,14 +12,33 @@ import {
 
 export type Item = {|
   id: string,
-  isEnabled: boolean,
+  // defaults to true
+  isEnabled?: boolean,
+  // defaults to false
+  canDragInteractiveElements?: boolean,
 |};
+
+const defaultItemRender = (item: Item) => (
+  provided: DraggableProvided,
+  snapshot: DraggableStateSnapshot,
+) => (
+  <div
+    {...provided.draggableProps}
+    {...provided.dragHandleProps}
+    data-is-dragging={snapshot.isDragging}
+    data-is-drop-animating={snapshot.isDropAnimating}
+    ref={provided.innerRef}
+  >
+    item: {item.id}
+  </div>
+);
 
 type Props = {|
   onDragStart?: Function,
   onDragEnd?: Function,
   items?: Item[],
   anotherChild?: Node,
+  renderItem?: typeof defaultItemRender,
 
   sensors?: Sensor[],
   enableDefaultSensors?: boolean,
@@ -32,7 +51,6 @@ function getItems() {
     { length: 3 },
     (v, k): Item => ({
       id: `${k}`,
-      isEnabled: true,
     }),
   );
 }
@@ -42,6 +60,7 @@ export default function App(props: Props) {
   const onDragEnd = props.onDragStart || noop;
   const sensors: Sensor[] = props.sensors || [];
   const [items] = useState(() => props.items || getItems());
+  const render = props.renderItem || defaultItemRender;
 
   return (
     <DragDropContext
@@ -61,22 +80,12 @@ export default function App(props: Props) {
                 key={item.id}
                 draggableId={item.id}
                 index={index}
-                isDragDisabled={!item.isEnabled}
+                isDragDisabled={item.isEnabled === false}
+                disableInteractiveElementBlocking={
+                  item.canDragInteractiveElements === true
+                }
               >
-                {(
-                  provided: DraggableProvided,
-                  snapshot: DraggableStateSnapshot,
-                ) => (
-                  <div
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    data-is-dragging={snapshot.isDragging}
-                    data-is-drop-animating={snapshot.isDropAnimating}
-                    ref={provided.innerRef}
-                  >
-                    item: {item.id}
-                  </div>
-                )}
+                {render(item)}
               </Draggable>
             ))}
             {droppableProvided.placeholder}
