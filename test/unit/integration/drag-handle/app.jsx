@@ -18,7 +18,11 @@ export type Item = {|
   canDragInteractiveElements?: boolean,
 |};
 
-const defaultItemRender = (item: Item) => (
+type RenderItem = (
+  item: Item,
+) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot) => Node;
+
+const defaultItemRender: RenderItem = (item: Item) => (
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
 ) => (
@@ -38,7 +42,7 @@ type Props = {|
   onDragEnd?: Function,
   items?: Item[],
   anotherChild?: Node,
-  renderItem?: typeof defaultItemRender,
+  renderItem?: RenderItem,
 
   sensors?: Sensor[],
   enableDefaultSensors?: boolean,
@@ -81,8 +85,11 @@ export default function App(props: Props) {
                 draggableId={item.id}
                 index={index}
                 isDragDisabled={item.isEnabled === false}
+                // default to disabled = true
                 disableInteractiveElementBlocking={
-                  item.canDragInteractiveElements === true
+                  typeof item.canDragInteractiveElements === 'boolean'
+                    ? item.canDragInteractiveElements
+                    : true
                 }
               >
                 {render(item)}

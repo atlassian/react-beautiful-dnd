@@ -227,7 +227,6 @@ function tryGetLock({
 
       // block next click if requested
       if (options.shouldBlockNextClick) {
-        console.log('adding handler');
         window.addEventListener('click', preventDefault, {
           // only blocking a single click
           once: true,
