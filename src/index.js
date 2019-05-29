@@ -21,6 +21,7 @@ export type {
   DragStart,
   DragUpdate,
   DropResult,
+  Direction,
   ResponderProvided,
   Announce,
   DraggableLocation,

@@ -8,6 +8,7 @@ import {
   type DraggableProvided,
   type DraggableStateSnapshot,
   type Sensor,
+  type Direction,
 } from '../../../../src';
 
 export type Item = {|
@@ -41,10 +42,12 @@ const defaultItemRender: RenderItem = (item: Item) => (
 
 type Props = {|
   onDragStart?: Function,
+  onDragUpdate?: Function,
   onDragEnd?: Function,
   items?: Item[],
   anotherChild?: Node,
   renderItem?: RenderItem,
+  direction?: Direction,
 
   sensors?: Sensor[],
   enableDefaultSensors?: boolean,
@@ -63,19 +66,22 @@ function getItems() {
 
 export default function App(props: Props) {
   const onDragStart = props.onDragStart || noop;
+  const onDragUpdate = props.onDragUpdate || noop;
   const onDragEnd = props.onDragEnd || noop;
   const sensors: Sensor[] = props.sensors || [];
   const [items] = useState(() => props.items || getItems());
   const render = props.renderItem || defaultItemRender;
+  const direction: Direction = props.direction || 'vertical';
 
   return (
     <DragDropContext
       onDragStart={onDragStart}
+      onDragUpdate={onDragUpdate}
       onDragEnd={onDragEnd}
       __unstableSensors={sensors}
       enableDefaultSensors={props.enableDefaultSensors}
     >
-      <Droppable droppableId="droppable">
+      <Droppable droppableId="droppable" direction={direction}>
         {(droppableProvided: DroppableProvided) => (
           <div
             {...droppableProvided.droppableProps}
