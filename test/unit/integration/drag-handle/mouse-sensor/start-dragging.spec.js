@@ -3,11 +3,12 @@ import invariant from 'tiny-invariant';
 import React from 'react';
 import type { Position } from 'css-box-model';
 import { render, fireEvent, createEvent } from 'react-testing-library';
-import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
+import {
+  sloppyClickThreshold,
+  primaryButton,
+} from '../../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
 import { isDragging } from '../util';
 import App from '../app';
-import { primaryButton } from './util';
-
 // blocking announcement messages
 jest.spyOn(console, 'warn').mockImplementation((message: string) => {
   invariant(

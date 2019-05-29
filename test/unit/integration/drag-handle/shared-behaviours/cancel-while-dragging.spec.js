@@ -9,7 +9,8 @@ import { forEachSensor, simpleLift, type Control } from '../controls';
 
 forEachSensor((control: Control) => {
   it('should cancel when pressing escape', () => {
-    const { getByText } = render(<App />);
+    const onDragEnd = jest.fn();
+    const { getByText } = render(<App onDragEnd={onDragEnd} />);
     const handle: HTMLElement = getByText('item: 0');
 
     simpleLift(control, handle);
@@ -26,10 +27,12 @@ forEachSensor((control: Control) => {
     expect(event.defaultPrevented).toBe(true);
     // drag ended
     expect(isDragging(handle)).toBe(false);
+    expect(onDragEnd.mock.calls[0][0].reason).toBe('CANCEL');
   });
 
   it('should cancel when window is resized', () => {
-    const { getByText } = render(<App />);
+    const onDragEnd = jest.fn();
+    const { getByText } = render(<App onDragEnd={onDragEnd} />);
     const handle: HTMLElement = getByText('item: 0');
 
     simpleLift(control, handle);
@@ -47,10 +50,12 @@ forEachSensor((control: Control) => {
     expect(event.defaultPrevented).toBe(false);
     // drag ended
     expect(isDragging(handle)).toBe(false);
+    expect(onDragEnd.mock.calls[0][0].reason).toBe('CANCEL');
   });
 
   it('should cancel when there is a visibility change', () => {
-    const { getByText } = render(<App />);
+    const onDragEnd = jest.fn();
+    const { getByText } = render(<App onDragEnd={onDragEnd} />);
     const handle: HTMLElement = getByText('item: 0');
 
     simpleLift(control, handle);
@@ -68,5 +73,6 @@ forEachSensor((control: Control) => {
     expect(event.defaultPrevented).toBe(false);
     // drag ended
     expect(isDragging(handle)).toBe(false);
+    expect(onDragEnd.mock.calls[0][0].reason).toBe('CANCEL');
   });
 });

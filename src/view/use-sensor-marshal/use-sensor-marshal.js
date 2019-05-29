@@ -11,6 +11,7 @@ import type {
   StopDragOptions,
   PreDragActions,
   DragActions,
+  DraggableDimension,
 } from '../../types';
 import create, { type Lock, type LockAPI } from './lock';
 import type { Store, Action } from '../../state/store-types';
@@ -318,24 +319,29 @@ export default function useSensorMarshal({
   ];
   const lockAPI: LockAPI = useState(() => create())[0];
 
+  const tryAbandonLock = useCallback(
+    function tryAbandonLock(previous: State, current: State) {
+      if (previous.isDragging && !current.isDragging) {
+        lockAPI.tryAbandon();
+      }
+    },
+    [lockAPI],
+  );
+
   // We need to abort any capturing if there is no longer a drag
   useLayoutEffect(
     function listenToStore() {
       let previous: State = store.getState();
       const unsubscribe = store.subscribe(() => {
         const current: State = store.getState();
-
-        if (previous.isDragging && !current.isDragging) {
-          lockAPI.tryAbandon();
-        }
-
+        tryAbandonLock(previous, current);
         previous = current;
       });
 
       // unsubscribe from store when unmounting
       return unsubscribe;
     },
-    [lockAPI, store],
+    [lockAPI, store, tryAbandonLock],
   );
 
   // abort any lock on unmount

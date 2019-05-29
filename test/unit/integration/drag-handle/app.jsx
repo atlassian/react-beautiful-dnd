@@ -16,6 +16,8 @@ export type Item = {|
   isEnabled?: boolean,
   // defaults to false
   canDragInteractiveElements?: boolean,
+  // defaults to false
+  shouldRespectForcePress?: boolean,
 |};
 
 type RenderItem = (
@@ -61,7 +63,7 @@ function getItems() {
 
 export default function App(props: Props) {
   const onDragStart = props.onDragStart || noop;
-  const onDragEnd = props.onDragStart || noop;
+  const onDragEnd = props.onDragEnd || noop;
   const sensors: Sensor[] = props.sensors || [];
   const [items] = useState(() => props.items || getItems());
   const render = props.renderItem || defaultItemRender;
@@ -88,6 +90,11 @@ export default function App(props: Props) {
                 disableInteractiveElementBlocking={
                   typeof item.canDragInteractiveElements === 'boolean'
                     ? item.canDragInteractiveElements
+                    : false
+                }
+                shouldRespectForcePress={
+                  typeof item.shouldRespectForcePress === 'boolean'
+                    ? item.shouldRespectForcePress
                     : false
                 }
               >

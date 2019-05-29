@@ -12,7 +12,6 @@ import App from '../app';
 
 it('should block a single click if requested', () => {
   let tryGetLock: TryGetActionLock;
-
   const a: Sensor = (tryStart: TryGetActionLock) => {
     tryGetLock = tryStart;
   };
