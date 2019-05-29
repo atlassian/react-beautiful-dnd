@@ -3,7 +3,7 @@ import React from 'react';
 import { render, fireEvent } from 'react-testing-library';
 import { mouse, simpleLift } from '../controls';
 import App, { type Item } from '../app';
-import { isDragging } from '../util';
+import { isDragging, getDropReason } from '../util';
 
 const mouseForcePressThreshold = 2;
 const standardForce = 1;
@@ -145,7 +145,7 @@ describe('force press is respected', () => {
     expect(forcePress.defaultPrevented).toBe(false);
     // drag cancelled
     expect(isDragging(handle)).toBe(false);
-    expect(onDragEnd.mock.calls[0][0].reason).toBe('CANCEL');
+    expect(getDropReason(onDragEnd)).toBe('CANCEL');
   });
 
   it('should not cancel a drag if not enough force is applied', () => {

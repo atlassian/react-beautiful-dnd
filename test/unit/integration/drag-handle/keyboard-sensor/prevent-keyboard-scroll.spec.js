@@ -4,6 +4,7 @@ import { createEvent, fireEvent, render } from 'react-testing-library';
 import * as keyCodes from '../../../../../src/view/key-codes';
 import App from '../app';
 import { simpleLift, keyboard } from '../controls';
+import { isDragging } from '../util';
 
 it('should prevent using keyboard keys that modify scroll', () => {
   const keys: number[] = [
@@ -22,5 +23,6 @@ it('should prevent using keyboard keys that modify scroll', () => {
     fireEvent(handle, event);
 
     expect(event.defaultPrevented).toBe(true);
+    expect(isDragging(handle)).toBe(true);
   });
 });

@@ -4,7 +4,7 @@ import { createEvent, fireEvent, render } from 'react-testing-library';
 import * as keyCodes from '../../../../../src/view/key-codes';
 import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
 import App from '../app';
-import { isDragging } from '../util';
+import { isDragging, getDropReason } from '../util';
 import { simpleLift, mouse } from '../controls';
 
 it('should not prevent a subsequent click if aborting during a pending drag', () => {
@@ -32,7 +32,8 @@ it('should not prevent a subsequent click if aborting during a pending drag', ()
 });
 
 it('should prevent a subsequent click if cancelling a drag', () => {
-  const { getByText } = render(<App />);
+  const onDragEnd = jest.fn();
+  const { getByText } = render(<App onDragEnd={onDragEnd} />);
   const handle: HTMLElement = getByText('item: 0');
 
   simpleLift(mouse, handle);
@@ -41,6 +42,10 @@ it('should prevent a subsequent click if cancelling a drag', () => {
   // cancel
   fireEvent.keyDown(handle, { keyCode: keyCodes.escape });
 
+  // drag cancelled
+  expect(getDropReason(onDragEnd)).toBe('CANCEL');
+  expect(isDragging(handle)).toBe(false);
+
   // click event prevented
   const click: Event = createEvent.click(handle);
   fireEvent(handle, click);
@@ -48,7 +53,8 @@ it('should prevent a subsequent click if cancelling a drag', () => {
 });
 
 it('should prevent a subsequent click if dropping a drag', () => {
-  const { getByText } = render(<App />);
+  const onDragEnd = jest.fn();
+  const { getByText } = render(<App onDragEnd={onDragEnd} />);
   const handle: HTMLElement = getByText('item: 0');
 
   simpleLift(mouse, handle);
@@ -56,6 +62,9 @@ it('should prevent a subsequent click if dropping a drag', () => {
 
   // cancel
   fireEvent.mouseUp(handle);
+
+  expect(getDropReason(onDragEnd)).toBe('DROP');
+  expect(isDragging(handle)).toBe(false);
 
   // click event prevented
   const click: Event = createEvent.click(handle);

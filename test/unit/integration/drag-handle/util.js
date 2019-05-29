@@ -1,6 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
+import type { DropReason } from '../../../../src/types';
 
 export function isDragging(el: HTMLElement): boolean {
   return el.getAttribute('data-is-dragging') === 'true';
@@ -27,4 +28,8 @@ export function getOffset(el: HTMLElement): Position {
     x: Number(result[1]),
     y: Number(result[2]),
   };
+}
+
+export function getDropReason(onDragEnd: JestMockFn<*, *>): DropReason {
+  return onDragEnd.mock.calls[0][0].reason;
 }

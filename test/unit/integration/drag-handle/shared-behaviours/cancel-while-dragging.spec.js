@@ -3,7 +3,7 @@ import React from 'react';
 import { createEvent, fireEvent, render } from 'react-testing-library';
 import * as keyCodes from '../../../../../src/view/key-codes';
 import App from '../app';
-import { isDragging } from '../util';
+import { isDragging, getDropReason } from '../util';
 import supportedEventName from '../../../../../src/view/use-sensor-marshal/sensors/util/supported-page-visibility-event-name';
 import { forEachSensor, simpleLift, type Control } from '../controls';
 
@@ -73,6 +73,6 @@ forEachSensor((control: Control) => {
     expect(event.defaultPrevented).toBe(false);
     // drag ended
     expect(isDragging(handle)).toBe(false);
-    expect(onDragEnd.mock.calls[0][0].reason).toBe('CANCEL');
+    expect(getDropReason(onDragEnd)).toBe('CANCEL');
   });
 });

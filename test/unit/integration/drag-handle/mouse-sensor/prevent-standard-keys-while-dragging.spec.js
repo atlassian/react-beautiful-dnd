@@ -17,5 +17,6 @@ it('should prevent enter or tab being pressed during a drag', () => {
     const event: Event = createEvent.keyDown(handle, { keyCode });
     fireEvent(handle, event);
     expect(event.defaultPrevented).toBe(true);
+    expect(isDragging(handle)).toBe(true);
   });
 });
