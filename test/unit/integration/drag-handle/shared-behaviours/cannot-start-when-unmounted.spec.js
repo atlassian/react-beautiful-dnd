@@ -3,7 +3,7 @@ import React from 'react';
 import { render } from 'react-testing-library';
 import { isDragging } from '../util';
 import App from '../app';
-import { forEachSensor, type Control, simpleLift } from './controls';
+import { forEachSensor, type Control, simpleLift } from '../controls';
 
 forEachSensor((control: Control) => {
   it('should not allow starting after the handle is unmounted', () => {

@@ -5,7 +5,7 @@ import * as keyCodes from '../../../../../src/view/key-codes';
 import App from '../app';
 import { isDragging } from '../util';
 import supportedEventName from '../../../../../src/view/use-sensor-marshal/sensors/util/supported-page-visibility-event-name';
-import { forEachSensor, simpleLift, type Control } from './controls';
+import { forEachSensor, simpleLift, type Control } from '../controls';
 
 forEachSensor((control: Control) => {
   it('should cancel when pressing escape', () => {

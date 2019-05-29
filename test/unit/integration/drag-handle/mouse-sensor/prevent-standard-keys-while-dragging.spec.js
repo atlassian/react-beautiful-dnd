@@ -4,13 +4,13 @@ import { createEvent, fireEvent, render } from 'react-testing-library';
 import * as keyCodes from '../../../../../src/view/key-codes';
 import App from '../app';
 import { isDragging } from '../util';
-import { simpleLift } from './util';
+import { simpleLift, mouse } from '../controls';
 
 it('should prevent enter or tab being pressed during a drag', () => {
   const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
-  simpleLift(handle);
+  simpleLift(mouse, handle);
   expect(isDragging(handle)).toBe(true);
 
   [keyCodes.enter, keyCodes.tab].forEach((keyCode: number) => {

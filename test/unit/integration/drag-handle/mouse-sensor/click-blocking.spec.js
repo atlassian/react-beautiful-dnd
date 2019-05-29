@@ -2,10 +2,10 @@
 import React from 'react';
 import { createEvent, fireEvent, render } from 'react-testing-library';
 import * as keyCodes from '../../../../../src/view/key-codes';
-import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/util/is-sloppy-click-threshold-exceeded';
+import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
 import App from '../app';
 import { isDragging } from '../util';
-import { simpleLift } from './util';
+import { simpleLift, mouse } from '../controls';
 
 it('should not prevent a subsequent click if aborting during a pending drag', () => {
   const { getByText } = render(<App />);
@@ -35,7 +35,7 @@ it('should prevent a subsequent click if cancelling a drag', () => {
   const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
-  simpleLift(handle);
+  simpleLift(mouse, handle);
   expect(isDragging(handle)).toBe(true);
 
   // cancel
@@ -51,7 +51,7 @@ it('should prevent a subsequent click if dropping a drag', () => {
   const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
-  simpleLift(handle);
+  simpleLift(mouse, handle);
   expect(isDragging(handle)).toBe(true);
 
   // cancel

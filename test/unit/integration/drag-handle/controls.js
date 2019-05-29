@@ -1,8 +1,8 @@
 // @flow
 import { createEvent, fireEvent, act } from 'react-testing-library';
-import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
-import { timeForLongPress } from '../../../../../src/view/use-sensor-marshal/sensors/use-touch-sensor';
-import * as keyCodes from '../../../../../src/view/key-codes';
+import { sloppyClickThreshold } from '../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
+import { timeForLongPress } from '../../../../src/view/use-sensor-marshal/sensors/use-touch-sensor';
+import * as keyCodes from '../../../../src/view/key-codes';
 
 export type Control = {|
   name: string,

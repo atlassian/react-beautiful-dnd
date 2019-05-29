@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import React from 'react';
-import { render, fireEvent } from 'react-testing-library';
+import { render, fireEvent, createEvent } from 'react-testing-library';
 import type {
   TryGetActionLock,
   Sensor,
@@ -9,15 +9,6 @@ import type {
   DragActions,
 } from '../../../../../src/types';
 import App from '../app';
-
-function getClick(): MouseEvent {
-  return new MouseEvent('click', {
-    clientX: 0,
-    clientY: 0,
-    cancelable: true,
-    bubbles: true,
-  });
-}
 
 it('should block a single click if requested', () => {
   let tryGetLock: TryGetActionLock;
@@ -41,8 +32,8 @@ it('should block a single click if requested', () => {
   drag.drop({ shouldBlockNextClick: true });
 
   // fire click
-  const first: MouseEvent = getClick();
-  const second: MouseEvent = getClick();
+  const first: MouseEvent = createEvent.click(handle);
+  const second: MouseEvent = createEvent.click(handle);
   fireEvent(handle, first);
   fireEvent(handle, second);
 
@@ -73,7 +64,7 @@ it('should not block any clicks if not requested', () => {
   drag.drop({ shouldBlockNextClick: false });
 
   // fire click
-  const first: MouseEvent = getClick();
+  const first: MouseEvent = createEvent.click(handle);
   fireEvent(handle, first);
 
   // click not prevented

@@ -2,7 +2,7 @@
 import React from 'react';
 import { createEvent, fireEvent, render } from 'react-testing-library';
 import * as keyCodes from '../../../../../src/view/key-codes';
-import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/util/is-sloppy-click-threshold-exceeded';
+import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
 import App from '../app';
 import { isDragging } from '../util';
 import supportedEventName from '../../../../../src/view/use-sensor-marshal/sensors/util/supported-page-visibility-event-name';

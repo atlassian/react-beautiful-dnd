@@ -3,7 +3,7 @@ import React from 'react';
 import { render } from 'react-testing-library';
 import { isDragging } from '../util';
 import App from '../app';
-import { forEachSensor, simpleLift, type Control } from './controls';
+import { forEachSensor, simpleLift, type Control } from '../controls';
 
 forEachSensor((control: Control) => {
   it('should not abort a drag if a parent render occurs', () => {

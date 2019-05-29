@@ -1,11 +1,11 @@
 // @flow
 import invariant from 'tiny-invariant';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { render, act } from 'react-testing-library';
 import { isDragging, getOffset } from '../util';
 import App from '../app';
 import { noop } from '../../../../../src/empty';
-import { forEachSensor, simpleLift, type Control } from './controls';
+import { forEachSensor, simpleLift, type Control } from '../controls';
 
 jest.spyOn(console, 'error').mockImplementation(noop);
 

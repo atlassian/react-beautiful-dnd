@@ -3,7 +3,7 @@ import React from 'react';
 import { render } from 'react-testing-library';
 import { isDragging } from '../util';
 import App from '../app';
-import { forEachSensor, type Control } from './controls';
+import { forEachSensor, type Control } from '../controls';
 
 forEachSensor((control: Control) => {
   it('should control the drag through the sensor', () => {
