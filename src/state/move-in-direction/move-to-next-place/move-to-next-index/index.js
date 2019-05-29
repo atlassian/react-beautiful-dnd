@@ -83,7 +83,6 @@ export default ({
     }
 
     if (isMovingForward) {
-      console.log('remove closest');
       return removeClosest(lastDisplaced);
     }
 
@@ -101,10 +100,6 @@ export default ({
       atProposedIndex,
       `Could not find item at proposed index ${proposedIndex}`,
     );
-    console.log('add closest', {
-      proposedIndex,
-      item: atProposedIndex.descriptor,
-    });
     return addClosest(atProposedIndex, lastDisplaced);
   })();
 

@@ -10,6 +10,7 @@ export type Control = {|
   lift: (handle: HTMLElement) => void,
   move: (handle: HTMLElement) => void,
   drop: (handle: HTMLElement) => void,
+  cancel: (handle: HTMLElement) => void,
 |};
 
 export function simpleLift(control: Control, handle: HTMLElement) {
@@ -50,6 +51,10 @@ export const mouse: Control = {
     fireEvent.mouseUp(handle);
     fireEvent(handle, getTransitionEnd());
   },
+  cancel: (handle: HTMLElement) => {
+    fireEvent.keyDown(handle, { keyCode: keyCodes.escape });
+    fireEvent(handle, getTransitionEnd());
+  },
 };
 
 export const keyboard: Control = {
@@ -66,6 +71,9 @@ export const keyboard: Control = {
   drop: (handle: HTMLElement) => {
     fireEvent.keyDown(handle, { keyCode: keyCodes.space });
     // no drop animation
+  },
+  cancel: (handle: HTMLElement) => {
+    fireEvent.keyDown(handle, { keyCode: keyCodes.escape });
   },
 };
 
@@ -91,6 +99,10 @@ export const touch: Control = {
   drop: (handle: HTMLElement) => {
     fireEvent.touchEnd(handle);
     // allow for drop animation
+    fireEvent(handle, getTransitionEnd());
+  },
+  cancel: (handle: HTMLElement) => {
+    fireEvent.keyDown(handle, { keyCode: keyCodes.escape });
     fireEvent(handle, getTransitionEnd());
   },
 };

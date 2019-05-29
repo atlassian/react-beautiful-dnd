@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import { render } from 'react-testing-library';
-import { isDragging } from '../util';
+import { isDragging, getDropReason } from '../util';
 import App from '../app';
-import { forEachSensor, type Control } from '../controls';
+import { forEachSensor, type Control, cancel } from '../controls';
 
 forEachSensor((control: Control) => {
   it('should control the drag through the sensor', () => {
@@ -14,27 +14,57 @@ forEachSensor((control: Control) => {
     );
     const handle: HTMLElement = getByText('item: 0');
 
-    control.preLift(handle);
-    expect(isDragging(handle)).toBe(false);
+    // Drop
+    Array.from({ length: 4 }).forEach(() => {
+      control.preLift(handle);
+      expect(isDragging(handle)).toBe(false);
 
-    control.lift(handle);
-    expect(isDragging(handle)).toBe(true);
+      control.lift(handle);
+      expect(isDragging(handle)).toBe(true);
 
-    // on drag start is async
-    jest.runOnlyPendingTimers();
-    expect(onDragStart).toHaveBeenCalled();
+      // on drag start is async
+      jest.runOnlyPendingTimers();
+      expect(onDragStart).toHaveBeenCalled();
 
-    // move
-    control.move(handle);
-    expect(isDragging(handle)).toBe(true);
+      // move
+      control.move(handle);
+      expect(isDragging(handle)).toBe(true);
 
-    // drop
-    expect(onDragEnd).not.toHaveBeenCalled();
+      // drop
+      expect(onDragEnd).not.toHaveBeenCalled();
 
-    control.drop(handle);
-    expect(isDragging(handle)).toBe(false);
+      control.drop(handle);
+      expect(isDragging(handle)).toBe(false);
 
-    expect(onDragEnd).toHaveBeenCalled();
-    expect(onDragEnd.mock.calls[0][0].reason).toBe('DROP');
+      expect(onDragEnd).toHaveBeenCalledTimes(1);
+      expect(getDropReason(onDragEnd)).toBe('DROP');
+
+      onDragEnd.mockClear();
+    });
+
+    // Cancel
+    Array.from({ length: 4 }).forEach(() => {
+      control.preLift(handle);
+      expect(isDragging(handle)).toBe(false);
+
+      control.lift(handle);
+      expect(isDragging(handle)).toBe(true);
+
+      // on drag start is async
+      jest.runOnlyPendingTimers();
+      expect(onDragStart).toHaveBeenCalled();
+
+      // move
+      control.move(handle);
+      expect(isDragging(handle)).toBe(true);
+
+      control.cancel(handle);
+
+      expect(isDragging(handle)).toBe(false);
+      expect(onDragEnd).toHaveBeenCalledTimes(1);
+      expect(getDropReason(onDragEnd)).toBe('CANCEL');
+
+      onDragEnd.mockClear();
+    });
   });
 });
