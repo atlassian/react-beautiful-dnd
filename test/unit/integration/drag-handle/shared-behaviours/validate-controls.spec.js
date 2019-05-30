@@ -6,7 +6,7 @@ import App from '../app';
 import { forEachSensor, type Control } from '../controls';
 
 forEachSensor((control: Control) => {
-  it('should control the drag through the sensor', () => {
+  it('should control a successful drag through the sensor', () => {
     const onDragStart = jest.fn();
     const onDragEnd = jest.fn();
     const { getByText } = render(
@@ -14,7 +14,6 @@ forEachSensor((control: Control) => {
     );
     const handle: HTMLElement = getByText('item: 0');
 
-    // Drop
     Array.from({ length: 4 }).forEach(() => {
       control.preLift(handle);
       expect(isDragging(handle)).toBe(false);
@@ -41,8 +40,16 @@ forEachSensor((control: Control) => {
 
       onDragEnd.mockClear();
     });
+  });
 
-    // Cancel
+  it('should control a cancel through the sensor', () => {
+    const onDragStart = jest.fn();
+    const onDragEnd = jest.fn();
+    const { getByText } = render(
+      <App onDragStart={onDragStart} onDragEnd={onDragEnd} />,
+    );
+    const handle: HTMLElement = getByText('item: 0');
+
     Array.from({ length: 4 }).forEach(() => {
       control.preLift(handle);
       expect(isDragging(handle)).toBe(false);

@@ -68,19 +68,3 @@ it('should not prevent the default behaviour for an indirect cancel', () => {
     unmount();
   });
 });
-
-it('should not prevent clicks after a drag', () => {
-  const onDragEnd = jest.fn();
-  const { getByText } = render(<App onDragEnd={onDragEnd} />);
-  const handle: HTMLElement = getByText('item: 0');
-
-  simpleLift(keyboard, handle);
-  keyboard.drop(handle);
-
-  const event: Event = createEvent.click(handle);
-  fireEvent(handle, event);
-
-  // click not blocked
-  expect(event.defaultPrevented).toBe(false);
-  expect(onDragEnd).toHaveBeenCalled();
-});
