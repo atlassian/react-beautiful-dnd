@@ -344,12 +344,15 @@ export default function useMouseSensor(
     [bindCapturingEvents],
   );
 
-  useLayoutEffect(() => {
-    listenForCapture();
+  useLayoutEffect(
+    function mount() {
+      listenForCapture();
 
-    // kill any pending window events when unmounting
-    return function unmount() {
-      unbindEventsRef.current();
-    };
-  }, [listenForCapture]);
+      // kill any pending window events when unmounting
+      return function unmount() {
+        unbindEventsRef.current();
+      };
+    },
+    [listenForCapture],
+  );
 }

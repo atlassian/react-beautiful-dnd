@@ -223,12 +223,15 @@ export default function useKeyboardSensor(
     [startCaptureBinding],
   );
 
-  useLayoutEffect(() => {
-    listenForCapture();
+  useLayoutEffect(
+    function mount() {
+      listenForCapture();
 
-    // kill any pending window events when unmounting
-    return () => {
-      unbindEventsRef.current();
-    };
-  });
+      // kill any pending window events when unmounting
+      return function unmount() {
+        unbindEventsRef.current();
+      };
+    },
+    [listenForCapture],
+  );
 }

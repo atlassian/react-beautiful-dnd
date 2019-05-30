@@ -393,19 +393,22 @@ export default function useMouseSensor(
     [bindCapturingEvents, getPhase, setPhase, startDragging],
   );
 
-  useLayoutEffect(() => {
-    listenForCapture();
+  useLayoutEffect(
+    function mount() {
+      listenForCapture();
 
-    return function unmount() {
-      // remove any existing listeners
-      unbindEventsRef.current();
+      return function unmount() {
+        // remove any existing listeners
+        unbindEventsRef.current();
 
-      // need to kill any pending drag start timer
-      const phase: Phase = getPhase();
-      if (phase.type === 'PENDING') {
-        clearTimeout(phase.longPressTimerId);
-        setPhase(idle);
-      }
-    };
-  }, [getPhase, listenForCapture, setPhase]);
+        // need to kill any pending drag start timer
+        const phase: Phase = getPhase();
+        if (phase.type === 'PENDING') {
+          clearTimeout(phase.longPressTimerId);
+          setPhase(idle);
+        }
+      };
+    },
+    [getPhase, listenForCapture, setPhase],
+  );
 }

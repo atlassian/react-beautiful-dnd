@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { fireEvent, render } from 'react-testing-library';
+import { fireEvent, render, createEvent } from 'react-testing-library';
 import * as keyCodes from '../../../../../src/view/key-codes';
 import App from '../app';
 import { simpleLift, keyboard } from '../controls';
@@ -14,12 +14,18 @@ it('should move up when pressing the up arrow', () => {
 
   simpleLift(keyboard, handle);
 
-  fireEvent.keyDown(handle, { keyCode: keyCodes.arrowUp });
+  const event: Event = createEvent.keyDown(handle, {
+    keyCode: keyCodes.arrowUp,
+  });
+  fireEvent(handle, event);
 
   // flush async responder
   jest.runOnlyPendingTimers();
   expect(onDragUpdate).toHaveBeenCalled();
   expect(onDragUpdate.mock.calls[0][0].destination.index).toBe(0);
+
+  // event consumed
+  expect(event.defaultPrevented).toBe(true);
 });
 
 it('should move down when pressing the down arrow', () => {
@@ -29,12 +35,18 @@ it('should move down when pressing the down arrow', () => {
 
   simpleLift(keyboard, handle);
 
-  fireEvent.keyDown(handle, { keyCode: keyCodes.arrowDown });
+  const event: Event = createEvent.keyDown(handle, {
+    keyCode: keyCodes.arrowDown,
+  });
+  fireEvent(handle, event);
 
   // flush async responder
   jest.runOnlyPendingTimers();
   expect(onDragUpdate).toHaveBeenCalled();
   expect(onDragUpdate.mock.calls[0][0].destination.index).toBe(1);
+
+  // event consumed
+  expect(event.defaultPrevented).toBe(true);
 });
 
 it('should move right when pressing the right arrow', () => {
@@ -46,12 +58,18 @@ it('should move right when pressing the right arrow', () => {
 
   simpleLift(keyboard, handle);
 
-  fireEvent.keyDown(handle, { keyCode: keyCodes.arrowRight });
+  const event: Event = createEvent.keyDown(handle, {
+    keyCode: keyCodes.arrowRight,
+  });
+  fireEvent(handle, event);
 
   // flush async responder
   jest.runOnlyPendingTimers();
   expect(onDragUpdate).toHaveBeenCalled();
   expect(onDragUpdate.mock.calls[0][0].destination.index).toBe(1);
+
+  // event consumed
+  expect(event.defaultPrevented).toBe(true);
 });
 
 it('should move left when pressing the left arrow', () => {
@@ -63,10 +81,16 @@ it('should move left when pressing the left arrow', () => {
 
   simpleLift(keyboard, handle);
 
-  fireEvent.keyDown(handle, { keyCode: keyCodes.arrowLeft });
+  const event: Event = createEvent.keyDown(handle, {
+    keyCode: keyCodes.arrowLeft,
+  });
+  fireEvent(handle, event);
 
   // flush async responder
   jest.runOnlyPendingTimers();
   expect(onDragUpdate).toHaveBeenCalled();
   expect(onDragUpdate.mock.calls[0][0].destination.index).toBe(0);
+
+  // event consumed
+  expect(event.defaultPrevented).toBe(true);
 });

@@ -1,5 +1,4 @@
 // @flow
-// @flow
 import React from 'react';
 import { render, createEvent, fireEvent } from 'react-testing-library';
 import App from '../app';
