@@ -4,6 +4,8 @@ import { fireEvent, render, createEvent } from 'react-testing-library';
 import App from '../app';
 import { touch, simpleLift } from '../controls';
 
+jest.useFakeTimers();
+
 it('should block a click after a drag', () => {
   const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
