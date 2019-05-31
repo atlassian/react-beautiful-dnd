@@ -107,6 +107,7 @@ function getTargetBindings({
   completed,
   getPhase,
 }: GetBindingArgs): EventBinding[] {
+  console.log('binding target');
   return [
     {
       eventName: 'touchmove',
@@ -145,6 +146,7 @@ function getTargetBindings({
         const phase: Phase = getPhase();
         // drag had not started yet - do not prevent the default action
         if (phase.type !== 'DRAGGING') {
+          console.log('TOUCH END');
           cancel();
           return;
         }
@@ -264,6 +266,7 @@ export default function useMouseSensor(
         // unbind this event handler
         unbindEventsRef.current();
 
+        console.log('STARTING PENDING DRAG');
         // eslint-disable-next-line no-use-before-define
         startPendingDrag(actions, point, target);
       },
@@ -276,8 +279,8 @@ export default function useMouseSensor(
   const listenForCapture = useCallback(
     function listenForCapture() {
       const options: EventOptions = {
-        passive: false,
         capture: true,
+        passive: false,
       };
 
       unbindEventsRef.current = bindEvents(
@@ -319,6 +322,7 @@ export default function useMouseSensor(
 
   const bindCapturingEvents = useCallback(
     function bindCapturingEvents(target: HTMLElement) {
+      console.log('bind capturing events');
       const options: EventOptions = { capture: true, passive: false };
       const args: GetBindingArgs = {
         cancel,
@@ -335,7 +339,7 @@ export default function useMouseSensor(
       const unbindTarget = bindEvents(target, getTargetBindings(args), options);
       const unbindWindow = bindEvents(window, getWindowBindings(args), options);
 
-      unbindEventsRef.current = function unbind() {
+      unbindEventsRef.current = function unbindAll() {
         unbindTarget();
         unbindWindow();
       };
@@ -351,6 +355,7 @@ export default function useMouseSensor(
         `Cannot start dragging from phase ${phase.type}`,
       );
 
+      console.log('STARTING A DRAG');
       const actions: DragActions = phase.actions.lift({
         clientSelection: phase.point,
         mode: 'FLUID',
