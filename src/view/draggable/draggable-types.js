@@ -7,19 +7,9 @@ import type {
   DraggableDimension,
   State,
   MovementMode,
+  ContextId,
 } from '../../types';
-import {
-  lift,
-  move,
-  moveByWindowScroll,
-  moveUp,
-  moveDown,
-  moveRight,
-  moveLeft,
-  drop,
-  dropAnimationFinished,
-} from '../../state/action-creators';
-import type { DragHandleProps } from '../use-drag-handle/drag-handle-types';
+import { dropAnimationFinished } from '../../state/action-creators';
 
 export type DraggingStyle = {|
   position: 'fixed',
@@ -69,6 +59,24 @@ export type DraggableProps = {|
   onTransitionEnd: ?(event: TransitionEvent) => void,
 |};
 
+export type DragHandleProps = {|
+  // what draggable the handle belongs to
+  'data-rbd-drag-handle-draggable-id': DraggableId,
+
+  // What DragDropContext the drag handle is in
+  'data-rbd-drag-handle-context-id': ContextId,
+
+  // Aria role (nicer screen reader text)
+  'aria-roledescription': string,
+
+  // Allow tabbing to this element
+  tabIndex: number,
+
+  // Stop html5 drag and drop
+  draggable: boolean,
+  onDragStart: (event: DragEvent) => void,
+|};
+
 export type Provided = {|
   draggableProps: DraggableProps,
   // will be null if the draggable is disabled
@@ -97,14 +105,6 @@ export type StateSnapshot = {|
 |};
 
 export type DispatchProps = {|
-  lift: typeof lift,
-  move: typeof move,
-  moveByWindowScroll: typeof moveByWindowScroll,
-  moveUp: typeof moveUp,
-  moveDown: typeof moveDown,
-  moveRight: typeof moveRight,
-  moveLeft: typeof moveLeft,
-  drop: typeof drop,
   dropAnimationFinished: typeof dropAnimationFinished,
 |};
 

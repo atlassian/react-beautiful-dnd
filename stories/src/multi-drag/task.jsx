@@ -108,10 +108,6 @@ export default class Task extends Component<Props> {
     provided: DraggableProvided,
     snapshot: DraggableStateSnapshot,
   ) => {
-    if (provided.dragHandleProps) {
-      provided.dragHandleProps.onKeyDown(event);
-    }
-
     if (event.defaultPrevented) {
       return;
     }

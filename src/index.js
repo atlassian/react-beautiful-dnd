@@ -43,12 +43,10 @@ export type {
 export type {
   Provided as DraggableProvided,
   StateSnapshot as DraggableStateSnapshot,
+  DragHandleProps,
   DropAnimation,
   DraggableProps,
   DraggableStyle,
   DraggingStyle,
   NotDraggingStyle,
 } from './view/draggable/draggable-types';
-
-// DragHandle types
-export type { DragHandleProps } from './view/use-drag-handle/drag-handle-types';

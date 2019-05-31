@@ -8,17 +8,7 @@ import Draggable from './draggable';
 import { origin } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
 import { curves, combine } from '../../animation';
-import {
-  lift as liftAction,
-  move as moveAction,
-  moveUp as moveUpAction,
-  moveDown as moveDownAction,
-  moveLeft as moveLeftAction,
-  moveRight as moveRightAction,
-  drop as dropAction,
-  dropAnimationFinished as dropAnimationFinishedAction,
-  moveByWindowScroll as moveByWindowScrollAction,
-} from '../../state/action-creators';
+import { dropAnimationFinished as dropAnimationFinishedAction } from '../../state/action-creators';
 import type {
   State,
   DraggableId,
@@ -297,14 +287,6 @@ export const makeMapStateToProps = (): Selector => {
 };
 
 const mapDispatchToProps: DispatchProps = {
-  lift: liftAction,
-  move: moveAction,
-  moveUp: moveUpAction,
-  moveDown: moveDownAction,
-  moveLeft: moveLeftAction,
-  moveRight: moveRightAction,
-  moveByWindowScroll: moveByWindowScrollAction,
-  drop: dropAction,
   dropAnimationFinished: dropAnimationFinishedAction,
 };
 
