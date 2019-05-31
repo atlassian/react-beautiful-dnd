@@ -64,7 +64,7 @@
     "use-memo-one": "^1.1.0"
   },
   "devDependencies": {
-    "@atlaskit/css-reset": "^4.0.0",
+    "@atlaskit/css-reset": "^5.0.0",
     "@atlaskit/theme": "^9.0.0",
     "@babel/core": "^7.4.4",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
