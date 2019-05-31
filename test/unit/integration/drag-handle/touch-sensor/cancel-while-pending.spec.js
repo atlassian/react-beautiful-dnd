@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { fireEvent, render, createEvent } from 'react-testing-library';
+import { fireEvent, render } from 'react-testing-library';
 import App from '../app';
 import { isDragging } from '../util';
 import supportedEventName from '../../../../../src/view/use-sensor-marshal/sensors/util/supported-page-visibility-event-name';
