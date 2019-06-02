@@ -59,7 +59,7 @@ const Container = styled.div`
   margin-bottom: ${grid}px;
   border-radius: ${borderRadius}px;
   font-size: 18px;
-  border: 1px solid ${colors.N90};
+  border: 3px solid ${colors.N90};
   ${props =>
     props.isDragging ? `box-shadow: 2px 2px 1px ${colors.N90};` : ''} ${props =>
     props.isGhosting
@@ -72,7 +72,7 @@ const Container = styled.div`
   /* avoid default outline which looks lame with the position: absolute; */
   &:focus {
     outline: none;
-    border-color: ${colors.N200};
+    border-color: ${colors.G200};
   }
 `;
 /* stylelint-disable block-no-empty */

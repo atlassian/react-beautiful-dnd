@@ -7,7 +7,8 @@ import style from './middleware/style';
 import drop from './middleware/drop/drop-middleware';
 import scrollListener from './middleware/scroll-listener';
 import responders from './middleware/responders/responders-middleware';
-import dropAnimationFinish from './middleware/drop-animation-finish';
+import dropAnimationFinish from './middleware/drop/drop-animation-finish-middleware';
+import dropAnimationFlushOnScroll from './middleware/drop/drop-animation-flush-on-scroll-middleware';
 import dimensionMarshalStopper from './middleware/dimension-marshal-stopper';
 import focus from './middleware/focus';
 import autoScroll from './middleware/auto-scroll';
@@ -82,6 +83,7 @@ export default ({
         drop,
         // When a drop animation finishes - fire a drop complete
         dropAnimationFinish,
+        dropAnimationFlushOnScroll,
         pendingDrop,
         autoScroll(autoScroller),
         scrollListener,
