@@ -48,6 +48,61 @@ function App() {
 2. If a **lock** is obtained then there are a number of _pre drag_ actions available to you (`PreDragActions`). This allows a `sensor` to claim a lock before starting a drag. This is important for things like [sloppy click detection](TODO) where a drag is only started after a sufficiently large movement.
 3. A _pre drag_ lock can be upgraded to a _drag lock_, which contains a different set of APIs (`FluidDragActions` or `SnapDragActions`). Once a `<Draggable />` has been lifted, it can be moved around.
 
+## Rules
+
+- Only one `<Draggable />` can be dragging at a time for a `<DragDropContext />`
+- That's it!
+
+## API
+
+### Creating a `sensor`
+
+A `sensor` is a [React hook](https://reactjs.org/docs/hooks-intro.html). It is fine if you do not want to use any of the React hook goodness, you can treat the `sensor` just as a function. React hooks are just functions that let you use the built in React hooks if you want to 🤫. You pass your `sensor` into the `sensors` array on a `<DragDropContext />`.
+
+```js
+function useMyCoolSensor(tryGetLock) {
+  const start = useCallback(function start() {
+    const preDrag = tryGetLock(document.querySelector('#item-1');
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('click', start);
+
+    return () => {
+      window.removeEventListener('click', start);
+    }
+  }, [])
+}
+
+function App() {
+  return (
+    <DragDropContext sensors={[useMyCoolSensor]}>{/*...*/}</DragDropContext>
+  );
+}
+```
+
+You can also disable all of the prebuilt sensors ([mouse](/docs/sensors/mouse.md), [keyboard](/docs/sensors/keyboard.md), and [touch](/docs/sensors/touch.md)) by setting `enableDefaultSensors={false}` on a `<DragDropContext />`. This is useful if you _only_ want a `<DragDropContext />` to be controlled programmatically.
+
+### Controlling a drag: try to get a lock
+
+```js
+export type TryGetLock = (
+  source: Event | Element,
+  forceStop?: () => void,
+) => ?PreDragActions;
+```
+
+- `source`: can either be an `Event` or a `Element`. For an `Element` we search for the closest _drag handle_ (via `.closest()`). For an `Event` we read the `event.target` and do the same search from there. If no _drag handle_ is found then a lock will not be given.
+- `forceStop`: a function that is called when the lock needs to be abandoned by the application. See **force abandoning locks**.
+
+### Controlling a drag: pre drag
+
+TODO
+
+### Controlling a drag: dragging
+
+TODO
+
 ## Force abandoning locks
 
 A **lock** can be aborted at any time by the application, such as when an error occurs. If you try to perform actions on an aborted **lock** then it will not do anything. The `tryGetLock()` function accepts two arguments: `tryGetLock(source: Element | Event, forceStop: () => void)`. The `forceStop` function will be called when the lock needs to be abandoned by the application. If you try to use any functions on the lock after it has been abandoned they will have no effect and will log a warning to the console.
