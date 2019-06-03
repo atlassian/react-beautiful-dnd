@@ -89,6 +89,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
   }, []);
 
   const updateScroll = useCallback(() => {
+    // reading scroll value when called so value will be the latest
     const scroll: Position = getClosestScroll();
     memoizedUpdateScroll(scroll.x, scroll.y);
   }, [getClosestScroll, memoizedUpdateScroll]);
