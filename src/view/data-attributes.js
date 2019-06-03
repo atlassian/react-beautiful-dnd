@@ -32,3 +32,7 @@ export const droppable = (() => {
 export const placeholder = {
   contextId: `${prefix}-placeholder-context-id`,
 };
+
+export const scrollContainer = {
+  contextId: `${prefix}-scroll-container-context-id`,
+};

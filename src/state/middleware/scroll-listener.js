@@ -23,7 +23,6 @@ export default (store: MiddlewareStore) => {
     }
 
     if (shouldEnd(action)) {
-      console.log('stopping scroll listener');
       listener.stop();
     }
 

@@ -6,6 +6,7 @@ import rafSchedule from 'raf-schd';
 import { useMemo, useCallback } from 'use-memo-one';
 import memoizeOne from 'memoize-one';
 import checkForNestedScrollContainers from './check-for-nested-scroll-container';
+import * as dataAttr from '../data-attributes';
 import { origin } from '../../state/position';
 import getScroll from './get-scroll';
 import type {
@@ -143,23 +144,29 @@ export default function useDroppableDimensionPublisher(args: Props) {
         shouldClipSubject: !previous.ignoreContainerClipping,
       });
 
-      if (env.closestScrollable) {
-        // bind scroll listener
+      const scrollable: ?Element = env.closestScrollable;
 
-        env.closestScrollable.addEventListener(
+      if (scrollable) {
+        scrollable.setAttribute(
+          dataAttr.scrollContainer.contextId,
+          appContext.contextId,
+        );
+
+        // bind scroll listener
+        scrollable.addEventListener(
           'scroll',
           onClosestScroll,
           getListenerOptions(dragging.scrollOptions),
         );
         // print a debug warning if using an unsupported nested scroll container setup
         if (process.env.NODE_ENV !== 'production') {
-          checkForNestedScrollContainers(env.closestScrollable);
+          checkForNestedScrollContainers(scrollable);
         }
       }
 
       return dimension;
     },
-    [descriptor, onClosestScroll, previousRef],
+    [appContext.contextId, descriptor, onClosestScroll, previousRef],
   );
   const recollect = useCallback(
     (options: RecollectDroppableOptions): DroppableDimension => {
@@ -206,6 +213,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
 
     // unwatch scroll
     scheduleScrollUpdate.cancel();
+    closest.removeAttribute(dataAttr.scrollContainer.contextId);
     closest.removeEventListener(
       'scroll',
       onClosestScroll,

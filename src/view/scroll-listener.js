@@ -18,7 +18,7 @@ type Result = {|
 
 function noop() {}
 
-function getWindowScrollBinding(onWindowScroll: OnWindowScroll): EventBinding {
+function getWindowScrollBinding(update: () => void): EventBinding {
   return {
     eventName: 'scroll',
     // TODO: should this be different for SNAP dragging?
@@ -38,13 +38,18 @@ function getWindowScrollBinding(onWindowScroll: OnWindowScroll): EventBinding {
         return;
       }
 
-      onWindowScroll(getWindowScroll());
+      update();
     },
   };
 }
 
 export default function getScrollListener({ onWindowScroll }: Args): Result {
-  const scheduled: OnWindowScroll = rafSchd(onWindowScroll);
+  function updateScroll() {
+    // letting the update function read the latest scroll when called
+    onWindowScroll(getWindowScroll());
+  }
+
+  const scheduled: () => void = rafSchd(updateScroll);
   const binding: EventBinding = getWindowScrollBinding(scheduled);
   let unbind: () => void = noop;
 
