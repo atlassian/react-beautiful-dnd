@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import { useRef } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
-import type { PreDragActions, DragActions } from '../../../types';
+import type { PreDragActions, FluidDragActions } from '../../../types';
 import type {
   EventBinding,
   EventOptions,
@@ -46,7 +46,7 @@ type Pending = {|
 
 type Dragging = {|
   type: 'DRAGGING',
-  actions: DragActions,
+  actions: FluidDragActions,
 |};
 
 type Phase = Idle | Pending | Dragging;
@@ -102,10 +102,7 @@ function getCaptureBindings({
         // preventing default as we are using this event
         event.preventDefault();
 
-        const actions: DragActions = phase.actions.lift({
-          clientSelection: pending,
-          mode: 'FLUID',
-        });
+        const actions: FluidDragActions = phase.actions.fluidLift(pending);
 
         setPhase({
           type: 'DRAGGING',

@@ -5,7 +5,7 @@ import { render } from 'react-testing-library';
 import type {
   TryGetActionLock,
   PreDragActions,
-  DragActions,
+  SnapDragActions,
   Sensor,
 } from '../../../../../src/types';
 import App from '../app';
@@ -32,7 +32,7 @@ it('should not allow pre drag actions when in a dragging phase', () => {
   // it is currently active
   expect(preDrag.isActive()).toBe(true);
 
-  const drag: DragActions = preDrag.lift({ mode: 'SNAP' });
+  const drag: SnapDragActions = preDrag.snapLift();
 
   // pre drag now outdated
   expect(preDrag.isActive()).toBe(false);
@@ -69,7 +69,7 @@ it('should not allow drag actions after a drop', () => {
   invariant(preDrag);
   expect(preDrag.isActive()).toBe(true);
 
-  const drag: DragActions = preDrag.lift({ mode: 'SNAP' });
+  const drag: SnapDragActions = preDrag.snapLift();
   expect(drag.isActive()).toBe(true);
 
   drag.cancel();

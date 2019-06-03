@@ -401,27 +401,24 @@ export type StopDragOptions = {|
   shouldBlockNextClick: boolean,
 |};
 
-type SensorSnapLift = {|
-  mode: 'SNAP',
-|};
-
-type SensorFluidLift = {|
-  mode: 'FLUID',
-  clientSelection: Position,
-|};
-
-export type SensorLift = SensorSnapLift | SensorFluidLift;
-
-export type DragActions = {|
+type DragActions = {|
+  drop: (args?: StopDragOptions) => void,
+  cancel: (args?: StopDragOptions) => void,
   isActive: () => boolean,
   shouldRespectForcePress: () => boolean,
+|};
+
+export type FluidDragActions = {|
+  ...DragActions,
   move: (point: Position) => void,
+|};
+
+export type SnapDragActions = {|
+  ...DragActions,
   moveUp: () => void,
   moveDown: () => void,
   moveRight: () => void,
   moveLeft: () => void,
-  drop: (args?: StopDragOptions) => void,
-  cancel: (args?: StopDragOptions) => void,
 |};
 
 export type PreDragActions = {|
@@ -430,7 +427,8 @@ export type PreDragActions = {|
   // whether it has been indicated if force press should be respected
   shouldRespectForcePress: () => boolean,
   // upgrade lock
-  lift: (args: SensorLift) => DragActions,
+  fluidLift: (clientSelection: Position) => FluidDragActions,
+  snapLift: () => SnapDragActions,
   // release the lock
   abort: () => void,
 |};

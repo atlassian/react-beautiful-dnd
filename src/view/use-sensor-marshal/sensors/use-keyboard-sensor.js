@@ -2,7 +2,7 @@
 import invariant from 'tiny-invariant';
 import { useRef } from 'react';
 import { useMemo, useCallback } from 'use-memo-one';
-import type { PreDragActions, DragActions } from '../../../types';
+import type { PreDragActions, SnapDragActions } from '../../../types';
 import type {
   EventBinding,
   EventOptions,
@@ -27,7 +27,7 @@ const scrollJumpKeys: KeyMap = {
 };
 
 function getDraggingBindings(
-  actions: DragActions,
+  actions: SnapDragActions,
   stop: () => void,
 ): EventBinding[] {
   function cancel() {
@@ -172,9 +172,7 @@ export default function useKeyboardSensor(
 
         // There is no pending period for a keyboard drag
         // We can lift immediately
-        const actions: DragActions = preDrag.lift({
-          mode: 'SNAP',
-        });
+        const actions: SnapDragActions = preDrag.snapLift();
 
         // unbind this listener
         unbindEventsRef.current();

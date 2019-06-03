@@ -1,17 +1,16 @@
 // @flow
 import rafSchd from 'raf-schd';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useCallback } from 'use-memo-one';
 import type { Position } from 'css-box-model';
 import type {
   ContextId,
   State,
   Sensor,
-  SensorLift,
   StopDragOptions,
   PreDragActions,
-  DragActions,
-  DraggableDimension,
+  FluidDragActions,
+  SnapDragActions,
 } from '../../types';
 import create, { type Lock, type LockAPI } from './lock';
 import type { Store, Action } from '../../state/store-types';
@@ -25,6 +24,7 @@ import {
   moveLeft as moveLeftAction,
   drop as dropAction,
   lift as liftAction,
+  type LiftArgs as LiftActionArgs,
 } from '../../state/action-creators';
 import useMouseSensor from './sensors/use-mouse-sensor';
 import useKeyboardSensor from './sensors/use-keyboard-sensor';
@@ -36,12 +36,11 @@ import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
 import isHtmlElement from '../is-type-of-element/is-html-element';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
+import { noop } from '../../empty';
 
 function preventDefault(event: Event) {
   event.preventDefault();
 }
-
-function noop() {}
 
 type LockPhase = 'PRE_DRAG' | 'DRAGGING' | 'FINISHED';
 type TryGetLockArgs = {|
@@ -187,44 +186,25 @@ function tryGetLock({
     }
   }
 
-  function lift(args: SensorLift): DragActions {
-    const actionArgs =
-      args.mode === 'FLUID'
-        ? {
-            clientSelection: args.clientSelection,
-            movementMode: 'FLUID',
-            id,
-          }
-        : {
-            movementMode: 'SNAP',
-            clientSelection: getBorderBoxCenterPosition(draggable),
-            id,
-          };
+  const tryDispatchWhenDragging = tryDispatch.bind(this, 'DRAGGING');
 
-    // Do lift operation
-    tryDispatch('PRE_DRAG', () => liftAction(actionArgs));
+  type LiftArgs = {|
+    liftActionArgs: LiftActionArgs,
+    cleanup: () => void,
+    actions: Object,
+  |};
+
+  function lift(args: LiftArgs) {
+    tryDispatch('PRE_DRAG', () => liftAction(args.liftActionArgs));
 
     // We are now in the DRAGGING phase
     phase = 'DRAGGING';
-
-    const execute = tryDispatch.bind(this, 'DRAGGING');
-
-    // Setup DragActions
-    const moveUp = () => execute(moveUpAction);
-    const moveDown = () => execute(moveDownAction);
-    const moveRight = () => execute(moveRightAction);
-    const moveLeft = () => execute(moveLeftAction);
-
-    const move = rafSchd((clientSelection: Position) => {
-      execute(() => moveAction({ client: clientSelection }));
-    });
 
     function finish(
       reason: 'CANCEL' | 'DROP',
       options?: StopDragOptions = { shouldBlockNextClick: false },
     ) {
-      // Cancel any pending request animation frames
-      move.cancel();
+      args.cleanup();
 
       // block next click if requested
       if (options.shouldBlockNextClick) {
@@ -254,14 +234,46 @@ function tryGetLock({
           shouldWarn: false,
         }),
       shouldRespectForcePress: getShouldRespectForcePress,
-      move,
-      moveUp,
-      moveDown,
-      moveRight,
-      moveLeft,
       drop: (options?: StopDragOptions) => finish('DROP', options),
       cancel: (options?: StopDragOptions) => finish('CANCEL', options),
+      ...args.actions,
     };
+  }
+
+  function fluidLift(clientSelection: Position): FluidDragActions {
+    const move = rafSchd((client: Position) => {
+      tryDispatchWhenDragging(() => moveAction({ client }));
+    });
+
+    const api = lift({
+      liftActionArgs: { id, clientSelection, movementMode: 'FLUID' },
+      cleanup: () => move.cancel(),
+      actions: { move },
+    });
+
+    return {
+      ...api,
+      move,
+    };
+  }
+
+  function snapLift(): SnapDragActions {
+    const actions = {
+      moveUp: () => tryDispatchWhenDragging(moveUpAction),
+      moveRight: () => tryDispatchWhenDragging(moveRightAction),
+      moveDown: () => tryDispatchWhenDragging(moveDownAction),
+      moveLeft: () => tryDispatchWhenDragging(moveLeftAction),
+    };
+
+    return lift({
+      liftActionArgs: {
+        id,
+        clientSelection: getBorderBoxCenterPosition(draggable),
+        movementMode: 'SNAP',
+      },
+      cleanup: noop,
+      actions,
+    });
   }
 
   function abortPreDrag() {
@@ -287,7 +299,8 @@ function tryGetLock({
         shouldWarn: false,
       }),
     shouldRespectForcePress: getShouldRespectForcePress,
-    lift,
+    fluidLift,
+    snapLift,
     abort: abortPreDrag,
   };
 

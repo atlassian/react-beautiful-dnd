@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import { useRef } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
-import type { PreDragActions, DragActions } from '../../../types';
+import type { PreDragActions, FluidDragActions } from '../../../types';
 import type {
   EventBinding,
   EventOptions,
@@ -31,7 +31,7 @@ type Pending = {|
 
 type Dragging = {|
   type: 'DRAGGING',
-  actions: DragActions,
+  actions: FluidDragActions,
   hasMoved: boolean,
 |};
 
@@ -351,10 +351,7 @@ export default function useMouseSensor(
         `Cannot start dragging from phase ${phase.type}`,
       );
 
-      const actions: DragActions = phase.actions.lift({
-        clientSelection: phase.point,
-        mode: 'FLUID',
-      });
+      const actions: FluidDragActions = phase.actions.fluidLift(phase.point);
 
       setPhase({
         type: 'DRAGGING',

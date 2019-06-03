@@ -6,7 +6,7 @@ import type {
   TryGetActionLock,
   Sensor,
   PreDragActions,
-  DragActions,
+  SnapDragActions,
 } from '../../../../../src/types';
 import App from '../app';
 
@@ -27,7 +27,7 @@ it('should block a single click if requested', () => {
   // trigger a drop
   const preDrag: ?PreDragActions = tryGetLock(handle);
   invariant(preDrag);
-  const drag: DragActions = preDrag.lift({ mode: 'SNAP' });
+  const drag: SnapDragActions = preDrag.snapLift();
   drag.drop({ shouldBlockNextClick: true });
 
   // fire click
@@ -59,7 +59,7 @@ it('should not block any clicks if not requested', () => {
   // trigger a drop
   const preDrag: ?PreDragActions = tryGetLock(handle);
   invariant(preDrag);
-  const drag: DragActions = preDrag.lift({ mode: 'SNAP' });
+  const drag: SnapDragActions = preDrag.snapLift();
   drag.drop({ shouldBlockNextClick: false });
 
   // fire click

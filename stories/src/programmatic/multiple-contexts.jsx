@@ -8,7 +8,7 @@ import type { Quote } from '../types';
 import type {
   DropResult,
   PreDragActions,
-  DragActions,
+  SnapDragActions,
   Sensor,
 } from '../../../src/types';
 import { quotes as initial } from '../data';
@@ -54,9 +54,7 @@ function getSensor(getContextId: () => string, delay: number) {
         }
         console.warn('starting drag');
 
-        const actions: DragActions = preDrag.lift({
-          mode: 'SNAP',
-        });
+        const actions: SnapDragActions = preDrag.snapLift();
         const { moveDown, moveUp, drop, isActive, cancel } = actions;
 
         const unbind = bindEvents(window, [

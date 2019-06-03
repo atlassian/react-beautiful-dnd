@@ -5,7 +5,8 @@ import { render } from 'react-testing-library';
 import type {
   TryGetActionLock,
   PreDragActions,
-  DragActions,
+  FluidDragActions,
+  SnapDragActions,
   Sensor,
 } from '../../../../../src/types';
 import App from '../app';
@@ -83,10 +84,7 @@ it('should not allow a sensor to obtain a on a dropping item, but can claim one 
   // drag not started yet
   expect(isDragging(handle)).toBe(false);
   // start a drag
-  const actions: DragActions = preDrag.lift({
-    mode: 'FLUID',
-    clientSelection: { x: 0, y: 0 },
-  });
+  const actions: FluidDragActions = preDrag.fluidLift({ x: 0, y: 0 });
   expect(isDragging(handle)).toBe(true);
 
   // release the movement
@@ -148,7 +146,7 @@ it('should release a lock when cancelling or dropping a drag', () => {
     invariant(preDrag, 'Expected to get lock');
     expect(preDrag.isActive()).toBe(true);
 
-    const drag: DragActions = preDrag.lift({ mode: 'SNAP' });
+    const drag: SnapDragActions = preDrag.snapLift();
     expect(drag.isActive()).toBe(true);
 
     // cannot get another lock

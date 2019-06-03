@@ -6,7 +6,7 @@ import { render } from 'react-testing-library';
 import type {
   TryGetActionLock,
   PreDragActions,
-  DragActions,
+  FluidDragActions,
   Sensor,
 } from '../../../../../src/types';
 import App from '../app';
@@ -28,10 +28,7 @@ it('should throttle move events by request animation frame', () => {
   invariant(preDrag);
 
   const initial: Position = { x: 2, y: 3 };
-  const actions: DragActions = preDrag.lift({
-    mode: 'FLUID',
-    clientSelection: initial,
-  });
+  const actions: FluidDragActions = preDrag.fluidLift(initial);
   // has not moved yet
   expect(getOffset(handle)).toEqual({ x: 0, y: 0 });
 
@@ -61,10 +58,7 @@ it('should cancel any pending moves after a lock is released', () => {
   invariant(preDrag);
 
   const initial: Position = { x: 2, y: 3 };
-  const actions: DragActions = preDrag.lift({
-    mode: 'FLUID',
-    clientSelection: initial,
-  });
+  const actions: FluidDragActions = preDrag.fluidLift(initial);
   // has not moved yet
   expect(getOffset(handle)).toEqual({ x: 0, y: 0 });
 

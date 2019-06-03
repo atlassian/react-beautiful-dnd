@@ -5,7 +5,7 @@ import type { Quote } from '../types';
 import type {
   DropResult,
   PreDragActions,
-  DragActions,
+  SnapDragActions,
 } from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
@@ -49,9 +49,7 @@ function useDemoSensor(
       }
       console.warn('starting drag');
 
-      const actions: DragActions = preDrag.lift({
-        mode: 'SNAP',
-      });
+      const actions: SnapDragActions = preDrag.snapLift();
       const { moveDown, moveUp, drop } = actions;
 
       await delay(moveDown);

@@ -6,7 +6,7 @@ import type { Quote } from '../types';
 import type {
   DropResult,
   PreDragActions,
-  DragActions,
+  SnapDragActions,
 } from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
@@ -17,7 +17,7 @@ type ControlProps = {|
   quotes: Quote[],
   canLift: boolean,
   isDragging: boolean,
-  lift: (quoteId: string) => ?DragActions,
+  lift: (quoteId: string) => ?SnapDragActions,
 |};
 
 function noop() {}
@@ -78,11 +78,11 @@ const ActionButton = styled(Button)`
 
 function Controls(props: ControlProps) {
   const { quotes, canLift, isDragging, lift } = props;
-  const actionsRef = useRef<?DragActions>(null);
+  const actionsRef = useRef<?SnapDragActions>(null);
 
   const selectRef = createRef();
 
-  function maybe(fn: (callbacks: DragActions) => void) {
+  function maybe(fn: (callbacks: SnapDragActions) => void) {
     if (actionsRef.current) {
       fn(actionsRef.current);
     }
@@ -114,7 +114,7 @@ function Controls(props: ControlProps) {
       <ActionButton
         type="button"
         onClick={() =>
-          maybe((callbacks: DragActions) => {
+          maybe((callbacks: SnapDragActions) => {
             actionsRef.current = null;
             callbacks.drop();
           })
@@ -126,7 +126,9 @@ function Controls(props: ControlProps) {
       <ArrowBox>
         <ArrowButton
           type="button"
-          onClick={() => maybe((callbacks: DragActions) => callbacks.moveUp())}
+          onClick={() =>
+            maybe((callbacks: SnapDragActions) => callbacks.moveUp())
+          }
           disabled={!isDragging}
           label="up"
         >
@@ -139,7 +141,7 @@ function Controls(props: ControlProps) {
           <ArrowButton
             type="button"
             onClick={() =>
-              maybe((callbacks: DragActions) => callbacks.moveDown())
+              maybe((callbacks: SnapDragActions) => callbacks.moveDown())
             }
             disabled={!isDragging}
             label="down"
@@ -201,7 +203,7 @@ export default function QuoteApp(props: Props) {
     [quotes],
   );
 
-  function lift(quoteId: string): ?DragActions {
+  function lift(quoteId: string): ?SnapDragActions {
     if (isDragging) {
       return null;
     }
@@ -219,7 +221,7 @@ export default function QuoteApp(props: Props) {
       return null;
     }
     setIsControlDragging(true);
-    return preDrag.lift({ mode: 'SNAP' });
+    return preDrag.snapLift();
   }
 
   return (

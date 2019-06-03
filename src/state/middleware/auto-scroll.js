@@ -16,14 +16,12 @@ export default (autoScroller: AutoScroller) => (store: MiddlewareStore) => (
   next: Dispatch,
 ) => (action: Action): any => {
   if (shouldStop(action)) {
-    console.log('SHOULD STOP');
     autoScroller.stop();
     next(action);
     return;
   }
 
   if (shouldCancelPending(action)) {
-    console.log('CANCEL PENDING');
     autoScroller.cancelPending();
     next(action);
     return;
