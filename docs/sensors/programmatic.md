@@ -51,6 +51,7 @@ function App() {
 ## Rules
 
 - Only one `<Draggable />` can be dragging at a time for a `<DragDropContext />`
+- You cannot use outdated or aborted **locks** (see below)
 - That's it!
 
 ## API
@@ -84,6 +85,8 @@ function App() {
 You can also disable all of the prebuilt sensors ([mouse](/docs/sensors/mouse.md), [keyboard](/docs/sensors/keyboard.md), and [touch](/docs/sensors/touch.md)) by setting `enableDefaultSensors={false}` on a `<DragDropContext />`. This is useful if you _only_ want a `<DragDropContext />` to be controlled programmatically.
 
 ### Controlling a drag: try to get a lock
+
+A `sensor` is provided with a function `tryGetLock()` which is used to try to get a **lock**.
 
 ```js
 export type TryGetLock = (
