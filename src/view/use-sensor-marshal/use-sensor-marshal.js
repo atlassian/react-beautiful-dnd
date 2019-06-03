@@ -1,5 +1,6 @@
 // @flow
 import rafSchd from 'raf-schd';
+import invariant from 'tiny-invariant';
 import { useState } from 'react';
 import { useCallback } from 'use-memo-one';
 import type { Position } from 'css-box-model';
@@ -42,7 +43,7 @@ function preventDefault(event: Event) {
   event.preventDefault();
 }
 
-type LockPhase = 'PRE_DRAG' | 'DRAGGING' | 'FINISHED';
+type LockPhase = 'PRE_DRAG' | 'DRAGGING' | 'COMPLETED';
 type TryGetLockArgs = {|
   lockAPI: LockAPI,
   contextId: ContextId,
@@ -195,7 +196,17 @@ function tryGetLock({
   |};
 
   function lift(args: LiftArgs) {
-    tryDispatch('PRE_DRAG', () => liftAction(args.liftActionArgs));
+    function completed() {
+      lockAPI.release();
+      phase = 'COMPLETED';
+    }
+    // Double lift = bad
+    if (phase !== 'PRE_DRAG') {
+      completed();
+      invariant(phase === 'PRE_DRAG', `Cannot lift in phase ${phase}`);
+    }
+
+    store.dispatch(liftAction(args.liftActionArgs));
 
     // We are now in the DRAGGING phase
     phase = 'DRAGGING';
@@ -216,11 +227,8 @@ function tryGetLock({
         });
       }
 
-      // We are no longer dragging
-      phase = 'FINISHED';
-
-      // releasing lock first so that a tryAbort will not run due to useEffect
-      lockAPI.release();
+      // releasing
+      completed();
       store.dispatch(dropAction({ reason }));
     }
 
