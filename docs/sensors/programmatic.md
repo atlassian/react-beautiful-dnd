@@ -1,25 +1,23 @@
 # Programmatic dragging 🎮
 
-> WIP!!
-
 It is possible to drive an entire drag and drop experience programmatically. You can use this to:
 
-- Create drag and drop interactions from any input type you can think of
-- Create beautiful scripted experiences
+- Create drag and drop interactions from **any input** type you can think of
+- Create beautiful scripted **experiences**
 
-The programmatic API is the same API that our [mouse], [keyboard], and [touch] sensor use.
+The programmatic API is the same API that our [mouse](/docs/sensors/mouse.md), [keyboard](/docs/sensors/keyboard.md), and [touch](/docs/sensors/touch.md) sensors use. So it is powerful enough to drive any experience we ship out of the box.
 
-## How does it work?
+## Overview
 
-You create a `sensor` that has the ability to attempt to claim a **lock**. A **lock** allows exclusive control of dragging a single item within a `<DragDropContext>`. The **lock** has two phases: _pre drag_ and _dragging_.
+You create a `sensor` that has the ability to attempt to claim a **lock**. A **lock** allows _exclusive_ control of dragging a single `<Draggable />` within a `<DragDropContext>`. When you are finished with your interaction, you can then release the **lock**.
 
-So here is how a `sensor` works:
+## Lifecycle
 
-1. Try to get a lock when it wants to drag and item. A sensor might not be able to claim a lock for a variety of reasons.
-2. If a lock is returned then there are a number of _pre drag_ actions available to you (`PreDragActions`). This allows you to claim a lock before starting a drag. This is important for things like [sloppy click detection](TODO) where a drag is only started after a sufficiently large movement.
-3. A _pre drag_ lock can be upgraded to a _drag lock_, which contains a different set of API's (`FluidDragActions` or `SnapDragActions`). This then allows you to move items around.
+TODO: diagram
 
-A **lock** can be aborted at any time by the application, such as when an error occurs. If you try to perform actions on an aborted **lock** then it will not do anything.
+1. Try to get a **lock** when a `sensor` wants to drag and item. A sensor might not be able to claim a lock for a variety of reasons, such as when another `sensor` already has a **lock**.
+2. If a **lock** is obtained then there are a number of _pre drag_ actions available to you (`PreDragActions`). This allows a `sensor` to claim a lock before starting a drag. This is important for things like [sloppy click detection](TODO) where a drag is only started after a sufficiently large movement.
+3. A _pre drag_ lock can be upgraded to a _drag lock_, which contains a different set of APIs (`FluidDragActions` or `SnapDragActions`). Once a `<Draggable />` has been lifted, it can be moved around.
 
 ```js
 function useMySensor(tryGetActionLock: TryGetActionLock) => void) {
@@ -45,11 +43,21 @@ function App() {
 }
 ```
 
-## Fluid vs. Snap mode
+## Aborted locks
+
+A **lock** can be aborted at any time by the application, such as when an error occurs. If you try to perform actions on an aborted **lock** then it will not do anything.
+
+TODO: isActive() and abort() callback
+
+## Expired locks
+
+TODO: calling pre drag actions when dragging, or calling drag actions when a lock has been released
+
+## Drag modes: fluid and snap
 
 There are two modes of drag interactions: **fluid** and **snap**.
 
-### Fluid dragging
+### Fluid mode
 
 When fluid dragging the dragging item is moved around based on client `x,y` positions. The impact of the drag is controlled by the center position of the dragging item.
 
