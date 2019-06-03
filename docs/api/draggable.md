@@ -306,14 +306,19 @@ It is an assumption that `<Draggable />`s are _visible siblings_ of one another.
 
 ```js
 type DragHandleProps = {|
-  onFocus: () => void,
-  onBlur: () => void,
-  onMouseDown: (event: MouseEvent) => void,
-  onKeyDown: (event: KeyboardEvent) => void,
-  onTouchStart: (event: TouchEvent) => void,
-  'data-react-beautiful-dnd-drag-handle': string,
+  // what draggable the handle belongs to
+  'data-rbd-drag-handle-draggable-id': DraggableId,
+
+  // What DragDropContext the drag handle is in
+  'data-rbd-drag-handle-context-id': ContextId,
+
+  // Aria role (nicer screen reader text)
   'aria-roledescription': string,
+
+  // Allow tabbing to this element
   tabIndex: number,
+
+  // Stop html5 drag and drop
   draggable: boolean,
   onDragStart: (event: DragEvent) => void,
 |};
@@ -348,42 +353,6 @@ Controlling a whole draggable by just a part of it
     </div>
   )}
 </Draggable>
-```
-
-#### `dragHandleProps` monkey patching
-
-You can override some of the `dragHandleProps` props with your own behavior if you need to.
-
-```js
-const myOnMouseDown = event => console.log('mouse down on', event.target);
-
-<Draggable draggableId="draggable-1" index={0}>
-  {(provided, snapshot) => {
-    const onMouseDown = (() => {
-      // dragHandleProps might be null
-      if (!provided.dragHandleProps) {
-        return onMouseDown;
-      }
-
-      // creating a new onMouseDown function that calls myOnMouseDown as well as the drag handle one.
-      return event => {
-        provided.dragHandleProps.onMouseDown(event);
-        myOnMouseDown(event);
-      };
-    })();
-
-    return (
-      <div
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-        onMouseDown={onMouseDown}
-      >
-        Drag me!
-      </div>
-    );
-  }}
-</Draggable>;
 ```
 
 ### 2. Snapshot: (DraggableStateSnapshot)
