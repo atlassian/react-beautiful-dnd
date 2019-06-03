@@ -17,7 +17,7 @@ So here is how a `sensor` works:
 
 1. Try to get a lock when it wants to drag and item. A sensor might not be able to claim a lock for a variety of reasons.
 2. If a lock is returned then there are a number of _pre drag_ actions available to you (`PreDragActions`). This allows you to claim a lock before starting a drag. This is important for things like [sloppy click detection](TODO) where a drag is only started after a sufficiently large movement.
-3. A _pre drag_ lock can be upgraded to a _drag lock_, which contains a different set of API's (`DragActions`). This then allows you to move items around.
+3. A _pre drag_ lock can be upgraded to a _drag lock_, which contains a different set of API's (`FluidDragActions` or `SnapDragActions`). This then allows you to move items around.
 
 A **lock** can be aborted at any time by the application, such as when an error occurs. If you try to perform actions on an aborted **lock** then it will not do anything.
 
@@ -29,7 +29,7 @@ function useMySensor(tryGetActionLock: TryGetActionLock) => void) {
     return;
   }
 
-  const drag: DragActions = preDrag.lift({ mode: 'SNAP' });
+  const drag: SnapDragActions = preDrag.snapLift();
 
   drag.moveDown();
   drag.moveDown();
@@ -44,6 +44,52 @@ function App() {
   )
 }
 ```
+
+## Fluid vs. Snap mode
+
+There are two modes of drag interactions: **fluid** and **snap**.
+
+### Fluid dragging
+
+When fluid dragging the dragging item is moved around based on client `x,y` positions. The impact of the drag is controlled by the center position of the dragging item.
+
+```js
+function useMySensor(tryGetActionLock: TryGetActionLock) => void) {
+  const preDrag: ?PreDragActions = tryGetActionLock();
+  // Could not get lock
+  if(!preDrag) {
+    return;
+  }
+
+  const drag: SnapDragActions = preDrag.fluidLift({x: 100, y: 200});
+
+  drag.move({x: 120, y: 130});
+}
+
+function App() {
+  return (
+    <DragDropContext sensors={[useMySensor]}>{/*...*/}</DragDropContext>
+  )
+}
+```
+
+Calls to `.move()` are throttled using [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame). So if you make multipole `.move()` calls in the same animation frame, it will only result in a single update
+
+```js
+const drag: SnapDragActions = preDrag.fluidLift({ x: 0, y: 0 });
+
+// will all be batched into a single update
+drag.move({ x: 0, y: 1 });
+drag.move({ x: 0, y: 2 });
+drag.move({ x: 0, y: 3 });
+
+// after animation frame
+// update(x: 0, y: 3)
+```
+
+### Snap dragging
+
+When snap dragging we jump the dragging item around to new positions in a single command. Eg "move up", "move down".
 
 ## <DragDropContext /> | `sensors`
 
@@ -83,18 +129,28 @@ type PreDragActions = {|
 
 ## Drag actions
 
-> WIP
-
 ```js
 type DragActions = {|
+  drop: (args?: StopDragOptions) => void,
+  cancel: (args?: StopDragOptions) => void,
   isActive: () => boolean,
   shouldRespectForcePress: () => boolean,
+|};
+
+// returned when using preDrag.fluidLift();
+
+export type FluidDragActions = {|
+  ...DragActions,
   move: (point: Position) => void,
+|};
+
+// returned when using preDrag.snapLift();
+
+export type SnapDragActions = {|
+  ...DragActions,
   moveUp: () => void,
   moveDown: () => void,
   moveRight: () => void,
   moveLeft: () => void,
-  drop: (args?: StopDragOptions) => void,
-  cancel: (args?: StopDragOptions) => void,
 |};
 ```
