@@ -7,6 +7,7 @@ import type {
   DropResult,
   PreDragActions,
   SnapDragActions,
+  TryGetLock,
 } from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
@@ -175,9 +176,7 @@ export default function QuoteApp(props: Props) {
   const [quotes, setQuotes] = useState(props.initial);
   const [isDragging, setIsDragging] = useState(false);
   const [isControlDragging, setIsControlDragging] = useState(false);
-  const tryGetActionLock = useRef<
-    (el: Element, stop: () => void) => ?PreDragActions,
-  >(() => null);
+  const tryGetLockRef = useRef<TryGetLock>(() => null);
 
   const onDragEnd = useCallback(
     function onDragEnd(result: DropResult) {
@@ -214,7 +213,7 @@ export default function QuoteApp(props: Props) {
       return null;
     }
 
-    const preDrag: ?PreDragActions = tryGetActionLock.current(handle, noop);
+    const preDrag: ?PreDragActions = tryGetLockRef.current(handle, noop);
 
     if (!preDrag) {
       console.log('unable to start capturing');
@@ -230,7 +229,7 @@ export default function QuoteApp(props: Props) {
       onDragEnd={onDragEnd}
       __unstableSensors={[
         tryGetLock => {
-          tryGetActionLock.current = tryGetLock;
+          tryGetLock.current = tryGetLock;
         },
       ]}
     >

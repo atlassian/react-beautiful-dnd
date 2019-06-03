@@ -30,10 +30,7 @@ function sleep(fn: Function, time?: number = 300) {
 
 function getSensor(getContextId: () => string, delay: number) {
   return function useCustomSensor(
-    tryGetActionLock: (
-      source: Event | Element,
-      abort: () => void,
-    ) => ?PreDragActions,
+    tryGetLock: (source: Event | Element, abort: () => void) => ?PreDragActions,
   ) {
     const start = useCallback(
       async function start() {
@@ -46,7 +43,7 @@ function getSensor(getContextId: () => string, delay: number) {
           return;
         }
 
-        const preDrag: ?PreDragActions = tryGetActionLock(handle, () => {});
+        const preDrag: ?PreDragActions = tryGetLock(handle, () => {});
 
         if (!preDrag) {
           console.warn('unable to start drag');
@@ -85,7 +82,7 @@ function getSensor(getContextId: () => string, delay: number) {
 
         unbind();
       },
-      [tryGetActionLock],
+      [tryGetLock],
     );
 
     useEffect(() => {

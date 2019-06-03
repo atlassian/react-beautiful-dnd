@@ -23,10 +23,7 @@ function delay(fn: Function, time?: number = 300) {
 function noop() {}
 
 function useDemoSensor(
-  tryGetActionLock: (
-    source: Event | Element,
-    abort: () => void,
-  ) => ?PreDragActions,
+  tryGetLock: (source: Event | Element, abort: () => void) => ?PreDragActions,
 ) {
   const start = useCallback(
     async function start() {
@@ -41,7 +38,7 @@ function useDemoSensor(
 
       // handle.scrollIntoView();
 
-      const preDrag: ?PreDragActions = tryGetActionLock(handle, noop);
+      const preDrag: ?PreDragActions = tryGetLock(handle, noop);
 
       if (!preDrag) {
         console.warn('unable to start drag');
@@ -65,7 +62,7 @@ function useDemoSensor(
       await delay(moveUp);
       await delay(drop);
     },
-    [tryGetActionLock],
+    [tryGetLock],
   );
 
   useEffect(() => {

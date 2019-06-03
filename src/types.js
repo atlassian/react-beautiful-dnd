@@ -433,9 +433,9 @@ export type PreDragActions = {|
   abort: () => void,
 |};
 
-export type TryGetActionLock = (
+export type TryGetLock = (
   source: Event | Element,
   forceStop?: () => void,
 ) => ?PreDragActions;
 
-export type Sensor = (tryGetActionLock: TryGetActionLock) => void;
+export type Sensor = (tryGetLock: TryGetLock) => void;

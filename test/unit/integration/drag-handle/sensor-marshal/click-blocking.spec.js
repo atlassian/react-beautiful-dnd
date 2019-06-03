@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import React from 'react';
 import { render, fireEvent, createEvent } from 'react-testing-library';
 import type {
-  TryGetActionLock,
+  TryGetLock,
   Sensor,
   PreDragActions,
   SnapDragActions,
@@ -11,8 +11,8 @@ import type {
 import App from '../app';
 
 it('should block a single click if requested', () => {
-  let tryGetLock: TryGetActionLock;
-  const a: Sensor = (tryStart: TryGetActionLock) => {
+  let tryGetLock: TryGetLock;
+  const a: Sensor = (tryStart: TryGetLock) => {
     tryGetLock = tryStart;
   };
 
@@ -42,9 +42,9 @@ it('should block a single click if requested', () => {
 });
 
 it('should not block any clicks if not requested', () => {
-  let tryGetLock: TryGetActionLock;
+  let tryGetLock: TryGetLock;
 
-  const a: Sensor = (tryStart: TryGetActionLock) => {
+  const a: Sensor = (tryStart: TryGetLock) => {
     tryGetLock = tryStart;
   };
 

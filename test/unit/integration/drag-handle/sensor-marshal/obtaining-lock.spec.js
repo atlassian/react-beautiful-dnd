@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import React from 'react';
 import { render } from 'react-testing-library';
 import type {
-  TryGetActionLock,
+  TryGetLock,
   PreDragActions,
   FluidDragActions,
   SnapDragActions,
@@ -15,13 +15,13 @@ import { isDragging, isDropAnimating } from '../util';
 function noop() {}
 
 it('should allow an exclusive lock for drag actions', () => {
-  let first: TryGetActionLock;
-  let second: TryGetActionLock;
+  let first: TryGetLock;
+  let second: TryGetLock;
 
-  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+  const a: Sensor = (tryGetLock: TryGetLock) => {
     first = tryGetLock;
   };
-  const b: Sensor = (tryGetLock: TryGetActionLock) => {
+  const b: Sensor = (tryGetLock: TryGetLock) => {
     second = tryGetLock;
   };
 
@@ -46,8 +46,8 @@ it('should allow an exclusive lock for drag actions', () => {
 });
 
 it('should allow a lock to be released', () => {
-  let tryGet: TryGetActionLock;
-  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+  let tryGet: TryGetLock;
+  const a: Sensor = (tryGetLock: TryGetLock) => {
     tryGet = tryGetLock;
   };
 
@@ -70,8 +70,8 @@ it('should allow a lock to be released', () => {
 });
 
 it('should not allow a sensor to obtain a on a dropping item, but can claim one on something else while dragging', () => {
-  let tryGet: TryGetActionLock;
-  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+  let tryGet: TryGetLock;
+  const a: Sensor = (tryGetLock: TryGetLock) => {
     tryGet = tryGetLock;
   };
   const { getByText } = render(<App sensors={[a]} />);
@@ -106,8 +106,8 @@ it('should not allow a sensor to obtain a on a dropping item, but can claim one 
 });
 
 it('should release a lock when aborting a pre drag', () => {
-  let tryGet: TryGetActionLock;
-  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+  let tryGet: TryGetLock;
+  const a: Sensor = (tryGetLock: TryGetLock) => {
     tryGet = tryGetLock;
   };
   const { getByText } = render(<App sensors={[a]} />);
@@ -132,8 +132,8 @@ it('should release a lock when aborting a pre drag', () => {
 });
 
 it('should release a lock when cancelling or dropping a drag', () => {
-  let tryGet: TryGetActionLock;
-  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+  let tryGet: TryGetLock;
+  const a: Sensor = (tryGetLock: TryGetLock) => {
     tryGet = tryGetLock;
   };
   const { getByText } = render(<App sensors={[a]} />);

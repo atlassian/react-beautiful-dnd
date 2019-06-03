@@ -4,7 +4,7 @@ import React from 'react';
 import type { Position } from 'css-box-model';
 import { render } from 'react-testing-library';
 import type {
-  TryGetActionLock,
+  TryGetLock,
   PreDragActions,
   FluidDragActions,
   Sensor,
@@ -16,8 +16,8 @@ import { add } from '../../../../../src/state/position';
 function noop() {}
 
 it('should throttle move events by request animation frame', () => {
-  let tryGet: TryGetActionLock;
-  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+  let tryGet: TryGetLock;
+  const a: Sensor = (tryGetLock: TryGetLock) => {
     tryGet = tryGetLock;
   };
   const { getByText } = render(<App sensors={[a]} />);
@@ -46,8 +46,8 @@ it('should throttle move events by request animation frame', () => {
 });
 
 it('should cancel any pending moves after a lock is released', () => {
-  let tryGet: TryGetActionLock;
-  const a: Sensor = (tryGetLock: TryGetActionLock) => {
+  let tryGet: TryGetLock;
+  const a: Sensor = (tryGetLock: TryGetLock) => {
     tryGet = tryGetLock;
   };
   const { getByText } = render(<App sensors={[a]} />);
