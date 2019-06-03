@@ -92,7 +92,6 @@ export default ({
       insideDestination,
     );
 
-    console.log('trying to add at logical index');
     const startIndex: number = insideDestination[0].descriptor.index;
     const atProposedIndex: ?DraggableDimension =
       withoutDraggable[proposedIndex - startIndex];

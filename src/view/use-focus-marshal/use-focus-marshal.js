@@ -78,7 +78,6 @@ export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
       const handle: ?HTMLElement = getDragHandle(contextId, tryGiveFocusTo);
 
       if (handle && handle !== document.activeElement) {
-        console.log('giving focus to ', tryGiveFocusTo);
         handle.focus();
       }
     },

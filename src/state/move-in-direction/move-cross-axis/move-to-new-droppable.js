@@ -109,19 +109,6 @@ export default ({
     return proposedIndex - firstIndex;
   })();
 
-  console.log(
-    {
-      moveRelativeTo: moveRelativeTo.descriptor.id,
-      sliceFrom,
-      proposedIndex,
-      // isGoingBeforeTarget,
-    },
-    {
-      droppableId: destination.descriptor.id,
-      index: proposedIndex,
-    },
-  );
-
   const displaced: Displacement[] = removeDraggableFromList(
     draggable,
     insideDestination,
