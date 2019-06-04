@@ -9,6 +9,8 @@ import type {
   MovementMode,
   ContextId,
 } from '../../types';
+import type { AppContextValue } from '../context/app-context';
+import type { DroppableContextValue } from '../context/droppable-context';
 import { dropAnimationFinished } from '../../state/action-creators';
 
 export type DraggingStyle = {|
@@ -142,16 +144,26 @@ export type ChildrenFn = (Provided, StateSnapshot) => Node | null;
 
 export type DefaultProps = {|
   isDragDisabled: boolean,
-  isClone: boolean,
   disableInteractiveElementBlocking: boolean,
   shouldRespectForcePress: boolean,
 |};
 
-export type OwnProps = {|
+export type PublicOwnProps = {|
   ...DefaultProps,
   draggableId: DraggableId,
   index: number,
   children: ChildrenFn,
+|};
+
+export type PrivateOwnProps = {|
+  ...PublicOwnProps,
+  isClone: boolean,
+|};
+
+export type OwnProps = {|
+  ...PrivateOwnProps,
+  droppableContext: DroppableContextValue,
+  appContext: AppContextValue,
 |};
 
 export type Props = {|

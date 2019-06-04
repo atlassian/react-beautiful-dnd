@@ -11,11 +11,6 @@ import type {
   DraggableStyle,
   DragHandleProps,
 } from './draggable-types';
-import AppContext, { type AppContextValue } from '../context/app-context';
-import DroppableContext, {
-  type DroppableContextValue,
-} from '../context/droppable-context';
-import useRequiredContext from '../use-required-context';
 import useValidation from './use-validation';
 import { serialize } from '../draggable-options';
 
@@ -31,13 +26,6 @@ export default function Draggable(props: Props) {
   }, []);
   const getRef = useCallback((): ?HTMLElement => ref.current, []);
 
-  // context
-  const appContext: AppContextValue = useRequiredContext(AppContext);
-  const droppableContext: DroppableContextValue = useRequiredContext(
-    DroppableContext,
-  );
-  const { usingCloneWhenDragging } = droppableContext;
-
   // Validating props and innerRef
   useValidation(props, getRef);
 
@@ -51,6 +39,8 @@ export default function Draggable(props: Props) {
     disableInteractiveElementBlocking: canDragInteractiveElements,
     index,
     isClone,
+    appContext,
+    droppableContext,
 
     // mapProps
     mapped,
@@ -150,7 +140,7 @@ export default function Draggable(props: Props) {
 
   const isDragging: boolean = mapped.type === 'DRAGGING';
 
-  if (isDragging && usingCloneWhenDragging && !isClone) {
+  if (isDragging && droppableContext.usingCloneWhenDragging && !isClone) {
     return null;
   }
 
