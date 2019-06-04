@@ -26,7 +26,6 @@ import type {
 import type {
   MapProps,
   OwnProps,
-  DefaultProps,
   DispatchProps,
   Selector,
   StateSnapshot,
@@ -290,29 +289,10 @@ const mapDispatchToProps: DispatchProps = {
   dropAnimationFinished: dropAnimationFinishedAction,
 };
 
-const defaultProps = ({
-  isClone: false,
-  isDragDisabled: false,
-  // Cannot drag interactive elements by default
-  disableInteractiveElementBlocking: false,
-  // Not respecting browser force touch interaction
-  // by default for a more consistent experience
-  shouldRespectForcePress: false,
-}: DefaultProps);
-
-// Abstract class allows to specify props and defaults to component.
-// All other ways give any or do not let add default props.
-// eslint-disable-next-line
-/*::
-class DraggableType extends Component<OwnProps> {
-  static defaultProps = defaultProps;
-}
-*/
-
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Draggable`
-const ConnectedDraggable: typeof DraggableType = (connect(
+const ConnectedDraggable = connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
   mapDispatchToProps,
@@ -329,8 +309,6 @@ const ConnectedDraggable: typeof DraggableType = (connect(
     // Switching to a strictEqual as we return a memoized object on changes
     areStatePropsEqual: isStrictEqual,
   },
-): any)(Draggable);
-
-ConnectedDraggable.defaultProps = defaultProps;
+)(Draggable);
 
 export default ConnectedDraggable;

@@ -13,7 +13,6 @@ import DroppableContext, {
 // import useAnimateInOut from '../use-animate-in-out/use-animate-in-out';
 import getMaxWindowScroll from '../window/get-max-window-scroll';
 import useValidation from './use-validation';
-import Draggable from '../draggable';
 import type {
   StateSnapshot as DraggableStateSnapshot,
   Provided as DraggableProvided,
@@ -21,6 +20,7 @@ import type {
 import AnimateInOut, {
   type AnimateProvided,
 } from '../animate-in-out/animate-in-out';
+import { PrivateDraggable } from '../draggable/draggable-api';
 
 export default function Droppable(props: Props) {
   const appContext: ?AppContextValue = useContext<?AppContextValue>(AppContext);
@@ -138,12 +138,20 @@ export default function Droppable(props: Props) {
     const { draggableId, source, render } = useClone;
 
     const item: Node = (
-      <Draggable draggableId={draggableId} index={source.index} isClone>
+      <PrivateDraggable
+        draggableId={draggableId}
+        index={source.index}
+        isClone
+        isEnabled
+        // not important as drag has already started
+        shouldRespectForcePress={false}
+        canDragInteractiveElements
+      >
         {(
           draggableProvided: DraggableProvided,
           draggableSnapshot: DraggableStateSnapshot,
         ) => render(draggableProvided, draggableSnapshot, source)}
-      </Draggable>
+      </PrivateDraggable>
     );
 
     return ReactDOM.createPortal(item, getContainerForClone());

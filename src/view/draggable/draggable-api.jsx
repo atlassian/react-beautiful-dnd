@@ -25,5 +25,23 @@ export function PrivateDraggable(props: PrivateOwnProps) {
 }
 
 export function PublicDraggable(props: PublicOwnProps) {
-  return <PrivateDraggable {...props} isClone={false} />;
+  // default values for props
+  const isEnabled: boolean =
+    typeof props.isDragDisabled === 'boolean' ? !props.isDragDisabled : true;
+  const canDragInteractiveElements: boolean = Boolean(
+    props.disableInteractiveElementBlocking,
+  );
+  const shouldRespectForcePress: boolean = Boolean(
+    props.shouldRespectForcePress,
+  );
+
+  return (
+    <PrivateDraggable
+      {...props}
+      isClone={false}
+      isEnabled={isEnabled}
+      canDragInteractiveElements={canDragInteractiveElements}
+      shouldRespectForcePress={shouldRespectForcePress}
+    />
+  );
 }

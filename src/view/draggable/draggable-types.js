@@ -142,22 +142,25 @@ export type MapProps = {|
 
 export type ChildrenFn = (Provided, StateSnapshot) => Node | null;
 
-export type DefaultProps = {|
-  isDragDisabled: boolean,
-  disableInteractiveElementBlocking: boolean,
-  shouldRespectForcePress: boolean,
-|};
-
 export type PublicOwnProps = {|
-  ...DefaultProps,
   draggableId: DraggableId,
   index: number,
   children: ChildrenFn,
+
+  // optional own props
+  isDragDisabled?: boolean,
+  disableInteractiveElementBlocking?: boolean,
+  shouldRespectForcePress?: boolean,
 |};
 
 export type PrivateOwnProps = {|
   ...PublicOwnProps,
   isClone: boolean,
+
+  // no longer optional
+  isEnabled: boolean,
+  canDragInteractiveElements: boolean,
+  shouldRespectForcePress: boolean,
 |};
 
 export type OwnProps = {|

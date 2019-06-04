@@ -34,9 +34,9 @@ export default function Draggable(props: Props) {
     // ownProps
     children,
     draggableId,
-    isDragDisabled,
+    isEnabled,
     shouldRespectForcePress,
-    disableInteractiveElementBlocking: canDragInteractiveElements,
+    canDragInteractiveElements,
     index,
     isClone,
     appContext,
@@ -48,7 +48,6 @@ export default function Draggable(props: Props) {
     // dispatchProps
     dropAnimationFinished: dropAnimationFinishedAction,
   } = props;
-  const isEnabled: boolean = !isDragDisabled;
 
   // TODO: is this the right approach?
   // The dimension publisher: talks to the marshal
