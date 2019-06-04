@@ -57,7 +57,7 @@
     "@babel/runtime-corejs2": "^7.4.4",
     "css-box-model": "^1.1.2",
     "memoize-one": "^5.0.4",
-    "raf-schd": "^4.0.0",
+    "raf-schd": "^4.0.1",
     "react-redux": "^7.0.3",
     "redux": "^4.0.1",
     "tiny-invariant": "^1.0.4",
