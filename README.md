@@ -1,145 +1,146 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/2182637/53611918-54c1ff80-3c24-11e9-9917-66ac3cef513d.png" alt="react beautiful dnd logo" />
+  <img src="https://user-images.githubusercontent.com/2182637/53611918-54c1ff80-3c24-11e9-9917-66ac3cef513d.png" alt="logo do react beautiful dnd" />
 </p>
 <h1 align="center">react-beautiful-dnd</h1>
 
 <div align="center">
 
-**Beautiful** and **accessible** drag and drop for lists with [`React`](https://facebook.github.io/react/)
+Clique e arraste **Lindo** e **acessível** para listas com [`React`](https://facebook.github.io/react/)
 
 [![CircleCI branch](https://img.shields.io/circleci/project/github/atlassian/react-beautiful-dnd/master.svg)](https://circleci.com/gh/atlassian/react-beautiful-dnd/tree/master)
 [![npm](https://img.shields.io/npm/v/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
 
-![quote application example](https://user-images.githubusercontent.com/2182637/53614150-efbed780-3c2c-11e9-9204-a5d2e746faca.gif)
+![exemplo de aplicação](https://user-images.githubusercontent.com/2182637/53614150-efbed780-3c2c-11e9-9204-a5d2e746faca.gif)
 
-[Play with this example if you want!](https://react-beautiful-dnd.netlify.com/iframe.html?selectedKind=board&selectedStory=simple)
+[Brinque com este exemplo se você quiser!](https://react-beautiful-dnd.netlify.com/iframe.html?selectedKind=board&selectedStory=simple)
 
 </div>
 
-## Core characteristics
+## Principais características
 
-- Beautiful and [natural movement](/docs/about/animations.md) of items 💐
-- [Accessible](/docs/about/accessibility.md): powerful keyboard and screen reader support ♿️
-- [Extremely performant](/docs/support/media.md) 🚀
-- Clean and powerful api which is simple to get started with
-- Plays extremely well with standard browser interactions
-- [Unopinionated styling](/docs/guides/preset-styles.md)
-- No creation of additional wrapper dom nodes - flexbox and focus management friendly!
+- [Movimento natural](/docs/about/animations.md) e lindo dos itens 💐
+- [Accessível](/docs/about/accessibility.md): suporte poderoso ao teclado e leitores de tela ♿️
+- [Extremamente performático](/docs/support/media.md) 🚀
+- API limpa e poderosa, fácil de começar a usar
+- Brinca muito bem com as interações padrões do browser
+- [Estilo sem influência](/docs/guides/preset-styles.md)
+- Sem a criação de Nós DOM adicionais ao redor - amigável para flexbox e gerenciamento de foco!
 
-## Get started 👩‍🏫
+## Comece a usar 👩‍🏫
 
-We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help you get started with `react-beautiful-dnd` as quickly as possible.
+Nós criamos um [curso grátis no `egghead.io`🥚](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) para te ajudar a começar a usar o `react-beautiful-dnd` o mais rápido possível.
 
 [![course-logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
 
-## Currently supported feature set ✅
+## Pacote atual de funcionalidades suportadas ✅
 
-- Vertical lists ↕
-- Horizontal lists ↔
-- Movement between lists (▤ ↔ ▤)
-- [Combining items](/docs/guides/combining.md)
-- Mouse 🐭, keyboard 🎹♿️ and touch 👉📱 (mobile, tablet and so on) support
-- [Multi drag support](/docs/patterns/multi-drag.md)
-- Incredible screen reader support ♿️ - we provide an amazing experience for english screen readers out of the box 📦. We also provide complete customisation control and internationalisation support for those who need it 💖
-- [Conditional dragging](/docs/api/draggable.md#optional-props) and [conditional dropping](/docs/api/droppable.md#conditionally-dropping)
-- Multiple independent lists on the one page
-- Flexible item sizes - the draggable items can have different heights (vertical lists) or widths (horizontal lists)
-- [Add and remove items during a drag](/docs/guides/changes-while-dragging.md)
-- Compatible with semantic `<table>` reordering - [table pattern](/docs/patterns/tables.md)
-- [Auto scrolling](/docs/guides/auto-scrolling.md) - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
-- Custom drag handles - you can drag a whole item by just a part of it
-- Compatible with [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html) - [portal pattern](/docs/patterns/using-a-portal.md)
-- 🌲 Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) package
-- A `<Droppable />` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
-- Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
-- Server side rendering (SSR) compatible - see [resetServerContext()](/docs/api/reset-server-context.md)
-- Plays well with [nested interactive elements](/docs/api/draggable.md#interactive-child-elements-within-a-draggable-) by default
+- Listas verticais ↕
+- Listas horizontais ↔
+- Movimento entre listas (▤ ↔ ▤)
+- [Combinar items](/docs/guides/combining.md)
+- Suporte a Mouse 🐭, teclado 🎹♿️ e toque 👉📱(celulares, tablets e por aí vai)
+- [Suporte a arraste múltiplo](/docs/patterns/multi-drag.md)
+- Suporte incrível a leitores de tela ♿️ - Nós fornecemos de fábrica uma experiência incrível para leitores de tela em inglês📦. Nós também fornecemos personalização completa e suporte a internacionalização para aqueles que precisam deles 💖
+- [Arraste condicional](/docs/api/draggable.md#optional-props) e [solte condicional](/docs/api/droppable.md#conditionally-dropping)
+- Listas múltiplas e independentes em uma mesma página
+- Itens de tamanhos flexíveis - os items arrastáveis podem ter alturas diferentes (listas verticais) ou larguras (listas horizontais)
+- [Adição/Remoção de itens durante o arraste](/docs/guides/changes-while-dragging.md)
+- Compatível com a reordenação semântica de `<table>` - [padrão de tabela](/docs/patterns/tables.md)
+- [Rolagem Automática](/docs/guides/auto-scrolling.md) - automaticamente rola os elementos e a janela de acordo com a necessidade durante o arraste (mesmo com o teclado 🔥)
+- Alças de arraste personalizadas - Você pode arrastar pelo item inteiro, ou só por parte dele
+- Compatível com [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html) - [padrão de portais](/docs/patterns/using-a-portal.md)
+- 🌲 Suporte ao pacote de árvores [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree)
+- Uma lista `<Droppable />` pode ser um container rolável (sem um pai rolável) ou ser filho de um container rolável (que também não tenha um pai rolável)
+- Listas aninhadas independentes - uma lista pode ser filha de outra lista, mas você não pode arrastar da lista pai pra lista filha
+- Compatível com renderização no servidor (SSR) - veja [resetServerContext()](/docs/api/reset-server-context.md)
+- Brinca bem com [elementos interativos aninhados](/docs/api/draggable.md#interactive-child-elements-within-a-draggable-) by default
 
-## Motivation 🤔
+## Motivação 🤔
 
-`react-beautiful-dnd` exists to create beautiful drag and drop for lists that anyone can use - even people who cannot see. For a good overview of the history and motivations of the project you can take a look at these external resources:
+O `react-beautiful-dnd` existe para criar lindas listas de clique e arraste que qualquer um possa usar - até mesmo pessoas que não podem enxergar. Para um bom panorama da história e motivações para o projeto, você pode dar uma olhada nos seguintes recursos externos:
 
-- 📖 [Rethinking drag and drop](https://medium.com/@alexandereardon/rethinking-drag-and-drop-d9f5770b4e6b)
-- 🎧 [React podcast: fast, accessible and beautiful drag and drop](https://reactpodcast.simplecast.fm/17)
+- 📖 [Repensando o Clique e Arraste](https://medium.com/@alexandereardon/rethinking-drag-and-drop-d9f5770b4e6b)
+- 🎧 [React podcast: Clique e arraste rápido, bonito e accessível](https://reactpodcast.simplecast.fm/17)
 
-## Not for everyone ✌️
+## Não é para todos ✌️
 
-There are a lot of libraries out there that allow for drag and drop interactions within React. Most notable of these is the amazing [`react-dnd`](https://github.com/react-dnd/react-dnd). It does an incredible job at providing a great set of drag and drop primitives which work especially well with the [wildly inconsistent](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) html5 drag and drop feature. `react-beautiful-dnd` is a higher level abstraction specifically built for lists (vertical, horizontal, movement between lists, nested lists and so on). Within that subset of functionality `react-beautiful-dnd` offers a powerful, natural and beautiful drag and drop experience. However, it does not provide the breadth of functionality offered by `react-dnd`. So `react-beautiful-dnd` might not be for you depending on what your use case is.
+Existem muitas bibliotecas por aí que permitem clique e arraste dentro do React. A mais notável delas é a maravilhosa[`react-dnd`](https://github.com/react-dnd/react-dnd). Ela faz um trabalho incrível em fornecer um conjunto de elementos primitivos de clique e arraste que funcionam especialmente bem com a [selvagenmente inconsistente](https://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) funcionalidade de clique e arraste do html5. `react-beautiful-dnd` é uma abstração de alto nível construída especificamente para listas(vertical, horizontal, movimento entre listas, listas aninhadas, etc). Dentro desse conjunto de funcionalidades, o `react-beautiful-dnd` oferece uma poderosa, natural e linda experiência de clique e arraste. No entanto, ele não provê a gama de funcionalidades oferecida pelo `react-dnd`. Então o `react-beautiful-dnd` pode não ser para você, dependendo do seu caso. 
 
-## Documentation 📖
+## Documentação 📖
 
 ### About 👋
 
-- [Installation](/docs/about/installation.md)
-- [Examples and samples](/docs/about/examples.md)
-- [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
-- [Design principles](/docs/about/design-principles.md)
-- [Animations](/docs/about/animations.md)
-- [Accessibility](/docs/about/accessibility.md)
-- [Browser support](/docs/about/browser-support.md)
+- [Instalação](/docs/about/installation.md)
+- [Exemplos e amostras](/docs/about/examples.md)
+- [Comece a usar](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
+- [Princípios de design](/docs/about/design-principles.md)
+- [Animações](/docs/about/animations.md)
+- [Accessibilidade](/docs/about/accessibility.md)
+- [Suporte de Navegador](/docs/about/browser-support.md)
 
-### Sensors 🔉
+### Sensores 🔉
 
-> The ways in which somebody can start and control a drag
+> Os jeitos que alguém controla um clique e arraste
 
-- [Mouse dragging 🐭](/docs/sensors/mouse.md)
-- [Touch dragging 👉📱](/docs/sensors/touch.md)
-- [Keyboard dragging 🎹♿️](/docs/sensors/keyboard.md)
+- [Arrastando com o mouse 🐭](/docs/sensors/mouse.md)
+- [Arrastando com o toque 👉📱](/docs/sensors/touch.md)
+- [Arrastando com o teclado 🎹♿️](/docs/sensors/keyboard.md)
 
 ### API 🏋️‍
 
-![diagram](https://user-images.githubusercontent.com/2182637/53607406-c8f3a780-3c12-11e9-979c-7f3b5bd1bfbd.gif)
+![diagrama](https://user-images.githubusercontent.com/2182637/53607406-c8f3a780-3c12-11e9-979c-7f3b5bd1bfbd.gif)
 
-- [`<DragDropContext />`](/docs/api/drag-drop-context.md) - _Wraps the part of your application you want to have drag and drop enabled for_
-- [`<Droppable />`](/docs/api/droppable.md) - _An area that can be dropped into. Contains `<Draggable />`s_
-- [`<Draggable />`](/docs/api/draggable.md) - _What can be dragged around_
-- [`resetServerContext()`](/docs/api/reset-server-context.md) - _Utility for server side rendering (SSR)_
+- [`<DragDropContext />`](/docs/api/drag-drop-context.md) - _Encapsula os elementos para os quais você quer ter clique e arraste_
+- [`<Droppable />`](/docs/api/droppable.md) - _Uma área onde elementos podem ser soltos. Contém `<Draggable />`s_
+- [`<Draggable />`](/docs/api/draggable.md) - _O que pode ser arrastado por aí_
+- [`resetServerContext()`](/docs/api/reset-server-context.md) - _Utilidade para Renderização no Servidor(SSR)_
 
-### Guides 🗺
+### Guias 🗺
 
-- [`<DragDropContext />` responders](/docs/guides/responders.md) - _`onDragStart`, `onDragUpdate`, `onDragEnd` and `onBeforeDragStart`_
-- [Combining `<Draggable />`s](/docs/guides/combining.md)
-- [Common setup issues](/docs/guides/common-setup-issues.md)
-- [Using `innerRef`](/docs/guides/using-inner-ref.md)
-- [Developer warnings and how to disable them](/docs/guides/developer-warnings.md)
-- [Rules for `draggableId` and `droppableId`s](/docs/guides/identifiers.md)
-- [Customising or skipping the drop animation](/docs/guides/drop-animation.md)
-- [Auto scrolling](/docs/guides/auto-scrolling.md)
-- [Controlling the screen reader](/docs/guides/screen-reader.md)
-- [Use the html5 `doctype`](/docs/guides/doctype.md)
-- [`TypeScript` and `flow`](/docs/guides/types.md)
-- [Dragging `<svg>`s](/docs/guides/dragging-svgs.md)
-- [Non-visible preset styles](/docs/guides/preset-styles.md)
-- [How we detect scroll containers](/docs/guides/how-we-detect-scroll-containers.md)
-- [How we use dom events](/docs/guides/how-we-use-dom-events.md) - _Useful if you need to build on top of `react-beautiful-dnd`_
-- [Adding `<Draggable />`s during a drag](/docs/guides/changes-while-dragging.md) - _⚠️ Advanced_
+- [`<DragDropContext />` respondedores](/docs/guides/responders.md) - _`onDragStart`, `onDragUpdate`, `onDragEnd` and `onBeforeDragStart`_
+- [Combinando `<Draggable />`s](/docs/guides/combining.md)
+- [Problemas comuns na configuração](/docs/guides/common-setup-issues.md)
+- [Usando `innerRef`](/docs/guides/using-inner-ref.md)
+- [Alertas de desenvolvedor e como desabilitá-los](/docs/guides/developer-warnings.md)
+- [Regras para `draggableId` e `droppableId`s](/docs/guides/identifiers.md)
+- [Customizando e pulando a animação de soltar](/docs/guides/drop-animation.md)
+- [Rolagem automática](/docs/guides/auto-scrolling.md)
+- [Controlando o leitor de tela](/docs/guides/screen-reader.md)
+- [Usando o `doctype` html5](/docs/guides/doctype.md)
+- [`TypeScript` e `flow`](/docs/guides/types.md)
+- [Arrastando `<svg>`s](/docs/guides/dragging-svgs.md)
+- [Estilos pre-setados invisíveis](/docs/guides/preset-styles.md)
+- [Como detectamos os contâineres roláveis](/docs/guides/how-we-detect-scroll-containers.md)
+- [Como usamos eventos DOM](/docs/guides/how-we-use-dom-events.md) - _Useful if you need to build on top of `react-beautiful-dnd`_
+- [Adicionando um `<Draggable />`s durante o arraste](/docs/guides/changes-while-dragging.md) - _⚠️ Advanced_
 
-### Patterns 👷‍
+### Padrões 👷‍
 
-- [Multi drag](/docs/patterns/multi-drag.md)
-- [Tables](/docs/patterns/tables.md)
-- [Using a portal (`ReactDOM.createPortal`)](/docs/patterns/using-a-portal.md)
+- [Arraste Múltiplo](/docs/patterns/multi-drag.md)
+- [Tabelas](/docs/patterns/tables.md)
+- [Usando um portal (`ReactDOM.createPortal`)](/docs/patterns/using-a-portal.md)
 
-### Support 👩‍⚕️
+### Suporte 👩‍⚕️
 
-- [Engineering health](/docs/support/engineering-health.md)
-- [Community and addons](/docs/support/community-and-addons.md)
-- [Release notes and changelog](https://github.com/atlassian/react-beautiful-dnd/releases)
-- [Upgrading](/docs/support/upgrading.md)
-- [Road map](https://github.com/atlassian/react-beautiful-dnd/issues)
-- [Media](/docs/support/media.md)
+- [Saúde da engenharia](/docs/support/engineering-health.md)
+- [Comunidade e adicionais](/docs/support/community-and-addons.md)
+- [Notas de lançamento e mudanças](https://github.com/atlassian/react-beautiful-dnd/releases)
+- [Atualizando](/docs/support/upgrading.md)
+- [Caminho de desenvolvimento](https://github.com/atlassian/react-beautiful-dnd/issues)
+- [Mídia](/docs/support/media.md)
 
-## Read this in other languages 🌎
+## Leia isso em outros idiomas 🌎
 
 - [![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **한글/Korean**](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
 - [![china](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **中文/Chinese**](https://github.com/chinanf-boy/react-beautiful-dnd-zh)
 - [![ru](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Russia.png) На русском/Russian**](https://github.com/vtereshyn/react-beautiful-dnd-ru)
+- [![pt](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Brazil.png) Português/Portuguese**](https://github.com/dudestein/react-beautiful-dnd-pt)
 
-## Author ✍️
+## Autor ✍️
 
 Alex Reardon [@alexandereardon](https://twitter.com/alexandereardon)
 
-## Collaborators 🤝
+## Colaboradores 🤝
 
 - Bogdan Chadkin [@IAmTrySound](https://twitter.com/IAmTrySound)
 - Luke Batchelor [@alukebatchelor](https://twitter.com/alukebatchelor)
