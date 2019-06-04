@@ -52,7 +52,7 @@ type Props = {|
   children: Node | null,
 
   // sensors
-  __unstableSensors?: Sensor[],
+  sensors?: Sensor[],
   enableDefaultSensors?: ?boolean,
 |};
 
@@ -73,7 +73,7 @@ function getStore(lazyRef: LazyStoreRef): Store {
 }
 
 export default function App(props: Props) {
-  const { contextId, setOnError, __unstableSensors } = props;
+  const { contextId, setOnError, sensors } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
@@ -202,7 +202,7 @@ export default function App(props: Props) {
   useSensorMarshal({
     contextId,
     store,
-    customSensors: __unstableSensors,
+    customSensors: sensors,
     // default to 'true' unless 'false' is explicitly passed
     enableDefaultSensors: props.enableDefaultSensors !== false,
   });

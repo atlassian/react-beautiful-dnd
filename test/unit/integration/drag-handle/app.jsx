@@ -78,7 +78,7 @@ export default function App(props: Props) {
       onDragStart={onDragStart}
       onDragUpdate={onDragUpdate}
       onDragEnd={onDragEnd}
-      __unstableSensors={sensors}
+      sensors={sensors}
       enableDefaultSensors={props.enableDefaultSensors}
     >
       <Droppable droppableId="droppable" direction={direction}>

@@ -122,7 +122,7 @@ function QuoteApp(props: Props) {
   );
 
   return (
-    <DragDropContext onDragEnd={onDragEnd} __unstableSensors={props.sensors}>
+    <DragDropContext onDragEnd={onDragEnd} sensors={props.sensors}>
       <QuoteList listId="list" quotes={quotes} />
     </DragDropContext>
   );

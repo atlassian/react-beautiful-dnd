@@ -227,7 +227,7 @@ export default function QuoteApp(props: Props) {
     <DragDropContext
       onDragStart={() => setIsDragging(true)}
       onDragEnd={onDragEnd}
-      __unstableSensors={[
+      sensors={[
         tryGetLock => {
           tryGetLock.current = tryGetLock;
         },

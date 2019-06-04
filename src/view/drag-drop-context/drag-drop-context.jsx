@@ -10,7 +10,7 @@ type Props = {|
   // we do not technically need any children for this component
   children: Node | null,
 
-  __unstableSensors?: Sensor[],
+  sensors?: Sensor[],
   enableDefaultSensors?: ?boolean,
 |};
 
