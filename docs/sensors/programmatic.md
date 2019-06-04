@@ -1,7 +1,5 @@
 # Programmatic dragging 🎮
 
-> WIP: this is a hot mess
-
 It is possible to drive an entire drag and drop experience programmatically 😱
 
 You can use the programmatic API to:
@@ -62,8 +60,14 @@ A `sensor` is a [React hook](https://reactjs.org/docs/hooks-intro.html). It is f
 
 ```js
 function useMyCoolSensor(tryGetLock) {
-  const start = useCallback(function start() {
-    const preDrag = tryGetLock(document.querySelector('#item-1');
+  const start = useCallback(function start(event: MouseEvent) {
+    const preDrag: ?PreDragActions = tryGetLock(event);
+    if (!preDrag) {
+      return;
+    }
+    preDrag.snapLift();
+    preDrag.moveDown();
+    preDrag.drop();
   }, []);
 
   useEffect(() => {
@@ -71,13 +75,15 @@ function useMyCoolSensor(tryGetLock) {
 
     return () => {
       window.removeEventListener('click', start);
-    }
-  }, [])
+    };
+  }, []);
 }
 
 function App() {
   return (
-    <DragDropContext sensors={[useMyCoolSensor]}>{/*...*/}</DragDropContext>
+    <DragDropContext sensors={[useMyCoolSensor]}>
+      <Things />
+    </DragDropContext>
   );
 }
 ```
@@ -86,7 +92,7 @@ You can also disable all of the prebuilt sensors ([mouse](/docs/sensors/mouse.md
 
 ### Controlling a drag: try to get a lock
 
-A `sensor` is provided with a function `tryGetLock()` which is used to try to get a **lock**.
+A `sensor` is provided with a function `tryGetLock()` which is used to try to get a **lock**. It might return a `PreDragAction` object
 
 ```js
 export type TryGetLock = (
@@ -98,13 +104,83 @@ export type TryGetLock = (
 - `source`: can either be an `Event` or a `Element`. For an `Element` we search for the closest _drag handle_ (via `.closest()`). For an `Event` we read the `event.target` and do the same search from there. If no _drag handle_ is found then a lock will not be given.
 - `forceStop`: a function that is called when the lock needs to be abandoned by the application. See **force abandoning locks**.
 
-### Controlling a drag: pre drag
+### Controlling a drag: pre drag (`PreDragAction`)
 
-TODO
+The `PreDragAction` object contains a number of functions:
+
+```js
+type PreDragActions = {|
+  // discover if the lock is still active
+  isActive: () => boolean,
+  // whether it has been indicated if force press should be respected
+  shouldRespectForcePress: () => boolean,
+  // Lift the current item
+  fluidLift: (clientSelection: Position) => FluidDragActions,
+  snapLift: () => SnapDragActions,
+  // Cancel the pre drag without starting a drag. Releases the lock
+  abort: () => void,
+|};
+```
+
+This phase allows you to conditionally start or abort a drag after obtaining an exclusive **lock**. This is useful if you are not sure if a drag should start such as when using [long press](/docs/sensors/touch.md) or [sloppy click detection](/docs/sensors/mouse.md). If you want to abort the pre drag without lifting you can call `.abort()`.
 
 ### Controlling a drag: dragging
 
-TODO
+You can lift a dragging item by calling either `.fluidLift(clientSelection)` or `snapLift()`. This will start a visual drag and will also trigger the `onDragStart` responder. There are two different _lift_ functions, as there are two different dragging modes: **snap dragging** (`SnapDragActions`) and **fluid dragging** (`FluidDragActions`).
+
+#### Shared
+
+```js
+type DragActions = {|
+  drop: (args?: StopDragOptions) => void,
+  cancel: (args?: StopDragOptions) => void,
+  isActive: () => boolean,
+  shouldRespectForcePress: () => boolean,
+|};
+
+type StopDragOptions = {|
+  shouldBlockNextClick: boolean,
+|};
+```
+
+#### Fluid dragging
+
+`<Draggable />`s move around naturally in response a moving point. The _impact_ of the drag is controlled by a _collision engine_. (This is what our [mouse sensor](/docs/sensors/mouse.md) and [touch sensor](/docs/sensors/touch.md) use)
+
+```js
+type FluidDragActions = {|
+  ...DragActions,
+  move: (clientSelection: Position) => void,
+|};
+```
+
+Calls to `.move()` are throttled using [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame). So if you make multipole `.move()` calls in the same animation frame, it will only result in a single update
+
+```js
+const drag: SnapDragActions = preDrag.fluidLift({ x: 0, y: 0 });
+
+// will all be batched into a single update
+drag.move({ x: 0, y: 1 });
+drag.move({ x: 0, y: 2 });
+drag.move({ x: 0, y: 3 });
+
+// after animation frame
+// update(x: 0, y: 3)
+```
+
+#### Snap dragging
+
+`<Draggable />`s are forced to move to a new position using a single command. For example, "move down". (This is what our [keyboard sensor](/docs/sensors/keyboard.md) uses)
+
+```js
+export type SnapDragActions = {|
+  ...DragActions,
+  moveUp: () => void,
+  moveDown: () => void,
+  moveRight: () => void,
+  moveLeft: () => void,
+|};
+```
 
 ## Force abandoning locks
 
@@ -157,116 +233,14 @@ function useMySensor(tryGetLock: TryGetLock) {
 }
 ```
 
-## Expired locks
+## Invalid behaviours
 
-TODO: calling pre drag actions when dragging, or calling drag actions when a lock has been released
+These are all caused by not respecting the lifecycle (see above)
 
-## Drag modes: fluid and snap
+> ⚠️ = warning logged
+> ❌ = error thrown
 
-There are two modes of drag interactions: **fluid** and **snap**.
-
-### Fluid mode
-
-When fluid dragging the dragging item is moved around based on client `x,y` positions. The impact of the drag is controlled by the center position of the dragging item.
-
-```js
-function useMySensor(tryGetLock: TryGetLock) => void) {
-  const preDrag: ?PreDragActions = tryGetLock();
-  // Could not get lock
-  if(!preDrag) {
-    return;
-  }
-
-  const drag: SnapDragActions = preDrag.fluidLift({x: 100, y: 200});
-
-  drag.move({x: 120, y: 130});
-}
-
-function App() {
-  return (
-    <DragDropContext sensors={[useMySensor]}>{/*...*/}</DragDropContext>
-  )
-}
-```
-
-Calls to `.move()` are throttled using [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame). So if you make multipole `.move()` calls in the same animation frame, it will only result in a single update
-
-```js
-const drag: SnapDragActions = preDrag.fluidLift({ x: 0, y: 0 });
-
-// will all be batched into a single update
-drag.move({ x: 0, y: 1 });
-drag.move({ x: 0, y: 2 });
-drag.move({ x: 0, y: 3 });
-
-// after animation frame
-// update(x: 0, y: 3)
-```
-
-### Snap dragging
-
-When snap dragging we jump the dragging item around to new positions in a single command. Eg "move up", "move down".
-
-## <DragDropContext /> | `sensors`
-
-This allows you to pass in an `array` of additional sensors you would like to use for the `DragDropContext`.
-
-```js
-import useMyCoolSensor from './awesome';
-
-<DragDropContext sensors={[useMyCoolSensor]}>{/*...*/}</DragDropContext>;
-```
-
-## <DragDropContext /> | `enableDefaultSensors`
-
-By default all of the default sensors ([mouse], [keyboard], and [touch]) will be applied. They can work in conjuction with your own custom sensors. However, you are welcome to disable the default sensors
-
-```js
-// disable default sensors
-<DragDropContext enableDefaultSensors={false}>{/*...*/}</DragDropContext>
-```
-
-## Pre drag actions
-
-When you request a lock with `tryGetLock(...)` you _can_ be supplied with `PreDragAction`s.
-
-```js
-type PreDragActions = {|
-  // is lock still active?
-  isActive: () => boolean,
-  // whether it has been indicated if force press should be respected
-  shouldRespectForcePress: () => boolean,
-  // upgrade lock
-  lift: (args: SensorLift) => DragActions,
-  // release the lock
-  abort: () => void,
-|};
-```
-
-## Drag actions
-
-```js
-type DragActions = {|
-  drop: (args?: StopDragOptions) => void,
-  cancel: (args?: StopDragOptions) => void,
-  isActive: () => boolean,
-  shouldRespectForcePress: () => boolean,
-|};
-
-// returned when using preDrag.fluidLift();
-
-export type FluidDragActions = {|
-  ...DragActions,
-  move: (point: Position) => void,
-|};
-
-// returned when using preDrag.snapLift();
-
-export type SnapDragActions = {|
-  ...DragActions,
-  moveUp: () => void,
-  moveDown: () => void,
-  moveRight: () => void,
-  moveLeft: () => void,
-|};
-```
+- ⚠️ Using any `PreDragAction`, `FluidDragAction` or `SnapDragAction` after `forceStop()` is called
+- ⚠️ Using any `PreDragAction` after `.abort()` has been called
+- ⚠️ Using any `FluidDragAction` or `SnapDragAction` after `.cancel()` or `.drop()` has been called.
+- ❌ Trying to call two `lift` functions on a `PreDragAction` will result in an error being thrown.

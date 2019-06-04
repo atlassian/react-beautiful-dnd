@@ -410,7 +410,7 @@ type DragActions = {|
 
 export type FluidDragActions = {|
   ...DragActions,
-  move: (point: Position) => void,
+  move: (clientSelection: Position) => void,
 |};
 
 export type SnapDragActions = {|
@@ -422,14 +422,14 @@ export type SnapDragActions = {|
 |};
 
 export type PreDragActions = {|
-  // is lock still active?
+  // discover if the lock is still active
   isActive: () => boolean,
   // whether it has been indicated if force press should be respected
   shouldRespectForcePress: () => boolean,
-  // upgrade lock
+  // lift the current item
   fluidLift: (clientSelection: Position) => FluidDragActions,
   snapLift: () => SnapDragActions,
-  // release the lock
+  // cancel the pre drag without starting a drag. Releases the lock
   abort: () => void,
 |};
 
