@@ -5,6 +5,7 @@ import getStyle from './get-style';
 import useDraggableDimensionPublisher, {
   type Args as DimensionPublisherArgs,
 } from '../use-draggable-dimension-publisher/use-draggable-dimension-publisher';
+import AppContext from '../context/app-context';
 import type {
   Props,
   Provided,
@@ -13,6 +14,7 @@ import type {
 } from './draggable-types';
 import useValidation from './use-validation';
 import { serialize } from '../draggable-options';
+import useRequiredContext from '../use-required-context';
 
 function preventHtml5Dnd(event: DragEvent) {
   event.preventDefault();
@@ -26,8 +28,8 @@ export default function Draggable(props: Props) {
   }, []);
   const getRef = useCallback((): ?HTMLElement => ref.current, []);
 
-  // Validating props and innerRef
-  useValidation(props, getRef);
+  // context
+  const { contextId } = useRequiredContext(AppContext);
 
   // props
   const {
@@ -39,8 +41,6 @@ export default function Draggable(props: Props) {
     canDragInteractiveElements,
     index,
     isClone,
-    appContext,
-    droppableContext,
 
     // mapProps
     mapped,
@@ -49,10 +49,14 @@ export default function Draggable(props: Props) {
     dropAnimationFinished: dropAnimationFinishedAction,
   } = props;
 
-  // TODO: is this the right approach?
-  // The dimension publisher: talks to the marshal
+  // Validating props and innerRef
+  useValidation(props, getRef);
+
+  // Clones do not speak to the dimension marshal
   // We are violating the rules of hooks here: conditional hooks.
-  // In this specific use case it is okay as an item will always either be a clone or not for it's whole lifecycle
+  // In this specific use case it is okay as an item will always either be a
+  // clone or not for it's whole lifecycle
+  /* eslint-disable react-hooks/rules-of-hooks */
   if (!isClone) {
     const forPublisher: DimensionPublisherArgs = useMemo(
       () => ({
@@ -64,6 +68,7 @@ export default function Draggable(props: Props) {
     );
     useDraggableDimensionPublisher(forPublisher);
   }
+  /* eslint-enable react-hooks/rules-of-hooks */
 
   const dragHandleProps: ?DragHandleProps = useMemo(
     () =>
@@ -71,7 +76,7 @@ export default function Draggable(props: Props) {
         ? {
             tabIndex: 0,
             'data-rbd-drag-handle-draggable-id': draggableId,
-            'data-rbd-drag-handle-context-id': appContext.contextId,
+            'data-rbd-drag-handle-context-id': contextId,
             // English default. Consumers are welcome to add their own start instruction
             'aria-roledescription': 'Draggable item. Press space bar to lift',
             // Opting out of html5 drag and drops
@@ -79,7 +84,7 @@ export default function Draggable(props: Props) {
             onDragStart: preventHtml5Dnd,
           }
         : null,
-    [appContext.contextId, draggableId, isEnabled],
+    [contextId, draggableId, isEnabled],
   );
 
   const onMoveEnd = useCallback(
@@ -111,7 +116,7 @@ export default function Draggable(props: Props) {
     const result: Provided = {
       innerRef: setRef,
       draggableProps: {
-        'data-rbd-draggable-context-id': appContext.contextId,
+        'data-rbd-draggable-context-id': contextId,
         'data-rbd-draggable-id': draggableId,
         'data-rbd-draggable-options': serialize({
           canDragInteractiveElements,
@@ -126,8 +131,8 @@ export default function Draggable(props: Props) {
 
     return result;
   }, [
-    appContext.contextId,
     canDragInteractiveElements,
+    contextId,
     dragHandleProps,
     draggableId,
     isEnabled,
@@ -136,12 +141,6 @@ export default function Draggable(props: Props) {
     setRef,
     shouldRespectForcePress,
   ]);
-
-  const isDragging: boolean = mapped.type === 'DRAGGING';
-
-  if (isDragging && droppableContext.usingCloneWhenDragging && !isClone) {
-    return null;
-  }
 
   return children(provided, mapped.snapshot);
 }

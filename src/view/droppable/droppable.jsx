@@ -3,6 +3,7 @@ import invariant from 'tiny-invariant';
 import ReactDOM from 'react-dom';
 import { useMemo, useCallback } from 'use-memo-one';
 import React, { useRef, useContext, type Node } from 'react';
+import type { DraggableId } from '../../types';
 import type { Props, Provided, UseClone } from './droppable-types';
 import useDroppableDimensionPublisher from '../use-droppable-dimension-publisher';
 import Placeholder from '../placeholder';
@@ -47,7 +48,6 @@ export default function Droppable(props: Props) {
     updateViewportMaxScroll,
 
     // clone (ownProps)
-    whenDraggingClone,
     getContainerForClone,
   } = props;
 
@@ -114,15 +114,15 @@ export default function Droppable(props: Props) {
     [contextId, droppableId, placeholder, setDroppableRef],
   );
 
-  const usingCloneWhenDragging: boolean = Boolean(whenDraggingClone);
+  const isUsingCloneFor: ?DraggableId = useClone ? useClone.draggableId : null;
 
   const droppableContext: ?DroppableContextValue = useMemo(
     () => ({
       droppableId,
       type,
-      usingCloneWhenDragging,
+      isUsingCloneFor,
     }),
-    [droppableId, type, usingCloneWhenDragging],
+    [droppableId, isUsingCloneFor, type],
   );
 
   useValidation({
@@ -137,7 +137,7 @@ export default function Droppable(props: Props) {
     }
     const { draggableId, source, render } = useClone;
 
-    const item: Node = (
+    const node: Node = (
       <PrivateDraggable
         draggableId={draggableId}
         index={source.index}
@@ -154,7 +154,7 @@ export default function Droppable(props: Props) {
       </PrivateDraggable>
     );
 
-    return ReactDOM.createPortal(item, getContainerForClone());
+    return ReactDOM.createPortal(node, getContainerForClone());
   }
 
   return (

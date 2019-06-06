@@ -158,10 +158,12 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    // invariant(
-    //   collection.critical.draggable.id !== descriptor.id,
-    //   'Cannot remove the dragging item during a drag',
-    // );
+    // The dragging item can be removed when using a clone
+    // Deleting entry first as if dragging item is combined then
+    // the original will never be remounted
+    if (collection.critical.draggable === descriptor) {
+      return;
+    }
 
     throwIfAddOrRemoveOfWrongType(collection, descriptor);
 

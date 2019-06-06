@@ -9,8 +9,6 @@ import type {
   MovementMode,
   ContextId,
 } from '../../types';
-import type { AppContextValue } from '../context/app-context';
-import type { DroppableContextValue } from '../context/droppable-context';
 import { dropAnimationFinished } from '../../state/action-creators';
 
 export type DraggingStyle = {|
@@ -165,8 +163,6 @@ export type PrivateOwnProps = {|
 
 export type OwnProps = {|
   ...PrivateOwnProps,
-  droppableContext: DroppableContextValue,
-  appContext: AppContextValue,
 |};
 
 export type Props = {|
