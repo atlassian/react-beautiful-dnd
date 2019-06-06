@@ -58,7 +58,7 @@ export default function Draggable(props: Props) {
   // clone or not for it's whole lifecycle
   /* eslint-disable react-hooks/rules-of-hooks */
 
-  // being super sure that isClone is not changing during a draggable lifecycle
+  // Being super sure that isClone is not changing during a draggable lifecycle
   useClonePropValidation(isClone);
   if (!isClone) {
     const forPublisher: DimensionPublisherArgs = useMemo(
