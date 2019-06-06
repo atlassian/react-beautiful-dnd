@@ -65,10 +65,12 @@ const getTarget = (draggable: DraggableDimension, onLift: OnLift): Rect => {
   // To keep things simple we just expand the whole area for this check
   // The worst case is some minor redundant offscreen movements
   const expandBy: Spacing = {
+    // pull backwards into viewport
     top: onLift.displacedBy.point.y,
-    right: onLift.displacedBy.point.x,
+    right: 0,
     bottom: 0,
-    left: 0,
+    // pull backwards into viewport
+    left: onLift.displacedBy.point.x,
   };
   return getRect(expand(marginBox, expandBy));
 };
