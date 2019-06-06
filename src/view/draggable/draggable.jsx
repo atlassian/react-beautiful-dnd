@@ -12,7 +12,7 @@ import type {
   DraggableStyle,
   DragHandleProps,
 } from './draggable-types';
-import useValidation from './use-validation';
+import { useValidation, useClonePropValidation } from './use-validation';
 import { serialize } from '../draggable-options';
 import useRequiredContext from '../use-required-context';
 
@@ -57,6 +57,9 @@ export default function Draggable(props: Props) {
   // In this specific use case it is okay as an item will always either be a
   // clone or not for it's whole lifecycle
   /* eslint-disable react-hooks/rules-of-hooks */
+
+  // being super sure that isClone is not changing during a draggable lifecycle
+  useClonePropValidation(isClone);
   if (!isClone) {
     const forPublisher: DimensionPublisherArgs = useMemo(
       () => ({
