@@ -133,6 +133,8 @@ There are a lot of libraries out there that allow for drag and drop interactions
 
 - [![kr](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/South-Korea.png) **한글/Korean**](https://github.com/LeeHyungGeun/react-beautiful-dnd-kr)
 - [![china](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **中文/Chinese**](https://github.com/chinanf-boy/react-beautiful-dnd-zh)
+- [![ru](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Russia.png) На русском/Russian**](https://github.com/vtereshyn/react-beautiful-dnd-ru)
+- [![pt](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/Brazil.png) Português/Portuguese](https://github.com/dudestein/react-beautiful-dnd-pt)
 
 ## Author ✍️
 
