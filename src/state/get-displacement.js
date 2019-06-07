@@ -58,6 +58,7 @@ const getTarget = (draggable: DraggableDimension, onLift: OnLift): Rect => {
     return marginBox;
   }
 
+  // ## Visibility overscanning
   // We are expanding rather than offsetting the marginBox.
   // In some cases we want
   // - the target based on the starting position (such as when dropping outside of any list)
@@ -72,6 +73,7 @@ const getTarget = (draggable: DraggableDimension, onLift: OnLift): Rect => {
     // pull backwards into viewport
     left: onLift.displacedBy.point.x,
   };
+
   return getRect(expand(marginBox, expandBy));
 };
 
