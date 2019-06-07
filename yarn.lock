@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@atlaskit/css-reset@^4.0.0":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-4.0.1.tgz#8c1dacba80f26b0913a5d04106df670d02b639a9"
-  integrity sha512-8QA8F12VyrqdmNaPy29fKicYExs7pIrM6vxEAy8Egw70XGGYuKefAZpRYuoijJd6T7HhwjZWAPhJxSegdv+ovQ==
+"@atlaskit/css-reset@^5.0.0":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-5.0.1.tgz#eeabaf6a7ea3a05517e8f898ad90e73dc7fb0385"
+  integrity sha512-DSNz9zs3tqPmi1YFznkfU+mZRidALPOcSFQyuOvZ/oKRBhGSTykeYWPXIqcAfwAwQRQfnbMgVpvjdVEWfjUOUw==
   dependencies:
     "@atlaskit/theme" "^9.0.0"
     fbjs "^1.0.0"
@@ -10061,11 +10061,6 @@ raf-schd@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/raf-schd/-/raf-schd-4.0.0.tgz#9855756c5045ff4ed4516e14a47719387c3c907b"
   integrity sha512-m7zq0JkIrECzw9mO5Zcq6jN4KayE34yoIS9hJoiZNXyOAT06PPA8PrR+WtJIeFW09YjUfNkMMN9lrmAt6BURCA==
-
-raf-schd@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/raf-schd/-/raf-schd-4.0.1.tgz#e72f29a96de260dead719f34c29e56fdc1c1473e"
-  integrity sha512-/QTXV4+Tf81CmJgTZac47N63ZzKmaVe+1cQX/grCFeLrs4Mcc6oq+KJfbF3tFjeS1NF91lmTvgmwYjk02UTo9A==
 
 raf-stub@^2.0.2:
   version "2.0.2"
