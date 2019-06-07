@@ -1,7 +1,6 @@
 // @flow
-import { getRect, type Rect, type Spacing, type Position } from 'css-box-model';
+import { getRect, type Rect, type Position } from 'css-box-model';
 import type {
-  DragImpact,
   Displacement,
   DraggableDimension,
   DroppableDimension,
@@ -9,7 +8,6 @@ import type {
   DraggableDimensionMap,
   Axis,
 } from '../../../../src/types';
-import getDisplacement from '../../../../src/state/get-displacement';
 import {
   getDroppableDimension,
   getDraggableDimension,
