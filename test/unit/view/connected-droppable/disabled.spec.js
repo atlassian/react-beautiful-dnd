@@ -68,9 +68,7 @@ describe('in foreign list', () => {
 
   // always dragging inside of home
   state.allPhases(preset.inHome1.descriptor.id).forEach((current: State) => {
-    it(`should return disabled map props when in phase ${
-      current.phase
-    }`, () => {
+    it(`should return disabled map props when in phase ${current.phase}`, () => {
       const result: MapProps = selector(current, ownProps);
       // memoization check
       expect(result).toBe(defaultDisabledProps);

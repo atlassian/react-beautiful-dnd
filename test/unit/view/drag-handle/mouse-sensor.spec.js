@@ -76,22 +76,20 @@ describe('initiation', () => {
       { x: -sloppyClickThreshold, y: 0 },
     ];
 
-    valid.forEach(
-      (point: Position): void => {
-        const customCallbacks = getStubCallbacks();
-        const customWrapper = getWrapper(customCallbacks);
+    valid.forEach((point: Position): void => {
+      const customCallbacks = getStubCallbacks();
+      const customWrapper = getWrapper(customCallbacks);
 
-        mouseDown(customWrapper, origin);
-        windowMouseMove(point);
+      mouseDown(customWrapper, origin);
+      windowMouseMove(point);
 
-        expect(customCallbacks.onLift).toHaveBeenCalledWith({
-          clientSelection: origin,
-          movementMode: 'FLUID',
-        });
+      expect(customCallbacks.onLift).toHaveBeenCalledWith({
+        clientSelection: origin,
+        movementMode: 'FLUID',
+      });
 
-        customWrapper.unmount();
-      },
-    );
+      customWrapper.unmount();
+    });
   });
 
   it('should not interfere with standard click events', () => {

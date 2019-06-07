@@ -68,13 +68,11 @@ export default ({
     // phase 1: removals
     const removals: DraggableDimensionMap = toDraggableMap(
       removedDraggables
-        .map(
-          (id: DraggableId): DraggableDimension => {
-            const item: ?DraggableDimension = existing[id];
-            invariant(item, `Could not find removed draggable "${id}"`);
-            return item;
-          },
-        )
+        .map((id: DraggableId): DraggableDimension => {
+          const item: ?DraggableDimension = existing[id];
+          invariant(item, `Could not find removed draggable "${id}"`);
+          return item;
+        })
         // only care about the ones inside of this droppable
         .filter(
           (draggable: DraggableDimension): boolean =>

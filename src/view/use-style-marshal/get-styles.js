@@ -26,16 +26,14 @@ const makeGetSelector = (context: string) => (attribute: string) =>
 
 const getStyles = (rules: Rule[], property: string): string =>
   rules
-    .map(
-      (rule: Rule): string => {
-        const value: ?string = rule.styles[property];
-        if (!value) {
-          return '';
-        }
+    .map((rule: Rule): string => {
+      const value: ?string = rule.styles[property];
+      if (!value) {
+        return '';
+      }
 
-        return `${rule.selector} { ${value} }`;
-      },
-    )
+      return `${rule.selector} { ${value} }`;
+    })
     .join(' ');
 
 const noPointerEvents: string = 'pointer-events: none;';

@@ -112,9 +112,7 @@ export default (callbacks: Callbacks) => {
       delete entries.draggables[published.id];
     } else {
       warning(`
-        Detected incorrect usage of 'key' on '<Draggable draggableId="${
-          published.id
-        }"$ />
+        Detected incorrect usage of 'key' on '<Draggable draggableId="${published.id}"$ />
 
         Your 'key' should be:
         - Unique for each Draggable in a list
@@ -191,9 +189,7 @@ export default (callbacks: Callbacks) => {
 
     invariant(
       entry,
-      `Cannot unregister Droppable with id ${
-        descriptor.id
-      } as as it is not registered`,
+      `Cannot unregister Droppable with id ${descriptor.id} as as it is not registered`,
     );
 
     // entry has already been overwritten

@@ -96,34 +96,33 @@ export const makeMapStateToProps = (): Selector => {
     },
   };
 
-  const memoizedOffset = memoizeOne(
-    (x: number, y: number): Position => ({ x, y }),
-  );
+  const memoizedOffset = memoizeOne((x: number, y: number): Position => ({
+    x,
+    y,
+  }));
 
-  const getDraggingProps = memoizeOne(
-    (
-      offset: Position,
-      mode: MovementMode,
-      dimension: DraggableDimension,
-      // the id of the droppable you are over
-      draggingOver: ?DroppableId,
-      // the id of a draggable you are grouping with
-      combineWith: ?DraggableId,
-      forceShouldAnimate: ?boolean,
-    ): MapProps => ({
-      mapped: {
-        type: 'DRAGGING',
-        dropping: null,
-        draggingOver,
-        combineWith,
-        mode,
-        offset,
-        dimension,
-        forceShouldAnimate,
-        snapshot: getDraggingSnapshot(mode, draggingOver, combineWith, null),
-      },
-    }),
-  );
+  const getDraggingProps = memoizeOne((
+    offset: Position,
+    mode: MovementMode,
+    dimension: DraggableDimension,
+    // the id of the droppable you are over
+    draggingOver: ?DroppableId,
+    // the id of a draggable you are grouping with
+    combineWith: ?DraggableId,
+    forceShouldAnimate: ?boolean,
+  ): MapProps => ({
+    mapped: {
+      type: 'DRAGGING',
+      dropping: null,
+      draggingOver,
+      combineWith,
+      mode,
+      offset,
+      dimension,
+      forceShouldAnimate,
+      snapshot: getDraggingSnapshot(mode, draggingOver, combineWith, null),
+    },
+  }));
 
   const getSecondaryProps = memoizeOne(
     (

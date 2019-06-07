@@ -462,25 +462,23 @@ describe('cancel', () => {
   it('should cancel when the user pushes any mouse button', () => {
     const mouseButtons: number[] = [primaryButton, auxiliaryButton];
 
-    mouseButtons.forEach(
-      (button: number, index: number): void => {
-        const upArrowMock: MockEvent = createMockEvent();
+    mouseButtons.forEach((button: number, index: number): void => {
+      const upArrowMock: MockEvent = createMockEvent();
 
-        pressSpacebar(wrapper);
-        const mouseDownEvent: MouseEvent = windowMouseDown(origin, button);
-        // should now do nothing
-        pressArrowUp(wrapper, upArrowMock);
+      pressSpacebar(wrapper);
+      const mouseDownEvent: MouseEvent = windowMouseDown(origin, button);
+      // should now do nothing
+      pressArrowUp(wrapper, upArrowMock);
 
-        expect(
-          callbacksCalled(callbacks)({
-            onLift: index + 1,
-            onCancel: index + 1,
-          }),
-        ).toBe(true);
-        expect(mouseDownEvent.defaultPrevented).toBe(false);
-        expect(upArrowMock.preventDefault).not.toHaveBeenCalled();
-      },
-    );
+      expect(
+        callbacksCalled(callbacks)({
+          onLift: index + 1,
+          onCancel: index + 1,
+        }),
+      ).toBe(true);
+      expect(mouseDownEvent.defaultPrevented).toBe(false);
+      expect(upArrowMock.preventDefault).not.toHaveBeenCalled();
+    });
   });
 
   it('should not do anything if there is nothing dragging', () => {
