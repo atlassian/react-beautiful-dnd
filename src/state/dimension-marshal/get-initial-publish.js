@@ -43,9 +43,8 @@ export default ({
     .filter(
       (entry: DroppableEntry): boolean => entry.descriptor.type === home.type,
     )
-    .map(
-      (entry: DroppableEntry): DroppableDimension =>
-        entry.callbacks.getDimensionAndWatchScroll(windowScroll, scrollOptions),
+    .map((entry: DroppableEntry): DroppableDimension =>
+      entry.callbacks.getDimensionAndWatchScroll(windowScroll, scrollOptions),
     );
 
   const draggables: DraggableDimension[] = values(entries.draggables)
@@ -53,9 +52,8 @@ export default ({
       (entry: DraggableEntry): boolean =>
         entry.descriptor.type === critical.draggable.type,
     )
-    .map(
-      (entry: DraggableEntry): DraggableDimension =>
-        entry.getDimension(windowScroll),
+    .map((entry: DraggableEntry): DraggableDimension =>
+      entry.getDimension(windowScroll),
     );
 
   const dimensions: DimensionMap = {

@@ -28,17 +28,15 @@ const Container = styled.div`
     isDragging ? 'box-shadow: 1px 1px 1px grey; background: lightblue' : ''};
 `;
 
-const getPortal = memoizeOne(
-  (): HTMLElement => {
-    invariant(document);
-    const body: ?HTMLBodyElement = document.body;
-    invariant(body);
-    const el: HTMLElement = document.createElement('div');
-    el.className = 'rbd-portal';
-    body.appendChild(el);
-    return el;
-  },
-);
+const getPortal = memoizeOne((): HTMLElement => {
+  invariant(document);
+  const body: ?HTMLBodyElement = document.body;
+  invariant(body);
+  const el: HTMLElement = document.createElement('div');
+  el.className = 'rbd-portal';
+  body.appendChild(el);
+  return el;
+});
 
 export default class Task extends Component<Props> {
   render() {

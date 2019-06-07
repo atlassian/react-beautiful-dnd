@@ -39,9 +39,7 @@ export const timings = {
 //   maxDropTime: 4,
 // };
 
-const outOfTheWayTiming: string = `${timings.outOfTheWay}s ${
-  curves.outOfTheWay
-}`;
+const outOfTheWayTiming: string = `${timings.outOfTheWay}s ${curves.outOfTheWay}`;
 export const placeholderTransitionDelayTime: number = 0.1;
 
 export const transitions = {

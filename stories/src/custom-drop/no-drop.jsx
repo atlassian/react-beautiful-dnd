@@ -70,13 +70,10 @@ const List = styled.div`
   width: 200px;
   margin: ${grid}px;
 `;
-const initial: Task[] = Array.from(
-  { length: 10 },
-  (v, k): Task => ({
-    id: `task-${k}`,
-    content: `Task ${k}`,
-  }),
-);
+const initial: Task[] = Array.from({ length: 10 }, (v, k): Task => ({
+  id: `task-${k}`,
+  content: `Task ${k}`,
+}));
 
 type State = {|
   tasks: Task[],

@@ -53,49 +53,39 @@ export default ({
     // Remove any options that are not enabled
     .filter((droppable: DroppableDimension): boolean => droppable.isEnabled)
     // Remove any droppables that do not have a visible subject
-    .filter(
-      (droppable: DroppableDimension): boolean =>
-        Boolean(droppable.subject.active),
+    .filter((droppable: DroppableDimension): boolean =>
+      Boolean(droppable.subject.active),
     )
     // Remove any that are not visible in the window
-    .filter(
-      (droppable: DroppableDimension): boolean =>
-        isPartiallyVisibleThroughFrame(viewport.frame)(
-          getKnownActive(droppable),
-        ),
+    .filter((droppable: DroppableDimension): boolean =>
+      isPartiallyVisibleThroughFrame(viewport.frame)(getKnownActive(droppable)),
     )
-    .filter(
-      (droppable: DroppableDimension): boolean => {
-        const activeOfTarget: Rect = getKnownActive(droppable);
+    .filter((droppable: DroppableDimension): boolean => {
+      const activeOfTarget: Rect = getKnownActive(droppable);
 
-        // is the target in front of the source on the cross axis?
-        if (isMovingForward) {
-          return active[axis.crossAxisEnd] < activeOfTarget[axis.crossAxisEnd];
-        }
-        // is the target behind the source on the cross axis?
-        return (
-          activeOfTarget[axis.crossAxisStart] < active[axis.crossAxisStart]
-        );
-      },
-    )
+      // is the target in front of the source on the cross axis?
+      if (isMovingForward) {
+        return active[axis.crossAxisEnd] < activeOfTarget[axis.crossAxisEnd];
+      }
+      // is the target behind the source on the cross axis?
+      return activeOfTarget[axis.crossAxisStart] < active[axis.crossAxisStart];
+    })
     // Must have some overlap on the main axis
-    .filter(
-      (droppable: DroppableDimension): boolean => {
-        const activeOfTarget: Rect = getKnownActive(droppable);
+    .filter((droppable: DroppableDimension): boolean => {
+      const activeOfTarget: Rect = getKnownActive(droppable);
 
-        const isBetweenDestinationClipped = isWithin(
-          activeOfTarget[axis.start],
-          activeOfTarget[axis.end],
-        );
+      const isBetweenDestinationClipped = isWithin(
+        activeOfTarget[axis.start],
+        activeOfTarget[axis.end],
+      );
 
-        return (
-          isBetweenSourceClipped(activeOfTarget[axis.start]) ||
-          isBetweenSourceClipped(activeOfTarget[axis.end]) ||
-          isBetweenDestinationClipped(active[axis.start]) ||
-          isBetweenDestinationClipped(active[axis.end])
-        );
-      },
-    )
+      return (
+        isBetweenSourceClipped(activeOfTarget[axis.start]) ||
+        isBetweenSourceClipped(activeOfTarget[axis.end]) ||
+        isBetweenDestinationClipped(active[axis.start]) ||
+        isBetweenDestinationClipped(active[axis.end])
+      );
+    })
     // Sort on the cross axis
     .sort((a: DroppableDimension, b: DroppableDimension) => {
       const first: number = getKnownActive(a)[axis.crossAxisStart];

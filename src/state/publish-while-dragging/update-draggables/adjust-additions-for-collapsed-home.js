@@ -26,26 +26,24 @@ export default ({
     dragging.displaceBy,
   );
 
-  return additions.map(
-    (draggable: DraggableDimension): DraggableDimension => {
-      // not in the home list, nothing to worry about there
-      if (draggable.descriptor.droppableId !== home.descriptor.id) {
-        return draggable;
-      }
+  return additions.map((draggable: DraggableDimension): DraggableDimension => {
+    // not in the home list, nothing to worry about there
+    if (draggable.descriptor.droppableId !== home.descriptor.id) {
+      return draggable;
+    }
 
-      // appears before the draggable - no need to shift
-      if (draggable.descriptor.index < dragging.descriptor.index) {
-        return draggable;
-      }
+    // appears before the draggable - no need to shift
+    if (draggable.descriptor.index < dragging.descriptor.index) {
+      return draggable;
+    }
 
-      // item occurs after dragging item
-      // need to shift it to account for collapsed home item
+    // item occurs after dragging item
+    // need to shift it to account for collapsed home item
 
-      return offsetDraggable({
-        draggable,
-        offset: displacedBy.point,
-        initialWindowScroll: viewport.scroll.initial,
-      });
-    },
-  );
+    return offsetDraggable({
+      draggable,
+      offset: displacedBy.point,
+      initialWindowScroll: viewport.scroll.initial,
+    });
+  });
 };
