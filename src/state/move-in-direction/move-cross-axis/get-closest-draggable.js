@@ -32,51 +32,48 @@ export default ({
   onLift,
 }: Args): ?DraggableDimension => {
   const sorted: DraggableDimension[] = insideDestination
-    .filter(
-      (draggable: DraggableDimension): boolean =>
-        // Allowing movement to draggables that are not visible in the viewport
-        // but must be visible in the droppable
-        // We can improve this, but this limitation is easier for now
-        isTotallyVisible({
-          target: getCurrentPageBorderBox(draggable, onLift),
-          destination,
-          viewport: viewport.frame,
-          withDroppableDisplacement: true,
-        }),
+    .filter((draggable: DraggableDimension): boolean =>
+      // Allowing movement to draggables that are not visible in the viewport
+      // but must be visible in the droppable
+      // We can improve this, but this limitation is easier for now
+      isTotallyVisible({
+        target: getCurrentPageBorderBox(draggable, onLift),
+        destination,
+        viewport: viewport.frame,
+        withDroppableDisplacement: true,
+      }),
     )
-    .sort(
-      (a: DraggableDimension, b: DraggableDimension): number => {
-        // Need to consider the change in scroll in the destination
-        const distanceToA = distance(
-          pageBorderBoxCenter,
-          withDroppableDisplacement(
-            destination,
-            getCurrentPageBorderBoxCenter(a, onLift),
-          ),
-        );
-        const distanceToB = distance(
-          pageBorderBoxCenter,
-          withDroppableDisplacement(
-            destination,
-            getCurrentPageBorderBoxCenter(b, onLift),
-          ),
-        );
+    .sort((a: DraggableDimension, b: DraggableDimension): number => {
+      // Need to consider the change in scroll in the destination
+      const distanceToA = distance(
+        pageBorderBoxCenter,
+        withDroppableDisplacement(
+          destination,
+          getCurrentPageBorderBoxCenter(a, onLift),
+        ),
+      );
+      const distanceToB = distance(
+        pageBorderBoxCenter,
+        withDroppableDisplacement(
+          destination,
+          getCurrentPageBorderBoxCenter(b, onLift),
+        ),
+      );
 
-        // if a is closer - return a
-        if (distanceToA < distanceToB) {
-          return -1;
-        }
+      // if a is closer - return a
+      if (distanceToA < distanceToB) {
+        return -1;
+      }
 
-        // if b is closer - return b
-        if (distanceToB < distanceToA) {
-          return 1;
-        }
+      // if b is closer - return b
+      if (distanceToB < distanceToA) {
+        return 1;
+      }
 
-        // if the distance to a and b are the same:
-        // return the one with the lower index (it will be higher on the main axis)
-        return a.descriptor.index - b.descriptor.index;
-      },
-    );
+      // if the distance to a and b are the same:
+      // return the one with the lower index (it will be higher on the main axis)
+      return a.descriptor.index - b.descriptor.index;
+    });
 
   return sorted[0] || null;
 };

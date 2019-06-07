@@ -52,51 +52,48 @@ export default ({
   const displacement: number = displacedBy.value;
 
   const displaced: Displacement[] = insideDestinationWithoutDraggable
-    .filter(
-      (child: DraggableDimension): boolean => {
-        const borderBox: Rect = child.page.borderBox;
-        const start: number = borderBox[axis.start];
-        const end: number = borderBox[axis.end];
+    .filter((child: DraggableDimension): boolean => {
+      const borderBox: Rect = child.page.borderBox;
+      const start: number = borderBox[axis.start];
+      const end: number = borderBox[axis.end];
 
-        const didStartDisplaced: boolean = getDidStartDisplaced(
-          child.descriptor.id,
-          onLift,
-        );
+      const didStartDisplaced: boolean = getDidStartDisplaced(
+        child.descriptor.id,
+        onLift,
+      );
 
-        // Moving forward will decrease the amount of things needed to be displaced
-        if (isMovingForward) {
-          if (didStartDisplaced) {
-            // if started displaced then its displaced position is its resting position
-            // continue to keep the item at rest until we go onto the start of the item
-            return targetCenter < start;
-          }
-          // if the item did not start displaced then we displace the item
-          // while we are still before the start edge
-          return targetCenter < start + displacement;
-        }
-
-        // Moving backwards will increase the amount of things needed to be displaced
-        // The logic for this works by looking at assuming everything has been displaced
-        // backwards and then looking at how you would undo that
-
+      // Moving forward will decrease the amount of things needed to be displaced
+      if (isMovingForward) {
         if (didStartDisplaced) {
-          // we continue to displace the item until we move back over the end of the item without displacement
-          return targetCenter <= end - displacement;
+          // if started displaced then its displaced position is its resting position
+          // continue to keep the item at rest until we go onto the start of the item
+          return targetCenter < start;
         }
+        // if the item did not start displaced then we displace the item
+        // while we are still before the start edge
+        return targetCenter < start + displacement;
+      }
 
-        // a non-displaced item is at rest. when we hit the item from the bottom we move it out of the way
-        return targetCenter <= end;
-      },
-    )
-    .map(
-      (dimension: DraggableDimension): Displacement =>
-        getDisplacement({
-          draggable: dimension,
-          destination,
-          previousImpact,
-          viewport: viewport.frame,
-          onLift,
-        }),
+      // Moving backwards will increase the amount of things needed to be displaced
+      // The logic for this works by looking at assuming everything has been displaced
+      // backwards and then looking at how you would undo that
+
+      if (didStartDisplaced) {
+        // we continue to displace the item until we move back over the end of the item without displacement
+        return targetCenter <= end - displacement;
+      }
+
+      // a non-displaced item is at rest. when we hit the item from the bottom we move it out of the way
+      return targetCenter <= end;
+    })
+    .map((dimension: DraggableDimension): Displacement =>
+      getDisplacement({
+        draggable: dimension,
+        destination,
+        previousImpact,
+        viewport: viewport.frame,
+        onLift,
+      }),
     );
 
   const newIndex: number =

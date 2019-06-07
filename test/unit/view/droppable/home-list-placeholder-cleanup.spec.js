@@ -8,6 +8,7 @@ import {
   homeAtRest,
   homePostDropAnimation,
 } from './util/get-props';
+import Placeholder from '../../../../src/view/placeholder';
 
 it('should not display a placeholder after a flushed drag end in the home list', () => {
   // dropping
@@ -16,14 +17,14 @@ it('should not display a placeholder after a flushed drag end in the home list',
     mapProps: isNotOverHome,
   });
 
-  expect(wrapper.find('Placeholder')).toHaveLength(1);
+  expect(wrapper.find(Placeholder)).toHaveLength(1);
 
   wrapper.setProps({
     ...homeAtRest,
   });
   wrapper.update();
 
-  expect(wrapper.find('Placeholder')).toHaveLength(0);
+  expect(wrapper.find(Placeholder)).toHaveLength(0);
 });
 
 it('should animate a placeholder closed in a home list after a drag', () => {
@@ -33,20 +34,20 @@ it('should animate a placeholder closed in a home list after a drag', () => {
     mapProps: isNotOverHome,
   });
 
-  expect(wrapper.find('Placeholder')).toHaveLength(1);
+  expect(wrapper.find(Placeholder)).toHaveLength(1);
 
   wrapper.setProps({
     ...homePostDropAnimation,
   });
   wrapper.update();
 
-  expect(wrapper.find('Placeholder')).toHaveLength(1);
+  expect(wrapper.find(Placeholder)).toHaveLength(1);
   expect(homePostDropAnimation.shouldAnimatePlaceholder).toBe(true);
 
   // finishing the animation
   act(() => {
     wrapper
-      .find('Placeholder')
+      .find(Placeholder)
       .props()
       .onClose();
   });
@@ -55,5 +56,5 @@ it('should animate a placeholder closed in a home list after a drag', () => {
   wrapper.update();
 
   // placeholder is now gone
-  expect(wrapper.find('Placeholder')).toHaveLength(0);
+  expect(wrapper.find(Placeholder)).toHaveLength(0);
 });
