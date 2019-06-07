@@ -40,6 +40,13 @@ const commonjsArgs = {
       'isValidElementType',
       'isContextConsumer',
     ],
+    'node_modules/react-is/index.js': [
+      'isValidElementType',
+      'isContextConsumer',
+    ],
+    'node_modules/react-redux/es/components/connectAdvanced.js': [
+      'isContextConsumer',
+    ],
   },
 };
 

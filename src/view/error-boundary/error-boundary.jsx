@@ -1,12 +1,25 @@
 // @flow
 import React, { type Node } from 'react';
 import { getFormattedMessage, warning } from '../../dev-warning';
+import {
+  clearErrorMap,
+  hasLoggedError,
+  setError,
+} from '../../utilities/handle-errors';
+
+const BEAUTIFUL_DND_ERROR = 'BEAUTIFUL_DND_ERROR';
 
 type Props = {|
   children: (setOnError: Function) => Node,
 |};
 
-function printFatalError(error: Error) {
+type Error = {
+  message: string,
+  filename?: string,
+  type?: string,
+};
+
+function printFatalError(message: string) {
   if (process.env.NODE_ENV === 'production') {
     return;
   }
@@ -17,12 +30,10 @@ function printFatalError(error: Error) {
         An error has occurred while a drag is occurring.
         Any existing drag will be cancelled.
 
-        > ${error.message}
+        > ${message}
         `,
     ),
   );
-  // eslint-disable-next-line no-console
-  console.error('raw', error);
 }
 
 // Not the best marker, but using invariant as a signal for when to try to recover from an error
@@ -39,6 +50,7 @@ export default class ErrorBoundary extends React.Component<Props> {
   }
   componentWillUnmount() {
     window.removeEventListener('error', this.onFatalError);
+    clearErrorMap();
   }
 
   setOnError = (fn: () => void) => {
@@ -46,7 +58,13 @@ export default class ErrorBoundary extends React.Component<Props> {
   };
 
   onFatalError = (error: Error) => {
-    printFatalError(error);
+    const { message = '', filename = '', type = '' } = error;
+    const errorKey = `${filename}-${message}`;
+    if (!type || type !== BEAUTIFUL_DND_ERROR || hasLoggedError(errorKey)) {
+      return;
+    }
+    setError(errorKey);
+    printFatalError(message);
 
     if (this.onError) {
       this.onError();
@@ -61,6 +79,8 @@ export default class ErrorBoundary extends React.Component<Props> {
   };
 
   componentDidCatch(error: Error) {
+    // explicitly report type to only capture our errors
+    error.type = BEAUTIFUL_DND_ERROR;
     this.onFatalError(error);
     // if it was not an invariant - throw
     if (!shouldRecover(error)) {

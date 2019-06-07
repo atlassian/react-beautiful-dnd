@@ -12,6 +12,7 @@ import type {
   StateSnapshot as DraggableStateSnapshot,
 } from '../../../../src/view/draggable/draggable-types';
 import { getComputedSpacing } from '../../../utils/dimension';
+import * as errorUtils from '../../../../src/utilities/handle-errors';
 
 type Props = {|
   provided: DraggableProvided,
@@ -141,6 +142,9 @@ it('should recover from an error on mount', () => {
     }
     return null;
   }
+  // verify we are internally keeping track of errors so we don't double log
+  const hasLoggedErrorSpy = jest.spyOn(errorUtils, 'hasLoggedError');
+  const setErrorSpy = jest.spyOn(errorUtils, 'setError');
   // This is lame. enzyme is bubbling up errors that where caught in componentDidCatch to the window
   expect(() =>
     mount(
@@ -149,4 +153,6 @@ it('should recover from an error on mount', () => {
       </DragDropContext>,
     ),
   ).toThrow();
+  expect(hasLoggedErrorSpy).toHaveBeenCalled();
+  expect(setErrorSpy).toHaveBeenCalled();
 });
