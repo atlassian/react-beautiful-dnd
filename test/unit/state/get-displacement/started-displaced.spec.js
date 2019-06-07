@@ -57,7 +57,6 @@ const dragging: DraggableDimension = getDraggableDimension({
     type: home.descriptor.type,
     index: 0,
   },
-  // i
   borderBox: {
     top: 0,
     left: 0,
