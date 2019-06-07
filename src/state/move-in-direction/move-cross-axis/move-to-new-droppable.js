@@ -114,15 +114,14 @@ export default ({
     insideDestination,
   )
     .slice(sliceFrom)
-    .map(
-      (dimension: DraggableDimension): Displacement =>
-        getDisplacement({
-          draggable: dimension,
-          destination,
-          viewport: viewport.frame,
-          previousImpact,
-          onLift,
-        }),
+    .map((dimension: DraggableDimension): Displacement =>
+      getDisplacement({
+        draggable: dimension,
+        destination,
+        viewport: viewport.frame,
+        previousImpact,
+        onLift,
+      }),
     );
 
   const displacedBy: DisplacedBy = getDisplacedBy(
