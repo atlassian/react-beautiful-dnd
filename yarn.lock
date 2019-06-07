@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@atlaskit/css-reset@^5.0.0":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-5.0.1.tgz#eeabaf6a7ea3a05517e8f898ad90e73dc7fb0385"
-  integrity sha512-DSNz9zs3tqPmi1YFznkfU+mZRidALPOcSFQyuOvZ/oKRBhGSTykeYWPXIqcAfwAwQRQfnbMgVpvjdVEWfjUOUw==
+"@atlaskit/css-reset@^4.0.0":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-4.0.1.tgz#8c1dacba80f26b0913a5d04106df670d02b639a9"
+  integrity sha512-8QA8F12VyrqdmNaPy29fKicYExs7pIrM6vxEAy8Egw70XGGYuKefAZpRYuoijJd6T7HhwjZWAPhJxSegdv+ovQ==
   dependencies:
     "@atlaskit/theme" "^9.0.0"
     fbjs "^1.0.0"
