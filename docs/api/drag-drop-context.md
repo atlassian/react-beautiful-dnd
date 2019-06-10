@@ -1,6 +1,6 @@
 # `<DragDropContext />`
 
-In order to use drag and drop, you need to have the part of your `React` tree that you want to be able to use drag and drop in wrapped in a `<DragDropContext />`. It is advised to just wrap your entire application in a `<DragDropContext />`. Having nested `<DragDropContext />`'s is _not_ supported. You will be able to achieve your desired conditional dragging and dropping using the props of `<Droppable />` and `<Draggable />`. You can think of `<DragDropContext />` as having a similar purpose to the [react-redux Provider component](https://react-redux.js.org/api/provider)
+In order to use drag and drop, you need to have the part of your `React` tree that you want to be able to use drag and drop in wrapped in a `<DragDropContext />`. It is advised to just wrap your entire application in a `<DragDropContext />`. Having nested `<DragDropContext />`'s is _not_ supported. You will be able to achieve your desired conditional dragging and dropping using the props of `<Droppable />` and `<Draggable />`. You can think of `<DragDropContext />` as having a similar purpose to the [react-redux Provider component](https://react-redux.js.org/api/provider). A content-security-protection nonce attribute is added to the injected style tags if provided.
 
 ## Props
 
@@ -18,6 +18,7 @@ import type { Node } from 'react';
 
 type Props = {|
   ...Responders,
+  nonce?: string,
   children: ?Node,
 |};
 ```

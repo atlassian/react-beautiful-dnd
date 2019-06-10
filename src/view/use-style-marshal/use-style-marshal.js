@@ -22,7 +22,7 @@ const createStyleEl = (nonce?: string): HTMLStyleElement => {
   return el;
 };
 
-export default function useStyleMarshal(uniqueId: number) {
+export default function useStyleMarshal(uniqueId: number, nonce?: string) {
   const uniqueContext: string = useMemo(() => `${uniqueId}`, [uniqueId]);
   const styles: Styles = useMemo(() => getStyles(uniqueContext), [
     uniqueContext,

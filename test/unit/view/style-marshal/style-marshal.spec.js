@@ -7,17 +7,19 @@ import getStyles, {
 } from '../../../../src/view/use-style-marshal/get-styles';
 import type { StyleMarshal } from '../../../../src/view/use-style-marshal/style-marshal-types';
 import { prefix } from '../../../../src/view/data-attributes';
+import uuidv4 from "uuid/v4";
 
 const getMarshal = (myMock): StyleMarshal => myMock.mock.calls[0][0];
 const getMock = () => jest.fn().mockImplementation(() => null);
 
 type Props = {|
   uniqueId: number,
+  nonce?: string,
   children: (marshal: StyleMarshal) => Node,
 |};
 
 function WithMarshal(props: Props) {
-  const marshal: StyleMarshal = useStyleMarshal(props.uniqueId);
+  const marshal: StyleMarshal = useStyleMarshal(props.uniqueId, props.nonce);
   return props.children(marshal);
 }
 
@@ -27,15 +29,23 @@ const getDynamicStyleTagSelector = (uniqueId: number) =>
 const getAlwaysStyleTagSelector = (uniqueId: number) =>
   `style[${prefix}-always="${uniqueId}"]`;
 
-const getDynamicStyleFromTag = (uniqueId: number): string => {
+const getDynamicStyleTag = (uniqueId: number): HTMLStyleElement => {
   const selector: string = getDynamicStyleTagSelector(uniqueId);
-  const el: HTMLStyleElement = (document.querySelector(selector): any);
+  return (document.querySelector(selector): any);
+};
+
+const getDynamicStyleFromTag = (uniqueId: number): string => {
+  const el = getDynamicStyleTag(uniqueId);
   return el.innerHTML;
 };
 
-const getAlwaysStyleFromTag = (uniqueId: number): string => {
+const getAlwaysStyleTag = (uniqueId: number): HTMLStyleElement => {
   const selector: string = getAlwaysStyleTagSelector(uniqueId);
-  const el: HTMLStyleElement = (document.querySelector(selector): any);
+  return (document.querySelector(selector): any);
+};
+
+const getAlwaysStyleFromTag = (uniqueId: number): string => {
+  const el = getAlwaysStyleTag(uniqueId);
   return el.innerHTML;
 };
 
@@ -173,5 +183,22 @@ it('should allow subsequent updates', () => {
     expect(getDynamicStyleFromTag(uniqueId)).toEqual(styles.dropAnimating);
   });
 
+  wrapper.unmount();
+});
+
+it('should insert nonce into tag attribute', () => {
+  const uniqueId: number = 2;
+  const nonce = Buffer.from(uuidv4()).toString("base64")
+  const wrapper: ReactWrapper<*> = mount(
+    <WithMarshal uniqueId={uniqueId} nonce={nonce}>{getMock()}</WithMarshal>,
+  );
+  const dynamicStyleTagNonce: string = getDynamicStyleTag(uniqueId).getAttribute('nonce');
+  const alwaysStyleTagNonce: string = getAlwaysStyleTag(uniqueId).getAttribute('nonce');
+
+  // the style tag exists
+  expect(dynamicStyleTagNonce).toEqual(nonce);
+  expect(alwaysStyleTagNonce).toEqual(nonce);
+
+  // now unmounted
   wrapper.unmount();
 });
