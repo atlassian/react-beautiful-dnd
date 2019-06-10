@@ -1,7 +1,6 @@
 // @flow
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
 import { getPreset } from '../../../utils/dimension';
-import getHomeImpact from '../../../../src/state/get-home-impact';
 import noImpact from '../../../../src/state/no-impact';
 import getStatePreset from '../../../utils/get-simple-state-preset';
 import type {
@@ -18,6 +17,8 @@ import {
 } from '../../../utils/dragging-state';
 import getOwnProps from './util/get-own-props';
 import getDraggingMapProps from './util/get-dragging-map-props';
+import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import { getDraggingSnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -34,7 +35,8 @@ draggingStates.forEach((current: IsDraggingState) => {
       );
 
       const expected: MapProps = {
-        dragging: {
+        mapped: {
+          type: 'DRAGGING',
           offset: { x: 20, y: 30 },
           mode: 'FLUID',
           dimension: preset.inHome1,
@@ -42,8 +44,13 @@ draggingStates.forEach((current: IsDraggingState) => {
           dropping: null,
           combineWith: null,
           forceShouldAnimate: null,
+          snapshot: getDraggingSnapshot({
+            mode: 'FLUID',
+            draggingOver: preset.home.descriptor.id,
+            combineWith: null,
+            dropping: null,
+          }),
         },
-        secondary: null,
       };
       expect(result).toEqual(expected);
     });
@@ -78,11 +85,14 @@ draggingStates.forEach((current: IsDraggingState) => {
 
     it('should indicate when over a droppable', () => {
       const selector: Selector = makeMapStateToProps();
+      const { impact: homeImpact } = getHomeOnLift({
+        draggable: preset.inHome1,
+        draggables: preset.draggables,
+        viewport: preset.viewport,
+        home: preset.home,
+      });
 
-      const inHome: IsDraggingState = withImpact(
-        current,
-        getHomeImpact(preset.inHome1, preset.home),
-      );
+      const inHome: IsDraggingState = withImpact(current, homeImpact);
       const overHome: DraggingMapProps = getDraggingMapProps(
         selector(inHome, ownProps),
       );

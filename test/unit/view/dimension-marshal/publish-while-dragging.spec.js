@@ -16,6 +16,7 @@ import { critical, preset } from '../../../utils/preset-action-args';
 import {
   getDroppableCallbacks,
   populateMarshal,
+  type DimensionWatcher,
   getCallbacksStub,
 } from '../../../utils/dimension-marshal';
 import { defaultRequest, withExpectedAdvancedUsageWarning } from './util';
@@ -200,6 +201,72 @@ describe('additions', () => {
       // we expect this to be ordered by index
       additions: [beforeInHome1, beforeInHome2],
       modified: [scrollableHome],
+    };
+    expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
+  });
+});
+
+describe('droppables', () => {
+  it('should recollect droppables that had internal changes (home)', () => {
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    const watcher: DimensionWatcher = populateMarshal(marshal, withScrollables);
+
+    // A publish has started
+    marshal.startPublishing(defaultRequest);
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+
+    withExpectedAdvancedUsageWarning(() => {
+      marshal.unregisterDraggable(preset.inHome2.descriptor);
+    });
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+    expect(watcher.droppable.recollect).not.toHaveBeenCalled();
+
+    // Fire the collection / publish step
+    requestAnimationFrame.flush();
+
+    // not hiding placeholder in home list
+    expect(watcher.droppable.recollect).toHaveBeenCalledWith(
+      scrollableHome.descriptor.id,
+      { withoutPlaceholder: false },
+    );
+
+    const expected: Published = {
+      additions: [],
+      removals: [preset.inHome2.descriptor.id],
+      modified: [scrollableHome],
+    };
+    expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
+  });
+
+  it('should recollect droppables that had internal changes (foreign)', () => {
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    const watcher: DimensionWatcher = populateMarshal(marshal, withScrollables);
+
+    // A publish has started
+    marshal.startPublishing(defaultRequest);
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+
+    withExpectedAdvancedUsageWarning(() => {
+      marshal.unregisterDraggable(preset.inForeign1.descriptor);
+    });
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+    expect(watcher.droppable.recollect).not.toHaveBeenCalled();
+
+    // Fire the collection / publish step
+    requestAnimationFrame.flush();
+
+    // hiding placeholder in foreign list
+    expect(watcher.droppable.recollect).toHaveBeenCalledWith(
+      scrollableForeign.descriptor.id,
+      { withoutPlaceholder: true },
+    );
+
+    const expected: Published = {
+      additions: [],
+      removals: [preset.inForeign1.descriptor.id],
+      modified: [scrollableForeign],
     };
     expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
   });

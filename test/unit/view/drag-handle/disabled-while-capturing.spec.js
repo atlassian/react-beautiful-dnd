@@ -3,7 +3,7 @@ import type { ReactWrapper } from 'enzyme';
 import { forEach, type Control } from './util/controls';
 import { getWrapper } from './util/wrappers';
 import { getStubCallbacks, callbacksCalled } from './util/callbacks';
-import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
 
 const expectMidDragDisabledWarning = (fn: Function) => {
   // arrange
@@ -23,11 +23,12 @@ forEach((control: Control) => {
   it('should abort a pending drag', () => {
     // not relevant for control
     if (!control.hasPreLift) {
+      expect(true).toBeTruthy();
       return;
     }
 
     const callbacks: Callbacks = getStubCallbacks();
-    const wrapper: ReactWrapper = getWrapper(callbacks);
+    const wrapper: ReactWrapper<*> = getWrapper(callbacks);
 
     control.preLift(wrapper);
 
@@ -43,7 +44,7 @@ forEach((control: Control) => {
 
   it('should cancel an existing drag', () => {
     const callbacks: Callbacks = getStubCallbacks();
-    const wrapper: ReactWrapper = getWrapper(callbacks);
+    const wrapper: ReactWrapper<*> = getWrapper(callbacks);
 
     control.preLift(wrapper);
     control.lift(wrapper);
@@ -68,7 +69,7 @@ forEach((control: Control) => {
 
   it('should stop publishing movements', () => {
     const callbacks: Callbacks = getStubCallbacks();
-    const wrapper: ReactWrapper = getWrapper(callbacks);
+    const wrapper: ReactWrapper<*> = getWrapper(callbacks);
 
     control.preLift(wrapper);
     control.lift(wrapper);
@@ -96,7 +97,7 @@ forEach((control: Control) => {
 
   it('should allow subsequent drags', () => {
     const callbacks: Callbacks = getStubCallbacks();
-    const wrapper: ReactWrapper = getWrapper(callbacks);
+    const wrapper: ReactWrapper<*> = getWrapper(callbacks);
 
     control.preLift(wrapper);
     control.lift(wrapper);

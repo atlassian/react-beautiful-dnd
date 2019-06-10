@@ -29,10 +29,14 @@ export type GetDroppableDimensionFn = (
   options: ScrollOptions,
 ) => DroppableDimension;
 
+export type RecollectDroppableOptions = {|
+  withoutPlaceholder: boolean,
+|};
+
 export type DroppableCallbacks = {|
   // a drag is starting
   getDimensionAndWatchScroll: GetDroppableDimensionFn,
-  recollect: () => DroppableDimension,
+  recollect: (options: RecollectDroppableOptions) => DroppableDimension,
   // scroll a droppable
   scroll: (change: Position) => void,
   // If the Droppable is listening for scroll events - it needs to stop!
@@ -83,11 +87,6 @@ export type DimensionMarshal = {|
   unregisterDraggable: (descriptor: DraggableDescriptor) => void,
   // Droppable
   registerDroppable: (
-    descriptor: DroppableDescriptor,
-    callbacks: DroppableCallbacks,
-  ) => void,
-  updateDroppable: (
-    previous: DroppableDescriptor,
     descriptor: DroppableDescriptor,
     callbacks: DroppableCallbacks,
   ) => void,

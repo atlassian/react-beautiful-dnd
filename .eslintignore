@@ -2,9 +2,5 @@
 dist/
 flow-typed/
 site/
+coverage/
 babel.config.js
-
-# autoprefixer's eslintConfig was being picked up and attempted to be applied. No thanks
-website/node_modules/
-website/public/
-website/.cache/

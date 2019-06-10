@@ -46,8 +46,8 @@ export default ({
 
   const currentIndex: number = location.index;
 
-  // update the insideDestination list to reflect the current
-  // list order
+  // update the insideDestination list to reflect the current list order
+  // TODO: cleanup
   const currentInsideDestination: DraggableDimension[] = (() => {
     const shallow = originalInsideDestination.slice();
 
@@ -75,7 +75,9 @@ export default ({
     return null;
   }
 
+  // TODO: what if target is original!?
   const target: DraggableDimension = currentInsideDestination[targetIndex];
+  invariant(target !== draggable, 'Cannot combine with self');
 
   const merge: CombineImpact = {
     whenEntered: isMovingForward ? forward : backward,
@@ -90,7 +92,6 @@ export default ({
     movement: previousImpact.movement,
     // grouping removes the destination
     destination: null,
-    direction: destination.axis.direction,
     merge,
   };
 

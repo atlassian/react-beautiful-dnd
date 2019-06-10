@@ -1,5 +1,6 @@
 // @flow
 import { mount } from 'enzyme';
+import invariant from 'tiny-invariant';
 import React from 'react';
 import { type Position } from 'css-box-model';
 import type {
@@ -7,9 +8,14 @@ import type {
   DroppableCallbacks,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import { getMarshalStub } from '../../../utils/dimension-marshal';
-import { withDimensionMarshal } from '../../../utils/get-context-options';
 import { setViewport } from '../../../utils/viewport';
-import { immediate, preset, scheduled, ScrollableItem } from './util/shared';
+import {
+  immediate,
+  preset,
+  scheduled,
+  ScrollableItem,
+  WithAppContext,
+} from './util/shared';
 
 const scroll = (el: HTMLElement, target: Position) => {
   el.scrollTop = target.y;
@@ -22,12 +28,15 @@ setViewport(preset.viewport);
 describe('should immediately publish updates', () => {
   it('should immediately publish the scroll offset of the closest scrollable', () => {
     const marshal: DimensionMarshal = getMarshalStub();
-    const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
-    const container: HTMLElement = wrapper.getDOMNode();
-
-    if (!container.classList.contains('scroll-container')) {
-      throw new Error('incorrect dom node collected');
-    }
+    const wrapper = mount(
+      <WithAppContext marshal={marshal}>
+        <ScrollableItem />
+      </WithAppContext>,
+    );
+    const container: ?HTMLElement = wrapper
+      .find('.scroll-container')
+      .getDOMNode();
+    invariant(container);
 
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
@@ -46,8 +55,15 @@ describe('should immediately publish updates', () => {
   it('should not fire a scroll if the value has not changed since the previous call', () => {
     // this can happen if you scroll backward and forward super quick
     const marshal: DimensionMarshal = getMarshalStub();
-    const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
-    const container: HTMLElement = wrapper.getDOMNode();
+    const wrapper = mount(
+      <WithAppContext marshal={marshal}>
+        <ScrollableItem />
+      </WithAppContext>,
+    );
+    const container: ?HTMLElement = wrapper
+      .find('.scroll-container')
+      .getDOMNode();
+    invariant(container);
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
       marshal.registerDroppable.mock.calls[0][1];
@@ -80,12 +96,15 @@ describe('should immediately publish updates', () => {
 describe('should schedule publish updates', () => {
   it('should publish the scroll offset of the closest scrollable', () => {
     const marshal: DimensionMarshal = getMarshalStub();
-    const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
-    const container: HTMLElement = wrapper.getDOMNode();
-
-    if (!container.classList.contains('scroll-container')) {
-      throw new Error('incorrect dom node collected');
-    }
+    const wrapper = mount(
+      <WithAppContext marshal={marshal}>
+        <ScrollableItem />
+      </WithAppContext>,
+    );
+    const container: ?HTMLElement = wrapper
+      .find('.scroll-container')
+      .getDOMNode();
+    invariant(container);
 
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
@@ -105,8 +124,15 @@ describe('should schedule publish updates', () => {
 
   it('should throttle multiple scrolls into a animation frame', () => {
     const marshal: DimensionMarshal = getMarshalStub();
-    const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
-    const container: HTMLElement = wrapper.getDOMNode();
+    const wrapper = mount(
+      <WithAppContext marshal={marshal}>
+        <ScrollableItem />
+      </WithAppContext>,
+    );
+    const container: ?HTMLElement = wrapper
+      .find('.scroll-container')
+      .getDOMNode();
+    invariant(container);
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
       marshal.registerDroppable.mock.calls[0][1];
@@ -136,8 +162,15 @@ describe('should schedule publish updates', () => {
   it('should not fire a scroll if the value has not changed since the previous frame', () => {
     // this can happen if you scroll backward and forward super quick
     const marshal: DimensionMarshal = getMarshalStub();
-    const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
-    const container: HTMLElement = wrapper.getDOMNode();
+    const wrapper = mount(
+      <WithAppContext marshal={marshal}>
+        <ScrollableItem />
+      </WithAppContext>,
+    );
+    const container: ?HTMLElement = wrapper
+      .find('.scroll-container')
+      .getDOMNode();
+    invariant(container);
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
       marshal.registerDroppable.mock.calls[0][1];
@@ -169,8 +202,15 @@ describe('should schedule publish updates', () => {
 
   it('should not publish a scroll update after requested not to update while an animation frame is occurring', () => {
     const marshal: DimensionMarshal = getMarshalStub();
-    const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
-    const container: HTMLElement = wrapper.getDOMNode();
+    const wrapper = mount(
+      <WithAppContext marshal={marshal}>
+        <ScrollableItem />
+      </WithAppContext>,
+    );
+    const container: ?HTMLElement = wrapper
+      .find('.scroll-container')
+      .getDOMNode();
+    invariant(container);
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
       marshal.registerDroppable.mock.calls[0][1];
@@ -200,8 +240,15 @@ describe('should schedule publish updates', () => {
 it('should stop watching scroll when no longer required to publish', () => {
   // this can happen if you scroll backward and forward super quick
   const marshal: DimensionMarshal = getMarshalStub();
-  const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
-  const container: HTMLElement = wrapper.getDOMNode();
+  const wrapper = mount(
+    <WithAppContext marshal={marshal}>
+      <ScrollableItem />
+    </WithAppContext>,
+  );
+  const container: ?HTMLElement = wrapper
+    .find('.scroll-container')
+    .getDOMNode();
+  invariant(container);
   // tell the droppable to watch for scrolling
   const callbacks: DroppableCallbacks =
     marshal.registerDroppable.mock.calls[0][1];
@@ -224,8 +271,15 @@ it('should stop watching scroll when no longer required to publish', () => {
 it('should stop watching for scroll events when the component is unmounted', () => {
   jest.spyOn(console, 'warn').mockImplementation(() => {});
   const marshal: DimensionMarshal = getMarshalStub();
-  const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
-  const container: HTMLElement = wrapper.getDOMNode();
+  const wrapper = mount(
+    <WithAppContext marshal={marshal}>
+      <ScrollableItem />
+    </WithAppContext>,
+  );
+  const container: ?HTMLElement = wrapper
+    .find('.scroll-container')
+    .getDOMNode();
+  invariant(container);
   // tell the droppable to watch for scrolling
   const callbacks: DroppableCallbacks =
     marshal.registerDroppable.mock.calls[0][1];
@@ -247,7 +301,11 @@ it('should stop watching for scroll events when the component is unmounted', () 
 
 it('should throw an error if asked to watch a scroll when already listening for scroll changes', () => {
   const marshal: DimensionMarshal = getMarshalStub();
-  const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
+  const wrapper = mount(
+    <WithAppContext marshal={marshal}>
+      <ScrollableItem />
+    </WithAppContext>,
+  );
   // tell the droppable to watch for scrolling
   const callbacks: DroppableCallbacks =
     marshal.registerDroppable.mock.calls[0][1];
@@ -266,8 +324,15 @@ it('should throw an error if asked to watch a scroll when already listening for 
 // if this is not the case then it will break in IE11
 it('should add and remove events with the same event options', () => {
   const marshal: DimensionMarshal = getMarshalStub();
-  const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
-  const container: HTMLElement = wrapper.getDOMNode();
+  const wrapper = mount(
+    <WithAppContext marshal={marshal}>
+      <ScrollableItem />
+    </WithAppContext>,
+  );
+  const container: ?HTMLElement = wrapper
+    .find('.scroll-container')
+    .getDOMNode();
+  invariant(container);
   jest.spyOn(container, 'addEventListener');
   jest.spyOn(container, 'removeEventListener');
 

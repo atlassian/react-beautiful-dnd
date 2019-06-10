@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { grid } from '../constants';
 import reorder from '../reorder';
 import {
@@ -70,13 +70,10 @@ const List = styled.div`
   width: 200px;
   margin: ${grid}px;
 `;
-const initial: Task[] = Array.from(
-  { length: 10 },
-  (v, k): Task => ({
-    id: `task-${k}`,
-    content: `Task ${k}`,
-  }),
-);
+const initial: Task[] = Array.from({ length: 10 }, (v, k): Task => ({
+  id: `task-${k}`,
+  content: `Task ${k}`,
+}));
 
 type State = {|
   tasks: Task[],

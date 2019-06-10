@@ -1,11 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
 import { type ReactWrapper } from 'enzyme';
-import {
-  canLiftContextKey,
-  styleContextKey,
-} from '../../../../src/view/context-keys';
-import { sloppyClickThreshold } from '../../../../src/view/drag-handle/util/is-sloppy-click-threshold-exceeded';
+import { sloppyClickThreshold } from '../../../../src/view/use-drag-handle/util/is-sloppy-click-threshold-exceeded';
 import * as keyCodes from '../../../../src/view/key-codes';
 import getWindowScroll from '../../../../src/view/window/get-window-scroll';
 import setWindowScroll from '../../../utils/set-window-scroll';
@@ -40,12 +36,15 @@ import {
   windowTab,
 } from './util/events';
 import { getWrapper } from './util/wrappers';
-import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
+import type { AppContextValue } from '../../../../src/view/context/app-context';
+import basicContext from './util/app-context';
+import forceUpdate from '../../../utils/force-update';
 
 const origin: Position = { x: 0, y: 0 };
 
 let callbacks: Callbacks;
-let wrapper: ReactWrapper;
+let wrapper: ReactWrapper<*>;
 
 beforeAll(() => {
   requestAnimationFrame.reset();
@@ -77,22 +76,20 @@ describe('initiation', () => {
       { x: -sloppyClickThreshold, y: 0 },
     ];
 
-    valid.forEach(
-      (point: Position): void => {
-        const customCallbacks = getStubCallbacks();
-        const customWrapper = getWrapper(customCallbacks);
+    valid.forEach((point: Position): void => {
+      const customCallbacks = getStubCallbacks();
+      const customWrapper = getWrapper(customCallbacks);
 
-        mouseDown(customWrapper, origin);
-        windowMouseMove(point);
+      mouseDown(customWrapper, origin);
+      windowMouseMove(point);
 
-        expect(customCallbacks.onLift).toHaveBeenCalledWith({
-          clientSelection: point,
-          movementMode: 'FLUID',
-        });
+      expect(customCallbacks.onLift).toHaveBeenCalledWith({
+        clientSelection: origin,
+        movementMode: 'FLUID',
+      });
 
-        customWrapper.unmount();
-      },
-    );
+      customWrapper.unmount();
+    });
   });
 
   it('should not interfere with standard click events', () => {
@@ -205,9 +202,9 @@ describe('initiation', () => {
 
   it('should not start a drag if the state says that a drag cannot start', () => {
     const customCallbacks: Callbacks = getStubCallbacks();
-    const customContext = {
-      [styleContextKey]: 'hello',
-      [canLiftContextKey]: () => false,
+    const customContext: AppContextValue = {
+      ...basicContext,
+      canLift: () => false,
     };
     const customWrapper = getWrapper(customCallbacks, customContext);
     const mock: MockEvent = createMockEvent();
@@ -554,12 +551,21 @@ describe('window scroll during drag', () => {
       x: 100,
       y: 200,
     });
-    // no animation frame to release diff
 
+    // no animation frame to release diff
     expect(
       callbacksCalled(callbacks)({
         onLift: 1,
         onWindowScroll: 0,
+      }),
+    ).toBe(true);
+
+    // releasing a frame
+    requestAnimationFrame.step();
+    expect(
+      callbacksCalled(callbacks)({
+        onLift: 1,
+        onWindowScroll: 1,
       }),
     ).toBe(true);
   });
@@ -593,6 +599,28 @@ describe('window scroll during drag', () => {
         onWindowScroll: 0,
       }),
     ).toBe(true);
+  });
+
+  it('should not fire an onWindowScroll if it is not the window scrolling (ie11 bug)', () => {
+    // start the lift
+    mouseDown(wrapper);
+    windowMouseMove({ x: 0, y: sloppyClickThreshold });
+    expect(callbacks.onLift).toHaveBeenCalled();
+
+    // trigger scroll event
+    const scrollable: HTMLElement = document.createElement('div');
+    const fakeEvent: Event = new Event('scroll');
+    Object.defineProperties(fakeEvent, {
+      currentTarget: {
+        writable: true,
+        value: scrollable,
+      },
+    });
+    window.dispatchEvent(fakeEvent);
+    // ensuring any events would be published
+    requestAnimationFrame.flush();
+
+    expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
   });
 });
 
@@ -976,6 +1004,7 @@ describe('disabled mid drag', () => {
     // lift
     mouseDown(wrapper);
     windowMouseMove({ x: 0, y: sloppyClickThreshold });
+    wrapper.setProps({ isDragging: true });
 
     expect(callbacksCalled(callbacks)({ onLift: 1 })).toBe(true);
 
@@ -996,6 +1025,7 @@ describe('disabled mid drag', () => {
     // lift
     mouseDown(wrapper);
     windowMouseMove({ x: 0, y: sloppyClickThreshold });
+    wrapper.setProps({ isDragging: true });
     // move
     windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
     requestAnimationFrame.step();
@@ -1022,6 +1052,7 @@ describe('disabled mid drag', () => {
     // lift
     mouseDown(wrapper);
     windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
+    wrapper.setProps({ isDragging: true });
     // move
     windowMouseMove({ x: 0, y: sloppyClickThreshold + 1 });
     requestAnimationFrame.step();
@@ -1058,6 +1089,22 @@ describe('disabled mid drag', () => {
 });
 
 describe('cancelled elsewhere in the app mid drag', () => {
+  it('should not abort a drag if a render occurs during a pending drag', () => {
+    // lift
+    mouseDown(wrapper);
+    forceUpdate(wrapper);
+
+    windowMouseMove({ x: 0, y: sloppyClickThreshold });
+
+    expect(
+      callbacksCalled(callbacks)({
+        onLift: 1,
+        onMove: 0,
+        onCancel: 0,
+      }),
+    ).toBe(true);
+  });
+
   it('should end a current drag without firing the onCancel callback', () => {
     // lift
     mouseDown(wrapper);
@@ -1105,6 +1152,7 @@ describe('unmounted mid drag', () => {
   beforeEach(() => {
     mouseDown(wrapper);
     windowMouseMove({ x: 0, y: sloppyClickThreshold });
+    wrapper.setProps({ isDragging: true });
     wrapper.unmount();
   });
 
@@ -1322,6 +1370,31 @@ describe('webkit force press', () => {
         callbacksCalled(callbacks)({
           onLift: 1,
           onCancel: 1,
+        }),
+      ).toBe(true);
+    });
+
+    it('should not cancel a drag if force press is not being respected', () => {
+      // arrange
+      const shouldRespectForcePress: boolean = false;
+      const customWrapper = getWrapper(
+        callbacks,
+        undefined,
+        shouldRespectForcePress,
+      );
+
+      // start the drag
+      mouseDown(customWrapper);
+      windowMouseMove({ x: 0, y: sloppyClickThreshold });
+
+      // will not cancel the drag
+      windowMouseForceChange(mouseForcePressThreshold);
+
+      expect(
+        callbacksCalled(callbacks)({
+          onLift: 1,
+          // no cancel called
+          onCancel: 0,
         }),
       ).toBe(true);
     });

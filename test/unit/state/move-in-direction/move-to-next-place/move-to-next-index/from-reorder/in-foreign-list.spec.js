@@ -11,9 +11,21 @@ import { getPreset } from '../../../../../../utils/dimension';
 import moveToNextIndex from '../../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-index';
 import getDisplacedBy from '../../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../../src/state/get-displacement-map';
+import getVisibleDisplacement from '../../../../../../utils/get-displacement/get-visible-displacement';
+import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   const preset = getPreset(axis);
+  const displacedBy: DisplacedBy = getDisplacedBy(
+    axis,
+    preset.inHome1.displaceBy,
+  );
+  const { onLift } = getOnHomeLift({
+    draggable: preset.inHome1,
+    home: preset.home,
+    draggables: preset.draggables,
+    viewport: preset.viewport,
+  });
   describe(`on ${axis.direction} axis`, () => {
     // it was cleaner for these scenarios to be batched together into a clean flow
     // rather than recreating the impacts for each test
@@ -21,38 +33,17 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
     it('should update the impact when moving after where we started in the foreign start', () => {
       // inHome1 has made its way into index #2 of foreign after a cross axis move
 
-      // always displace forward in a foreign list
-      const willDisplaceForward: boolean = true;
-      const displacedBy: DisplacedBy = getDisplacedBy(
-        axis,
-        preset.inHome1.displaceBy,
-        willDisplaceForward,
-      );
       const initial: Displacement[] = [
-        {
-          draggableId: preset.inForeign2.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
-        {
-          draggableId: preset.inForeign3.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
-        {
-          draggableId: preset.inForeign4.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
+        getVisibleDisplacement(preset.inForeign2),
+        getVisibleDisplacement(preset.inForeign3),
+        getVisibleDisplacement(preset.inForeign4),
       ];
       const crossAxisMove: DragImpact = {
         movement: {
           displaced: initial,
           map: getDisplacementMap(initial),
-          willDisplaceForward,
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
         destination: {
           droppableId: preset.foreign.descriptor.id,
@@ -69,29 +60,20 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: crossAxisMove,
+        onLift,
       });
       invariant(first);
       {
         const displaced: Displacement[] = [
-          {
-            draggableId: preset.inForeign3.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign4.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
+          getVisibleDisplacement(preset.inForeign3),
+          getVisibleDisplacement(preset.inForeign4),
         ];
         const expected: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            willDisplaceForward,
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -110,24 +92,19 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: first,
+        onLift,
       });
       invariant(second);
       {
         const displaced: Displacement[] = [
-          {
-            draggableId: preset.inForeign4.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
+          getVisibleDisplacement(preset.inForeign4),
         ];
         const expected: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            willDisplaceForward,
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -148,29 +125,20 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: second,
+        onLift,
       });
       invariant(third);
       {
         const displaced: Displacement[] = [
-          {
-            draggableId: preset.inForeign3.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign4.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
+          getVisibleDisplacement(preset.inForeign3),
+          getVisibleDisplacement(preset.inForeign4),
         ];
         const expected: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            willDisplaceForward,
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -188,35 +156,22 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: third,
+        onLift,
       });
       invariant(fourth);
       {
         // ordered by closest
         const displaced: Displacement[] = [
-          {
-            draggableId: preset.inForeign2.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign3.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign4.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
+          getVisibleDisplacement(preset.inForeign2),
+          getVisibleDisplacement(preset.inForeign3),
+          getVisibleDisplacement(preset.inForeign4),
         ];
         const expected: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            willDisplaceForward,
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -231,34 +186,16 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
 
     it('should update the impact when moving before where we started in the foreign list', () => {
       // inHome1 has made its way into index #3 of foreign after a cross axis move
-
-      // always displace forward in a foreign list
-      const willDisplaceForward: boolean = true;
-      const displacedBy: DisplacedBy = getDisplacedBy(
-        axis,
-        preset.inHome1.displaceBy,
-        willDisplaceForward,
-      );
       const initial: Displacement[] = [
-        {
-          draggableId: preset.inForeign3.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
-        {
-          draggableId: preset.inForeign4.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
+        getVisibleDisplacement(preset.inForeign3),
+        getVisibleDisplacement(preset.inForeign4),
       ];
       const crossAxisMove: DragImpact = {
         movement: {
           displaced: initial,
           map: getDisplacementMap(initial),
-          willDisplaceForward,
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
         destination: {
           droppableId: preset.foreign.descriptor.id,
@@ -275,34 +212,21 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: crossAxisMove,
+        onLift,
       });
       invariant(first);
       {
         const displaced: Displacement[] = [
-          {
-            draggableId: preset.inForeign2.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign3.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign4.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
+          getVisibleDisplacement(preset.inForeign2),
+          getVisibleDisplacement(preset.inForeign3),
+          getVisibleDisplacement(preset.inForeign4),
         ];
         const expected: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            willDisplaceForward,
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -321,39 +245,22 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: first,
+        onLift,
       });
       invariant(second);
       {
         const displaced: Displacement[] = [
-          {
-            draggableId: preset.inForeign1.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign2.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign3.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign4.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
+          getVisibleDisplacement(preset.inForeign1),
+          getVisibleDisplacement(preset.inForeign2),
+          getVisibleDisplacement(preset.inForeign3),
+          getVisibleDisplacement(preset.inForeign4),
         ];
         const expected: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            willDisplaceForward,
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -374,35 +281,22 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: second,
+        onLift,
       });
       invariant(third);
       {
         // ordered by closest impacted
         const displaced: Displacement[] = [
-          {
-            draggableId: preset.inForeign2.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign3.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign4.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
+          getVisibleDisplacement(preset.inForeign2),
+          getVisibleDisplacement(preset.inForeign3),
+          getVisibleDisplacement(preset.inForeign4),
         ];
         const expected: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            willDisplaceForward,
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -421,30 +315,21 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: third,
+        onLift,
       });
       invariant(fourth);
       {
         // ordered by closest
         const displaced: Displacement[] = [
-          {
-            draggableId: preset.inForeign3.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
-          {
-            draggableId: preset.inForeign4.descriptor.id,
-            isVisible: true,
-            shouldAnimate: true,
-          },
+          getVisibleDisplacement(preset.inForeign3),
+          getVisibleDisplacement(preset.inForeign4),
         ];
         const expected: DragImpact = {
           movement: {
             displaced,
             map: getDisplacementMap(displaced),
-            willDisplaceForward,
             displacedBy,
           },
-          direction: axis.direction,
           merge: null,
           destination: {
             droppableId: preset.foreign.descriptor.id,
@@ -459,42 +344,17 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
 
     it('should not allow movement before the start of the list', () => {
       // cross axis move inHome1 before inForeign1
-      const willDisplaceForward: boolean = true;
-      const displacedBy: DisplacedBy = getDisplacedBy(
-        axis,
-        preset.inHome1.displaceBy,
-        willDisplaceForward,
-      );
       const initial: Displacement[] = [
-        {
-          draggableId: preset.inForeign1.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
-        {
-          draggableId: preset.inForeign2.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
-        {
-          draggableId: preset.inForeign3.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
-        {
-          draggableId: preset.inForeign4.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
+        getVisibleDisplacement(preset.inForeign1),
+        getVisibleDisplacement(preset.inForeign2),
+        getVisibleDisplacement(preset.inForeign3),
       ];
       const crossAxisMove: DragImpact = {
         movement: {
           displaced: initial,
           map: getDisplacementMap(initial),
-          willDisplaceForward,
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
         destination: {
           droppableId: preset.foreign.descriptor.id,
@@ -512,37 +372,26 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
         destination: preset.home,
         insideDestination: preset.inForeignList,
         previousImpact: crossAxisMove,
+        onLift,
       });
 
       expect(impact).toBe(null);
     });
 
     it('should allow movement into a spot after the last item in a list', () => {
-      // cross axis move inHome4 before inForeign4
-      const willDisplaceForward: boolean = true;
-      const displacedBy: DisplacedBy = getDisplacedBy(
-        axis,
-        preset.inHome4.displaceBy,
-        willDisplaceForward,
-      );
+      // cross axis move inHome1 before inForeign4
       const initial: Displacement[] = [
-        {
-          draggableId: preset.inForeign4.descriptor.id,
-          isVisible: true,
-          shouldAnimate: true,
-        },
+        getVisibleDisplacement(preset.inForeign4),
       ];
       const crossAxisMove: DragImpact = {
         movement: {
           // nothing is displaced at this point
           displaced: initial,
           map: getDisplacementMap(initial),
-          willDisplaceForward,
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
-        // trying to move after spot after inForeign4
+        // currently in the spot that inForeign4 initially occupied
         destination: {
           droppableId: preset.foreign.descriptor.id,
           index: preset.inForeign4.descriptor.index,
@@ -554,11 +403,12 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
       const impact: ?DragImpact = moveToNextIndex({
         isMovingForward: true,
         isInHomeList: false,
-        draggable: preset.inHome4,
+        draggable: preset.inHome1,
         draggables: preset.draggables,
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: crossAxisMove,
+        onLift,
       });
       invariant(impact);
       const expected: DragImpact = {
@@ -566,10 +416,8 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
           // nothing is displaced at this point
           displaced: [],
           map: {},
-          willDisplaceForward,
           displacedBy,
         },
-        direction: axis.direction,
         merge: null,
         // trying to move after spot after inForeign4
         destination: {
@@ -580,44 +428,65 @@ import getDisplacementMap from '../../../../../../../src/state/get-displacement-
       expect(impact).toEqual(expected);
     });
 
+    const atEndOfForeignList: DragImpact = {
+      movement: {
+        // nothing is displaced at this point
+        displaced: [],
+        map: {},
+        displacedBy,
+      },
+      merge: null,
+      // after inForeign4
+      destination: {
+        droppableId: preset.foreign.descriptor.id,
+        index: preset.inForeign4.descriptor.index + 1,
+      },
+    };
+
     it('should not allow movement after it is already after the last item in a list', () => {
-      // cross axis move inHome4 after inForeign4
-      const willDisplaceForward: boolean = true;
-      const displacedBy: DisplacedBy = getDisplacedBy(
-        axis,
-        preset.inHome4.displaceBy,
-        willDisplaceForward,
-      );
-      const crossAxisMove: DragImpact = {
-        movement: {
-          // nothing is displaced at this point
-          displaced: [],
-          map: {},
-          willDisplaceForward,
-          displacedBy,
-        },
-        direction: axis.direction,
-        merge: null,
-        // trying to move after spot after inForeign4
-        destination: {
-          droppableId: preset.foreign.descriptor.id,
-          index: preset.inForeign4.descriptor.index + 1,
-        },
-      };
-
-      // cannot move forwards outside of list
-
       const impact: ?DragImpact = moveToNextIndex({
         isMovingForward: true,
         isInHomeList: false,
-        draggable: preset.inHome4,
+        draggable: preset.inHome1,
         draggables: preset.draggables,
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
-        previousImpact: crossAxisMove,
+        previousImpact: atEndOfForeignList,
+        onLift,
       });
 
       expect(impact).toBe(null);
+    });
+
+    it('should allow movement back from after the last item in a list', () => {
+      const impact: ?DragImpact = moveToNextIndex({
+        isMovingForward: false,
+        isInHomeList: false,
+        draggable: preset.inHome1,
+        draggables: preset.draggables,
+        destination: preset.foreign,
+        insideDestination: preset.inForeignList,
+        previousImpact: atEndOfForeignList,
+        onLift,
+      });
+
+      const displaced: Displacement[] = [
+        getVisibleDisplacement(preset.inForeign4),
+      ];
+      const expected: DragImpact = {
+        movement: {
+          displaced,
+          map: getDisplacementMap(displaced),
+          displacedBy,
+        },
+        merge: null,
+        // now in position of inForeign4
+        destination: {
+          droppableId: preset.foreign.descriptor.id,
+          index: preset.inForeign4.descriptor.index,
+        },
+      };
+      expect(impact).toEqual(expected);
     });
   });
 });

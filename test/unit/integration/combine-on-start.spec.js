@@ -114,7 +114,7 @@ it('should allow the changing of combining in onDragStart', () => {
     onDragUpdate: jest.fn(),
     onDragEnd: jest.fn(),
   };
-  const wrapper: ReactWrapper = mount(<App {...responders} />);
+  const wrapper: ReactWrapper<*> = mount(<App {...responders} />);
 
   pressSpacebar(wrapper.find('.drag-handle').first());
   // flush onDragStart  responder

@@ -7,115 +7,117 @@ import type {
   Selector,
   OwnProps,
   MapProps,
+  DropAnimation,
 } from '../../../../src/view/draggable/draggable-types';
 import type {
   DropAnimatingState,
-  DisplacedBy,
-  Axis,
   DragImpact,
   Combine,
 } from '../../../../src/types';
-import {
-  curves,
-  combine as combineStyle,
-} from '../../../../src/view/animation';
-import getDisplacedBy from '../../../../src/state/get-displaced-by';
+import { curves, combine as combineStyle } from '../../../../src/animation';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
+import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import { getDraggingSnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
 const state = getStatePreset();
 const ownProps: OwnProps = getOwnProps(preset.inHome1);
 
-describe('dropping', () => {
-  it('should move to the new home offset', () => {
-    const current: DropAnimatingState = state.dropAnimating();
-    const selector: Selector = makeMapStateToProps();
-    const expected: MapProps = {
-      dragging: {
-        dimension: preset.inHome1,
+it('should move to the new home offset', () => {
+  const current: DropAnimatingState = state.dropAnimating();
+  const selector: Selector = makeMapStateToProps();
+  const dropping: DropAnimation = {
+    duration: current.dropDuration,
+    curve: curves.drop,
+    moveTo: current.newHomeClientOffset,
+    opacity: null,
+    scale: null,
+  };
+  const expected: MapProps = {
+    mapped: {
+      type: 'DRAGGING',
+      dimension: preset.inHome1,
+      draggingOver: preset.home.descriptor.id,
+      forceShouldAnimate: null,
+      offset: current.newHomeClientOffset,
+      mode: current.completed.result.mode,
+      combineWith: null,
+      dropping,
+      snapshot: getDraggingSnapshot({
         draggingOver: preset.home.descriptor.id,
-        forceShouldAnimate: null,
-        offset: current.pending.newHomeClientOffset,
-        mode: current.pending.result.mode,
+        mode: current.completed.result.mode,
         combineWith: null,
-        dropping: {
-          duration: current.pending.dropDuration,
-          curve: curves.drop,
-          moveTo: current.pending.newHomeClientOffset,
-          opacity: null,
-          scale: null,
-        },
-      },
-      secondary: null,
-    };
+        dropping,
+      }),
+    },
+  };
 
-    const whileDropping: MapProps = selector(current, ownProps);
+  const whileDropping: MapProps = selector(current, ownProps);
 
-    expect(whileDropping).toEqual(expected);
+  expect(whileDropping).toEqual(expected);
+});
+
+it('should maintain combine information', () => {
+  const { impact: homeImpact } = getHomeOnLift({
+    draggable: preset.inHome1,
+    home: preset.home,
+    draggables: preset.draggables,
+    viewport: preset.viewport,
   });
-
-  it('should maintain combine information', () => {
-    const withoutCombine: DropAnimatingState = state.dropAnimating();
-    const axis: Axis = preset.home.axis;
-    const willDisplaceForward: boolean = false;
-    const displacedBy: DisplacedBy = getDisplacedBy(
-      axis,
-      preset.inHome1.displaceBy,
-      willDisplaceForward,
-    );
-    const combine: Combine = {
-      draggableId: preset.inHome2.descriptor.id,
-      droppableId: preset.inHome2.descriptor.droppableId,
-    };
-    const impact: DragImpact = {
-      movement: {
-        displaced: [],
-        map: {},
-        displacedBy,
-        willDisplaceForward,
-      },
-      direction: preset.home.axis.direction,
-      destination: null,
-      merge: {
-        whenEntered: forward,
+  const combine: Combine = {
+    draggableId: preset.inHome2.descriptor.id,
+    droppableId: preset.inHome2.descriptor.droppableId,
+  };
+  const impact: DragImpact = {
+    ...homeImpact,
+    destination: null,
+    merge: {
+      whenEntered: forward,
+      combine,
+    },
+  };
+  const withoutCombine: DropAnimatingState = state.dropAnimating();
+  const withCombine: DropAnimatingState = {
+    ...withoutCombine,
+    completed: {
+      critical: withoutCombine.completed.critical,
+      impact,
+      result: {
+        ...withoutCombine.completed.result,
+        destination: null,
         combine,
       },
-    };
-    const withCombine: DropAnimatingState = {
-      ...withoutCombine,
-      pending: {
-        ...withoutCombine.pending,
-        impact,
-        result: {
-          ...withoutCombine.pending.result,
-          destination: null,
-          combine,
-        },
-      },
-    };
+    },
+  };
 
-    const selector: Selector = makeMapStateToProps();
-    const expected: MapProps = {
-      dragging: {
-        dimension: preset.inHome1,
-        draggingOver: preset.home.descriptor.id,
-        forceShouldAnimate: null,
-        offset: withCombine.pending.newHomeClientOffset,
-        mode: withCombine.pending.result.mode,
+  const selector: Selector = makeMapStateToProps();
+  const dropping: DropAnimation = {
+    duration: withCombine.dropDuration,
+    curve: curves.drop,
+    moveTo: withCombine.newHomeClientOffset,
+    scale: combineStyle.scale.drop,
+    opacity: combineStyle.opacity.drop,
+  };
+  const expected: MapProps = {
+    mapped: {
+      type: 'DRAGGING',
+      dimension: preset.inHome1,
+      draggingOver: preset.home.descriptor.id,
+      forceShouldAnimate: null,
+      offset: withCombine.newHomeClientOffset,
+      mode: withCombine.completed.result.mode,
+      combineWith: preset.inHome2.descriptor.id,
+      dropping,
+      snapshot: getDraggingSnapshot({
+        mode: withCombine.completed.result.mode,
         combineWith: preset.inHome2.descriptor.id,
-        dropping: {
-          duration: withCombine.pending.dropDuration,
-          curve: curves.drop,
-          moveTo: withCombine.pending.newHomeClientOffset,
-          scale: combineStyle.scale.drop,
-          opacity: combineStyle.opacity.drop,
-        },
-      },
-      secondary: null,
-    };
+        dropping,
+        draggingOver: preset.home.descriptor.id,
+      }),
+    },
+  };
 
-    const whileDropping: MapProps = selector(withCombine, ownProps);
+  const whileDropping: MapProps = selector(withCombine, ownProps);
 
-    expect(whileDropping).toEqual(expected);
-  });
+  expect(whileDropping).toEqual(expected);
 });

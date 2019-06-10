@@ -2,9 +2,9 @@
 
 > This page is designed to guide you through adding your own multi drag experience to your `react-beautiful-dnd` lists.
 
-Dragging multiple `Draggable`s at once (multi drag) is currently a pattern that needs to be built on top of `react-beautiful-dnd`. We have not included the interaction into the library itself. This is done because a multi drag experience introduces a lot of concepts, decisions and opinions. We have done a lot of work to ensure there is a standard base of [dom event management](/docs/guides/how-we-use-dom-events.md) to build on.
+Dragging multiple `<Draggable />`s at once (multi drag) is currently a pattern that needs to be built on top of `react-beautiful-dnd`. We have not included the interaction into the library itself. This is done because a multi drag experience introduces a lot of concepts, decisions and opinions. We have done a lot of work to ensure there is a standard base of [dom event management](/docs/guides/how-we-use-dom-events.md) to build on.
 
-We have created a [reference application](react-beautiful-dnd.netlify.com/iframe.html?selectedKind=Multi%20drag&selectedStory=pattern&full=0&down=1&left=1&panelRight=0&downPanel=storybook%2Factions%2Factions-panel) ([source](/stories/9-multi-drag-story.js)) which implements this multi drag pattern. The application is fairly basic and does not handle performance in large lists well. As such, there is are [a few performance recommendations](#performance) that we suggest you also add on to our reference application if you want to support lists greater than 50 in size.
+We have created a [reference application](https://react-beautiful-dnd.netlify.com/iframe.html?selectedKind=Multi%20drag&selectedStory=pattern&full=0&down=1&left=1&panelRight=0&downPanel=storybook%2Factions%2Factions-panel) ([source](/stories/src/multi-drag)) which implements this multi drag pattern. The application is fairly basic and does not handle performance in large lists well. As such, there is are [a few performance recommendations](#performance) that we suggest you also add on to our reference application if you want to support lists greater than 50 in size.
 
 ![multi drag demo](https://user-images.githubusercontent.com/2182637/37322724-7843a218-26d3-11e8-9ebb-8d5853387bb3.gif)
 
@@ -26,7 +26,7 @@ Keep in mind that internally `react-beautiful-dnd` is not aware of multi drag. T
 
 ## Selection
 
-Before a drag starts we need to allow the user to _optionally_ select a number of `Draggable`s to drag. We an item is selected you should apply a style update to the `Draggable` such as a background color change to indicate that the item is selected.
+Before a drag starts we need to allow the user to _optionally_ select a number of `<Draggable />`s to drag. We an item is selected you should apply a style update to the `<Draggable />` such as a background color change to indicate that the item is selected.
 
 ### Selection interaction recommendations
 
@@ -40,14 +40,14 @@ If a user clicks on an item the selected state of the item should be toggled. Ad
 
 #### `onClick` event handler
 
-- Attach an `onClick` handler to your _drag handle_ or `Draggable`
+- Attach an `onClick` handler to your _drag handle_ or `<Draggable />`
 - Only toggle selection if the user is using the [`primaryButton`](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button) (`event.button === 0`)
 - Prevent the default action on the `click` as you are using it for selection (it is only useful to call `event.preventDefault()` to avoid _selection clearing_)
 
 #### Keyboard event handler
 
 - When the user presses **enter** <kbd>⏎</kbd> toggle the selection of the item
-- **Option 1**: Attach an `onKeyDown` handler to your _drag handle_ or `Draggable`. You will need to monkey patch the `DragHandleProvided > onKeyDown` keyboard handler.
+- **Option 1**: Attach an `onKeyDown` handler to your _drag handle_ or `<Draggable />`. You will need to monkey patch the `DragHandleProvided > onKeyDown` keyboard handler.
 - **Option 2**: Attach an `onKeyUp` handler to your _drag handle_. Then you will not need to monkey patch the `onKeyDown` handler. However, `keyup` events will not have their default action prevented so you will not be able to check `event.defaultPrevented` to see if the keypress was used for a drag. If you are only using the **enter** <kbd>⏎</kbd> key in your event handler then you should be fine as that is not used as a part of dragging.
 - Prevent the default action on the `keydown` / `keyup` event if you are toggling selection as you are using it for selection as you want to opt out of the standard browser behaviour and also provide a clue that this event has been used.
 
@@ -211,7 +211,7 @@ class Task extends Component<Props> {
 
 #### `window` `click` handler
 
-We add a `click` handler to the `window` to detect for a click that is not on a `Draggable`. We call `preventDefault` in our selection `onClick` handler so `click` events used for selection will have the `event.defaultPrevented` property set to `true`. Additionally, if a drag occurred the default `click` action [will be prevented](https://github.com/atlassian/react-beautiful-dnd#sloppy-clicks-and-click-prevention-). So if we receive a `click` event on the window that has not has `event.defaultPrevented` set to false we clear the current selection.
+We add a `click` handler to the `window` to detect for a click that is not on a `<Draggable />`. We call `preventDefault` in our selection `onClick` handler so `click` events used for selection will have the `event.defaultPrevented` property set to `true`. Additionally, if a drag occurred the default `click` action [will be prevented](/docs/sensors/mouse.md#sloppy-clicks-and-click-prevention-). So if we receive a `click` event on the window that has not has `event.defaultPrevented` set to false we clear the current selection.
 
 #### `window` `keydown` handler
 
@@ -291,7 +291,7 @@ Doing a multi drag interaction in a performant way can be challenging. The core 
 
 ### Selection state change
 
-In response to a selection change you want to call `render` on the minimum amount of `Draggable` and `Droppable` components as possible. In our example application whenever the selection changes we re-render the entire tree. This approach will not scale. Therefore we suggest using the optimisations listed above.
+In response to a selection change you want to call `render` on the minimum amount of `<Draggable />` and `<Droppable />` components as possible. In our example application whenever the selection changes we re-render the entire tree. This approach will not scale. Therefore we suggest using the optimisations listed above.
 
 In the event of a 'unselect all' action you might need to render a lot of components at once to clear their selected styles. For most usages this will be fine. If you want to go further you will need to avoid calling `render` for selection style changes.
 
@@ -303,3 +303,5 @@ Additionally, when a drag starts we can also update the appearance of a lot of `
 ### Drag count
 
 When dragging you need to display a count of the items that are dragging. In our example we provide this information down by re-rendering the tree. As with selection changes it would be good to only render the item that needs the change. You could publish this information down using `redux` and `redux-select`. For this particular problem you might be able to get away with [`unstated`](https://github.com/jamiebuilds/unstated) or the new [React 16.3 `Context` api](https://github.com/reactjs/rfcs/blob/master/text/0002-new-version-of-context.md).
+
+[← Back to documentation](/README.md#documentation-)

@@ -1,10 +1,6 @@
 // @flow
 import { getRect, type Position } from 'css-box-model';
 import { type ReactWrapper } from 'enzyme';
-import {
-  canLiftContextKey,
-  styleContextKey,
-} from '../../../../src/view/context-keys';
 import * as keyCodes from '../../../../src/view/key-codes';
 import { withKeyboard } from '../../../utils/user-input-util';
 import {
@@ -33,12 +29,14 @@ import {
   windowMouseMove,
 } from './util/events';
 import { getWrapper } from './util/wrappers';
-import type { Callbacks } from '../../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks } from '../../../../src/view/use-drag-handle/drag-handle-types';
+import type { AppContextValue } from '../../../../src/view/context/app-context';
+import basicContext from './util/app-context';
 
 const origin: Position = { x: 0, y: 0 };
 
 let callbacks: Callbacks;
-let wrapper: ReactWrapper;
+let wrapper: ReactWrapper<*>;
 
 beforeAll(() => {
   requestAnimationFrame.reset();
@@ -134,9 +132,9 @@ describe('initiation', () => {
 
   it('should not lift if the state does not currently allow lifting', () => {
     const customCallbacks: Callbacks = getStubCallbacks();
-    const customContext = {
-      [styleContextKey]: 'hello',
-      [canLiftContextKey]: () => false,
+    const customContext: AppContextValue = {
+      ...basicContext,
+      canLift: () => false,
     };
     const customWrapper = getWrapper(customCallbacks, customContext);
     const mock: MockEvent = createMockEvent();
@@ -202,6 +200,24 @@ describe('progress', () => {
       }),
     ).toBe(true);
     expect(event.defaultPrevented).toBe(false);
+  });
+
+  it('should not fire an onWindowScroll if it is not the window scrolling (ie11 bug)', () => {
+    // start the lift
+    pressSpacebar(wrapper);
+
+    // trigger scroll event
+    const scrollable: HTMLElement = document.createElement('div');
+    const fakeEvent: Event = new Event('scroll');
+    Object.defineProperties(fakeEvent, {
+      currentTarget: {
+        writable: true,
+        value: scrollable,
+      },
+    });
+    window.dispatchEvent(fakeEvent);
+
+    expect(callbacks.onWindowScroll).not.toHaveBeenCalled();
   });
 
   it('should prevent using keyboard keys that modify scroll', () => {
@@ -446,25 +462,23 @@ describe('cancel', () => {
   it('should cancel when the user pushes any mouse button', () => {
     const mouseButtons: number[] = [primaryButton, auxiliaryButton];
 
-    mouseButtons.forEach(
-      (button: number, index: number): void => {
-        const upArrowMock: MockEvent = createMockEvent();
+    mouseButtons.forEach((button: number, index: number): void => {
+      const upArrowMock: MockEvent = createMockEvent();
 
-        pressSpacebar(wrapper);
-        const mouseDownEvent: MouseEvent = windowMouseDown(origin, button);
-        // should now do nothing
-        pressArrowUp(wrapper, upArrowMock);
+      pressSpacebar(wrapper);
+      const mouseDownEvent: MouseEvent = windowMouseDown(origin, button);
+      // should now do nothing
+      pressArrowUp(wrapper, upArrowMock);
 
-        expect(
-          callbacksCalled(callbacks)({
-            onLift: index + 1,
-            onCancel: index + 1,
-          }),
-        ).toBe(true);
-        expect(mouseDownEvent.defaultPrevented).toBe(false);
-        expect(upArrowMock.preventDefault).not.toHaveBeenCalled();
-      },
-    );
+      expect(
+        callbacksCalled(callbacks)({
+          onLift: index + 1,
+          onCancel: index + 1,
+        }),
+      ).toBe(true);
+      expect(mouseDownEvent.defaultPrevented).toBe(false);
+      expect(upArrowMock.preventDefault).not.toHaveBeenCalled();
+    });
   });
 
   it('should not do anything if there is nothing dragging', () => {
@@ -504,6 +518,7 @@ describe('cancel', () => {
 describe('disabled mid drag', () => {
   it('should cancel the current drag', () => {
     pressSpacebar(wrapper);
+    wrapper.setProps({ isDragging: true });
 
     wrapper.setProps({
       isEnabled: false,
@@ -520,6 +535,8 @@ describe('disabled mid drag', () => {
   it('should drop any pending movements', () => {
     // lift
     pressSpacebar(wrapper);
+    wrapper.setProps({ isDragging: true });
+    wrapper.setProps({ isDragging: true });
     expect(callbacks.onLift).toHaveBeenCalledTimes(1);
 
     pressArrowUp(wrapper);
@@ -551,6 +568,7 @@ describe('disabled mid drag', () => {
   it('should stop preventing default action on events', () => {
     // setup
     pressSpacebar(wrapper);
+    wrapper.setProps({ isDragging: true });
     wrapper.setProps({
       isEnabled: false,
     });
@@ -618,6 +636,7 @@ describe('cancelled elsewhere in the app mid drag', () => {
 
 it('should call the onCancel prop if unmounted mid drag', () => {
   pressSpacebar(wrapper);
+  wrapper.setProps({ isDragging: true });
 
   wrapper.unmount();
 

@@ -1,9 +1,10 @@
 // @flow
 import invariant from 'tiny-invariant';
+import isHtmlElement from './is-type-of-element/is-html-element';
 
 export default (ref: ?mixed) => {
   invariant(
-    ref && ref instanceof HTMLElement,
+    ref && isHtmlElement(ref),
     `
     provided.innerRef has not been provided with a HTMLElement.
 

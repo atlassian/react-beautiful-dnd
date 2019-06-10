@@ -4,12 +4,11 @@ import type {
   Critical,
   DraggableId,
   DroppableId,
-  DropResult,
+  CompletedDrag,
   MovementMode,
   Viewport,
   DimensionMap,
   DropReason,
-  PendingDrop,
   Published,
 } from '../types';
 
@@ -230,34 +229,51 @@ export const moveLeft = (): MoveLeftAction => ({
   payload: null,
 });
 
-type CleanAction = {|
-  type: 'CLEAN',
-  payload: null,
+type CleanActionArgs = {|
+  shouldFlush: boolean,
 |};
 
-export const clean = (): CleanAction => ({
+type CleanAction = {|
   type: 'CLEAN',
-  payload: null,
+  payload: CleanActionArgs,
+|};
+
+export const clean = (
+  args?: CleanActionArgs = { shouldFlush: false },
+): CleanAction => ({
+  type: 'CLEAN',
+  payload: args,
 });
+
+export type AnimateDropArgs = {|
+  completed: CompletedDrag,
+  newHomeClientOffset: Position,
+  dropDuration: number,
+|};
 
 export type DropAnimateAction = {
   type: 'DROP_ANIMATE',
-  payload: PendingDrop,
+  payload: AnimateDropArgs,
 };
 
-export const animateDrop = (pending: PendingDrop): DropAnimateAction => ({
+export const animateDrop = (args: AnimateDropArgs): DropAnimateAction => ({
   type: 'DROP_ANIMATE',
-  payload: pending,
+  payload: args,
 });
+
+export type DropCompleteArgs = {|
+  completed: CompletedDrag,
+  shouldFlush: boolean,
+|};
 
 export type DropCompleteAction = {
   type: 'DROP_COMPLETE',
-  payload: DropResult,
+  payload: DropCompleteArgs,
 };
 
-export const completeDrop = (result: DropResult): DropCompleteAction => ({
+export const completeDrop = (args: DropCompleteArgs): DropCompleteAction => ({
   type: 'DROP_COMPLETE',
-  payload: result,
+  payload: args,
 });
 
 type DropArgs = {|

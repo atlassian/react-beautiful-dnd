@@ -14,6 +14,7 @@ import type {
   DimensionMarshal,
   Callbacks,
   DroppableCallbacks,
+  RecollectDroppableOptions,
 } from '../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   DroppableDimension,
@@ -47,7 +48,6 @@ export const getMarshalStub = (): DimensionMarshal => ({
   updateDraggable: jest.fn(),
   unregisterDraggable: jest.fn(),
   registerDroppable: jest.fn(),
-  updateDroppable: jest.fn(),
   unregisterDroppable: jest.fn(),
   updateDroppableScroll: jest.fn(),
   updateDroppableIsEnabled: jest.fn(),
@@ -112,8 +112,8 @@ export const populateMarshal = (
       scroll: (change: Position) => {
         watcher.droppable.scroll(id, change);
       },
-      recollect: () => {
-        watcher.droppable.recollect(id);
+      recollect: (options: RecollectDroppableOptions) => {
+        watcher.droppable.recollect(id, options);
         return droppable;
       },
       dragStopped: () => {

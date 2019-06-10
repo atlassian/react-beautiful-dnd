@@ -1,6 +1,6 @@
 // @flow
 import type { Action, Dispatch } from '../store-types';
-import type { StyleMarshal } from '../../view/style-marshal/style-marshal-types';
+import type { StyleMarshal } from '../../view/use-style-marshal/style-marshal-types';
 
 export default (marshal: StyleMarshal) => () => (next: Dispatch) => (
   action: Action,
@@ -10,7 +10,7 @@ export default (marshal: StyleMarshal) => () => (next: Dispatch) => (
   }
 
   if (action.type === 'DROP_ANIMATE') {
-    marshal.dropping(action.payload.result.reason);
+    marshal.dropping(action.payload.completed.result.reason);
   }
 
   // this will clear any styles immediately before a reorder

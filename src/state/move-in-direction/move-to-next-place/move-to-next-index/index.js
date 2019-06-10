@@ -7,40 +7,15 @@ import type {
   DragImpact,
   DisplacedBy,
   Displacement,
+  OnLift,
 } from '../../../../types';
 import type { Instruction } from './move-to-next-index-types';
 import getDisplacementMap from '../../../get-displacement-map';
 import { addClosest, removeClosest } from '../update-displacement';
-import getWillDisplaceForward from '../../../will-displace-forward';
 import getDisplacedBy from '../../../get-displaced-by';
 import fromReorder from './from-reorder';
 import fromCombine from './from-combine';
-
-type IsIncreasingDisplacementArgs = {|
-  isInHomeList: boolean,
-  isMovingForward: boolean,
-  proposedIndex: number,
-  startIndexInHome: number,
-|};
-
-const getIsIncreasingDisplacement = ({
-  isInHomeList,
-  isMovingForward,
-  proposedIndex,
-  startIndexInHome,
-}: IsIncreasingDisplacementArgs): boolean => {
-  // in foreign list moving forward will reduce the amount displaced
-  if (!isInHomeList) {
-    return !isMovingForward;
-  }
-
-  // increase displacement if moving forward past start
-  if (isMovingForward) {
-    return proposedIndex > startIndexInHome;
-  }
-  // increase displacement if moving backwards away from start
-  return proposedIndex < startIndexInHome;
-};
+import removeDraggableFromList from '../../../remove-draggable-from-list';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -50,6 +25,7 @@ export type Args = {|
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
+  onLift: OnLift,
 |};
 
 export default ({
@@ -60,32 +36,34 @@ export default ({
   destination,
   insideDestination,
   previousImpact,
+  onLift,
 }: Args): ?DragImpact => {
   const instruction: ?Instruction = (() => {
+    // moving from reorder
     if (previousImpact.destination) {
       return fromReorder({
         isMovingForward,
         isInHomeList,
         draggable,
-        previousImpact,
+        location: previousImpact.destination,
         insideDestination,
       });
     }
 
-    invariant(
-      previousImpact.merge,
-      'Cannot move to next spot without a destination or merge',
-    );
+    // moving from merge
+    if (previousImpact.merge) {
+      return fromCombine({
+        isMovingForward,
+        destination,
+        previousImpact,
+        draggables,
+        merge: previousImpact.merge,
+        onLift,
+      });
+    }
 
-    return fromCombine({
-      isInHomeList,
-      isMovingForward,
-      draggable,
-      destination,
-      previousImpact,
-      draggables,
-      merge: previousImpact.merge,
-    });
+    invariant('Cannot move to next spot without a destination or merge');
+    return null;
   })();
 
   if (instruction == null) {
@@ -93,46 +71,39 @@ export default ({
   }
 
   const { proposedIndex, modifyDisplacement } = instruction;
-  const startIndexInHome: number = draggable.descriptor.index;
-  const willDisplaceForward: boolean = getWillDisplaceForward({
-    isInHomeList,
-    proposedIndex,
-    startIndexInHome,
-  });
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
-    willDisplaceForward,
   );
 
-  const atProposedIndex: DraggableDimension = insideDestination[proposedIndex];
-
   const displaced: Displacement[] = (() => {
+    const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
+
     if (!modifyDisplacement) {
-      return previousImpact.movement.displaced;
+      return lastDisplaced;
     }
 
-    const isIncreasingDisplacement: boolean = getIsIncreasingDisplacement({
-      isInHomeList,
-      isMovingForward,
-      proposedIndex,
-      startIndexInHome,
-    });
+    if (isMovingForward) {
+      return removeClosest(lastDisplaced);
+    }
 
-    const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
-    return isIncreasingDisplacement
-      ? addClosest(atProposedIndex, lastDisplaced)
-      : removeClosest(lastDisplaced);
+    // moving backwards - will increase the amount of displaced items
+
+    const withoutDraggable: DraggableDimension[] = removeDraggableFromList(
+      draggable,
+      insideDestination,
+    );
+
+    const atProposedIndex: DraggableDimension = withoutDraggable[proposedIndex];
+    return addClosest(atProposedIndex, lastDisplaced);
   })();
 
   return {
     movement: {
       displacedBy,
-      willDisplaceForward,
       displaced,
       map: getDisplacementMap(displaced),
     },
-    direction: destination.axis.direction,
     destination: {
       droppableId: destination.descriptor.id,
       index: proposedIndex,

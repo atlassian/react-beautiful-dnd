@@ -1,25 +1,22 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { State, DropResult } from '../../../../src/types';
+import type { State } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
+import {
+  collectionStarting,
+  completeDrop,
+  drop,
+  initialPublish,
+  publishWhileDragging,
+} from '../../../../src/state/action-creators';
+import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
 import middleware from '../../../../src/state/middleware/pending-drop';
+import {
+  initialPublishWithScrollables,
+  publishAdditionArgs,
+} from '../../../utils/preset-action-args';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
-import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
-import getHomeLocation from '../../../../src/state/get-home-location';
-import {
-  initialPublish,
-  drop,
-  completeDrop,
-  publishWhileDragging,
-  collectionStarting,
-} from '../../../../src/state/action-creators';
-import {
-  getDragStart,
-  critical,
-  publishAdditionArgs,
-  initialPublishWithScrollables,
-} from '../../../utils/preset-action-args';
 
 it('should trigger a drop on a dynamic publish if a drop pending is waiting', () => {
   const mock = jest.fn();
@@ -46,13 +43,14 @@ it('should trigger a drop on a dynamic publish if a drop pending is waiting', ()
   store.dispatch(publishWhileDragging(publishAdditionArgs));
 
   expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
-  const expected: DropResult = {
-    ...getDragStart(),
-    destination: getHomeLocation(critical.draggable),
-    reason: 'DROP',
-    combine: null,
-  };
-  expect(mock).toHaveBeenCalledWith(completeDrop(expected));
+
+  expect(mock).toHaveBeenCalledWith(
+    completeDrop({
+      // $ExpectError - this calculation is not completed by this module and it is non trival
+      completed: expect.any(Object),
+      shouldFlush: false,
+    }),
+  );
   expect(mock).toHaveBeenCalledTimes(3);
   expect(store.getState().phase).toBe('IDLE');
 });

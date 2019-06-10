@@ -2,15 +2,16 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { forEach, type Control } from './util/controls';
-import { createRef } from './util/wrappers';
+import type { DragHandleProps } from '../../../../src/view/use-drag-handle/drag-handle-types';
+import { WithDragHandle } from './util/wrappers';
+import createRef from '../../../utils/create-ref';
 import {
   getStubCallbacks,
   callbacksCalled,
   whereAnyCallbacksCalled,
 } from './util/callbacks';
-import DragHandle from '../../../../src/view/drag-handle/drag-handle';
-import basicContext from './util/basic-context';
-import type { DragHandleProps } from '../../../../src/view/drag-handle/drag-handle-types';
+import basicContext from './util/app-context';
+import AppContext from '../../../../src/view/context/app-context';
 
 const draggableId = 'draggable';
 
@@ -27,20 +28,27 @@ forEach((control: Control) => {
       const callbacks = getStubCallbacks();
       const ref = createRef();
       const wrapper = mount(
-        <DragHandle
-          draggableId={draggableId}
-          callbacks={callbacks}
-          isDragging={false}
-          isDropAnimating={false}
-          isEnabled
-          getDraggableRef={ref.getRef}
-          canDragInteractiveElements={false}
-        >
-          {(dragHandleProps: ?DragHandleProps) => (
-            <div {...dragHandleProps} contentEditable ref={ref.setRef} />
-          )}
-        </DragHandle>,
-        { context: basicContext },
+        <AppContext.Provider value={basicContext}>
+          <WithDragHandle
+            draggableId={draggableId}
+            callbacks={callbacks}
+            isDragging={false}
+            isDropAnimating={false}
+            isEnabled
+            getDraggableRef={ref.getRef}
+            canDragInteractiveElements={false}
+            getShouldRespectForcePress={() => true}
+          >
+            {(dragHandleProps: ?DragHandleProps) => (
+              <div
+                {...dragHandleProps}
+                className="drag-handle"
+                contentEditable
+                ref={ref.setRef}
+              />
+            )}
+          </WithDragHandle>
+        </AppContext.Provider>,
       );
       const target = wrapper.getDOMNode();
       const options = {
@@ -64,22 +72,28 @@ forEach((control: Control) => {
       const customCallbacks = getStubCallbacks();
       const ref = createRef();
       const customWrapper = mount(
-        <DragHandle
-          draggableId={draggableId}
-          callbacks={customCallbacks}
-          isDragging={false}
-          isDropAnimating={false}
-          isEnabled
-          getDraggableRef={ref.getRef}
-          canDragInteractiveElements={false}
-        >
-          {(dragHandleProps: ?DragHandleProps) => (
-            <div {...dragHandleProps} ref={ref.setRef}>
-              <div className="editable" contentEditable />
-            </div>
-          )}
-        </DragHandle>,
-        { context: basicContext },
+        <AppContext.Provider value={basicContext}>
+          <WithDragHandle
+            draggableId={draggableId}
+            callbacks={customCallbacks}
+            isDragging={false}
+            isDropAnimating={false}
+            isEnabled
+            getDraggableRef={ref.getRef}
+            canDragInteractiveElements={false}
+            getShouldRespectForcePress={() => true}
+          >
+            {(dragHandleProps: ?DragHandleProps) => (
+              <div
+                {...dragHandleProps}
+                className="drag-handle"
+                ref={ref.setRef}
+              >
+                <div className="editable" contentEditable />
+              </div>
+            )}
+          </WithDragHandle>
+        </AppContext.Provider>,
       );
       const target = customWrapper.getDOMNode().querySelector('.editable');
       if (!target) {
@@ -102,25 +116,31 @@ forEach((control: Control) => {
       const customCallbacks = getStubCallbacks();
       const ref = createRef();
       const customWrapper = mount(
-        <DragHandle
-          draggableId={draggableId}
-          callbacks={customCallbacks}
-          isDragging={false}
-          isDropAnimating={false}
-          isEnabled
-          getDraggableRef={ref.getRef}
-          canDragInteractiveElements={false}
-        >
-          {(dragHandleProps: ?DragHandleProps) => (
-            <div {...dragHandleProps} ref={ref.setRef}>
-              <div className="editable" contentEditable>
-                <p>hello there</p>
-                <span className="target">Edit me!</span>
+        <AppContext.Provider value={basicContext}>
+          <WithDragHandle
+            draggableId={draggableId}
+            callbacks={customCallbacks}
+            isDragging={false}
+            isDropAnimating={false}
+            isEnabled
+            getDraggableRef={ref.getRef}
+            canDragInteractiveElements={false}
+            getShouldRespectForcePress={() => true}
+          >
+            {(dragHandleProps: ?DragHandleProps) => (
+              <div
+                {...dragHandleProps}
+                className="drag-handle"
+                ref={ref.setRef}
+              >
+                <div className="editable" contentEditable>
+                  <p>hello there</p>
+                  <span className="target">Edit me!</span>
+                </div>
               </div>
-            </div>
-          )}
-        </DragHandle>,
-        { context: basicContext },
+            )}
+          </WithDragHandle>
+        </AppContext.Provider>,
       );
       const target = customWrapper.getDOMNode().querySelector('.target');
       if (!target) {
@@ -147,25 +167,31 @@ forEach((control: Control) => {
       const customCallbacks = getStubCallbacks();
       const ref = createRef();
       const customWrapper = mount(
-        <DragHandle
-          draggableId={draggableId}
-          callbacks={customCallbacks}
-          isDragging={false}
-          isDropAnimating={false}
-          isEnabled
-          getDraggableRef={ref.getRef}
-          canDragInteractiveElements={false}
-        >
-          {(dragHandleProps: ?DragHandleProps) => (
-            <div {...dragHandleProps} ref={ref.setRef}>
-              <div className="editable" contentEditable={false}>
-                <p>hello there</p>
-                <span className="target">Edit me!</span>
+        <AppContext.Provider value={basicContext}>
+          <WithDragHandle
+            draggableId={draggableId}
+            callbacks={customCallbacks}
+            isDragging={false}
+            isDropAnimating={false}
+            isEnabled
+            getDraggableRef={ref.getRef}
+            canDragInteractiveElements={false}
+            getShouldRespectForcePress={() => true}
+          >
+            {(dragHandleProps: ?DragHandleProps) => (
+              <div
+                {...dragHandleProps}
+                className="drag-handle"
+                ref={ref.setRef}
+              >
+                <div className="editable" contentEditable={false}>
+                  <p>hello there</p>
+                  <span className="target">Edit me!</span>
+                </div>
               </div>
-            </div>
-          )}
-        </DragHandle>,
-        { context: basicContext },
+            )}
+          </WithDragHandle>
+        </AppContext.Provider>,
       );
       const target = customWrapper.getDOMNode().querySelector('.target');
       if (!target) {
@@ -177,12 +203,10 @@ forEach((control: Control) => {
 
       control.preLift(customWrapper, options);
       control.lift(customWrapper, options);
-      control.drop(customWrapper);
 
       expect(
         callbacksCalled(customCallbacks)({
           onLift: 1,
-          onDrop: 1,
         }),
       ).toBe(true);
 
@@ -195,23 +219,29 @@ forEach((control: Control) => {
       const customCallbacks = getStubCallbacks();
       const ref = createRef();
       const customWrapper = mount(
-        <DragHandle
-          draggableId={draggableId}
-          callbacks={customCallbacks}
-          isDragging={false}
-          isDropAnimating={false}
-          isEnabled
-          getDraggableRef={ref.getRef}
-          // stating that we can drag
-          canDragInteractiveElements
-        >
-          {(dragHandleProps: ?DragHandleProps) => (
-            <div {...dragHandleProps} ref={ref.setRef}>
-              <div className="editable" contentEditable />
-            </div>
-          )}
-        </DragHandle>,
-        { context: basicContext },
+        <AppContext.Provider value={basicContext}>
+          <WithDragHandle
+            draggableId={draggableId}
+            callbacks={customCallbacks}
+            isDragging={false}
+            isDropAnimating={false}
+            isEnabled
+            getDraggableRef={ref.getRef}
+            getShouldRespectForcePress={() => true}
+            // stating that we can drag
+            canDragInteractiveElements
+          >
+            {(dragHandleProps: ?DragHandleProps) => (
+              <div
+                {...dragHandleProps}
+                className="drag-handle"
+                ref={ref.setRef}
+              >
+                <div className="editable" contentEditable />
+              </div>
+            )}
+          </WithDragHandle>
+        </AppContext.Provider>,
       );
       const target = customWrapper.getDOMNode().querySelector('.editable');
       if (!target) {
@@ -223,12 +253,10 @@ forEach((control: Control) => {
 
       control.preLift(customWrapper, options);
       control.lift(customWrapper, options);
-      control.drop(customWrapper);
 
       expect(
         callbacksCalled(customCallbacks)({
           onLift: 1,
-          onDrop: 1,
         }),
       ).toBe(true);
 
@@ -239,26 +267,32 @@ forEach((control: Control) => {
       const customCallbacks = getStubCallbacks();
       const ref = createRef();
       const customWrapper = mount(
-        <DragHandle
-          draggableId={draggableId}
-          callbacks={customCallbacks}
-          isDragging={false}
-          isDropAnimating={false}
-          isEnabled
-          getDraggableRef={ref.getRef}
-          // stating that we can drag
-          canDragInteractiveElements
-        >
-          {(dragHandleProps: ?DragHandleProps) => (
-            <div {...dragHandleProps} ref={ref.setRef}>
-              <div className="editable" contentEditable>
-                <p>hello there</p>
-                <span className="target">Edit me!</span>
+        <AppContext.Provider value={basicContext}>
+          <WithDragHandle
+            draggableId={draggableId}
+            callbacks={customCallbacks}
+            isDragging={false}
+            isDropAnimating={false}
+            isEnabled
+            getDraggableRef={ref.getRef}
+            getShouldRespectForcePress={() => true}
+            // stating that we can drag
+            canDragInteractiveElements
+          >
+            {(dragHandleProps: ?DragHandleProps) => (
+              <div
+                {...dragHandleProps}
+                className="drag-handle"
+                ref={ref.setRef}
+              >
+                <div className="editable" contentEditable>
+                  <p>hello there</p>
+                  <span className="target">Edit me!</span>
+                </div>
               </div>
-            </div>
-          )}
-        </DragHandle>,
-        { context: basicContext },
+            )}
+          </WithDragHandle>
+        </AppContext.Provider>,
       );
       const target = customWrapper.getDOMNode().querySelector('.target');
       if (!target) {
@@ -270,12 +304,10 @@ forEach((control: Control) => {
 
       control.preLift(customWrapper, options);
       control.lift(customWrapper, options);
-      control.drop(customWrapper);
 
       expect(
         callbacksCalled(customCallbacks)({
           onLift: 1,
-          onDrop: 1,
         }),
       ).toBe(true);
 

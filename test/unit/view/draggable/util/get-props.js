@@ -24,6 +24,7 @@ export const defaultOwnProps: OwnProps = {
   index: 0,
   isDragDisabled: false,
   disableInteractiveElementBlocking: false,
+  shouldRespectForcePress: true,
   // will be overwritten
   children: () => null,
 };

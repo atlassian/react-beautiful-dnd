@@ -1,5 +1,5 @@
 // @flow
-import type { Callbacks } from '../../../../../src/view/drag-handle/drag-handle-types';
+import type { Callbacks } from '../../../../../src/view/use-drag-handle/drag-handle-types';
 
 export const getStubCallbacks = (): Callbacks => ({
   onLift: jest.fn(),
@@ -40,6 +40,7 @@ export const callbacksCalled = (callbacks: Callbacks) => ({
   onMoveLeft = 0,
   onDrop = 0,
   onCancel = 0,
+  onWindowScroll = 0,
 }: CallBacksCalledFn = {}) =>
   callbacks.onLift.mock.calls.length === onLift &&
   callbacks.onMove.mock.calls.length === onMove &&
@@ -48,7 +49,8 @@ export const callbacksCalled = (callbacks: Callbacks) => ({
   callbacks.onDrop.mock.calls.length === onDrop &&
   callbacks.onCancel.mock.calls.length === onCancel &&
   callbacks.onMoveRight.mock.calls.length === onMoveRight &&
-  callbacks.onMoveLeft.mock.calls.length === onMoveLeft;
+  callbacks.onMoveLeft.mock.calls.length === onMoveLeft &&
+  callbacks.onWindowScroll.mock.calls.length === onWindowScroll;
 
 export const whereAnyCallbacksCalled = (callbacks: Callbacks) =>
   !callbacksCalled(callbacks)();

@@ -15,6 +15,7 @@ import {
 import type { Store } from '../../../../../src/state/store-types';
 import getResponders from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
+import getCompletedWithResult from './util/get-completed-with-result';
 
 const result: DropResult = {
   ...getDragStart(),
@@ -71,7 +72,12 @@ it('should flush any pending responders if a drop occurs', () => {
   expect(responders.onDragStart).not.toHaveBeenCalled();
   expect(responders.onDragUpdate).not.toHaveBeenCalled();
 
-  store.dispatch(completeDrop(result));
+  store.dispatch(
+    completeDrop({
+      completed: getCompletedWithResult(result, store.getState()),
+      shouldFlush: false,
+    }),
+  );
   expect(responders.onDragStart).toHaveBeenCalledTimes(1);
   expect(responders.onDragUpdate).toHaveBeenCalledTimes(2);
   expect(responders.onDragEnd).toHaveBeenCalledWith(result, expect.any(Object));
@@ -89,7 +95,12 @@ it('should work across multiple drags', () => {
     expect(responders.onDragStart).not.toHaveBeenCalled();
     expect(responders.onDragUpdate).not.toHaveBeenCalled();
 
-    store.dispatch(completeDrop(result));
+    store.dispatch(
+      completeDrop({
+        completed: getCompletedWithResult(result, store.getState()),
+        shouldFlush: false,
+      }),
+    );
     expect(responders.onDragStart).toHaveBeenCalledTimes(1);
     expect(responders.onDragUpdate).toHaveBeenCalledTimes(1);
     expect(responders.onDragEnd).toHaveBeenCalledWith(

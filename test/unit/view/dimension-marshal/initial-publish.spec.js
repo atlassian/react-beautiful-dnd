@@ -186,8 +186,8 @@ it('should publish droppables that have been updated (id change)', () => {
       id: 'some new id',
     },
   };
-  marshal.updateDroppable(
-    preset.home.descriptor,
+  marshal.unregisterDroppable(preset.home.descriptor);
+  marshal.registerDroppable(
     updatedHome.descriptor,
     getDroppableCallbacks(updatedHome),
   );

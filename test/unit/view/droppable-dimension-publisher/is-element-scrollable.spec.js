@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import getClosestScrollable from '../../../../src/view/droppable-dimension-publisher/get-closest-scrollable';
+import getClosestScrollable from '../../../../src/view/use-droppable-dimension-publisher/get-closest-scrollable';
 
 it('should return true if an element has overflow:auto or overflow:scroll', () => {
   ['overflowY', 'overflowX'].forEach((overflow: string) => {

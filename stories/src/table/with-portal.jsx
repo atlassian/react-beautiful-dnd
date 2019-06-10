@@ -1,10 +1,12 @@
 // @flow
+/* eslint-disable react/sort-comp */
 import React, { Component, Fragment, type Node } from 'react';
 import ReactDOM from 'react-dom';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
+import { colors } from '@atlaskit/theme';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import reorder from '../reorder';
-import { colors, grid } from '../constants';
+import { grid } from '../constants';
 import type { Quote } from '../types';
 import type {
   DropResult,
@@ -26,11 +28,11 @@ const TBody = styled.tbody`
 const THead = styled.thead`
   border: 0;
   border-bottom: none;
-  background-color: ${colors.grey.light};
+  background-color: ${colors.N20};
 `;
 
 const Row = styled.tr`
-  ${props => (props.isDragging ? `background: ${colors.green};` : '')};
+  ${props => (props.isDragging ? `background: ${colors.G50};` : '')};
 `;
 
 const Cell = styled.td`
@@ -57,7 +59,6 @@ type SnapshotMap = {
 const snapshotMap: SnapshotMap = {};
 
 class TableCell extends React.Component<TableCellProps> {
-  // eslint-disable-next-line react/sort-comp
   ref: ?HTMLElement;
 
   componentDidMount() {
@@ -181,6 +182,8 @@ Object.assign(table.style, {
   margin: '0',
   padding: '0',
   border: '0',
+  height: '0',
+  width: '0',
 });
 const tbody: HTMLElement = document.createElement('tbody');
 table.appendChild(tbody);
@@ -387,6 +390,7 @@ export default class TableApp extends Component<AppProps, AppState> {
                         )}
                       </Draggable>
                     ))}
+                    {droppableProvided.placeholder}
                   </TBody>
                 )}
               </Droppable>

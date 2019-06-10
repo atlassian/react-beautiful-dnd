@@ -9,7 +9,15 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   parser: 'babel-eslint',
-  plugins: ['prettier', 'flowtype', 'react', 'import', 'jest'],
+  plugins: [
+    'prettier',
+    'flowtype',
+    'emotion',
+    'react',
+    'react-hooks',
+    'import',
+    'jest',
+  ],
   env: {
     es6: true,
     browser: true,
@@ -47,12 +55,70 @@ module.exports = {
     // Allowing ++ on numbers
     'no-plusplus': 'off',
 
+    'no-restricted-syntax': [
+      // Nicer booleans #1
+      // Disabling the use of !! to cast to boolean
+      'error',
+      {
+        selector:
+          'UnaryExpression[operator="!"] > UnaryExpression[operator="!"]',
+        message:
+          '!! to cast to boolean relies on a double negative. Use Boolean() instead',
+      },
+      // Nicer booleans #2
+      // Avoiding accidental `new Boolean()` calls
+      // (also covered by `no-new-wrappers` but i am having fun)
+      {
+        selector: 'NewExpression[callee.name="Boolean"]',
+        message:
+          'Avoid using constructor: `new Boolean(value)` as it creates a Boolean object. Did you mean `Boolean(value)`?',
+      },
+      // We are using a useLayoutEffect / useEffect switch to avoid SSR warnings for useLayoutEffect
+      // We want to ensure we use `import useEffect from '*use-isomorphic-layout-effect'`
+      // to ensure we still get the benefits of `eslint-plugin-react-hooks`
+      {
+        selector:
+          'ImportDeclaration[source.value=/use-isomorphic-layout-effect/] > ImportDefaultSpecifier[local.name!="useLayoutEffect"]',
+        message:
+          'Must use `useLayoutEffect` as the name of the import from `*use-isomorphic-layout-effect` to leverage `eslint-plugin-react-hooks`',
+      },
+    ],
+
     // Allowing Math.pow rather than forcing `**`
     'no-restricted-properties': [
       'off',
       {
         object: 'Math',
         property: 'pow',
+      },
+    ],
+
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          // Forcing use of useMemoOne
+          {
+            name: 'react',
+            importNames: ['useMemo', 'useCallback'],
+            message:
+              '`useMemo` and `useCallback` are subject to cache busting. Please use `useMemoOne`',
+          },
+          // Forcing use aliased imports from useMemoOne
+          {
+            name: 'use-memo-one',
+            importNames: ['useMemoOne', 'useCallbackOne'],
+            message:
+              'use-memo-one exports `useMemo` and `useCallback` which work nicer with `eslint-plugin-react-hooks`',
+          },
+          // Disabling using of useLayoutEffect from react
+          {
+            name: 'react',
+            importNames: ['useLayoutEffect'],
+            message:
+              '`useLayoutEffect` causes a warning in SSR. Use `useIsomorphicLayoutEffect`',
+          },
+        ],
       },
     ],
 
@@ -80,6 +146,9 @@ module.exports = {
     // Adding 'skipShapeProps' as the rule has issues with correctly handling PropTypes.shape
     'react/no-unused-prop-types': ['error', { skipShapeProps: true }],
 
+    // Having issues with this rule not working correctly
+    'react/default-props-match-prop-types': 'off',
+
     // Require // @flow at the top of files
     'flowtype/require-valid-file-annotation': [
       'error',
@@ -89,5 +158,10 @@ module.exports = {
 
     // Allowing importing from dev deps (for stories and tests)
     'import/no-extraneous-dependencies': 'off',
+
+    // Enforce rules of hooks
+    'react-hooks/rules-of-hooks': 'error',
+    // Second argument to hook functions
+    'react-hooks/exhaustive-deps': 'warn',
   },
 };

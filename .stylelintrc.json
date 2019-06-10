@@ -1,5 +1,12 @@
 {
-  "processors": ["stylelint-processor-styled-components"],
+  "processors": [
+    [
+      "stylelint-processor-styled-components",
+      {
+        "moduleName": "@emotion/styled"
+      }
+    ]
+  ],
   "extends": [
     "stylelint-config-standard",
     "stylelint-config-styled-components",

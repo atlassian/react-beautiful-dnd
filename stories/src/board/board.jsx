@@ -1,16 +1,17 @@
 // @flow
 import React, { Component } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
-import Column from './column';
-import { colors } from '../constants';
-import reorder, { reorderQuoteMap } from '../reorder';
-import { DragDropContext, Droppable } from '../../../src';
+import styled from '@emotion/styled';
+import { Global, css } from '@emotion/core';
+import { colors } from '@atlaskit/theme';
 import type {
   DropResult,
   DraggableLocation,
   DroppableProvided,
 } from '../../../src';
 import type { QuoteMap, Quote } from '../types';
+import Column from './column';
+import reorder, { reorderQuoteMap } from '../reorder';
+import { DragDropContext, Droppable } from '../../../src';
 
 const ParentContainer = styled.div`
   height: ${({ height }) => height};
@@ -19,8 +20,8 @@ const ParentContainer = styled.div`
 `;
 
 const Container = styled.div`
+  background-color: ${colors.B100};
   min-height: 100vh;
-
   /* like display:flex but will allow bleeding over the window width */
   min-width: 100vw;
   display: inline-flex;
@@ -37,12 +38,6 @@ type State = {|
   columns: QuoteMap,
   ordered: string[],
 |};
-
-const GlobalStyle = createGlobalStyle`
-  body {
-    background: ${colors.blue.deep};
-  }
-`;
 
 export default class Board extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
@@ -144,6 +139,7 @@ export default class Board extends Component<Props, State> {
                 isCombineEnabled={this.props.isCombineEnabled}
               />
             ))}
+            {provided.placeholder}
           </Container>
         )}
       </Droppable>
@@ -158,7 +154,13 @@ export default class Board extends Component<Props, State> {
             board
           )}
         </DragDropContext>
-        <GlobalStyle />
+        <Global
+          styles={css`
+            body {
+              background: ${colors.B200};
+            }
+          `}
+        />
       </React.Fragment>
     );
   }

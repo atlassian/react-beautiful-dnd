@@ -31,11 +31,14 @@ export default ({
   // We are not considering margins for this calculation.
   // This is because a move might move a Draggable slightly outside of the bounds
   // of a Droppable (which is okay)
-  const diff: Position = subtract(
+  const changeNeeded: Position = subtract(
     newPageBorderBoxCenter,
     draggable.page.borderBox.center,
   );
-  const shifted: Spacing = offsetByPosition(draggable.page.borderBox, diff);
+  const shifted: Spacing = offsetByPosition(
+    draggable.page.borderBox,
+    changeNeeded,
+  );
 
   // Must be totally visible, not just partially visible.
   const args: IsVisibleArgs = {
@@ -45,9 +48,5 @@ export default ({
     viewport,
   };
 
-  if (onlyOnMainAxis) {
-    return isTotallyVisibleOnAxis(args);
-  }
-
-  return isTotallyVisible(args);
+  return onlyOnMainAxis ? isTotallyVisibleOnAxis(args) : isTotallyVisible(args);
 };

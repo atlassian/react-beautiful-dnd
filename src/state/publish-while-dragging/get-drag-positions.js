@@ -77,9 +77,7 @@ export default ({
       isEqual(oldCurrent.client.borderBoxCenter, client.borderBoxCenter),
       `
         Incorrect new client center position.
-        Expected (${oldCurrent.client.borderBoxCenter.x}, ${
-        oldCurrent.client.borderBoxCenter.y
-      })
+        Expected (${oldCurrent.client.borderBoxCenter.x}, ${oldCurrent.client.borderBoxCenter.y})
         to equal (${client.borderBoxCenter.x}, ${client.borderBoxCenter.y})
       `,
     );

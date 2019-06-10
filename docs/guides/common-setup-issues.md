@@ -16,18 +16,57 @@ If you are not sure if your `package.json` version satisfies `16.3.1` have a rea
 
 ## No duplicate ids
 
-`draggableId` and `droppableId` values must be unique for the whole `DragDropContext` and not just a list.
+`draggableId` and `droppableId` values must be unique for the whole `<DragDropContext />` and not just a list.
 
 More information: [identifiers guide](/docs/guides/identifiers.md)
 
-## No margin collapsing between `Draggables`
+## `<Draggable />` indexes
 
-This can happen if you have a `margin-top` as well as a `margin-bottom` on a `Draggable`.
+Rules:
 
-[More information](https://github.com/atlassian/react-beautiful-dnd#unsupported-margin-setups)
+- Must start from `0`
+- Must be consecutive. `[0, 1, 2]` and not `[1, 2, 8]`
+- Must be unique with a `<Droppable />` (no duplicates)
+
+[More information](/docs/api/draggable.md#draggable-props)
+
+## No margin collapsing between `<Draggable />`s
+
+This can happen if you have a `margin-top` as well as a `margin-bottom` on a `<Draggable />`.
+
+[More information](/docs/api/draggable.md#unsupported-margin-setups)
+
+## `key`s for a list of `<Draggable />`
+
+If you are rendering a list of `<Draggable />`s then it is important that you add a [`key`](https://reactjs.org/docs/lists-and-keys.html) prop to each `<Draggable />`.
+
+```js
+return items.map((item, index) => (
+  <Draggable
+    // adding a key is important!
+    key={item.id}
+    draggableId={item.id}
+    index={index}
+  >
+    {(provided, snapshot) => (
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+      >
+        {item.content}
+      </div>
+    )}
+  </Draggable>
+));
+```
+
+[More information](/docs/api/draggable.md)
 
 ## Avoid empty lists
 
-We recommend you set a `min-height` or `min-width` on a `Droppable` to ensure that there is a visible drop target when a list is empty
+We recommend you set a `min-height` or `min-width` on a `<Droppable />` to ensure that there is a visible drop target when a list is empty
 
 We go over this in our [Get started with `react-beautiful-dnd` course](https://egghead.io/lessons/react-move-items-between-columns-with-react-beautiful-dnd-using-ondragend)
+
+[← Back to documentation](/README.md#documentation-)

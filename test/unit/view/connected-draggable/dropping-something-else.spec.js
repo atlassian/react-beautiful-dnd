@@ -5,7 +5,6 @@ import getStatePreset from '../../../utils/get-simple-state-preset';
 import {
   draggingStates,
   withImpact,
-  withPending,
   type IsDraggingState,
 } from '../../../utils/dragging-state';
 import getOwnProps from './util/get-own-props';
@@ -18,51 +17,27 @@ import type {
   Axis,
   DragImpact,
   DropAnimatingState,
-  PendingDrop,
-  Displacement,
   DisplacedBy,
 } from '../../../../src/types';
-import getDisplacementMap from '../../../../src/state/get-displacement-map';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import getSecondaryMapProps from './util/get-secondary-map-props';
+import { getSecondarySnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
 const state = getStatePreset();
-
-const ownProps: OwnProps = getOwnProps(preset.inHome2);
 const axis: Axis = preset.home.axis;
 
-const willDisplaceForward: boolean = false;
 const displacedBy: DisplacedBy = getDisplacedBy(
   axis,
   preset.inHome1.displaceBy,
-  willDisplaceForward,
 );
-const displaced: Displacement[] = [
-  {
-    draggableId: ownProps.draggableId,
-    isVisible: true,
-    shouldAnimate: true,
-  },
-];
-const impact: DragImpact = {
-  movement: {
-    displaced,
-    map: getDisplacementMap(displaced),
-    displacedBy,
-    willDisplaceForward,
-  },
-  direction: preset.home.axis.direction,
-  destination: {
-    index: preset.inHome1.descriptor.index,
-    droppableId: preset.home.descriptor.id,
-  },
-  merge: null,
-};
+
+const impact: DragImpact = state.dropAnimating().completed.impact;
 
 draggingStates.forEach((current: IsDraggingState) => {
   describe(`in phase ${current.phase}`, () => {
     describe('was displaced before drop', () => {
+      const ownProps: OwnProps = getOwnProps(preset.inHome2);
       it('should continue to be moved out of the way', () => {
         const selector: Selector = makeMapStateToProps();
 
@@ -70,11 +45,14 @@ draggingStates.forEach((current: IsDraggingState) => {
         const whileDragging: MapProps = selector(dragging, ownProps);
 
         const expected: MapProps = {
-          dragging: null,
-          secondary: {
+          mapped: {
+            type: 'SECONDARY',
             offset: displacedBy.point,
             combineTargetFor: null,
-            shouldAnimateDisplacement: true,
+            shouldAnimateDisplacement: false,
+            snapshot: getSecondarySnapshot({
+              combineTargetFor: null,
+            }),
           },
         };
         expect(whileDragging).toEqual(expected);
@@ -90,18 +68,8 @@ draggingStates.forEach((current: IsDraggingState) => {
           displacedBy.point,
         );
 
-        const base: DropAnimatingState = state.dropAnimating();
-        const pending: PendingDrop = {
-          newHomeClientOffset: { x: 10, y: 20 },
-          // being super caucious
-          impact: JSON.parse(JSON.stringify(impact)),
-          result: base.pending.result,
-          dropDuration: base.pending.dropDuration,
-        };
-
-        const dropping: DropAnimatingState = withPending(
-          state.dropAnimating(),
-          pending,
+        const dropping: DropAnimatingState = JSON.parse(
+          JSON.stringify(state.dropAnimating()),
         );
         const whileDropping: MapProps = selector(dropping, ownProps);
         expect(whileDropping).toBe(whileDragging);
@@ -110,13 +78,17 @@ draggingStates.forEach((current: IsDraggingState) => {
 
     describe('was not displaced before drop', () => {
       it('should not break memoization', () => {
+        const ownProps: OwnProps = getOwnProps(preset.inForeign1);
         const selector: Selector = makeMapStateToProps();
         const expected: MapProps = {
-          dragging: null,
-          secondary: {
+          mapped: {
+            type: 'SECONDARY',
             offset: { x: 0, y: 0 },
             shouldAnimateDisplacement: true,
             combineTargetFor: null,
+            snapshot: getSecondarySnapshot({
+              combineTargetFor: null,
+            }),
           },
         };
 

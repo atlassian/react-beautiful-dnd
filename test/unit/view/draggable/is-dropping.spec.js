@@ -1,5 +1,4 @@
 // @flow
-import type { ReactWrapper } from 'enzyme';
 import { type Position } from 'css-box-model';
 import type {
   MapProps,
@@ -16,31 +15,15 @@ import {
   atRestMapProps,
   getDispatchPropsStub,
   whileDropping,
-  droppable,
 } from './util/get-props';
-import Placeholder from '../../../../src/view/placeholder';
 import getLastCall from './util/get-last-call';
-import { zIndexOptions } from '../../../../src/view/draggable/draggable';
+import { zIndexOptions } from '../../../../src/view/draggable/get-style';
 import {
   transitions,
   curves,
   combine,
   transforms,
-} from '../../../../src/view/animation';
-
-it('should render a placeholder', () => {
-  const myMock = jest.fn();
-
-  const wrapper: ReactWrapper = mount({
-    mapProps: whileDragging,
-    WrappedComponent: getStubber(myMock),
-  });
-
-  expect(wrapper.find(Placeholder).exists()).toBe(true);
-  expect(wrapper.find(Placeholder).props().placeholder).toBe(
-    preset.inHome1.placeholder,
-  );
-});
+} from '../../../../src/animation';
 
 it('should animate a drop to a provided offset', () => {
   const myMock = jest.fn();
@@ -54,9 +37,9 @@ it('should animate a drop to a provided offset', () => {
     scale: null,
   };
   const mapProps: MapProps = {
-    ...whileDragging,
-    dragging: {
-      ...whileDragging.dragging,
+    mapped: {
+      type: 'DRAGGING',
+      ...whileDragging.mapped,
       offset,
       dropping,
     },
@@ -97,9 +80,9 @@ it('should animate opacity and scale when combining', () => {
     scale: combine.scale.drop,
   };
   const mapProps: MapProps = {
-    ...whileDragging,
-    dragging: {
-      ...whileDragging.dragging,
+    mapped: {
+      type: 'DRAGGING',
+      ...whileDragging.mapped,
       combineWith: preset.inHome2.descriptor.id,
       offset,
       dropping,
@@ -142,9 +125,9 @@ it('should trigger a drop animation finished action when the transition is finis
     scale: null,
   };
   const mapProps: MapProps = {
-    ...whileDragging,
-    dragging: {
-      ...whileDragging.dragging,
+    mapped: {
+      type: 'DRAGGING',
+      ...whileDragging.mapped,
       offset,
       dropping,
     },
@@ -158,14 +141,60 @@ it('should trigger a drop animation finished action when the transition is finis
 
   expect(dispatchPropsStub.dropAnimationFinished).not.toHaveBeenCalled();
 
-  wrapper.simulate('transitionEnd');
+  // $ExpectError - invalid event
+  const event: TransitionEvent = {
+    propertyName: 'transform',
+  };
+  wrapper.simulate('transitionend', event);
 
   expect(dispatchPropsStub.dropAnimationFinished).toHaveBeenCalled();
+});
+
+it('should not trigger a drop finished when a non-primary property finishes transitioning', () => {
+  const myMock = jest.fn();
+  const dispatchPropsStub = getDispatchPropsStub();
+  const offset: Position = { x: 10, y: 20 };
+  const duration: number = 1;
+  const dropping: DropAnimation = {
+    duration,
+    curve: curves.drop,
+    moveTo: offset,
+    opacity: null,
+    scale: null,
+  };
+  const mapProps: MapProps = {
+    mapped: {
+      type: 'DRAGGING',
+      ...whileDragging.mapped,
+      offset,
+      dropping,
+    },
+  };
+
+  const wrapper = mount({
+    mapProps,
+    dispatchProps: dispatchPropsStub,
+    WrappedComponent: getStubber(myMock),
+  });
+
+  expect(dispatchPropsStub.dropAnimationFinished).not.toHaveBeenCalled();
+
+  // $ExpectError - invalid event
+  const event: TransitionEvent = {
+    propertyName: 'background',
+  };
+  wrapper.simulate('transitionend', event);
+
+  expect(dispatchPropsStub.dropAnimationFinished).not.toHaveBeenCalled();
 });
 
 it('should only trigger a drop animation finished event if a transition end occurs while dropping', () => {
   const myMock = jest.fn();
   const dispatchPropsStub = getDispatchPropsStub();
+  // $ExpectError - invalid event
+  const event: TransitionEvent = {
+    propertyName: 'transform',
+  };
 
   // not trigger at rest
   const wrapper = mount({
@@ -173,57 +202,28 @@ it('should only trigger a drop animation finished event if a transition end occu
     dispatchProps: dispatchPropsStub,
     WrappedComponent: getStubber(myMock),
   });
-  wrapper.simulate('transitionEnd');
+  wrapper.simulate('transitionend', event);
   expect(dispatchPropsStub.dropAnimationFinished).not.toHaveBeenCalled();
 
   // not triggered during drag
   wrapper.setProps(whileDragging);
-  wrapper.simulate('transitionEnd');
+  wrapper.simulate('transitionend', event);
   expect(dispatchPropsStub.dropAnimationFinished).not.toHaveBeenCalled();
 
   // triggered during drop
   wrapper.setProps(whileDropping);
-  wrapper.simulate('transitionEnd');
+  wrapper.simulate('transitionend', event);
   expect(dispatchPropsStub.dropAnimationFinished).toHaveBeenCalled();
 });
 
-describe('snapshot', () => {
-  it('should let consumers know a drop is occuring and provide drop animation information', () => {
-    const offset: Position = { x: 10, y: 20 };
-    const duration: number = 1;
-    const dropping: DropAnimation = {
-      duration,
-      curve: curves.drop,
-      moveTo: offset,
-      opacity: null,
-      scale: null,
-    };
-    const mapProps: MapProps = {
-      ...whileDragging,
-      dragging: {
-        ...whileDragging.dragging,
-        offset,
-        dropping,
-      },
-    };
-    const myMock = jest.fn();
+it('should pass along snapshots', () => {
+  const myMock = jest.fn();
 
-    mount({
-      mapProps,
-      WrappedComponent: getStubber(myMock),
-    });
-
-    const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
-    const expected: StateSnapshot = {
-      // still set to true while dropping
-      isDragging: true,
-      isDropAnimating: true,
-      dropAnimation: dropping,
-      draggingOver: droppable.id,
-      combineWith: null,
-      combineTargetFor: null,
-      mode: 'FLUID',
-    };
-    expect(snapshot).toEqual(expected);
+  mount({
+    mapProps: whileDropping,
+    WrappedComponent: getStubber(myMock),
   });
+
+  const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
+  expect(snapshot).toEqual(whileDropping.mapped.snapshot);
 });

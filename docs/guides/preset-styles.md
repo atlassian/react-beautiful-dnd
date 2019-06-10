@@ -1,6 +1,6 @@
 # Preset styles
 
-We apply a number of non-visible styles to facilitate the dragging experience. We do this using combination of styling targets and techniques. It is a goal of the library to provide unopinioned styling. However, we do apply some reasonable `cursor` styling on drag handles by default. This is designed to make the library work as simply as possible out of the box. If you want to use your own cursors you are more than welcome to. All you need to do is override our cursor style rules by using a rule with [higher specificity](https://css-tricks.com/specifics-on-css-specificity/).
+We apply a number of **non-visible** styles to facilitate the dragging experience. We do this using combination of styling targets and techniques. It is a goal of the library to provide unopinioned styling. However, we do apply some reasonable `cursor` styling on drag handles by default. This is designed to make the library work as simply as possible out of the box. If you want to use your own cursors you are more than welcome to. All you need to do is override our cursor style rules by using a rule with [higher specificity](https://css-tricks.com/specifics-on-css-specificity/).
 
 Here are the styles that are applied at various points in the drag lifecycle:
 
@@ -66,7 +66,7 @@ pointer-events: none;
 
 **Styles applied using the `data-react-beautiful-dnd-draggable` attribute**
 
-This is what we use to control `Draggable`s that need to move out of the way of a dragging `Draggable`.
+This is what we use to control `<Draggable />`s that need to move out of the way of a dragging `<Draggable />`.
 
 ```css
 transition: ${string};
@@ -76,7 +76,7 @@ transition: ${string};
 
 **Styles applied using the `data-react-beautiful-dnd-droppable` attribute**
 
-We apply `pointer-events: none` to a `Droppable` during a drag. This is technically not required as an optimisation. However, it gets around a common issue where hover styles are triggered during a drag. You are welcome to opt out of this one as it is it not required for functinality.
+We apply `pointer-events: none` to a `<Droppable />` during a drag. This is technically not required as an optimisation. However, it gets around a common issue where hover styles are triggered during a drag. You are welcome to opt out of this one as it is it not required for functinality.
 
 ```css
 pointer-events: none;
@@ -115,7 +115,7 @@ user-select: none;
 
 **Styles applied using the `data-react-beautiful-dnd-drag-handle` attribute**
 
-We apply the grab cursor to all drag handles except the drag handle for the dropping `Draggable`. At this point the user is able to drag other `Draggable`'s if they like.
+We apply the grab cursor to all drag handles except the drag handle for the dropping `<Draggable />`. At this point the user is able to drag other `<Draggable />`'s if they like.
 
 ```css
 cursor: grab;
@@ -134,3 +134,5 @@ This is the same as `Phase: dropping`. However we do not apply a `cursor: grab` 
 ## Preset styles are vendor prefixed
 
 All styles applied are vendor prefixed correctly to meet the requirements of our [supported browser matrix](https://confluence.atlassian.com/cloud/supported-browsers-744721663.html). This is done by hand to avoid adding to react-beautiful-dnd's size by including a css-in-js library
+
+[← Back to documentation](/README.md#documentation-)

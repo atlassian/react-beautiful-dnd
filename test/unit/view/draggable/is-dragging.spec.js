@@ -1,5 +1,4 @@
 // @flow
-import type { ReactWrapper } from 'enzyme';
 import { type Position } from 'css-box-model';
 import type {
   MapProps,
@@ -9,38 +8,18 @@ import type {
 } from '../../../../src/view/draggable/draggable-types';
 import mount from './util/mount';
 import getStubber from './util/get-stubber';
-import {
-  whileDragging,
-  preset,
-  atRestMapProps,
-  droppable,
-} from './util/get-props';
-import Placeholder from '../../../../src/view/placeholder';
+import { whileDragging, preset, atRestMapProps } from './util/get-props';
 import getLastCall from './util/get-last-call';
-import { zIndexOptions } from '../../../../src/view/draggable/draggable';
-import { transitions, combine } from '../../../../src/view/animation';
-
-it('should render a placeholder', () => {
-  const myMock = jest.fn();
-
-  const wrapper: ReactWrapper = mount({
-    mapProps: whileDragging,
-    WrappedComponent: getStubber(myMock),
-  });
-
-  expect(wrapper.find(Placeholder).exists()).toBe(true);
-  expect(wrapper.find(Placeholder).props().placeholder).toBe(
-    preset.inHome1.placeholder,
-  );
-});
+import { zIndexOptions } from '../../../../src/view/draggable/get-style';
+import { transitions, combine } from '../../../../src/animation';
 
 it('should move to the provided offset', () => {
   const myMock = jest.fn();
   const offset: Position = { x: 10, y: 20 };
   const mapProps: MapProps = {
-    ...whileDragging,
-    dragging: {
-      ...whileDragging.dragging,
+    mapped: {
+      type: 'DRAGGING',
+      ...whileDragging.mapped,
       offset,
     },
   };
@@ -86,9 +65,9 @@ it('should move to the provided offset on update', () => {
 
   offsets.forEach((offset: Position) => {
     const mapProps: MapProps = {
-      ...whileDragging,
-      dragging: {
-        ...whileDragging.dragging,
+      mapped: {
+        type: 'DRAGGING',
+        ...whileDragging.mapped,
         offset,
       },
     };
@@ -106,9 +85,9 @@ it('should animate snap movements', () => {
   const myMock = jest.fn();
   const offset: Position = { x: 10, y: 20 };
   const mapProps: MapProps = {
-    ...whileDragging,
-    dragging: {
-      ...whileDragging.dragging,
+    mapped: {
+      type: 'DRAGGING',
+      ...whileDragging.mapped,
       mode: 'SNAP',
       offset,
     },
@@ -141,9 +120,9 @@ it('should update the opacity when combining with another item', () => {
   const myMock = jest.fn();
   const offset: Position = { x: 10, y: 20 };
   const mapProps: MapProps = {
-    ...whileDragging,
-    dragging: {
-      ...whileDragging.dragging,
+    mapped: {
+      type: 'DRAGGING',
+      ...whileDragging.mapped,
       offset,
       draggingOver: preset.home.descriptor.id,
       combineWith: preset.inHome2.descriptor.id,
@@ -174,93 +153,14 @@ it('should update the opacity when combining with another item', () => {
   expect(provided.draggableProps.style).toEqual(expected);
 });
 
-describe('snapshot', () => {
-  it('should tell a consumer what is currently being dragged over', () => {
-    const mapProps: MapProps = {
-      ...whileDragging,
-      dragging: {
-        ...whileDragging.dragging,
-        draggingOver: 'foobar',
-        mode: 'SNAP',
-      },
-    };
+it('should pass on the snapshot', () => {
+  const myMock = jest.fn();
 
-    const myMock = jest.fn();
-
-    mount({
-      mapProps,
-      WrappedComponent: getStubber(myMock),
-    });
-
-    const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
-    const expected: StateSnapshot = {
-      isDragging: true,
-      draggingOver: 'foobar',
-      isDropAnimating: false,
-      dropAnimation: null,
-      combineWith: null,
-      combineTargetFor: null,
-      mode: 'SNAP',
-    };
-    expect(snapshot).toEqual(expected);
+  mount({
+    mapProps: whileDragging,
+    WrappedComponent: getStubber(myMock),
   });
 
-  it('should let consumers know if dragging and not over a droppable', () => {
-    const mapProps: MapProps = {
-      ...whileDragging,
-      dragging: {
-        ...whileDragging.dragging,
-        draggingOver: null,
-      },
-    };
-
-    const myMock = jest.fn();
-
-    mount({
-      mapProps,
-      WrappedComponent: getStubber(myMock),
-    });
-
-    const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
-    const expected: StateSnapshot = {
-      isDragging: true,
-      draggingOver: null,
-      isDropAnimating: false,
-      dropAnimation: null,
-      combineWith: null,
-      combineTargetFor: null,
-      mode: 'FLUID',
-    };
-    expect(snapshot).toEqual(expected);
-  });
-
-  it('should tell a consumer what is being combined with', () => {
-    const mapProps: MapProps = {
-      ...whileDragging,
-      dragging: {
-        ...whileDragging.dragging,
-        draggingOver: preset.home.descriptor.id,
-        combineWith: preset.inHome2.descriptor.id,
-      },
-    };
-
-    const myMock = jest.fn();
-
-    mount({
-      mapProps,
-      WrappedComponent: getStubber(myMock),
-    });
-
-    const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
-    const expected: StateSnapshot = {
-      isDragging: true,
-      draggingOver: droppable.id,
-      isDropAnimating: false,
-      dropAnimation: null,
-      combineWith: preset.inHome2.descriptor.id,
-      combineTargetFor: null,
-      mode: 'FLUID',
-    };
-    expect(snapshot).toEqual(expected);
-  });
+  const snapshot: StateSnapshot = getLastCall(myMock)[0].snapshot;
+  expect(snapshot).toBe(whileDragging.mapped.snapshot);
 });

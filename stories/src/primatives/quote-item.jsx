@@ -1,8 +1,9 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
-import { borderRadius, colors, grid } from '../constants';
-import type { Quote } from '../types';
+import styled from '@emotion/styled';
+import { colors } from '@atlaskit/theme';
+import { borderRadius, grid } from '../constants';
+import type { Quote, AuthorColors } from '../types';
 import type { DraggableProvided } from '../../../src';
 
 type Props = {
@@ -12,47 +13,55 @@ type Props = {
   isGroupedOver?: boolean,
 };
 
-const getBackgroundColor = (isDragging: boolean, isGroupedOver: boolean) => {
+const getBackgroundColor = (
+  isDragging: boolean,
+  isGroupedOver: boolean,
+  authorColors: AuthorColors,
+) => {
   if (isDragging) {
-    return colors.green;
+    return authorColors.soft;
   }
 
   if (isGroupedOver) {
-    return colors.grey.N30;
+    return colors.N30;
   }
 
-  return colors.white;
+  return colors.N0;
 };
+
+const getBorderColor = (isDragging: boolean, authorColors: AuthorColors) =>
+  isDragging ? authorColors.hard : 'transparent';
 
 const Container = styled.a`
   border-radius: ${borderRadius}px;
-  border: 1px solid grey;
+  border: 2px solid transparent;
+  border-color: ${props => getBorderColor(props.isDragging, props.colors)};
   background-color: ${props =>
-    getBackgroundColor(props.isDragging, props.isGroupedOver)};
+    getBackgroundColor(props.isDragging, props.isGroupedOver, props.colors)};
   box-shadow: ${({ isDragging }) =>
-    isDragging ? `2px 2px 1px ${colors.shadow}` : 'none'};
+    isDragging ? `2px 2px 1px ${colors.N70}` : 'none'};
   padding: ${grid}px;
   min-height: 40px;
   margin-bottom: ${grid}px;
   user-select: none;
 
   /* anchor overrides */
-  color: ${colors.black};
+  color: ${colors.N900};
 
   &:hover,
   &:active {
-    color: ${colors.black};
+    color: ${colors.N900};
     text-decoration: none;
   }
 
   &:focus {
-    outline: 2px solid ${colors.purple};
+    outline: none;
+    border-color: ${props => props.colors.hard};
     box-shadow: none;
   }
 
   /* flexbox */
   display: flex;
-  align-items: center;
 `;
 
 const Avatar = styled.img`
@@ -92,18 +101,25 @@ const BlockQuote = styled.div`
 const Footer = styled.div`
   display: flex;
   margin-top: ${grid}px;
+  align-items: center;
+`;
+
+const Author = styled.small`
+  flex-grow: 0;
+  margin: 0;
+  background-color: ${props => props.colors.soft};
+  border-radius: ${borderRadius}px;
+  font-weight: normal;
+  padding: ${grid / 2}px;
 `;
 
 const QuoteId = styled.small`
-  flex-grow: 0;
-  margin: 0;
-`;
-
-const Attribution = styled.small`
-  margin: 0;
-  margin-left: ${grid}px;
-  text-align: right;
   flex-grow: 1;
+  flex-shrink: 1;
+  margin: 0;
+  font-weight: normal;
+  text-overflow: ellipsis;
+  text-align: right;
 `;
 
 // Previously this extended React.Component
@@ -113,28 +129,29 @@ const Attribution = styled.small`
 // Need to be super sure we are not relying on PureComponent here for
 // things we should be doing in the selector as we do not know if consumers
 // will be using PureComponent
-export default class QuoteItem extends React.PureComponent<Props> {
-  render() {
-    const { quote, isDragging, isGroupedOver, provided } = this.props;
+function QuoteItem(props: Props) {
+  const { quote, isDragging, isGroupedOver, provided } = props;
 
-    return (
-      <Container
-        href={quote.author.url}
-        isDragging={isDragging}
-        isGroupedOver={isGroupedOver}
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-      >
-        <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
-        <Content>
-          <BlockQuote>{quote.content}</BlockQuote>
-          <Footer>
-            <QuoteId>({quote.id})</QuoteId>
-            <Attribution>TEMP</Attribution>
-          </Footer>
-        </Content>
-      </Container>
-    );
-  }
+  return (
+    <Container
+      href={quote.author.url}
+      isDragging={isDragging}
+      isGroupedOver={isGroupedOver}
+      colors={quote.author.colors}
+      ref={provided.innerRef}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+    >
+      <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
+      <Content>
+        <BlockQuote>{quote.content}</BlockQuote>
+        <Footer>
+          <Author colors={quote.author.colors}>{quote.author.name}</Author>
+          <QuoteId>id:{quote.id}</QuoteId>
+        </Footer>
+      </Content>
+    </Container>
+  );
 }
+
+export default React.memo<Props>(QuoteItem);

@@ -8,13 +8,15 @@ import type {
   DroppableDimensionMap,
   DragImpact,
   Viewport,
+  OnLift,
 } from '../../../types';
 import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getClosestDraggable from './get-closest-draggable';
-import moveToNewDroppable from './move-to-new-droppable';
+// import moveToNewDroppable from './move-to-new-droppable';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import getClientFromPageBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
 import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border-box-center';
+import moveToNewDroppable from './move-to-new-droppable';
 
 type Args = {|
   isMovingForward: boolean,
@@ -31,6 +33,7 @@ type Args = {|
   previousImpact: DragImpact,
   // the current viewport
   viewport: Viewport,
+  onLift: OnLift,
 |};
 
 export default ({
@@ -42,6 +45,7 @@ export default ({
   droppables,
   previousImpact,
   viewport,
+  onLift,
 }: Args): ?PublicResult => {
   // not considering the container scroll changes as container scrolling cancels a keyboard drag
 
@@ -64,11 +68,11 @@ export default ({
   );
 
   const moveRelativeTo: ?DraggableDimension = getClosestDraggable({
-    axis: destination.axis,
     pageBorderBoxCenter: previousPageBorderBoxCenter,
     viewport,
     destination,
     insideDestination,
+    onLift,
   });
 
   const impact: ?DragImpact = moveToNewDroppable({
@@ -80,6 +84,7 @@ export default ({
     insideDestination,
     previousImpact,
     viewport,
+    onLift,
   });
 
   if (!impact) {
@@ -91,6 +96,7 @@ export default ({
     draggable,
     droppable: destination,
     draggables,
+    onLift,
   });
 
   const clientSelection: Position = getClientFromPageBorderBoxCenter({

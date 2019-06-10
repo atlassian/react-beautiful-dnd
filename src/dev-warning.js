@@ -4,9 +4,14 @@ const isProduction: boolean = process.env.NODE_ENV === 'production';
 
 // not replacing newlines (which \s does)
 const spacesAndTabs: RegExp = /[ \t]{2,}/g;
+const lineStartWithSpaces: RegExp = /^[ \t]*/gm;
 
 // using .trim() to clear the any newlines before the first text and after last text
-const clean = (value: string) => value.replace(spacesAndTabs, ' ').trim();
+const clean = (value: string) =>
+  value
+    .replace(spacesAndTabs, ' ')
+    .replace(lineStartWithSpaces, '')
+    .trim();
 
 const getDevMessage = (message: string) =>
   clean(`

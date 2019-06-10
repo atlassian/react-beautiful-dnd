@@ -26,6 +26,8 @@ import type {
   DroppableDimension,
 } from '../../../../../src/types';
 import type { Store } from '../../../../../src/state/store-types';
+import getNotAnimatedDisplacement from '../../../../utils/get-displacement/get-not-animated-displacement';
+import getVisibleDisplacement from '../../../../utils/get-displacement/get-visible-displacement';
 
 jest.useFakeTimers();
 const preset = getPreset();
@@ -48,11 +50,11 @@ it('should not call onDragUpdate if the destination or source have not changed',
 });
 
 it('should call onDragUpdate if the source has changed - even if the destination has not changed', () => {
-  // - dragging inHome2 with no impact
+  // - dragging inHome2
   // - inHome1 is removed
   const responders: Responders = createResponders();
   const store: Store = createStore(middleware(() => responders, getAnnounce()));
-  // dragging inHome2 with no impact
+  // dragging inHome2
   const scrollableHome: DroppableDimension = makeScrollable(preset.home);
   const customInitial: InitialPublishArgs = {
     critical: {
@@ -101,11 +103,16 @@ it('should call onDragUpdate if the source has changed - even if the destination
   // move up into the original position (and release cycle)
   store.dispatch(moveUp());
   jest.runOnlyPendingTimers();
-  // no current displacement
+  // validating current displacement
   {
     const current: State = store.getState();
     invariant(current.impact);
-    expect(current.impact.movement.displaced).toEqual([]);
+    expect(current.impact.movement.displaced).toEqual([
+      // displacement removed and then readded
+      getVisibleDisplacement(preset.inHome3),
+      // original not animated displacement
+      getNotAnimatedDisplacement(preset.inHome4),
+    ]);
   }
   const lastUpdate: DragUpdate = {
     draggableId: preset.inHome2.descriptor.id,

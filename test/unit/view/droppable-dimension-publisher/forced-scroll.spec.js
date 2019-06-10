@@ -1,12 +1,12 @@
 // @flow
 import { mount } from 'enzyme';
 import React from 'react';
+import invariant from 'tiny-invariant';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import { getMarshalStub } from '../../../utils/dimension-marshal';
-import { withDimensionMarshal } from '../../../utils/get-context-options';
 import { setViewport } from '../../../utils/viewport';
 import {
   App,
@@ -16,6 +16,7 @@ import {
   preset,
   scheduled,
   ScrollableItem,
+  WithAppContext,
 } from './util/shared';
 import tryCleanPrototypeStubs from '../../../utils/try-clean-prototype-stubs';
 
@@ -29,11 +30,14 @@ it('should throw if the droppable has no closest scrollable', () => {
   const marshal: DimensionMarshal = getMarshalStub();
   // no scroll parent
   const wrapper = mount(
-    <App parentIsScrollable={false} droppableIsScrollable={false} />,
-    withDimensionMarshal(marshal),
+    <WithAppContext marshal={marshal}>
+      <App parentIsScrollable={false} droppableIsScrollable={false} />,
+    </WithAppContext>,
   );
-  const droppable: HTMLElement = wrapper.instance().getRef();
-  const parent: HTMLElement = wrapper.getDOMNode();
+  const droppable: ?HTMLElement = wrapper.find('.droppable').getDOMNode();
+  invariant(droppable);
+  const parent: ?HTMLElement = wrapper.find('.scroll-parent').getDOMNode();
+  invariant(parent);
   jest
     .spyOn(droppable, 'getBoundingClientRect')
     .mockImplementation(() => smallFrameClient.borderBox);
@@ -65,12 +69,15 @@ it('should throw if the droppable has no closest scrollable', () => {
 describe('there is a closest scrollable', () => {
   it('should update the scroll of the closest scrollable', () => {
     const marshal: DimensionMarshal = getMarshalStub();
-    const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
-    const container: HTMLElement = wrapper.getDOMNode();
-
-    if (!container.classList.contains('scroll-container')) {
-      throw new Error('incorrect dom node collected');
-    }
+    const wrapper = mount(
+      <WithAppContext marshal={marshal}>
+        <ScrollableItem />
+      </WithAppContext>,
+    );
+    const container: ?HTMLElement = wrapper
+      .find('.scroll-container')
+      .getDOMNode();
+    invariant(container);
 
     expect(container.scrollTop).toBe(0);
     expect(container.scrollLeft).toBe(0);
@@ -89,14 +96,16 @@ describe('there is a closest scrollable', () => {
 
   it('should throw if asked to scoll while scroll is not currently being watched', () => {
     const marshal: DimensionMarshal = getMarshalStub();
-    const wrapper = mount(<ScrollableItem />, withDimensionMarshal(marshal));
+    const wrapper = mount(
+      <WithAppContext marshal={marshal}>
+        <ScrollableItem />
+      </WithAppContext>,
+    );
 
-    const container: HTMLElement = wrapper.getDOMNode();
-
-    if (!container.classList.contains('scroll-container')) {
-      throw new Error('incorrect dom node collected');
-    }
-
+    const container: ?HTMLElement = wrapper
+      .find('.scroll-container')
+      .getDOMNode();
+    invariant(container);
     expect(container.scrollTop).toBe(0);
     expect(container.scrollLeft).toBe(0);
 

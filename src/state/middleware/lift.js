@@ -5,7 +5,7 @@ import type { DimensionMarshal } from '../dimension-marshal/dimension-marshal-ty
 import type { State, ScrollOptions, LiftRequest } from '../../types';
 import type { MiddlewareStore, Action, Dispatch } from '../store-types';
 
-export default (getMarshal: () => DimensionMarshal) => ({
+export default (marshal: DimensionMarshal) => ({
   getState,
   dispatch,
 }: MiddlewareStore) => (next: Dispatch) => (action: Action): any => {
@@ -13,8 +13,6 @@ export default (getMarshal: () => DimensionMarshal) => ({
     next(action);
     return;
   }
-
-  const marshal: DimensionMarshal = getMarshal();
   const { id, clientSelection, movementMode } = action.payload;
   const initial: State = getState();
 
@@ -22,7 +20,7 @@ export default (getMarshal: () => DimensionMarshal) => ({
   // this can change the descriptor of the dragging item
   // Will call the onDragEnd responders
   if (initial.phase === 'DROP_ANIMATING') {
-    dispatch(completeDrop(initial.pending.result));
+    dispatch(completeDrop({ completed: initial.completed, shouldFlush: true }));
   }
 
   invariant(getState().phase === 'IDLE', 'Incorrect phase to start a drag');

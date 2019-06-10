@@ -5,8 +5,9 @@ import type {
   DragImpact,
   DraggingState,
   DroppableDimension,
+  DimensionMap,
 } from '../../../../../../src/types';
-import patchDroppableMap from '../../../../../../src/state/patch-droppable-map';
+import patchDimensionMap from '../../../../../../src/state/patch-dimension-map';
 
 type DragToArgs = {|
   selection: Position,
@@ -30,13 +31,18 @@ export default ({
     viewport,
   );
 
+  const dimensions: DimensionMap = (() => {
+    if (!droppable) {
+      return base.dimensions;
+    }
+    return patchDimensionMap(base.dimensions, droppable);
+  })();
+
   return {
     ...base,
     // add impact if needed
     impact: impact || base.impact,
     // add droppable if needed
-    dimensions: droppable
-      ? patchDroppableMap(base.dimensions, droppable)
-      : base.dimensions,
+    dimensions,
   };
 };

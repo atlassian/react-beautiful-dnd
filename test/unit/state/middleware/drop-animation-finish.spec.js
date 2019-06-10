@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { DropResult, State } from '../../../../src/types';
+import type { State } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
 import middleware from '../../../../src/state/middleware/drop-animation-finish';
 import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
@@ -14,7 +14,10 @@ import {
   dropAnimationFinished,
   drop,
 } from '../../../../src/state/action-creators';
-import { initialPublishArgs } from '../../../utils/preset-action-args';
+import {
+  initialPublishArgs,
+  getCompletedArgs,
+} from '../../../utils/preset-action-args';
 
 it('should fire a complete drop action when a drop animation finish action is fired', () => {
   const mock = jest.fn();
@@ -43,13 +46,12 @@ it('should fire a complete drop action when a drop animation finish action is fi
     state.phase === 'DROP_ANIMATING',
     `Incorrect phase: ${state.phase}`,
   );
-  const result: DropResult = state.pending.result;
 
   mock.mockReset();
   store.dispatch(dropAnimationFinished());
   expect(mock).toHaveBeenCalledWith(dropAnimationFinished());
 
-  expect(mock).toHaveBeenCalledWith(completeDrop(result));
+  expect(mock).toHaveBeenCalledWith(completeDrop(getCompletedArgs('DROP')));
   expect(mock).toHaveBeenCalledTimes(2);
 });
 

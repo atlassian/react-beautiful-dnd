@@ -19,11 +19,11 @@ export default (state: State, id: DraggableId): boolean => {
   //   the drop animation is complete. Otherwise they will be grabbing
   //   items not in their original position which can lead to bad visuals
   // Not allowing dragging of the dropping draggable
-  if (state.pending.result.draggableId === id) {
+  if (state.completed.result.draggableId === id) {
     return false;
   }
 
   // if dropping - allow lifting
   // if cancelling - disallow lifting
-  return state.pending.result.reason === 'DROP';
+  return state.completed.result.reason === 'DROP';
 };
