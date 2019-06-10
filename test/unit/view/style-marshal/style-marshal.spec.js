@@ -1,13 +1,13 @@
 // @flow
 import React, { type Node } from 'react';
 import { mount, type ReactWrapper } from 'enzyme';
+import uuidv4 from 'uuid/v4';
 import useStyleMarshal from '../../../../src/view/use-style-marshal';
 import getStyles, {
   type Styles,
 } from '../../../../src/view/use-style-marshal/get-styles';
 import type { StyleMarshal } from '../../../../src/view/use-style-marshal/style-marshal-types';
 import { prefix } from '../../../../src/view/data-attributes';
-import uuidv4 from "uuid/v4";
 
 const getMarshal = (myMock): StyleMarshal => myMock.mock.calls[0][0];
 const getMock = () => jest.fn().mockImplementation(() => null);
@@ -188,12 +188,20 @@ it('should allow subsequent updates', () => {
 
 it('should insert nonce into tag attribute', () => {
   const uniqueId: number = 2;
-  const nonce = Buffer.from(uuidv4()).toString("base64")
+  const nonce = Buffer.from(uuidv4()).toString('base64');
   const wrapper: ReactWrapper<*> = mount(
-    <WithMarshal uniqueId={uniqueId} nonce={nonce}>{getMock()}</WithMarshal>,
+    <WithMarshal uniqueId={uniqueId} nonce={nonce}>
+      {getMock()}
+    </WithMarshal>,
   );
-  const dynamicStyleTagNonce: string = getDynamicStyleTag(uniqueId).getAttribute('nonce');
-  const alwaysStyleTagNonce: string = getAlwaysStyleTag(uniqueId).getAttribute('nonce');
+  const dynamicStyleTag = getDynamicStyleTag(uniqueId);
+  const dynamicStyleTagNonce = dynamicStyleTag
+    ? dynamicStyleTag.getAttribute('nonce')
+    : '';
+  const alwaysStyleTag = getAlwaysStyleTag(uniqueId);
+  const alwaysStyleTagNonce = alwaysStyleTag
+    ? alwaysStyleTag.getAttribute('nonce')
+    : '';
 
   // the style tag exists
   expect(dynamicStyleTagNonce).toEqual(nonce);
