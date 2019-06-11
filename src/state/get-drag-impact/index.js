@@ -39,7 +39,6 @@ export default ({
   previousImpact,
   viewport,
   userDirection,
-  onLift,
 }: Args): DragImpact => {
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
@@ -59,10 +58,10 @@ export default ({
     destination.descriptor.id,
     draggables,
   );
-  const insideDestinationWithoutDraggable: DraggableDimension[] = removeDraggableFromList(
-    draggable,
-    insideDestination,
-  );
+  // const insideDestinationWithoutDraggable: DraggableDimension[] = removeDraggableFromList(
+  //   draggable,
+  //   insideDestination,
+  // );
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
   const pageBorderBoxCenterWithDroppableScrollChange: Position = withDroppableScroll(
@@ -71,27 +70,26 @@ export default ({
   );
 
   // checking combine first so we combine before any reordering
-  const withMerge: ?DragImpact = getCombineImpact({
-    pageBorderBoxCenterWithDroppableScrollChange,
-    previousImpact,
-    destination,
-    insideDestinationWithoutDraggable,
-    userDirection,
-    onLift,
-  });
+  // const withMerge: ?DragImpact = getCombineImpact({
+  //   pageBorderBoxCenterWithDroppableScrollChange,
+  //   previousImpact,
+  //   destination,
+  //   insideDestinationWithoutDraggable,
+  //   userDirection,
+  //   onLift,
+  // });
 
-  if (withMerge) {
-    return withMerge;
-  }
+  // if (withMerge) {
+  //   return withMerge;
+  // }
 
   return getReorderImpact({
     pageBorderBoxCenterWithDroppableScrollChange,
-    destination,
     draggable,
+    destination,
     insideDestination,
-    previousImpact,
+    last: previousImpact.displaced,
     viewport,
     userDirection,
-    onLift,
   });
 };

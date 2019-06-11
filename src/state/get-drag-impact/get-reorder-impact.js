@@ -1,45 +1,52 @@
 // @flow
 import { type Position, type Rect } from 'css-box-model';
 import type {
-  DragMovement,
   DraggableDimension,
   DroppableDimension,
   DragImpact,
   Axis,
-  Displacement,
+  DisplacementGroups,
+  ReorderImpact,
   Viewport,
   UserDirection,
   DisplacedBy,
-  OnLift,
 } from '../../types';
-import getDisplacement from '../get-displacement';
-import getDisplacementMap from '../get-displacement-map';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
-import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
 import removeDraggableFromList from '../remove-draggable-from-list';
-import isHomeOf from '../droppable/is-home-of'; ``;
+import isHomeOf from '../droppable/is-home-of';
+import { find } from '../../native-with-fallback';
+import getDisplacementGroups from '../get-displacement-groups';
+import { emptyGroups } from '../no-impact';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
   draggable: DraggableDimension,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
-  previousImpact: DragImpact,
+  last: DisplacementGroups,
   viewport: Viewport,
   userDirection: UserDirection,
-  onLift: OnLift,
 |};
+
+function at(destination: DroppableDimension, index: number): ReorderImpact {
+  return {
+    type: 'REORDER',
+    destination: {
+      droppableId: destination.descriptor.id,
+      index,
+    },
+  };
+}
 
 export default ({
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
   draggable,
   destination,
   insideDestination,
-  previousImpact,
+  last,
   viewport,
   userDirection,
-  onLift,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const isMovingForward: boolean = isUserMovingForward(
@@ -50,59 +57,6 @@ export default ({
     destination.axis,
     draggable.displaceBy,
   );
-  const targetCenter: number = currentCenter[axis.line];
-  const displacement: number = displacedBy.value;
-
-  const insideDestinationWithoutDraggable = removeDraggableFromList(
-    draggable,
-    insideDestination,
-  );
-
-  const displaced: Displacement[] = insideDestinationWithoutDraggable
-    .filter((child: DraggableDimension): boolean => {
-      const borderBox: Rect = child.page.borderBox;
-      const start: number = borderBox[axis.start];
-      const end: number = borderBox[axis.end];
-
-      const didStartDisplaced: boolean = getDidStartDisplaced(
-        child.descriptor.id,
-        onLift,
-      );
-
-      // Moving forward will decrease the amount of things needed to be displaced
-      if (isMovingForward) {
-        if (didStartDisplaced) {
-          // if started displaced then its displaced position is its resting position
-          // continue to keep the item at rest until we go onto the start of the item
-          return targetCenter < start;
-        }
-        // if the item did not start displaced then we displace the item
-        // while we are still before the start edge
-        return targetCenter < start + displacement;
-      }
-
-      // Moving backwards will increase the amount of things needed to be displaced
-      // The logic for this works by looking at assuming everything has been displaced
-      // backwards and then looking at how you would undo that
-
-      if (didStartDisplaced) {
-        // we continue to displace the item until we move back over the end of the item without displacement
-        return targetCenter <= end - displacement;
-      }
-
-      // a non-displaced item is at rest. when we hit the item from the bottom we move it out of the way
-      return targetCenter <= end;
-    })
-    .map((dimension: DraggableDimension): Displacement =>
-      getDisplacement({
-        draggable: dimension,
-        destination,
-        previousImpact,
-        viewport: viewport.frame,
-        onLift,
-      }),
-    );
-
   // This is needed as we support lists with indexes that do not start from 0
   const rawIndexOfLastItem: number = (() => {
     if (!insideDestination.length) {
@@ -118,20 +72,55 @@ export default ({
       : indexOfLastItem + 1;
   })();
 
-  const newIndex: number = rawIndexOfLastItem - displaced.length;
+  const insideDestinationWithoutDraggable = removeDraggableFromList(
+    draggable,
+    insideDestination,
+  );
 
-  const movement: DragMovement = {
-    displacedBy,
-    displaced,
-    map: getDisplacementMap(displaced),
-  };
-  const impact: DragImpact = {
-    movement,
-    destination: {
-      droppableId: destination.descriptor.id,
-      index: newIndex,
+  const targetCenter: number = currentCenter[axis.line];
+  const displacement: number = displacedBy.value;
+
+  const first: ?DraggableDimension = find(
+    insideDestinationWithoutDraggable,
+    (child: DraggableDimension) => {
+      const borderBox: Rect = child.page.borderBox;
+      const start: number = borderBox[axis.start];
+      const end: number = borderBox[axis.end];
+
+      if (isMovingForward) {
+        return targetCenter < start + displacement;
+      }
+
+      // moving backwards
+      return targetCenter <= end;
     },
-    merge: null,
+  );
+
+  if (!first) {
+    return {
+      displaced: emptyGroups,
+      displacedBy,
+      // go into last spot of list
+      at: at(destination, rawIndexOfLastItem),
+    };
+  }
+
+  const impacted: DraggableDimension[] = insideDestinationWithoutDraggable.slice(
+    first.descriptor.index,
+  );
+
+  const displaced: DisplacementGroups = getDisplacementGroups({
+    afterDragging: impacted,
+    destination,
+    displacedBy,
+    last,
+    viewport: viewport.frame,
+  });
+
+  const impact: DragImpact = {
+    displaced,
+    displacedBy,
+    at: at(destination, first.descriptor.index),
   };
 
   return impact;
