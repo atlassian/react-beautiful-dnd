@@ -10,6 +10,7 @@ import type {
   Viewport,
   DraggableIdMap,
   DisplacementGroups,
+  DraggableId,
   OnLift,
 } from '../types';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
@@ -45,6 +46,7 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
   invariant(rawIndex !== -1, 'Expected draggable to be inside home list');
 
   const afterDragging: DraggableDimension[] = insideHome.slice(rawIndex + 1);
+  // TODO: toDroppableIdMap?
   const wasDisplaced: DraggableIdMap = afterDragging.reduce(
     (previous: DraggableIdMap, item: DraggableDimension): DraggableIdMap => {
       previous[item.descriptor.id] = true;
@@ -69,9 +71,14 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
     forceShouldAnimate: false,
   });
 
+  const closestDisplaced: ?DraggableId = afterDragging.length
+    ? afterDragging[0].descriptor.id
+    : null;
+
   const impact: DragImpact = {
     displaced,
     displacedBy,
+    closestDisplaced,
     at: {
       type: 'REORDER',
       destination: getHomeLocation(draggable.descriptor),

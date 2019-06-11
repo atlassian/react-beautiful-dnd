@@ -17,7 +17,7 @@ import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import removeDraggableFromList from '../remove-draggable-from-list';
 import isHomeOf from '../droppable/is-home-of';
-import { find } from '../../native-with-fallback';
+import { find, findIndex } from '../../native-with-fallback';
 import getDisplacementGroups from '../get-displacement-groups';
 import { emptyGroups } from '../no-impact';
 import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
@@ -62,23 +62,13 @@ export default ({
     destination.axis,
     draggable.displaceBy,
   );
-  // This is needed as we support lists with indexes that do not start from 0
-  const rawIndexOfLastItem: number = (() => {
-    if (!insideDestination.length) {
-      return 0;
-    }
-
-    const indexOfLastItem: number =
-      insideDestination[insideDestination.length - 1].descriptor.index;
-
-    // When in a foreign list there will be an additional one item in the list
-    return isHomeOf(draggable, destination)
-      ? indexOfLastItem
-      : indexOfLastItem + 1;
-  })();
 
   const targetCenter: number = currentCenter[axis.line];
   const displacement: number = displacedBy.value;
+  const withoutDraggable: DraggableDimension[] = removeDraggableFromList(
+    draggable,
+    insideDestination,
+  );
 
   const first: ?DraggableDimension = find(
     insideDestination,
@@ -119,11 +109,27 @@ export default ({
     },
   );
 
+  // go into last spot of list
   if (!first) {
+    // This is needed as we support lists with indexes that do not start from 0
+    const rawIndexOfLastItem: number = (() => {
+      if (!insideDestination.length) {
+        return 0;
+      }
+
+      const indexOfLastItem: number =
+        insideDestination[insideDestination.length - 1].descriptor.index;
+
+      // When in a foreign list there will be an additional one item in the list
+      return isHomeOf(draggable, destination)
+        ? indexOfLastItem
+        : indexOfLastItem + 1;
+    })();
+
     return {
       displaced: emptyGroups,
+      closestDisplaced: null,
       displacedBy,
-      // go into last spot of list
       at: at(destination, rawIndexOfLastItem),
     };
   }
@@ -133,6 +139,8 @@ export default ({
     insideDestination.slice(first.descriptor.index),
   );
 
+  console.log('impacted', impacted);
+
   const displaced: DisplacementGroups = getDisplacementGroups({
     afterDragging: impacted,
     destination,
@@ -141,10 +149,16 @@ export default ({
     viewport: viewport.frame,
   });
 
+  const newIndex: number = removeDraggableFromList(
+    draggable,
+    insideDestination,
+  ).indexOf(first);
+
   const impact: DragImpact = {
     displaced,
     displacedBy,
-    at: at(destination, first.descriptor.index),
+    closestDisplaced: first.descriptor.id,
+    at: at(destination, first.descriptor.index - 1),
   };
 
   return impact;

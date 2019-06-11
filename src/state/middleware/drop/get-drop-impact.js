@@ -9,7 +9,8 @@ import type {
 } from '../../../types';
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import recompute from '../../update-displacement-visibility/recompute';
-import { noMovement } from '../../no-impact';
+import { tryGetDestination } from '../../get-impact-location';
+import { emptyGroups } from '../../no-impact';
 
 type Args = {|
   reason: DropReason,
@@ -35,10 +36,7 @@ export default ({
   onLiftImpact,
   onLift,
 }: Args): Result => {
-  const didDropInsideDroppable: boolean =
-    reason === 'DROP' && Boolean(whatIsDraggedOver(lastImpact));
-
-  if (!didDropInsideDroppable) {
+  if (!lastImpact.at || reason !== 'DROP') {
     // Dropping outside of a list or the drag was cancelled
 
     // Going to use the on lift impact
@@ -57,15 +55,15 @@ export default ({
 
     return {
       impact,
-      didDropInsideDroppable,
+      didDropInsideDroppable: false,
     };
   }
 
   // use the existing impact
-  if (lastImpact.destination) {
+  if (lastImpact.at.type === 'REORDER') {
     return {
       impact: lastImpact,
-      didDropInsideDroppable,
+      didDropInsideDroppable: true,
     };
   }
 
@@ -73,11 +71,12 @@ export default ({
   // will animate closed
   const withoutMovement: DragImpact = {
     ...lastImpact,
-    movement: noMovement,
+    displaced: emptyGroups,
+    closestDisplaced: null,
   };
 
   return {
     impact: withoutMovement,
-    didDropInsideDroppable,
+    didDropInsideDroppable: true,
   };
 };

@@ -40,7 +40,7 @@ const getResultWithoutDroppableDisplacement = ({
 
   if (at.type === 'REORDER') {
     return whenReordering({
-      movement: impact.movement,
+      impact,
       draggable,
       draggables,
       droppable,

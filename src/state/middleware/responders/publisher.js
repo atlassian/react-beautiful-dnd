@@ -22,6 +22,7 @@ import type {
   OnDragEndResponder,
 } from '../../../types';
 import { isCombineEqual, isCriticalEqual, areLocationsEqual } from './is-equal';
+import { tryGetDestination, tryGetCombine } from '../../get-impact-location';
 
 const withTimings = (key: string, fn: Function) => {
   timings.start(key);
@@ -122,8 +123,9 @@ export default (getResponders: () => Responders, announce: Announce) => {
 
   // Passing in the critical location again as it can change during a drag
   const update = (critical: Critical, impact: DragImpact) => {
-    const location: ?DraggableLocation = impact.destination;
-    const combine: ?Combine = impact.merge ? impact.merge.combine : null;
+    const location: ?DraggableLocation = tryGetDestination(impact);
+    const combine: ?Combine = tryGetCombine(impact);
+
     invariant(
       dragging,
       'Cannot fire onDragMove when onDragStart has not been called',

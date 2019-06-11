@@ -2,9 +2,9 @@
 import { offset, type Position, type BoxModel } from 'css-box-model';
 import type {
   Axis,
+  DragImpact,
   DraggableDimension,
   DraggableDimensionMap,
-  DragMovement,
   DroppableDimension,
   OnLift,
 } from '../../../types';
@@ -14,7 +14,7 @@ import { negate } from '../../position';
 import didStartDisplaced from '../../starting-displaced/did-start-displaced';
 
 type NewHomeArgs = {|
-  movement: DragMovement,
+  impact: DragImpact,
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
   droppable: DroppableDimension,
@@ -24,7 +24,7 @@ type NewHomeArgs = {|
 // Returns the client offset required to move an item from its
 // original client position to its final resting position
 export default ({
-  movement,
+  impact,
   draggable,
   draggables,
   droppable,
@@ -47,30 +47,26 @@ export default ({
     });
   }
 
-  const { displaced, displacedBy } = movement;
+  const { closestDisplaced, displacedBy } = impact;
 
   // go before the first displaced item
   // items can only be displaced forwards
-  if (displaced.length) {
-    const closestAfter: DraggableDimension =
-      draggables[displaced[0].draggableId];
+  if (closestDisplaced) {
+    const closest: DraggableDimension = draggables[closestDisplaced];
     // want to go before where it would be with the displacement
 
     // target is displaced and is already in it's starting position
-    if (didStartDisplaced(closestAfter.descriptor.id, onLift)) {
+    if (didStartDisplaced(closestDisplaced, onLift)) {
       return goBefore({
         axis,
-        moveRelativeTo: closestAfter.page,
+        moveRelativeTo: closest.page,
         isMoving: draggablePage,
       });
     }
 
     // target has been displaced during the drag and it is not in its starting position
     // we need to account for the displacement
-    const withDisplacement: BoxModel = offset(
-      closestAfter.page,
-      displacedBy.point,
-    );
+    const withDisplacement: BoxModel = offset(closest.page, displacedBy.point);
 
     return goBefore({
       axis,

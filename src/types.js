@@ -196,6 +196,7 @@ export type ImpactLocation = ReorderImpact | CombineImpact;
 
 export type DragImpact = {|
   displaced: DisplacementGroups,
+  closestDisplaced: ?DraggableId,
   displacedBy: DisplacedBy,
   at: ?ImpactLocation,
 |};
@@ -299,6 +300,7 @@ export type IdleState = {|
   shouldFlush: boolean,
 |};
 
+// TODO: rename
 export type OnLift = {|
   wasDisplaced: DraggableIdMap,
   displacedBy: DisplacedBy,

@@ -23,6 +23,7 @@ import { isEqual } from '../../position';
 import getDropDuration from './get-drop-duration';
 import getNewHomeClientOffset from './get-new-home-client-offset';
 import getDropImpact, { type Result } from './get-drop-impact';
+import { tryGetCombine, tryGetDestination } from '../../get-impact-location';
 
 export default ({ getState, dispatch }: MiddlewareStore) => (
   next: Dispatch,
@@ -81,10 +82,11 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
 
   // only populating destination / combine if 'didDropInsideDroppable' is true
   const destination: ?DraggableLocation = didDropInsideDroppable
-    ? impact.destination
+    ? tryGetDestination(impact)
     : null;
-  const combine: ?Combine =
-    didDropInsideDroppable && impact.merge ? impact.merge.combine : null;
+  const combine: ?Combine = didDropInsideDroppable
+    ? tryGetCombine(impact)
+    : null;
 
   const source: DraggableLocation = {
     index: critical.draggable.index,
