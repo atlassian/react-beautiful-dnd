@@ -49,8 +49,7 @@ const getResultWithoutDroppableDisplacement = ({
   }
 
   return whenCombining({
-    movement: impact.movement,
-    combine: merge.combine,
+    impact,
     draggables,
     onLift,
   });

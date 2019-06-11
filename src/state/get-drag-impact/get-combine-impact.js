@@ -8,7 +8,7 @@ import type {
   DroppableDimension,
   CombineImpact,
   DragImpact,
-  DisplacementMap,
+  DisplacementGroups,
   OnLift,
   DisplacedBy,
 } from '../../types';
@@ -16,20 +16,21 @@ import isWithin from '../is-within';
 import { find } from '../../native-with-fallback';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getCombinedItemDisplacement from '../get-combined-item-displacement';
+import removeDraggableFromList from '../remove-draggable-from-list';
 
-const getWhenEntered = (
+function getWhenEntered(
   id: DraggableId,
   current: UserDirection,
-  oldMerge: ?CombineImpact,
-): UserDirection => {
-  if (!oldMerge) {
+  lastCombineImpact: ?CombineImpact,
+): UserDirection {
+  if (!lastCombineImpact) {
     return current;
   }
-  if (id !== oldMerge.combine.draggableId) {
+  if (id !== lastCombineImpact.combine.draggableId) {
     return current;
   }
-  return oldMerge.whenEntered;
-};
+  return lastCombineImpact.whenEntered;
+}
 
 type IsCombiningWithArgs = {|
   id: DraggableId,
@@ -38,7 +39,7 @@ type IsCombiningWithArgs = {|
   borderBox: Rect,
   displaceBy: Position,
   currentUserDirection: UserDirection,
-  oldMerge: ?CombineImpact,
+  lastCombineImpact: ?CombineImpact,
 |};
 
 const isCombiningWith = ({
@@ -48,7 +49,7 @@ const isCombiningWith = ({
   borderBox,
   displaceBy,
   currentUserDirection,
-  oldMerge,
+  lastCombineImpact,
 }: IsCombiningWithArgs): boolean => {
   const start: number = borderBox[axis.start] + displaceBy[axis.line];
   const end: number = borderBox[axis.end] + displaceBy[axis.line];
@@ -58,7 +59,7 @@ const isCombiningWith = ({
   const whenEntered: UserDirection = getWhenEntered(
     id,
     currentUserDirection,
-    oldMerge,
+    lastCombineImpact,
   );
   const isMovingForward: boolean = isUserMovingForward(axis, whenEntered);
   const targetCenter: number = currentCenter[axis.line];
@@ -71,19 +72,28 @@ const isCombiningWith = ({
   return isWithin(end - twoThirdsOfSize, end)(targetCenter);
 };
 
+function tryGetCombineImpact(impact: DragImpact): ?CombineImpact {
+  if (impact.at && impact.at.type === 'COMBINE') {
+    return impact.at;
+  }
+  return null;
+}
+
 type Args = {|
+  draggable: DraggableDimension,
   pageBorderBoxCenterWithDroppableScrollChange: Position,
   previousImpact: DragImpact,
   destination: DroppableDimension,
-  insideDestinationWithoutDraggable: DraggableDimension[],
+  insideDestination: DraggableDimension[],
   userDirection: UserDirection,
   onLift: OnLift,
 |};
 export default ({
+  draggable,
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
   previousImpact,
   destination,
-  insideDestinationWithoutDraggable,
+  insideDestination,
   userDirection,
   onLift,
 }: Args): ?DragImpact => {
@@ -92,17 +102,17 @@ export default ({
   }
 
   const axis: Axis = destination.axis;
-  const map: DisplacementMap = previousImpact.movement.map;
-  const canBeDisplacedBy: DisplacedBy = previousImpact.movement.displacedBy;
-  const oldMerge: ?CombineImpact = previousImpact.merge;
+  const displaced: DisplacementGroups = previousImpact.displaced;
+  const canBeDisplacedBy: DisplacedBy = previousImpact.displacedBy;
+  const lastCombineImpact: ?CombineImpact = tryGetCombineImpact(previousImpact);
 
   const target: ?DraggableDimension = find(
-    insideDestinationWithoutDraggable,
+    removeDraggableFromList(draggable, insideDestination),
     (child: DraggableDimension): boolean => {
       const id: DraggableId = child.descriptor.id;
 
       const displaceBy: Position = getCombinedItemDisplacement({
-        displaced: map,
+        displaced,
         onLift,
         combineWith: id,
         displacedBy: canBeDisplacedBy,
@@ -115,7 +125,7 @@ export default ({
         borderBox: child.page.borderBox,
         displaceBy,
         currentUserDirection: userDirection,
-        oldMerge,
+        lastCombineImpact,
       });
     },
   );
@@ -124,20 +134,22 @@ export default ({
     return null;
   }
 
-  const merge: CombineImpact = {
-    whenEntered: getWhenEntered(target.descriptor.id, userDirection, oldMerge),
-    combine: {
-      draggableId: target.descriptor.id,
-      droppableId: destination.descriptor.id,
+  // no change of displacement
+  const impact: DragImpact = {
+    displacedBy: previousImpact.displacedBy,
+    displaced: previousImpact.displaced,
+    at: {
+      type: 'COMBINE',
+      whenEntered: getWhenEntered(
+        target.descriptor.id,
+        userDirection,
+        lastCombineImpact,
+      ),
+      combine: {
+        draggableId: target.descriptor.id,
+        droppableId: destination.descriptor.id,
+      },
     },
   };
-
-  // no change of displacement
-  // clearing any destination
-  const withMerge: DragImpact = {
-    ...previousImpact,
-    destination: null,
-    merge,
-  };
-  return withMerge;
+  return impact;
 };

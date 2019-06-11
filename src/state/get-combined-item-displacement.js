@@ -1,7 +1,7 @@
 // @flow
 import type { Position } from 'css-box-model';
 import type {
-  DisplacementMap,
+  DisplacementGroups,
   OnLift,
   DraggableId,
   DisplacedBy,
@@ -10,7 +10,7 @@ import { origin, negate } from './position';
 import didStartDisplaced from './starting-displaced/did-start-displaced';
 
 type Args = {|
-  displaced: DisplacementMap,
+  displaced: DisplacementGroups,
   onLift: OnLift,
   combineWith: DraggableId,
   displacedBy: DisplacedBy,
@@ -22,7 +22,9 @@ export default ({
   combineWith,
   displacedBy,
 }: Args): Position => {
-  const isDisplaced: boolean = Boolean(displaced[combineWith]);
+  const isDisplaced: boolean = Boolean(
+    displaced.visible[combineWith] || displaced.invisible[combineWith],
+  );
 
   if (didStartDisplaced(combineWith, onLift)) {
     return isDisplaced ? origin : negate(displacedBy.point);
