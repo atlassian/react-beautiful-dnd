@@ -1,16 +1,16 @@
 // @flow
-import type { DroppableId, DragImpact } from '../../types';
+import type { ImpactLocation, DroppableId, DragImpact } from '../../types';
 
 export default (impact: DragImpact): ?DroppableId => {
-  const { merge, destination } = impact;
+  const at: ?ImpactLocation = impact.at;
 
-  if (destination) {
-    return destination.droppableId;
+  if (!at) {
+    return null;
   }
 
-  if (merge) {
-    return merge.combine.droppableId;
+  if (at.type === 'REORDER') {
+    return at.destination.droppableId;
   }
 
-  return null;
+  return at.combine.droppableId;
 };

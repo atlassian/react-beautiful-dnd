@@ -187,7 +187,7 @@ export type ReorderImpact = {|
 |};
 
 export type CombineImpact = {|
-  type: 'REORDER',
+  type: 'COMBINE',
   whenEntered: UserDirection,
   combine: Combine,
 |};

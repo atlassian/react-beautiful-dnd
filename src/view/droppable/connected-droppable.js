@@ -195,7 +195,9 @@ export const makeMapStateToProps = (): Selector => {
 
       // Looking at impact as this controls the placeholder
       const wasOver: boolean = whatIsDraggedOver(completed.impact) === id;
-      const wasCombining: boolean = Boolean(completed.impact.merge);
+      const wasCombining: boolean = Boolean(
+        completed.impact.at && completed.impact.at.type === 'COMBINE',
+      );
 
       // need to cut any animations: sadly a memoization fail
       // we need to do this for all lists as there might be

@@ -40,7 +40,9 @@ const getCombineWithFromResult = (result: DropResult): ?DraggableId => {
 };
 
 const getCombineWithFromImpact = (impact: DragImpact): ?DraggableId => {
-  return impact.merge ? impact.merge.combine.draggableId : null;
+  return impact.at && impact.at.type === 'COMBINE'
+    ? impact.at.combine.draggableId
+    : null;
 };
 
 // Returning a function to ensure each
@@ -134,35 +136,26 @@ export const makeMapStateToProps = (): Selector => {
     draggingId: DraggableId,
     impact: DragImpact,
   ): ?MapProps => {
-    // Doing this cuts 50% of the time to move
-    // Otherwise need to loop over every item in every selector (yuck!)
-    const map: DisplacementMap = impact.movement.map;
-    const displacement: ?Displacement = map[ownId];
-    const movement: DragMovement = impact.movement;
-    const merge: ?CombineImpact = impact.merge;
-    const isCombinedWith: boolean = Boolean(
-      merge && merge.combine.draggableId === ownId,
-    );
-    const displacedBy: Position = movement.displacedBy.point;
-    const offset: Position = memoizedOffset(displacedBy.x, displacedBy.y);
+    const displacement: ?Displacement = impact.displaced.visible[ownId];
 
-    if (isCombinedWith) {
-      return getSecondaryProps(
-        displacement ? offset : origin,
-        draggingId,
-        displacement ? displacement.shouldAnimate : true,
-      );
-    }
-
-    // does not need to move
     if (!displacement) {
       return null;
     }
 
-    // do not need to do anything
-    if (!displacement.isVisible) {
-      return null;
-    }
+    // const merge: ?CombineImpact = impact.merge;
+    // const isCombinedWith: boolean = Boolean(
+    //   merge && merge.combine.draggableId === ownId,
+    // );
+    const displacedBy: Position = impact.displacedBy.point;
+    const offset: Position = memoizedOffset(displacedBy.x, displacedBy.y);
+
+    // if (isCombinedWith) {
+    //   return getSecondaryProps(
+    //     displacement ? offset : origin,
+    //     draggingId,
+    //     displacement ? displacement.shouldAnimate : true,
+    //   );
+    // }
 
     return getSecondaryProps(offset, null, displacement.shouldAnimate);
   };

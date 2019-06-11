@@ -14,10 +14,8 @@ import type {
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import withDroppableScroll from '../with-scroll-change/with-droppable-scroll';
-import getCombineImpact from './get-combine-impact';
 import getReorderImpact from './get-reorder-impact';
 import noImpact from '../no-impact';
-import removeDraggableFromList from '../remove-draggable-from-list';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -39,6 +37,7 @@ export default ({
   previousImpact,
   viewport,
   userDirection,
+  onLift,
 }: Args): DragImpact => {
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
@@ -91,5 +90,6 @@ export default ({
     last: previousImpact.displaced,
     viewport,
     userDirection,
+    onLift,
   });
 };

@@ -1,6 +1,7 @@
 // @flow
 import { type Position, type Rect } from 'css-box-model';
 import type {
+  DraggableId,
   DraggableDimension,
   DroppableDimension,
   DragImpact,
@@ -10,6 +11,7 @@ import type {
   Viewport,
   UserDirection,
   DisplacedBy,
+  OnLift,
 } from '../../types';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
@@ -18,6 +20,7 @@ import isHomeOf from '../droppable/is-home-of';
 import { find } from '../../native-with-fallback';
 import getDisplacementGroups from '../get-displacement-groups';
 import { emptyGroups } from '../no-impact';
+import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
@@ -27,6 +30,7 @@ type Args = {|
   last: DisplacementGroups,
   viewport: Viewport,
   userDirection: UserDirection,
+  onLift: OnLift,
 |};
 
 function at(destination: DroppableDimension, index: number): ReorderImpact {
@@ -47,6 +51,7 @@ export default ({
   last,
   viewport,
   userDirection,
+  onLift,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const isMovingForward: boolean = isUserMovingForward(
@@ -72,26 +77,44 @@ export default ({
       : indexOfLastItem + 1;
   })();
 
-  const insideDestinationWithoutDraggable = removeDraggableFromList(
-    draggable,
-    insideDestination,
-  );
-
   const targetCenter: number = currentCenter[axis.line];
   const displacement: number = displacedBy.value;
 
   const first: ?DraggableDimension = find(
-    insideDestinationWithoutDraggable,
-    (child: DraggableDimension) => {
+    insideDestination,
+    (child: DraggableDimension): boolean => {
+      const id: DraggableId = child.descriptor.id;
+      if (id === draggable.descriptor.id) {
+        return false;
+      }
       const borderBox: Rect = child.page.borderBox;
       const start: number = borderBox[axis.start];
       const end: number = borderBox[axis.end];
 
+      const didStartDisplaced: boolean = getDidStartDisplaced(id, onLift);
+
+      // Moving forward will decrease the amount of things needed to be displaced
       if (isMovingForward) {
+        if (didStartDisplaced) {
+          // if started displaced then its displaced position is its resting position
+          // continue to keep the item at rest until we go onto the start of the item
+          return targetCenter < start;
+        }
+        // if the item did not start displaced then we displace the item
+        // while we are still before the start edge
         return targetCenter < start + displacement;
       }
 
-      // moving backwards
+      // Moving backwards will increase the amount of things needed to be displaced
+      // The logic for this works by looking at assuming everything has been displaced
+      // backwards and then looking at how you would undo that
+
+      if (didStartDisplaced) {
+        // we continue to displace the item until we move back over the end of the item without displacement
+        return targetCenter <= end - displacement;
+      }
+
+      // a non-displaced item is at rest. when we hit the item from the bottom we move it out of the way
       return targetCenter <= end;
     },
   );
@@ -105,8 +128,9 @@ export default ({
     };
   }
 
-  const impacted: DraggableDimension[] = insideDestinationWithoutDraggable.slice(
-    first.descriptor.index,
+  const impacted: DraggableDimension[] = removeDraggableFromList(
+    draggable,
+    insideDestination.slice(first.descriptor.index),
   );
 
   const displaced: DisplacementGroups = getDisplacementGroups({
