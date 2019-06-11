@@ -65,18 +65,15 @@ export default ({
 
   const targetCenter: number = currentCenter[axis.line];
   const displacement: number = displacedBy.value;
-  const withoutDraggable: DraggableDimension[] = removeDraggableFromList(
+  const withoutDragging: DraggableDimension[] = removeDraggableFromList(
     draggable,
     insideDestination,
   );
 
   const first: ?DraggableDimension = find(
-    insideDestination,
+    withoutDragging,
     (child: DraggableDimension): boolean => {
       const id: DraggableId = child.descriptor.id;
-      if (id === draggable.descriptor.id) {
-        return false;
-      }
       const borderBox: Rect = child.page.borderBox;
       const start: number = borderBox[axis.start];
       const end: number = borderBox[axis.end];
@@ -134,12 +131,8 @@ export default ({
     };
   }
 
-  const impacted: DraggableDimension[] = removeDraggableFromList(
-    draggable,
-    insideDestination.slice(first.descriptor.index),
-  );
-
-  console.log('impacted', impacted);
+  const newIndex: number = withoutDragging.indexOf(first);
+  const impacted: DraggableDimension[] = withoutDragging.slice(newIndex);
 
   const displaced: DisplacementGroups = getDisplacementGroups({
     afterDragging: impacted,
@@ -149,16 +142,11 @@ export default ({
     viewport: viewport.frame,
   });
 
-  const newIndex: number = removeDraggableFromList(
-    draggable,
-    insideDestination,
-  ).indexOf(first);
-
   const impact: DragImpact = {
     displaced,
     displacedBy,
     closestDisplaced: first.descriptor.id,
-    at: at(destination, first.descriptor.index - 1),
+    at: at(destination, newIndex),
   };
 
   return impact;
