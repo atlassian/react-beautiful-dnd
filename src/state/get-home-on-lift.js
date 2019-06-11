@@ -71,16 +71,16 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
     forceShouldAnimate: false,
   });
 
-  const closestDisplaced: ?DraggableId = afterDragging.length
+  const closestAfter: ?DraggableId = afterDragging.length
     ? afterDragging[0].descriptor.id
     : null;
 
   const impact: DragImpact = {
     displaced,
     displacedBy,
-    closestDisplaced,
     at: {
       type: 'REORDER',
+      closestAfter,
       destination: getHomeLocation(draggable.descriptor),
     },
   };

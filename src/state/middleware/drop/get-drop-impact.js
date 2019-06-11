@@ -72,7 +72,6 @@ export default ({
   const withoutMovement: DragImpact = {
     ...lastImpact,
     displaced: emptyGroups,
-    closestDisplaced: null,
   };
 
   return {
