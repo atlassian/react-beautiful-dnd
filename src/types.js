@@ -184,6 +184,7 @@ export type DisplacementGroups = {|
 export type ReorderImpact = {|
   type: 'REORDER',
   destination: DraggableLocation,
+  closestAfter: ?DraggableId,
 |};
 
 export type CombineImpact = {|
@@ -196,7 +197,6 @@ export type ImpactLocation = ReorderImpact | CombineImpact;
 
 export type DragImpact = {|
   displaced: DisplacementGroups,
-  closestDisplaced: ?DraggableId,
   displacedBy: DisplacedBy,
   at: ?ImpactLocation,
 |};

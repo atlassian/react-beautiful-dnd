@@ -17,7 +17,7 @@ import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import removeDraggableFromList from '../remove-draggable-from-list';
 import isHomeOf from '../droppable/is-home-of';
-import { find, findIndex } from '../../native-with-fallback';
+import { find } from '../../native-with-fallback';
 import getDisplacementGroups from '../get-displacement-groups';
 import { emptyGroups } from '../no-impact';
 import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
@@ -33,9 +33,14 @@ type Args = {|
   onLift: OnLift,
 |};
 
-function at(destination: DroppableDimension, index: number): ReorderImpact {
+function at(
+  destination: DroppableDimension,
+  closestAfter: ?DraggableId,
+  index: number,
+): ReorderImpact {
   return {
     type: 'REORDER',
+    closestAfter,
     destination: {
       droppableId: destination.descriptor.id,
       index,
@@ -125,9 +130,8 @@ export default ({
 
     return {
       displaced: emptyGroups,
-      closestDisplaced: null,
       displacedBy,
-      at: at(destination, rawIndexOfLastItem),
+      at: at(destination, null, rawIndexOfLastItem),
     };
   }
 
@@ -145,8 +149,7 @@ export default ({
   const impact: DragImpact = {
     displaced,
     displacedBy,
-    closestDisplaced: first.descriptor.id,
-    at: at(destination, newIndex),
+    at: at(destination, first.descriptor.id, newIndex),
   };
 
   return impact;

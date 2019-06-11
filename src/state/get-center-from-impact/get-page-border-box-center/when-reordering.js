@@ -1,8 +1,10 @@
 // @flow
+import invariant from 'tiny-invariant';
 import { offset, type Position, type BoxModel } from 'css-box-model';
 import type {
   Axis,
   DragImpact,
+  DraggableId,
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimension,
@@ -47,16 +49,18 @@ export default ({
     });
   }
 
-  const { closestDisplaced, displacedBy } = impact;
+  const { at, displacedBy } = impact;
+  invariant(at && at.type === 'REORDER');
+  const closestAfter: ?DraggableId = at.closestAfter;
 
   // go before the first displaced item
   // items can only be displaced forwards
-  if (closestDisplaced) {
-    const closest: DraggableDimension = draggables[closestDisplaced];
+  if (closestAfter) {
+    const closest: DraggableDimension = draggables[closestAfter];
     // want to go before where it would be with the displacement
 
     // target is displaced and is already in it's starting position
-    if (didStartDisplaced(closestDisplaced, onLift)) {
+    if (didStartDisplaced(closestAfter, onLift)) {
       return goBefore({
         axis,
         moveRelativeTo: closest.page,
