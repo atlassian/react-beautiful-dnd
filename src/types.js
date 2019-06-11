@@ -145,12 +145,15 @@ export type DraggableLocation = {|
   index: number,
 |};
 
+export type DraggableIdMap = {
+  [id: DraggableId]: true,
+};
+
 export type DraggableDimensionMap = { [key: DraggableId]: DraggableDimension };
 export type DroppableDimensionMap = { [key: DroppableId]: DroppableDimension };
 
 export type Displacement = {|
   draggableId: DraggableId,
-  isVisible: boolean,
   shouldAnimate: boolean,
 |};
 
@@ -159,15 +162,6 @@ export type DisplacementMap = { [key: DraggableId]: Displacement };
 export type DisplacedBy = {|
   value: number,
   point: Position,
-|};
-
-export type DragMovement = {|
-  // The draggables that need to move in response to a drag.
-  // Ordered by closest draggable to the *current* location of the dragging item
-  displaced: Displacement[],
-  // displaced as a map
-  map: DisplacementMap,
-  displacedBy: DisplacedBy,
 |};
 
 export type VerticalUserDirection = 'up' | 'down';
@@ -182,19 +176,28 @@ export type Combine = {|
   draggableId: DraggableId,
   droppableId: DroppableId,
 |};
+export type DisplacementGroups = {|
+  visible: DisplacementMap,
+  invisible: DraggableIdMap,
+|};
+
+export type ReorderImpact = {|
+  type: 'REORDER',
+  destination: DraggableLocation,
+|};
 
 export type CombineImpact = {|
-  // This has an impact on the hitbox for a grouping action
+  type: 'REORDER',
   whenEntered: UserDirection,
   combine: Combine,
 |};
 
+export type ImpactLocation = ReorderImpact | CombineImpact;
+
 export type DragImpact = {|
-  movement: DragMovement,
-  // a reorder location
-  destination: ?DraggableLocation,
-  // a merge location
-  merge: ?CombineImpact,
+  displaced: DisplacementGroups,
+  displacedBy: DisplacedBy,
+  at: ?ImpactLocation,
 |};
 
 export type ClientPositions = {|
@@ -295,10 +298,6 @@ export type IdleState = {|
   completed: ?CompletedDrag,
   shouldFlush: boolean,
 |};
-
-export type DraggableIdMap = {
-  [id: DraggableId]: true,
-};
 
 export type OnLift = {|
   wasDisplaced: DraggableIdMap,

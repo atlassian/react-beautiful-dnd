@@ -18,7 +18,7 @@ import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
 import removeDraggableFromList from '../remove-draggable-from-list';
-import isHomeOf from '../droppable/is-home-of';
+import isHomeOf from '../droppable/is-home-of'; ``;
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,

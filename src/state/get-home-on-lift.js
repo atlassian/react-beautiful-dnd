@@ -6,18 +6,15 @@ import type {
   DroppableDimension,
   DraggableDimensionMap,
   DragImpact,
-  Displacement,
   DisplacedBy,
   Viewport,
-  DragMovement,
   DraggableIdMap,
+  DisplacementGroups,
   OnLift,
 } from '../types';
-import noImpact from './no-impact';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import getDisplacedBy from './get-displaced-by';
-import getDisplacementMap from './get-displacement-map';
-import getDisplacement from './get-displacement';
+import getDisplacementGroups from './get-displacement-groups';
 
 type Args = {|
   draggable: DraggableDimension,
@@ -47,10 +44,8 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
   const rawIndex: number = insideHome.indexOf(draggable);
   invariant(rawIndex !== -1, 'Expected draggable to be inside home list');
 
-  const originallyDisplaced: DraggableDimension[] = insideHome.slice(
-    rawIndex + 1,
-  );
-  const wasDisplaced: DraggableIdMap = originallyDisplaced.reduce(
+  const afterDragging: DraggableDimension[] = insideHome.slice(rawIndex + 1);
+  const wasDisplaced: DraggableIdMap = afterDragging.reduce(
     (previous: DraggableIdMap, item: DraggableDimension): DraggableIdMap => {
       previous[item.descriptor.id] = true;
       return previous;
@@ -62,31 +57,25 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
     wasDisplaced,
   };
 
-  const displaced: Displacement[] = originallyDisplaced.map(
-    (dimension: DraggableDimension): Displacement =>
-      getDisplacement({
-        draggable: dimension,
-        destination: home,
-        previousImpact: noImpact,
-        viewport: viewport.frame,
-        // originally we do not want any animation as we want
-        // everything to be fixed in the same position that
-        // it started in
-        forceShouldAnimate: false,
-        onLift,
-      }),
-  );
-
-  const movement: DragMovement = {
-    displaced,
-    map: getDisplacementMap(displaced),
+  const displaced: DisplacementGroups = getDisplacementGroups({
+    afterDragging,
+    destination: home,
     displacedBy,
-  };
+    last: null,
+    viewport: viewport.frame,
+    // originally we do not want any animation as we want
+    // everything to be fixed in the same position that
+    // it started in
+    forceShouldAnimate: false,
+  });
 
   const impact: DragImpact = {
-    movement,
-    destination: getHomeLocation(draggable.descriptor),
-    merge: null,
+    displaced,
+    displacedBy,
+    at: {
+      type: 'REORDER',
+      destination: getHomeLocation(draggable.descriptor),
+    },
   };
 
   return { impact, onLift };
