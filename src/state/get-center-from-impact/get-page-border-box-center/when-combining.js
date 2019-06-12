@@ -5,7 +5,7 @@ import type {
   DraggableDimensionMap,
   DraggableId,
   Combine,
-  OnLift,
+  LiftEffect,
   DragImpact,
 } from '../../../types';
 import { add } from '../../position';
@@ -16,12 +16,12 @@ type Args = {|
   impact: DragImpact,
   // all draggables in the system
   draggables: DraggableDimensionMap,
-  onLift: OnLift,
+  displacedByLift: LiftEffect,
 |};
 
 // Returns the client offset required to move an item from its
 // original client position to its final resting position
-export default ({ onLift, impact, draggables }: Args): Position => {
+export default ({ displacedByLift, impact, draggables }: Args): Position => {
   const combine: ?Combine = tryGetCombine(impact);
   invariant(combine);
 
@@ -30,7 +30,7 @@ export default ({ onLift, impact, draggables }: Args): Position => {
 
   const displaceBy: Position = getCombinedItemDisplacement({
     displaced: impact.displaced,
-    onLift,
+    displacedByLift,
     combineWith,
     displacedBy: impact.displacedBy,
   });

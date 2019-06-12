@@ -8,7 +8,7 @@ import type {
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimension,
-  OnLift,
+  LiftEffect,
 } from '../../../types';
 import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
@@ -20,7 +20,7 @@ type NewHomeArgs = {|
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
   droppable: DroppableDimension,
-  onLift: OnLift,
+  displacedByLift: LiftEffect,
 |};
 
 // Returns the client offset required to move an item from its
@@ -30,7 +30,7 @@ export default ({
   draggable,
   draggables,
   droppable,
-  onLift,
+  displacedByLift,
 }: NewHomeArgs): Position => {
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable.descriptor.id,
@@ -60,7 +60,7 @@ export default ({
     // want to go before where it would be with the displacement
 
     // target is displaced and is already in it's starting position
-    if (didStartDisplaced(closestAfter, onLift)) {
+    if (didStartDisplaced(closestAfter, displacedByLift)) {
       return goBefore({
         axis,
         moveRelativeTo: closest.page,
@@ -90,11 +90,14 @@ export default ({
     return draggablePage.borderBox.center;
   }
 
-  if (didStartDisplaced(last.descriptor.id, onLift)) {
+  if (didStartDisplaced(last.descriptor.id, displacedByLift)) {
     // if the item started displaced and it is no longer displaced then
     // we need to go after it it's non-displaced position
 
-    const page: BoxModel = offset(last.page, negate(onLift.displacedBy.point));
+    const page: BoxModel = offset(
+      last.page,
+      negate(displacedByLift.displacedBy.point),
+    );
     return goAfter({
       axis,
       moveRelativeTo: page,

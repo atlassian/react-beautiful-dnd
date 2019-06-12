@@ -6,7 +6,7 @@ import type {
   DroppableDimension,
   DraggableDimensionMap,
   ImpactLocation,
-  OnLift,
+  LiftEffect,
 } from '../../../types';
 import whenCombining from './when-combining';
 import whenReordering from './when-reordering';
@@ -14,7 +14,7 @@ import withDroppableDisplacement from '../../with-scroll-change/with-droppable-d
 
 type Args = {|
   impact: DragImpact,
-  onLift: OnLift,
+  displacedByLift: LiftEffect,
   draggable: DraggableDimension,
   droppable: ?DroppableDimension,
   draggables: DraggableDimensionMap,
@@ -25,7 +25,7 @@ const getResultWithoutDroppableDisplacement = ({
   draggable,
   droppable,
   draggables,
-  onLift,
+  displacedByLift,
 }: Args): Position => {
   const original: Position = draggable.page.borderBox.center;
   const at: ?ImpactLocation = impact.at;
@@ -44,14 +44,14 @@ const getResultWithoutDroppableDisplacement = ({
       draggable,
       draggables,
       droppable,
-      onLift,
+      displacedByLift,
     });
   }
 
   return whenCombining({
     impact,
     draggables,
-    onLift,
+    displacedByLift,
   });
 };
 

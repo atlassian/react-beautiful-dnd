@@ -11,7 +11,7 @@ import type {
   Viewport,
   UserDirection,
   DisplacedBy,
-  OnLift,
+  LiftEffect,
 } from '../../types';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
@@ -21,7 +21,7 @@ import { find } from '../../native-with-fallback';
 import getDisplacementGroups from '../get-displacement-groups';
 import { emptyGroups } from '../no-impact';
 import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
-import getDisplaced from '../get-displaced';
+// import getDisplaced from '../get-displaced';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
@@ -31,7 +31,7 @@ type Args = {|
   last: DisplacementGroups,
   viewport: Viewport,
   userDirection: UserDirection,
-  onLift: OnLift,
+  displacedByLift: LiftEffect,
 |};
 
 function at(
@@ -57,7 +57,7 @@ export default ({
   last,
   viewport,
   userDirection,
-  onLift,
+  displacedByLift,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const isMovingForward: boolean = isUserMovingForward(
@@ -84,7 +84,10 @@ export default ({
       const start: number = borderBox[axis.start];
       const end: number = borderBox[axis.end];
 
-      const didStartDisplaced: boolean = getDidStartDisplaced(id, onLift);
+      const didStartDisplaced: boolean = getDidStartDisplaced(
+        id,
+        displacedByLift,
+      );
 
       // Moving forward will decrease the amount of things needed to be displaced
       if (isMovingForward) {

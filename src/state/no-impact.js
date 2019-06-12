@@ -15,7 +15,6 @@ export const emptyGroups: DisplacementGroups = {
 const noImpact: DragImpact = {
   displaced: emptyGroups,
   displacedBy: noDisplacedBy,
-  closestDisplaced: null,
   at: null,
 };
 

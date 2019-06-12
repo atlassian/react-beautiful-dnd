@@ -15,7 +15,7 @@ import type {
 import * as timings from '../../debug/timings';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 import getDragImpact from '../get-drag-impact';
-import getHomeOnLift from '../get-home-on-lift';
+import getLiftEffects from '../get-lift-effects';
 import getDragPositions from './get-drag-positions';
 import updateDraggables from './update-draggables';
 import updateDroppables from './update-droppables';

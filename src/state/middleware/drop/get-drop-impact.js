@@ -5,7 +5,7 @@ import type {
   Viewport,
   DroppableDimension,
   DraggableDimensionMap,
-  OnLift,
+  LiftEffect,
 } from '../../../types';
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import recompute from '../../update-displacement-visibility/recompute';
@@ -19,7 +19,7 @@ type Args = {|
   viewport: Viewport,
   home: DroppableDimension,
   draggables: DraggableDimensionMap,
-  onLift: OnLift,
+  displacedByLift: LiftEffect,
 |};
 
 export type Result = {|
@@ -34,7 +34,7 @@ export default ({
   viewport,
   draggables,
   onLiftImpact,
-  onLift,
+  displacedByLift,
 }: Args): Result => {
   if (!lastImpact.at || reason !== 'DROP') {
     // Dropping outside of a list or the drag was cancelled
@@ -48,7 +48,7 @@ export default ({
       destination: home,
       viewport,
       draggables,
-      onLift,
+      displacedByLift,
       // We need the draggables to animate back to their positions
       forceShouldAnimate: true,
     });

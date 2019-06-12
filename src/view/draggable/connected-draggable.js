@@ -13,13 +13,10 @@ import type {
   State,
   DraggableId,
   DroppableId,
-  DragMovement,
   DraggableDimension,
-  CombineImpact,
   Displacement,
   CompletedDrag,
   DragImpact,
-  DisplacementMap,
   MovementMode,
   DropResult,
 } from '../../types';

@@ -9,7 +9,7 @@ import type {
   UserDirection,
   DragImpact,
   Viewport,
-  OnLift,
+  LiftEffect,
 } from '../../types';
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
@@ -27,7 +27,7 @@ type Args = {|
   previousImpact: DragImpact,
   viewport: Viewport,
   userDirection: UserDirection,
-  onLift: OnLift,
+  displacedByLift: LiftEffect,
 |};
 
 export default ({
@@ -38,7 +38,7 @@ export default ({
   previousImpact,
   viewport,
   userDirection,
-  onLift,
+  displacedByLift,
 }: Args): DragImpact => {
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
@@ -74,7 +74,7 @@ export default ({
     destination,
     insideDestination,
     userDirection,
-    onLift,
+    displacedByLift,
   });
 
   if (withMerge) {
@@ -89,6 +89,6 @@ export default ({
     last: previousImpact.displaced,
     viewport,
     userDirection,
-    onLift,
+    displacedByLift,
   });
 };

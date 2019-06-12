@@ -11,11 +11,12 @@ import type {
   DraggableIdMap,
   DisplacementGroups,
   DraggableId,
-  OnLift,
+  LiftEffect,
 } from '../types';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import getDisplacedBy from './get-displaced-by';
 import getDisplacementGroups from './get-displacement-groups';
+// import { emptyGroups } from './no-impact';
 
 type Args = {|
   draggable: DraggableDimension,
@@ -25,7 +26,8 @@ type Args = {|
 |};
 
 type Result = {|
-  onLift: OnLift,
+  reverseDisplacement: LiftEffect,
+  displacedByLift: LiftEffect,
   impact: DragImpact,
 |};
 
@@ -47,16 +49,16 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
 
   const afterDragging: DraggableDimension[] = insideHome.slice(rawIndex + 1);
   // TODO: toDroppableIdMap?
-  const wasDisplaced: DraggableIdMap = afterDragging.reduce(
+  const effected: DraggableIdMap = afterDragging.reduce(
     (previous: DraggableIdMap, item: DraggableDimension): DraggableIdMap => {
       previous[item.descriptor.id] = true;
       return previous;
     },
     {},
   );
-  const onLift: OnLift = {
+  const displacedByLift: LiftEffect = {
     displacedBy,
-    wasDisplaced,
+    effected,
   };
 
   const displaced: DisplacementGroups = getDisplacementGroups({
@@ -84,6 +86,26 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
       destination: getHomeLocation(draggable.descriptor),
     },
   };
+  const reverseDisplacement: LiftEffect = {
+    displacedBy,
+    effected: {},
+  };
+  return { impact, displacedByLift, reverseDisplacement };
 
-  return { impact, onLift };
+  // const virtualOnLift: OnLift = {
+  //   wasDisplaced: {},
+  //   displacedBy,
+  // };
+
+  // const virtual: DragImpact = {
+  //   displaced: emptyGroups,
+  //   displacedBy,
+  //   at: {
+  //     type: 'REORDER',
+  //     closestAfter: null,
+  //     destination: getHomeLocation(draggable.descriptor),
+  //   },
+  // };
+
+  // return { impact: virtual, onLift: virtualOnLift };
 };

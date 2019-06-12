@@ -2,7 +2,7 @@
 import type { Position } from 'css-box-model';
 import type {
   DisplacementGroups,
-  OnLift,
+  LiftEffect,
   DraggableId,
   DisplacedBy,
 } from '../types';
@@ -11,14 +11,14 @@ import didStartDisplaced from './starting-displaced/did-start-displaced';
 
 type Args = {|
   displaced: DisplacementGroups,
-  onLift: OnLift,
+  displacedByLift: LiftEffect,
   combineWith: DraggableId,
   displacedBy: DisplacedBy,
 |};
 
 export default ({
   displaced,
-  onLift,
+  displacedByLift,
   combineWith,
   displacedBy,
 }: Args): Position => {
@@ -26,7 +26,7 @@ export default ({
     displaced.visible[combineWith] || displaced.invisible[combineWith],
   );
 
-  if (didStartDisplaced(combineWith, onLift)) {
+  if (didStartDisplaced(combineWith, displacedByLift)) {
     return isDisplaced ? origin : negate(displacedBy.point);
   }
 

@@ -9,7 +9,7 @@ import type {
   CombineImpact,
   DragImpact,
   DisplacementGroups,
-  OnLift,
+  LiftEffect,
   DisplacedBy,
 } from '../../types';
 import isWithin from '../is-within';
@@ -86,7 +86,7 @@ type Args = {|
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   userDirection: UserDirection,
-  onLift: OnLift,
+  displacedByLift: LiftEffect,
 |};
 export default ({
   draggable,
@@ -95,7 +95,7 @@ export default ({
   destination,
   insideDestination,
   userDirection,
-  onLift,
+  displacedByLift,
 }: Args): ?DragImpact => {
   if (!destination.isCombineEnabled) {
     return null;
@@ -113,7 +113,7 @@ export default ({
 
       const displaceBy: Position = getCombinedItemDisplacement({
         displaced,
-        onLift,
+        displacedByLift,
         combineWith: id,
         displacedBy: canBeDisplacedBy,
       });

@@ -195,7 +195,13 @@ export type CombineImpact = {|
 
 export type ImpactLocation = ReorderImpact | CombineImpact;
 
+export type Displaced = {|
+  forwards: DisplacementGroups,
+  backwards: DisplacementGroups,
+|};
+
 export type DragImpact = {|
+  // TODO: Displaced
   displaced: DisplacementGroups,
   displacedBy: DisplacedBy,
   at: ?ImpactLocation,
@@ -300,9 +306,8 @@ export type IdleState = {|
   shouldFlush: boolean,
 |};
 
-// TODO: rename
-export type OnLift = {|
-  wasDisplaced: DraggableIdMap,
+export type LiftEffect = {|
+  effected: DraggableIdMap,
   displacedBy: DisplacedBy,
 |};
 
@@ -317,7 +322,9 @@ export type DraggingState = {|
   userDirection: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
-  onLift: OnLift,
+  // for virtual lists
+  reverseDisplacement: LiftEffect,
+  displacedByLift: LiftEffect,
   onLiftImpact: DragImpact,
   // when there is a fixed list we want to opt out of this behaviour
   isWindowScrollAllowed: boolean,

@@ -5,7 +5,7 @@ import type {
   DragImpact,
   Displacement,
   Viewport,
-  OnLift,
+  LiftEffect,
 } from '../../types';
 import getDisplacement from '../get-displacement';
 import withNewDisplacement from './with-new-displacement';
@@ -15,7 +15,7 @@ type RecomputeArgs = {|
   impact: DragImpact,
   destination: DroppableDimension,
   viewport: Viewport,
-  onLift: OnLift,
+  displacedByLift: LiftEffect,
   draggables: DraggableDimensionMap,
   forceShouldAnimate?: boolean,
 |};
@@ -25,7 +25,7 @@ export default ({
   viewport,
   destination,
   draggables,
-  onLift,
+  displacedByLift,
   forceShouldAnimate,
 }: RecomputeArgs): DragImpact => {
   // TODO!!!!
