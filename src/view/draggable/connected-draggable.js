@@ -136,21 +136,24 @@ export const makeMapStateToProps = (): Selector => {
     afterCritical: LiftEffect,
   ): ?MapProps => {
     const displacement: ?Displacement = impact.displaced.visible[ownId];
-    const isSpecial: boolean = Boolean(
+    const isAfterCriticalInVirtualList: boolean = Boolean(
       afterCritical.inVirtualList && afterCritical.effected[ownId],
     );
 
+    console.log('displacement', displacement);
     if (!displacement) {
-      if (!isSpecial) {
+      if (!isAfterCriticalInVirtualList) {
         return null;
       }
 
-      const change: Position = negate(impact.displacedBy.point);
+      // when not over a list we close the gap
+
+      const change: Position = negate(afterCritical.displacedBy.point);
       const offset: Position = memoizedOffset(change.x, change.y);
       return getSecondaryProps(offset, null, true);
     }
 
-    if (isSpecial) {
+    if (isAfterCriticalInVirtualList) {
       return null;
     }
 
