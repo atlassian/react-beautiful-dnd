@@ -5,7 +5,7 @@ import { Component } from 'react';
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import Draggable from './draggable';
-import { origin } from '../../state/position';
+import { origin, negate } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
 import { curves, combine } from '../../animation';
 import { dropAnimationFinished as dropAnimationFinishedAction } from '../../state/action-creators';
@@ -19,6 +19,7 @@ import type {
   DragImpact,
   MovementMode,
   DropResult,
+  LiftEffect,
 } from '../../types';
 import type {
   MapProps,
@@ -132,10 +133,21 @@ export const makeMapStateToProps = (): Selector => {
     ownId: DraggableId,
     draggingId: DraggableId,
     impact: DragImpact,
+    reverseDisplacement: LiftEffect,
   ): ?MapProps => {
     const displacement: ?Displacement = impact.displaced.visible[ownId];
+    const shouldReverse: boolean = Boolean(reverseDisplacement.effected[ownId]);
 
     if (!displacement) {
+      if (!shouldReverse) {
+        return null;
+      }
+      const change: Position = negate(impact.displacedBy.point);
+      const offset: Position = memoizedOffset(change.x, change.y);
+      return getSecondaryProps(offset, null, true);
+    }
+
+    if (shouldReverse) {
       return null;
     }
 
@@ -144,7 +156,8 @@ export const makeMapStateToProps = (): Selector => {
     //   merge && merge.combine.draggableId === ownId,
     // );
     const displacedBy: Position = impact.displacedBy.point;
-    const offset: Position = memoizedOffset(displacedBy.x, displacedBy.y);
+    const change: Position = shouldReverse ? negate(displacedBy) : displacedBy;
+    const offset: Position = memoizedOffset(change.x, change.y);
 
     // if (isCombinedWith) {
     //   return getSecondaryProps(
@@ -245,6 +258,7 @@ export const makeMapStateToProps = (): Selector => {
         ownProps.draggableId,
         state.critical.draggable.id,
         state.impact,
+        state.reverseDisplacement,
       );
     }
 
@@ -259,6 +273,7 @@ export const makeMapStateToProps = (): Selector => {
         ownProps.draggableId,
         completed.result.draggableId,
         completed.impact,
+        state.reverseDisplacement,
       );
     }
 

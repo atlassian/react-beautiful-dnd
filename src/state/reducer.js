@@ -422,10 +422,11 @@ export default (state: State = idle, action: Action): State => {
     // Moving into a new phase
     const result: DropAnimatingState = {
       phase: 'DROP_ANIMATING',
-      dimensions: state.dimensions,
       completed,
       dropDuration,
       newHomeClientOffset,
+      dimensions: state.dimensions,
+      reverseDisplacement: state.reverseDisplacement,
     };
 
     return result;

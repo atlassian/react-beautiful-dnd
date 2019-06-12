@@ -363,6 +363,8 @@ export type DropAnimatingState = {|
   dropDuration: number,
   // We still need to render placeholders and fix the dimensions of the dragging item
   dimensions: DimensionMap,
+  // We still need to know which items displacement needs to be reversed
+  reverseDisplacement: LiftEffect,
 |};
 
 export type State =

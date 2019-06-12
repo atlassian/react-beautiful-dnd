@@ -68,6 +68,7 @@ export default ({
     destination.axis,
     draggable.displaceBy,
   );
+  const isHomeList: boolean = isHomeOf(draggable, destination);
 
   const targetCenter: number = currentCenter[axis.line];
   const displacement: number = displacedBy.value;
@@ -127,9 +128,7 @@ export default ({
         insideDestination[insideDestination.length - 1].descriptor.index;
 
       // When in a foreign list there will be an additional one item in the list
-      return isHomeOf(draggable, destination)
-        ? indexOfLastItem
-        : indexOfLastItem + 1;
+      return isHomeList ? indexOfLastItem : indexOfLastItem + 1;
     })();
 
     return {
@@ -139,8 +138,8 @@ export default ({
     };
   }
 
-  const newIndex: number = withoutDragging.indexOf(first);
-  const impacted: DraggableDimension[] = withoutDragging.slice(newIndex);
+  const sliceFrom: number = withoutDragging.indexOf(first);
+  const impacted: DraggableDimension[] = withoutDragging.slice(sliceFrom);
 
   const displaced: DisplacementGroups = getDisplacementGroups({
     afterDragging: impacted,
@@ -150,10 +149,22 @@ export default ({
     viewport: viewport.frame,
   });
 
+  const atIndex: number = (() => {
+    if (!isHomeList) {
+      return first.descriptor.index;
+    }
+
+    if (first.descriptor.index > draggable.descriptor.index) {
+      return first.descriptor.index - 1;
+    }
+
+    return first.descriptor.index;
+  })();
+
   const impact: DragImpact = {
     displaced,
     displacedBy,
-    at: at(destination, first.descriptor.id, newIndex),
+    at: at(destination, first.descriptor.id, atIndex),
   };
 
   return impact;

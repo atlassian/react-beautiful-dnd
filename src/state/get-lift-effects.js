@@ -86,26 +86,33 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
       destination: getHomeLocation(draggable.descriptor),
     },
   };
-  const reverseDisplacement: LiftEffect = {
+  // const reverseDisplacement: LiftEffect = {
+  //   displacedBy,
+  //   effected: {},
+  // };
+  // return { impact, displacedByLift, reverseDisplacement };
+
+  const virtual: DragImpact = {
+    displaced,
+    displacedBy,
+    at: {
+      type: 'REORDER',
+      closestAfter: null,
+      destination: getHomeLocation(draggable.descriptor),
+    },
+  };
+  const empty: LiftEffect = {
     displacedBy,
     effected: {},
   };
-  return { impact, displacedByLift, reverseDisplacement };
+  const reverseDisplacement: LiftEffect = {
+    effected,
+    displacedBy,
+  };
 
-  // const virtualOnLift: OnLift = {
-  //   wasDisplaced: {},
-  //   displacedBy,
-  // };
-
-  // const virtual: DragImpact = {
-  //   displaced: emptyGroups,
-  //   displacedBy,
-  //   at: {
-  //     type: 'REORDER',
-  //     closestAfter: null,
-  //     destination: getHomeLocation(draggable.descriptor),
-  //   },
-  // };
-
-  // return { impact: virtual, onLift: virtualOnLift };
+  return {
+    impact: virtual,
+    displacedByLift: reverseDisplacement,
+    reverseDisplacement,
+  };
 };
