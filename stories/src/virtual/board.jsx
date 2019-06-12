@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import styled from '@emotion/styled';
+import { colors } from '@atlaskit/theme';
 import type {
   DropResult,
   DraggableLocation,
@@ -13,7 +14,7 @@ import type { QuoteMap, Quote } from '../types';
 import reorder, { reorderQuoteMap } from '../reorder';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
-import { grid } from '../constants';
+import { grid, borderRadius } from '../constants';
 
 type Props = {|
   initial: QuoteMap,
@@ -50,11 +51,6 @@ function Item(props: ItemProps) {
 const Container = styled.div`
   display: flex;
   background: blue;
-
-  > * {
-    flex-shrink: 0;
-    margin: ${grid}px;
-  }
 `;
 
 const Row = React.memo(({ data: quotes, index, style }) => {
@@ -80,39 +76,57 @@ type ColumnProps = {|
   quotes: Quote[],
 |};
 
+const ColumnContainer = styled.div`
+  border-top-left-radius: ${borderRadius}px;
+  border-top-right-radius: ${borderRadius}px;
+  background-color: ${colors.N30};
+  flex-shrink: 0;
+  margin: ${grid}px;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ColumnHeader = styled.h3`
+  align-self: center;
+  padding: ${grid}px;
+`;
+
 const Column = React.memo(function Column(props: ColumnProps) {
   const { columnId, quotes } = props;
 
   return (
-    <Droppable
-      droppableId={columnId}
-      mode="VIRTUAL"
-      whenDraggingClone={(
-        provided: DraggableProvided,
-        snapshot: DraggableStateSnapshot,
-        source: DraggableLocation,
-      ) => (
-        <QuoteItem
-          provided={provided}
-          isDragging={snapshot.isDragging}
-          quote={quotes[source.index]}
-          style={{ margin: 0 }}
-        />
-      )}
-    >
-      {(droppableProvided: DroppableProvided) => (
-        <List
-          height={500}
-          itemCount={quotes.length}
-          itemSize={100}
-          width={300}
-          innerRef={droppableProvided.innerRef}
-          itemData={quotes}
-        >
-          {Row}
-        </List>
-      )}
-    </Droppable>
+    <ColumnContainer>
+      <ColumnHeader>{columnId}</ColumnHeader>
+      <Droppable
+        droppableId={columnId}
+        mode="VIRTUAL"
+        whenDraggingClone={(
+          provided: DraggableProvided,
+          snapshot: DraggableStateSnapshot,
+          source: DraggableLocation,
+        ) => (
+          <QuoteItem
+            provided={provided}
+            isDragging={snapshot.isDragging}
+            quote={quotes[source.index]}
+            style={{ margin: 0 }}
+          />
+        )}
+      >
+        {(droppableProvided: DroppableProvided) => (
+          <List
+            height={500}
+            itemCount={quotes.length}
+            itemSize={110}
+            width={300}
+            innerRef={droppableProvided.innerRef}
+            itemData={quotes}
+          >
+            {Row}
+          </List>
+        )}
+      </Droppable>
+    </ColumnContainer>
   );
 });
 
