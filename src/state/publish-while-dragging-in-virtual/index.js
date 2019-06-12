@@ -10,13 +10,14 @@ import type {
   DraggableId,
   DraggableDimension,
   DraggableDimensionMap,
-  DroppableDimensionMap,
+  DroppableDimension,
   DragImpact,
 } from '../../types';
 import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
 import adjustAdditionsForScrollChanges from '../publish-while-dragging/update-draggables/adjust-additions-for-scroll-changes';
 import { toDraggableMap, toDraggableList } from '../dimension-structures';
+import getLiftEffect from '../get-lift-effect';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -52,15 +53,25 @@ export default ({
   // we do this so that list operations remain fast
   // TODO: need to test the impact of this like crazy
   published.removals.forEach((id: DraggableId) => {
-    if (id !== state.critical.draggable.id) {
-      delete draggables[id];
-    }
+    delete draggables[id];
   });
 
   const dimensions: DimensionMap = {
     droppables: state.dimensions.droppables,
     draggables,
   };
+
+  const draggable: DraggableDimension =
+    dimensions.draggables[state.critical.draggable.id];
+  const home: DroppableDimension =
+    dimensions.droppables[state.critical.droppable.id];
+
+  const { impact: onLiftImpact, afterCritical } = getLiftEffect({
+    draggable,
+    home,
+    draggables,
+    viewport: state.viewport,
+  });
 
   const impact: DragImpact = getDragImpact({
     pageBorderBoxCenter: state.current.page.borderBoxCenter,
@@ -71,7 +82,7 @@ export default ({
     previousImpact: state.impact,
     viewport: state.viewport,
     userDirection: state.userDirection,
-    onLift: state.onLift,
+    afterCritical,
   });
 
   timings.finish(timingsKey);
@@ -83,7 +94,9 @@ export default ({
     // eslint-disable-next-line
     phase: 'DRAGGING',
     impact,
+    onLiftImpact,
     dimensions,
+    afterCritical,
     // not animating this movement
     forceShouldAnimate: false,
   };
