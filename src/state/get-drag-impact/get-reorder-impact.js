@@ -31,7 +31,7 @@ type Args = {|
   last: DisplacementGroups,
   viewport: Viewport,
   userDirection: UserDirection,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
 |};
 
 function at(
@@ -57,7 +57,7 @@ export default ({
   last,
   viewport,
   userDirection,
-  displacedByLift,
+  afterCritical,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const isMovingForward: boolean = isUserMovingForward(
@@ -87,7 +87,7 @@ export default ({
 
       const didStartDisplaced: boolean = getDidStartDisplaced(
         id,
-        displacedByLift,
+        afterCritical,
       );
 
       // Moving forward will decrease the amount of things needed to be displaced

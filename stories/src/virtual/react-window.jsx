@@ -89,6 +89,7 @@ function App(props: Props) {
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable
         droppableId="droppable"
+        mode="VIRTUAL"
         whenDraggingClone={(
           provided: DraggableProvided,
           snapshot: DraggableStateSnapshot,

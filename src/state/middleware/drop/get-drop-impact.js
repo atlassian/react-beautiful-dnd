@@ -19,7 +19,7 @@ type Args = {|
   viewport: Viewport,
   home: DroppableDimension,
   draggables: DraggableDimensionMap,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
 |};
 
 export type Result = {|
@@ -34,7 +34,7 @@ export default ({
   viewport,
   draggables,
   onLiftImpact,
-  displacedByLift,
+  afterCritical,
 }: Args): Result => {
   if (!lastImpact.at || reason !== 'DROP') {
     // Dropping outside of a list or the drag was cancelled
@@ -48,7 +48,7 @@ export default ({
       destination: home,
       viewport,
       draggables,
-      displacedByLift,
+      afterCritical,
       // We need the draggables to animate back to their positions
       forceShouldAnimate: true,
     });

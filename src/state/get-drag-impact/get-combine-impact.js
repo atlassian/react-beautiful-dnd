@@ -86,7 +86,7 @@ type Args = {|
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   userDirection: UserDirection,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
 |};
 export default ({
   draggable,
@@ -95,7 +95,7 @@ export default ({
   destination,
   insideDestination,
   userDirection,
-  displacedByLift,
+  afterCritical,
 }: Args): ?DragImpact => {
   if (!destination.isCombineEnabled) {
     return null;
@@ -113,7 +113,7 @@ export default ({
 
       const displaceBy: Position = getCombinedItemDisplacement({
         displaced,
-        displacedByLift,
+        afterCritical,
         combineWith: id,
         displacedBy: canBeDisplacedBy,
       });

@@ -27,7 +27,7 @@ type Args = {|
   previousImpact: DragImpact,
   viewport: Viewport,
   userDirection: UserDirection,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
@@ -38,7 +38,7 @@ export default ({
   previousImpact,
   viewport,
   userDirection,
-  displacedByLift,
+  afterCritical,
 }: Args): DragImpact => {
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
@@ -74,7 +74,7 @@ export default ({
     destination,
     insideDestination,
     userDirection,
-    displacedByLift,
+    afterCritical,
   });
 
   if (withMerge) {
@@ -89,6 +89,6 @@ export default ({
     last: previousImpact.displaced,
     viewport,
     userDirection,
-    displacedByLift,
+    afterCritical,
   });
 };

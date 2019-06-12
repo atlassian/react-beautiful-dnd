@@ -16,12 +16,12 @@ type Args = {|
   impact: DragImpact,
   // all draggables in the system
   draggables: DraggableDimensionMap,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
 |};
 
 // Returns the client offset required to move an item from its
 // original client position to its final resting position
-export default ({ displacedByLift, impact, draggables }: Args): Position => {
+export default ({ afterCritical, impact, draggables }: Args): Position => {
   const combine: ?Combine = tryGetCombine(impact);
   invariant(combine);
 
@@ -30,7 +30,7 @@ export default ({ displacedByLift, impact, draggables }: Args): Position => {
 
   const displaceBy: Position = getCombinedItemDisplacement({
     displaced: impact.displaced,
-    displacedByLift,
+    afterCritical,
     combineWith,
     displacedBy: impact.displacedBy,
   });

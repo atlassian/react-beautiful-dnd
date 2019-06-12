@@ -133,21 +133,24 @@ export const makeMapStateToProps = (): Selector => {
     ownId: DraggableId,
     draggingId: DraggableId,
     impact: DragImpact,
-    reverseDisplacement: LiftEffect,
+    afterCritical: LiftEffect,
   ): ?MapProps => {
     const displacement: ?Displacement = impact.displaced.visible[ownId];
-    const shouldReverse: boolean = Boolean(reverseDisplacement.effected[ownId]);
+    const isSpecial: boolean = Boolean(
+      afterCritical.inVirtualList && afterCritical.effected[ownId],
+    );
 
     if (!displacement) {
-      if (!shouldReverse) {
+      if (!isSpecial) {
         return null;
       }
+
       const change: Position = negate(impact.displacedBy.point);
       const offset: Position = memoizedOffset(change.x, change.y);
       return getSecondaryProps(offset, null, true);
     }
 
-    if (shouldReverse) {
+    if (isSpecial) {
       return null;
     }
 
@@ -155,9 +158,8 @@ export const makeMapStateToProps = (): Selector => {
     // const isCombinedWith: boolean = Boolean(
     //   merge && merge.combine.draggableId === ownId,
     // );
-    const displacedBy: Position = impact.displacedBy.point;
-    const change: Position = shouldReverse ? negate(displacedBy) : displacedBy;
-    const offset: Position = memoizedOffset(change.x, change.y);
+    const displaceBy: Position = impact.displacedBy.point;
+    const offset: Position = memoizedOffset(displaceBy.x, displaceBy.y);
 
     // if (isCombinedWith) {
     //   return getSecondaryProps(
@@ -258,7 +260,7 @@ export const makeMapStateToProps = (): Selector => {
         ownProps.draggableId,
         state.critical.draggable.id,
         state.impact,
-        state.reverseDisplacement,
+        state.afterCritical,
       );
     }
 
@@ -273,7 +275,7 @@ export const makeMapStateToProps = (): Selector => {
         ownProps.draggableId,
         completed.result.draggableId,
         completed.impact,
-        state.reverseDisplacement,
+        completed.afterCritical,
       );
     }
 

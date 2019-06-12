@@ -22,6 +22,7 @@ import type {
   DroppableDescriptor,
   Direction,
   ScrollOptions,
+  DroppableMode,
 } from '../../types';
 import getDimension from './get-dimension';
 import AppContext, { type AppContextValue } from '../context/app-context';
@@ -35,6 +36,7 @@ import useLayoutEffect from '../use-isomorphic-layout-effect';
 type Props = {|
   droppableId: DroppableId,
   type: TypeId,
+  mode: DroppableMode,
   direction: Direction,
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
@@ -58,12 +60,14 @@ export default function useDroppableDimensionPublisher(args: Props) {
   const appContext: AppContextValue = useRequiredContext(AppContext);
   const marshal: DimensionMarshal = appContext.marshal;
   const previousRef = usePreviousRef(args);
-  const descriptor = useMemo<DroppableDescriptor>(() => {
-    return {
+  const descriptor = useMemo<DroppableDescriptor>(
+    () => ({
       id: args.droppableId,
       type: args.type,
-    };
-  }, [args.droppableId, args.type]);
+      mode: args.mode,
+    }),
+    [args.droppableId, args.mode, args.type],
+  );
   const publishedDescriptorRef = useRef<DroppableDescriptor>(descriptor);
 
   const memoizedUpdateScroll = useMemo(

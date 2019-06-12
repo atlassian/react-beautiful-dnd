@@ -29,7 +29,7 @@ import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
 import update from './post-reducer/when-moving/update';
 import refreshSnap from './post-reducer/when-moving/refresh-snap';
-import getLiftEffects from './get-lift-effects';
+import getLiftEffect from './get-lift-effect';
 import patchDimensionMap from './patch-dimension-map';
 import publishWhileDraggingInVirtual from './publish-while-dragging-in-virtual';
 
@@ -104,7 +104,7 @@ export default (state: State = idle, action: Action): State => {
       dimensions.droppables,
     ).every((item: DroppableDimension) => !item.isFixedOnPage);
 
-    const { impact, displacedByLift, reverseDisplacement } = getLiftEffects({
+    const { impact, afterCritical } = getLiftEffect({
       draggable,
       home,
       draggables: dimensions.draggables,
@@ -121,8 +121,7 @@ export default (state: State = idle, action: Action): State => {
       current: initial,
       isWindowScrollAllowed,
       impact,
-      displacedByLift,
-      reverseDisplacement,
+      afterCritical,
       onLiftImpact: impact,
       viewport,
       userDirection: forward,
@@ -426,7 +425,6 @@ export default (state: State = idle, action: Action): State => {
       dropDuration,
       newHomeClientOffset,
       dimensions: state.dimensions,
-      reverseDisplacement: state.reverseDisplacement,
     };
 
     return result;

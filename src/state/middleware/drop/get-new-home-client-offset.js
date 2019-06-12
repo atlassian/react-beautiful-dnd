@@ -21,7 +21,7 @@ type Args = {|
   draggable: DraggableDimension,
   dimensions: DimensionMap,
   viewport: Viewport,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
@@ -29,7 +29,7 @@ export default ({
   draggable,
   dimensions,
   viewport,
-  displacedByLift,
+  afterCritical,
 }: Args): Position => {
   const { draggables, droppables } = dimensions;
   const droppableId: ?DroppableId = whatIsDraggedOver(impact);
@@ -43,7 +43,7 @@ export default ({
     draggable,
     draggables,
     // if there is no destination, then we will be dropping back into the home
-    displacedByLift,
+    afterCritical,
     droppable: destination || home,
     viewport,
   });
@@ -58,8 +58,8 @@ export default ({
   // When dropping with a merge we want to drop the dragging item
   // into the new home location of the target.
   // The target will move as a result of a drop if it started displaced
-  if (combine && didStartDisplaced(combine.draggableId, displacedByLift)) {
-    return subtract(offset, displacedByLift.displacedBy.point);
+  if (combine && didStartDisplaced(combine.draggableId, afterCritical)) {
+    return subtract(offset, afterCritical.displacedBy.point);
   }
 
   return offset;

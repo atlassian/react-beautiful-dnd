@@ -232,6 +232,7 @@ function getBody(): HTMLElement {
 }
 
 const defaultProps = ({
+  mode: 'STANDARD',
   type: 'DEFAULT',
   direction: 'vertical',
   isDropDisabled: false,

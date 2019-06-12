@@ -17,7 +17,7 @@ type Args = {|
   droppable: DroppableDimension,
   draggables: DraggableDimensionMap,
   viewport: Viewport,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
@@ -26,14 +26,14 @@ export default ({
   droppable,
   draggables,
   viewport,
-  displacedByLift,
+  afterCritical,
 }: Args): Position => {
   const pageBorderBoxCenter: Position = getPageBorderBoxCenterFromImpact({
     impact,
     draggable,
     draggables,
     droppable,
-    displacedByLift,
+    afterCritical,
   });
 
   return getClientFromPageBorderBoxCenter({

@@ -7,9 +7,11 @@ export type DroppableId = Id;
 export type TypeId = Id;
 export type ContextId = Id;
 
+export type DroppableMode = 'STANDARD' | 'VIRTUAL';
 export type DroppableDescriptor = {|
   id: DroppableId,
   type: TypeId,
+  mode: DroppableMode,
 |};
 
 export type DraggableDescriptor = {|
@@ -283,6 +285,12 @@ export type Viewport = {|
   scroll: ScrollDetails,
 |};
 
+export type LiftEffect = {|
+  inVirtualList: boolean,
+  effected: DraggableIdMap,
+  displacedBy: DisplacedBy,
+|};
+
 export type DimensionMap = {|
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
@@ -298,17 +306,13 @@ export type CompletedDrag = {|
   critical: Critical,
   result: DropResult,
   impact: DragImpact,
+  afterCritical: LiftEffect,
 |};
 
 export type IdleState = {|
   phase: 'IDLE',
   completed: ?CompletedDrag,
   shouldFlush: boolean,
-|};
-
-export type LiftEffect = {|
-  effected: DraggableIdMap,
-  displacedBy: DisplacedBy,
 |};
 
 export type DraggingState = {|
@@ -322,9 +326,7 @@ export type DraggingState = {|
   userDirection: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
-  // for virtual lists
-  reverseDisplacement: LiftEffect,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
   onLiftImpact: DragImpact,
   // when there is a fixed list we want to opt out of this behaviour
   isWindowScrollAllowed: boolean,
@@ -363,8 +365,6 @@ export type DropAnimatingState = {|
   dropDuration: number,
   // We still need to render placeholders and fix the dimensions of the dragging item
   dimensions: DimensionMap,
-  // We still need to know which items displacement needs to be reversed
-  reverseDisplacement: LiftEffect,
 |};
 
 export type State =

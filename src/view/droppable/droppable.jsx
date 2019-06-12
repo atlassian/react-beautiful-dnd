@@ -37,6 +37,7 @@ export default function Droppable(props: Props) {
     children,
     droppableId,
     type,
+    mode,
     direction,
     ignoreContainerClipping,
     isDropDisabled,
@@ -76,6 +77,7 @@ export default function Droppable(props: Props) {
   useDroppableDimensionPublisher({
     droppableId,
     type,
+    mode,
     direction,
     isDropDisabled,
     isCombineEnabled,

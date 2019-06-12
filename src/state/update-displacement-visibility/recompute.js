@@ -15,7 +15,7 @@ type RecomputeArgs = {|
   impact: DragImpact,
   destination: DroppableDimension,
   viewport: Viewport,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
   draggables: DraggableDimensionMap,
   forceShouldAnimate?: boolean,
 |};
@@ -25,7 +25,7 @@ export default ({
   viewport,
   destination,
   draggables,
-  displacedByLift,
+  afterCritical,
   forceShouldAnimate,
 }: RecomputeArgs): DragImpact => {
   // TODO!!!!

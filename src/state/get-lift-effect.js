@@ -16,7 +16,6 @@ import type {
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
 import getDisplacedBy from './get-displaced-by';
 import getDisplacementGroups from './get-displacement-groups';
-// import { emptyGroups } from './no-impact';
 
 type Args = {|
   draggable: DraggableDimension,
@@ -26,8 +25,7 @@ type Args = {|
 |};
 
 type Result = {|
-  reverseDisplacement: LiftEffect,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
   impact: DragImpact,
 |};
 
@@ -56,7 +54,8 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
     },
     {},
   );
-  const displacedByLift: LiftEffect = {
+  const afterCritical: LiftEffect = {
+    inVirtualList: home.descriptor.mode === 'VIRTUAL',
     displacedBy,
     effected,
   };
@@ -86,33 +85,5 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
       destination: getHomeLocation(draggable.descriptor),
     },
   };
-  // const reverseDisplacement: LiftEffect = {
-  //   displacedBy,
-  //   effected: {},
-  // };
-  // return { impact, displacedByLift, reverseDisplacement };
-
-  const virtual: DragImpact = {
-    displaced,
-    displacedBy,
-    at: {
-      type: 'REORDER',
-      closestAfter: null,
-      destination: getHomeLocation(draggable.descriptor),
-    },
-  };
-  const empty: LiftEffect = {
-    displacedBy,
-    effected: {},
-  };
-  const reverseDisplacement: LiftEffect = {
-    effected,
-    displacedBy,
-  };
-
-  return {
-    impact: virtual,
-    displacedByLift: reverseDisplacement,
-    reverseDisplacement,
-  };
+  return { impact, afterCritical };
 };

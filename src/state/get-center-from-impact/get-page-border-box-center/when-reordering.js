@@ -20,7 +20,7 @@ type NewHomeArgs = {|
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
   droppable: DroppableDimension,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
 |};
 
 // Returns the client offset required to move an item from its
@@ -30,7 +30,7 @@ export default ({
   draggable,
   draggables,
   droppable,
-  displacedByLift,
+  afterCritical,
 }: NewHomeArgs): Position => {
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable.descriptor.id,
@@ -60,7 +60,7 @@ export default ({
     // want to go before where it would be with the displacement
 
     // target is displaced and is already in it's starting position
-    if (didStartDisplaced(closestAfter, displacedByLift)) {
+    if (didStartDisplaced(closestAfter, afterCritical)) {
       return goBefore({
         axis,
         moveRelativeTo: closest.page,
@@ -90,13 +90,13 @@ export default ({
     return draggablePage.borderBox.center;
   }
 
-  if (didStartDisplaced(last.descriptor.id, displacedByLift)) {
+  if (didStartDisplaced(last.descriptor.id, afterCritical)) {
     // if the item started displaced and it is no longer displaced then
     // we need to go after it it's non-displaced position
 
     const page: BoxModel = offset(
       last.page,
-      negate(displacedByLift.displacedBy.point),
+      negate(afterCritical.displacedBy.point),
     );
     return goAfter({
       axis,

@@ -70,7 +70,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   const { impact, didDropInsideDroppable }: Result = getDropImpact({
     reason,
     lastImpact: state.impact,
-    displacedByLift: state.displacedByLift,
+    afterCritical: state.afterCritical,
     onLiftImpact: state.onLiftImpact,
     home: state.dimensions.droppables[state.critical.droppable.id],
     viewport: state.viewport,
@@ -109,11 +109,12 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     draggable,
     dimensions,
     viewport: state.viewport,
-    displacedByLift: state.displacedByLift,
+    afterCritical: state.afterCritical,
   });
 
   const completed: CompletedDrag = {
     critical: state.critical,
+    afterCritical: state.afterCritical,
     result,
     impact,
   };

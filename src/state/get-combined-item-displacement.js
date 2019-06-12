@@ -11,14 +11,14 @@ import didStartDisplaced from './starting-displaced/did-start-displaced';
 
 type Args = {|
   displaced: DisplacementGroups,
-  displacedByLift: LiftEffect,
+  afterCritical: LiftEffect,
   combineWith: DraggableId,
   displacedBy: DisplacedBy,
 |};
 
 export default ({
   displaced,
-  displacedByLift,
+  afterCritical,
   combineWith,
   displacedBy,
 }: Args): Position => {
@@ -26,7 +26,7 @@ export default ({
     displaced.visible[combineWith] || displaced.invisible[combineWith],
   );
 
-  if (didStartDisplaced(combineWith, displacedByLift)) {
+  if (didStartDisplaced(combineWith, afterCritical)) {
     return isDisplaced ? origin : negate(displacedBy.point);
   }
 

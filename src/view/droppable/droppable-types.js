@@ -9,6 +9,7 @@ import type {
   State,
   ContextId,
   DraggableLocation,
+  DroppableMode,
 } from '../../types';
 import type {
   StateSnapshot as DraggableStateSnapshot,
@@ -63,6 +64,7 @@ export type MapProps = {|
 |};
 
 export type DefaultProps = {|
+  mode: DroppableMode,
   type: TypeId,
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
