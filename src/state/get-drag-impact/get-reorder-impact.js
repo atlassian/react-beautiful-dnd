@@ -21,6 +21,7 @@ import { find } from '../../native-with-fallback';
 import getDisplacementGroups from '../get-displacement-groups';
 import { emptyGroups } from '../no-impact';
 import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
+import getDisplaced from '../get-displaced';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,

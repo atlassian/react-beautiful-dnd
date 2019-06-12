@@ -1,6 +1,5 @@
 // @flow
 import type { DraggableDimension, DraggableLocation } from '../../../../types';
-import type { Instruction } from './move-to-next-index-types';
 
 type Args = {|
   isMovingForward: boolean,
@@ -14,7 +13,7 @@ export default ({
   isInHomeList,
   insideDestination,
   location,
-}: Args): ?Instruction => {
+}: Args): ?number => {
   if (!insideDestination.length) {
     return null;
   }
@@ -38,8 +37,6 @@ export default ({
   if (proposedIndex > upperBound) {
     return null;
   }
-  return {
-    proposedIndex,
-    modifyDisplacement: true,
-  };
+
+  return proposedIndex;
 };

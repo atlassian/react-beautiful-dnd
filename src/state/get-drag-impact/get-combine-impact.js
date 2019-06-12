@@ -137,6 +137,7 @@ export default ({
   // no change of displacement
   const impact: DragImpact = {
     displacedBy: previousImpact.displacedBy,
+    // TODO: use getDisplaced
     displaced: previousImpact.displaced,
     at: {
       type: 'COMBINE',

@@ -8,6 +8,7 @@ import type {
   DisplacedBy,
   Displacement,
   OnLift,
+  ImpactLocation,
 } from '../../../../types';
 import type { Instruction } from './move-to-next-index-types';
 import getDisplacementMap from '../../../get-displacement-map';
@@ -16,6 +17,7 @@ import getDisplacedBy from '../../../get-displaced-by';
 import fromReorder from './from-reorder';
 import fromCombine from './from-combine';
 import removeDraggableFromList from '../../../remove-draggable-from-list';
+import getDisplaced from '../../../get-displaced';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -38,6 +40,41 @@ export default ({
   previousImpact,
   onLift,
 }: Args): ?DragImpact => {
+  const wasAt: ?ImpactLocation = previousImpact.at;
+  invariant(wasAt, 'Cannot move in direction without previous impact location');
+
+  if (wasAt.type === 'REORDER') {
+    const newIndex: ?number = fromReorder({
+      isMovingForward,
+      isInHomeList,
+      location: previousImpact.destination,
+      insideDestination,
+    });
+    if (newIndex == null) {
+      return null;
+    }
+    const withoutDraggable: DraggableDimension[] = removeDraggableFromList(
+      draggable,
+      insideDestination,
+    );
+
+    const at: ReorderLocation = {
+      type: 'REORDER',
+      destination: {
+        droppableId: destination.descriptor.id,
+        index: newIndex,
+        // unknown at this point
+        closestAfter: null,
+      },
+    };
+    const displaced: Displaced = getDisplaced({
+      withoutDraggable,
+      destination,
+      displacedBy,
+      at,
+    });
+  }
+
   const instruction: ?Instruction = (() => {
     // moving from reorder
     if (previousImpact.destination) {
