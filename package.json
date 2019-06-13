@@ -23,10 +23,12 @@
   },
   "main": "dist/react-beautiful-dnd.cjs.js",
   "module": "dist/react-beautiful-dnd.esm.js",
+  "types": "typescript/react-beautiful-dnd.d.ts",
   "sideEffects": false,
   "files": [
     "/dist",
-    "/src"
+    "/src",
+    "/typescript"
   ],
   "config": {
     "prettier_target": "*.{js,jsx,md,json} src/**/*.{js,jsx,md,json} test/**/*.{js,jsx,md,json} docs/**/*.{js,jsx,md,json} stories/**/*.{js,jsx,md,json} cypress/**/*.{js,jsx,md,json}"
