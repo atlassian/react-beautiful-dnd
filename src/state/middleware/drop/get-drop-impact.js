@@ -4,23 +4,19 @@ import type {
   DragImpact,
   Viewport,
   DroppableDimension,
-  DraggableDimension,
   DraggableDimensionMap,
   LiftEffect,
-  UserDirection,
 } from '../../../types';
 import recompute from '../../update-displacement-visibility/recompute';
 import { emptyGroups } from '../../no-impact';
 
 type Args = {|
-  draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
   home: DroppableDimension,
   reason: DropReason,
   lastImpact: DragImpact,
   onLiftImpact: DragImpact,
   viewport: Viewport,
-  userDirection: UserDirection,
   afterCritical: LiftEffect,
 |};
 
@@ -30,14 +26,12 @@ export type Result = {|
 |};
 
 export default ({
-  draggable,
   draggables,
   reason,
   lastImpact,
   home,
   viewport,
   onLiftImpact,
-  userDirection,
 }: Args): Result => {
   if (!lastImpact.at || reason !== 'DROP') {
     // Dropping outside of a list or the drag was cancelled
@@ -47,12 +41,10 @@ export default ({
     // What is visible can be different to when  the drag started
 
     const recomputedHomeImpact: DragImpact = recompute({
-      draggable,
       draggables,
       impact: onLiftImpact,
       destination: home,
       viewport,
-      userDirection,
       // We need the draggables to animate back to their positions
       forceShouldAnimate: true,
     });

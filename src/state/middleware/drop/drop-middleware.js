@@ -70,14 +70,12 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   // Only keeping impact when doing a user drop - otherwise we are cancelling
 
   const { impact, didDropInsideDroppable }: Result = getDropImpact({
-    draggable,
     reason,
     lastImpact: state.impact,
     afterCritical: state.afterCritical,
     onLiftImpact: state.onLiftImpact,
     home: state.dimensions.droppables[state.critical.droppable.id],
     viewport: state.viewport,
-    userDirection: state.userDirection,
     draggables: state.dimensions.draggables,
   });
 
