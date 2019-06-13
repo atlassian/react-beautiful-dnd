@@ -70,7 +70,7 @@ function goAtEnd({
   };
 }
 
-export default function calculateDragImpact({
+export default function calculateImpact({
   draggable,
   insideDestination,
   destination,

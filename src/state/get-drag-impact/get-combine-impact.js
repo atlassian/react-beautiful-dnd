@@ -17,6 +17,7 @@ import { find } from '../../native-with-fallback';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getCombinedItemDisplacement from '../get-combined-item-displacement';
 import removeDraggableFromList from '../remove-draggable-from-list';
+import calculateImpact from '../calculate-drag-impact/calculate-combine-impact';
 
 function getWhenEntered(
   id: DraggableId,
@@ -106,7 +107,7 @@ export default ({
   const canBeDisplacedBy: DisplacedBy = previousImpact.displacedBy;
   const lastCombineImpact: ?CombineImpact = tryGetCombineImpact(previousImpact);
 
-  const target: ?DraggableDimension = find(
+  const combineWith: ?DraggableDimension = find(
     removeDraggableFromList(draggable, insideDestination),
     (child: DraggableDimension): boolean => {
       const id: DraggableId = child.descriptor.id;
@@ -130,27 +131,14 @@ export default ({
     },
   );
 
-  if (!target) {
+  if (!combineWith) {
     return null;
   }
 
-  // no change of displacement
-  const impact: DragImpact = {
-    displacedBy: previousImpact.displacedBy,
-    // TODO: use getDisplaced
-    displaced: previousImpact.displaced,
-    at: {
-      type: 'COMBINE',
-      whenEntered: getWhenEntered(
-        target.descriptor.id,
-        userDirection,
-        lastCombineImpact,
-      ),
-      combine: {
-        draggableId: target.descriptor.id,
-        droppableId: destination.descriptor.id,
-      },
-    },
-  };
-  return impact;
+  return calculateImpact({
+    combineWith,
+    userDirection,
+    destination,
+    previousImpact,
+  });
 };

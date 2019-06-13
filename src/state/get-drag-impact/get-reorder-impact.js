@@ -18,7 +18,7 @@ import removeDraggableFromList from '../remove-draggable-from-list';
 import isHomeOf from '../droppable/is-home-of';
 import { find } from '../../native-with-fallback';
 import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
-import calculateReorderImpact from './calculate-reorder-impact';
+import calculateReorderImpact from '../calculate-drag-impact/calculate-reorder-impact';
 // import getDisplaced from '../get-displaced';
 
 type Args = {|

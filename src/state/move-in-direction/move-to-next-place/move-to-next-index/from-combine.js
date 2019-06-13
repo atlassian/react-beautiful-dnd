@@ -2,14 +2,12 @@
 import type {
   DroppableDimension,
   DragImpact,
-  CombineImpact,
+  Combine,
   DraggableDimension,
   DraggableDimensionMap,
   DraggableId,
-  DragMovement,
-  OnLift,
+  LiftEffect,
 } from '../../../../types';
-import type { Instruction } from './move-to-next-index-types';
 import didStartDisplaced from '../../../starting-displaced/did-start-displaced';
 
 type Args = {|
@@ -17,43 +15,43 @@ type Args = {|
   destination: DroppableDimension,
   previousImpact: DragImpact,
   draggables: DraggableDimensionMap,
-  merge: CombineImpact,
-  onLift: OnLift,
+  combine: Combine,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
   isMovingForward,
   destination,
-  previousImpact,
+  // previousImpact,
   draggables,
-  merge,
-  onLift,
-}: Args): ?Instruction => {
+  combine,
+  afterCritical,
+}: Args): ?number => {
   if (!destination.isCombineEnabled) {
     return null;
   }
 
-  const movement: DragMovement = previousImpact.movement;
-  const combineId: DraggableId = merge.combine.draggableId;
-  const combine: DraggableDimension = draggables[combineId];
-  const combineIndex: number = combine.descriptor.index;
-  const wasDisplacedAtStart: boolean = didStartDisplaced(combineId, onLift);
+  // are we sitting on a displaced item?
+
+  const combineId: DraggableId = combine.draggableId;
+  const combineWith: DraggableDimension = draggables[combineId];
+  const combineIndex: number = combineWith.descriptor.index;
+  const wasDisplacedAtStart: boolean = didStartDisplaced(
+    combineId,
+    afterCritical,
+  );
+
+  // are we sitting on a displaced item?
 
   if (wasDisplacedAtStart) {
     const hasDisplacedFromStart: boolean = !movement.map[combineId];
 
     if (hasDisplacedFromStart) {
       if (isMovingForward) {
-        return {
-          proposedIndex: combineIndex,
-          modifyDisplacement: false,
-        };
+        return combineIndex;
       }
 
-      return {
-        proposedIndex: combineIndex - 1,
-        modifyDisplacement: true,
-      };
+      return combineIndex - 1;
     }
 
     // move into position of combine

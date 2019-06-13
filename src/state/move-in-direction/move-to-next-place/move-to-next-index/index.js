@@ -19,7 +19,7 @@ import fromReorder from './from-reorder';
 import fromCombine from './from-combine';
 import removeDraggableFromList from '../../../remove-draggable-from-list';
 import getDisplaced from '../../../get-displaced';
-import calculateReorderImpact from '../../../get-drag-impact/calculate-reorder-impact';
+import calculateReorderImpact from '../../../calculate-drag-impact/calculate-reorder-impact';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -54,6 +54,7 @@ export default ({
       location: wasAt.destination,
       insideDestination,
     });
+    // TODO: can we just pass new index on?
     if (newIndex == null) {
       return null;
     }
@@ -66,28 +67,30 @@ export default ({
       displacedBy: previousImpact.displacedBy,
       index: newIndex,
     });
-
-    const withoutDraggable: DraggableDimension[] = removeDraggableFromList(
-      draggable,
-      insideDestination,
-    );
-
-    const at: ReorderLocation = {
-      type: 'REORDER',
-      destination: {
-        droppableId: destination.descriptor.id,
-        index: newIndex,
-        // unknown at this point
-        closestAfter: null,
-      },
-    };
-    const displaced: Displaced = getDisplaced({
-      withoutDraggable,
-      destination,
-      displacedBy,
-      at,
-    });
   }
+
+  // COMBINE
+  const newIndex: ?number = fromCombine({
+    isMovingForward,
+    destination,
+    previousImpact,
+    draggables,
+    combine: wasAt.combine,
+    afterCritical,
+  });
+  if (newIndex == null) {
+    return null;
+  }
+
+  return calculateCombineImpact({
+    draggable,
+    insideDestination,
+    destination,
+    viewport,
+    last: previousImpact.displaced,
+    displacedBy: previousImpact.displacedBy,
+    index: newIndex,
+  });
 
   const instruction: ?Instruction = (() => {
     // moving from reorder
