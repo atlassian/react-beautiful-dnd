@@ -1,16 +1,15 @@
 // @flow
 import type {
   DraggableId,
-  DraggableDimension,
-  DroppableDimension,
+  DroppableId,
   DragImpact,
   UserDirection,
   CombineImpact,
 } from '../../types';
 
 type Args = {|
-  combineWith: DraggableDimension,
-  destination: DroppableDimension,
+  combineWithId: DraggableId,
+  destinationId: DroppableId,
   previousImpact: DragImpact,
   userDirection: UserDirection,
 |};
@@ -37,14 +36,14 @@ function tryGetCombineImpact(impact: DragImpact): ?CombineImpact {
 }
 
 export default function calculateCombineImpact({
-  combineWith,
+  combineWithId,
+  destinationId,
   userDirection,
-  destination,
   previousImpact,
 }: Args): DragImpact {
   const lastCombineImpact: ?CombineImpact = tryGetCombineImpact(previousImpact);
   const whenEntered: UserDirection = getWhenEntered(
-    combineWith.descriptor.id,
+    combineWithId,
     userDirection,
     lastCombineImpact,
   );
@@ -56,8 +55,8 @@ export default function calculateCombineImpact({
       type: 'COMBINE',
       whenEntered,
       combine: {
-        draggableId: combineWith.descriptor.id,
-        droppableId: destination.descriptor.id,
+        draggableId: combineWithId,
+        droppableId: destinationId,
       },
     },
   };

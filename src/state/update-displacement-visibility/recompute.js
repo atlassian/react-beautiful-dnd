@@ -1,61 +1,67 @@
 // @flow
 import type {
+  DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
   DragImpact,
-  Displacement,
   Viewport,
-  LiftEffect,
+  Combine,
+  ImpactLocation,
+  UserDirection,
 } from '../../types';
-import getDisplacement from '../get-displacement';
-import withNewDisplacement from './with-new-displacement';
-import getDisplacementGroups from '../get-displacement-groups';
+import { warning } from '../../dev-warning';
+import calculateReorderImpact from '../calculate-drag-impact/calculate-reorder-impact';
+import calculateCombineImpact from '../calculate-drag-impact/calculate-combine-impact';
+import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 
 type RecomputeArgs = {|
   impact: DragImpact,
+  draggable: DraggableDimension,
+  draggables: DraggableDimensionMap,
   destination: DroppableDimension,
   viewport: Viewport,
-  afterCritical: LiftEffect,
-  draggables: DraggableDimensionMap,
   forceShouldAnimate?: boolean,
+  userDirection: UserDirection,
 |};
 
 export default ({
   impact,
+  draggable,
   viewport,
-  destination,
   draggables,
-  afterCritical,
+  destination,
+  userDirection,
   forceShouldAnimate,
 }: RecomputeArgs): DragImpact => {
-  // TODO!!!!
-  console.warn('TODO: RECOMPUTE');
-  return impact;
-  const displaced: DisplacementGroups = getDisplacementGroups({
-    afterDragging,
-    destination,
-    displacedBy,
-    viewport,
-    forceShouldAnimate,
-    last: impact.displaced,
+  const at: ?ImpactLocation = impact.at;
+  if (!at) {
+    warning('Not recomputing impact as there is no destination');
+    return impact;
+  }
+
+  if (at.type === 'REORDER') {
+    const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
+      destination.descriptor.id,
+      draggables,
+    );
+    return calculateReorderImpact({
+      forceShouldAnimate,
+      draggable,
+      insideDestination,
+      destination,
+      viewport,
+      displacedBy: impact.displacedBy,
+      last: impact.displaced,
+      index: at.destination.index,
+    });
+  }
+
+  const combine: Combine = at.combine;
+
+  return calculateCombineImpact({
+    combineWithId: combine.draggableId,
+    destinationId: combine.droppableId,
+    userDirection,
+    previousImpact: impact,
   });
-
-  const updated: Displacement[] = impact.movement.displaced.map(
-    (entry: Displacement) =>
-      getDisplacement({
-        draggable: draggables[entry.draggableId],
-        destination,
-        previousImpact: impact,
-        viewport: viewport.frame,
-        onLift,
-        forceShouldAnimate,
-      }),
-  );
-
-  return {
-    ...impact,
-    displaced,
-  };
-
-  // return withNewDisplacement(impact, updated);
 };

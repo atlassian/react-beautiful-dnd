@@ -22,6 +22,7 @@ type Args = {|
   displacedBy: DisplacedBy,
   last: DisplacementGroups,
   index: ?number,
+  forceShouldAnimate?: boolean,
 |};
 
 function getIndexOfLastItem(
@@ -78,6 +79,7 @@ export default function calculateReorderImpact({
   displacedBy,
   last,
   index,
+  forceShouldAnimate,
 }: Args): DragImpact {
   const inHomeList: boolean = isHomeOf(draggable, destination);
 
@@ -119,6 +121,7 @@ export default function calculateReorderImpact({
     displacedBy,
     last,
     viewport: viewport.frame,
+    forceShouldAnimate,
   });
   const closestAfter: ?DraggableId = impacted.length
     ? impacted[0].descriptor.id
