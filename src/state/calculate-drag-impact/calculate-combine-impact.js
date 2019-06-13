@@ -36,24 +36,25 @@ function tryGetCombineImpact(impact: DragImpact): ?CombineImpact {
   return null;
 }
 
-export default function calculateImpact({
+export default function calculateCombineImpact({
   combineWith,
   userDirection,
   destination,
   previousImpact,
 }: Args): DragImpact {
   const lastCombineImpact: ?CombineImpact = tryGetCombineImpact(previousImpact);
+  const whenEntered: UserDirection = getWhenEntered(
+    combineWith.descriptor.id,
+    userDirection,
+    lastCombineImpact,
+  );
   const impact: DragImpact = {
     // no change to displacement when combining
     displacedBy: previousImpact.displacedBy,
     displaced: previousImpact.displaced,
     at: {
       type: 'COMBINE',
-      whenEntered: getWhenEntered(
-        combineWith.descriptor.id,
-        userDirection,
-        lastCombineImpact,
-      ),
+      whenEntered,
       combine: {
         draggableId: combineWith.descriptor.id,
         droppableId: destination.descriptor.id,

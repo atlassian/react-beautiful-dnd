@@ -7,9 +7,7 @@ import type {
   DraggableDimensionMap,
   LiftEffect,
 } from '../../../types';
-import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import recompute from '../../update-displacement-visibility/recompute';
-import { tryGetDestination } from '../../get-impact-location';
 import { emptyGroups } from '../../no-impact';
 
 type Args = {|
@@ -43,7 +41,7 @@ export default ({
     // Need to recompute the visibility of the original impact
     // What is visible can be different to when  the drag started
 
-    const impact: DragImpact = recompute({
+    const recomputedHomeImpact: DragImpact = recompute({
       impact: onLiftImpact,
       destination: home,
       viewport,
@@ -54,7 +52,7 @@ export default ({
     });
 
     return {
-      impact,
+      impact: recomputedHomeImpact,
       didDropInsideDroppable: false,
     };
   }

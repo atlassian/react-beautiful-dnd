@@ -67,28 +67,25 @@ export default ({
   );
 
   // checking combine first so we combine before any reordering
-  const withMerge: ?DragImpact = getCombineImpact({
-    pageBorderBoxCenterWithDroppableScrollChange,
-    draggable,
-    previousImpact,
-    destination,
-    insideDestination,
-    userDirection,
-    afterCritical,
-  });
-
-  if (withMerge) {
-    return withMerge;
-  }
-
-  return getReorderImpact({
-    pageBorderBoxCenterWithDroppableScrollChange,
-    draggable,
-    destination,
-    insideDestination,
-    last: previousImpact.displaced,
-    viewport,
-    userDirection,
-    afterCritical,
-  });
+  return (
+    getCombineImpact({
+      pageBorderBoxCenterWithDroppableScrollChange,
+      draggable,
+      previousImpact,
+      destination,
+      insideDestination,
+      userDirection,
+      afterCritical,
+    }) ||
+    getReorderImpact({
+      pageBorderBoxCenterWithDroppableScrollChange,
+      draggable,
+      destination,
+      insideDestination,
+      last: previousImpact.displaced,
+      viewport,
+      userDirection,
+      afterCritical,
+    })
+  );
 };
