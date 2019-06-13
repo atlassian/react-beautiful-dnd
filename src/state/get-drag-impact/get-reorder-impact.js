@@ -7,7 +7,6 @@ import type {
   DragImpact,
   Axis,
   DisplacementGroups,
-  ReorderImpact,
   Viewport,
   UserDirection,
   DisplacedBy,
@@ -21,6 +20,7 @@ import { find } from '../../native-with-fallback';
 import getDisplacementGroups from '../get-displacement-groups';
 import { emptyGroups } from '../no-impact';
 import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
+import calculateReorderImpact from './calculate-reorder-impact';
 // import getDisplaced from '../get-displaced';
 
 type Args = {|
@@ -33,21 +33,6 @@ type Args = {|
   userDirection: UserDirection,
   afterCritical: LiftEffect,
 |};
-
-function at(
-  destination: DroppableDimension,
-  closestAfter: ?DraggableId,
-  index: number,
-): ReorderImpact {
-  return {
-    type: 'REORDER',
-    closestAfter,
-    destination: {
-      droppableId: destination.descriptor.id,
-      index,
-    },
-  };
-}
 
 export default ({
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
@@ -116,6 +101,32 @@ export default ({
     },
   );
 
+  // TODO: move out of IIFE
+  const atIndex: ?number = (() => {
+    if (!first) {
+      return null;
+    }
+
+    if (!isHomeList) {
+      return first.descriptor.index;
+    }
+
+    if (first.descriptor.index > draggable.descriptor.index) {
+      return first.descriptor.index - 1;
+    }
+
+    return first.descriptor.index;
+  })();
+
+  return calculateReorderImpact({
+    draggable,
+    insideDestination,
+    destination,
+    viewport,
+    last,
+    index: atIndex,
+  });
+
   // go into last spot of list
   if (!first) {
     // This is needed as we support lists with indexes that do not start from 0
@@ -134,7 +145,14 @@ export default ({
     return {
       displaced: emptyGroups,
       displacedBy,
-      at: at(destination, null, rawIndexOfLastItem),
+      at: {
+        type: 'REORDER',
+        closestAfter: null,
+        destination: {
+          droppableId: destination.descriptor.id,
+          index: rawIndexOfLastItem,
+        },
+      },
     };
   }
 
@@ -149,22 +167,17 @@ export default ({
     viewport: viewport.frame,
   });
 
-  const atIndex: number = (() => {
-    if (!isHomeList) {
-      return first.descriptor.index;
-    }
-
-    if (first.descriptor.index > draggable.descriptor.index) {
-      return first.descriptor.index - 1;
-    }
-
-    return first.descriptor.index;
-  })();
-
   const impact: DragImpact = {
     displaced,
     displacedBy,
-    at: at(destination, first.descriptor.id, atIndex),
+    at: {
+      type: 'REORDER',
+      closestAfter: first.descriptor.id,
+      destination: {
+        droppableId: destination.descriptor.id,
+        index: atIndex,
+      },
+    },
   };
 
   return impact;

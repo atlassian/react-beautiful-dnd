@@ -66,6 +66,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 
 ## Articles, tutorials and blogs
 
+- CSS-Tricks [tweet](https://twitter.com/css/status/1138866065965010945)
 - dev.to 7 most popular DEV posts [May 27th, 2019](https://dev.to/devteam/the-7-most-popular-dev-posts-from-the-past-week-2ice)
 - [React Drag and Drop - Multiple Horizontal Lists](https://www.youtube.com/watch?v=RI9kA09Egas)
 - [Building a Drag-and-Drop Game with react-beautiful-dnd](https://able.bio/drenther/building-a-drag-and-drop-game-with-react-beautiful-dnd--094r3g8)

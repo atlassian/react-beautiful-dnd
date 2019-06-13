@@ -14,6 +14,7 @@ export default ({
   insideDestination,
   location,
 }: Args): ?number => {
+  // cannot move in the list
   if (!insideDestination.length) {
     return null;
   }

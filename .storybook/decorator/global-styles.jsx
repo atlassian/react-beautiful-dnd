@@ -5,7 +5,7 @@ import { colors } from '@atlaskit/theme';
 import { grid } from '../../stories/src/constants';
 
 const GlobalStyles = styled.div`
-  background-color: ${colors.N0};
+  xbackground-color: ${colors.N0};
   min-height: 100vh;
   color: ${colors.N900};
 `;

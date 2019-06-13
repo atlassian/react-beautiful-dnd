@@ -7,7 +7,8 @@ import type {
   DragImpact,
   DisplacedBy,
   Displacement,
-  OnLift,
+  LiftEffect,
+  Viewport,
   ImpactLocation,
 } from '../../../../types';
 import type { Instruction } from './move-to-next-index-types';
@@ -18,6 +19,7 @@ import fromReorder from './from-reorder';
 import fromCombine from './from-combine';
 import removeDraggableFromList from '../../../remove-draggable-from-list';
 import getDisplaced from '../../../get-displaced';
+import calculateReorderImpact from '../../../get-drag-impact/calculate-reorder-impact';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -27,7 +29,8 @@ export type Args = {|
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
-  onLift: OnLift,
+  viewport: Viewport,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
@@ -38,7 +41,8 @@ export default ({
   destination,
   insideDestination,
   previousImpact,
-  onLift,
+  viewport,
+  afterCritical,
 }: Args): ?DragImpact => {
   const wasAt: ?ImpactLocation = previousImpact.at;
   invariant(wasAt, 'Cannot move in direction without previous impact location');
@@ -47,12 +51,21 @@ export default ({
     const newIndex: ?number = fromReorder({
       isMovingForward,
       isInHomeList,
-      location: previousImpact.destination,
+      location: wasAt.destination,
       insideDestination,
     });
     if (newIndex == null) {
       return null;
     }
+    return calculateReorderImpact({
+      draggable,
+      insideDestination,
+      destination,
+      viewport,
+      last: previousImpact.displaced,
+      index: newIndex,
+    });
+
     const withoutDraggable: DraggableDimension[] = removeDraggableFromList(
       draggable,
       insideDestination,
