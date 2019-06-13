@@ -63,6 +63,7 @@ export default ({
       destination,
       viewport,
       last: previousImpact.displaced,
+      displacedBy: previousImpact.displacedBy,
       index: newIndex,
     });
 

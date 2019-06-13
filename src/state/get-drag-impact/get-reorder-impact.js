@@ -17,8 +17,6 @@ import getDisplacedBy from '../get-displaced-by';
 import removeDraggableFromList from '../remove-draggable-from-list';
 import isHomeOf from '../droppable/is-home-of';
 import { find } from '../../native-with-fallback';
-import getDisplacementGroups from '../get-displacement-groups';
-import { emptyGroups } from '../no-impact';
 import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
 import calculateReorderImpact from './calculate-reorder-impact';
 // import getDisplaced from '../get-displaced';
@@ -33,6 +31,28 @@ type Args = {|
   userDirection: UserDirection,
   afterCritical: LiftEffect,
 |};
+
+type AtIndexArgs = {|
+  draggable: DraggableDimension,
+  closest: ?DraggableDimension,
+  inHomeList: boolean,
+|};
+
+function atIndex({ draggable, closest, inHomeList }: AtIndexArgs): ?number {
+  if (!closest) {
+    return null;
+  }
+
+  if (!inHomeList) {
+    return closest.descriptor.index;
+  }
+
+  if (closest.descriptor.index > draggable.descriptor.index) {
+    return closest.descriptor.index - 1;
+  }
+
+  return closest.descriptor.index;
+}
 
 export default ({
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
@@ -53,7 +73,6 @@ export default ({
     destination.axis,
     draggable.displaceBy,
   );
-  const isHomeList: boolean = isHomeOf(draggable, destination);
 
   const targetCenter: number = currentCenter[axis.line];
   const displacement: number = displacedBy.value;
@@ -62,7 +81,7 @@ export default ({
     insideDestination,
   );
 
-  const first: ?DraggableDimension = find(
+  const closest: ?DraggableDimension = find(
     withoutDragging,
     (child: DraggableDimension): boolean => {
       const id: DraggableId = child.descriptor.id;
@@ -101,22 +120,11 @@ export default ({
     },
   );
 
-  // TODO: move out of IIFE
-  const atIndex: ?number = (() => {
-    if (!first) {
-      return null;
-    }
-
-    if (!isHomeList) {
-      return first.descriptor.index;
-    }
-
-    if (first.descriptor.index > draggable.descriptor.index) {
-      return first.descriptor.index - 1;
-    }
-
-    return first.descriptor.index;
-  })();
+  const newIndex: ?number = atIndex({
+    draggable,
+    closest,
+    inHomeList: isHomeOf(draggable, destination),
+  });
 
   return calculateReorderImpact({
     draggable,
@@ -124,61 +132,7 @@ export default ({
     destination,
     viewport,
     last,
-    index: atIndex,
-  });
-
-  // go into last spot of list
-  if (!first) {
-    // This is needed as we support lists with indexes that do not start from 0
-    const rawIndexOfLastItem: number = (() => {
-      if (!insideDestination.length) {
-        return 0;
-      }
-
-      const indexOfLastItem: number =
-        insideDestination[insideDestination.length - 1].descriptor.index;
-
-      // When in a foreign list there will be an additional one item in the list
-      return isHomeList ? indexOfLastItem : indexOfLastItem + 1;
-    })();
-
-    return {
-      displaced: emptyGroups,
-      displacedBy,
-      at: {
-        type: 'REORDER',
-        closestAfter: null,
-        destination: {
-          droppableId: destination.descriptor.id,
-          index: rawIndexOfLastItem,
-        },
-      },
-    };
-  }
-
-  const sliceFrom: number = withoutDragging.indexOf(first);
-  const impacted: DraggableDimension[] = withoutDragging.slice(sliceFrom);
-
-  const displaced: DisplacementGroups = getDisplacementGroups({
-    afterDragging: impacted,
-    destination,
     displacedBy,
-    last,
-    viewport: viewport.frame,
+    index: newIndex,
   });
-
-  const impact: DragImpact = {
-    displaced,
-    displacedBy,
-    at: {
-      type: 'REORDER',
-      closestAfter: first.descriptor.id,
-      destination: {
-        droppableId: destination.descriptor.id,
-        index: atIndex,
-      },
-    },
-  };
-
-  return impact;
 };

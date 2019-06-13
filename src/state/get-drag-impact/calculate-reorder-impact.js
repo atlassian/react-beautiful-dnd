@@ -8,7 +8,6 @@ import type {
   Viewport,
   DisplacedBy,
 } from '../../types';
-import getDisplacedBy from '../get-displaced-by';
 import removeDraggableFromList from '../remove-draggable-from-list';
 import isHomeOf from '../droppable/is-home-of';
 import { emptyGroups } from '../no-impact';
@@ -20,6 +19,7 @@ type Args = {|
   insideDestination: DraggableDimension[],
   destination: DroppableDimension,
   viewport: Viewport,
+  displacedBy: DisplacedBy,
   last: DisplacementGroups,
   index: ?number,
 |};
@@ -75,13 +75,10 @@ export default function calculateDragImpact({
   insideDestination,
   destination,
   viewport,
+  displacedBy,
   last,
   index,
 }: Args): DragImpact {
-  const displacedBy: DisplacedBy = getDisplacedBy(
-    destination.axis,
-    draggable.displaceBy,
-  );
   const inHomeList: boolean = isHomeOf(draggable, destination);
 
   // Go into last spot of list
