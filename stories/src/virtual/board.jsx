@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import styled from '@emotion/styled';
+import { Global, css } from '@emotion/core';
 import { colors } from '@atlaskit/theme';
 import type {
   DropResult,
@@ -11,6 +12,7 @@ import type {
   DroppableProvided,
 } from '../../../src';
 import type { QuoteMap, Quote } from '../types';
+import Title from '../primatives/title';
 import reorder, { reorderQuoteMap } from '../reorder';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
@@ -50,11 +52,20 @@ function Item(props: ItemProps) {
 
 const Container = styled.div`
   display: flex;
-  background: blue;
 `;
 
 const Row = React.memo(({ data: quotes, index, style }) => {
   const quote: Quote = quotes[index];
+  console.log('style', style);
+  const patchedStyle = {
+    ...style,
+    // marginBottom: grid,
+    left: style.left + grid,
+    top: style.top + grid,
+    width: `calc(${style.width} - ${grid * 2}px)`,
+    height: style.height - grid,
+  };
+  console.log('patched style', patchedStyle);
 
   return (
     <Draggable draggableId={quote.id} index={index} key={quote.id}>
@@ -64,7 +75,7 @@ const Row = React.memo(({ data: quotes, index, style }) => {
           quote={quote}
           style={style}
           isDragging={snapshot.isDragging}
-          style={{ margin: 0, ...style }}
+          style={patchedStyle}
         />
       )}
     </Draggable>
@@ -86,17 +97,24 @@ const ColumnContainer = styled.div`
   flex-direction: column;
 `;
 
-const ColumnHeader = styled.h3`
-  align-self: center;
-  padding: ${grid}px;
-`;
+const innerElementType = React.forwardRef(({ style, ...rest }, ref) => (
+  <div
+    ref={ref}
+    style={{
+      ...style,
+      width: 'auto',
+      padding: grid,
+    }}
+    {...rest}
+  />
+));
 
 const Column = React.memo(function Column(props: ColumnProps) {
   const { columnId, quotes } = props;
 
   return (
     <ColumnContainer>
-      <ColumnHeader>{columnId}</ColumnHeader>
+      <Title>{columnId}</Title>
       <Droppable
         droppableId={columnId}
         mode="VIRTUAL"
@@ -120,6 +138,7 @@ const Column = React.memo(function Column(props: ColumnProps) {
             itemSize={110}
             width={300}
             innerRef={droppableProvided.innerRef}
+            innerElementType={innerElementType}
             itemData={quotes}
           >
             {Row}
@@ -159,15 +178,24 @@ function Board(props: Props) {
   }
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Container>
-        {ordered.map((key: string, index: number) => {
-          const quotes: Quote[] = columns[key];
+    <React.Fragment>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Container>
+          {ordered.map((key: string, index: number) => {
+            const quotes: Quote[] = columns[key];
 
-          return <Column key={key} quotes={quotes} columnId={key} />;
-        })}
-      </Container>
-    </DragDropContext>
+            return <Column key={key} quotes={quotes} columnId={key} />;
+          })}
+        </Container>
+      </DragDropContext>
+      <Global
+        styles={css`
+          body {
+            background: ${colors.B200} !important;
+          }
+        `}
+      />
+    </React.Fragment>
   );
 }
 
