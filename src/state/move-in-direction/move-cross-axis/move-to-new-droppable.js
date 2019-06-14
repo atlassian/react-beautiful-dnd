@@ -83,7 +83,9 @@ export default ({
   }
 
   const isGoingBeforeTarget: boolean = Boolean(
-    previousPageBorderBoxCenter[destination.axis.line] <
+    // Using <= as we optimise slightly for moving before items in a new list
+    // This is nicer in lists with fixed height items
+    previousPageBorderBoxCenter[destination.axis.line] <=
       moveRelativeTo.page.borderBox.center[destination.axis.line],
   );
 
