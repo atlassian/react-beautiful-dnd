@@ -87,10 +87,13 @@ export default function getDisplacementGroups({
 }: Args): DisplacementGroups {
   const invisible: DraggableIdMap = {};
   const visible: DisplacementMap = {};
+  const all: DraggableId[] = [];
 
   afterDragging.forEach(function process(draggable: DraggableDimension) {
     const target: Rect = getTarget(draggable, displacedBy);
     const id: DraggableId = draggable.descriptor.id;
+
+    all.push(id);
 
     const isVisible: boolean = isPartiallyVisible({
       // TODO: borderBox?
@@ -121,5 +124,5 @@ export default function getDisplacementGroups({
     visible[id] = displacement;
   });
 
-  return { visible, invisible };
+  return { visible, all, invisible };
 }

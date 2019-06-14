@@ -1,6 +1,5 @@
 // @flow
 import type {
-  DraggableId,
   DraggableDimension,
   DroppableDimension,
   DragImpact,
@@ -52,7 +51,7 @@ function goAtEnd({
   inHomeList,
   displacedBy,
   destination,
-}: GoAtEndArgs) {
+}: GoAtEndArgs): DragImpact {
   const newIndex: number = getIndexOfLastItem(insideDestination, {
     inHomeList,
   });
@@ -62,7 +61,6 @@ function goAtEnd({
     displacedBy,
     at: {
       type: 'REORDER',
-      closestAfter: null,
       destination: {
         droppableId: destination.descriptor.id,
         index: newIndex,
@@ -123,16 +121,12 @@ export default function calculateReorderImpact({
     viewport: viewport.frame,
     forceShouldAnimate,
   });
-  const closestAfter: ?DraggableId = impacted.length
-    ? impacted[0].descriptor.id
-    : null;
 
   return {
     displaced,
     displacedBy,
     at: {
       type: 'REORDER',
-      closestAfter,
       destination: {
         droppableId: destination.descriptor.id,
         index,

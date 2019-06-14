@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { offset, type Position, type BoxModel } from 'css-box-model';
 import type {
   Axis,
@@ -49,9 +48,8 @@ export default ({
     });
   }
 
-  const { at, displacedBy } = impact;
-  invariant(at && at.type === 'REORDER');
-  const closestAfter: ?DraggableId = at.closestAfter;
+  const { displaced, displacedBy } = impact;
+  const closestAfter: ?DraggableId = displaced.all[0];
 
   // go before the first displaced item
   // items can only be displaced forwards

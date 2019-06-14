@@ -34,7 +34,7 @@ export default ({
 }: RecomputeArgs): DragImpact => {
   const last: DisplacementGroups = impact.displaced;
   const afterDragging: DraggableDimension[] = getDraggables(
-    [...Object.keys(last.visible), ...Object.keys(last.invisible)],
+    last.all,
     draggables,
   );
 

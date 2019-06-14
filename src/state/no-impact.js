@@ -10,6 +10,7 @@ export const noDisplacedBy: DisplacedBy = {
 export const emptyGroups: DisplacementGroups = {
   invisible: {},
   visible: {},
+  all: [],
 };
 
 const noImpact: DragImpact = {

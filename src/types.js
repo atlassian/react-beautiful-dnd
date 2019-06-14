@@ -179,6 +179,7 @@ export type Combine = {|
   droppableId: DroppableId,
 |};
 export type DisplacementGroups = {|
+  all: DraggableId[],
   visible: DisplacementMap,
   invisible: DraggableIdMap,
 |};
@@ -186,7 +187,6 @@ export type DisplacementGroups = {|
 export type ReorderImpact = {|
   type: 'REORDER',
   destination: DraggableLocation,
-  closestAfter: ?DraggableId,
 |};
 
 export type CombineImpact = {|
