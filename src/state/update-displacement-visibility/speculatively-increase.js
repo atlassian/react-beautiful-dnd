@@ -1,19 +1,21 @@
 // @flow
 import type { Position } from 'css-box-model';
 import type {
+  DraggableId,
   DroppableDimension,
   DraggableDimension,
   DraggableDimensionMap,
   DragImpact,
   Displacement,
+  DisplacementGroups,
+  DraggableIdMap,
+  DisplacementMap,
   Viewport,
-  OnLift,
 } from '../../types';
 import scrollViewport from '../scroll-viewport';
 import scrollDroppable from '../droppable/scroll-droppable';
 import { add } from '../position';
-import getDisplacement from '../get-displacement';
-import withNewDisplacement from './with-new-displacement';
+import getDisplacementGroups from '../get-displacement-groups';
 
 type SpeculativeArgs = {|
   impact: DragImpact,
@@ -21,8 +23,27 @@ type SpeculativeArgs = {|
   viewport: Viewport,
   draggables: DraggableDimensionMap,
   maxScrollChange: Position,
-  onLift: OnLift,
 |};
+
+function getDraggables(
+  ids: DraggableId[],
+  draggables: DraggableDimensionMap,
+): DraggableDimension[] {
+  return ids.map((id: DraggableId): DraggableDimension => draggables[id]);
+}
+
+function tryGetVisible(
+  id: DraggableId,
+  groups: DisplacementGroups[],
+): ?Displacement {
+  for (let i = 0; i < groups.length; i++) {
+    const displacement: ?Displacement = groups[i].visible[id];
+    if (displacement) {
+      return displacement;
+    }
+  }
+  return null;
+}
 
 export default ({
   impact,
@@ -30,10 +51,7 @@ export default ({
   destination,
   draggables,
   maxScrollChange,
-  onLift,
 }: SpeculativeArgs): DragImpact => {
-  const displaced: Displacement[] = impact.movement.displaced;
-
   const scrolledViewport: Viewport = scrollViewport(
     viewport,
     add(viewport.scroll.current, maxScrollChange),
@@ -45,45 +63,44 @@ export default ({
       )
     : destination;
 
-  const updated: Displacement[] = displaced.map((entry: Displacement) => {
-    // already visible: do not need to speculatively increase
-    if (entry.isVisible) {
-      return entry;
-    }
-
-    const draggable: DraggableDimension = draggables[entry.draggableId];
-
-    // check if would be visibly displaced in a scrolled droppable or viewport
-
-    const withScrolledViewport: Displacement = getDisplacement({
-      draggable,
-      destination,
-      previousImpact: impact,
-      viewport: scrolledViewport.frame,
-      onLift,
-      forceShouldAnimate: false,
-    });
-
-    if (withScrolledViewport.isVisible) {
-      return withScrolledViewport;
-    }
-
-    const withScrolledDroppable: Displacement = getDisplacement({
-      draggable,
-      destination: scrolledDroppable,
-      previousImpact: impact,
-      viewport: viewport.frame,
-      onLift,
-      forceShouldAnimate: false,
-    });
-
-    if (withScrolledDroppable.isVisible) {
-      return withScrolledDroppable;
-    }
-
-    // still not visible
-    return entry;
+  const last: DisplacementGroups = impact.displaced;
+  const withViewportScroll: DisplacementGroups = getDisplacementGroups({
+    afterDragging: getDraggables(last.all, draggables),
+    destination,
+    displacedBy: impact.displacedBy,
+    viewport: scrolledViewport.frame,
+    last,
+  });
+  const withDroppableScroll: DisplacementGroups = getDisplacementGroups({
+    afterDragging: getDraggables(last.all, draggables),
+    destination: scrolledDroppable,
+    displacedBy: impact.displacedBy,
+    viewport: viewport.frame,
+    last,
   });
 
-  return withNewDisplacement(impact, updated);
+  const invisible: DraggableIdMap = {};
+  const visible: DisplacementMap = {};
+  const groups: DisplacementGroups[] = [
+    last,
+    withViewportScroll,
+    withDroppableScroll,
+  ];
+
+  last.all.forEach((id: DraggableId) => {
+    const displacement: ?Displacement = tryGetVisible(id, groups);
+
+    if (displacement) {
+      visible[id] = displacement;
+      return;
+    }
+    invisible[id] = true;
+  });
+
+  const newImpact: DragImpact = {
+    ...impact,
+    displaced: { all: last.all, invisible, visible },
+  };
+
+  return newImpact;
 };
