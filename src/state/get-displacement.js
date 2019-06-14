@@ -10,7 +10,7 @@ import type {
   OnLift,
 } from '../types';
 import { isPartiallyVisible } from './visibility/is-visible';
-import didStartDisplaced from './starting-displaced/did-start-displaced';
+// import didStartDisplaced from './starting-displaced/did-start-displaced';
 
 type Args = {|
   draggable: DraggableDimension,

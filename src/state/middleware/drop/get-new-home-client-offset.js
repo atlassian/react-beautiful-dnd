@@ -13,8 +13,6 @@ import type {
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import { subtract } from '../../position';
 import getClientBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center';
-import didStartDisplaced from '../../starting-displaced/did-start-displaced';
-import { tryGetCombine } from '../../get-impact-location';
 
 type Args = {|
   impact: DragImpact,

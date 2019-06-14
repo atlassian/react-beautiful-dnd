@@ -17,9 +17,8 @@ import getDisplacedBy from '../get-displaced-by';
 import removeDraggableFromList from '../remove-draggable-from-list';
 import isHomeOf from '../droppable/is-home-of';
 import { find } from '../../native-with-fallback';
-import getDidStartDisplaced from '../starting-displaced/did-start-displaced';
+import getDidStartAfterCritical from '../did-start-after-critical';
 import calculateReorderImpact from '../calculate-drag-impact/calculate-reorder-impact';
-// import getDisplaced from '../get-displaced';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
@@ -89,14 +88,14 @@ export default ({
       const start: number = borderBox[axis.start];
       const end: number = borderBox[axis.end];
 
-      const didStartDisplaced: boolean = getDidStartDisplaced(
+      const didStartAfterCritical: boolean = getDidStartAfterCritical(
         id,
         afterCritical,
       );
 
       // Moving forward will decrease the amount of things needed to be displaced
       if (isMovingForward) {
-        if (didStartDisplaced) {
+        if (didStartAfterCritical) {
           // if started displaced then its displaced position is its resting position
           // continue to keep the item at rest until we go onto the start of the item
           return targetCenter < start;
@@ -110,7 +109,7 @@ export default ({
       // The logic for this works by looking at assuming everything has been displaced
       // backwards and then looking at how you would undo that
 
-      if (didStartDisplaced) {
+      if (didStartAfterCritical) {
         // we continue to displace the item until we move back over the end of the item without displacement
         return targetCenter <= end - displacement;
       }

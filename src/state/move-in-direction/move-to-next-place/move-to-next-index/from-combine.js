@@ -8,7 +8,7 @@ import type {
   DraggableId,
   LiftEffect,
 } from '../../../../types';
-import didStartDisplaced from '../../../starting-displaced/did-start-displaced';
+import didStartDisplaced from '../../../did-start-after-critical';
 
 type Args = {|
   isMovingForward: boolean,

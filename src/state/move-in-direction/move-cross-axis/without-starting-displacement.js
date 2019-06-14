@@ -3,7 +3,7 @@ import type { Position, Rect, Spacing } from 'css-box-model';
 import type { DraggableDimension, OnLift } from '../../../types';
 import { negate, subtract } from '../../position';
 import { offsetByPosition } from '../../spacing';
-import didStartDisplaced from '../../starting-displaced/did-start-displaced';
+import didStartDisplaced from '../../did-start-after-critical';
 
 export const getCurrentPageBorderBoxCenter = (
   draggable: DraggableDimension,

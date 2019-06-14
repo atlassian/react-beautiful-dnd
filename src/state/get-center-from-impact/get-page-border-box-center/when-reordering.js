@@ -12,7 +12,7 @@ import type {
 import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import { negate } from '../../position';
-import didStartDisplaced from '../../starting-displaced/did-start-displaced';
+import didStartAfterCritical from '../../did-start-after-critical';
 
 type NewHomeArgs = {|
   impact: DragImpact,
@@ -58,7 +58,7 @@ export default ({
     // want to go before where it would be with the displacement
 
     // target is displaced and is already in it's starting position
-    if (didStartDisplaced(closestAfter, afterCritical)) {
+    if (didStartAfterCritical(closestAfter, afterCritical)) {
       return goBefore({
         axis,
         moveRelativeTo: closest.page,
@@ -88,7 +88,7 @@ export default ({
     return draggablePage.borderBox.center;
   }
 
-  if (didStartDisplaced(last.descriptor.id, afterCritical)) {
+  if (didStartAfterCritical(last.descriptor.id, afterCritical)) {
     // if the item started displaced and it is no longer displaced then
     // we need to go after it it's non-displaced position
 

@@ -18,7 +18,7 @@ import getDisplacedBy from '../../../get-displaced-by';
 import fromReorder from './from-reorder';
 import fromCombine from './from-combine';
 import removeDraggableFromList from '../../../remove-draggable-from-list';
-import getDisplaced from '../../../get-displaced';
+// import getDisplaced from '../../../get-displaced';
 import calculateReorderImpact from '../../../calculate-drag-impact/calculate-reorder-impact';
 
 export type Args = {|

@@ -7,7 +7,7 @@ import type {
   DisplacedBy,
 } from '../types';
 import { origin, negate } from './position';
-import didStartDisplaced from './starting-displaced/did-start-displaced';
+import didStartAfterCritical from './did-start-after-critical';
 
 type Args = {|
   displaced: DisplacementGroups,
@@ -26,7 +26,7 @@ export default ({
     displaced.visible[combineWith] || displaced.invisible[combineWith],
   );
 
-  if (didStartDisplaced(combineWith, afterCritical)) {
+  if (didStartAfterCritical(combineWith, afterCritical)) {
     return isDisplaced ? origin : negate(displacedBy.point);
   }
 
