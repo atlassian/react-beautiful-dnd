@@ -78,7 +78,6 @@ export default ({ state, type }: Args): ?PublicResult => {
         isOver,
         draggables,
         droppables,
-        previousImpact: state.impact,
         viewport: state.viewport,
         afterCritical: state.afterCritical,
       });

@@ -1,25 +1,21 @@
 // @flow
 import type { Position } from 'css-box-model';
-import invariant from 'tiny-invariant';
 import type {
   DragImpact,
   DraggableDimension,
   DraggableDimensionMap,
   DroppableDimension,
-  Displacement,
   Viewport,
   DisplacedBy,
-  OnLift,
+  LiftEffect,
 } from '../../../types';
 import getDisplacedBy from '../../get-displaced-by';
-import getDisplacement from '../../get-displacement';
-import getDisplacementMap from '../../get-displacement-map';
-import { noMovement } from '../../no-impact';
+import { emptyGroups, noDisplacedBy } from '../../no-impact';
 import getPageBorderBoxCenter from '../../get-center-from-impact/get-page-border-box-center';
 import isTotallyVisibleInNewLocation from '../move-to-next-place/is-totally-visible-in-new-location';
 import { addPlaceholder } from '../../droppable/with-placeholder';
-import removeDraggableFromList from '../../remove-draggable-from-list';
 import isHomeOf from '../../droppable/is-home-of';
+import calculateReorderImpact from '../../calculate-drag-impact/calculate-reorder-impact';
 
 type Args = {|
   previousPageBorderBoxCenter: Position,
@@ -28,9 +24,8 @@ type Args = {|
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
   destination: DroppableDimension,
-  previousImpact: DragImpact,
   viewport: Viewport,
-  onLift: OnLift,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
@@ -40,9 +35,8 @@ export default ({
   draggable,
   draggables,
   destination,
-  previousImpact,
   viewport,
-  onLift,
+  afterCritical,
 }: Args): ?DragImpact => {
   if (!moveRelativeTo) {
     // Draggables available, but none are candidates for movement
@@ -52,19 +46,22 @@ export default ({
 
     // Try move to top of empty list if it is visible
     const proposed: DragImpact = {
-      movement: noMovement,
-      destination: {
-        droppableId: destination.descriptor.id,
-        index: 0,
+      displaced: emptyGroups,
+      displacedBy: noDisplacedBy,
+      at: {
+        type: 'REORDER',
+        destination: {
+          droppableId: destination.descriptor.id,
+          index: 0,
+        },
       },
-      merge: null,
     };
     const proposedPageBorderBoxCenter: Position = getPageBorderBoxCenter({
       impact: proposed,
       draggable,
       droppable: destination,
       draggables,
-      onLift,
+      afterCritical,
     });
 
     // need to add room for a placeholder in a foreign list
@@ -104,42 +101,19 @@ export default ({
     return relativeTo + 1;
   })();
 
-  const sliceFrom: number = (() => {
-    const firstIndex: number = insideDestination[0].descriptor.index;
-    return proposedIndex - firstIndex;
-  })();
-
-  const displaced: Displacement[] = removeDraggableFromList(
-    draggable,
-    insideDestination,
-  )
-    .slice(sliceFrom)
-    .map((dimension: DraggableDimension): Displacement =>
-      getDisplacement({
-        draggable: dimension,
-        destination,
-        viewport: viewport.frame,
-        previousImpact,
-        onLift,
-      }),
-    );
-
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
   );
 
-  const impact: DragImpact = {
-    movement: {
-      displacedBy,
-      displaced,
-      map: getDisplacementMap(displaced),
-    },
-    destination: {
-      droppableId: destination.descriptor.id,
-      index: proposedIndex,
-    },
-    merge: null,
-  };
-  return impact;
+  return calculateReorderImpact({
+    draggable,
+    insideDestination,
+    destination,
+    viewport,
+    displacedBy,
+    // last groups won't be relevant
+    last: emptyGroups,
+    index: proposedIndex,
+  });
 };
