@@ -2,11 +2,12 @@
 import * as keyCodes from '../../src/view/key-codes';
 import { timings } from '../../src/animation';
 
-beforeEach(() => {
-  cy.visit('/iframe.html?id=board--simple');
-});
-
 it('should reorder lists', () => {
+  cy.visit('/iframe.html?id=board--simple', {
+    headers: {
+      'Content-Security-Policy': "style-src 'self'",
+    },
+  });
   // order: Jake, BMO
   cy.get('h4')
     .eq(0)

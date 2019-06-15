@@ -2,11 +2,15 @@
 import * as keyCodes from '../../src/view/key-codes';
 import { timings } from '../../src/animation';
 
-beforeEach(() => {
-  cy.visit('/iframe.html?id=single-vertical-list--basic');
-});
-
 it('should reorder a list', () => {
+  cy.visit(
+    '/iframe.html?id=single-vertical-list--basic&nonce=LFKHSDLFHSDFGSKKDJF',
+    {
+      headers: {
+        'Content-Security-Policy': "style-src 'self'",
+      },
+    },
+  );
   // order: 1, 2
   cy.get('[data-react-beautiful-dnd-drag-handle]')
     .eq(0)

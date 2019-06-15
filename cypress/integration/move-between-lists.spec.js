@@ -2,11 +2,12 @@
 import * as keyCodes from '../../src/view/key-codes';
 import { timings } from '../../src/animation';
 
-beforeEach(() => {
-  cy.visit('/iframe.html?id=board--simple');
-});
-
 it('should move between lists', () => {
+  cy.visit('/iframe.html?id=board--simple', {
+    headers: {
+      'Content-Security-Policy': "style-src 'self'",
+    },
+  });
   // first list has item with id:2
   cy.get('[data-react-beautiful-dnd-droppable]')
     .eq(1)
