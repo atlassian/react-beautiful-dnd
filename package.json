@@ -54,7 +54,7 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@babel/runtime-corejs2": "^7.4.5",
+    "@babel/runtime-corejs3": "^7.4.5",
     "css-box-model": "^1.1.2",
     "memoize-one": "^5.0.4",
     "raf-schd": "^4.0.0",
