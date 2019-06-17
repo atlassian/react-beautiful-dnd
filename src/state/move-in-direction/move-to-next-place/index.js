@@ -54,7 +54,6 @@ export default ({
 
   const impact: ?DragImpact =
     moveToNextCombine({
-      isInHomeList,
       isMovingForward,
       draggable,
       destination,

@@ -6,17 +6,18 @@ import type {
   DragImpact,
   CombineImpact,
   DraggableLocation,
+  DraggableId,
 } from '../../../../types';
 import {
   forward,
   backward,
 } from '../../../user-direction/user-direction-preset';
 import { tryGetDestination } from '../../../get-impact-location';
-import { findIndex, find } from '../../../../native-with-fallback';
+import { findIndex } from '../../../../native-with-fallback';
+import removeDraggableFromList from '../../../remove-draggable-from-list';
 
 export type Args = {|
   isMovingForward: boolean,
-  isInHomeList: boolean,
   draggable: DraggableDimension,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
@@ -25,10 +26,9 @@ export type Args = {|
 
 export default ({
   isMovingForward,
-  isInHomeList,
   draggable,
   destination,
-  insideDestination: originalInsideDestination,
+  insideDestination,
   previousImpact,
 }: Args): ?DragImpact => {
   if (!destination.isCombineEnabled) {
@@ -41,65 +41,59 @@ export default ({
     return null;
   }
 
-  // we are on a location, and we are trying to combine onto a sibling
-  // that sibling might be displaced
-
-  const currentIndex: number = location.index;
-  const targetIndex: number = isMovingForward
-    ? currentIndex + 1
-    : currentIndex - 1;
-
-  if (targetIndex < 0) {
-    return null;
+  function getImpact(target: DraggableId) {
+    const at: CombineImpact = {
+      type: 'COMBINE',
+      whenEntered: isMovingForward ? forward : backward,
+      combine: {
+        draggableId: target,
+        droppableId: destination.descriptor.id,
+      },
+    };
+    return {
+      ...previousImpact,
+      at,
+    };
   }
 
-  const atTarget = find(
-    originalInsideDestination,
-    d => d.descriptor.index === targetIndex,
+  const all: DraggableId[] = previousImpact.displaced.all;
+  const closestId: ?DraggableId = all.length ? all[0] : null;
+
+  if (isMovingForward) {
+    return closestId ? getImpact(closestId) : null;
+  }
+
+  const withoutDraggable = removeDraggableFromList(
+    draggable,
+    insideDestination,
   );
-  console.warn('target index', targetIndex);
-  console.warn('add target index id:', atTarget && atTarget.descriptor.id);
 
-  // update the insideDestination list to reflect the current list order
-  // TODO: cleanup
-  const currentInsideDestination: DraggableDimension[] = (() => {
-    const shallow = originalInsideDestination.slice();
+  // Moving backwards
 
-    // if we are in the home list we need to remove the item from its original position
-    // before we insert it into its new position
-    if (isInHomeList) {
-      const originalIndex: number = shallow.indexOf(draggable);
-      shallow.splice(originalIndex, 1);
+  // if nothing is displaced - move backwards onto the last item
+  if (!closestId) {
+    if (!withoutDraggable.length) {
+      return null;
     }
+    const last: DraggableDimension =
+      withoutDraggable[withoutDraggable.length - 1];
+    return getImpact(last.descriptor.id);
+  }
 
-    // put the draggable into its current position in the list
-    // TODO: THIS IS WRONG
-    shallow.splice(location.index, 0, draggable);
-    return shallow;
-  })();
+  // need to find the first item before the closest
+  const indexOfClosest: number = findIndex(
+    withoutDraggable,
+    d => d.descriptor.id === closestId,
+  );
+  invariant(indexOfClosest !== -1, 'Could not find displaced item in set');
 
-  // The last item that can be grouped with is the last one
-  if (targetIndex > currentInsideDestination.length - 1) {
+  const proposedIndex: number = indexOfClosest - 1;
+
+  // cannot move before start of set
+  if (proposedIndex < 0) {
     return null;
   }
 
-  // TODO: what if target is original!?
-  const target: DraggableDimension = currentInsideDestination[targetIndex];
-  invariant(target !== draggable, 'Cannot combine with self');
-
-  const at: CombineImpact = {
-    type: 'COMBINE',
-    whenEntered: isMovingForward ? forward : backward,
-    combine: {
-      draggableId: target.descriptor.id,
-      droppableId: destination.descriptor.id,
-    },
-  };
-
-  const impact: DragImpact = {
-    ...previousImpact,
-    at,
-  };
-
-  return impact;
+  const before: DraggableDimension = withoutDraggable[proposedIndex];
+  return getImpact(before.descriptor.id);
 };
