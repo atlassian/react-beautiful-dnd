@@ -17,7 +17,7 @@ import { find } from '../../native-with-fallback';
 import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getCombinedItemDisplacement from '../get-combined-item-displacement';
 import removeDraggableFromList from '../remove-draggable-from-list';
-import calculateImpact from '../calculate-drag-impact/calculate-combine-impact';
+import calculateCombineImpact from '../calculate-drag-impact/calculate-combine-impact';
 
 function getWhenEntered(
   id: DraggableId,
@@ -135,10 +135,10 @@ export default ({
     return null;
   }
 
-  return calculateImpact({
-    combineWith,
-    userDirection,
-    destination,
+  return calculateCombineImpact({
+    combineWithId: combineWith.descriptor.id,
+    destinationId: destination.descriptor.id,
     previousImpact,
+    userDirection,
   });
 };

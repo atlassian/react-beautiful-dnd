@@ -12,6 +12,7 @@ import {
   backward,
 } from '../../../user-direction/user-direction-preset';
 import { tryGetDestination } from '../../../get-impact-location';
+import { findIndex, find } from '../../../../native-with-fallback';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -44,6 +45,20 @@ export default ({
   // that sibling might be displaced
 
   const currentIndex: number = location.index;
+  const targetIndex: number = isMovingForward
+    ? currentIndex + 1
+    : currentIndex - 1;
+
+  if (targetIndex < 0) {
+    return null;
+  }
+
+  const atTarget = find(
+    originalInsideDestination,
+    d => d.descriptor.index === targetIndex,
+  );
+  console.warn('target index', targetIndex);
+  console.warn('add target index id:', atTarget && atTarget.descriptor.id);
 
   // update the insideDestination list to reflect the current list order
   // TODO: cleanup
@@ -53,21 +68,15 @@ export default ({
     // if we are in the home list we need to remove the item from its original position
     // before we insert it into its new position
     if (isInHomeList) {
-      shallow.splice(draggable.descriptor.index, 1);
+      const originalIndex: number = shallow.indexOf(draggable);
+      shallow.splice(originalIndex, 1);
     }
 
     // put the draggable into its current position in the list
+    // TODO: THIS IS WRONG
     shallow.splice(location.index, 0, draggable);
     return shallow;
   })();
-
-  const targetIndex: number = isMovingForward
-    ? currentIndex + 1
-    : currentIndex - 1;
-
-  if (targetIndex < 0) {
-    return null;
-  }
 
   // The last item that can be grouped with is the last one
   if (targetIndex > currentInsideDestination.length - 1) {
