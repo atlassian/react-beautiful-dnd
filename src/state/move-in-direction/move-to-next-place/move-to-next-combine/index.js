@@ -11,6 +11,7 @@ import {
   forward,
   backward,
 } from '../../../user-direction/user-direction-preset';
+import { tryGetDestination } from '../../../get-impact-location';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -33,16 +34,14 @@ export default ({
     return null;
   }
 
-  // we move from a merge to a reorder
-  if (previousImpact.merge) {
+  const location: ?DraggableLocation = tryGetDestination(previousImpact);
+
+  if (!location) {
     return null;
   }
 
   // we are on a location, and we are trying to combine onto a sibling
   // that sibling might be displaced
-
-  const location: ?DraggableLocation = previousImpact.destination;
-  invariant(location, 'Need a previous location to move from into a combine');
 
   const currentIndex: number = location.index;
 
@@ -79,7 +78,8 @@ export default ({
   const target: DraggableDimension = currentInsideDestination[targetIndex];
   invariant(target !== draggable, 'Cannot combine with self');
 
-  const merge: CombineImpact = {
+  const at: CombineImpact = {
+    type: 'COMBINE',
     whenEntered: isMovingForward ? forward : backward,
     combine: {
       draggableId: target.descriptor.id,
@@ -88,11 +88,8 @@ export default ({
   };
 
   const impact: DragImpact = {
-    // grouping does not modify the existing displacement
-    movement: previousImpact.movement,
-    // grouping removes the destination
-    destination: null,
-    merge,
+    ...previousImpact,
+    at,
   };
 
   return impact;
