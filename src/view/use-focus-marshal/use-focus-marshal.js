@@ -6,6 +6,7 @@ import type { FocusMarshal, Unregister } from './focus-marshal-types';
 import { dragHandle as dragHandleAttr } from '../data-attributes';
 import { warning } from '../../dev-warning';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
+import { toArray } from '../../native-with-fallback';
 
 type Entry = {|
   id: DraggableId,
@@ -22,18 +23,16 @@ function getDragHandle(
 ): ?HTMLElement {
   // find the drag handle
   const selector: string = `[${dragHandleAttr.contextId}="${contextId}"]`;
-  const possible: Element[] = Array.from(document.querySelectorAll(selector));
+  const possible: HTMLElement[] = toArray(document.querySelectorAll(selector));
 
   if (!possible.length) {
     warning(`Unable to find any drag handles in the context "${contextId}"`);
     return null;
   }
 
-  const handle: ?Element = possible.find(
-    (el: Element): boolean => {
-      return el.getAttribute(dragHandleAttr.draggableId) === draggableId;
-    },
-  );
+  const handle: ?HTMLElement = possible.find((el: HTMLElement): boolean => {
+    return el.getAttribute(dragHandleAttr.draggableId) === draggableId;
+  });
 
   if (!handle) {
     warning(

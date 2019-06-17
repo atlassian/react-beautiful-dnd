@@ -45,3 +45,8 @@ export function find<T>(list: Array<T>, predicate: PredicateFn<T>): ?T {
   // Array.prototype.find returns undefined when nothing is found
   return undefined;
 }
+
+// Using this rather than Array.from to avoid babel brining in lots of code
+export function toArray(list: NodeList<HTMLElement>): HTMLElement[] {
+  return Array.prototype.slice.call(list);
+}
