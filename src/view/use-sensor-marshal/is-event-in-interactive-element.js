@@ -51,9 +51,15 @@ function isAnInteractiveElement(parent: Element, current: ?Element) {
   return isAnInteractiveElement(parent, current.parentElement);
 }
 
-export default function isTargetInInteractiveElement(
+export default function isEventInInteractiveElement(
   draggable: Element,
-  target: Element,
+  event: Event,
 ): boolean {
+  const target: EventTarget = event.target;
+
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
   return isAnInteractiveElement(draggable, target);
 }

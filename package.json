@@ -12,7 +12,8 @@
     "react",
     "react.js",
     "natural",
-    "beautiful"
+    "beautiful",
+    "accessible"
   ],
   "repository": {
     "type": "git",

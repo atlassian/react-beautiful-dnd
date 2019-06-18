@@ -165,9 +165,13 @@ export default function useKeyboardSensor(api: SensorAPI) {
           return;
         }
 
-        // abort function not defined yet
-        // eslint-disable-next-line no-use-before-define
-        const preDrag: ?PreDragActions = api.tryGetLock(draggableId, stop);
+        const preDrag: ?PreDragActions = api.tryGetLock(
+          draggableId,
+          // abort function not defined yet
+          // eslint-disable-next-line no-use-before-define
+          stop,
+          event,
+        );
 
         // Cannot start capturing at this time
         if (!preDrag) {

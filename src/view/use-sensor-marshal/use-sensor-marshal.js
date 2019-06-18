@@ -33,7 +33,7 @@ import useMouseSensor from './sensors/use-mouse-sensor';
 import useKeyboardSensor from './sensors/use-keyboard-sensor';
 import useTouchSensor from './sensors/use-touch-sensor';
 import useValidateSensorHooks from './use-validate-sensor-hooks';
-import isTargetInInteractiveElement from './is-target-in-interactive-element';
+import isEventInInteractiveElement from './is-event-in-interactive-element';
 import getDataFromDraggable from './get-data-from-draggable';
 import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
@@ -52,6 +52,7 @@ type TryStartArgs = {|
   store: Store,
   draggableId: DraggableId,
   forceSensorStop: () => void,
+  event: ?Event,
 |};
 
 type IsActiveArgs = {|
@@ -123,6 +124,7 @@ function tryStart({
   contextId,
   store,
   draggableId,
+  event,
   forceSensorStop,
 }: TryStartArgs): ?PreDragActions {
   // lock is already claimed - cannot start
@@ -150,12 +152,13 @@ function tryStart({
   }
 
   // do not allow dragging from interactive elements
-  // if (
-  //   !canDragInteractiveElements &&
-  //   isTargetInInteractiveElement(draggable, target)
-  // ) {
-  //   return null;
-  // }
+  if (
+    event &&
+    !canDragInteractiveElements &&
+    isEventInInteractiveElement(draggable, event)
+  ) {
+    return null;
+  }
 
   // Application might now allow dragging right now
   if (!canStartDrag(store.getState(), id)) {
@@ -367,12 +370,14 @@ export default function useSensorMarshal({
     (
       draggableId: DraggableId,
       forceStop?: () => void = noop,
+      event?: Event,
     ): ?PreDragActions =>
       tryStart({
         lockAPI,
         contextId,
         store,
         draggableId,
+        event,
         forceSensorStop: forceStop,
       }),
     [contextId, lockAPI, store],

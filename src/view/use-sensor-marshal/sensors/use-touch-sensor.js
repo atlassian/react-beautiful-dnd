@@ -254,8 +254,12 @@ export default function useMouseSensor(api: SensorAPI) {
           return;
         }
 
-        // eslint-disable-next-line no-use-before-define
-        const actions: ?PreDragActions = api.tryGetLock(draggableId, stop);
+        const actions: ?PreDragActions = api.tryGetLock(
+          draggableId,
+          // eslint-disable-next-line no-use-before-define
+          stop,
+          event,
+        );
 
         // could not start a drag
         if (!actions) {

@@ -259,6 +259,7 @@ export default function useMouseSensor(api: SensorAPI) {
           // stop is defined later
           // eslint-disable-next-line no-use-before-define
           stop,
+          event,
         );
 
         if (!actions) {
