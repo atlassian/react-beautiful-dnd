@@ -11,11 +11,11 @@ The programmatic API is the same API that our [mouse](/docs/sensors/mouse.md), [
 
 ## Overview
 
-You create a `sensor` that has the ability to attempt to claim a **lock**. A **lock** allows _exclusive_ control of dragging a single `<Draggable />` within a `<DragDropContext>`. When you are finished with your interaction, you can then release the **lock**.
+You create a `sensor` that has the ability to attempt to claim a **lock**. A **lock** allows _exclusive_ control of dragging within a `<DragDropContext>`. When you are finished with your interaction, you can then release the **lock**.
 
 ```js
-function mySimpleSensor(tryGetLock: TryGetLock) {
-  const preDrag: ?PreDragActions = tryGetLock('item-1');
+function mySimpleSensor(api: SensorAPI) {
+  const preDrag: ?PreDragActions = api.tryGetLock('item-1');
   // Could not get lock
   if (!preDrag) {
     return;
@@ -58,9 +58,9 @@ function App() {
 A `sensor` is a [React hook](https://reactjs.org/docs/hooks-intro.html). It is fine if you do not want to use any of the React hook goodness, you can treat the `sensor` just as a function. React hooks are just functions that let you use the built in React hooks if you want to 🤫. You pass your `sensor` into the `sensors` array on a `<DragDropContext />`.
 
 ```js
-function useMyCoolSensor(tryGetLock) {
+function useMyCoolSensor(api: SensorAPI) {
   const start = useCallback(function start(event: MouseEvent) {
-    const preDrag: ?PreDragActions = tryGetLock('item-2');
+    const preDrag: ?PreDragActions = api.tryGetLock('item-2');
     if (!preDrag) {
       return;
     }
@@ -91,17 +91,29 @@ You can also disable all of the prebuilt sensors ([mouse](/docs/sensors/mouse.md
 
 ### Controlling a drag: try to get a lock
 
-A `sensor` is provided with a function `tryGetLock()` which is used to try to get a **lock**. It might return a `PreDragAction` object
+A `sensor` is provided with a an object (`SensorAPI`) which is used to try to get a **lock**
 
 ```js
-export type TryGetLock = (
+type SensorAPI = {|
+  tryGetLock: TryGetLock,
+  getContextId: () => ContextId,
+|};
+```
+
+- `tryGetLock` (`TryGetLock`): a function that is used to **try** and get a **lock** for a `<Draggable />`.
+- `getContextId`: a function that returns the `ContextId` of the `<DragDropContext />`
+
+```js
+type TryGetLock = (
   draggableId: DraggableId,
   forceStop?: () => void,
+  event?: Event,
 ) => ?PreDragActions;
 ```
 
-- `source`: can either be an `Event` or a `Element`. For an `Element` we search for the closest _drag handle_ (via `.closest()`). For an `Event` we read the `event.target` and do the same search from there. If no _drag handle_ is found then a lock will not be given.
-- `forceStop`: a function that is called when the lock needs to be abandoned by the application. See **force abandoning locks**.
+- `draggableId`: The `DraggableId` of the `<Draggable />` that you want to drag.
+- `forceStop` (optional): a function that is called when the lock needs to be abandoned by the application. See **force abandoning locks**.
+- `event` (optional): Used to do further validation when starting the drag from a user input event. We will do some [interactive element checking](TODO)
 
 ### Controlling a drag: pre drag (`PreDragAction`)
 
@@ -183,10 +195,10 @@ export type SnapDragActions = {|
 
 ## Force abandoning locks
 
-A **lock** can be aborted at any time by the application, such as when an error occurs. If you try to perform actions on an aborted **lock** then it will not do anything. The `tryGetLock()` function accepts two arguments: `tryGetLock(source: Element | Event, forceStop: () => void)`. The `forceStop` function will be called when the lock needs to be abandoned by the application. If you try to use any functions on the lock after it has been abandoned they will have no effect and will log a warning to the console.
+A **lock** can be aborted at any time by the application, such as when an error occurs. If you try to perform actions on an aborted **lock** then it will not do anything. The second argument to `SensorAPI.tryGetLock()` is a `forceStop` function. The `forceStop` function will be called when the **lock** needs to be abandoned by the application. If you try to use any functions on the **lock** after it has been abandoned they will have no effect and will log a warning to the console.
 
 ```js
-function useMySensor(tryGetLock: TryGetLock) {
+function useMySensor(api: SensorAPI) {
   let unbindClick;
 
   function forceStop() {
@@ -195,8 +207,7 @@ function useMySensor(tryGetLock: TryGetLock) {
     }
   }
 
-  const element = document.querySelector('#item-1');
-  const preDrag: ?PreDragActions = tryGetLock(element, forceStop);
+  const preDrag: ?PreDragActions = api.tryGetLock('item-1', forceStop);
   // Could not get lock
   if (!preDrag) {
     return;
@@ -212,8 +223,8 @@ function useMySensor(tryGetLock: TryGetLock) {
 The `PreDragActions`, `FluidDragActions` and `SnapDragActions` all have a `isActive()` function which can be called to discover if a lock is still active. So if you do not want to provide a `forceStop()` function, it is best to defensively call api's with a `isActiveCheck`.
 
 ```js
-function useMySensor(tryGetLock: TryGetLock) {
-  const preDrag: ?PreDragActions = tryGetLock();
+function useMySensor(api: SensorAPI) {
+  const preDrag: ?PreDragActions = api.tryGetLock();
   // Could not get lock
   if (!preDrag) {
     return;
