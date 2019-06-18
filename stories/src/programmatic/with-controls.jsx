@@ -7,7 +7,7 @@ import type {
   DropResult,
   PreDragActions,
   SnapDragActions,
-  TryGetLock,
+  SensorAPI,
 } from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
@@ -176,7 +176,7 @@ export default function QuoteApp(props: Props) {
   const [quotes, setQuotes] = useState(props.initial);
   const [isDragging, setIsDragging] = useState(false);
   const [isControlDragging, setIsControlDragging] = useState(false);
-  const tryGetLockRef = useRef<TryGetLock>(() => null);
+  const sensorAPIRef = useRef<?SensorAPI>(null);
 
   const onDragEnd = useCallback(
     function onDragEnd(result: DropResult) {
@@ -206,14 +206,15 @@ export default function QuoteApp(props: Props) {
     if (isDragging) {
       return null;
     }
-    const selector: string = `[data-rbd-draggable-id="${quoteId}"][data-rbd-drag-handle-context-id]`;
-    const handle: ?HTMLElement = document.querySelector(selector);
-    if (!handle) {
-      console.log('could not find drag handle');
+
+    const api: ?SensorAPI = sensorAPIRef.current;
+
+    if (!api) {
+      console.warn('unable to find sensor api');
       return null;
     }
 
-    const preDrag: ?PreDragActions = tryGetLockRef.current(handle, noop);
+    const preDrag: ?PreDragActions = api.tryGetLock(quoteId, noop);
 
     if (!preDrag) {
       console.log('unable to start capturing');
@@ -228,8 +229,8 @@ export default function QuoteApp(props: Props) {
       onDragStart={() => setIsDragging(true)}
       onDragEnd={onDragEnd}
       sensors={[
-        tryGetLock => {
-          tryGetLock.current = tryGetLock;
+        api => {
+          sensorAPIRef.current = api;
         },
       ]}
     >

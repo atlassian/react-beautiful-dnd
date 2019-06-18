@@ -3,7 +3,12 @@ import invariant from 'tiny-invariant';
 import { useRef } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
-import type { PreDragActions, FluidDragActions } from '../../../types';
+import type {
+  PreDragActions,
+  FluidDragActions,
+  DraggableId,
+  SensorAPI,
+} from '../../../types';
 import type {
   EventBinding,
   EventOptions,
@@ -12,6 +17,7 @@ import bindEvents from '../../event-bindings/bind-events';
 import * as keyCodes from '../../key-codes';
 import preventStandardKeyEvents from './util/prevent-standard-key-events';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
+import tryFindDraggableIdFromEvent from './util/try-find-draggable-id-from-event';
 import { warning } from '../../../dev-warning';
 import useLayoutEffect from '../../use-isomorphic-layout-effect';
 import { noop } from '../../../empty';
@@ -217,9 +223,7 @@ function getCaptureBindings({
   ];
 }
 
-export default function useMouseSensor(
-  tryStartCapturing: (event: Event, abort: () => void) => ?PreDragActions,
-) {
+export default function useMouseSensor(api: SensorAPI) {
   const phaseRef = useRef<Phase>(idle);
   const unbindEventsRef = useRef<() => void>(noop);
 
@@ -241,9 +245,21 @@ export default function useMouseSensor(
           return;
         }
 
-        // stop is defined later
-        // eslint-disable-next-line no-use-before-define
-        const actions: ?PreDragActions = tryStartCapturing(event, stop);
+        const draggableId: ?DraggableId = tryFindDraggableIdFromEvent(
+          api.getContextId(),
+          event,
+        );
+
+        if (!draggableId) {
+          return;
+        }
+
+        const actions: ?PreDragActions = api.tryGetLock(
+          draggableId,
+          // stop is defined later
+          // eslint-disable-next-line no-use-before-define
+          stop,
+        );
 
         if (!actions) {
           return;
@@ -266,7 +282,7 @@ export default function useMouseSensor(
     }),
     // not including startPendingDrag as it is not defined initially
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tryStartCapturing],
+    [api],
   );
 
   const listenForCapture = useCallback(

@@ -6,6 +6,7 @@ import type {
   DropResult,
   PreDragActions,
   SnapDragActions,
+  SensorAPI,
 } from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
@@ -22,23 +23,10 @@ function delay(fn: Function, time?: number = 300) {
 
 function noop() {}
 
-function useDemoSensor(
-  tryGetLock: (source: Event | Element, abort: () => void) => ?PreDragActions,
-) {
+function useDemoSensor(api: SensorAPI) {
   const start = useCallback(
     async function start() {
-      // grabbing the first drag handle we can
-      const handle: ?HTMLElement = document.querySelector(
-        '[data-rbd-drag-handle-context-id]',
-      );
-      if (!handle) {
-        console.log('could not find drag handle');
-        return;
-      }
-
-      // handle.scrollIntoView();
-
-      const preDrag: ?PreDragActions = tryGetLock(handle, noop);
+      const preDrag: ?PreDragActions = api.tryGetLock('1', noop);
 
       if (!preDrag) {
         console.warn('unable to start drag');
@@ -62,7 +50,7 @@ function useDemoSensor(
       await delay(moveUp);
       await delay(drop);
     },
-    [tryGetLock],
+    [api],
   );
 
   useEffect(() => {

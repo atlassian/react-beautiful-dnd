@@ -3,7 +3,12 @@ import invariant from 'tiny-invariant';
 import { useRef } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
-import type { PreDragActions, FluidDragActions } from '../../../types';
+import type {
+  DraggableId,
+  SensorAPI,
+  PreDragActions,
+  FluidDragActions,
+} from '../../../types';
 import type {
   EventBinding,
   EventOptions,
@@ -13,6 +18,7 @@ import * as keyCodes from '../../key-codes';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
 import { noop } from '../../../empty';
 import useLayoutEffect from '../../use-isomorphic-layout-effect';
+import tryFindDraggableIdFromEvent from './util/try-find-draggable-id-from-event';
 
 type TouchWithForce = Touch & {
   force: number,
@@ -214,9 +220,7 @@ function getTargetBindings({
   ];
 }
 
-export default function useMouseSensor(
-  tryStartCapturing: (event: Event, abort: () => void) => ?PreDragActions,
-) {
+export default function useMouseSensor(api: SensorAPI) {
   const phaseRef = useRef<Phase>(idle);
   const unbindEventsRef = useRef<() => void>(noop);
 
@@ -241,8 +245,17 @@ export default function useMouseSensor(
         // browser interactions as possible.
         // This includes navigation on anchors which we want to preserve
 
+        const draggableId: ?DraggableId = tryFindDraggableIdFromEvent(
+          api.getContextId(),
+          event,
+        );
+
+        if (!draggableId) {
+          return;
+        }
+
         // eslint-disable-next-line no-use-before-define
-        const actions: ?PreDragActions = tryStartCapturing(event, stop);
+        const actions: ?PreDragActions = api.tryGetLock(draggableId, stop);
 
         // could not start a drag
         if (!actions) {
@@ -270,7 +283,7 @@ export default function useMouseSensor(
     }),
     // not including stop or startPendingDrag as it is not defined initially
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tryStartCapturing],
+    [api],
   );
 
   const listenForCapture = useCallback(

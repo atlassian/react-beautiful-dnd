@@ -2,7 +2,7 @@
 import rafSchd from 'raf-schd';
 import invariant from 'tiny-invariant';
 import { useState } from 'react';
-import { useCallback } from 'use-memo-one';
+import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
 import type {
   ContextId,
@@ -12,10 +12,12 @@ import type {
   PreDragActions,
   FluidDragActions,
   SnapDragActions,
+  DraggableId,
+  SensorAPI,
 } from '../../types';
 import create, { type Lock, type LockAPI } from './lock';
 import type { Store, Action } from '../../state/store-types';
-import { getClosestDragHandle, getClosestDraggable } from './get-closest';
+import tryGetDraggable from './try-get-draggable';
 import canStartDrag from '../../state/can-start-drag';
 import {
   move as moveAction,
@@ -44,11 +46,11 @@ function preventDefault(event: Event) {
 }
 
 type LockPhase = 'PRE_DRAG' | 'DRAGGING' | 'COMPLETED';
-type TryGetLockArgs = {|
+type TryStartArgs = {|
   lockAPI: LockAPI,
   contextId: ContextId,
   store: Store,
-  source: Event | Element,
+  draggableId: DraggableId,
   forceSensorStop: () => void,
 |};
 
@@ -116,34 +118,27 @@ function getTarget(source: Event | Element): ?Element {
   return target instanceof Element ? target : null;
 }
 
-function tryGetLock({
+function tryStart({
   lockAPI,
   contextId,
   store,
-  source,
+  draggableId,
   forceSensorStop,
-}: TryGetLockArgs): ?PreDragActions {
+}: TryStartArgs): ?PreDragActions {
+  console.log('called');
   // lock is already claimed - cannot start
   if (lockAPI.isClaimed()) {
+    console.log('lock claimed!');
     return null;
   }
 
-  const target: ?Element = getTarget(source);
+  const draggable: ?HTMLElement = tryGetDraggable(contextId, draggableId);
 
-  // Must be a HTMLElement
-  if (!isHtmlElement(target)) {
-    warning('Expected target to be a HTMLElement');
+  if (!draggable) {
+    warning(`Unable to find draggable with id: ${draggableId}`);
     return null;
   }
 
-  const handle: ?HTMLElement = getClosestDragHandle(contextId, target);
-
-  // event did not contain a drag handle parent - cannot start
-  if (handle == null) {
-    return null;
-  }
-
-  const draggable: HTMLElement = getClosestDraggable(contextId, handle);
   const {
     id,
     isEnabled,
@@ -151,18 +146,20 @@ function tryGetLock({
     shouldRespectForcePress,
   } = getDataFromDraggable(draggable);
 
+  console.log('got this far');
+
   // draggable is not enabled - cannot start
   if (!isEnabled) {
     return null;
   }
 
   // do not allow dragging from interactive elements
-  if (
-    !canDragInteractiveElements &&
-    isTargetInInteractiveElement(draggable, target)
-  ) {
-    return null;
-  }
+  // if (
+  //   !canDragInteractiveElements &&
+  //   isTargetInInteractiveElement(draggable, target)
+  // ) {
+  //   return null;
+  // }
 
   // Application might now allow dragging right now
   if (!canStartDrag(store.getState(), id)) {
@@ -370,21 +367,34 @@ export default function useSensorMarshal({
     return lockAPI.tryAbandon;
   }, [lockAPI.tryAbandon]);
 
-  const wrapper = useCallback(
-    (source: Event | Element, forceStop?: () => void = noop): ?PreDragActions =>
-      tryGetLock({
+  const tryGetLock = useCallback(
+    (
+      draggableId: DraggableId,
+      forceStop?: () => void = noop,
+    ): ?PreDragActions =>
+      tryStart({
         lockAPI,
         contextId,
         store,
-        source,
+        draggableId,
         forceSensorStop: forceStop,
       }),
     [contextId, lockAPI, store],
   );
 
+  const getContextId = useCallback(() => contextId, [contextId]);
+
+  const api: SensorAPI = useMemo(
+    () => ({
+      tryGetLock,
+      getContextId,
+    }),
+    [getContextId, tryGetLock],
+  );
+
   // Bad ass
   useValidateSensorHooks(useSensors);
   for (let i = 0; i < useSensors.length; i++) {
-    useSensors[i](wrapper);
+    useSensors[i](api);
   }
 }

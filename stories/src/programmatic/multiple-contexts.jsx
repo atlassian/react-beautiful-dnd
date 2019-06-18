@@ -1,7 +1,7 @@
+/* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
 // @flow
-import React, { useState, useEffect, createRef } from 'react';
-import invariant from 'tiny-invariant';
+import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { useCallback } from 'use-memo-one';
 import type { Quote } from '../types';
@@ -10,9 +10,9 @@ import type {
   PreDragActions,
   SnapDragActions,
   Sensor,
+  SensorAPI,
 } from '../../../src/types';
 import { quotes as initial } from '../data';
-import * as dataAttr from '../../../src/view/data-attributes';
 import { DragDropContext } from '../../../src';
 import QuoteList from '../primatives/quote-list';
 import reorder from '../reorder';
@@ -28,28 +28,16 @@ function sleep(fn: Function, time?: number = 300) {
   });
 }
 
-function getSensor(getContextId: () => string, delay: number) {
-  return function useCustomSensor(
-    tryGetLock: (source: Event | Element, abort: () => void) => ?PreDragActions,
-  ) {
+function getSensor(delay: number): Sensor {
+  return function useCustomSensor(api: SensorAPI) {
     const start = useCallback(
       async function start() {
-        // grabbing the first drag handle we can
-        const handle: ?HTMLElement = document.querySelector(
-          `[data-rbd-drag-handle-context-id="${getContextId()}"]`,
-        );
-        if (!handle) {
-          console.log('could not find drag handle');
-          return;
-        }
-
-        const preDrag: ?PreDragActions = tryGetLock(handle, () => {});
+        const preDrag: ?PreDragActions = api.tryGetLock('1', () => {});
 
         if (!preDrag) {
           console.warn('unable to start drag');
           return;
         }
-        console.warn('starting drag');
 
         const actions: SnapDragActions = preDrag.snapLift();
         const { moveDown, moveUp, drop, isActive, cancel } = actions;
@@ -82,7 +70,7 @@ function getSensor(getContextId: () => string, delay: number) {
 
         unbind();
       },
-      [tryGetLock],
+      [api],
     );
 
     useEffect(() => {
@@ -140,52 +128,26 @@ const Title = styled.h3`
   padding: ${grid * 2}px;
 `;
 
-const selector: string = `[${dataAttr.droppable.contextId}]`;
-
-function getContextIdFromEl(el: ?HTMLElement) {
-  invariant(el, 'No ref set');
-  const droppable: ?HTMLElement = el.querySelector(selector);
-  invariant(droppable, 'Could not find droppable');
-  const contextId: ?string = droppable.getAttribute(
-    dataAttr.droppable.contextId,
-  );
-  invariant(contextId, 'Expected data attribute to be set');
-  return contextId;
-}
-
 export default function App() {
-  const firstRef = createRef();
-  const secondRef = createRef();
-
-  function getContextId(ref) {
-    return () => getContextIdFromEl(ref.current);
-  }
-
   return (
     <Root>
-      <Column ref={firstRef}>
+      <Column>
         <Title>
           Programmatic #1{' '}
           <span role="img" aria-label="controller">
             🎮
           </span>
         </Title>
-        <QuoteApp
-          initial={initial}
-          sensors={[getSensor(getContextId(firstRef), 300)]}
-        />
+        <QuoteApp initial={initial} sensors={[getSensor(300)]} />
       </Column>
-      <Column ref={secondRef}>
+      <Column>
         <Title>
           Programmatic #2{' '}
           <span role="img" aria-label="controller">
             🎮
           </span>
         </Title>
-        <QuoteApp
-          initial={initial}
-          sensors={[getSensor(getContextId(secondRef), 400)]}
-        />
+        <QuoteApp initial={initial} sensors={[getSensor(400)]} />
       </Column>
       <Column>
         <Title>

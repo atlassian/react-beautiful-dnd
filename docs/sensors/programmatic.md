@@ -15,14 +15,13 @@ You create a `sensor` that has the ability to attempt to claim a **lock**. A **l
 
 ```js
 function mySimpleSensor(tryGetLock: TryGetLock) {
-  const preDrag: ?PreDragActions = tryGetLock();
+  const preDrag: ?PreDragActions = tryGetLock('item-1');
   // Could not get lock
   if (!preDrag) {
     return;
   }
 
-  const element = document.querySelector('#item-1');
-  const drag: SnapDragActions = preDrag.snapLift(element);
+  const drag: SnapDragActions = preDrag.snapLift();
 
   drag.moveDown();
   drag.moveDown();
@@ -61,7 +60,7 @@ A `sensor` is a [React hook](https://reactjs.org/docs/hooks-intro.html). It is f
 ```js
 function useMyCoolSensor(tryGetLock) {
   const start = useCallback(function start(event: MouseEvent) {
-    const preDrag: ?PreDragActions = tryGetLock(event);
+    const preDrag: ?PreDragActions = tryGetLock('item-2');
     if (!preDrag) {
       return;
     }
@@ -96,7 +95,7 @@ A `sensor` is provided with a function `tryGetLock()` which is used to try to ge
 
 ```js
 export type TryGetLock = (
-  source: Event | Element,
+  draggableId: DraggableId,
   forceStop?: () => void,
 ) => ?PreDragActions;
 ```

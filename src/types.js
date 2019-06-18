@@ -444,8 +444,13 @@ export type PreDragActions = {|
 |};
 
 export type TryGetLock = (
-  source: Event | Element,
+  draggableId: DraggableId,
   forceStop?: () => void,
 ) => ?PreDragActions;
 
-export type Sensor = (tryGetLock: TryGetLock) => void;
+export type SensorAPI = {|
+  tryGetLock: TryGetLock,
+  getContextId: () => ContextId,
+|};
+
+export type Sensor = (api: SensorAPI) => void;

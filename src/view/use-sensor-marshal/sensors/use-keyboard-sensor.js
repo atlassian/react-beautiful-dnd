@@ -2,7 +2,12 @@
 import invariant from 'tiny-invariant';
 import { useRef } from 'react';
 import { useMemo, useCallback } from 'use-memo-one';
-import type { PreDragActions, SnapDragActions } from '../../../types';
+import type {
+  SensorAPI,
+  PreDragActions,
+  SnapDragActions,
+  DraggableId,
+} from '../../../types';
 import type {
   EventBinding,
   EventOptions,
@@ -12,6 +17,7 @@ import bindEvents from '../../event-bindings/bind-events';
 import preventStandardKeyEvents from './util/prevent-standard-key-events';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
 import useLayoutEffect from '../../use-isomorphic-layout-effect';
+import tryFindDraggableIdFromEvent from './util/try-find-draggable-id-from-event';
 
 function noop() {}
 
@@ -133,12 +139,7 @@ function getDraggingBindings(
   ];
 }
 
-export default function useKeyboardSensor(
-  tryStartCapturing: (
-    source: Event | Element,
-    abort: () => void,
-  ) => ?PreDragActions,
-) {
+export default function useKeyboardSensor(api: SensorAPI) {
   const unbindEventsRef = useRef<() => void>(noop);
 
   const startCaptureBinding: EventBinding = useMemo(
@@ -155,9 +156,18 @@ export default function useKeyboardSensor(
           return;
         }
 
+        const draggableId: ?DraggableId = tryFindDraggableIdFromEvent(
+          api.getContextId(),
+          event,
+        );
+
+        if (!draggableId) {
+          return;
+        }
+
         // abort function not defined yet
         // eslint-disable-next-line no-use-before-define
-        const preDrag: ?PreDragActions = tryStartCapturing(event, stop);
+        const preDrag: ?PreDragActions = api.tryGetLock(draggableId, stop);
 
         // Cannot start capturing at this time
         if (!preDrag) {
@@ -200,7 +210,7 @@ export default function useKeyboardSensor(
     }),
     // not including startPendingDrag as it is not defined initially
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tryStartCapturing],
+    [api],
   );
 
   const listenForCapture = useCallback(
