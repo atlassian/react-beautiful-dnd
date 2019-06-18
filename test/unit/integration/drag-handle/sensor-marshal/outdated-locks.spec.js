@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import React from 'react';
 import { render } from 'react-testing-library';
 import type {
-  TryGetLock,
+  SensorAPI,
   PreDragActions,
   SnapDragActions,
   Sensor,
@@ -19,15 +19,14 @@ afterEach(() => {
 });
 
 it('should not allow pre drag actions when in a dragging phase', () => {
-  let first: TryGetLock;
-  const a: Sensor = (tryGetLock: TryGetLock) => {
-    first = tryGetLock;
+  let api: SensorAPI;
+  const a: Sensor = (value: SensorAPI) => {
+    api = value;
   };
-  const { getByText } = render(<App sensors={[a]} />);
-  invariant(first, 'expected first to be set');
-  const item: HTMLElement = getByText('item: 0');
+  render(<App sensors={[a]} />);
+  invariant(api, 'expected api to be set');
 
-  const preDrag: ?PreDragActions = first(item);
+  const preDrag: ?PreDragActions = api.tryGetLock('0');
   invariant(preDrag);
   // it is currently active
   expect(preDrag.isActive()).toBe(true);
@@ -57,15 +56,14 @@ it('should not allow pre drag actions when in a dragging phase', () => {
 });
 
 it('should not allow drag actions after a drop', () => {
-  let first: TryGetLock;
-  const a: Sensor = (tryGetLock: TryGetLock) => {
-    first = tryGetLock;
+  let api: SensorAPI;
+  const sensor: Sensor = (value: SensorAPI) => {
+    api = value;
   };
-  const { getByText } = render(<App sensors={[a]} />);
-  invariant(first, 'expected first to be set');
-  const item: HTMLElement = getByText('item: 0');
+  render(<App sensors={[sensor]} />);
+  invariant(api, 'expected api to be set');
 
-  const preDrag: ?PreDragActions = first(item);
+  const preDrag: ?PreDragActions = api.tryGetLock('0');
   invariant(preDrag);
   expect(preDrag.isActive()).toBe(true);
 
@@ -85,15 +83,14 @@ it('should not allow drag actions after a drop', () => {
 });
 
 it('should not allow drag actions after lock lost', () => {
-  let first: TryGetLock;
-  const a: Sensor = (tryGetLock: TryGetLock) => {
-    first = tryGetLock;
+  let api: SensorAPI;
+  const sensor: Sensor = (value: SensorAPI) => {
+    api = value;
   };
-  const { getByText, unmount } = render(<App sensors={[a]} />);
-  invariant(first, 'expected first to be set');
-  const item: HTMLElement = getByText('item: 0');
+  const { unmount } = render(<App sensors={[sensor]} />);
+  invariant(api, 'expected first to be set');
 
-  const preDrag: ?PreDragActions = first(item);
+  const preDrag: ?PreDragActions = api.tryGetLock('0');
   invariant(preDrag);
   expect(preDrag.isActive()).toBe(true);
 

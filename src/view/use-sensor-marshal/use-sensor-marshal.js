@@ -125,10 +125,8 @@ function tryStart({
   draggableId,
   forceSensorStop,
 }: TryStartArgs): ?PreDragActions {
-  console.log('called');
   // lock is already claimed - cannot start
   if (lockAPI.isClaimed()) {
-    console.log('lock claimed!');
     return null;
   }
 
@@ -145,8 +143,6 @@ function tryStart({
     canDragInteractiveElements,
     shouldRespectForcePress,
   } = getDataFromDraggable(draggable);
-
-  console.log('got this far');
 
   // draggable is not enabled - cannot start
   if (!isEnabled) {

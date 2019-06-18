@@ -29,6 +29,7 @@ export type {
   OnDragStartResponder,
   OnDragUpdateResponder,
   OnDragEndResponder,
+  SensorAPI,
   Sensor,
 } from './types';
 

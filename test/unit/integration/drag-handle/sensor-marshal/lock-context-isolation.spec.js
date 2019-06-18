@@ -2,18 +2,18 @@
 import invariant from 'tiny-invariant';
 import React from 'react';
 import { render } from 'react-testing-library';
-import type { TryGetLock, Sensor } from '../../../../../src/types';
+import type { SensorAPI, Sensor } from '../../../../../src/types';
 import App from '../app';
 
 it('should allow different locks in different DragDropContexts', () => {
-  let first: TryGetLock;
-  let second: TryGetLock;
+  let first: SensorAPI;
+  let second: SensorAPI;
 
-  const a: Sensor = (tryGetLock: TryGetLock) => {
-    first = tryGetLock;
+  const a: Sensor = (value: SensorAPI) => {
+    first = value;
   };
-  const b: Sensor = (tryGetLock: TryGetLock) => {
-    second = tryGetLock;
+  const b: Sensor = (value: SensorAPI) => {
+    second = value;
   };
 
   const { getAllByText } = render(
@@ -31,6 +31,6 @@ it('should allow different locks in different DragDropContexts', () => {
   // each sensor can get a different lock
   invariant(first, 'expected first to be set');
   invariant(second, 'expected second to be set');
-  expect(first(inFirst)).toBeTruthy();
-  expect(second(inSecond)).toBeTruthy();
+  expect(first.tryGetLock('0')).toBeTruthy();
+  expect(second.tryGetLock('0')).toBeTruthy();
 });

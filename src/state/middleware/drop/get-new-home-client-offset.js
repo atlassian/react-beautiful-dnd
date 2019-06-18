@@ -51,7 +51,7 @@ export default ({
     draggable.client.borderBox.center,
   );
 
-  console.warn('TODO: check this is not needed');
+  // console.warn('TODO: check this is not needed');
   // const combine: ?Combine = tryGetCombine(impact);
 
   // // When dropping with a merge we want to drop the dragging item

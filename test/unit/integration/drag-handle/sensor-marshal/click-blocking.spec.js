@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import React from 'react';
 import { render, fireEvent, createEvent } from 'react-testing-library';
 import type {
-  TryGetLock,
+  SensorAPI,
   Sensor,
   PreDragActions,
   SnapDragActions,
@@ -11,21 +11,21 @@ import type {
 import App from '../app';
 
 it('should block a single click if requested', () => {
-  let tryGetLock: TryGetLock;
-  const a: Sensor = (tryStart: TryGetLock) => {
-    tryGetLock = tryStart;
+  let api: SensorAPI;
+  const sensor: Sensor = (value: SensorAPI) => {
+    api = value;
   };
 
   const { getByText } = render(
     <React.Fragment>
-      <App sensors={[a]} />
+      <App sensors={[sensor]} />
     </React.Fragment>,
   );
   const handle: HTMLElement = getByText('item: 0');
-  invariant(tryGetLock);
+  invariant(api);
 
   // trigger a drop
-  const preDrag: ?PreDragActions = tryGetLock(handle);
+  const preDrag: ?PreDragActions = api.tryGetLock('0');
   invariant(preDrag);
   const drag: SnapDragActions = preDrag.snapLift();
   drag.drop({ shouldBlockNextClick: true });
@@ -42,10 +42,10 @@ it('should block a single click if requested', () => {
 });
 
 it('should not block any clicks if not requested', () => {
-  let tryGetLock: TryGetLock;
+  let api: SensorAPI;
 
-  const a: Sensor = (tryStart: TryGetLock) => {
-    tryGetLock = tryStart;
+  const a: Sensor = (value: SensorAPI) => {
+    api = value;
   };
 
   const { getByText } = render(
@@ -54,10 +54,10 @@ it('should not block any clicks if not requested', () => {
     </React.Fragment>,
   );
   const handle: HTMLElement = getByText('item: 0');
-  invariant(tryGetLock);
+  invariant(api);
 
   // trigger a drop
-  const preDrag: ?PreDragActions = tryGetLock(handle);
+  const preDrag: ?PreDragActions = api.tryGetLock('0');
   invariant(preDrag);
   const drag: SnapDragActions = preDrag.snapLift();
   drag.drop({ shouldBlockNextClick: false });

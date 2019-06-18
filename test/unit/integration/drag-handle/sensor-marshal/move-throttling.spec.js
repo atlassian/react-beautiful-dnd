@@ -4,7 +4,7 @@ import React from 'react';
 import type { Position } from 'css-box-model';
 import { render } from 'react-testing-library';
 import type {
-  TryGetLock,
+  SensorAPI,
   PreDragActions,
   FluidDragActions,
   Sensor,
@@ -16,15 +16,15 @@ import { add } from '../../../../../src/state/position';
 function noop() {}
 
 it('should throttle move events by request animation frame', () => {
-  let tryGet: TryGetLock;
-  const a: Sensor = (tryGetLock: TryGetLock) => {
-    tryGet = tryGetLock;
+  let api: SensorAPI;
+  const sensor: Sensor = (value: SensorAPI) => {
+    api = value;
   };
-  const { getByText } = render(<App sensors={[a]} />);
-  invariant(tryGet, 'expected getter to be set');
+  const { getByText } = render(<App sensors={[sensor]} />);
+  invariant(api, 'expected getter to be set');
   const handle: HTMLElement = getByText('item: 0');
 
-  const preDrag: ?PreDragActions = tryGet(handle, noop);
+  const preDrag: ?PreDragActions = api.tryGetLock('0', noop);
   invariant(preDrag);
 
   const initial: Position = { x: 2, y: 3 };
@@ -46,15 +46,15 @@ it('should throttle move events by request animation frame', () => {
 });
 
 it('should cancel any pending moves after a lock is released', () => {
-  let tryGet: TryGetLock;
-  const a: Sensor = (tryGetLock: TryGetLock) => {
-    tryGet = tryGetLock;
+  let api: SensorAPI;
+  const a: Sensor = (value: SensorAPI) => {
+    api = value;
   };
   const { getByText } = render(<App sensors={[a]} />);
-  invariant(tryGet, 'expected getter to be set');
+  invariant(api, 'expected api to be set');
   const handle: HTMLElement = getByText('item: 0');
 
-  const preDrag: ?PreDragActions = tryGet(handle, noop);
+  const preDrag: ?PreDragActions = api.tryGetLock('0', noop);
   invariant(preDrag);
 
   const initial: Position = { x: 2, y: 3 };

@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import React from 'react';
 import { render } from 'react-testing-library';
 import type {
-  TryGetLock,
+  SensorAPI,
   PreDragActions,
   FluidDragActions,
   SnapDragActions,
@@ -15,54 +15,51 @@ import { isDragging, isDropAnimating } from '../util';
 function noop() {}
 
 it('should allow an exclusive lock for drag actions', () => {
-  let first: TryGetLock;
-  let second: TryGetLock;
+  let first: SensorAPI;
+  let second: SensorAPI;
 
-  const a: Sensor = (tryGetLock: TryGetLock) => {
-    first = tryGetLock;
+  const a: Sensor = (value: SensorAPI) => {
+    first = value;
   };
-  const b: Sensor = (tryGetLock: TryGetLock) => {
-    second = tryGetLock;
+  const b: Sensor = (value: SensorAPI) => {
+    second = value;
   };
 
-  const { getByText } = render(<App sensors={[a, b]} />);
+  render(<App sensors={[a, b]} />);
   invariant(first, 'expected first to be set');
   invariant(second, 'expected second to be set');
-  const item0: HTMLElement = getByText('item: 0');
-  const item1: HTMLElement = getByText('item: 1');
 
   // first can get a lock
-  expect(first(item0)).toBeTruthy();
+  expect(first.tryGetLock('0')).toBeTruthy();
 
   // second cannot get a lock
-  expect(second(item0)).toBe(null);
+  expect(second.tryGetLock('0')).toBe(null);
 
   // first cannot get another lock on the same element
-  expect(first(item0)).toBe(null);
+  expect(first.tryGetLock('0')).toBe(null);
 
   // nothing cannot get lock on a different element
-  expect(first(item1)).toBe(null);
-  expect(second(item1)).toBe(null);
+  expect(first.tryGetLock('1')).toBe(null);
+  expect(second.tryGetLock('1')).toBe(null);
 });
 
 it('should allow a lock to be released', () => {
-  let tryGet: TryGetLock;
-  const a: Sensor = (tryGetLock: TryGetLock) => {
-    tryGet = tryGetLock;
+  let api: SensorAPI;
+  const sensor: Sensor = (value: SensorAPI) => {
+    api = value;
   };
 
-  const { getByText } = render(<App sensors={[a]} />);
-  invariant(tryGet, 'expected getter to be set');
-  const handle: HTMLElement = getByText('item: 0');
+  render(<App sensors={[sensor]} />);
+  invariant(api, 'expected getter to be set');
 
   Array.from({ length: 4 }).forEach(() => {
     // get the lock
-    const lock: ?PreDragActions = tryGet(handle, noop);
+    const lock: ?PreDragActions = api.tryGetLock('0', noop);
     expect(lock).toBeTruthy();
     invariant(lock, 'Expected lock to be set');
 
     // cannot get another lock
-    expect(tryGet(handle)).toBe(null);
+    expect(api.tryGetLock('0')).toBe(null);
 
     // release the lock
     lock.abort();
@@ -70,15 +67,15 @@ it('should allow a lock to be released', () => {
 });
 
 it('should not allow a sensor to obtain a on a dropping item, but can claim one on something else while dragging', () => {
-  let tryGet: TryGetLock;
-  const a: Sensor = (tryGetLock: TryGetLock) => {
-    tryGet = tryGetLock;
+  let api: SensorAPI;
+  const sensor: Sensor = (value: SensorAPI) => {
+    api = value;
   };
-  const { getByText } = render(<App sensors={[a]} />);
-  invariant(tryGet, 'expected getter to be set');
+  const { getByText } = render(<App sensors={[sensor]} />);
+  invariant(api, 'expected getter to be set');
   const handle: HTMLElement = getByText('item: 0');
 
-  const preDrag: ?PreDragActions = tryGet(handle, noop);
+  const preDrag: ?PreDragActions = api.tryGetLock('0', noop);
   invariant(preDrag, 'Expected to get lock');
 
   // drag not started yet
@@ -99,23 +96,21 @@ it('should not allow a sensor to obtain a on a dropping item, but can claim one 
   expect(preDrag.isActive()).toBe(false);
 
   // cannot get a new lock while still dropping
-  expect(tryGet(handle, noop)).toBe(null);
+  expect(api.tryGetLock('0', noop)).toBe(null);
 
   // can get a lock on a handle that is not dropping - while the other is dropping
-  expect(tryGet(getByText('item: 1'), noop)).toBeTruthy();
+  expect(api.tryGetLock('1', noop)).toBeTruthy();
 });
 
 it('should release a lock when aborting a pre drag', () => {
-  let tryGet: TryGetLock;
-  const a: Sensor = (tryGetLock: TryGetLock) => {
-    tryGet = tryGetLock;
+  let api: SensorAPI;
+  const sensor: Sensor = (value: SensorAPI) => {
+    api = value;
   };
-  const { getByText } = render(<App sensors={[a]} />);
-  invariant(tryGet, 'expected getter to be set');
-  const handle0: HTMLElement = getByText('item: 0');
-  const handle1: HTMLElement = getByText('item: 1');
+  render(<App sensors={[sensor]} />);
+  invariant(api, 'expected getter to be set');
 
-  const preDrag: ?PreDragActions = tryGet(handle0, noop);
+  const preDrag: ?PreDragActions = api.tryGetLock('0', noop);
   invariant(preDrag, 'Expected to get lock');
   expect(preDrag.isActive()).toBe(true);
   // should release the lock
@@ -123,7 +118,7 @@ it('should release a lock when aborting a pre drag', () => {
   expect(preDrag.isActive()).toBe(false);
 
   // can get another lock
-  const second: ?PreDragActions = tryGet(handle1, noop);
+  const second: ?PreDragActions = api.tryGetLock('1', noop);
   expect(second).toBeTruthy();
   invariant(second);
   // need to release this one :)
@@ -132,17 +127,15 @@ it('should release a lock when aborting a pre drag', () => {
 });
 
 it('should release a lock when cancelling or dropping a drag', () => {
-  let tryGet: TryGetLock;
-  const a: Sensor = (tryGetLock: TryGetLock) => {
-    tryGet = tryGetLock;
+  let api: SensorAPI;
+  const sensor: Sensor = (value: SensorAPI) => {
+    api = value;
   };
-  const { getByText } = render(<App sensors={[a]} />);
-  invariant(tryGet, 'expected getter to be set');
-  const handle0: HTMLElement = getByText('item: 0');
-  const handle1: HTMLElement = getByText('item: 1');
+  render(<App sensors={[sensor]} />);
+  invariant(api, 'expected getter to be set');
 
   ['cancel', 'drop'].forEach((property: string) => {
-    const preDrag: ?PreDragActions = tryGet(handle0, noop);
+    const preDrag: ?PreDragActions = api.tryGetLock('0', noop);
     invariant(preDrag, 'Expected to get lock');
     expect(preDrag.isActive()).toBe(true);
 
@@ -150,14 +143,14 @@ it('should release a lock when cancelling or dropping a drag', () => {
     expect(drag.isActive()).toBe(true);
 
     // cannot get another lock
-    const second: ?PreDragActions = tryGet(handle1, noop);
+    const second: ?PreDragActions = api.tryGetLock('1', noop);
     expect(second).toBe(null);
 
     // calling canel or drop
     drag[property]();
 
     // can now get another lock
-    const third: ?PreDragActions = tryGet(handle1, noop);
+    const third: ?PreDragActions = api.tryGetLock('1', noop);
     expect(third).toBeTruthy();
     // need to try to release it
     invariant(third);
