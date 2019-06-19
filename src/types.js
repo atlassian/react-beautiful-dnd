@@ -443,15 +443,19 @@ export type PreDragActions = {|
   abort: () => void,
 |};
 
-export type TryGetLock = (
-  draggableId: DraggableId,
+export type TryGetLockOptions = {
   forceStop?: () => void,
   event?: Event,
+};
+
+export type TryGetLock = (
+  draggableId: DraggableId,
+  options?: TryGetLockOptions,
 ) => ?PreDragActions;
 
 export type SensorAPI = {|
   tryGetLock: TryGetLock,
-  tryFindDraggableId: (event: Event) => ?DraggableId,
+  tryGetClosestDraggableId: (event: Event) => ?DraggableId,
 |};
 
 export type Sensor = (api: SensorAPI) => void;

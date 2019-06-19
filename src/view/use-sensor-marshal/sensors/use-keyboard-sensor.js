@@ -17,7 +17,6 @@ import bindEvents from '../../event-bindings/bind-events';
 import preventStandardKeyEvents from './util/prevent-standard-key-events';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
 import useLayoutEffect from '../../use-isomorphic-layout-effect';
-import tryFindDraggableIdFromEvent from './util/try-find-draggable-id-from-event';
 
 function noop() {}
 
@@ -156,7 +155,7 @@ export default function useKeyboardSensor(api: SensorAPI) {
           return;
         }
 
-        const draggableId: ?DraggableId = api.tryFindDraggableId(event);
+        const draggableId: ?DraggableId = api.tryGetClosestDraggableId(event);
 
         if (!draggableId) {
           return;
@@ -166,8 +165,7 @@ export default function useKeyboardSensor(api: SensorAPI) {
           draggableId,
           // abort function not defined yet
           // eslint-disable-next-line no-use-before-define
-          stop,
-          event,
+          { forceStop: stop, event },
         );
 
         // Cannot start capturing at this time

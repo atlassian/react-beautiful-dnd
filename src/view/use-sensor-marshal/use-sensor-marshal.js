@@ -14,6 +14,8 @@ import type {
   SnapDragActions,
   DraggableId,
   SensorAPI,
+  TryGetLock,
+  TryGetLockOptions,
 } from '../../types';
 import create, { type Lock, type LockAPI } from './lock';
 import type { Store, Action } from '../../state/store-types';
@@ -37,10 +39,9 @@ import isEventInInteractiveElement from './is-event-in-interactive-element';
 import getDataFromDraggable from './get-data-from-draggable';
 import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
-import isHtmlElement from '../is-type-of-element/is-html-element';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 import { noop } from '../../empty';
-import tryFindDraggableIdFromEvent from './sensors/util/try-find-draggable-id-from-event';
+import tryGetClosestDraggableIdFromEvent from './try-get-closest-draggable-id-from-event';
 
 function preventDefault(event: Event) {
   event.preventDefault();
@@ -52,8 +53,7 @@ type TryStartArgs = {|
   contextId: ContextId,
   store: Store,
   draggableId: DraggableId,
-  forceSensorStop: () => void,
-  event: ?Event,
+  tryGetLockOptions: TryGetLockOptions,
 |};
 
 type IsActiveArgs = {|
@@ -109,14 +109,14 @@ function tryStart({
   contextId,
   store,
   draggableId,
-  event,
-  forceSensorStop,
+  tryGetLockOptions,
 }: TryStartArgs): ?PreDragActions {
   // lock is already claimed - cannot start
   if (lockAPI.isClaimed()) {
     return null;
   }
 
+  // TODO: can we get this from the dimension marshal?
   const draggable: ?HTMLElement = tryGetDraggable(contextId, draggableId);
 
   if (!draggable) {
@@ -137,6 +137,7 @@ function tryStart({
   }
 
   // do not allow dragging from interactive elements
+  const event: ?Event = tryGetLockOptions.event;
   if (
     event &&
     !canDragInteractiveElements &&
@@ -151,7 +152,8 @@ function tryStart({
   }
 
   // claiming lock
-  const lock: Lock = lockAPI.claim(forceSensorStop);
+  const forceStop: () => void = tryGetLockOptions.forceStop || noop;
+  const lock: Lock = lockAPI.claim(forceStop);
   let phase: LockPhase = 'PRE_DRAG';
 
   function getShouldRespectForcePress(): boolean {
@@ -351,35 +353,30 @@ export default function useSensorMarshal({
     return lockAPI.tryAbandon;
   }, [lockAPI.tryAbandon]);
 
-  const tryGetLock = useCallback(
-    (
-      draggableId: DraggableId,
-      forceStop?: () => void = noop,
-      event?: Event,
-    ): ?PreDragActions =>
+  const tryGetLock: TryGetLock = useCallback(
+    (draggableId: DraggableId, options?: TryGetLockOptions): ?PreDragActions =>
       tryStart({
         lockAPI,
         contextId,
         store,
         draggableId,
-        event,
-        forceSensorStop: forceStop,
+        tryGetLockOptions: options || {},
       }),
     [contextId, lockAPI, store],
   );
 
-  const tryFindDraggableId = useCallback(
+  const tryGetClosestDraggableId = useCallback(
     (event: Event): ?DraggableId =>
-      tryFindDraggableIdFromEvent(contextId, event),
+      tryGetClosestDraggableIdFromEvent(contextId, event),
     [contextId],
   );
 
   const api: SensorAPI = useMemo(
     () => ({
       tryGetLock,
-      tryFindDraggableId,
+      tryGetClosestDraggableId,
     }),
-    [tryFindDraggableId, tryGetLock],
+    [tryGetClosestDraggableId, tryGetLock],
   );
 
   // Bad ass

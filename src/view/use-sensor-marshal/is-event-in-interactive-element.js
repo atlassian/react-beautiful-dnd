@@ -1,3 +1,5 @@
+import isHtmlElement from '../is-type-of-element/is-html-element';
+
 // @flow
 
 export type TagNameMap = {
@@ -57,7 +59,7 @@ export default function isEventInInteractiveElement(
 ): boolean {
   const target: EventTarget = event.target;
 
-  if (!(target instanceof HTMLElement)) {
+  if (!isHtmlElement(target)) {
     return false;
   }
 

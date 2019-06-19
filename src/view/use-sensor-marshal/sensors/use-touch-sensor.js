@@ -18,7 +18,7 @@ import * as keyCodes from '../../key-codes';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
 import { noop } from '../../../empty';
 import useLayoutEffect from '../../use-isomorphic-layout-effect';
-import tryFindDraggableIdFromEvent from './util/try-find-draggable-id-from-event';
+import isHtmlElement from '../../is-type-of-element/is-html-element';
 
 type TouchWithForce = Touch & {
   force: number,
@@ -245,7 +245,7 @@ export default function useMouseSensor(api: SensorAPI) {
         // browser interactions as possible.
         // This includes navigation on anchors which we want to preserve
 
-        const draggableId: ?DraggableId = api.tryFindDraggableId(event);
+        const draggableId: ?DraggableId = api.tryGetClosestDraggableId(event);
 
         if (!draggableId) {
           return;
@@ -254,8 +254,7 @@ export default function useMouseSensor(api: SensorAPI) {
         const actions: ?PreDragActions = api.tryGetLock(
           draggableId,
           // eslint-disable-next-line no-use-before-define
-          stop,
-          event,
+          { forceStop: stop, event },
         );
 
         // could not start a drag
@@ -271,7 +270,7 @@ export default function useMouseSensor(api: SensorAPI) {
         };
         const target: EventTarget = event.target;
         invariant(
-          target instanceof HTMLElement,
+          isHtmlElement(target),
           'Expected touch target to be an element',
         );
 

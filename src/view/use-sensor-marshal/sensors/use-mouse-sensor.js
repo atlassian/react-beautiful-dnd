@@ -17,7 +17,6 @@ import bindEvents from '../../event-bindings/bind-events';
 import * as keyCodes from '../../key-codes';
 import preventStandardKeyEvents from './util/prevent-standard-key-events';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
-import tryFindDraggableIdFromEvent from './util/try-find-draggable-id-from-event';
 import { warning } from '../../../dev-warning';
 import useLayoutEffect from '../../use-isomorphic-layout-effect';
 import { noop } from '../../../empty';
@@ -245,7 +244,7 @@ export default function useMouseSensor(api: SensorAPI) {
           return;
         }
 
-        const draggableId: ?DraggableId = api.tryFindDraggableId(event);
+        const draggableId: ?DraggableId = api.tryGetClosestDraggableId(event);
 
         if (!draggableId) {
           return;
@@ -255,8 +254,7 @@ export default function useMouseSensor(api: SensorAPI) {
           draggableId,
           // stop is defined later
           // eslint-disable-next-line no-use-before-define
-          stop,
-          event,
+          { forceStop: stop, event },
         );
 
         if (!actions) {
