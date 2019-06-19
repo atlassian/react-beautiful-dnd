@@ -2,6 +2,8 @@
 import type { ContextId, DraggableId } from '../../../../types';
 import * as attributes from '../../../data-attributes';
 import closest from '../../closest';
+import isHtmlElement from '../../../is-type-of-element/is-html-element';
+import { warning } from '../../../../dev-warning';
 
 function getSelector(contextId: ContextId): string {
   return `[${attributes.dragHandle.contextId}="${contextId}"]`;
@@ -15,7 +17,8 @@ export default function tryFindDraggableIdFromEvent(
 
   const target: ?EventTarget = event.target;
 
-  if (!(target instanceof HTMLElement)) {
+  if (!isHtmlElement(target)) {
+    warning('drag handle must be a HTMLElement');
     return null;
   }
 

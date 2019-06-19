@@ -8,7 +8,7 @@ import {
   type DraggableStateSnapshot,
 } from '../../../../../src';
 import App, { type Item } from '../app';
-import { interactiveTagNames } from '../../../../../src/view/use-sensor-marshal/is-target-in-interactive-element';
+import { interactiveTagNames } from '../../../../../src/view/use-sensor-marshal/is-event-in-interactive-element';
 
 const mixedCase = (obj: Object): string[] => [
   ...Object.keys(obj).map(s => s.toLowerCase()),

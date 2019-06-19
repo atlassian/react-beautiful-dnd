@@ -103,22 +103,6 @@ function isActive({
   return true;
 }
 
-function getTarget(source: Event | Element): ?Element {
-  if (source instanceof Element) {
-    return source;
-  }
-  // source is an event
-
-  // Event is already used: do not start a drag
-  if (source.defaultPrevented) {
-    return null;
-  }
-
-  // Only interested if the target is an Element
-  const target: EventTarget = source.target;
-  return target instanceof Element ? target : null;
-}
-
 function tryStart({
   lockAPI,
   contextId,

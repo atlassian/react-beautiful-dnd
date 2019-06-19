@@ -46,7 +46,9 @@ export function find<T>(list: Array<T>, predicate: PredicateFn<T>): ?T {
   return undefined;
 }
 
-// Using this rather than Array.from to avoid babel brining in lots of code
-export function toArray(list: NodeList<HTMLElement>): HTMLElement[] {
+// Using this rather than Array.from as Array.from adds 2kb to the gzip
+// document.querySelector actually returns Element[], but flow thinks it is HTMLElement[]
+// So we downcast the result to Element[]
+export function toArray(list: NodeList<HTMLElement>): Element[] {
   return Array.prototype.slice.call(list);
 }

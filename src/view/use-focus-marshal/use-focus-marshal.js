@@ -6,7 +6,8 @@ import type { FocusMarshal, Unregister } from './focus-marshal-types';
 import { dragHandle as dragHandleAttr } from '../data-attributes';
 import { warning } from '../../dev-warning';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
-import { toArray, find } from '../../native-with-fallback';
+import { find, toArray } from '../../native-with-fallback';
+import isHtmlElement from '../is-type-of-element/is-html-element';
 
 type Entry = {|
   id: DraggableId,
@@ -23,14 +24,14 @@ function getDragHandle(
 ): ?HTMLElement {
   // find the drag handle
   const selector: string = `[${dragHandleAttr.contextId}="${contextId}"]`;
-  const possible: HTMLElement[] = toArray(document.querySelectorAll(selector));
+  const possible: Element[] = toArray(document.querySelectorAll(selector));
 
   if (!possible.length) {
     warning(`Unable to find any drag handles in the context "${contextId}"`);
     return null;
   }
 
-  const handle: ?HTMLElement = find(possible, (el: HTMLElement): boolean => {
+  const handle: ?Element = find(possible, (el: Element): boolean => {
     return el.getAttribute(dragHandleAttr.draggableId) === draggableId;
   });
 
@@ -41,8 +42,8 @@ function getDragHandle(
     return null;
   }
 
-  if (!(handle instanceof HTMLElement)) {
-    warning(`Drag handle is not a HTMLElement`);
+  if (!isHtmlElement(handle)) {
+    warning('drag handle needs to be a HTMLElement');
     return null;
   }
 
