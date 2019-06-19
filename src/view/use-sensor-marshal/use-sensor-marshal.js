@@ -48,13 +48,6 @@ function preventDefault(event: Event) {
 }
 
 type LockPhase = 'PRE_DRAG' | 'DRAGGING' | 'COMPLETED';
-type TryStartArgs = {|
-  lockAPI: LockAPI,
-  contextId: ContextId,
-  store: Store,
-  draggableId: DraggableId,
-  tryGetLockOptions: TryGetLockOptions,
-|};
 
 type IsActiveArgs = {|
   expected: LockPhase,
@@ -104,12 +97,22 @@ function isActive({
   return true;
 }
 
+type TryStartArgs = {|
+  lockAPI: LockAPI,
+  contextId: ContextId,
+  store: Store,
+  draggableId: DraggableId,
+  forceSensorStop: ?() => void,
+  sourceEvent: ?Event,
+|};
+
 function tryStart({
   lockAPI,
   contextId,
   store,
   draggableId,
-  tryGetLockOptions,
+  forceSensorStop,
+  sourceEvent,
 }: TryStartArgs): ?PreDragActions {
   // lock is already claimed - cannot start
   if (lockAPI.isClaimed()) {
@@ -137,11 +140,10 @@ function tryStart({
   }
 
   // do not allow dragging from interactive elements
-  const event: ?Event = tryGetLockOptions.event;
   if (
-    event &&
+    sourceEvent &&
     !canDragInteractiveElements &&
-    isEventInInteractiveElement(draggable, event)
+    isEventInInteractiveElement(draggable, sourceEvent)
   ) {
     return null;
   }
@@ -152,8 +154,7 @@ function tryStart({
   }
 
   // claiming lock
-  const forceStop: () => void = tryGetLockOptions.forceStop || noop;
-  const lock: Lock = lockAPI.claim(forceStop);
+  const lock: Lock = lockAPI.claim(forceSensorStop || noop);
   let phase: LockPhase = 'PRE_DRAG';
 
   function getShouldRespectForcePress(): boolean {
@@ -354,13 +355,19 @@ export default function useSensorMarshal({
   }, [lockAPI.tryAbandon]);
 
   const tryGetLock: TryGetLock = useCallback(
-    (draggableId: DraggableId, options?: TryGetLockOptions): ?PreDragActions =>
+    (
+      draggableId: DraggableId,
+      forceStop?: () => void,
+      options?: TryGetLockOptions,
+    ): ?PreDragActions =>
       tryStart({
         lockAPI,
         contextId,
         store,
         draggableId,
-        tryGetLockOptions: options || {},
+        forceSensorStop: forceStop,
+        sourceEvent:
+          options && options.sourceEvent ? options.sourceEvent : null,
       }),
     [contextId, lockAPI, store],
   );

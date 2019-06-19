@@ -165,7 +165,8 @@ export default function useKeyboardSensor(api: SensorAPI) {
           draggableId,
           // abort function not defined yet
           // eslint-disable-next-line no-use-before-define
-          { forceStop: stop, event },
+          stop,
+          { sourceEvent: event },
         );
 
         // Cannot start capturing at this time

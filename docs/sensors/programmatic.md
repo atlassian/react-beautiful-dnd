@@ -104,23 +104,23 @@ type SensorAPI = {|
 - `tryGetClosestDraggableId(event)`: a function that will try to find the closest `draggableId` based on an event. It will look upwards from the `event.target` to try and find a _drag handle_
 
 ```js
-type TryGetLock = (
+export type TryGetLock = (
   draggableId: DraggableId,
+  forceStop?: () => void,
   options?: TryGetLockOptions,
 ) => ?PreDragActions;
 ```
 
 - `draggableId`: The `DraggableId` of the `<Draggable />` that you want to drag.
+- `forceStop` (optional): a function that is called when the lock needs to be abandoned by the application. See **force abandoning locks**.
 
 ```js
 type TryGetLockOptions = {
-  forceStop?: () => void,
-  event?: Event,
+  sourceEvent?: Event,
 };
 ```
 
-- `forceStop` (optional): a function that is called when the lock needs to be abandoned by the application. See **force abandoning locks**.
-- `event` (optional): Used to do further validation when starting the drag from a user input event. We will do some [interactive element checking](TODO)
+- `sourceEvent` (optional): Used to do further validation when starting the drag from a user input event. We will do some [interactive element checking](TODO)
 
 ### Controlling a drag: pre drag (`PreDragAction`)
 

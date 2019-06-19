@@ -444,12 +444,12 @@ export type PreDragActions = {|
 |};
 
 export type TryGetLockOptions = {
-  forceStop?: () => void,
-  event?: Event,
+  sourceEvent?: Event,
 };
 
 export type TryGetLock = (
   draggableId: DraggableId,
+  forceStop?: () => void,
   options?: TryGetLockOptions,
 ) => ?PreDragActions;
 

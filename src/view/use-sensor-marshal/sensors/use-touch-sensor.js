@@ -254,7 +254,8 @@ export default function useMouseSensor(api: SensorAPI) {
         const actions: ?PreDragActions = api.tryGetLock(
           draggableId,
           // eslint-disable-next-line no-use-before-define
-          { forceStop: stop, event },
+          stop,
+          { sourceEvent: event },
         );
 
         // could not start a drag

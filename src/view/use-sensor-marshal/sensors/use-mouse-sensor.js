@@ -254,7 +254,8 @@ export default function useMouseSensor(api: SensorAPI) {
           draggableId,
           // stop is defined later
           // eslint-disable-next-line no-use-before-define
-          { forceStop: stop, event },
+          stop,
+          { sourceEvent: event },
         );
 
         if (!actions) {
