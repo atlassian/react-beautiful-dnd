@@ -7,8 +7,10 @@ import type {
   DropPendingState,
   Published,
   Critical,
+  Scrollable,
   DraggableId,
   DraggableDimension,
+  DroppableDimensionMap,
   DraggableDimensionMap,
   DroppableDimension,
   DragImpact,
@@ -16,8 +18,14 @@ import type {
 import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
 import adjustAdditionsForScrollChanges from '../publish-while-dragging/update-draggables/adjust-additions-for-scroll-changes';
-import { toDraggableMap, toDraggableList } from '../dimension-structures';
+import {
+  toDraggableMap,
+  toDraggableList,
+  toDroppableMap,
+} from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
+import scrollDroppable from '../droppable/scroll-droppable';
+import getFrame from '../get-frame';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -32,15 +40,35 @@ export default ({
 }: Args): DraggingState | DropPendingState => {
   timings.start(timingsKey);
 
-  // Rules:
+  // The scroll might be different to what is currently in the state
+  // We want to ensure the new draggables are in step with the state
+  const withScrollChange: DroppableDimension[] = published.modified.map(
+    (droppable: DroppableDimension): DroppableDimension => {
+      const existing: DroppableDimension =
+        state.dimensions.droppables[droppable.descriptor.id];
 
-  // - do not remove old dimensions (WE SHOULD! to speed up list lookups)
-  // - do not add a new dimension if we already have it
-  // - shift any added dimension to account for change scroll
+      // TODO: need to ensure collector is okay with collecting from non-scroll containers
+      // TODO: collector should be updated to simply return a list of current scroll positions
+      const frame: ?Scrollable = existing.frame;
+      if (!frame) {
+        return droppable;
+      }
+      const scrolled: DroppableDimension = scrollDroppable(
+        existing,
+        frame.scroll.current,
+      );
+      return scrolled;
+    },
+  );
+
+  const droppables: DroppableDimensionMap = {
+    ...state.dimensions.droppables,
+    ...toDroppableMap(withScrollChange),
+  };
 
   const updated: DraggableDimension[] = adjustAdditionsForScrollChanges({
     additions: published.additions,
-    updatedDroppables: state.dimensions.droppables,
+    updatedDroppables: droppables,
     viewport: state.viewport,
   });
 
@@ -57,7 +85,7 @@ export default ({
   });
 
   const dimensions: DimensionMap = {
-    droppables: state.dimensions.droppables,
+    droppables,
     draggables,
   };
 
