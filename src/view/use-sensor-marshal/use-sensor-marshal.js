@@ -40,6 +40,7 @@ import { warning } from '../../dev-warning';
 import isHtmlElement from '../is-type-of-element/is-html-element';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 import { noop } from '../../empty';
+import tryFindDraggableIdFromEvent from './sensors/util/try-find-draggable-id-from-event';
 
 function preventDefault(event: Event) {
   event.preventDefault();
@@ -367,14 +368,18 @@ export default function useSensorMarshal({
     [contextId, lockAPI, store],
   );
 
-  const getContextId = useCallback(() => contextId, [contextId]);
+  const tryFindDraggableId = useCallback(
+    (event: Event): ?DraggableId =>
+      tryFindDraggableIdFromEvent(contextId, event),
+    [contextId],
+  );
 
   const api: SensorAPI = useMemo(
     () => ({
       tryGetLock,
-      getContextId,
+      tryFindDraggableId,
     }),
-    [getContextId, tryGetLock],
+    [tryFindDraggableId, tryGetLock],
   );
 
   // Bad ass

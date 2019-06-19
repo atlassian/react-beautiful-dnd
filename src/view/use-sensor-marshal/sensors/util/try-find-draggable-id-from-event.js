@@ -13,15 +13,14 @@ export default function tryFindDraggableIdFromEvent(
   contextId: ContextId,
   event: Event,
 ): ?DraggableId {
-  const selector: string = getSelector(contextId);
-
   const target: ?EventTarget = event.target;
 
   if (!isHtmlElement(target)) {
-    warning('drag handle must be a HTMLElement');
+    warning('event target must be a HTMLElement');
     return null;
   }
 
+  const selector: string = getSelector(contextId);
   const handle: ?Element = closest(target, selector);
 
   if (!handle) {

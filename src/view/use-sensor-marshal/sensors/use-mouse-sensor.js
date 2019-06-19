@@ -245,10 +245,7 @@ export default function useMouseSensor(api: SensorAPI) {
           return;
         }
 
-        const draggableId: ?DraggableId = tryFindDraggableIdFromEvent(
-          api.getContextId(),
-          event,
-        );
+        const draggableId: ?DraggableId = api.tryFindDraggableId(event);
 
         if (!draggableId) {
           return;

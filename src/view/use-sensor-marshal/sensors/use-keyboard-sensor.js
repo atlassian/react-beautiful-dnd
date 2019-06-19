@@ -156,10 +156,7 @@ export default function useKeyboardSensor(api: SensorAPI) {
           return;
         }
 
-        const draggableId: ?DraggableId = tryFindDraggableIdFromEvent(
-          api.getContextId(),
-          event,
-        );
+        const draggableId: ?DraggableId = api.tryFindDraggableId(event);
 
         if (!draggableId) {
           return;

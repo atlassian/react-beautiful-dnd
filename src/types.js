@@ -451,7 +451,7 @@ export type TryGetLock = (
 
 export type SensorAPI = {|
   tryGetLock: TryGetLock,
-  getContextId: () => ContextId,
+  tryFindDraggableId: (event: Event) => ?DraggableId,
 |};
 
 export type Sensor = (api: SensorAPI) => void;

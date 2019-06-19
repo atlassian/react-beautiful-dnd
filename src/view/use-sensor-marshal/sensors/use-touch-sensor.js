@@ -245,10 +245,7 @@ export default function useMouseSensor(api: SensorAPI) {
         // browser interactions as possible.
         // This includes navigation on anchors which we want to preserve
 
-        const draggableId: ?DraggableId = tryFindDraggableIdFromEvent(
-          api.getContextId(),
-          event,
-        );
+        const draggableId: ?DraggableId = api.tryFindDraggableId(event);
 
         if (!draggableId) {
           return;
