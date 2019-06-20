@@ -4,7 +4,7 @@ import invariant from 'tiny-invariant';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 import { resetServerContext } from '../../../../src';
-import App from './app';
+import App from '../app';
 
 beforeEach(() => {
   // Reset server context between tests to prevent state being shared between them
