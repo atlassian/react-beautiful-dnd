@@ -40,6 +40,8 @@ export default ({
 }: Args): DraggingState | DropPendingState => {
   timings.start(timingsKey);
 
+  // TODO: update window scroll (needs to be a part of the published object)
+
   // The scroll might be different to what is currently in the state
   // We want to ensure the new draggables are in step with the state
   const withScrollChange: DroppableDimension[] = published.modified.map(
