@@ -10,7 +10,6 @@ import type {
   Viewport,
   DraggableIdMap,
   DisplacementGroups,
-  DraggableId,
   LiftEffect,
 } from '../types';
 import getDraggablesInsideDroppable from './get-draggables-inside-droppable';
@@ -46,7 +45,6 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
   invariant(rawIndex !== -1, 'Expected draggable to be inside home list');
 
   const afterDragging: DraggableDimension[] = insideHome.slice(rawIndex + 1);
-  // TODO: toDroppableIdMap?
   const effected: DraggableIdMap = afterDragging.reduce(
     (previous: DraggableIdMap, item: DraggableDimension): DraggableIdMap => {
       previous[item.descriptor.id] = true;
