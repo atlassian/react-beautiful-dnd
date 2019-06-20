@@ -51,6 +51,7 @@ it('should mark everything after the critical ', () => {
     preset.inHome2.displaceBy,
   );
 
+  // ordered by closest impacted
   const all: DraggableId[] = getDraggableIds([preset.inHome3, preset.inHome4]);
 
   {
@@ -76,34 +77,4 @@ it('should mark everything after the critical ', () => {
     };
     expect(impact).toEqual(expected);
   }
-
-  // ordered by closest impacted
-  // not animated displacement on lift
-
-  // const displaced: DisplacementGroups = [
-  //   getNotAnimatedDisplacement(preset.inHome3),
-  //   getNotAnimatedDisplacement(preset.inHome4),
-  // ];
-  // const expectedImpact: DragImpact = {
-  //   movement: {
-  //     displaced,
-  //     map: getDisplacementMap(displaced),
-  //     displacedBy,
-  //   },
-  //   destination: getHomeLocation(preset.inHome2.descriptor),
-  //   merge: null,
-  // };
-
-  // expect(impact).toEqual(expectedImpact);
-
-  // // onLift
-  // const wasDisplaced: DraggableIdMap = {
-  //   [preset.inHome3.descriptor.id]: true,
-  //   [preset.inHome4.descriptor.id]: true,
-  // };
-  // const expectedOnLift: OnLift = {
-  //   displacedBy,
-  //   wasDisplaced,
-  // };
-  // expect(onLift).toEqual(expectedOnLift);
 });
