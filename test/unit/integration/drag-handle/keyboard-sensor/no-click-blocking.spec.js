@@ -4,6 +4,8 @@ import { render, createEvent, fireEvent } from 'react-testing-library';
 import App from '../app';
 import { simpleLift, keyboard } from '../controls';
 
+jest.useFakeTimers();
+
 it('should not prevent clicks after a drag', () => {
   const onDragEnd = jest.fn();
   const onDragStart = jest.fn();
@@ -13,6 +15,9 @@ it('should not prevent clicks after a drag', () => {
   const handle: HTMLElement = getByText('item: 0');
 
   simpleLift(keyboard, handle);
+
+  // flush start timer
+  jest.runOnlyPendingTimers();
   expect(onDragStart).toHaveBeenCalled();
   keyboard.drop(handle);
 
