@@ -31,11 +31,11 @@ const getCreatePlaceholderCalls = () => {
 it('should animate a mount', () => {
   const wrapper: ReactWrapper<*> = mount(
     <Placeholder
+      contextId="0"
       animate="open"
       placeholder={placeholder}
       onClose={jest.fn()}
       onTransitionEnd={jest.fn()}
-      styleContext={styleContext}
     />,
   );
 
@@ -61,10 +61,10 @@ it('should not animate a mount if interrupted', () => {
   const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="open"
+      contextId="0"
       placeholder={placeholder}
       onClose={jest.fn()}
       onTransitionEnd={jest.fn()}
-      styleContext={styleContext}
     />,
   );
   const onMount: PlaceholderStyle = getPlaceholderStyle(wrapper);
@@ -76,6 +76,7 @@ it('should not animate a mount if interrupted', () => {
   wrapper.setProps({
     animate: 'none',
   });
+
   // render 1: normal
   // render 2: useEffect calling setState
   // render 3: result of setState
@@ -102,10 +103,10 @@ it('should not animate in if unmounted', () => {
   const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="open"
+      contextId="0"
       placeholder={placeholder}
       onClose={jest.fn()}
       onTransitionEnd={jest.fn()}
-      styleContext={styleContext}
     />,
   );
   expectIsEmpty(getPlaceholderStyle(wrapper));

@@ -17,7 +17,7 @@ import {
   backward,
   forward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
 import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
 import beforePoint from '../../../../../utils/before-point';
@@ -35,7 +35,7 @@ import afterPoint from '../../../../../utils/after-point';
       axis,
       preset.inHome3.displaceBy,
     );
-    const { onLift, impact: homeImpact } = getHomeOnLift({
+    const { afterCritical, impact: homeImpact } = getLiftEffect({
       draggable: preset.inHome3,
       home: preset.home,
       draggables: preset.draggables,
@@ -56,7 +56,7 @@ import afterPoint from '../../../../../utils/after-point';
       previousImpact: homeImpact,
       viewport,
       userDirection: backward,
-      onLift,
+      afterCritical,
     });
 
     it('should displace items when moving backwards onto their bottom edge', () => {
@@ -70,7 +70,7 @@ import afterPoint from '../../../../../utils/after-point';
           previousImpact: homeImpact,
           viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
 
         // ordered by closest to current location
