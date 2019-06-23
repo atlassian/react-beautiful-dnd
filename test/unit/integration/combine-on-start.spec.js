@@ -1,8 +1,7 @@
 // @flow
 import React from 'react';
 import { getRect } from 'css-box-model';
-import { mount, type ReactWrapper } from 'enzyme';
-import { withKeyboard } from '../../utils/user-input-util';
+import { render, fireEvent } from 'react-testing-library';
 import * as keyCodes from '../../../src/view/key-codes';
 import type {
   DraggableProvided,
@@ -14,9 +13,7 @@ import type {
 import type { Responders } from '../../../src/types';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import { getComputedSpacing } from '../../utils/dimension';
-
-const pressSpacebar = withKeyboard(keyCodes.space);
-const pressArrowDown = withKeyboard(keyCodes.arrowDown);
+import { simpleLift, keyboard } from './drag-handle/controls';
 
 // Both list and item will have the same dimensions
 jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() =>
@@ -78,7 +75,7 @@ class App extends React.Component<*, State> {
                 {(draggableProvided: DraggableProvided) => (
                   <div
                     ref={draggableProvided.innerRef}
-                    className="drag-handle"
+                    data-testid="drag-handle-1"
                     {...draggableProvided.draggableProps}
                     {...draggableProvided.dragHandleProps}
                   >
@@ -90,7 +87,7 @@ class App extends React.Component<*, State> {
                 {(draggableProvided: DraggableProvided) => (
                   <div
                     ref={draggableProvided.innerRef}
-                    className="drag-handle"
+                    data-testid="drag-handle-2"
                     {...draggableProvided.draggableProps}
                     {...draggableProvided.dragHandleProps}
                   >
@@ -114,9 +111,10 @@ it('should allow the changing of combining in onDragStart', () => {
     onDragUpdate: jest.fn(),
     onDragEnd: jest.fn(),
   };
-  const wrapper: ReactWrapper<*> = mount(<App {...responders} />);
+  const { getByTestId } = render(<App {...responders} />);
 
-  pressSpacebar(wrapper.find('.drag-handle').first());
+  const handle: HTMLElement = getByTestId('drag-handle-1');
+  simpleLift(keyboard, handle);
   // flush onDragStart  responder
   jest.runOnlyPendingTimers();
 
@@ -132,7 +130,7 @@ it('should allow the changing of combining in onDragStart', () => {
   expect(responders.onDragStart).toHaveBeenCalledWith(start);
 
   // now moving down will cause a combine impact!
-  pressArrowDown(wrapper.find('.drag-handle').first());
+  fireEvent.keyDown(handle, { keyCode: keyCodes.arrowDown });
   jest.runOnlyPendingTimers();
   const update: DragUpdate = {
     ...start,
