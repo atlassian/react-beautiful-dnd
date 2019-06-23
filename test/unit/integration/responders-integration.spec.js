@@ -1,15 +1,10 @@
 // @flow
 import invariant from 'tiny-invariant';
 import React from 'react';
-import { mount } from 'enzyme';
-import { getRect, type Rect, type Position } from 'css-box-model';
+import { render, fireEvent } from 'react-testing-library';
+import { getRect, type Rect } from 'css-box-model';
 import { DragDropContext, Draggable, Droppable } from '../../../src';
 import { sloppyClickThreshold } from '../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
-import {
-  dispatchWindowMouseEvent,
-  dispatchWindowKeyDownEvent,
-  mouseEvent,
-} from '../../utils/user-input-util';
 import type {
   Responders,
   DraggableLocation,
@@ -20,89 +15,80 @@ import type {
 } from '../../../src/types';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
-import * as keyCodes from '../../../src/view/key-codes';
 import { getComputedSpacing } from '../../utils/dimension';
 import tryCleanPrototypeStubs from '../../utils/try-clean-prototype-stubs';
+import { simpleLift, mouse } from './drag-handle/controls';
 
-const windowMouseMove = dispatchWindowMouseEvent.bind(null, 'mousemove');
-const windowMouseUp = dispatchWindowMouseEvent.bind(null, 'mouseup');
-const mouseDown = mouseEvent.bind(null, 'mousedown');
-const cancelWithKeyboard = dispatchWindowKeyDownEvent.bind(
-  null,
-  keyCodes.escape,
-);
+const draggableId: DraggableId = 'drag-1';
+const droppableId: DroppableId = 'drop-1';
+
+// both our list and item have the same dimension for now
+const borderBox: Rect = getRect({
+  top: 0,
+  right: 100,
+  bottom: 100,
+  left: 0,
+});
+
+const setRefDimensions = (ref: ?HTMLElement) => {
+  if (!ref) {
+    return;
+  }
+
+  jest.spyOn(ref, 'getBoundingClientRect').mockImplementation(() => borderBox);
+
+  // Stubbing out totally - not including margins in this
+  jest
+    .spyOn(window, 'getComputedStyle')
+    .mockImplementation(() => getComputedSpacing({}));
+};
+
+type Props = {|
+  responders: Responders,
+|};
+function App({ responders }: Props) {
+  return (
+    <DragDropContext
+      onBeforeDragStart={responders.onBeforeDragStart}
+      onDragStart={responders.onDragStart}
+      onDragUpdate={responders.onDragUpdate}
+      onDragEnd={responders.onDragEnd}
+    >
+      <Droppable droppableId={droppableId}>
+        {(droppableProvided: DroppableProvided) => (
+          <div
+            ref={(ref: ?HTMLElement) => {
+              setRefDimensions(ref);
+              droppableProvided.innerRef(ref);
+            }}
+            {...droppableProvided.droppableProps}
+          >
+            <h2>Droppable</h2>
+            <Draggable draggableId={draggableId} index={0}>
+              {(draggableProvided: DraggableProvided) => (
+                <div
+                  data-testid="drag-handle"
+                  ref={(ref: ?HTMLElement) => {
+                    setRefDimensions(ref);
+                    draggableProvided.innerRef(ref);
+                  }}
+                  {...draggableProvided.draggableProps}
+                  {...draggableProvided.dragHandleProps}
+                >
+                  <h4>Draggable</h4>
+                </div>
+              )}
+            </Draggable>
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+}
 
 describe('responders integration', () => {
   let responders: Responders;
   let wrapper;
-
-  const draggableId: DraggableId = 'drag-1';
-  const droppableId: DroppableId = 'drop-1';
-
-  // both our list and item have the same dimension for now
-  const borderBox: Rect = getRect({
-    top: 0,
-    right: 100,
-    bottom: 100,
-    left: 0,
-  });
-
-  const getMountedApp = () => {
-    // Both list and item will have the same dimensions
-
-    const setRefDimensions = (ref: ?HTMLElement) => {
-      if (!ref) {
-        return;
-      }
-
-      jest
-        .spyOn(ref, 'getBoundingClientRect')
-        .mockImplementation(() => borderBox);
-
-      // Stubbing out totally - not including margins in this
-      jest
-        .spyOn(window, 'getComputedStyle')
-        .mockImplementation(() => getComputedSpacing({}));
-    };
-
-    return mount(
-      <DragDropContext
-        onBeforeDragStart={responders.onBeforeDragStart}
-        onDragStart={responders.onDragStart}
-        onDragUpdate={responders.onDragUpdate}
-        onDragEnd={responders.onDragEnd}
-      >
-        <Droppable droppableId={droppableId}>
-          {(droppableProvided: DroppableProvided) => (
-            <div
-              ref={(ref: ?HTMLElement) => {
-                setRefDimensions(ref);
-                droppableProvided.innerRef(ref);
-              }}
-              {...droppableProvided.droppableProps}
-            >
-              <h2>Droppable</h2>
-              <Draggable draggableId={draggableId} index={0}>
-                {(draggableProvided: DraggableProvided) => (
-                  <div
-                    className="drag-handle"
-                    ref={(ref: ?HTMLElement) => {
-                      setRefDimensions(ref);
-                      draggableProvided.innerRef(ref);
-                    }}
-                    {...draggableProvided.draggableProps}
-                    {...draggableProvided.dragHandleProps}
-                  >
-                    <h4>Draggable</h4>
-                  </div>
-                )}
-              </Draggable>
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>,
-    );
-  };
 
   beforeEach(() => {
     jest.useFakeTimers();
@@ -112,7 +98,7 @@ describe('responders integration', () => {
       onDragUpdate: jest.fn(),
       onDragEnd: jest.fn(),
     };
-    wrapper = getMountedApp();
+    wrapper = render(<App responders={responders} />);
     // unmounting during a drag can cause a warning
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -130,64 +116,36 @@ describe('responders integration', () => {
   });
 
   const drag = (() => {
-    const initial: Position = {
-      x: borderBox.left + 1,
-      y: borderBox.top + 1,
-    };
-    const dragStart: Position = {
-      x: initial.x,
-      y: initial.y + sloppyClickThreshold,
-    };
-    const dragMove: Position = {
-      x: dragStart.x,
-      y: dragStart.y + 1,
-    };
+    function getHandle(): HTMLElement {
+      const handle: HTMLElement = wrapper.getByTestId('drag-handle');
+      return handle;
+    }
 
     const start = () => {
-      mouseDown(wrapper.find('.drag-handle'), initial);
-
-      // Drag does not start until mouse has moved past a certain threshold
-      windowMouseMove(dragStart);
+      simpleLift(mouse, getHandle());
 
       // drag start responder is scheduled with setTimeout
       jest.runOnlyPendingTimers();
     };
 
     const move = () => {
-      windowMouseMove({
-        x: dragMove.x,
-        y: dragMove.y,
+      fireEvent.mouseMove(getHandle(), {
+        x: 0,
+        y: sloppyClickThreshold + 2,
       });
+
       // movements are scheduled in an animation frame
       requestAnimationFrame.step();
       // responder updates are scheduled with setTimeout
       jest.runOnlyPendingTimers();
     };
 
-    const tryFlushDropAnimation = () => {
-      // could not get this right just using window events
-      const props = wrapper
-        .find('[data-react-beautiful-dnd-draggable]')
-        .first()
-        .props();
-
-      if (props.onTransitionEnd) {
-        props.onTransitionEnd({ propertyName: 'transform' });
-      }
-    };
-
     const stop = () => {
-      windowMouseUp();
-      // tell enzyme the onTransitionEnd prop has chan`ged
-      wrapper.update();
-      tryFlushDropAnimation();
+      mouse.drop(getHandle());
     };
 
     const cancel = () => {
-      cancelWithKeyboard();
-      // tell enzyme the onTransitionEnd prop has changed
-      wrapper.update();
-      tryFlushDropAnimation();
+      mouse.cancel(getHandle());
     };
 
     const perform = () => {
@@ -386,10 +344,7 @@ describe('responders integration', () => {
 
   describe('dynamic responders', () => {
     const setResponders = (provided: Responders) => {
-      wrapper.setProps({
-        onDragStart: provided.onDragStart,
-        onDragEnd: provided.onDragEnd,
-      });
+      wrapper.rerender(<App responders={provided} />);
     };
 
     it('should allow you to change responders before a drag started', () => {
