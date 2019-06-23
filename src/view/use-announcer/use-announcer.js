@@ -52,6 +52,8 @@ export default function useAnnouncer(contextId: ContextId): Announce {
     getBodyElement().appendChild(el);
 
     return () => {
+      // unmounting after a timeout to let any annoucements
+      // during a mount be published
       setTimeout(function remove() {
         const toBeRemoved: ?HTMLElement = ref.current;
         invariant(toBeRemoved, 'Cannot unmount announcement node');
