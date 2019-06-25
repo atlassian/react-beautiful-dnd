@@ -22,7 +22,7 @@ import type {
 import { getPreset, getDraggableDimension, makeScrollable } from './dimension';
 import { offsetByPosition } from '../../src/state/spacing';
 import getHomeLocation from '../../src/state/get-home-location';
-import getHomeOnLift from '../../src/state/get-home-on-lift';
+import getLiftEffect from '../../src/state/get-lift-effect';
 import getDropImpact from '../../src/state/middleware/drop/get-drop-impact';
 
 // In case a consumer needs the references
@@ -35,7 +35,7 @@ export const critical: Critical = {
   droppable: preset.home.descriptor,
 };
 
-export const { onLift, impact: homeImpact } = getHomeOnLift({
+export const { afterCritical, impact: homeImpact } = getLiftEffect({
   draggable: preset.inHome1,
   draggables: preset.draggables,
   home: preset.home,
@@ -120,7 +120,7 @@ export const getDropImpactForReason = (reason: DropReason): DragImpact =>
     home: preset.home,
     viewport: preset.viewport,
     onLiftImpact: homeImpact,
-    onLift,
+    afterCritical,
   }).impact;
 
 export const getCompletedArgs = (reason: DropReason): DropCompleteArgs => {
@@ -138,6 +138,7 @@ export const getCompletedArgs = (reason: DropReason): DropCompleteArgs => {
     result: customResult,
     impact: getDropImpactForReason(reason),
     critical,
+    afterCritical,
   };
 
   return { completed, shouldFlush: false };
@@ -147,6 +148,7 @@ const droppedOnHome: CompletedDrag = {
   result,
   impact: getDropImpactForReason('DROP'),
   critical,
+  afterCritical,
 };
 
 export const animateDropArgs: AnimateDropArgs = {

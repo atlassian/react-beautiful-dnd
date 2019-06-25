@@ -1,9 +1,10 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { completeDrop, initialPublish } from '../action-creators';
 import type { DimensionMarshal } from '../dimension-marshal/dimension-marshal-types';
 import type { State, ScrollOptions, LiftRequest } from '../../types';
 import type { MiddlewareStore, Action, Dispatch } from '../store-types';
+import { completeDrop, initialPublish } from '../action-creators';
+import validateDimensions from './util/validate-dimensions';
 
 export default (marshal: DimensionMarshal) => ({
   getState,
@@ -35,6 +36,8 @@ export default (marshal: DimensionMarshal) => ({
   };
   // Let's get the marshal started!
   const { critical, dimensions, viewport } = marshal.startPublishing(request);
+
+  validateDimensions(critical, dimensions);
 
   // Okay, we are good to start dragging now
   dispatch(
