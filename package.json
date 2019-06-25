@@ -90,7 +90,7 @@
     "enzyme-adapter-react-16": "^1.14.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
-    "eslint-config-prettier": "^5.1.0",
+    "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-cypress": "^2.2.1",
     "eslint-plugin-emotion": "^10.0.7",
     "eslint-plugin-flowtype": "^3.10.1",
