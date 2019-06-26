@@ -2,7 +2,7 @@
 import React from 'react';
 import { getRect } from 'css-box-model';
 // import { mount, type ReactWrapper } from 'enzyme';
-import { render, fireEvent } from 'react-testing-library';
+import { render, fireEvent } from '@testing-library/react';
 import {
   DragDropContext,
   Draggable,

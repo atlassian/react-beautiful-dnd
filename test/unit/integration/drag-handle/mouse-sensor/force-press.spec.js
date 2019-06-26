@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { render, fireEvent } from 'react-testing-library';
+import { render, fireEvent } from '@testing-library/react';
 import { mouse, simpleLift } from '../controls';
 import App, { type Item } from '../app';
 import { isDragging, getDropReason } from '../util';
@@ -46,6 +46,7 @@ it('should log a warning if a mouse force changed event is fired when there is n
   // not providing any force value
   fireEvent(handle, getForceChangeEvent());
   expect(console.warn).toHaveBeenCalled();
+  // $ExpectError - we are mocking console.warn
   console.warn.mockRestore();
 });
 
@@ -61,6 +62,7 @@ it('should log a warning if a mouse force changed event is fired when there is n
   expect(console.warn).not.toHaveBeenCalled();
   fireEvent(handle, getForceChangeEvent(standardForce));
   expect(console.warn).toHaveBeenCalled();
+  // $ExpectError - we are mocking console.warn
   console.warn.mockRestore();
 });
 

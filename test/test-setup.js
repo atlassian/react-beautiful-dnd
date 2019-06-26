@@ -1,5 +1,5 @@
 // @flow
-import { cleanup } from 'react-testing-library';
+import { cleanup } from '@testing-library/react';
 
 // ensuring that each test has at least one assertion
 beforeEach(() => {

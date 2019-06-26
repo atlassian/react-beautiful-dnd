@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { fireEvent, render, createEvent } from 'react-testing-library';
+import { fireEvent, render, createEvent } from '@testing-library/react';
 import App from '../app';
 import { touch, simpleLift } from '../controls';
 

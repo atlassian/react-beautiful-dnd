@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import React from 'react';
-import { render, fireEvent, createEvent } from 'react-testing-library';
+import { render, fireEvent, createEvent } from '@testing-library/react';
 import type {
   SensorAPI,
   Sensor,

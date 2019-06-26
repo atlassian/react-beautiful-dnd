@@ -1,7 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import invariant from 'tiny-invariant';
-import { render } from 'react-testing-library';
+import { render } from '@testing-library/react';
 import type { Announce, ContextId } from '../../../src/types';
 import useAnnouncer from '../../../src/view/use-announcer';
 import { getId } from '../../../src/view/use-announcer/use-announcer';

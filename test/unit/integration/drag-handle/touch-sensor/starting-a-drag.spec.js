@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { createEvent, fireEvent, render } from 'react-testing-library';
+import { createEvent, fireEvent, render } from '@testing-library/react';
 import App from '../app';
 import { isDragging } from '../util';
 import { timeForLongPress } from '../../../../../src/view/use-sensor-marshal/sensors/use-touch-sensor';

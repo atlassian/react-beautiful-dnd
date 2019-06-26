@@ -2,7 +2,7 @@
 import invariant from 'tiny-invariant';
 import React from 'react';
 import type { Position } from 'css-box-model';
-import { render, fireEvent, createEvent } from 'react-testing-library';
+import { render, fireEvent, createEvent } from '@testing-library/react';
 import {
   sloppyClickThreshold,
   primaryButton,

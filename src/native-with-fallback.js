@@ -33,7 +33,6 @@ export function findIndex<T>(
   return -1;
 }
 
-// TODO: swap order
 export function find<T>(list: Array<T>, predicate: PredicateFn<T>): ?T {
   if (list.find) {
     return list.find(predicate);

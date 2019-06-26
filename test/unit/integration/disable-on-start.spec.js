@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { getRect } from 'css-box-model';
-import { render } from 'react-testing-library';
+import { render } from '@testing-library/react';
 import type {
   DraggableProvided,
   DroppableProvided,

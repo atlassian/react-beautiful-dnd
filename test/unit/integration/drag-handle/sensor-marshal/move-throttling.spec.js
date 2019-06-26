@@ -2,7 +2,7 @@
 import invariant from 'tiny-invariant';
 import React from 'react';
 import type { Position } from 'css-box-model';
-import { render } from 'react-testing-library';
+import { render } from '@testing-library/react';
 import type {
   SensorAPI,
   PreDragActions,

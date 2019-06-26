@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { render } from 'react-testing-library';
+import { render } from '@testing-library/react';
 import { isDragging } from '../util';
 import App from '../app';
 import { forEachSensor, simpleLift, type Control } from '../controls';

@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { render, createEvent, fireEvent } from 'react-testing-library';
+import { render, createEvent, fireEvent } from '@testing-library/react';
 import App from '../app';
 import { isDragging } from '../util';
 import * as keyCodes from '../../../../../src/view/key-codes';

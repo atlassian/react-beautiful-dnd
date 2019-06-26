@@ -2,7 +2,7 @@
 import React from 'react';
 import { getRect } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import { render } from 'react-testing-library';
+import { render } from '@testing-library/react';
 import { DragDropContext, Draggable, Droppable } from '../../../src';
 import { getComputedSpacing } from '../../utils/dimension';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';

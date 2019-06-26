@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { fireEvent, render, createEvent } from 'react-testing-library';
+import { fireEvent, render, createEvent } from '@testing-library/react';
 import * as keyCodes from '../../../../../src/view/key-codes';
 import App from '../app';
 import { simpleLift, keyboard } from '../controls';

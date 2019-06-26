@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { fireEvent, render } from 'react-testing-library';
+import { fireEvent, render } from '@testing-library/react';
 import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
 import App from '../app';
 import { isDragging } from '../util';

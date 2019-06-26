@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { getRect } from 'css-box-model';
-import { render, fireEvent } from 'react-testing-library';
+import { render, fireEvent } from '@testing-library/react';
 import * as keyCodes from '../../../src/view/key-codes';
 import type {
   DraggableProvided,
