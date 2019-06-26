@@ -49,7 +49,7 @@ export default function getScrollListener({ onWindowScroll }: Args): Result {
     onWindowScroll(getWindowScroll());
   }
 
-  const scheduled: () => void = rafSchd(updateScroll);
+  const scheduled = rafSchd(updateScroll);
   const binding: EventBinding = getWindowScrollBinding(scheduled);
   let unbind: () => void = noop;
 
