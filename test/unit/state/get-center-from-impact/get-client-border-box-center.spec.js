@@ -18,12 +18,12 @@ import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import noImpact from '../../../../src/state/no-impact';
 import scrollViewport from '../../../../src/state/scroll-viewport';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
 import getDisplacementMap from '../../../../src/state/get-displacement-map';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   const preset = getPreset();
-  const { onLift, impact: homeImpact } = getHomeOnLift({
+  const { afterCritical, impact: homeImpact } = getLiftEffect({
     draggable: preset.inHome1,
     draggables: preset.draggables,
     home: preset.home,
@@ -45,7 +45,7 @@ import getDisplacementMap from '../../../../src/state/get-displacement-map';
       droppable: scrolled,
       draggables: preset.draggables,
       viewport: preset.viewport,
-      onLift,
+      afterCritical,
     });
 
     const offset: Position = subtract(
