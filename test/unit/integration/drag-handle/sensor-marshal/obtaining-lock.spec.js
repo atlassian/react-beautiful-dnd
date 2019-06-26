@@ -86,6 +86,7 @@ it('should not allow a sensor to obtain a on a dropping item, but can claim one 
 
   // release the movement
   actions.move({ x: 100, y: 100 });
+  // $ExpectError - flush() does not exist on requestAnimationFrame
   requestAnimationFrame.flush();
 
   actions.drop();

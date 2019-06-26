@@ -41,6 +41,7 @@ it('should throttle move events by request animation frame', () => {
   expect(getOffset(handle)).toEqual({ x: 0, y: 0 });
 
   // moved after frame
+  // $ExpectError - step() does not exist on requestAnimationFrame
   requestAnimationFrame.step();
   expect(getOffset(handle)).toEqual(offset);
 });
@@ -70,6 +71,7 @@ it('should cancel any pending moves after a lock is released', () => {
   actions.cancel();
 
   // will not do anything
+  // $ExpectError - step() does not exist on requestAnimationFrame
   requestAnimationFrame.step();
   expect(getOffset(handle)).toEqual({ x: 0, y: 0 });
 });

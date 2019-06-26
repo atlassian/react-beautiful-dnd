@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   DimensionMap,
   DraggingState,
@@ -25,7 +24,6 @@ import {
 } from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
 import scrollDroppable from '../droppable/scroll-droppable';
-import getFrame from '../get-frame';
 
 type Args = {|
   state: CollectingState | DropPendingState,

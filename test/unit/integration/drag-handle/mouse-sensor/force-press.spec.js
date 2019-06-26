@@ -35,23 +35,22 @@ afterAll(() => {
 });
 
 it('should log a warning if a mouse force changed event is fired when there is no force value', () => {
-  jest.spyOn(console, 'warn').mockImplementation(() => {});
+  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
   setForceDownThreshold(mouseForcePressThreshold);
   const { getByText } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
   simpleLift(mouse, handle);
 
-  expect(console.warn).not.toHaveBeenCalled();
+  expect(warn).not.toHaveBeenCalled();
   // not providing any force value
   fireEvent(handle, getForceChangeEvent());
-  expect(console.warn).toHaveBeenCalled();
-  // $ExpectError - we are mocking console.warn
-  console.warn.mockRestore();
+  expect(warn).toHaveBeenCalled();
+  warn.mockRestore();
 });
 
 it('should log a warning if a mouse force changed event is fired when there is no MouseEvent.WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN global', () => {
-  jest.spyOn(console, 'warn').mockImplementation(() => {});
+  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
   // not setting force threshold
   setForceDownThreshold();
   const { getByText } = render(<App />);
@@ -59,11 +58,10 @@ it('should log a warning if a mouse force changed event is fired when there is n
 
   simpleLift(mouse, handle);
 
-  expect(console.warn).not.toHaveBeenCalled();
+  expect(warn).not.toHaveBeenCalled();
   fireEvent(handle, getForceChangeEvent(standardForce));
-  expect(console.warn).toHaveBeenCalled();
-  // $ExpectError - we are mocking console.warn
-  console.warn.mockRestore();
+  expect(warn).toHaveBeenCalled();
+  warn.mockRestore();
 });
 
 describe('force press is not respected', () => {

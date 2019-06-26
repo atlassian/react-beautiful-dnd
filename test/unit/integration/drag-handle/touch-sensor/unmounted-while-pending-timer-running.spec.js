@@ -4,11 +4,12 @@ import { render } from '@testing-library/react';
 import App from '../app';
 import { isDragging } from '../util';
 import { touch } from '../controls';
+import { noop } from '../../../../../src/empty';
 
 jest.useFakeTimers();
 
 it('should cancel a pending drag when unmounted', () => {
-  jest.spyOn(console, 'warn');
+  const warn = jest.spyOn(console, 'warn').mockImplementation(noop);
   const { getByText, unmount } = render(<App />);
   const handle: HTMLElement = getByText('item: 0');
 
@@ -19,7 +20,7 @@ it('should cancel a pending drag when unmounted', () => {
   // finish lift timer
   jest.runOnlyPendingTimers();
 
-  expect(console.warn).not.toHaveBeenCalled();
+  expect(warn).not.toHaveBeenCalled();
   expect(isDragging(handle)).toBe(false);
-  console.warn.mockRestore();
+  warn.mockRestore();
 });

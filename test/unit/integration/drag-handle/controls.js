@@ -44,6 +44,7 @@ export const mouse: Control = {
     });
     // movements are throttled by raf
     act(() => {
+      // $ExpectError - step() does not exist on requestAnimationFrame
       requestAnimationFrame.step();
     });
   },
@@ -93,6 +94,7 @@ export const touch: Control = {
     });
     act(() => {
       // movements are throttled by raf
+      // $ExpectError - step() does not exist on requestAnimationFrame
       requestAnimationFrame.step();
     });
   },

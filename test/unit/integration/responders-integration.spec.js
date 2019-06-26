@@ -112,6 +112,7 @@ describe('responders integration', () => {
     tryCleanPrototypeStubs();
 
     // eslint-disable-next-line no-console
+    // $ExpectError - mock
     console.warn.mockRestore();
   });
 
@@ -135,6 +136,7 @@ describe('responders integration', () => {
       });
 
       // movements are scheduled in an animation frame
+      // $ExpectError - step() does not exist on requestAnimationFrame
       requestAnimationFrame.step();
       // responder updates are scheduled with setTimeout
       jest.runOnlyPendingTimers();
@@ -223,6 +225,7 @@ describe('responders integration', () => {
     provided?: Responders = responders,
   ) => {
     expect(provided.onDragEnd).toHaveBeenCalledTimes(amountOfDrags);
+    // $ExpectError - mock
     expect(provided.onDragEnd.mock.calls[amountOfDrags - 1][0]).toEqual(
       expected.completed,
     );
@@ -230,6 +233,7 @@ describe('responders integration', () => {
 
   const wasDragCancelled = (amountOfDrags?: number = 1) => {
     expect(responders.onDragEnd).toHaveBeenCalledTimes(amountOfDrags);
+    // $ExpectError - mock
     expect(responders.onDragEnd.mock.calls[amountOfDrags - 1][0]).toEqual(
       expected.cancelled,
     );

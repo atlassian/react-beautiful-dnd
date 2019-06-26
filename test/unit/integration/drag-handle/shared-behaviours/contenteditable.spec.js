@@ -15,6 +15,7 @@ forEachSensor((control: Control) => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
   afterEach(() => {
+    // $ExpectError - mock
     console.error.mockRestore();
   });
 

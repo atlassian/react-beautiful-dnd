@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { fireEvent, render, createEvent } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import App, { type Item } from '../app';
 import { touch, simpleLift } from '../controls';
 import { forcePressThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/use-touch-sensor';

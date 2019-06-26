@@ -1,5 +1,5 @@
 // @flow
-import React, { type Node } from 'react';
+import React from 'react';
 import { render } from '@testing-library/react';
 import { forEachSensor, type Control, simpleLift } from '../controls';
 import { isDragging } from '../util';
@@ -24,6 +24,7 @@ forEachSensor((control: Control) => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
   afterEach(() => {
+    // $ExpectError - mock property
     console.error.mockRestore();
   });
 

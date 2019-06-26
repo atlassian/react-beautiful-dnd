@@ -207,6 +207,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
 
   fireEvent.keyDown(handle, { keyCode: keyCodes.arrowDown });
   // flushing keyboard movement
+  // $ExpectError - step() does not exist on requestAnimationFrame
   requestAnimationFrame.step();
 
   // item1: moving down
@@ -224,6 +225,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
 
   // checking for no post renders
   clearRenderMocks();
+  // $ExpectError - flush() does not exist on requestAnimationFrame
   requestAnimationFrame.flush();
   jest.runAllTimers();
   expect(first.onRender).toHaveBeenCalledTimes(0);

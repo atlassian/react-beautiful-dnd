@@ -7,5 +7,8 @@ module.exports = {
 
     // allowing useMemo and useCallback in tests
     'no-restricted-imports': 'off',
+
+    // Allowing Array.from
+    'no-restricted-syntax': 'off',
   },
 };
