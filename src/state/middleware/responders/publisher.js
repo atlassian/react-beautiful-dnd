@@ -2,7 +2,9 @@
 import invariant from 'tiny-invariant';
 import messagePreset from '../util/screen-reader-message-preset';
 import * as timings from '../../../debug/timings';
-import getExpiringAnnounce from './expiring-announce';
+import getExpiringAnnounce, {
+  type ExpiringAnnounce,
+} from './expiring-announce';
 import getAsyncMarshal, { type AsyncMarshal } from './async-marshal';
 import type {
   DropResult,
@@ -57,7 +59,7 @@ const execute = (
     return;
   }
 
-  const willExpire: Announce = getExpiringAnnounce(announce);
+  const willExpire: ExpiringAnnounce = getExpiringAnnounce(announce);
   const provided: ResponderProvided = {
     announce: willExpire,
   };
