@@ -133,6 +133,31 @@ jobs:
           path: cypress/videos
       - store_artifacts:
           path: cypress/screenshots
+  test-a11y:
+    docker:
+      - image: circleci/node:10.15.3-browsers
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v7-dependencies-{{ checksum "yarn.lock" }}
+
+      # PR's from forks cannot use the dependency cache for performance reasons
+      - run:
+          name: 'Forked PR dependency install'
+          command: yarn
+
+      - run:
+          name: Accessibility Audit
+          command: node browser-test-harness.js yarn test:accessibility
+
+      - store_artifacts:
+          path: test-reports/lighthouse
+
+      - store_test_results:
+          path: test-reports/lighthouse
 workflows:
   version: 2
   build:
@@ -148,5 +173,8 @@ workflows:
           requires:
             - install
       - test-browser:
+          requires:
+            - install
+      - test-a11y:
           requires:
             - install
