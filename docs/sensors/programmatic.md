@@ -1,5 +1,7 @@
 # Programmatic dragging 🎮
 
+![programmatic api logo](https://user-images.githubusercontent.com/2182637/60233733-ec8ade00-98e4-11e9-88b2-6fe407cf6bcb.jpg)
+
 It is possible to drive an entire drag and drop experience programmatically 😱
 
 You can use the programmatic API to:
