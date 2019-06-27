@@ -27,7 +27,7 @@ type GetDisplacedArgs = {|
   shouldAnimate?: boolean,
 |};
 
-export function getDisplacementGroups({
+export function getForcedDisplacementGroups({
   visible = [],
   invisible = [],
   shouldAnimate = true,
