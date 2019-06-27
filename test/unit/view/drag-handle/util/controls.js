@@ -1,7 +1,6 @@
 // @flow
 import type { ReactWrapper } from 'enzyme';
 import { sloppyClickThreshold } from '../../../../../src/view/use-drag-handle/util/is-sloppy-click-threshold-exceeded';
-import { timeForLongPress } from '../../../../../src/view/use-drag-handle/sensor/use-touch-sensor';
 import {
   primaryButton,
   touchStart,
@@ -25,6 +24,8 @@ export type Control = {|
   drop: (wrap: ReactWrapper<*>) => void,
   cleanup: () => void,
 |};
+
+const timeForLongPress = 150;
 
 // using the class rather than the attribute as the attribute will not be present when disabled
 const getDragHandle = (wrapper: ReactWrapper<*>) =>

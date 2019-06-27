@@ -24,6 +24,7 @@ export type Args = {|
   getShouldRespectForcePress: () => boolean,
   onCaptureStart: (abort: () => void) => void,
   onCaptureEnd: () => void,
+  timeForLongPress: number,
 |};
 export type OnTouchStart = (event: TouchEvent) => void;
 
@@ -41,7 +42,6 @@ type WebkitHack = {|
   releaseTouchMove: () => void,
 |};
 
-export const timeForLongPress: number = 150;
 export const forcePressThreshold: number = 0.15;
 const touchStartMarshal: EventMarshal = createEventMarshal();
 const noop = (): void => {};
@@ -113,6 +113,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
     getShouldRespectForcePress,
     onCaptureStart,
     onCaptureEnd,
+    timeForLongPress,
   } = args;
   const pendingRef = useRef<?PendingDrag>(null);
   const isDraggingRef = useRef<boolean>(false);
@@ -400,7 +401,7 @@ export default function useTouchSensor(args: Args): OnTouchStart {
       onCaptureStart(stop);
       bindWindowEvents();
     },
-    [bindWindowEvents, onCaptureStart, startDragging, stop],
+    [bindWindowEvents, onCaptureStart, startDragging, stop, timeForLongPress],
   );
 
   const onTouchStart = (event: TouchEvent) => {

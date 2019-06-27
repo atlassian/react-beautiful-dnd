@@ -4,10 +4,7 @@ import { type ReactWrapper } from 'enzyme';
 import * as keyCodes from '../../../../src/view/key-codes';
 import getWindowScroll from '../../../../src/view/window/get-window-scroll';
 import setWindowScroll from '../../../utils/set-window-scroll';
-import {
-  timeForLongPress,
-  forcePressThreshold,
-} from '../../../../src/view/use-drag-handle/sensor/use-touch-sensor';
+import { forcePressThreshold } from '../../../../src/view/use-drag-handle/sensor/use-touch-sensor';
 import {
   dispatchWindowEvent,
   dispatchWindowKeyDownEvent,
@@ -31,6 +28,7 @@ import type { AppContextValue } from '../../../../src/view/context/app-context';
 import basicContext from './util/app-context';
 import forceUpdate from '../../../utils/force-update';
 
+const timeForLongPress = 150;
 const origin: Position = { x: 0, y: 0 };
 let callbacks: Callbacks;
 let wrapper: ReactWrapper<*>;
@@ -44,7 +42,7 @@ beforeEach(() => {
   jest.spyOn(console, 'warn').mockImplementation(() => {});
   jest.spyOn(console, 'error').mockImplementation(() => {});
   callbacks = getStubCallbacks();
-  wrapper = getWrapper(callbacks);
+  wrapper = getWrapper(callbacks, undefined, undefined, timeForLongPress);
 });
 
 afterEach(() => {
@@ -472,7 +470,12 @@ describe('disabling a draggable during a drag', () => {
 
       // lift
       const customCallbacks = getStubCallbacks();
-      const customWrapper = getWrapper(customCallbacks);
+      const customWrapper = getWrapper(
+        customCallbacks,
+        undefined,
+        undefined,
+        timeForLongPress,
+      );
       // pending drag started
       touchStart(customWrapper, origin);
 

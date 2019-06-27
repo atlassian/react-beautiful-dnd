@@ -38,6 +38,7 @@ forEach((control: Control) => {
             getDraggableRef={ref.getRef}
             canDragInteractiveElements={false}
             getShouldRespectForcePress={() => true}
+            timeForLongPress={150}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div
@@ -82,6 +83,7 @@ forEach((control: Control) => {
             getDraggableRef={ref.getRef}
             canDragInteractiveElements={false}
             getShouldRespectForcePress={() => true}
+            timeForLongPress={150}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div
@@ -126,6 +128,7 @@ forEach((control: Control) => {
             getDraggableRef={ref.getRef}
             canDragInteractiveElements={false}
             getShouldRespectForcePress={() => true}
+            timeForLongPress={150}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div
@@ -177,6 +180,7 @@ forEach((control: Control) => {
             getDraggableRef={ref.getRef}
             canDragInteractiveElements={false}
             getShouldRespectForcePress={() => true}
+            timeForLongPress={150}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div
@@ -230,6 +234,7 @@ forEach((control: Control) => {
             getShouldRespectForcePress={() => true}
             // stating that we can drag
             canDragInteractiveElements
+            timeForLongPress={150}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div
@@ -278,6 +283,7 @@ forEach((control: Control) => {
             getShouldRespectForcePress={() => true}
             // stating that we can drag
             canDragInteractiveElements
+            timeForLongPress={150}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div

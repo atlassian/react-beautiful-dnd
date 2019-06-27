@@ -9,4 +9,5 @@ export default (dimension: DraggableDimension): OwnProps => ({
   disableInteractiveElementBlocking: false,
   shouldRespectForcePress: true,
   children: () => null,
+  timeForLongPress: 150,
 });

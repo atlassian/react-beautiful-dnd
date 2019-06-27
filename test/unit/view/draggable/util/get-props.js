@@ -27,6 +27,7 @@ export const defaultOwnProps: OwnProps = {
   shouldRespectForcePress: true,
   // will be overwritten
   children: () => null,
+  timeForLongPress: 150,
 };
 
 export const disabledOwnProps: OwnProps = {

@@ -88,6 +88,7 @@ describe('Portal usage (ref changing while mounted)', () => {
             getDraggableRef={() => this.ref}
             canDragInteractiveElements={false}
             getShouldRespectForcePress={() => true}
+            timeForLongPress={150}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <Child
@@ -197,6 +198,7 @@ describe('Focus retention moving between lists (focus retention between mounts)'
             getDraggableRef={() => this.ref}
             canDragInteractiveElements={false}
             getShouldRespectForcePress={() => true}
+            timeForLongPress={150}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div
@@ -402,6 +404,7 @@ describe('Focus retention moving between lists (focus retention between mounts)'
             getDraggableRef={ref.getRef}
             canDragInteractiveElements={false}
             getShouldRespectForcePress={() => true}
+            timeForLongPress={150}
           >
             {(dragHandleProps: ?DragHandleProps) => (
               <div

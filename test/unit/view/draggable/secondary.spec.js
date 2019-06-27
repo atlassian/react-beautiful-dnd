@@ -21,6 +21,7 @@ const ownProps: OwnProps = {
   disableInteractiveElementBlocking: true,
   shouldRespectForcePress: true,
   children: () => null,
+  timeForLongPress: 150,
 };
 
 const getSecondarySnapshot = (
