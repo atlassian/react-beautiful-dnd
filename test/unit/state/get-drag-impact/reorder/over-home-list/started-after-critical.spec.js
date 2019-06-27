@@ -4,13 +4,11 @@ import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import { patch } from '../../../../../../src/state/position';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import { getPreset } from '../../../../../utils/dimension';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import type {
   Axis,
   DragImpact,
   Viewport,
-  Displacement,
   DisplacedBy,
 } from '../../../../../../src/types';
 import {
@@ -18,8 +16,6 @@ import {
   forward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
-import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
 import beforePoint from '../../../../../utils/before-point';
 import afterPoint from '../../../../../utils/after-point';
 import getHomeLocation from '../../../../../../src/state/get-home-location';
