@@ -131,6 +131,7 @@ const Footer = styled.div`
 `;
 
 const Author = styled.small`
+  color: ${props => props.colors.hard};
   flex-grow: 0;
   margin: 0;
   background-color: ${props => props.colors.soft};

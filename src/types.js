@@ -378,6 +378,8 @@ export type StateWhenUpdatesAllowed = DraggingState | CollectingState;
 
 export type Announce = (message: string) => void;
 
+export type DragHandleDescription = string;
+
 export type InOutAnimationMode = 'none' | 'open' | 'close';
 
 export type ResponderProvided = {|

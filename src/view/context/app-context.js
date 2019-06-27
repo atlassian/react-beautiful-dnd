@@ -10,6 +10,7 @@ export type AppContextValue = {|
   contextId: ContextId,
   canLift: (id: DraggableId) => boolean,
   isMovementAllowed: () => boolean,
+  dragHandleDescriptionId: string,
 |};
 
 export default React.createContext<?AppContextValue>(null);

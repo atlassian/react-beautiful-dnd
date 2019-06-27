@@ -38,6 +38,7 @@ import {
 } from '../../state/action-creators';
 import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
+import useDragHandleDescription from '../use-drag-handle-description';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
 import usePrevious from '../use-previous-ref';
@@ -54,6 +55,7 @@ type Props = {|
   // sensors
   sensors?: Sensor[],
   enableDefaultSensors?: ?boolean,
+  dragHandleDescription: string,
 |};
 
 const createResponders = (props: Props): Responders => ({
@@ -73,7 +75,7 @@ function getStore(lazyRef: LazyStoreRef): Store {
 }
 
 export default function App(props: Props) {
-  const { contextId, setOnError, sensors } = props;
+  const { contextId, setOnError, sensors, dragHandleDescription } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
@@ -86,6 +88,11 @@ export default function App(props: Props) {
   }, [lastPropsRef]);
 
   const announce: Announce = useAnnouncer(contextId);
+
+  const dragHandleDescriptionId = useDragHandleDescription(
+    contextId,
+    dragHandleDescription,
+  );
   const styleMarshal: StyleMarshal = useStyleMarshal(contextId);
 
   const lazyDispatch: Action => void = useCallback((action: Action): void => {
@@ -133,12 +140,12 @@ export default function App(props: Props) {
   const store: Store = useMemo<Store>(
     () =>
       createStore({
-        dimensionMarshal,
-        focusMarshal,
-        styleMarshal,
         announce,
         autoScroller,
+        dimensionMarshal,
+        focusMarshal,
         getResponders,
+        styleMarshal,
       }),
     [
       announce,
@@ -189,6 +196,7 @@ export default function App(props: Props) {
       contextId,
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
+      dragHandleDescriptionId,
     }),
     [
       contextId,
@@ -196,6 +204,7 @@ export default function App(props: Props) {
       focusMarshal,
       getCanLift,
       getIsMovementAllowed,
+      dragHandleDescriptionId,
     ],
   );
 
