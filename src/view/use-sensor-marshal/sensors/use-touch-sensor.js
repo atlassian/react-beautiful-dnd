@@ -47,6 +47,14 @@ const idle: Idle = { type: 'IDLE' };
 export const timeForLongPress: number = 150;
 export const forcePressThreshold: number = 0.15;
 
+// window.addEventListener(
+//   'touchmove',
+//   (event: Event) => {
+//     console.log('TOUCHMOVE. prevented?', event.defaultPrevented);
+//   },
+//   { capture: false, passive: false },
+// );
+
 type GetBindingArgs = {|
   cancel: () => void,
   completed: () => void,
@@ -422,4 +430,21 @@ export default function useMouseSensor(api: SensorAPI) {
     },
     [getPhase, listenForCapture, setPhase],
   );
+
+  // This is needed for safari
+  // Simply adding a non capture, non passive 'touchmove' listener.
+  // This forces event.preventDefault() in dynamically added
+  // touchmove event handlers to actually work
+  // https://github.com/atlassian/react-beautiful-dnd/issues/1374
+  useLayoutEffect(function webkitHack() {
+    const unbind = bindEvents(window, [
+      {
+        eventName: 'touchmove',
+        fn: noop,
+        options: { capture: false, passive: false },
+      },
+    ]);
+
+    return unbind;
+  });
 }
