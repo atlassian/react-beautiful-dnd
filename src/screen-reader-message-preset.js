@@ -6,13 +6,16 @@ import type {
   DropResult,
   DraggableLocation,
   Combine,
-} from '../../../types';
+} from './types';
 
 export type MessagePreset = {|
+  liftInstruction: string,
   onDragStart: (start: DragStart) => string,
   onDragUpdate: (update: DragUpdate) => string,
   onDragEnd: (result: DropResult) => string,
 |};
+
+const liftInstruction: string = `Draggable item. Ensure your screen reader is not in browse mode and then press spacebar to lift.`;
 
 const position = (index: number): number => index + 1;
 
@@ -119,6 +122,7 @@ const onDragEnd = (result: DropResult): string => {
 };
 
 const preset: MessagePreset = {
+  liftInstruction,
   onDragStart,
   onDragUpdate,
   onDragEnd,

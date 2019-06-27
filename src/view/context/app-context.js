@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import type { DraggableId, ContextId } from '../../types';
+import type { DraggableId, ContextId, ElementId } from '../../types';
 import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
 import type { FocusMarshal } from '../use-focus-marshal/focus-marshal-types';
 
@@ -10,7 +10,7 @@ export type AppContextValue = {|
   contextId: ContextId,
   canLift: (id: DraggableId) => boolean,
   isMovementAllowed: () => boolean,
-  dragHandleDescriptionId: string,
+  liftInstructionId: ElementId,
 |};
 
 export default React.createContext<?AppContextValue>(null);

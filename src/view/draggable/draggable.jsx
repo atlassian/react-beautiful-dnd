@@ -29,7 +29,7 @@ export default function Draggable(props: Props) {
   const getRef = useCallback((): ?HTMLElement => ref.current, []);
 
   // context
-  const { contextId, dragHandleDescriptionId } = useRequiredContext(AppContext);
+  const { contextId, liftInstructionId } = useRequiredContext(AppContext);
 
   // props
   const {
@@ -80,13 +80,13 @@ export default function Draggable(props: Props) {
             tabIndex: 0,
             'data-rbd-drag-handle-draggable-id': draggableId,
             'data-rbd-drag-handle-context-id': contextId,
-            'aria-labelledby': dragHandleDescriptionId,
+            'aria-labelledby': liftInstructionId,
             // Opting out of html5 drag and drops
             draggable: false,
             onDragStart: preventHtml5Dnd,
           }
         : null,
-    [contextId, dragHandleDescriptionId, draggableId, isEnabled],
+    [contextId, draggableId, isEnabled, liftInstructionId],
   );
 
   const onMoveEnd = useCallback(

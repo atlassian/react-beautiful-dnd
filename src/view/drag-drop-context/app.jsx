@@ -24,6 +24,7 @@ import type {
   Responders,
   Announce,
   Sensor,
+  ElementId,
 } from '../../types';
 import type { Store, Action } from '../../state/store-types';
 import StoreContext from '../context/store-context';
@@ -38,7 +39,7 @@ import {
 } from '../../state/action-creators';
 import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
-import useDragHandleDescription from '../use-drag-handle-description';
+import useDragHandleDescription from '../use-lift-instruction';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
 import usePrevious from '../use-previous-ref';
@@ -55,7 +56,7 @@ type Props = {|
   // sensors
   sensors?: Sensor[],
   enableDefaultSensors?: ?boolean,
-  dragHandleDescription: string,
+  liftInstruction: string,
 |};
 
 const createResponders = (props: Props): Responders => ({
@@ -75,7 +76,7 @@ function getStore(lazyRef: LazyStoreRef): Store {
 }
 
 export default function App(props: Props) {
-  const { contextId, setOnError, sensors, dragHandleDescription } = props;
+  const { contextId, setOnError, sensors, liftInstruction } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
@@ -89,9 +90,9 @@ export default function App(props: Props) {
 
   const announce: Announce = useAnnouncer(contextId);
 
-  const dragHandleDescriptionId = useDragHandleDescription(
+  const liftInstructionId: ElementId = useDragHandleDescription(
     contextId,
-    dragHandleDescription,
+    liftInstruction,
   );
   const styleMarshal: StyleMarshal = useStyleMarshal(contextId);
 
@@ -196,7 +197,7 @@ export default function App(props: Props) {
       contextId,
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
-      dragHandleDescriptionId,
+      liftInstructionId,
     }),
     [
       contextId,
@@ -204,7 +205,7 @@ export default function App(props: Props) {
       focusMarshal,
       getCanLift,
       getIsMovementAllowed,
-      dragHandleDescriptionId,
+      liftInstructionId,
     ],
   );
 

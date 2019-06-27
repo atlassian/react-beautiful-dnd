@@ -6,6 +6,7 @@ export type DraggableId = Id;
 export type DroppableId = Id;
 export type TypeId = Id;
 export type ContextId = Id;
+export type ElementId = Id;
 
 export type DroppableMode = 'STANDARD' | 'VIRTUAL';
 export type DroppableDescriptor = {|
@@ -377,8 +378,6 @@ export type State =
 export type StateWhenUpdatesAllowed = DraggingState | CollectingState;
 
 export type Announce = (message: string) => void;
-
-export type DragHandleDescription = string;
 
 export type InOutAnimationMode = 'none' | 'open' | 'close';
 
