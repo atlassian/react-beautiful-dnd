@@ -446,5 +446,5 @@ export default function useMouseSensor(api: SensorAPI) {
     ]);
 
     return unbind;
-  });
+  }, []);
 }
