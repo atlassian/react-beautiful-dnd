@@ -85,44 +85,48 @@ export default function getDisplacementGroups({
   forceShouldAnimate,
   last,
 }: Args): DisplacementGroups {
-  const invisible: DraggableIdMap = {};
-  const visible: DisplacementMap = {};
-  const all: DraggableId[] = [];
+  return afterDragging.reduce(
+    function process(
+      groups: DisplacementGroups,
+      draggable: DraggableDimension,
+    ): DisplacementGroups {
+      const target: Rect = getTarget(draggable, displacedBy);
+      const id: DraggableId = draggable.descriptor.id;
 
-  afterDragging.forEach(function process(draggable: DraggableDimension) {
-    const target: Rect = getTarget(draggable, displacedBy);
-    const id: DraggableId = draggable.descriptor.id;
+      groups.all.push(id);
 
-    all.push(id);
+      const isVisible: boolean = isPartiallyVisible({
+        target,
+        destination,
+        viewport,
+        withDroppableDisplacement: true,
+      });
 
-    const isVisible: boolean = isPartiallyVisible({
-      // TODO: borderBox?
-      target,
-      destination,
-      viewport,
-      withDroppableDisplacement: true,
-    });
+      if (!isVisible) {
+        groups.invisible[draggable.descriptor.id] = true;
+        return groups;
+      }
 
-    if (!isVisible) {
-      invisible[draggable.descriptor.id] = true;
-      return;
-    }
+      // item is visible
 
-    // item is visible
+      const shouldAnimate: boolean = getShouldAnimate(
+        id,
+        last,
+        forceShouldAnimate,
+      );
 
-    const shouldAnimate: boolean = getShouldAnimate(
-      id,
-      last,
-      forceShouldAnimate,
-    );
+      const displacement: Displacement = {
+        draggableId: id,
+        shouldAnimate,
+      };
 
-    const displacement: Displacement = {
-      draggableId: id,
-      shouldAnimate,
-    };
-
-    visible[id] = displacement;
-  });
-
-  return { visible, all, invisible };
+      groups.visible[id] = displacement;
+      return groups;
+    },
+    {
+      all: [],
+      visible: {},
+      invisible: {},
+    },
+  );
 }

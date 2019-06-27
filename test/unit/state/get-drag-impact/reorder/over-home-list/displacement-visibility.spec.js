@@ -261,6 +261,7 @@ const viewport: Viewport = getViewport();
         notVisible2.displaceBy,
       );
       const expected: DragImpact = {
+        // no longer the same due to visibility overscanning
         displaced: getForcedDisplacementGroups({
           visible: [visible, partialVisible],
           invisible: [notVisible1],
