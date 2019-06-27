@@ -17,11 +17,13 @@ import {
   backward,
   forward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
 import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
 import beforePoint from '../../../../../utils/before-point';
 import afterPoint from '../../../../../utils/after-point';
+import getHomeLocation from '../../../../../../src/state/get-home-location';
+import { getForcedDisplacementGroups } from '../../../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -35,7 +37,7 @@ import afterPoint from '../../../../../utils/after-point';
       axis,
       preset.inHome2.displaceBy,
     );
-    const { onLift, impact: homeImpact } = getHomeOnLift({
+    const { afterCritical, impact: homeImpact } = getLiftEffect({
       draggable: preset.inHome2,
       home: preset.home,
       draggables: preset.draggables,
@@ -56,7 +58,7 @@ import afterPoint from '../../../../../utils/after-point';
       previousImpact: homeImpact,
       viewport,
       userDirection: forward,
-      onLift,
+      afterCritical,
     });
 
     // Do not need to move forward to a displaced edge.
@@ -71,48 +73,40 @@ import afterPoint from '../../../../../utils/after-point';
           previousImpact: homeImpact,
           viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
 
-        // ordered by closest to current location
-        const displaced: Displacement[] = [
-          // inHome4 would have been displaced on lift so it won't be animated
-          getNotAnimatedDisplacement(preset.inHome3),
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
+          displaced: getForcedDisplacementGroups({
+            // inHome4 would have been displaced on lift so it won't be animated
+            visible: [preset.inHome3, preset.inHome4],
+            animation: [false, false],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: getHomeLocation(preset.inHome2.descriptor),
           },
-          destination: {
-            // in original position
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome2.descriptor.index,
-          },
-          merge: null,
         };
 
         expect(impact).toEqual(expected);
       }
-      // ordered by closest to current location
-      const displaced: Displacement[] = [
-        // inHome4 would have been displaced on lift so it won't be animated
-        getNotAnimatedDisplacement(preset.inHome4),
-      ];
+
       const expected: DragImpact = {
-        movement: {
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
+        displaced: getForcedDisplacementGroups({
+          // inHome4 would have been displaced on lift so it won't be animated
+          visible: [preset.inHome4],
+          animation: [false],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            // is now in position of inHome3
+            droppableId: preset.home.descriptor.id,
+            index: preset.inHome3.descriptor.index,
+          },
         },
-        destination: {
-          // is now in position of inHome3
-          droppableId: preset.home.descriptor.id,
-          index: preset.inHome3.descriptor.index,
-        },
-        merge: null,
       };
 
       expect(goingForwards).toEqual(expected);
@@ -140,7 +134,7 @@ import afterPoint from '../../../../../utils/after-point';
           previousImpact: goingForwards,
           viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
         expect(impact).toEqual(goingForwards);
       }
@@ -154,27 +148,27 @@ import afterPoint from '../../../../../utils/after-point';
           previousImpact: goingForwards,
           viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
 
-        const displaced: Displacement[] = [
-          // is now animated
-          getVisibleDisplacement(preset.inHome3),
-          // original displacement stays not displaced
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
+          displaced: getForcedDisplacementGroups({
+            // inHome4 would have been displaced on lift so it won't be animated
+            visible: [preset.inHome3, preset.inHome4],
+            // inHome3 is now animated
+            // inHome4 displacement stays not displaced
+            animation: [true, false],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.home.descriptor.id,
+              index: preset.inHome2.descriptor.index,
+            },
           },
-          destination: {
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome2.descriptor.index,
-          },
-          merge: null,
         };
+
         expect(impact).toEqual(expected);
       }
     });

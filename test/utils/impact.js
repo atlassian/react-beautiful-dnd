@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import type {
   DraggableDimension,
   DraggableId,
@@ -24,24 +25,36 @@ export function getDraggableIdMap(ids: DraggableId[]): DraggableIdMap {
 type GetDisplacedArgs = {|
   visible?: DraggableDimension[],
   invisible?: DraggableDimension[],
-  shouldAnimate?: boolean,
+  animation?: boolean[],
 |};
 
 export function getForcedDisplacementGroups({
   visible = [],
   invisible = [],
-  shouldAnimate = true,
+  animation,
 }: GetDisplacedArgs): DisplacementGroups {
   const all: DraggableId[] = [...visible, ...invisible]
     .map((item: DraggableDimension): DraggableDescriptor => item.descriptor)
     .sort((a, b) => a.index - b.index)
     .map((descriptor: DraggableDescriptor): DraggableId => descriptor.id);
 
+  if (animation) {
+    invariant(
+      animation.length === visible.length,
+      'animation array needs to be the same lenght as the visible',
+    );
+  }
+
   const visibleMap: DisplacementMap = visible.reduce(
-    (previous: DisplacementMap, item: DraggableDimension): DisplacementMap => {
+    (
+      previous: DisplacementMap,
+      item: DraggableDimension,
+      index,
+    ): DisplacementMap => {
       previous[item.descriptor.id] = {
         draggableId: item.descriptor.id,
-        shouldAnimate,
+        // defaulting to true
+        shouldAnimate: animation ? animation[index] : true,
       };
       return previous;
     },
