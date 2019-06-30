@@ -5,10 +5,8 @@ import type {
   Displacement,
   DraggableDimension,
   DroppableDimension,
-  DisplacementMap,
   DisplacementGroups,
   DisplacedBy,
-  DraggableIdMap,
 } from '../types';
 import { isPartiallyVisible } from './visibility/is-visible';
 

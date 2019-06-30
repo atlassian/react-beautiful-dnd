@@ -27,7 +27,7 @@ const viewport: Viewport = getViewport();
 
 // this is just an application of get-displacement.spec
 
-[vertical /*, horizontal */].forEach((axis: Axis) => {
+[vertical /* , horizontal */].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const crossAxisStart: number = 0;
     const crossAxisEnd: number = 100;
