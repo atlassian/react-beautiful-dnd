@@ -70,6 +70,7 @@ describe('get droppable over', () => {
       descriptor: {
         id: 'partially hidden subject',
         type: 'TYPE',
+        mode: 'STANDARD',
       },
       borderBox: {
         top: 0,
@@ -108,6 +109,7 @@ describe('get droppable over', () => {
       descriptor: {
         id: 'hidden subject',
         type: 'TYPE',
+        mode: 'STANDARD',
       },
       borderBox: {
         top: 0,
