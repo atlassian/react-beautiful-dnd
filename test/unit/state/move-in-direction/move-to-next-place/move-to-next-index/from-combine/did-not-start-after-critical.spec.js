@@ -2,7 +2,6 @@
 import type {
   Axis,
   DragImpact,
-  Displacement,
   DroppableDimension,
 } from '../../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../../src/state/axis';
@@ -13,9 +12,8 @@ import {
 import { getPreset } from '../../../../../../utils/dimension';
 import moveToNextIndex from '../../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-index/index';
 import getDisplacedBy from '../../../../../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../../../../../src/state/get-displacement-map';
-import getVisibleDisplacement from '../../../../../../utils/get-displacement/get-visible-displacement';
 import getLiftEffect from '../../../../../../../src/state/get-lift-effect';
+import { getForcedDisplacement } from '../../../../../../utils/impact';
 
 const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
   ...droppable,
@@ -28,32 +26,30 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
     it('should move forward off combining with is displaced', () => {
       // Setup: inHome1 combining with inForeign1 and then moving forward past it
       // Expected: inHome1 moves after inForeign1 and inForeign1 is no longer displaced
-      const { onLift } = getHomeOnLift({
+      const { afterCritical } = getLiftEffect({
         draggable: preset.inHome1,
         home: preset.home,
         draggables: preset.draggables,
         viewport: preset.viewport,
       });
-      const initial: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign1),
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const combining: DragImpact = {
-        movement: {
-          displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
-          displaced: initial,
-          map: getDisplacementMap(initial),
-        },
-        merge: {
+        displaced: getForcedDisplacement({
+          visible: [
+            preset.inForeign1,
+            preset.inForeign2,
+            preset.inForeign3,
+            preset.inForeign4,
+          ],
+        }),
+        displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
+        at: {
+          type: 'COMBINE',
           whenEntered: forward,
           combine: {
             draggableId: preset.inForeign1.descriptor.id,
             droppableId: preset.foreign.descriptor.id,
           },
         },
-        destination: null,
       };
 
       const result: ?DragImpact = moveToNextIndex({
@@ -64,25 +60,22 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
         destination: enableCombine(preset.foreign),
         insideDestination: preset.inForeignList,
         previousImpact: combining,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
 
-      const displaced: Displacement[] = [
-        // inForeign1 no longer displaced
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const expected: DragImpact = {
-        movement: {
-          displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
-          displaced,
-          map: getDisplacementMap(displaced),
-        },
-        merge: null,
-        destination: {
-          index: preset.inForeign2.descriptor.index,
-          droppableId: preset.foreign.descriptor.id,
+        // inForeign1 no longer displaced
+        displaced: getForcedDisplacement({
+          visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
+        }),
+        displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
+        at: {
+          type: 'REORDER',
+          destination: {
+            index: preset.inForeign2.descriptor.index,
+            droppableId: preset.foreign.descriptor.id,
+          },
         },
       };
       expect(result).toEqual(expected);
@@ -91,32 +84,30 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
     it('should move backward off combining with is displaced', () => {
       // Setup: inHome1 combining with inForeign1 and then moving backward before it
       // Expected: inHome1 goes before inForeign1 and displacement is not changed
-      const { onLift } = getHomeOnLift({
+      const { afterCritical } = getLiftEffect({
         draggable: preset.inHome1,
         home: preset.home,
         draggables: preset.draggables,
         viewport: preset.viewport,
       });
-      const initial: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign1),
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const combining: DragImpact = {
-        movement: {
-          displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
-          displaced: initial,
-          map: getDisplacementMap(initial),
-        },
-        merge: {
+        displaced: getForcedDisplacement({
+          visible: [
+            preset.inForeign1,
+            preset.inForeign2,
+            preset.inForeign3,
+            preset.inForeign4,
+          ],
+        }),
+        displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
+        at: {
+          type: 'COMBINE',
           whenEntered: forward,
           combine: {
             draggableId: preset.inForeign1.descriptor.id,
             droppableId: preset.foreign.descriptor.id,
           },
         },
-        destination: null,
       };
 
       const result: ?DragImpact = moveToNextIndex({
@@ -127,15 +118,18 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
         destination: enableCombine(preset.foreign),
         insideDestination: preset.inForeignList,
         previousImpact: combining,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
 
       const expected: DragImpact = {
         ...combining,
-        merge: null,
-        destination: {
-          index: preset.inForeign1.descriptor.index,
-          droppableId: preset.foreign.descriptor.id,
+        at: {
+          type: 'REORDER',
+          destination: {
+            index: preset.inForeign1.descriptor.index,
+            droppableId: preset.foreign.descriptor.id,
+          },
         },
       };
       expect(result).toEqual(expected);
@@ -149,33 +143,27 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       // Expected
       // - inHome1 moves before inForeign1
       // - inForeign1 becomes displaced
-      const { onLift } = getHomeOnLift({
+      const { afterCritical } = getLiftEffect({
         draggable: preset.inHome1,
         home: preset.home,
         draggables: preset.draggables,
         viewport: preset.viewport,
       });
-      const initial: Displacement[] = [
-        // inForeign1 is not displaced
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const combining: DragImpact = {
-        movement: {
-          displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
-          displaced: initial,
-          map: getDisplacementMap(initial),
-        },
-        merge: {
-          // moved backward onto inForeign1
+        displaced: getForcedDisplacement({
+          // inForeign1 is not displaced
+          visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
+        }),
+        displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
+        // moved backward onto inForeign1
+        at: {
+          type: 'COMBINE',
           whenEntered: backward,
           combine: {
             draggableId: preset.inForeign1.descriptor.id,
             droppableId: preset.foreign.descriptor.id,
           },
         },
-        destination: null,
       };
 
       const result: ?DragImpact = moveToNextIndex({
@@ -186,25 +174,22 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
         destination: enableCombine(preset.foreign),
         insideDestination: preset.inForeignList,
         previousImpact: combining,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
 
-      const displaced: Displacement[] = [
-        // inForeign1 still not displaced
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const expected: DragImpact = {
-        movement: {
-          displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
-          displaced,
-          map: getDisplacementMap(displaced),
-        },
-        merge: null,
-        destination: {
-          index: preset.inForeign2.descriptor.index,
-          droppableId: preset.foreign.descriptor.id,
+        displaced: getForcedDisplacement({
+          // inForeign1 still not displaced
+          visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
+        }),
+        displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
+        at: {
+          type: 'REORDER',
+          destination: {
+            index: preset.inForeign2.descriptor.index,
+            droppableId: preset.foreign.descriptor.id,
+          },
         },
       };
 
@@ -219,33 +204,31 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       // Expected
       // - inHome1 moves forward off inForeign1
       // - no displacement changes
-      const { onLift } = getHomeOnLift({
+      const { afterCritical } = getLiftEffect({
         draggable: preset.inHome1,
         home: preset.home,
         draggables: preset.draggables,
         viewport: preset.viewport,
       });
-      const initial: Displacement[] = [
-        // inForeign1 not displaced
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const combining: DragImpact = {
-        movement: {
-          displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
-          displaced: initial,
-          map: getDisplacementMap(initial),
-        },
-        merge: {
+        displaced: getForcedDisplacement({
+          visible: [
+            // inForeign1 not displaced
+            preset.inForeign2,
+            preset.inForeign3,
+            preset.inForeign4,
+          ],
+        }),
+        displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
+        at: {
           // moved backward onto inForeign1
+          type: 'COMBINE',
           whenEntered: backward,
           combine: {
             draggableId: preset.inForeign1.descriptor.id,
             droppableId: preset.foreign.descriptor.id,
           },
         },
-        destination: null,
       };
 
       const result: ?DragImpact = moveToNextIndex({
@@ -256,26 +239,27 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
         destination: enableCombine(preset.foreign),
         insideDestination: preset.inForeignList,
         previousImpact: combining,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
 
-      const displaced: Displacement[] = [
-        // inForeign1 now displaced
-        getVisibleDisplacement(preset.inForeign1),
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const expected: DragImpact = {
-        movement: {
-          displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
-          displaced,
-          map: getDisplacementMap(displaced),
-        },
-        merge: null,
-        destination: {
-          index: preset.inForeign1.descriptor.index,
-          droppableId: preset.foreign.descriptor.id,
+        displaced: getForcedDisplacement({
+          // inForeign1 now displaced
+          visible: [
+            preset.inForeign1,
+            preset.inForeign2,
+            preset.inForeign3,
+            preset.inForeign4,
+          ],
+        }),
+        displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
+        at: {
+          type: 'REORDER',
+          destination: {
+            index: preset.inForeign1.descriptor.index,
+            droppableId: preset.foreign.descriptor.id,
+          },
         },
       };
       expect(result).toEqual(expected);
