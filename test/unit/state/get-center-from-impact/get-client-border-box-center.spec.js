@@ -6,7 +6,6 @@ import type {
   Axis,
   DragImpact,
   DisplacedBy,
-  Displacement,
 } from '../../../../src/types';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import { add, negate, subtract } from '../../../../src/state/position';
