@@ -10,7 +10,7 @@ import type {
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { patch } from '../../../../../../src/state/position';
 import { backward } from '../../../../../../src/state/user-direction/user-direction-preset';
 import { getPreset } from '../../../../../utils/dimension';

@@ -11,7 +11,7 @@ import type {
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import moveToNewDroppable from '../../../../../../src/state/move-in-direction/move-cross-axis/move-to-new-droppable';
 import noImpact from '../../../../../../src/state/no-impact';
 import { getPreset } from '../../../../../utils/dimension';

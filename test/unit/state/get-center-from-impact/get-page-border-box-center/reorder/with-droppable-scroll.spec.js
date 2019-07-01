@@ -8,12 +8,13 @@ import type {
 } from '../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset, makeScrollable } from '../../../../../utils/dimension';
 import { goIntoStart } from '../../../../../../src/state/get-center-from-impact/move-relative-to';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import { negate, add } from '../../../../../../src/state/position';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
+import { emptyGroups } from '../../../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -24,24 +25,22 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
         axis,
         preset.inHome1.displaceBy,
       );
-      const { onLift } = getHomeOnLift({
+      const { afterCritical } = getLiftEffect({
         draggable: preset.inHome1,
         home: preset.home,
         draggables: preset.draggables,
         viewport: preset.viewport,
       });
       const impact: DragImpact = {
-        movement: {
-          displacedBy,
-          displaced: [],
-          map: {},
+        displaced: emptyGroups,
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            index: 0,
+            droppableId: preset.emptyForeign.descriptor.id,
+          },
         },
-        // moving into the last position
-        destination: {
-          index: 0,
-          droppableId: preset.emptyForeign.descriptor.id,
-        },
-        merge: null,
       };
       const expectedCenter: Position = goIntoStart({
         axis,
@@ -55,7 +54,7 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
           draggable: preset.inHome1,
           draggables: preset.dimensions.draggables,
           droppable: preset.emptyForeign,
-          onLift,
+          afterCritical,
         });
 
         expect(result).toEqual(expectedCenter);
@@ -77,7 +76,7 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
           draggable: preset.inHome1,
           draggables: preset.dimensions.draggables,
           droppable: scrolled,
-          onLift,
+          afterCritical,
         });
 
         expect(result).toEqual(add(expectedCenter, displacement));

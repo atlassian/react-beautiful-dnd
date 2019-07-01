@@ -17,7 +17,7 @@ import {
   backward,
   forward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
 import afterPoint from '../../../../../utils/after-point';
 import beforePoint from '../../../../../utils/before-point';

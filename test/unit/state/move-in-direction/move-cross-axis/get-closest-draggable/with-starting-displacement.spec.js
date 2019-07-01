@@ -8,7 +8,7 @@ import type {
 } from '../../../../../../src/types';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import { toDraggableMap } from '../../../../../../src/state/dimension-structures';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import getClosestDraggable from '../../../../../../src/state/move-in-direction/move-cross-axis/get-closest-draggable';
 import { negate, patch } from '../../../../../../src/state/position';
 import scrollViewport from '../../../../../../src/state/scroll-viewport';

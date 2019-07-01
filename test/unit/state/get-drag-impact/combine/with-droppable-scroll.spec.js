@@ -9,7 +9,7 @@ import type {
 import { vertical, horizontal } from '../../../../../src/state/axis';
 import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
 import getDragImpact from '../../../../../src/state/get-drag-impact';
-import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import { patch } from '../../../../../src/state/position';
 import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
 import { getPreset, makeScrollable } from '../../../../utils/dimension';

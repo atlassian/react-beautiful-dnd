@@ -29,7 +29,7 @@ import getVisibleDisplacement from '../../../utils/get-displacement/get-visible-
 import getNotVisibleDisplacement from '../../../utils/get-displacement/get-not-visible-displacement';
 import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-animated-displacement';
 import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

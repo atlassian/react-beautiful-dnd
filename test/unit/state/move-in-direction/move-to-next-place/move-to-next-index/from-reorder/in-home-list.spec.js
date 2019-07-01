@@ -11,7 +11,7 @@ import { getPreset } from '../../../../../../utils/dimension';
 import moveToNextIndex from '../../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-index';
 import getDisplacedBy from '../../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../../src/state/get-displacement-map';
-import getHomeOnLift from '../../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../../src/state/get-lift-effect';
 import getNotAnimatedDisplacement from '../../../../../../utils/get-displacement/get-not-animated-displacement';
 import getVisibleDisplacement from '../../../../../../utils/get-displacement/get-visible-displacement';
 

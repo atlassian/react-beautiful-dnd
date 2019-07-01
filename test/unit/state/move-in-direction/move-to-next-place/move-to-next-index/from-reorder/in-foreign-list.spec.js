@@ -12,7 +12,7 @@ import moveToNextIndex from '../../../../../../../src/state/move-in-direction/mo
 import getDisplacedBy from '../../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../../src/state/get-displacement-map';
 import getVisibleDisplacement from '../../../../../../utils/get-displacement/get-visible-displacement';
-import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
+import getOnHomeLift from '../../../../../../../src/state/get-lift-effect';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   const preset = getPreset(axis);

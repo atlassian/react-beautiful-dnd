@@ -22,7 +22,7 @@ import {
 import getViewport from '../../../../../../src/view/window/get-viewport';
 import { getPreset, makeScrollable } from '../../../../../utils/dimension';
 
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
 import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
 

@@ -2,24 +2,21 @@
 import type { Position } from 'css-box-model';
 import type {
   Axis,
-  Displacement,
   DroppableDimension,
   DisplacedBy,
   DragImpact,
 } from '../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../../utils/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import {
   forward,
   backward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
-import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
 import { subtract, add } from '../../../../../../src/state/position';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
+import { getForcedDisplacement } from '../../../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -28,7 +25,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
       ...preset.home,
       isCombineEnabled: true,
     };
-    const { onLift } = getHomeOnLift({
+    const { afterCritical } = getLiftEffect({
       draggable: preset.inHome2,
       home: withCombineEnabled,
       draggables: preset.draggables,
@@ -41,18 +38,14 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
 
     describe('item started displaced', () => {
       it('should move onto a displaced center - the initial visible center', () => {
-        const displaced: Displacement[] = [
-          getNotAnimatedDisplacement(preset.inHome3),
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const impact: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced,
-            map: getDisplacementMap(displaced),
-          },
-          destination: null,
-          merge: {
+          displaced: getForcedDisplacement({
+            visible: [preset.inHome3, preset.inHome4],
+            animation: [false, false],
+          }),
+          displacedBy,
+          at: {
+            type: 'COMBINE',
             whenEntered: forward,
             // combining with inHome3
             combine: {
@@ -64,7 +57,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
 
         const result: Position = getPageBorderBoxCenter({
           impact,
-          onLift,
+          afterCritical,
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppable: withCombineEnabled,
@@ -76,17 +69,14 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
       it('should move onto a non-displaced center', () => {
         // combining with inHome3 which is no longer displaced
         // inHome2 would have moved forward and is now moving backwards
-        const displaced: Displacement[] = [
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const impact: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced,
-            map: getDisplacementMap(displaced),
-          },
-          destination: null,
-          merge: {
+          displaced: getForcedDisplacement({
+            visible: [preset.inHome4],
+            animation: [false],
+          }),
+          displacedBy,
+          at: {
+            type: 'COMBINE',
             whenEntered: backward,
             // combining with not displaced inHome1
             combine: {
@@ -98,7 +88,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
 
         const result: Position = getPageBorderBoxCenter({
           impact,
-          onLift,
+          afterCritical,
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppable: withCombineEnabled,
@@ -116,20 +106,15 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
       it('should move onto a displaced center', () => {
         // moving inHome2 backwards past inHome1 (pushing it forward)
         // and then moving onto inHome1
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inHome1),
-          // inHome2 not displaced as it is the dragging item
-          getNotAnimatedDisplacement(preset.inHome3),
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const impact: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced,
-            map: getDisplacementMap(displaced),
-          },
-          destination: null,
-          merge: {
+          displaced: getForcedDisplacement({
+            // inHome2 not displaced as it is the dragging item
+            visible: [preset.inHome1, preset.inHome3, preset.inHome4],
+            animation: [true, false, false],
+          }),
+          displacedBy,
+          at: {
+            type: 'COMBINE',
             whenEntered: backward,
             // combining with not displaced inHome1
             combine: {
@@ -141,7 +126,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
 
         const result: Position = getPageBorderBoxCenter({
           impact,
-          onLift,
+          afterCritical,
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppable: withCombineEnabled,
@@ -156,19 +141,15 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
 
       it('should move onto a non-displaced center', () => {
         // moving inHome2 backwards onto inHome1
-        const displaced: Displacement[] = [
-          // inHome2 not displaced as it is the dragging item
-          getNotAnimatedDisplacement(preset.inHome3),
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const impact: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced,
-            map: getDisplacementMap(displaced),
-          },
-          destination: null,
-          merge: {
+          displaced: getForcedDisplacement({
+            // inHome2 not displaced as it is the dragging item
+            visible: [preset.inHome3, preset.inHome4],
+            animation: [false, false],
+          }),
+          displacedBy,
+          at: {
+            type: 'COMBINE',
             whenEntered: backward,
             // combining with not displaced inHome1
             combine: {
@@ -180,7 +161,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
 
         const result: Position = getPageBorderBoxCenter({
           impact,
-          onLift,
+          afterCritical,
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppable: withCombineEnabled,

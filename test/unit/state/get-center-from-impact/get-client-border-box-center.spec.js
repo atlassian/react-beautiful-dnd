@@ -12,14 +12,13 @@ import { vertical, horizontal } from '../../../../src/state/axis';
 import { add, negate, subtract } from '../../../../src/state/position';
 import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 import { getPreset, makeScrollable } from '../../../utils/dimension';
-import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-animated-displacement';
 import getClientBorderBoxCenter from '../../../../src/state/get-center-from-impact/get-client-border-box-center';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import noImpact from '../../../../src/state/no-impact';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
-import getDisplacementMap from '../../../../src/state/get-displacement-map';
+import { getForcedDisplacement } from '../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   const preset = getPreset();
@@ -68,19 +67,14 @@ import getDisplacementMap from '../../../../src/state/get-displacement-map';
       axis,
       preset.inHome1.displaceBy,
     );
-    const displaced: Displacement[] = [
-      getNotAnimatedDisplacement(preset.inHome2),
-      getNotAnimatedDisplacement(preset.inHome3),
-      getNotAnimatedDisplacement(preset.inHome4),
-    ];
     const impact: DragImpact = {
-      movement: {
-        displaced,
-        map: getDisplacementMap(displaced),
-        displacedBy,
-      },
-      destination: null,
-      merge: {
+      displaced: getForcedDisplacement({
+        visible: [preset.inHome2, preset.inHome3, preset.inHome4],
+        animation: [false, false, false],
+      }),
+      displacedBy,
+      at: {
+        type: 'COMBINE',
         whenEntered: forward,
         combine: {
           draggableId: preset.inHome2.descriptor.id,
@@ -95,7 +89,7 @@ import getDisplacementMap from '../../../../src/state/get-displacement-map';
       draggables: preset.draggables,
       droppable: scrolled,
       viewport: preset.viewport,
-      onLift,
+      afterCritical,
     });
     const offset: Position = subtract(
       newClientCenter,
@@ -124,7 +118,7 @@ import getDisplacementMap from '../../../../src/state/get-displacement-map';
       draggables: preset.draggables,
       droppable: preset.home,
       viewport: scrolled,
-      onLift,
+      afterCritical,
     });
     const offset: Position = subtract(
       newClientCenter,

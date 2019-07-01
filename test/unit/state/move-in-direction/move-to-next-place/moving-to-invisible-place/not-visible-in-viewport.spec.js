@@ -29,7 +29,7 @@ import {
   isPartiallyVisible,
 } from '../../../../../../src/state/visibility/is-visible';
 import { toDraggableMap } from '../../../../../../src/state/dimension-structures';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
 import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
 

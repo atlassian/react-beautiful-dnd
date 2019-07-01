@@ -6,7 +6,7 @@ import type {
 } from '../../../../../src/types';
 import { horizontal, vertical } from '../../../../../src/state/axis';
 import getDragImpact from '../../../../../src/state/get-drag-impact';
-import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
 import { enableCombining, getPreset } from '../../../../utils/dimension';
 

@@ -13,7 +13,7 @@ import {
   getDraggableDimension,
 } from '../../../utils/dimension';
 import { toDraggableMap } from '../../../../src/state/dimension-structures';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { createViewport } from '../../../utils/viewport';
 import { origin, patch } from '../../../../src/state/position';
 import { vertical, horizontal } from '../../../../src/state/axis';

@@ -15,7 +15,7 @@ import moveToNextIndex from '../../../../../../../src/state/move-in-direction/mo
 import getDisplacedBy from '../../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../../src/state/get-displacement-map';
 import getVisibleDisplacement from '../../../../../../utils/get-displacement/get-visible-displacement';
-import getHomeOnLift from '../../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../../src/state/get-lift-effect';
 
 const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
   ...droppable,

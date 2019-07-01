@@ -8,7 +8,7 @@ import type {
 } from '../../../../src/types';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { add, negate, patch, subtract } from '../../../../src/state/position';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';

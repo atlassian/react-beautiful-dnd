@@ -17,7 +17,7 @@ import {
 } from '../../../utils/dragging-state';
 import getOwnProps from './util/get-own-props';
 import getDraggingMapProps from './util/get-dragging-map-props';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { getDraggingSnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
