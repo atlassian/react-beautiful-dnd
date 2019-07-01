@@ -3,7 +3,6 @@ import invariant from 'tiny-invariant';
 import type {
   Axis,
   DragImpact,
-  Displacement,
   DisplacedBy,
 } from '../../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../../src/state/axis';
