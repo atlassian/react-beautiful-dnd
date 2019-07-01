@@ -20,7 +20,7 @@ import {
 } from '../../../../../utils/dimension';
 import getViewport from '../../../../../../src/view/window/get-viewport';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import { getForcedDisplacementGroups } from '../../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../../utils/impact';
 import noAfterCritical from '../../../../../utils/no-after-critical';
 
 const viewport: Viewport = getViewport();
@@ -137,7 +137,7 @@ const viewport: Viewport = getViewport();
         notVisible2.displaceBy,
       );
       const expected: DragImpact = {
-        displaced: getForcedDisplacementGroups({
+        displaced: getForcedDisplacement({
           visible: [visible, partialVisible],
           invisible: [notVisible1],
           animation: [true, true],
@@ -262,7 +262,7 @@ const viewport: Viewport = getViewport();
       );
       const expected: DragImpact = {
         // no longer the same due to visibility overscanning
-        displaced: getForcedDisplacementGroups({
+        displaced: getForcedDisplacement({
           visible: [visible, partialVisible],
           invisible: [notVisible1],
           animation: [true, true],

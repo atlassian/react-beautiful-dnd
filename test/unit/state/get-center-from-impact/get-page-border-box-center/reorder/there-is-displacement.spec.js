@@ -5,7 +5,6 @@ import type {
   Axis,
   DragImpact,
   DisplacedBy,
-  Displacement,
 } from '../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
@@ -13,7 +12,7 @@ import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../../utils/dimension';
 import { goBefore } from '../../../../../../src/state/get-center-from-impact/move-relative-to';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
-import { getForcedDisplacementGroups } from '../../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -34,7 +33,7 @@ import { getForcedDisplacementGroups } from '../../../../../utils/impact';
 
         const impact: DragImpact = {
           // moved forward over inHome2
-          displaced: getForcedDisplacementGroups({
+          displaced: getForcedDisplacement({
             visible: [preset.inHome3, preset.inHome4],
             animation: [false, false],
           }),
@@ -78,7 +77,7 @@ import { getForcedDisplacementGroups } from '../../../../../utils/impact';
         );
         // moved into foreign
         const impact: DragImpact = {
-          displaced: getForcedDisplacementGroups({
+          displaced: getForcedDisplacement({
             visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
             animation: [false, false, false],
           }),

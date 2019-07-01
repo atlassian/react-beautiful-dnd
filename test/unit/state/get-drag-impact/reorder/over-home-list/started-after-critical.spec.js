@@ -19,7 +19,7 @@ import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import beforePoint from '../../../../../utils/before-point';
 import afterPoint from '../../../../../utils/after-point';
 import getHomeLocation from '../../../../../../src/state/get-home-location';
-import { getForcedDisplacementGroups } from '../../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -73,7 +73,7 @@ import { getForcedDisplacementGroups } from '../../../../../utils/impact';
         });
 
         const expected: DragImpact = {
-          displaced: getForcedDisplacementGroups({
+          displaced: getForcedDisplacement({
             // inHome4 would have been displaced on lift so it won't be animated
             visible: [preset.inHome3, preset.inHome4],
             animation: [false, false],
@@ -89,7 +89,7 @@ import { getForcedDisplacementGroups } from '../../../../../utils/impact';
       }
 
       const expected: DragImpact = {
-        displaced: getForcedDisplacementGroups({
+        displaced: getForcedDisplacement({
           // inHome4 would have been displaced on lift so it won't be animated
           visible: [preset.inHome4],
           animation: [false],
@@ -148,7 +148,7 @@ import { getForcedDisplacementGroups } from '../../../../../utils/impact';
         });
 
         const expected: DragImpact = {
-          displaced: getForcedDisplacementGroups({
+          displaced: getForcedDisplacement({
             // inHome4 would have been displaced on lift so it won't be animated
             visible: [preset.inHome3, preset.inHome4],
             // inHome3 is now animated
