@@ -10,10 +10,9 @@ import { vertical, horizontal } from '../../../../../../../src/state/axis';
 import { getPreset } from '../../../../../../utils/dimension';
 import moveToNextIndex from '../../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-index';
 import getDisplacedBy from '../../../../../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../../../../../src/state/get-displacement-map';
 import getLiftEffect from '../../../../../../../src/state/get-lift-effect';
-import getNotAnimatedDisplacement from '../../../../../../utils/get-displacement/get-not-animated-displacement';
-import getVisibleDisplacement from '../../../../../../utils/get-displacement/get-visible-displacement';
+import { getForcedDisplacement } from '../../../../../../utils/impact';
+import { emptyGroups } from '../../../../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   const preset = getPreset(axis);
@@ -23,7 +22,7 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         axis,
         preset.inHome2.displaceBy,
       );
-      const { onLift, impact: homeImpact } = getHomeOnLift({
+      const { afterCritical, impact: homeImpact } = getLiftEffect({
         draggable: preset.inHome2,
         home: preset.home,
         draggables: preset.draggables,
@@ -38,28 +37,29 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         destination: preset.home,
         insideDestination: preset.inHomeList,
         previousImpact: homeImpact,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
       invariant(forwardsPastInHome3);
       {
-        const displaced: Displacement[] = [
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced,
-            map: getDisplacementMap(displaced),
+          displaced: getForcedDisplacement({
+            visible: [preset.inHome4],
+            animation: [false],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              index: preset.inHome3.descriptor.index,
+              droppableId: preset.home.descriptor.id,
+            },
           },
-          destination: {
-            index: preset.inHome3.descriptor.index,
-            droppableId: preset.home.descriptor.id,
-          },
-          merge: null,
         };
         expect(forwardsPastInHome3).toEqual(expected);
       }
       const forwardsPastInHome4: ?DragImpact = moveToNextIndex({
+        viewport: preset.viewport,
         isMovingForward: true,
         isInHomeList: true,
         draggable: preset.inHome2,
@@ -67,26 +67,26 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         destination: preset.home,
         insideDestination: preset.inHomeList,
         previousImpact: forwardsPastInHome3,
-        onLift,
+        afterCritical,
       });
       invariant(forwardsPastInHome4);
       {
         const expected: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced: [],
-            map: {},
+          displaced: emptyGroups,
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              index: preset.inHome4.descriptor.index,
+              droppableId: preset.home.descriptor.id,
+            },
           },
-          destination: {
-            index: preset.inHome4.descriptor.index,
-            droppableId: preset.home.descriptor.id,
-          },
-          merge: null,
         };
         expect(forwardsPastInHome4).toEqual(expected);
       }
 
       const backwardsPastInHome4: ?DragImpact = moveToNextIndex({
+        viewport: preset.viewport,
         isMovingForward: false,
         isInHomeList: true,
         draggable: preset.inHome2,
@@ -94,30 +94,28 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         destination: preset.home,
         insideDestination: preset.inHomeList,
         previousImpact: forwardsPastInHome4,
-        onLift,
+        afterCritical,
       });
       invariant(backwardsPastInHome4);
       {
-        const displaced: Displacement[] = [
-          // now animated displacement
-          getVisibleDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced,
-            map: getDisplacementMap(displaced),
+          displaced: getForcedDisplacement({
+            visible: [preset.inHome4],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              index: preset.inHome3.descriptor.index,
+              droppableId: preset.home.descriptor.id,
+            },
           },
-          destination: {
-            index: preset.inHome3.descriptor.index,
-            droppableId: preset.home.descriptor.id,
-          },
-          merge: null,
         };
         expect(backwardsPastInHome4).toEqual(expected);
       }
 
       const backwardsToHome: ?DragImpact = moveToNextIndex({
+        viewport: preset.viewport,
         isMovingForward: false,
         isInHomeList: true,
         draggable: preset.inHome2,
@@ -125,30 +123,28 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         destination: preset.home,
         insideDestination: preset.inHomeList,
         previousImpact: backwardsPastInHome4,
-        onLift,
+        afterCritical,
       });
       invariant(backwardsToHome);
       {
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inHome3),
-          getVisibleDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced,
-            map: getDisplacementMap(displaced),
+          displaced: getForcedDisplacement({
+            visible: [preset.inHome3, preset.inHome4],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              index: preset.inHome2.descriptor.index,
+              droppableId: preset.home.descriptor.id,
+            },
           },
-          destination: {
-            index: preset.inHome2.descriptor.index,
-            droppableId: preset.home.descriptor.id,
-          },
-          merge: null,
         };
         expect(backwardsToHome).toEqual(expected);
       }
 
       const backwardsPastHome: ?DragImpact = moveToNextIndex({
+        viewport: preset.viewport,
         isMovingForward: false,
         isInHomeList: true,
         draggable: preset.inHome2,
@@ -156,26 +152,22 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         destination: preset.home,
         insideDestination: preset.inHomeList,
         previousImpact: backwardsToHome,
-        onLift,
+        afterCritical,
       });
       invariant(backwardsToHome);
       {
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inHome1),
-          getVisibleDisplacement(preset.inHome3),
-          getVisibleDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced,
-            map: getDisplacementMap(displaced),
+          displaced: getForcedDisplacement({
+            visible: [preset.inHome1, preset.inHome3, preset.inHome4],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              index: preset.inHome1.descriptor.index,
+              droppableId: preset.home.descriptor.id,
+            },
           },
-          destination: {
-            index: preset.inHome1.descriptor.index,
-            droppableId: preset.home.descriptor.id,
-          },
-          merge: null,
         };
         expect(backwardsPastHome).toEqual(expected);
       }
@@ -187,7 +179,7 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         axis,
         preset.inHome3.displaceBy,
       );
-      const { onLift, impact: homeImpact } = getHomeOnLift({
+      const { afterCritical, impact: homeImpact } = getLiftEffect({
         draggable: preset.inHome3,
         home: preset.home,
         draggables: preset.draggables,
@@ -195,6 +187,7 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
       });
 
       const backwardsPastInHome2: ?DragImpact = moveToNextIndex({
+        viewport: preset.viewport,
         isMovingForward: false,
         isInHomeList: true,
         draggable: preset.inHome3,
@@ -202,25 +195,23 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         destination: preset.home,
         insideDestination: preset.inHomeList,
         previousImpact: homeImpact,
-        onLift,
+        afterCritical,
       });
       invariant(backwardsPastInHome2);
       {
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inHome2),
-          // initial displacement not animated
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome2.descriptor.index,
+          displaced: getForcedDisplacement({
+            visible: [preset.inHome2, preset.inHome4],
+            // initial displacement not animated
+            animation: [true, false],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.home.descriptor.id,
+              index: preset.inHome2.descriptor.index,
+            },
           },
         };
         expect(backwardsPastInHome2).toEqual(expected);
@@ -228,6 +219,7 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
 
       // move backwards again
       const backwardsPastInHome1: ?DragImpact = moveToNextIndex({
+        viewport: preset.viewport,
         isMovingForward: false,
         isInHomeList: true,
         draggable: preset.inHome3,
@@ -235,27 +227,24 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         destination: preset.home,
         insideDestination: preset.inHomeList,
         previousImpact: backwardsPastInHome2,
-        onLift,
+        afterCritical,
       });
       invariant(backwardsPastInHome1);
       {
-        // ordered by closest displaced
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inHome1),
-          getVisibleDisplacement(preset.inHome2),
-          // initial displacement not animated
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome1.descriptor.index,
+          displaced: getForcedDisplacement({
+            // ordered by closest displaced
+            visible: [preset.inHome1, preset.inHome2, preset.inHome4],
+            // initial displacement not animated
+            animation: [true, true, false],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.home.descriptor.id,
+              index: preset.inHome1.descriptor.index,
+            },
           },
         };
         expect(backwardsPastInHome1).toEqual(expected);
@@ -263,6 +252,7 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
 
       // move forwards
       const forwardsPastInHome1: ?DragImpact = moveToNextIndex({
+        viewport: preset.viewport,
         isMovingForward: true,
         isInHomeList: true,
         draggable: preset.inHome3,
@@ -270,32 +260,33 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         destination: preset.home,
         insideDestination: preset.inHomeList,
         previousImpact: backwardsPastInHome1,
-        onLift,
+        afterCritical,
       });
       invariant(forwardsPastInHome1);
       {
-        // ordered by closest displaced
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inHome2),
-          // initial displacement not animated
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome2.descriptor.index,
+          displaced: getForcedDisplacement({
+            visible: [preset.inHome2, preset.inHome4],
+            animation: [
+              true,
+              // initial displacement not animated
+              false,
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.home.descriptor.id,
+              index: preset.inHome2.descriptor.index,
+            },
           },
         };
         expect(forwardsPastInHome1).toEqual(expected);
       }
 
       const forwardsToHome: ?DragImpact = moveToNextIndex({
+        viewport: preset.viewport,
         isMovingForward: true,
         isInHomeList: true,
         draggable: preset.inHome3,
@@ -303,28 +294,28 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         destination: preset.home,
         insideDestination: preset.inHomeList,
         previousImpact: forwardsPastInHome1,
-        onLift,
+        afterCritical,
       });
       invariant(forwardsToHome);
       {
-        const displaced: Displacement[] = [
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome3.descriptor.index,
+          displaced: getForcedDisplacement({
+            visible: [preset.inHome4],
+            animation: [false],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.home.descriptor.id,
+              index: preset.inHome3.descriptor.index,
+            },
           },
         };
         expect(forwardsToHome).toEqual(expected);
       }
       const forwardsPastHome: ?DragImpact = moveToNextIndex({
+        viewport: preset.viewport,
         isMovingForward: true,
         isInHomeList: true,
         draggable: preset.inHome3,
@@ -332,21 +323,19 @@ import getVisibleDisplacement from '../../../../../../utils/get-displacement/get
         destination: preset.home,
         insideDestination: preset.inHomeList,
         previousImpact: forwardsToHome,
-        onLift,
+        afterCritical,
       });
       invariant(forwardsPastHome);
       {
-        const displaced: Displacement[] = [];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome4.descriptor.index,
+          displaced: emptyGroups,
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.home.descriptor.id,
+              index: preset.inHome4.descriptor.index,
+            },
           },
         };
         expect(forwardsPastHome).toEqual(expected);
