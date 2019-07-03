@@ -1,11 +1,11 @@
 // @flow
 import { getRect, type Rect, type Position } from 'css-box-model';
 import type {
-  Displacement,
   DraggableDimension,
   DroppableDimension,
   Viewport,
   DraggableDimensionMap,
+  DisplacementGroups,
   Axis,
 } from '../../../../src/types';
 import {
@@ -17,9 +17,8 @@ import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { createViewport } from '../../../utils/viewport';
 import { origin, patch } from '../../../../src/state/position';
 import { vertical, horizontal } from '../../../../src/state/axis';
-import getNotVisibleDisplacement from '../../../utils/get-displacement/get-not-visible-displacement';
 import { offsetByPosition } from '../../../../src/state/spacing';
-import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-animated-displacement';
+import { getForcedDisplacement } from '../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   it(`should overscan visibility on axis ${axis.direction}`, () => {
@@ -45,6 +44,7 @@ import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-
       descriptor: {
         id: 'drop',
         type: 'TYPE',
+        mode: 'STANDARD',
       },
       direction: axis.direction,
       borderBox: {
@@ -102,17 +102,19 @@ import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-
       notVisible2,
     ]);
 
-    const { impact: homeImpact } = getHomeOnLift({
+    const { impact: homeImpact } = getLiftEffect({
       draggable: fillVisibleArea,
       home,
       draggables,
       viewport,
     });
 
-    const expected: Displacement[] = [
-      getNotAnimatedDisplacement(notVisible1),
-      getNotVisibleDisplacement(notVisible2),
-    ];
-    expect(homeImpact.movement.displaced).toEqual(expected);
+    const expected: DisplacementGroups = getForcedDisplacement({
+      visible: [notVisible1],
+      invisible: [notVisible2],
+      animation: [false],
+    });
+
+    expect(homeImpact.displaced).toEqual(expected);
   });
 });
