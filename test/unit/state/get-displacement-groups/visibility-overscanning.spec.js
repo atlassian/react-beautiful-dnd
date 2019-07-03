@@ -110,9 +110,13 @@ import { getForcedDisplacement } from '../../../utils/impact';
     });
 
     const expected: DisplacementGroups = getForcedDisplacement({
-      visible: [notVisible1],
+      visible: [
+        {
+          dimension: notVisible1,
+          shouldAnimate: false,
+        },
+      ],
       invisible: [notVisible2],
-      animation: [false],
     });
 
     expect(homeImpact.displaced).toEqual(expected);

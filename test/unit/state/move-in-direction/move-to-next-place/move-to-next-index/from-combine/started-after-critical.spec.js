@@ -93,8 +93,7 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       const expected: DragImpact = {
         displaced: getForcedDisplacement({
           // inHome3 now displaced
-          visible: [preset.inHome4],
-          animation: [false],
+          visible: [{ dimension: preset.inHome4, shouldAnimate: false }],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome2.displaceBy),
         at: {
@@ -119,8 +118,7 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       const combining: DragImpact = {
         displaced: getForcedDisplacement({
           // inHome3 now displaced
-          visible: [preset.inHome4],
-          animation: [false],
+          visible: [{ dimension: preset.inHome4, shouldAnimate: false }],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome2.displaceBy),
         at: {
@@ -149,8 +147,10 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       const expected: DragImpact = {
         displaced: getForcedDisplacement({
           // inHome3 now displaced
-          visible: [preset.inHome3, preset.inHome4],
-          animation: [true, false],
+          visible: [
+            { dimension: preset.inHome3, shouldAnimate: true },
+            { dimension: preset.inHome4, shouldAnimate: false },
+          ],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome2.displaceBy),
         at: {
@@ -176,8 +176,7 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       const combining: DragImpact = {
         displaced: getForcedDisplacement({
           // preset.inHome3 is no longer displaced
-          visible: [preset.inHome4],
-          animation: [false],
+          visible: [{ dimension: preset.inHome4, shouldAnimate: false }],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome2.displaceBy),
         at: {
@@ -205,8 +204,7 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       const expected: DragImpact = {
         // forwards movement off inHome3. It will leave inHome3 in the same spot and go after it
         displaced: getForcedDisplacement({
-          visible: [preset.inHome4],
-          animation: [false],
+          visible: [{ dimension: preset.inHome4, shouldAnimate: false }],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome2.displaceBy),
         at: {

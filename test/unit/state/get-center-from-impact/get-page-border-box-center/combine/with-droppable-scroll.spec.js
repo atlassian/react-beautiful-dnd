@@ -38,8 +38,20 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
       // combining with inHome2
       const impact: DragImpact = {
         displaced: getForcedDisplacement({
-          visible: [preset.inHome2, preset.inHome3, preset.inHome4],
-          animation: [false, false, false],
+          visible: [
+            {
+              dimension: preset.inHome2,
+              shouldAnimate: false,
+            },
+            {
+              dimension: preset.inHome3,
+              shouldAnimate: false,
+            },
+            {
+              dimension: preset.inHome4,
+              shouldAnimate: false,
+            },
+          ],
         }),
         displacedBy,
         at: {

@@ -45,8 +45,7 @@ it('should mark everything after the critical ', () => {
   {
     const expected: DragImpact = {
       displaced: getForcedDisplacement({
-        visible: all,
-        animation: [false, false],
+        visible: all.map(dimension => ({ dimension, shouldAnimate: false })),
       }),
       displacedBy,
       at: {

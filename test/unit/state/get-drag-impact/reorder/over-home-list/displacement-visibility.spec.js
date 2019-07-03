@@ -138,9 +138,17 @@ const viewport: Viewport = getViewport();
       );
       const expected: DragImpact = {
         displaced: getForcedDisplacement({
-          visible: [visible, partialVisible],
+          visible: [
+            {
+              dimension: visible,
+              shouldAnimate: true,
+            },
+            {
+              dimension: partialVisible,
+              shouldAnimate: true,
+            },
+          ],
           invisible: [notVisible1],
-          animation: [true, true],
         }),
         displacedBy,
         at: {
@@ -263,9 +271,17 @@ const viewport: Viewport = getViewport();
       const expected: DragImpact = {
         // no longer the same due to visibility overscanning
         displaced: getForcedDisplacement({
-          visible: [visible, partialVisible],
+          visible: [
+            {
+              dimension: visible,
+              shouldAnimate: true,
+            },
+            {
+              dimension: partialVisible,
+              shouldAnimate: true,
+            },
+          ],
           invisible: [notVisible1],
-          animation: [true, true],
         }),
         displacedBy,
         at: {

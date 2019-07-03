@@ -149,7 +149,12 @@ describe('initial displacement', () => {
     });
 
     const expected: DisplacementGroups = getForcedDisplacement({
-      visible: [isVisible, isVisibleDueToOverScanning],
+      visible: [
+        {
+          dimension: isVisible,
+        },
+        { dimension: isVisibleDueToOverScanning },
+      ],
       // overscanning
       invisible: [isNotVisible],
     });

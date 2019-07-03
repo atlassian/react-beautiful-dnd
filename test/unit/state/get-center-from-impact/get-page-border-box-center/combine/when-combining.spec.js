@@ -40,8 +40,16 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
       it('should move onto a displaced center - the initial visible center', () => {
         const impact: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inHome3, preset.inHome4],
-            animation: [false, false],
+            visible: [
+              {
+                dimension: preset.inHome3,
+                shouldAnimate: false,
+              },
+              {
+                dimension: preset.inHome4,
+                shouldAnimate: false,
+              },
+            ],
           }),
           displacedBy,
           at: {
@@ -71,8 +79,7 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
         // inHome2 would have moved forward and is now moving backwards
         const impact: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inHome4],
-            animation: [false],
+            visible: [{ dimension: preset.inHome4, shouldAnimate: false }],
           }),
           displacedBy,
           at: {
@@ -109,8 +116,20 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
         const impact: DragImpact = {
           displaced: getForcedDisplacement({
             // inHome2 not displaced as it is the dragging item
-            visible: [preset.inHome1, preset.inHome3, preset.inHome4],
-            animation: [true, false, false],
+            visible: [
+              {
+                dimension: preset.inHome1,
+                shouldAnimate: true,
+              },
+              {
+                dimension: preset.inHome3,
+                shouldAnimate: false,
+              },
+              {
+                dimension: preset.inHome4,
+                shouldAnimate: false,
+              },
+            ],
           }),
           displacedBy,
           at: {
@@ -144,8 +163,16 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
         const impact: DragImpact = {
           displaced: getForcedDisplacement({
             // inHome2 not displaced as it is the dragging item
-            visible: [preset.inHome3, preset.inHome4],
-            animation: [false, false],
+            visible: [
+              {
+                dimension: preset.inHome3,
+                shouldAnimate: false,
+              },
+              {
+                dimension: preset.inHome4,
+                shouldAnimate: false,
+              },
+            ],
           }),
           displacedBy,
           at: {

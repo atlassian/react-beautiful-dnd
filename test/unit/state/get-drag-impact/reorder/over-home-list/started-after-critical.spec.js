@@ -75,8 +75,16 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
             // inHome4 would have been displaced on lift so it won't be animated
-            visible: [preset.inHome3, preset.inHome4],
-            animation: [false, false],
+            visible: [
+              {
+                dimension: preset.inHome3,
+                shouldAnimate: false,
+              },
+              {
+                dimension: preset.inHome4,
+                shouldAnimate: false,
+              },
+            ],
           }),
           displacedBy,
           at: {
@@ -91,8 +99,12 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
       const expected: DragImpact = {
         displaced: getForcedDisplacement({
           // inHome4 would have been displaced on lift so it won't be animated
-          visible: [preset.inHome4],
-          animation: [false],
+          visible: [
+            {
+              dimension: preset.inHome4,
+              shouldAnimate: false,
+            },
+          ],
         }),
         displacedBy,
         at: {
@@ -150,10 +162,18 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
             // inHome4 would have been displaced on lift so it won't be animated
-            visible: [preset.inHome3, preset.inHome4],
-            // inHome3 is now animated
-            // inHome4 displacement stays not displaced
-            animation: [true, false],
+            visible: [
+              // inHome3 is now animated
+              {
+                dimension: preset.inHome3,
+                shouldAnimate: true,
+              },
+              // inHome4 displacement stays not displaced
+              {
+                dimension: preset.inHome4,
+                shouldAnimate: false,
+              },
+            ],
           }),
           displacedBy,
           at: {

@@ -43,8 +43,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       {
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inHome4],
-            animation: [false],
+            visible: [{ dimension: preset.inHome4, shouldAnimate: false }],
           }),
           displacedBy,
           at: {
@@ -99,7 +98,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       {
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inHome4],
+            visible: [{ dimension: preset.inHome4 }],
           }),
           displacedBy,
           at: {
@@ -128,7 +127,10 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       {
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inHome3, preset.inHome4],
+            visible: [
+              { dimension: preset.inHome3 },
+              { dimension: preset.inHome4 },
+            ],
           }),
           displacedBy,
           at: {
@@ -157,7 +159,11 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       {
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inHome1, preset.inHome3, preset.inHome4],
+            visible: [
+              { dimension: preset.inHome1 },
+              { dimension: preset.inHome3 },
+              { dimension: preset.inHome4 },
+            ],
           }),
           displacedBy,
           at: {
@@ -200,9 +206,11 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       {
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inHome2, preset.inHome4],
-            // initial displacement not animated
-            animation: [true, false],
+            visible: [
+              { dimension: preset.inHome2, shouldAnimate: true },
+              // initial displacement not animated
+              { dimension: preset.inHome4, shouldAnimate: false },
+            ],
           }),
           displacedBy,
           at: {
@@ -233,9 +241,21 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
             // ordered by closest displaced
-            visible: [preset.inHome1, preset.inHome2, preset.inHome4],
-            // initial displacement not animated
-            animation: [true, true, false],
+            visible: [
+              {
+                dimension: preset.inHome1,
+                shouldAnimate: true,
+              },
+              {
+                dimension: preset.inHome2,
+                shouldAnimate: true,
+              },
+              {
+                // initial displacement not animated
+                dimension: preset.inHome4,
+                shouldAnimate: false,
+              },
+            ],
           }),
           displacedBy,
           at: {
@@ -265,11 +285,16 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       {
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inHome2, preset.inHome4],
-            animation: [
-              true,
-              // initial displacement not animated
-              false,
+            visible: [
+              {
+                dimension: preset.inHome2,
+                shouldAnimate: true,
+              },
+              {
+                // initial displacement not animated
+                dimension: preset.inHome4,
+                shouldAnimate: false,
+              },
             ],
           }),
           displacedBy,
@@ -299,8 +324,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       {
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inHome4],
-            animation: [false],
+            visible: [{ dimension: preset.inHome4, shouldAnimate: false }],
           }),
           displacedBy,
           at: {

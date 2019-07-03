@@ -35,10 +35,10 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       const combining: DragImpact = {
         displaced: getForcedDisplacement({
           visible: [
-            preset.inForeign1,
-            preset.inForeign2,
-            preset.inForeign3,
-            preset.inForeign4,
+            { dimension: preset.inForeign1 },
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
           ],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
@@ -67,7 +67,11 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       const expected: DragImpact = {
         // inForeign1 no longer displaced
         displaced: getForcedDisplacement({
-          visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
+          visible: [
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
         at: {
@@ -93,10 +97,10 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       const combining: DragImpact = {
         displaced: getForcedDisplacement({
           visible: [
-            preset.inForeign1,
-            preset.inForeign2,
-            preset.inForeign3,
-            preset.inForeign4,
+            { dimension: preset.inForeign1 },
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
           ],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
@@ -152,7 +156,11 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       const combining: DragImpact = {
         displaced: getForcedDisplacement({
           // inForeign1 is not displaced
-          visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
+          visible: [
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
         // moved backward onto inForeign1
@@ -181,7 +189,11 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
       const expected: DragImpact = {
         displaced: getForcedDisplacement({
           // inForeign1 still not displaced
-          visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
+          visible: [
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
         at: {
@@ -214,9 +226,9 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
         displaced: getForcedDisplacement({
           visible: [
             // inForeign1 not displaced
-            preset.inForeign2,
-            preset.inForeign3,
-            preset.inForeign4,
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
           ],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
@@ -247,10 +259,10 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
         displaced: getForcedDisplacement({
           // inForeign1 now displaced
           visible: [
-            preset.inForeign1,
-            preset.inForeign2,
-            preset.inForeign3,
-            preset.inForeign4,
+            { dimension: preset.inForeign1 },
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
           ],
         }),
         displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),

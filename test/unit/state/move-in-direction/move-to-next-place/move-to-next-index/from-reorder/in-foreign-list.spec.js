@@ -34,7 +34,11 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
 
       const crossAxisMove: DragImpact = {
         displaced: getForcedDisplacement({
-          visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
+          visible: [
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
         }),
         displacedBy,
         at: {
@@ -62,7 +66,10 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       {
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inForeign3, preset.inForeign4],
+            visible: [
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
           }),
           displacedBy,
           at: {
@@ -92,7 +99,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       {
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inForeign4],
+            visible: [{ dimension: preset.inForeign4 }],
           }),
           displacedBy,
           at: {
@@ -124,7 +131,10 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       {
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inForeign3, preset.inForeign4],
+            visible: [
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
           }),
           displacedBy,
           at: {
@@ -154,7 +164,11 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
             // ordered by closest
-            visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
+            visible: [
+              { dimension: preset.inForeign2 },
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
           }),
           displacedBy,
           at: {
@@ -175,7 +189,10 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       // inHome1 has made its way into index #3 of foreign after a cross axis move
       const crossAxisMove: DragImpact = {
         displaced: getForcedDisplacement({
-          visible: [preset.inForeign3, preset.inForeign4],
+          visible: [
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
         }),
         displacedBy,
         at: {
@@ -203,7 +220,11 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       {
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
+            visible: [
+              { dimension: preset.inForeign2 },
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
           }),
           displacedBy,
           at: {
@@ -234,10 +255,10 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
             visible: [
-              preset.inForeign1,
-              preset.inForeign2,
-              preset.inForeign3,
-              preset.inForeign4,
+              { dimension: preset.inForeign1 },
+              { dimension: preset.inForeign2 },
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
             ],
           }),
           displacedBy,
@@ -271,7 +292,11 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
             // ordered by closest impacted
-            visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
+            visible: [
+              { dimension: preset.inForeign2 },
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
           }),
           displacedBy,
           at: {
@@ -302,7 +327,10 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
         const expected: DragImpact = {
           displaced: getForcedDisplacement({
             // ordered by closest
-            visible: [preset.inForeign3, preset.inForeign4],
+            visible: [
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
           }),
           displacedBy,
           at: {
@@ -323,7 +351,11 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       // cross axis move inHome1 before inForeign1
       const crossAxisMove: DragImpact = {
         displaced: getForcedDisplacement({
-          visible: [preset.inForeign1, preset.inForeign2, preset.inForeign3],
+          visible: [
+            { dimension: preset.inForeign1 },
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+          ],
         }),
         displacedBy,
         at: {
@@ -356,7 +388,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
       // cross axis move inHome1 before inForeign4
       const crossAxisMove: DragImpact = {
         displaced: getForcedDisplacement({
-          visible: [preset.inForeign4],
+          visible: [{ dimension: preset.inForeign4 }],
         }),
         displacedBy,
         at: {
@@ -444,7 +476,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
 
       const expected: DragImpact = {
         displaced: getForcedDisplacement({
-          visible: [preset.inForeign4],
+          visible: [{ dimension: preset.inForeign4 }],
         }),
         displacedBy,
         at: {

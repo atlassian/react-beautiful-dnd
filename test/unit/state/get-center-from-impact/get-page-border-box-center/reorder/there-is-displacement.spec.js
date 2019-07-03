@@ -34,8 +34,16 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
         const impact: DragImpact = {
           // moved forward over inHome2
           displaced: getForcedDisplacement({
-            visible: [preset.inHome3, preset.inHome4],
-            animation: [false, false],
+            visible: [
+              {
+                dimension: preset.inHome3,
+                shouldAnimate: false,
+              },
+              {
+                dimension: preset.inHome4,
+                shouldAnimate: false,
+              },
+            ],
           }),
           displacedBy,
           at: {
@@ -78,8 +86,20 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
         // moved into foreign
         const impact: DragImpact = {
           displaced: getForcedDisplacement({
-            visible: [preset.inForeign2, preset.inForeign3, preset.inForeign4],
-            animation: [false, false, false],
+            visible: [
+              {
+                dimension: preset.inForeign2,
+                shouldAnimate: false,
+              },
+              {
+                dimension: preset.inForeign3,
+                shouldAnimate: false,
+              },
+              {
+                dimension: preset.inForeign4,
+                shouldAnimate: false,
+              },
+            ],
           }),
           displacedBy,
           at: {
