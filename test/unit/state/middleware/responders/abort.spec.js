@@ -102,6 +102,7 @@ it('should not publish an onDragEnd if aborted after a drop', () => {
     }),
   );
   expect(responders.onDragEnd).toHaveBeenCalledTimes(1);
+  // $ExpectError - mock
   responders.onDragEnd.mockReset();
 
   // abort

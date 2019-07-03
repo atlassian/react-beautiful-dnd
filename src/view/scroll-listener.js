@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import rafSchd from 'raf-schd';
 import bindEvents from './event-bindings/bind-events';
@@ -14,6 +15,7 @@ type Args = {|
 type Result = {|
   start: () => void,
   stop: () => void,
+  isActive: () => boolean,
 |};
 
 function noop() {}
@@ -21,8 +23,6 @@ function noop() {}
 function getWindowScrollBinding(update: () => void): EventBinding {
   return {
     eventName: 'scroll',
-    // TODO: should this be different for SNAP dragging?
-
     // ## Passive: true
     // Eventual consistency is fine because we use position: fixed on the item
     // ## Capture: false
@@ -53,14 +53,20 @@ export default function getScrollListener({ onWindowScroll }: Args): Result {
   const binding: EventBinding = getWindowScrollBinding(scheduled);
   let unbind: () => void = noop;
 
+  function isActive(): boolean {
+    return unbind !== noop;
+  }
+
   function start() {
+    invariant(!isActive(), 'Cannot start scroll listener when already active');
     unbind = bindEvents(window, [binding]);
   }
   function stop() {
+    invariant(isActive(), 'Cannot stop scroll listener when not active');
     scheduled.cancel();
     unbind();
     unbind = noop;
   }
 
-  return { start, stop };
+  return { start, stop, isActive };
 }

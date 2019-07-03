@@ -11,7 +11,7 @@ import getNotVisibleDisplacement from '../../../utils/get-displacement/get-not-v
 import getVisibleDisplacement from '../../../utils/get-displacement/get-visible-displacement';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../src/state/get-displacement-map';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
 import recompute from '../../../../src/state/update-displacement-visibility/recompute';
 import { horizontal, vertical } from '../../../../src/state/axis';
 

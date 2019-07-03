@@ -18,11 +18,11 @@ export default (store: MiddlewareStore) => {
   });
 
   return (next: Dispatch) => (action: Action): any => {
-    if (action.type === 'INITIAL_PUBLISH') {
+    if (!listener.isActive() && action.type === 'INITIAL_PUBLISH') {
       listener.start();
     }
 
-    if (shouldEnd(action)) {
+    if (listener.isActive() && shouldEnd(action)) {
       listener.stop();
     }
 

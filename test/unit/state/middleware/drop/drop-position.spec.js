@@ -17,7 +17,7 @@ import getClientBorderBoxCenter from '../../../../../src/state/get-center-from-i
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
 import noImpact from '../../../../../src/state/no-impact';
-import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import getDisplacementMap from '../../../../../src/state/get-displacement-map';
 import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get-new-home-client-offset';
 import patchDimensionMap from '../../../../../src/state/patch-dimension-map';

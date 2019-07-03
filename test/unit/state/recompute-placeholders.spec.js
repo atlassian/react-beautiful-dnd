@@ -16,7 +16,7 @@ import noImpact from '../../../src/state/no-impact';
 import getVisibleDisplacement from '../../utils/get-displacement/get-visible-displacement';
 import { addPlaceholder } from '../../../src/state/droppable/with-placeholder';
 import patchDroppableMap from '../../../src/state/patch-droppable-map';
-import getHomeOnLift from '../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../src/state/get-lift-effect';
 
 [horizontal, vertical].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

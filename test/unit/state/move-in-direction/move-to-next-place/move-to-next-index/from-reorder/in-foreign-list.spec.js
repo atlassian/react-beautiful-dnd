@@ -3,16 +3,15 @@ import invariant from 'tiny-invariant';
 import type {
   Axis,
   DragImpact,
-  Displacement,
   DisplacedBy,
 } from '../../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../../src/state/axis';
 import { getPreset } from '../../../../../../utils/dimension';
 import moveToNextIndex from '../../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-index';
 import getDisplacedBy from '../../../../../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../../../../../src/state/get-displacement-map';
-import getVisibleDisplacement from '../../../../../../utils/get-displacement/get-visible-displacement';
-import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../../src/state/get-lift-effect';
+import { getForcedDisplacement } from '../../../../../../utils/impact';
+import { emptyGroups } from '../../../../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   const preset = getPreset(axis);
@@ -20,7 +19,7 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
     axis,
     preset.inHome1.displaceBy,
   );
-  const { onLift } = getOnHomeLift({
+  const { afterCritical } = getLiftEffect({
     draggable: preset.inHome1,
     home: preset.home,
     draggables: preset.draggables,
@@ -33,21 +32,21 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
     it('should update the impact when moving after where we started in the foreign start', () => {
       // inHome1 has made its way into index #2 of foreign after a cross axis move
 
-      const initial: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const crossAxisMove: DragImpact = {
-        movement: {
-          displaced: initial,
-          map: getDisplacementMap(initial),
-          displacedBy,
-        },
-        merge: null,
-        destination: {
-          droppableId: preset.foreign.descriptor.id,
-          index: preset.inForeign2.descriptor.index,
+        displaced: getForcedDisplacement({
+          visible: [
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            droppableId: preset.foreign.descriptor.id,
+            index: preset.inForeign2.descriptor.index,
+          },
         },
       };
 
@@ -60,24 +59,25 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: crossAxisMove,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
       invariant(first);
       {
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign3.descriptor.index,
+          displaced: getForcedDisplacement({
+            visible: [
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign3.descriptor.index,
+            },
           },
         };
         expect(first).toEqual(expected);
@@ -92,23 +92,22 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: first,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
       invariant(second);
       {
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign4.descriptor.index,
+          displaced: getForcedDisplacement({
+            visible: [{ dimension: preset.inForeign4 }],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign4.descriptor.index,
+            },
           },
         };
         expect(second).toEqual(expected);
@@ -125,24 +124,25 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: second,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
       invariant(third);
       {
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign3.descriptor.index,
+          displaced: getForcedDisplacement({
+            visible: [
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign3.descriptor.index,
+            },
           },
         };
         expect(third).toEqual(expected);
@@ -156,26 +156,27 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: third,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
       invariant(fourth);
       {
-        // ordered by closest
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign2),
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign2.descriptor.index,
+          displaced: getForcedDisplacement({
+            // ordered by closest
+            visible: [
+              { dimension: preset.inForeign2 },
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign2.descriptor.index,
+            },
           },
         };
         expect(fourth).toEqual(expected);
@@ -186,20 +187,20 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
 
     it('should update the impact when moving before where we started in the foreign list', () => {
       // inHome1 has made its way into index #3 of foreign after a cross axis move
-      const initial: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const crossAxisMove: DragImpact = {
-        movement: {
-          displaced: initial,
-          map: getDisplacementMap(initial),
-          displacedBy,
-        },
-        merge: null,
-        destination: {
-          droppableId: preset.foreign.descriptor.id,
-          index: preset.inForeign3.descriptor.index,
+        displaced: getForcedDisplacement({
+          visible: [
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            droppableId: preset.foreign.descriptor.id,
+            index: preset.inForeign3.descriptor.index,
+          },
         },
       };
 
@@ -212,25 +213,26 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: crossAxisMove,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
       invariant(first);
       {
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign2),
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign2.descriptor.index,
+          displaced: getForcedDisplacement({
+            visible: [
+              { dimension: preset.inForeign2 },
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign2.descriptor.index,
+            },
           },
         };
         expect(first).toEqual(expected);
@@ -245,26 +247,27 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: first,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
       invariant(second);
       {
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign1),
-          getVisibleDisplacement(preset.inForeign2),
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign1.descriptor.index,
+          displaced: getForcedDisplacement({
+            visible: [
+              { dimension: preset.inForeign1 },
+              { dimension: preset.inForeign2 },
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign1.descriptor.index,
+            },
           },
         };
         expect(second).toEqual(expected);
@@ -281,26 +284,27 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: second,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
       invariant(third);
       {
-        // ordered by closest impacted
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign2),
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign2.descriptor.index,
+          displaced: getForcedDisplacement({
+            // ordered by closest impacted
+            visible: [
+              { dimension: preset.inForeign2 },
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign2.descriptor.index,
+            },
           },
         };
         expect(third).toEqual(expected);
@@ -315,25 +319,26 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: third,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
       invariant(fourth);
       {
-        // ordered by closest
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign3.descriptor.index,
+          displaced: getForcedDisplacement({
+            // ordered by closest
+            visible: [
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign3.descriptor.index,
+            },
           },
         };
         expect(fourth).toEqual(expected);
@@ -342,23 +347,23 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
       }
     });
 
-    it('should not allow movement before the start of the list', () => {
+    it('should not allow displaced before the start of the list', () => {
       // cross axis move inHome1 before inForeign1
-      const initial: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign1),
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-      ];
       const crossAxisMove: DragImpact = {
-        movement: {
-          displaced: initial,
-          map: getDisplacementMap(initial),
-          displacedBy,
-        },
-        merge: null,
-        destination: {
-          droppableId: preset.foreign.descriptor.id,
-          index: preset.inForeign1.descriptor.index,
+        displaced: getForcedDisplacement({
+          visible: [
+            { dimension: preset.inForeign1 },
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+          ],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            droppableId: preset.foreign.descriptor.id,
+            index: preset.inForeign1.descriptor.index,
+          },
         },
       };
 
@@ -372,29 +377,27 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.home,
         insideDestination: preset.inForeignList,
         previousImpact: crossAxisMove,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
 
       expect(impact).toBe(null);
     });
 
-    it('should allow movement into a spot after the last item in a list', () => {
+    it('should allow displaced into a spot after the last item in a list', () => {
       // cross axis move inHome1 before inForeign4
-      const initial: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const crossAxisMove: DragImpact = {
-        movement: {
-          // nothing is displaced at this point
-          displaced: initial,
-          map: getDisplacementMap(initial),
-          displacedBy,
-        },
-        merge: null,
-        // currently in the spot that inForeign4 initially occupied
-        destination: {
-          droppableId: preset.foreign.descriptor.id,
-          index: preset.inForeign4.descriptor.index,
+        displaced: getForcedDisplacement({
+          visible: [{ dimension: preset.inForeign4 }],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          // currently in the spot that inForeign4 initially occupied
+          destination: {
+            droppableId: preset.foreign.descriptor.id,
+            index: preset.inForeign4.descriptor.index,
+          },
         },
       };
 
@@ -408,42 +411,41 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: crossAxisMove,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
       invariant(impact);
       const expected: DragImpact = {
-        movement: {
-          // nothing is displaced at this point
-          displaced: [],
-          map: {},
-          displacedBy,
-        },
-        merge: null,
-        // trying to move after spot after inForeign4
-        destination: {
-          droppableId: preset.foreign.descriptor.id,
-          index: preset.inForeign4.descriptor.index + 1,
+        // nothing is displaced at this point
+        displaced: emptyGroups,
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          // trying to move after spot after inForeign4
+          destination: {
+            droppableId: preset.foreign.descriptor.id,
+            index: preset.inForeign4.descriptor.index + 1,
+          },
         },
       };
       expect(impact).toEqual(expected);
     });
 
     const atEndOfForeignList: DragImpact = {
-      movement: {
-        // nothing is displaced at this point
-        displaced: [],
-        map: {},
-        displacedBy,
-      },
-      merge: null,
-      // after inForeign4
-      destination: {
-        droppableId: preset.foreign.descriptor.id,
-        index: preset.inForeign4.descriptor.index + 1,
+      // nothing is displaced at this point
+      displaced: emptyGroups,
+      displacedBy,
+      at: {
+        type: 'REORDER',
+        // after inForeign4
+        destination: {
+          droppableId: preset.foreign.descriptor.id,
+          index: preset.inForeign4.descriptor.index + 1,
+        },
       },
     };
 
-    it('should not allow movement after it is already after the last item in a list', () => {
+    it('should not allow displaced after it is already after the last item in a list', () => {
       const impact: ?DragImpact = moveToNextIndex({
         isMovingForward: true,
         isInHomeList: false,
@@ -452,13 +454,14 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: atEndOfForeignList,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
 
       expect(impact).toBe(null);
     });
 
-    it('should allow movement back from after the last item in a list', () => {
+    it('should allow displaced back from after the last item in a list', () => {
       const impact: ?DragImpact = moveToNextIndex({
         isMovingForward: false,
         isInHomeList: false,
@@ -467,23 +470,22 @@ import getOnHomeLift from '../../../../../../../src/state/get-home-on-lift';
         destination: preset.foreign,
         insideDestination: preset.inForeignList,
         previousImpact: atEndOfForeignList,
-        onLift,
+        afterCritical,
+        viewport: preset.viewport,
       });
 
-      const displaced: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const expected: DragImpact = {
-        movement: {
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
-        },
-        merge: null,
-        // now in position of inForeign4
-        destination: {
-          droppableId: preset.foreign.descriptor.id,
-          index: preset.inForeign4.descriptor.index,
+        displaced: getForcedDisplacement({
+          visible: [{ dimension: preset.inForeign4 }],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          // now in position of inForeign4
+          destination: {
+            droppableId: preset.foreign.descriptor.id,
+            index: preset.inForeign4.descriptor.index,
+          },
         },
       };
       expect(impact).toEqual(expected);

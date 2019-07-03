@@ -15,13 +15,17 @@ it('should return the droppableId of a reorder impact', () => {
   };
   const impact: DragImpact = {
     ...noImpact,
-    destination,
+    at: {
+      type: 'REORDER',
+      destination,
+    },
   };
   expect(whatIsDraggedOver(impact)).toEqual(destination.droppableId);
 });
 
 it('should return the droppableId from a merge impact', () => {
-  const merge: CombineImpact = {
+  const at: CombineImpact = {
+    type: 'COMBINE',
     combine: {
       draggableId: 'draggable',
       droppableId: 'droppable',
@@ -30,9 +34,9 @@ it('should return the droppableId from a merge impact', () => {
   };
   const impact: DragImpact = {
     ...noImpact,
-    merge,
+    at,
   };
-  expect(whatIsDraggedOver(impact)).toEqual(merge.combine.droppableId);
+  expect(whatIsDraggedOver(impact)).toEqual(at.combine.droppableId);
 });
 
 it('should return null when there is no destination or merge impact', () => {

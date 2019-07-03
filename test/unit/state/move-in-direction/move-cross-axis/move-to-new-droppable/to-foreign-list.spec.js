@@ -14,7 +14,7 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
 import { goIntoStart } from '../../../../../../src/state/get-center-from-impact/move-relative-to';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import moveToNewDroppable from '../../../../../../src/state/move-in-direction/move-cross-axis/move-to-new-droppable';
 import { noMovement } from '../../../../../../src/state/no-impact';
 import {

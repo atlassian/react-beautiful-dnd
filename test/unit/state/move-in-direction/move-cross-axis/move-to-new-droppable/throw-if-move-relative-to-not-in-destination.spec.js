@@ -4,7 +4,7 @@ import type { Viewport } from '../../../../../../src/types';
 import moveToNewDroppable from '../../../../../../src/state/move-in-direction/move-cross-axis/move-to-new-droppable';
 import noImpact from '../../../../../../src/state/no-impact';
 import { getPreset } from '../../../../../utils/dimension';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 
 const dontCare: Position = { x: 0, y: 0 };
 

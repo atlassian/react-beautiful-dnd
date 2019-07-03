@@ -2,7 +2,7 @@
 import type { Position } from 'css-box-model';
 import { horizontal, vertical } from '../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../src/state/get-center-from-impact/get-page-border-box-center';
-import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../utils/dimension';
 import type { Axis } from '../../../../../src/types';
 
@@ -10,7 +10,7 @@ import type { Axis } from '../../../../../src/types';
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
     const original: Position = preset.inHome1.page.borderBox.center;
-    const { onLift, impact: homeImpact } = getHomeOnLift({
+    const { afterCritical, impact: homeImpact } = getLiftEffect({
       draggable: preset.inHome1,
       home: preset.home,
       draggables: preset.draggables,
@@ -23,7 +23,7 @@ import type { Axis } from '../../../../../src/types';
         draggable: preset.inHome1,
         droppable: null,
         draggables: preset.dimensions.draggables,
-        onLift,
+        afterCritical,
       });
 
       expect(result).toEqual(original);

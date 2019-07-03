@@ -15,7 +15,7 @@ import {
   getDroppableDimension,
   getDraggableDimension,
 } from '../../../../utils/dimension';
-import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../src/state/get-lift-effect';
 
 const preset = getPreset();
 const viewport: Viewport = getViewport();

@@ -15,7 +15,7 @@ import {
 } from '../../../utils/dimension';
 
 import { toDraggableMap } from '../../../../src/state/dimension-structures';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { createViewport } from '../../../utils/viewport';
 import { origin } from '../../../../src/state/position';
 import noImpact from '../../../../src/state/no-impact';

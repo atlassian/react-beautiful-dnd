@@ -136,7 +136,6 @@ describe('responders integration', () => {
       });
 
       // movements are scheduled in an animation frame
-      // $ExpectError - step() does not exist on requestAnimationFrame
       requestAnimationFrame.step();
       // responder updates are scheduled with setTimeout
       jest.runOnlyPendingTimers();

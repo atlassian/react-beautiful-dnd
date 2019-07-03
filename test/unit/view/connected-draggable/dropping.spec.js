@@ -16,7 +16,7 @@ import type {
 } from '../../../../src/types';
 import { curves, combine as combineStyle } from '../../../../src/animation';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { getDraggingSnapshot } from './util/get-snapshot';
 
 const preset = getPreset();

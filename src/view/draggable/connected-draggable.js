@@ -232,21 +232,8 @@ function getSecondarySelector(): TrySelect {
     if (isAfterCriticalInVirtualList) {
       return null;
     }
-
-    // const merge: ?CombineImpact = impact.merge;
-    // const isCombinedWith: boolean = Boolean(
-    //   merge && merge.combine.draggableId === ownId,
-    // );
     const displaceBy: Position = impact.displacedBy.point;
     const offset: Position = memoizedOffset(displaceBy.x, displaceBy.y);
-
-    // if (isCombinedWith) {
-    //   return getSecondaryProps(
-    //     displacement ? offset : origin,
-    //     draggingId,
-    //     displacement ? displacement.shouldAnimate : true,
-    //   );
-    // }
 
     return getMemoizedProps(offset, null, displacement.shouldAnimate);
   };

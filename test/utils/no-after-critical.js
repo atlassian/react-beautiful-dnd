@@ -1,9 +1,10 @@
 // @flow
-import type { OnLift } from '../../src/types';
+import type { LiftEffect } from '../../src/types';
 import { origin } from '../../src/state/position';
 
-const noOnLift: OnLift = {
-  wasDisplaced: {},
+const noOnLift: LiftEffect = {
+  effected: {},
+  inVirtualList: false,
   displacedBy: {
     point: origin,
     value: 0,

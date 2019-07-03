@@ -10,7 +10,7 @@ import { getPreset } from '../../../utils/dimension';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import getHomeLocation from '../../../../src/state/get-home-location';
 import {
-  getForcedDisplacementGroups,
+  getForcedDisplacement,
   getDraggableIdMap,
   getDraggableIds,
 } from '../../../utils/impact';
@@ -44,9 +44,8 @@ it('should mark everything after the critical ', () => {
   }
   {
     const expected: DragImpact = {
-      displaced: getForcedDisplacementGroups({
-        visible: all,
-        animation: [false, false],
+      displaced: getForcedDisplacement({
+        visible: all.map(dimension => ({ dimension, shouldAnimate: false })),
       }),
       displacedBy,
       at: {

@@ -8,7 +8,7 @@ import getDropImpact, {
   type Result,
 } from '../../../../../src/state/middleware/drop/get-drop-impact';
 import noImpact, { noMovement } from '../../../../../src/state/no-impact';
-import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../utils/dimension';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { vertical } from '../../../../../src/state/axis';

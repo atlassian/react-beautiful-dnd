@@ -33,6 +33,7 @@ const gap: number = 10;
     const descriptor: DroppableDescriptor = {
       id: 'foo',
       type: 'TYPE',
+      mode: 'STANDARD',
     };
     const withoutFrame: DroppableDimension = getDroppableDimension({
       descriptor,
