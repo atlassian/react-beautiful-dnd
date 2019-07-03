@@ -1,23 +1,26 @@
 // @flow
 import { getRect } from 'css-box-model';
 import type {
-  Displacement,
+  DisplacementGroups,
   DraggableDimension,
   DroppableDimension,
   Viewport,
   DraggableDimensionMap,
+  DisplacedBy,
 } from '../../../../src/types';
-import getDisplacement from '../../../../src/state/get-displacement';
+import getDisplacementGroups from '../../../../src/state/get-displacement-groups';
 import {
   getDroppableDimension,
   getDraggableDimension,
 } from '../../../utils/dimension';
-
 import { toDraggableMap } from '../../../../src/state/dimension-structures';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { createViewport } from '../../../utils/viewport';
 import { origin } from '../../../../src/state/position';
 import noImpact from '../../../../src/state/no-impact';
+import getDisplacedBy from '../../../../src/state/get-displaced-by';
+import { getForcedDisplacement } from '../../../utils/impact';
+import { offsetByPosition } from '../../../../src/state/spacing';
 
 const viewport: Viewport = createViewport({
   frame: getRect({
@@ -33,15 +36,15 @@ const viewport: Viewport = createViewport({
 
 const home: DroppableDimension = getDroppableDimension({
   descriptor: {
-    id: 'foreign',
+    id: 'home',
     type: 'TYPE',
+    mode: 'STANDARD',
   },
   borderBox: {
     top: viewport.frame.top,
     left: viewport.frame.left,
     right: viewport.frame.right / 2,
-    // much longer than viewport
-    bottom: viewport.frame.bottom + 2000,
+    bottom: viewport.frame.bottom,
   },
 });
 
@@ -49,21 +52,21 @@ const foreign: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'foreign',
     type: 'TYPE',
+    mode: 'STANDARD',
   },
   borderBox: {
     top: viewport.frame.top,
     left: home.client.borderBox.left + 1,
     right: viewport.frame.right,
-    // much longer than viewport
-    bottom: viewport.frame.bottom + 2000,
+    bottom: viewport.frame.bottom,
   },
 });
 
 const dragging: DraggableDimension = getDraggableDimension({
   descriptor: {
     id: 'in-viewport',
-    droppableId: 'home',
-    type: foreign.descriptor.type,
+    droppableId: home.descriptor.id,
+    type: home.descriptor.type,
     index: 0,
   },
   borderBox: {
@@ -74,20 +77,22 @@ const dragging: DraggableDimension = getDraggableDimension({
   },
 });
 
+const displacedBy: DisplacedBy = getDisplacedBy(home.axis, dragging.displaceBy);
+
 const isVisible: DraggableDimension = getDraggableDimension({
   descriptor: {
-    id: 'not-in-viewport',
+    id: 'is-visible',
     droppableId: foreign.descriptor.id,
     type: foreign.descriptor.type,
-    index: 1,
+    index: 0,
   },
   // outside of viewport but within droppable
   borderBox: viewport.frame,
 });
 
-const isNotVisible: DraggableDimension = getDraggableDimension({
+const isVisibleDueToOverScanning: DraggableDimension = getDraggableDimension({
   descriptor: {
-    id: 'not-in-viewport',
+    id: 'is-visible-due-to-overscanning',
     droppableId: foreign.descriptor.id,
     type: foreign.descriptor.type,
     index: 1,
@@ -99,14 +104,34 @@ const isNotVisible: DraggableDimension = getDraggableDimension({
     bottom: viewport.frame.bottom + 100,
   },
 });
+console.log('viewport', viewport.frame);
+
+const isNotVisible: DraggableDimension = getDraggableDimension({
+  descriptor: {
+    id: 'is-not-visible',
+    droppableId: foreign.descriptor.id,
+    type: foreign.descriptor.type,
+    index: 2,
+  },
+  // outside of viewport but within droppable
+  // TODO - shift so not impacted by overscanning
+  borderBox: {
+    ...viewport.frame,
+    top: viewport.frame.bottom + dragging.client.marginBox.height + 1,
+    bottom: viewport.frame.bottom + dragging.client.marginBox.height + 10,
+  },
+});
+
+console.log('shifted');
 
 const draggables: DraggableDimensionMap = toDraggableMap([
   dragging,
   isVisible,
+  isVisibleDueToOverScanning,
   isNotVisible,
 ]);
 
-const { onLift, impact: homeImpact } = getHomeOnLift({
+const { afterCritical, impact: homeImpact } = getLiftEffect({
   draggable: dragging,
   home,
   draggables,
@@ -114,34 +139,35 @@ const { onLift, impact: homeImpact } = getHomeOnLift({
 });
 
 describe('initial displacement', () => {
-  it('should correctly mark visible items', () => {
-    const result: Displacement = getDisplacement({
-      draggable: isVisible,
+  it.only('should correctly mark visible items', () => {
+    const result: DisplacementGroups = getDisplacementGroups({
+      afterDragging: [isVisible, isVisibleDueToOverScanning, isNotVisible],
       destination: foreign,
-      previousImpact: homeImpact,
+      displacedBy,
+      last: homeImpact.displaced,
       viewport: viewport.frame,
-      onLift,
     });
 
-    const expected: Displacement = {
-      draggableId: isVisible.descriptor.id,
-      isVisible: true,
-      shouldAnimate: true,
-    };
+    const expected: DisplacementGroups = getForcedDisplacement({
+      visible: [isVisible, isVisibleDueToOverScanning],
+      // overscanning
+      invisible: [isNotVisible],
+    });
+
     expect(result).toEqual(expected);
   });
 
   it('should correctly mark invisible items', () => {
-    const result: Displacement = getDisplacement({
-      draggable: isNotVisible,
+    const result: DisplacementGroups = getDisplacementGroups({
+      draggable: isVisibleDueToOverScanning,
       destination: foreign,
       previousImpact: homeImpact,
       viewport: viewport.frame,
-      onLift,
+      afterCritical,
     });
 
-    const expected: Displacement = {
-      draggableId: isNotVisible.descriptor.id,
+    const expected: DisplacementGroups = {
+      draggableId: isVisibleDueToOverScanning.descriptor.id,
       isVisible: false,
       shouldAnimate: false,
     };
@@ -151,15 +177,15 @@ describe('initial displacement', () => {
 
 describe('subsequent displacement', () => {
   it('should correctly mark visible items', () => {
-    const result: Displacement = getDisplacement({
+    const result: DisplacementGroups = getDisplacementGroups({
       draggable: isVisible,
       destination: foreign,
       previousImpact: noImpact,
       viewport: viewport.frame,
-      onLift,
+      afterCritical,
     });
 
-    const expected: Displacement = {
+    const expected: DisplacementGroups = {
       draggableId: isVisible.descriptor.id,
       isVisible: true,
       shouldAnimate: true,
@@ -168,16 +194,16 @@ describe('subsequent displacement', () => {
   });
 
   it('should correctly mark invisible items', () => {
-    const result: Displacement = getDisplacement({
-      draggable: isNotVisible,
+    const result: DisplacementGroups = getDisplacementGroups({
+      draggable: isVisibleDueToOverScanning,
       destination: foreign,
       previousImpact: noImpact,
       viewport: viewport.frame,
-      onLift,
+      afterCritical,
     });
 
-    const expected: Displacement = {
-      draggableId: isNotVisible.descriptor.id,
+    const expected: DisplacementGroups = {
+      draggableId: isVisibleDueToOverScanning.descriptor.id,
       isVisible: false,
       shouldAnimate: false,
     };
