@@ -29,6 +29,7 @@ const inViewport: Spacing = {
       descriptor: {
         id: 'subset',
         type: 'TYPE',
+        mode: 'STANDARD',
       },
       borderBox: inViewport,
       direction: axis.direction,
