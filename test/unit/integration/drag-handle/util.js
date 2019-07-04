@@ -22,7 +22,7 @@ export function getOffset(el: HTMLElement): Position {
   const regex: RegExp = /translate\((\d+)px, (\d+)px\)/;
 
   const result = transform.match(regex);
-  invariant(result, 'Unable to formate translate');
+  invariant(result, `Unable to formate translate: ${transform}`);
 
   return {
     x: Number(result[1]),

@@ -24,6 +24,7 @@ import type {
   Responders,
   Announce,
   Sensor,
+  ElementId,
 } from '../../types';
 import type { Store, Action } from '../../state/store-types';
 import StoreContext from '../context/store-context';
@@ -38,6 +39,7 @@ import {
 } from '../../state/action-creators';
 import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
+import useDragHandleDescription from '../use-lift-instruction';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
 import usePrevious from '../use-previous-ref';
@@ -54,6 +56,7 @@ type Props = {|
   // sensors
   sensors?: Sensor[],
   enableDefaultSensors?: ?boolean,
+  liftInstruction: string,
 |};
 
 const createResponders = (props: Props): Responders => ({
@@ -73,7 +76,7 @@ function getStore(lazyRef: LazyStoreRef): Store {
 }
 
 export default function App(props: Props) {
-  const { contextId, setOnError, sensors } = props;
+  const { contextId, setOnError, sensors, liftInstruction } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
@@ -86,6 +89,11 @@ export default function App(props: Props) {
   }, [lastPropsRef]);
 
   const announce: Announce = useAnnouncer(contextId);
+
+  const liftInstructionId: ElementId = useDragHandleDescription(
+    contextId,
+    liftInstruction,
+  );
   const styleMarshal: StyleMarshal = useStyleMarshal(contextId);
 
   const lazyDispatch: Action => void = useCallback((action: Action): void => {
@@ -133,12 +141,12 @@ export default function App(props: Props) {
   const store: Store = useMemo<Store>(
     () =>
       createStore({
-        dimensionMarshal,
-        focusMarshal,
-        styleMarshal,
         announce,
         autoScroller,
+        dimensionMarshal,
+        focusMarshal,
         getResponders,
+        styleMarshal,
       }),
     [
       announce,
@@ -189,6 +197,7 @@ export default function App(props: Props) {
       contextId,
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
+      liftInstructionId,
     }),
     [
       contextId,
@@ -196,6 +205,7 @@ export default function App(props: Props) {
       focusMarshal,
       getCanLift,
       getIsMovementAllowed,
+      liftInstructionId,
     ],
   );
 

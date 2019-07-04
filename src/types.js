@@ -6,6 +6,7 @@ export type DraggableId = Id;
 export type DroppableId = Id;
 export type TypeId = Id;
 export type ContextId = Id;
+export type ElementId = Id;
 
 export type DroppableMode = 'STANDARD' | 'VIRTUAL';
 export type DroppableDescriptor = {|

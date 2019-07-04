@@ -33,6 +33,7 @@
     "prettier_target": "*.{js,jsx,md,json} src/**/*.{js,jsx,md,json} test/**/*.{js,jsx,md,json} docs/**/*.{js,jsx,md,json} stories/**/*.{js,jsx,md,json} cypress/**/*.{js,jsx,md,json}"
   },
   "scripts": {
+    "test:accessibility": "lighthouse http://localhost:9002/iframe.html?id=single-vertical-list--basic --chrome-flags='--headless' --output=json --output=html --output-path=./test-reports/lighthouse/a11y.json && node a11y-audit-parse.js",
     "test": "jest --config ./jest.config.js",
     "test:ci": "jest test --maxWorkers=2",
     "test:browser": "cypress open",
@@ -109,6 +110,7 @@
     "jest": "^24.8.0",
     "jest-junit": "^6.4.0",
     "jest-watch-typeahead": "^0.3.1",
+    "lighthouse": "^4.3.1",
     "markdown-it": "^8.4.2",
     "prettier": "^1.18.2",
     "raf-stub": "^2.0.2",

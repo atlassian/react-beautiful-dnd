@@ -312,8 +312,8 @@ type DragHandleProps = {|
   // What DragDropContext the drag handle is in
   'data-rbd-drag-handle-context-id': ContextId,
 
-  // Aria role (nicer screen reader text)
-  'aria-roledescription': string,
+  // Id of hidden element that contains the lift instruction (nicer screen reader text)
+  'aria-labelledby': ElementId,
 
   // Allow tabbing to this element
   tabIndex: number,

@@ -5,21 +5,7 @@ import { useMemo, useCallback } from 'use-memo-one';
 import type { Announce, ContextId } from '../../types';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';
-
-// https://allyjs.io/tutorials/hiding-elements.html
-// Element is visually hidden but is readable by screen readers
-const visuallyHidden: Object = {
-  position: 'absolute',
-  width: '1px',
-  height: '1px',
-  margin: '-1px',
-  border: '0',
-  padding: '0',
-  overflow: 'hidden',
-  clip: 'rect(0 0 0 0)',
-  // for if 'clip' is ever removed
-  'clip-path': 'inset(100%)',
-};
+import visuallyHidden from '../visually-hidden-style';
 
 export const getId = (contextId: ContextId): string =>
   `rbd-announcement-${contextId}`;

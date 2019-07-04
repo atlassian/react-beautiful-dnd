@@ -8,6 +8,7 @@ import type {
   State,
   MovementMode,
   ContextId,
+  ElementId,
 } from '../../types';
 import { dropAnimationFinished } from '../../state/action-creators';
 
@@ -66,8 +67,8 @@ export type DragHandleProps = {|
   // What DragDropContext the drag handle is in
   'data-rbd-drag-handle-context-id': ContextId,
 
-  // Aria role (nicer screen reader text)
-  'aria-roledescription': string,
+  // id of drag handle aria description for screen readers
+  'aria-labelledby': ElementId,
 
   // Allow tabbing to this element
   tabIndex: number,
