@@ -17,10 +17,8 @@ import { toDraggableMap } from '../../../../src/state/dimension-structures';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { createViewport } from '../../../utils/viewport';
 import { origin } from '../../../../src/state/position';
-import noImpact from '../../../../src/state/no-impact';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { getForcedDisplacement } from '../../../utils/impact';
-import { offsetByPosition } from '../../../../src/state/spacing';
 
 const viewport: Viewport = createViewport({
   frame: getRect({
@@ -104,7 +102,6 @@ const isVisibleDueToOverScanning: DraggableDimension = getDraggableDimension({
     bottom: viewport.frame.bottom + 100,
   },
 });
-console.log('viewport', viewport.frame);
 
 const isNotVisible: DraggableDimension = getDraggableDimension({
   descriptor: {
@@ -122,8 +119,6 @@ const isNotVisible: DraggableDimension = getDraggableDimension({
   },
 });
 
-console.log('shifted');
-
 const draggables: DraggableDimensionMap = toDraggableMap([
   dragging,
   isVisible,
@@ -131,87 +126,36 @@ const draggables: DraggableDimensionMap = toDraggableMap([
   isNotVisible,
 ]);
 
-const { afterCritical, impact: homeImpact } = getLiftEffect({
+const { impact: homeImpact } = getLiftEffect({
   draggable: dragging,
   home,
   draggables,
   viewport,
 });
 
-describe('initial displacement', () => {
-  it.only('should correctly mark visible items', () => {
-    const result: DisplacementGroups = getDisplacementGroups({
-      afterDragging: [isVisible, isVisibleDueToOverScanning, isNotVisible],
-      destination: foreign,
-      displacedBy,
-      last: homeImpact.displaced,
-      viewport: viewport.frame,
-    });
+const afterDragging: DraggableDimension[] = [
+  isVisible,
+  isVisibleDueToOverScanning,
+  isNotVisible,
+];
 
-    const expected: DisplacementGroups = getForcedDisplacement({
-      visible: [
-        {
-          dimension: isVisible,
-        },
-        { dimension: isVisibleDueToOverScanning },
-      ],
+it('should correctly mark visibility', () => {
+  const result: DisplacementGroups = getDisplacementGroups({
+    afterDragging,
+    destination: foreign,
+    displacedBy,
+    last: homeImpact.displaced,
+    viewport: viewport.frame,
+  });
+
+  const expected: DisplacementGroups = getForcedDisplacement({
+    visible: [
+      { dimension: isVisible },
       // overscanning
-      invisible: [isNotVisible],
-    });
-
-    expect(result).toEqual(expected);
+      { dimension: isVisibleDueToOverScanning },
+    ],
+    invisible: [isNotVisible],
   });
 
-  it('should correctly mark invisible items', () => {
-    const result: DisplacementGroups = getDisplacementGroups({
-      draggable: isVisibleDueToOverScanning,
-      destination: foreign,
-      previousImpact: homeImpact,
-      viewport: viewport.frame,
-      afterCritical,
-    });
-
-    const expected: DisplacementGroups = {
-      draggableId: isVisibleDueToOverScanning.descriptor.id,
-      isVisible: false,
-      shouldAnimate: false,
-    };
-    expect(result).toEqual(expected);
-  });
-});
-
-describe('subsequent displacement', () => {
-  it('should correctly mark visible items', () => {
-    const result: DisplacementGroups = getDisplacementGroups({
-      draggable: isVisible,
-      destination: foreign,
-      previousImpact: noImpact,
-      viewport: viewport.frame,
-      afterCritical,
-    });
-
-    const expected: DisplacementGroups = {
-      draggableId: isVisible.descriptor.id,
-      isVisible: true,
-      shouldAnimate: true,
-    };
-    expect(result).toEqual(expected);
-  });
-
-  it('should correctly mark invisible items', () => {
-    const result: DisplacementGroups = getDisplacementGroups({
-      draggable: isVisibleDueToOverScanning,
-      destination: foreign,
-      previousImpact: noImpact,
-      viewport: viewport.frame,
-      afterCritical,
-    });
-
-    const expected: DisplacementGroups = {
-      draggableId: isVisibleDueToOverScanning.descriptor.id,
-      isVisible: false,
-      shouldAnimate: false,
-    };
-    expect(result).toEqual(expected);
-  });
+  expect(result).toEqual(expected);
 });

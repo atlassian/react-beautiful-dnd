@@ -8,23 +8,19 @@ import type {
   Viewport,
   DraggableDimensionMap,
 } from '../../../../src/types';
-import getDisplacement from '../../../../src/state/get-displacement';
+import getDisplacementGroups from '../../../../src/state/get-displacement-groups';
 import {
   getDroppableDimension,
   getDraggableDimension,
 } from '../../../utils/dimension';
-
 import { toDraggableMap } from '../../../../src/state/dimension-structures';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { createViewport } from '../../../utils/viewport';
 import { origin } from '../../../../src/state/position';
 import noImpact from '../../../../src/state/no-impact';
 import scrollViewport from '../../../../src/state/scroll-viewport';
-import getDisplacementMap from '../../../../src/state/get-displacement-map';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { vertical } from '../../../../src/state/axis';
-import getVisibleDisplacement from '../../../utils/get-displacement/get-visible-displacement';
-import getNotVisibleDisplacement from '../../../utils/get-displacement/get-not-visible-displacement';
 
 const viewport: Viewport = createViewport({
   frame: getRect({
@@ -42,6 +38,7 @@ const home: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'drop',
     type: 'TYPE',
+    mode: 'STANDARD',
   },
   borderBox: {
     ...viewport.frame,
@@ -103,7 +100,7 @@ const draggables: DraggableDimensionMap = toDraggableMap([
   isNotVisible,
 ]);
 
-const { onLift, impact: homeImpact } = getHomeOnLift({
+const { afterCritical, impact: homeImpact } = getLiftEffect({
   draggable: dragging,
   home,
   draggables,
@@ -112,12 +109,12 @@ const { onLift, impact: homeImpact } = getHomeOnLift({
 
 describe('still displaced', () => {
   it('should correctly mark visible items', () => {
-    const result: Displacement = getDisplacement({
+    const result: Displacement = getDisplacementGroups({
       draggable: isVisible,
       destination: home,
       previousImpact: homeImpact,
       viewport: viewport.frame,
-      onLift,
+      afterCritical,
     });
 
     const expected: Displacement = {
@@ -130,12 +127,12 @@ describe('still displaced', () => {
   });
 
   it('should correctly mark invisible items', () => {
-    const result: Displacement = getDisplacement({
+    const result: Displacement = getDisplacementGroups({
       draggable: isNotVisible,
       destination: home,
       previousImpact: homeImpact,
       viewport: viewport.frame,
-      onLift,
+      afterCritical,
     });
 
     const expected: Displacement = {
@@ -149,12 +146,12 @@ describe('still displaced', () => {
 
 describe('no longer displaced', () => {
   it('should correctly mark visible items', () => {
-    const result: Displacement = getDisplacement({
+    const result: Displacement = getDisplacementGroups({
       draggable: isVisible,
       destination: home,
       previousImpact: noImpact,
       viewport: viewport.frame,
-      onLift,
+      afterCritical,
     });
 
     const expected: Displacement = {
@@ -167,12 +164,12 @@ describe('no longer displaced', () => {
   });
 
   it('should correctly mark invisible items', () => {
-    const result: Displacement = getDisplacement({
+    const result: Displacement = getDisplacementGroups({
       draggable: isNotVisible,
       destination: home,
       previousImpact: noImpact,
       viewport: viewport.frame,
-      onLift,
+      afterCritical,
     });
 
     const expected: Displacement = {
@@ -192,12 +189,12 @@ describe('element has become visible after displacement', () => {
   });
 
   it('should keep the displacement not animated if already initially displaced', () => {
-    const result: Displacement = getDisplacement({
+    const result: Displacement = getDisplacementGroups({
       draggable: isNotVisible,
       destination: home,
       previousImpact: homeImpact,
       viewport: scrolled.frame,
-      onLift,
+      afterCritical,
     });
 
     const expected: Displacement = {
@@ -219,7 +216,7 @@ describe('element has become visible after displacement', () => {
     const previous: DragImpact = {
       movement: {
         displaced,
-        map: getDisplacementMap(displaced),
+        map: getDisplacementGroupsMap(displaced),
         displacedBy: getDisplacedBy(vertical, dragging.displaceBy),
       },
       destination: {
@@ -228,12 +225,12 @@ describe('element has become visible after displacement', () => {
       },
       merge: null,
     };
-    const result: Displacement = getDisplacement({
+    const result: Displacement = getDisplacementGroups({
       draggable: isNotVisible,
       destination: home,
       previousImpact: previous,
       viewport: scrolled.frame,
-      onLift,
+      afterCritical,
     });
 
     const expected: Displacement = {
