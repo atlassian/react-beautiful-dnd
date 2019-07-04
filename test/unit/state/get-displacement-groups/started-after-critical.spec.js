@@ -7,6 +7,8 @@ import type {
   DroppableDimension,
   Viewport,
   DraggableDimensionMap,
+  DisplacedBy,
+  DisplacementGroups,
 } from '../../../../src/types';
 import getDisplacementGroups from '../../../../src/state/get-displacement-groups';
 import {
@@ -21,6 +23,7 @@ import noImpact from '../../../../src/state/no-impact';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { vertical } from '../../../../src/state/axis';
+import { getForcedDisplacement } from '../../../utils/impact';
 
 const viewport: Viewport = createViewport({
   frame: getRect({
@@ -62,6 +65,8 @@ const dragging: DraggableDimension = getDraggableDimension({
   },
 });
 
+const displacedBy: DisplacedBy = getDisplacedBy(home.axis, dragging.displaceBy);
+
 const isVisible: DraggableDimension = getDraggableDimension({
   descriptor: {
     id: 'not-in-viewport',
@@ -100,46 +105,36 @@ const draggables: DraggableDimensionMap = toDraggableMap([
   isNotVisible,
 ]);
 
-const { afterCritical, impact: homeImpact } = getLiftEffect({
+const { impact: homeImpact } = getLiftEffect({
   draggable: dragging,
   home,
   draggables,
   viewport,
 });
 
+const afterDragging: DraggableDimension[] = [isVisible, isNotVisible];
+
 describe('still displaced', () => {
-  it('should correctly mark visible items', () => {
-    const result: Displacement = getDisplacementGroups({
-      draggable: isVisible,
+  it('should correctly mark item visibility', () => {
+    const result: DisplacementGroups = getDisplacementGroups({
+      afterDragging,
       destination: home,
-      previousImpact: homeImpact,
+      displacedBy,
+      last: homeImpact.displaced,
       viewport: viewport.frame,
-      afterCritical,
     });
 
-    const expected: Displacement = {
-      draggableId: isVisible.descriptor.id,
-      isVisible: true,
-      // already started displaced
-      shouldAnimate: false,
-    };
-    expect(result).toEqual(expected);
-  });
-
-  it('should correctly mark invisible items', () => {
-    const result: Displacement = getDisplacementGroups({
-      draggable: isNotVisible,
-      destination: home,
-      previousImpact: homeImpact,
-      viewport: viewport.frame,
-      afterCritical,
+    const expected: DisplacementGroups = getForcedDisplacement({
+      visible: [
+        {
+          dimension: isVisible,
+          // already started displaced
+          shouldAnimate: false,
+        },
+      ],
+      invisible: [isNotVisible],
     });
 
-    const expected: Displacement = {
-      draggableId: isNotVisible.descriptor.id,
-      isVisible: false,
-      shouldAnimate: false,
-    };
     expect(result).toEqual(expected);
   });
 });
