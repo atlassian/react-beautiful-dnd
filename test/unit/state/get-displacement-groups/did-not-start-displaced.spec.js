@@ -106,8 +106,8 @@ import { vertical, horizontal } from '../../../../src/state/axis';
     // outside of viewport but within droppable
     borderBox: {
       ...foreign.client.borderBox,
-      top: viewport.frame.bottom + 1,
-      bottom: viewport.frame.bottom + 100,
+      [axis.start]: viewport.frame[axis.end] + 1,
+      [axis.end]: viewport.frame[axis.end] + 100,
     },
   });
 
@@ -119,11 +119,12 @@ import { vertical, horizontal } from '../../../../src/state/axis';
       index: 2,
     },
     // outside of viewport but within droppable
-    // TODO - shift so not impacted by overscanning
     borderBox: {
       ...viewport.frame,
-      top: viewport.frame.bottom + dragging.client.marginBox.height + 1,
-      bottom: viewport.frame.bottom + dragging.client.marginBox.height + 10,
+      [axis.start]:
+        viewport.frame[axis.end] + dragging.client.marginBox[axis.size] + 1,
+      [axis.end]:
+        viewport.frame[axis.end] + dragging.client.marginBox[axis.size] + 10,
     },
   });
 
