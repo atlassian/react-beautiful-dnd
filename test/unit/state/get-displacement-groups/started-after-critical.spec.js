@@ -2,7 +2,6 @@
 import { getRect } from 'css-box-model';
 import type {
   DragImpact,
-  Displacement,
   DraggableDimension,
   DroppableDimension,
   Viewport,
@@ -19,10 +18,9 @@ import { toDraggableMap } from '../../../../src/state/dimension-structures';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { createViewport } from '../../../utils/viewport';
 import { origin } from '../../../../src/state/position';
-import noImpact from '../../../../src/state/no-impact';
+import { emptyGroups } from '../../../../src/state/no-impact';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import { vertical } from '../../../../src/state/axis';
 import { getForcedDisplacement } from '../../../utils/impact';
 
 const viewport: Viewport = createViewport({
@@ -114,127 +112,82 @@ const { impact: homeImpact } = getLiftEffect({
 
 const afterDragging: DraggableDimension[] = [isVisible, isNotVisible];
 
-describe('still displaced', () => {
-  it('should correctly mark item visibility', () => {
-    const result: DisplacementGroups = getDisplacementGroups({
-      afterDragging,
-      destination: home,
-      displacedBy,
-      last: homeImpact.displaced,
-      viewport: viewport.frame,
-    });
-
-    const expected: DisplacementGroups = getForcedDisplacement({
-      visible: [
-        {
-          dimension: isVisible,
-          // already started displaced
-          shouldAnimate: false,
-        },
-      ],
-      invisible: [isNotVisible],
-    });
-
-    expect(result).toEqual(expected);
+it('should correctly mark item visibility', () => {
+  const result: DisplacementGroups = getDisplacementGroups({
+    afterDragging,
+    destination: home,
+    displacedBy,
+    last: homeImpact.displaced,
+    viewport: viewport.frame,
   });
+
+  const expected: DisplacementGroups = getForcedDisplacement({
+    visible: [
+      {
+        dimension: isVisible,
+        // already started displaced
+        shouldAnimate: false,
+      },
+    ],
+    invisible: [isNotVisible],
+  });
+
+  expect(result).toEqual(expected);
 });
 
-describe('no longer displaced', () => {
-  it('should correctly mark visible items', () => {
-    const result: Displacement = getDisplacementGroups({
-      draggable: isVisible,
-      destination: home,
-      previousImpact: noImpact,
-      viewport: viewport.frame,
-      afterCritical,
-    });
-
-    const expected: Displacement = {
-      draggableId: isVisible.descriptor.id,
-      isVisible: true,
-      // now displacement is animated
-      shouldAnimate: true,
-    };
-    expect(result).toEqual(expected);
-  });
-
-  it('should correctly mark invisible items', () => {
-    const result: Displacement = getDisplacementGroups({
-      draggable: isNotVisible,
-      destination: home,
-      previousImpact: noImpact,
-      viewport: viewport.frame,
-      afterCritical,
-    });
-
-    const expected: Displacement = {
-      draggableId: isNotVisible.descriptor.id,
-      isVisible: false,
-      shouldAnimate: false,
-    };
-    expect(result).toEqual(expected);
-  });
-});
-
-describe('element has become visible after displacement', () => {
+it('should not animate previously invisible displacement', () => {
   // scrolling enough for isNotVisible to be visible
   const scrolled: Viewport = scrollViewport(viewport, {
     x: 0,
     y: 10,
   });
 
-  it('should keep the displacement not animated if already initially displaced', () => {
-    const result: Displacement = getDisplacementGroups({
-      draggable: isNotVisible,
-      destination: home,
-      previousImpact: homeImpact,
-      viewport: scrolled.frame,
-      afterCritical,
-    });
-
-    const expected: Displacement = {
-      draggableId: isNotVisible.descriptor.id,
-      // is now visible
-      isVisible: true,
-      // keeping displacement not animated
-      shouldAnimate: false,
-    };
-    expect(result).toEqual(expected);
+  // isNotVisible was displaced but not visible
+  // We are now going to make it visible and ensure that it is not animated
+  const last: DisplacementGroups = getForcedDisplacement({
+    visible: [
+      {
+        dimension: isVisible,
+        // already started displaced
+        shouldAnimate: false,
+      },
+    ],
+    invisible: [isNotVisible],
   });
 
-  it('should keep the displacement animated if re-displaced', () => {
-    const displaced: Displacement[] = [
-      getVisibleDisplacement(isVisible),
-      // previously was displaced, but not animated
-      getNotVisibleDisplacement(isNotVisible),
-    ];
-    const previous: DragImpact = {
-      movement: {
-        displaced,
-        map: getDisplacementGroupsMap(displaced),
-        displacedBy: getDisplacedBy(vertical, dragging.displaceBy),
-      },
-      destination: {
-        index: 0,
-        droppableId: home.descriptor.id,
-      },
-      merge: null,
-    };
-    const result: Displacement = getDisplacementGroups({
-      draggable: isNotVisible,
-      destination: home,
-      previousImpact: previous,
-      viewport: scrolled.frame,
-      afterCritical,
-    });
-
-    const expected: Displacement = {
-      draggableId: isNotVisible.descriptor.id,
-      // is now visible
-      isVisible: true,
-      // not animating displacement as was previously displaced while not visible
-      shouldAnimate: false,
-    };
-    expect(result).toEqual(expected);
+  const result: DisplacementGroups = getDisplacementGroups({
+    afterDragging,
+    displacedBy,
+    destination: home,
+    last,
+    viewport: scrolled.frame,
   });
+
+  const expected: DisplacementGroups = getForcedDisplacement({
+    visible: [
+      {
+        dimension: isVisible,
+        // already started displaced
+        shouldAnimate: false,
+      },
+      {
+        dimension: isNotVisible,
+        // was previously visible so now will not animate
+        shouldAnimate: false,
+      },
+    ],
+  });
+  expect(result).toEqual(expected);
+});
+
+it('should return nothing when nothing is after the dragging item', () => {
+  const result: DisplacementGroups = getDisplacementGroups({
+    afterDragging: [],
+    destination: home,
+    displacedBy,
+    last: homeImpact.displaced,
+    viewport: viewport.frame,
+  });
+
+  expect(result).toEqual(emptyGroups);
 });
