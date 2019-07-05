@@ -11,7 +11,7 @@ import type {
 } from '../../../../src/types';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import { createViewport } from '../../../utils/viewport';
-import { origin } from '../../../../src/state/position';
+import { origin, patch } from '../../../../src/state/position';
 import {
   getDroppableDimension,
   getDraggableDimension,
@@ -24,7 +24,7 @@ import getDisplacementGroups from '../../../../src/state/get-displacement-groups
 import { getForcedDisplacement } from '../../../utils/impact';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 
-[vertical, horizontal].forEach((axis: Axis) => {
+[vertical /*, horizontal */].forEach((axis: Axis) => {
   describe(`on the ${axis.direction} axis`, () => {
     const viewport: Viewport = createViewport({
       frame: getRect({
@@ -49,7 +49,7 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
         top: viewport.frame.top,
         left: viewport.frame.left,
         right: viewport.frame.right / 2,
-        bottom: viewport.frame.bottom,
+        bottom: viewport.frame.bottom + 2000,
       },
     });
 
@@ -64,7 +64,7 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
         top: viewport.frame.top,
         left: home.client.borderBox.left + 1,
         right: viewport.frame.right,
-        bottom: viewport.frame.bottom,
+        bottom: viewport.frame.bottom + 2000,
       },
     });
 
@@ -208,7 +208,7 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
       expect(result).toEqual(last);
     });
 
-    it('should mark an item as not animated when moving from invisible to visible', () => {
+    it.only('should mark an item as not animated when moving from invisible to visible', () => {
       const last: DisplacementGroups = getForcedDisplacement({
         visible: [
           { dimension: isVisible },
@@ -235,7 +235,7 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
         visible: [
           { dimension: isVisible },
           { dimension: isVisibleDueToOverScanning },
-          { dimension: isNotVisible, shouldAnimate: true },
+          { dimension: isNotVisible, shouldAnimate: false },
         ],
       });
 
