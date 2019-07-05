@@ -244,6 +244,26 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
 
     it('should make displacement animated if being displaced for the first time', () => {});
 
-    it('should force the animation value when requested', () => {});
+    it('should force the animation value when requested', () => {
+      const result: DisplacementGroups = getDisplacementGroups({
+        afterDragging,
+        destination: foreign,
+        displacedBy,
+        last: emptyGroups,
+        viewport: viewport.frame,
+        forceShouldAnimate: false,
+      });
+
+      const expected: DisplacementGroups = getForcedDisplacement({
+        visible: [
+          { dimension: isVisible, shouldAnimate: false },
+          { dimension: isVisibleDueToOverScanning, shouldAnimate: false },
+        ],
+
+        invisible: [isNotVisible],
+      });
+
+      expect(result).toEqual(expected);
+    });
   });
 });
