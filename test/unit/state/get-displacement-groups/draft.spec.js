@@ -24,7 +24,7 @@ import getDisplacementGroups from '../../../../src/state/get-displacement-groups
 import { getForcedDisplacement } from '../../../utils/impact';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 
-[vertical /*, horizontal */].forEach((axis: Axis) => {
+[vertical, horizontal].forEach((axis: Axis) => {
   describe(`on the ${axis.direction} axis`, () => {
     const viewport: Viewport = createViewport({
       frame: getRect({
@@ -38,6 +38,10 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
       scrollWidth: 1000,
     });
 
+    const homeCrossAxisEnd: number =
+      viewport.frame[axis.crossAxisStart] +
+      viewport.frame[axis.crossAxisSize] / 2;
+
     const home: DroppableDimension = getDroppableDimension({
       descriptor: {
         id: 'home',
@@ -46,10 +50,10 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
       },
       direction: axis.direction,
       borderBox: {
-        top: viewport.frame.top,
-        left: viewport.frame.left,
-        right: viewport.frame.right / 2,
-        bottom: viewport.frame.bottom + 2000,
+        [axis.start]: viewport.frame[axis.start],
+        [axis.end]: viewport.frame[axis.end] + 2000,
+        [axis.crossAxisStart]: viewport.frame[axis.crossAxisStart],
+        [axis.crossAxisEnd]: homeCrossAxisEnd,
       },
     });
 
@@ -61,10 +65,10 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
       },
       direction: axis.direction,
       borderBox: {
-        top: viewport.frame.top,
-        left: home.client.borderBox.left + 1,
-        right: viewport.frame.right,
-        bottom: viewport.frame.bottom + 2000,
+        [axis.start]: viewport.frame[axis.start],
+        [axis.end]: viewport.frame[axis.end] + 2000,
+        [axis.crossAxisStart]: homeCrossAxisEnd + 1,
+        [axis.crossAxisEnd]: viewport.frame[axis.crossAxisEnd],
       },
     });
 
@@ -208,7 +212,7 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
       expect(result).toEqual(last);
     });
 
-    it.only('should mark an item as not animated when moving from invisible to visible', () => {
+    it('should mark an item as not animated when moving from invisible to visible', () => {
       const last: DisplacementGroups = getForcedDisplacement({
         visible: [
           { dimension: isVisible },
@@ -217,11 +221,7 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
         invisible: [isNotVisible],
       });
       // scrolling enough for isNotVisible to be visible
-      TODO;
-      const scrolled: Viewport = scrollViewport(viewport, {
-        x: 0,
-        y: 1000,
-      });
+      const scrolled: Viewport = scrollViewport(viewport, patch(axis.line, 1));
 
       const result: DisplacementGroups = getDisplacementGroups({
         afterDragging,
