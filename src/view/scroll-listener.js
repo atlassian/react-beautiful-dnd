@@ -34,7 +34,10 @@ function getWindowScrollBinding(update: () => void): EventBinding {
       // IE11 fix:
       // Scrollable events still bubble up and are caught by this handler in ie11.
       // We can ignore this event
-      if (event.currentTarget !== window) {
+      if (
+        event.currentTarget === window &&
+        (event.target !== window && event.target !== window.document)
+      ) {
         return;
       }
 
