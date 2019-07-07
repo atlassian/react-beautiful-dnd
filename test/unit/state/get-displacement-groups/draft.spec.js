@@ -144,7 +144,6 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
       isNotVisible,
     ]);
 
-    console.log('running');
     const { impact: homeImpact } = getLiftEffect({
       draggable: dragging,
       home,
@@ -242,7 +241,27 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
       expect(result).toEqual(expected);
     });
 
-    it('should make displacement animated if being displaced for the first time', () => {});
+    it('should make displacement animated if being displaced for the first time', () => {
+      const result: DisplacementGroups = getDisplacementGroups({
+        afterDragging,
+        destination: foreign,
+        displacedBy,
+        last: emptyGroups,
+        viewport: viewport.frame,
+      });
+
+      const expected: DisplacementGroups = getForcedDisplacement({
+        // both are animated
+        visible: [
+          { dimension: isVisible },
+          // overscanning
+          { dimension: isVisibleDueToOverScanning },
+        ],
+        invisible: [isNotVisible],
+      });
+
+      expect(result).toEqual(expected);
+    });
 
     it('should force the animation value when requested', () => {
       const result: DisplacementGroups = getDisplacementGroups({
