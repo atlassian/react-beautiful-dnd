@@ -2,20 +2,20 @@
 import type { Position } from 'css-box-model';
 import type {
   Axis,
-  Displacement,
+  DisplacementGroups,
   DisplacedBy,
   Viewport,
 } from '../../../../src/types';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { add, negate, patch, subtract } from '../../../../src/state/position';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
 import { getPreset } from '../../../utils/dimension';
-import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-animated-displacement';
 import { offsetByPosition } from '../../../../src/state/spacing';
-import getDisplacement from '../../../../src/state/get-displacement';
+import { getForcedDisplacement } from '../../../utils/impact';
+import getDisplacementGroups from '../../../../src/state/get-displacement-groups';
+import { emptyGroups } from '../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -26,13 +26,6 @@ import getDisplacement from '../../../../src/state/get-displacement';
       axis,
       preset.inHome1.displaceBy,
     );
-
-    const { onLift, impact: homeImpact } = getHomeOnLift({
-      draggable: preset.inHome1,
-      home: preset.home,
-      draggables: preset.draggables,
-      viewport,
-    });
 
     it('should calculate visibility as if in original location', () => {
       const onEndOfInHome2: Position = patch(
@@ -52,7 +45,7 @@ import getDisplacement from '../../../../src/state/get-displacement';
 
       const scrolled: Viewport = scrollViewport(viewport, newScroll);
 
-      // should currently be invisible in its displaced location
+      // Displaced location is currently not visible
       expect(
         isPartiallyVisible({
           target: offsetByPosition(
@@ -65,18 +58,23 @@ import getDisplacement from '../../../../src/state/get-displacement';
         }),
       ).toBe(false);
 
-      // displacement states that it is visible despite currently being invisible
-      // (it is using the original location for visibility)
-      const result: Displacement = getDisplacement({
-        draggable: preset.inHome2,
-        destination: preset.home,
-        // now readding initial displacement to inHome2
-        previousImpact: homeImpact,
-        viewport: scrolled.frame,
-        onLift,
+      // Displacement states that inHome2 is visible despite currently being invisible due to displacement
+      const result: DisplacementGroups = getForcedDisplacement({
+        visible: [
+          { dimension: preset.inHome2 },
+          { dimension: preset.inHome3 },
+          { dimension: preset.inHome4 },
+        ],
       });
 
-      expect(result).toEqual(getNotAnimatedDisplacement(preset.inHome2));
+      const expected: DisplacementGroups = getDisplacementGroups({
+        afterDragging: [preset.inHome2, preset.inHome3, preset.inHome4],
+        destination: preset.home,
+        displacedBy: getDisplacedBy(axis, preset.inHome1.displaceBy),
+        last: emptyGroups,
+        viewport: scrolled.frame,
+      });
+      expect(result).toEqual(expected);
     });
   });
 });
