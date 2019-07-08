@@ -7,12 +7,10 @@ import type {
   DroppableDimensionMap,
   DragImpact,
   Viewport,
-  Displacement,
 } from '../../../../../../src/types';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import { patch, subtract } from '../../../../../../src/state/position';
 import {
@@ -23,8 +21,7 @@ import getViewport from '../../../../../../src/view/window/get-viewport';
 import { getPreset, makeScrollable } from '../../../../../utils/dimension';
 
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
-import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
+import { getForcedDisplacement } from '../../../../../utils/impact';
 
 const viewport: Viewport = getViewport();
 
@@ -40,7 +37,7 @@ const viewport: Viewport = getViewport();
 
     // moving inHome1 past inHome2 by scrolling the dimension
     describe('moving beyond start position with own scroll', () => {
-      const { onLift, impact: homeImpact } = getHomeOnLift({
+      const { afterCritical, impact: homeImpact } = getLiftEffect({
         draggable: preset.inHome1,
         home: scrollableHome,
         draggables: preset.draggables,
@@ -74,26 +71,6 @@ const viewport: Viewport = getViewport();
           axis,
           preset.inHome1.displaceBy,
         );
-        const displaced: Displacement[] = [
-          // inHome2 no longer displaced
-          // originally displaced
-          getNotAnimatedDisplacement(preset.inHome3),
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
-        const expected: DragImpact = {
-          movement: {
-            map: getDisplacementMap(displaced),
-            displaced,
-            displacedBy,
-          },
-          destination: {
-            // now in position of inHome2 as it has moved backwards (it started displaced)
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome2.descriptor.index,
-          },
-          merge: null,
-        };
-
         const impact: DragImpact = getDragImpact({
           pageBorderBoxCenter,
           draggable: preset.inHome1,
@@ -102,16 +79,35 @@ const viewport: Viewport = getViewport();
           previousImpact: homeImpact,
           viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
 
+        const expected: DragImpact = {
+          displaced: getForcedDisplacement({
+            // inHome2 no longer displaced
+            // originally displaced so not animated
+            visible: [
+              { dimension: preset.inHome3, shouldAnimate: false },
+              { dimension: preset.inHome4, shouldAnimate: false },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              // now in position of inHome2 as it has moved backwards (it started displaced)
+              droppableId: preset.home.descriptor.id,
+              index: preset.inHome2.descriptor.index,
+            },
+          },
+        };
         expect(impact).toEqual(expected);
       });
     });
 
     // moving inHome4 back past inHome2
     describe('moving back past start position with own scroll', () => {
-      const { onLift, impact: homeImpact } = getHomeOnLift({
+      const { afterCritical, impact: homeImpact } = getLiftEffect({
         draggable: preset.inHome4,
         home: scrollableHome,
         draggables: preset.draggables,
@@ -145,26 +141,6 @@ const viewport: Viewport = getViewport();
           axis,
           preset.inHome4.displaceBy,
         );
-        // ordered by closest to current location
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inHome2),
-          getVisibleDisplacement(preset.inHome3),
-          // inHome4 not displaced as it is the dragging item
-        ];
-        const expected: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced,
-            map: getDisplacementMap(displaced),
-          },
-          destination: {
-            // is now in place of inHome2
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome2.descriptor.index,
-          },
-          merge: null,
-        };
-
         const impact: DragImpact = getDragImpact({
           pageBorderBoxCenter,
           draggable: preset.inHome4,
@@ -173,9 +149,28 @@ const viewport: Viewport = getViewport();
           previousImpact: homeImpact,
           viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
 
+        const expected: DragImpact = {
+          displaced: getForcedDisplacement({
+            visible: [
+              // ordered by closest to current location
+              { dimension: preset.inHome2 },
+              { dimension: preset.inHome3 },
+              // inHome4 not displaced as it is the dragging item
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              // is now in place of inHome2
+              droppableId: preset.home.descriptor.id,
+              index: preset.inHome2.descriptor.index,
+            },
+          },
+        };
         expect(impact).toEqual(expected);
       });
     });
