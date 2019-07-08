@@ -4,7 +4,6 @@ import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import { patch } from '../../../../../../src/state/position';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import { getPreset } from '../../../../../utils/dimension';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import type {
   Axis,
@@ -18,9 +17,9 @@ import {
   forward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
 import afterPoint from '../../../../../utils/after-point';
 import beforePoint from '../../../../../utils/before-point';
+import { getForcedDisplacement } from '../../../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -34,7 +33,7 @@ import beforePoint from '../../../../../utils/before-point';
       axis,
       preset.inHome1.displaceBy,
     );
-    const { onLift, impact: homeImpact } = getHomeOnLift({
+    const { afterCritical, impact: homeImpact } = getLiftEffect({
       draggable: preset.inHome1,
       home: preset.home,
       draggables: preset.draggables,
@@ -55,7 +54,7 @@ import beforePoint from '../../../../../utils/before-point';
       previousImpact: homeImpact,
       viewport,
       userDirection: backward,
-      onLift,
+      afterCritical,
     });
 
     it('should displace items when moving backwards onto their bottom edge', () => {
@@ -69,27 +68,27 @@ import beforePoint from '../../../../../utils/before-point';
           previousImpact: homeImpact,
           viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
 
-        // ordered by closest to current location
-        // animated and visible as it is a foreign list
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
+          displaced: getForcedDisplacement({
+            visible: [
+              // ordered by closest to current location
+              // animated and visible as it is a foreign list
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              // is now in position of inForeign3
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign3.descriptor.index,
+            },
           },
-          destination: {
-            // is now in position of inForeign3
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign3.descriptor.index,
-          },
-          merge: null,
         };
 
         expect(impact).toEqual(expected);
@@ -141,7 +140,7 @@ import beforePoint from '../../../../../utils/before-point';
           previousImpact: goingBackwards,
           viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
         expect(impact).toEqual(goingBackwards);
       }
@@ -155,7 +154,7 @@ import beforePoint from '../../../../../utils/before-point';
           previousImpact: goingBackwards,
           viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
         // ordered by closest impacted
         const displaced: Displacement[] = [
@@ -168,12 +167,14 @@ import beforePoint from '../../../../../utils/before-point';
             map: getDisplacementMap(displaced),
             displacedBy,
           },
-          destination: {
-            // is now in position of inForeign3
-            droppableId: preset.inForeign3.descriptor.droppableId,
-            index: preset.inForeign3.descriptor.index,
+          displacedBy,
+          at: {
+            destination: {
+              // is now in position of inForeign3
+              droppableId: preset.inForeign3.descriptor.droppableId,
+              index: preset.inForeign3.descriptor.index,
+            },
           },
-          merge: null,
         };
         expect(impact).toEqual(expected);
       }
