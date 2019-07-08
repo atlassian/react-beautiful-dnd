@@ -66,7 +66,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  // $ExpectError - .reset does not exist on raf
   requestAnimationFrame.reset();
 });
 

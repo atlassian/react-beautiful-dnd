@@ -62,14 +62,12 @@ it('should use the fluid scroller when in fluid mode', () => {
 
   // lift in center - should not cause an auto scroll
   scroller.start(onCenter('FLUID'));
-  // $ExpectError - .reset does not exist on raf
   requestAnimationFrame.flush();
   expect(mocks.scrollWindow).not.toHaveBeenCalled();
 
   // now scrolling on visibile edge. Should cause a big auto scroll
   // this will be done with the fluid scroller
   scroller.scroll(onEnd('FLUID'));
-  // $ExpectError - .reset does not exist on raf
   requestAnimationFrame.step();
   expect(mocks.scrollWindow).toHaveBeenCalled();
 });
@@ -80,13 +78,11 @@ it('should use the jump scroller when in SNAP mode and there is a jumpScrollerRe
 
   // lift in center - should not cause an auto scroll
   scroller.start(onCenter('SNAP'));
-  // $ExpectError - .reset does not exist on raf
   requestAnimationFrame.flush();
   expect(mocks.scrollWindow).not.toHaveBeenCalled();
 
   // now scrolling on visibile edge. Should not cause an auto scroll because we are in SNAP mode
   scroller.scroll(onEnd('SNAP'));
-  // $ExpectError - .reset does not exist on raf
   requestAnimationFrame.step();
   expect(mocks.scrollWindow).not.toHaveBeenCalled();
 
@@ -96,7 +92,6 @@ it('should use the jump scroller when in SNAP mode and there is a jumpScrollerRe
     scrollableViewport,
   );
   scroller.scroll(withRequest);
-  // $ExpectError - .reset does not exist on raf
   requestAnimationFrame.step();
   expect(mocks.scrollWindow).toHaveBeenCalled();
 });
