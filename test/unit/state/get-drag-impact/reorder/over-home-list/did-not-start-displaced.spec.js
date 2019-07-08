@@ -4,13 +4,11 @@ import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import { patch } from '../../../../../../src/state/position';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import { getPreset } from '../../../../../utils/dimension';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import type {
   Axis,
   DragImpact,
   Viewport,
-  Displacement,
   DisplacedBy,
 } from '../../../../../../src/types';
 import {
@@ -18,10 +16,9 @@ import {
   forward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
-import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
 import beforePoint from '../../../../../utils/before-point';
 import afterPoint from '../../../../../utils/after-point';
+import { getForcedDisplacement } from '../../../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -73,51 +70,50 @@ import afterPoint from '../../../../../utils/after-point';
           afterCritical,
         });
 
-        // ordered by closest to current location
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inHome2),
-          // inHome3 is not displaced as it is the dragging item
-          // inHome4 would have been displaced on lift so it won't be animated
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
+          displaced: getForcedDisplacement({
+            // ordered by closest to current location
+            visible: [
+              { dimension: preset.inHome2, shouldAnimate: true },
+              // inHome3 is not displaced as it is the dragging item
+              // inHome4 would have been displaced on lift so it won't be animated
+              { dimension: preset.inHome4, shouldAnimate: false },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              // is now in position of inHome2
+              droppableId: preset.home.descriptor.id,
+              index: preset.inHome2.descriptor.index,
+            },
           },
-          destination: {
-            // is now in position of inHome2
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome2.descriptor.index,
-          },
-          merge: null,
         };
-
         expect(impact).toEqual(expected);
       }
-      // ordered by closest to current location
-      const displaced: Displacement[] = [
-        getVisibleDisplacement(preset.inHome1),
-        getVisibleDisplacement(preset.inHome2),
-        // inHome3 is not displaced as it is the dragging item
-        // inHome4 would have been displaced on lift so it won't be animated
-        getNotAnimatedDisplacement(preset.inHome4),
-      ];
-      const expected: DragImpact = {
-        movement: {
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
-        },
-        destination: {
-          // is now in position of inHome1
-          droppableId: preset.home.descriptor.id,
-          index: preset.inHome1.descriptor.index,
-        },
-        merge: null,
-      };
 
+      const expected: DragImpact = {
+        displaced: getForcedDisplacement({
+          // ordered by closest to current location
+          visible: [
+            { dimension: preset.inHome1 },
+            { dimension: preset.inHome2 },
+            // inHome3 is not displaced as it is the dragging item
+            // inHome4 would have been displaced on lift so it won't be animated
+            { dimension: preset.inHome4, shouldAnimate: false },
+          ],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            // is now in position of inHome1
+            droppableId: preset.home.descriptor.id,
+            index: preset.inHome1.descriptor.index,
+          },
+        },
+      };
       expect(goingBackwards).toEqual(expected);
     });
 
@@ -145,7 +141,7 @@ import afterPoint from '../../../../../utils/after-point';
           previousImpact: goingBackwards,
           viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
         expect(impact).toEqual(goingBackwards);
       }
@@ -159,25 +155,26 @@ import afterPoint from '../../../../../utils/after-point';
           previousImpact: goingBackwards,
           viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inHome2),
-          // not displacing inHome3 as it is the dragging item
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
+
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
+          displaced: getForcedDisplacement({
+            visible: [
+              { dimension: preset.inHome2 },
+              // not displacing inHome3 as it is the dragging item
+              { dimension: preset.inHome4, shouldAnimate: false },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.home.descriptor.id,
+              // is now in position of inHome2
+              index: preset.inHome2.descriptor.index,
+            },
           },
-          destination: {
-            droppableId: preset.home.descriptor.id,
-            // is now in position of inHome2
-            index: preset.inHome2.descriptor.index,
-          },
-          merge: null,
         };
         expect(impact).toEqual(expected);
       }
