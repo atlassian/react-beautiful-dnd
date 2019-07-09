@@ -63,7 +63,7 @@
     "react-redux": "^7.1.0",
     "redux": "^4.0.2",
     "tiny-invariant": "^1.0.5",
-    "use-memo-one": "^1.1.0"
+    "use-memo-one": "^1.1.1"
   },
   "devDependencies": {
     "@atlaskit/css-reset": "^5.0.2",
