@@ -9,7 +9,6 @@ import type {
   Axis,
   DragImpact,
   Viewport,
-  Displacement,
   DisplacedBy,
 } from '../../../../../../src/types';
 import {
@@ -93,26 +92,26 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
 
         expect(impact).toEqual(expected);
       }
-      // ordered by closest to current location
-      const displaced: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
-      const expected: DragImpact = {
-        movement: {
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
-        },
-        destination: {
-          // is now in position of inForeign2
-          droppableId: preset.inForeign2.descriptor.droppableId,
-          index: preset.inForeign2.descriptor.index,
-        },
-        merge: null,
-      };
 
+      const expected: DragImpact = {
+        displaced: getForcedDisplacement({
+          // ordered by closest to current location
+          visible: [
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            // is now in position of inForeign2
+            droppableId: preset.inForeign2.descriptor.droppableId,
+            index: preset.inForeign2.descriptor.index,
+          },
+        },
+      };
       expect(goingBackwards).toEqual(expected);
     });
 
@@ -156,19 +155,18 @@ import { getForcedDisplacement } from '../../../../../utils/impact';
           userDirection: forward,
           afterCritical,
         });
-        // ordered by closest impacted
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
+
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
+          displaced: getForcedDisplacement({
+            // ordered by closest impacted
+            visible: [
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
+          }),
           displacedBy,
           at: {
+            type: 'REORDER',
             destination: {
               // is now in position of inForeign3
               droppableId: preset.inForeign3.descriptor.droppableId,

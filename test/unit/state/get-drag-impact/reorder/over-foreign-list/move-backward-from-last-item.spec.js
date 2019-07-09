@@ -5,7 +5,6 @@ import type {
   DragImpact,
   Viewport,
   DisplacedBy,
-  Displacement,
 } from '../../../../../../src/types';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
@@ -14,15 +13,15 @@ import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { patch } from '../../../../../../src/state/position';
 import { backward } from '../../../../../../src/state/user-direction/user-direction-preset';
 import { getPreset } from '../../../../../utils/dimension';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
+import { emptyGroups } from '../../../../../../src/state/no-impact';
+import { getForcedDisplacement } from '../../../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     it('should allow movement past from last item', () => {
       const preset = getPreset(axis);
       const viewport: Viewport = preset.viewport;
-      const { onLift } = getHomeOnLift({
+      const { afterCritical } = getLiftEffect({
         draggable: preset.inHome1,
         home: preset.home,
         draggables: preset.draggables,
@@ -38,17 +37,16 @@ import getDisplacementMap from '../../../../../../src/state/get-displacement-map
         preset.foreign.page.borderBox.center[axis.crossAxisLine],
       );
       const inLastSpot: DragImpact = {
-        movement: {
-          displaced: [],
-          map: {},
-          displacedBy,
+        displaced: emptyGroups,
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          // after last item
+          destination: {
+            index: preset.inForeign4.descriptor.index + 1,
+            droppableId: preset.inForeign4.descriptor.droppableId,
+          },
         },
-        // after last item
-        destination: {
-          index: preset.inForeign4.descriptor.index + 1,
-          droppableId: preset.inForeign4.descriptor.droppableId,
-        },
-        merge: null,
       };
 
       const goingBackwards: DragImpact = getDragImpact({
@@ -59,24 +57,22 @@ import getDisplacementMap from '../../../../../../src/state/get-displacement-map
         previousImpact: inLastSpot,
         viewport,
         userDirection: backward,
-        onLift,
+        afterCritical,
       });
 
-      const displaced: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const expected: DragImpact = {
-        movement: {
-          displacedBy,
-          displaced,
-          map: getDisplacementMap(displaced),
+        displaced: getForcedDisplacement({
+          visible: [{ dimension: preset.inForeign4 }],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          // now in visual spot of inForeign4
+          destination: {
+            index: preset.inForeign4.descriptor.index,
+            droppableId: preset.inForeign4.descriptor.droppableId,
+          },
         },
-        // now in visual spot of inForeign4
-        destination: {
-          index: preset.inForeign4.descriptor.index,
-          droppableId: preset.inForeign4.descriptor.droppableId,
-        },
-        merge: null,
       };
       expect(goingBackwards).toEqual(expected);
     });
