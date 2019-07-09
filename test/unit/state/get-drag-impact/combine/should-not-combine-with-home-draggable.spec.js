@@ -15,7 +15,7 @@ import { enableCombining, getPreset } from '../../../../utils/dimension';
     const preset = getPreset(axis);
 
     it('should not allow combining with the dragging item', () => {
-      const { onLift, impact: homeImpact } = getHomeOnLift({
+      const { afterCritical, impact: homeImpact } = getLiftEffect({
         draggable: preset.inHome1,
         home: preset.home,
         draggables: preset.draggables,
@@ -35,7 +35,7 @@ import { enableCombining, getPreset } from '../../../../utils/dimension';
         previousImpact: homeImpact,
         viewport: preset.viewport,
         userDirection: forward,
-        onLift,
+        afterCritical,
       });
       expect(impact).toEqual(homeImpact);
     });

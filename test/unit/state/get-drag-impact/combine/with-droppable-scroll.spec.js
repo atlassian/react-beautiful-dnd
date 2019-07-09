@@ -25,7 +25,7 @@ import { getPreset, makeScrollable } from '../../../../utils/dimension';
     const scrollableHome: DroppableDimension = makeScrollable(
       withCombineEnabled,
     );
-    const { onLift, impact: homeImpact } = getHomeOnLift({
+    const { afterCritical, impact: homeImpact } = getLiftEffect({
       draggable: preset.inHome1,
       home: scrollableHome,
       draggables: preset.draggables,
@@ -61,10 +61,10 @@ import { getPreset, makeScrollable } from '../../../../utils/dimension';
           previousImpact: homeImpact,
           viewport: preset.viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
 
-        expect(impact.merge).toEqual(null);
+        expect(impact.at).toHaveProperty('type', 'REORDER');
       }
       // combine now due to do droppable scroll
       {
@@ -76,13 +76,14 @@ import { getPreset, makeScrollable } from '../../../../utils/dimension';
           previousImpact: homeImpact,
           viewport: preset.viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
 
         const expected: DragImpact = {
-          movement: homeImpact.movement,
-          destination: null,
-          merge: {
+          displaced: homeImpact.displaced,
+          displacedBy: homeImpact.displacedBy,
+          at: {
+            type: 'COMBINE',
             whenEntered: forward,
             combine: {
               draggableId: preset.inHome2.descriptor.id,
