@@ -80,6 +80,9 @@ export default ({
     return getImpact(last.descriptor.id);
   }
 
+  // We are moving from being between two displaced items
+  // backwards onto the first one
+
   // need to find the first item before the closest
   const indexOfClosest: number = findIndex(
     withoutDraggable,
@@ -89,7 +92,7 @@ export default ({
 
   const proposedIndex: number = indexOfClosest - 1;
 
-  // cannot move before start of set
+  // There is no displaced item before
   if (proposedIndex < 0) {
     return null;
   }
