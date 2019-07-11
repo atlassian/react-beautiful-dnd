@@ -44,16 +44,10 @@ type Dragging = {|
 type Phase = Idle | Pending | Dragging;
 
 const idle: Idle = { type: 'IDLE' };
-export const timeForLongPress: number = 150;
+// Decreased from 150 as a work around for an issue for forcepress on iOS
+// https://github.com/atlassian/react-beautiful-dnd/issues/1401
+export const timeForLongPress: number = 120;
 export const forcePressThreshold: number = 0.15;
-
-// window.addEventListener(
-//   'touchmove',
-//   (event: Event) => {
-//     console.log('TOUCHMOVE. prevented?', event.defaultPrevented);
-//   },
-//   { capture: false, passive: false },
-// );
 
 type GetBindingArgs = {|
   cancel: () => void,
@@ -194,29 +188,46 @@ function getTargetBindings({
         // needed to use phase.actions
         invariant(phase.type !== 'IDLE');
 
-        // Opting out of respecting force press interactions
-        if (!phase.actions.shouldRespectForcePress()) {
-          event.preventDefault();
-          return;
-        }
-
-        // A force push action will no longer fire after a touchmove
-        // This is being super safe. While this situation should not occur we
-        // are still expressing that we want to opt out of force pressing
-        if (phase.type === 'DRAGGING' && phase.hasMoved) {
-          event.preventDefault();
-          return;
-        }
-
-        // A drag could be pending or has already started but no movement has occurred
+        // This is not fantastic logic, but it is done to account for
+        // and issue with forcepress on iOS
+        // Calling event.preventDefault() will currently opt out of scrolling and clicking
+        // https://github.com/atlassian/react-beautiful-dnd/issues/1401
 
         const touch: TouchWithForce = (event.touches[0]: any);
+        const isForcePress: boolean = touch.force >= forcePressThreshold;
 
-        if (touch.force >= forcePressThreshold) {
-          // this is an indirect cancel so we do not preventDefault
-          // we also want to allow the force press to occur
-          cancel();
+        if (!isForcePress) {
+          return;
         }
+
+        const shouldRespect: boolean = phase.actions.shouldRespectForcePress();
+
+        if (phase.type === 'PENDING') {
+          if (shouldRespect) {
+            cancel();
+          }
+          // If not respecting we just let the event go through
+          // It will not have an impact on the browser until
+          // there has been a sufficient time ellapsed
+          return;
+        }
+
+        // 'DRAGGING'
+
+        if (shouldRespect) {
+          if (phase.hasMoved) {
+            // After the user has moved we do not allow the dragging item to be force pressed
+            // This prevents strange behaviour such as a link preview opening mid drag
+            event.preventDefault();
+            return;
+          }
+          // indirect cancel
+          cancel();
+          return;
+        }
+
+        // not respecting during a drag
+        event.preventDefault();
       },
     },
     // Cancel on page visibility change
