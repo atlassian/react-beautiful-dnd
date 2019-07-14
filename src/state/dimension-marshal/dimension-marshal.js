@@ -111,10 +111,7 @@ export default (registry: Registry, callbacks: Callbacks) => {
     // all good if they where not already listening
     const home: DroppableDescriptor = collection.critical.droppable;
     registry.droppable
-      .getAll()
-      .filter(
-        (entry: DroppableEntry): boolean => entry.descriptor.type === home.type,
-      )
+      .getAllByType(home.type)
       .forEach((entry: DroppableEntry) => entry.callbacks.dragStopped());
 
     // Finally - clear our collection

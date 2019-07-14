@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { Id, DraggableId, DroppableId } from '../../types';
+import type { Id, TypeId, DraggableId, DroppableId } from '../../types';
 import type {
   Registry,
   DraggableAPI,
@@ -83,7 +83,10 @@ export default function createRegistry(): Registry {
     getById: getDraggableById,
     findById: findDraggableById,
     exists: (id: DraggableId): boolean => Boolean(findDraggableById(id)),
-    getAll: (): DraggableEntry[] => values(entries.draggables),
+    getAllByType: (type: TypeId): DraggableEntry[] =>
+      values(entries.draggables).filter(
+        (entry: DraggableEntry): boolean => entry.descriptor.type === type,
+      ),
   };
 
   function findDroppableById(id: DroppableId): ?DroppableEntry {
@@ -113,7 +116,10 @@ export default function createRegistry(): Registry {
     getById: getDroppableById,
     findById: findDroppableById,
     exists: (id: DroppableId): boolean => Boolean(findDroppableById(id)),
-    getAll: (): DroppableEntry[] => values(entries.droppables),
+    getAllByType: (type: TypeId): DroppableEntry[] =>
+      values(entries.droppables).filter(
+        (entry: DroppableEntry): boolean => entry.descriptor.type === type,
+      ),
   };
 
   function clean(): void {

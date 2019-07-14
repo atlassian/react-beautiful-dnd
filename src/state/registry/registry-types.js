@@ -10,6 +10,7 @@ import type {
   ScrollOptions,
   DroppableDescriptor,
   DroppableDimension,
+  TypeId,
 } from '../../types';
 
 export type GetDraggableDimensionFn = (
@@ -29,7 +30,7 @@ export type DraggableAPI = {|
   exists: (id: DraggableId) => boolean,
   getById: (id: DraggableId) => DraggableEntry,
   findById: (id: DraggableId) => ?DraggableEntry,
-  getAll: () => DraggableEntry[],
+  getAllByType: (type: TypeId) => DraggableEntry[],
 |};
 
 export type GetDroppableDimensionFn = (
@@ -64,7 +65,7 @@ export type DroppableAPI = {|
   exists: (id: DraggableId) => boolean,
   getById: (id: DroppableId) => DroppableEntry,
   findById: (id: DroppableId) => ?DroppableEntry,
-  getAll: () => DroppableEntry[],
+  getAllByType: (type: TypeId) => DroppableEntry[],
 |};
 
 export type Registry = {|

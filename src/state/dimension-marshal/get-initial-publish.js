@@ -8,7 +8,6 @@ import type {
   DroppableEntry,
 } from '../registry/registry-types';
 import { toDraggableMap, toDroppableMap } from '../dimension-structures';
-import { values } from '../../native-with-fallback';
 import type {
   DroppableDescriptor,
   DroppableDimension,
@@ -39,21 +38,13 @@ export default ({
   const home: DroppableDescriptor = critical.droppable;
 
   const droppables: DroppableDimension[] = registry.droppable
-    .getAll()
-    // Exclude things of the wrong type
-    .filter(
-      (entry: DroppableEntry): boolean => entry.descriptor.type === home.type,
-    )
+    .getAllByType(home.type)
     .map((entry: DroppableEntry): DroppableDimension =>
       entry.callbacks.getDimensionAndWatchScroll(windowScroll, scrollOptions),
     );
 
   const draggables: DraggableDimension[] = registry.draggable
-    .getAll()
-    .filter(
-      (entry: DraggableEntry): boolean =>
-        entry.descriptor.type === critical.draggable.type,
-    )
+    .getAllByType(critical.draggable.type)
     .map((entry: DraggableEntry): DraggableDimension =>
       entry.getDimension(windowScroll),
     );
