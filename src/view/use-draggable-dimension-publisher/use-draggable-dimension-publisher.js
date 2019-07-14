@@ -92,5 +92,5 @@ export default function useDraggableDimensionPublisher(args: Args) {
   useLayoutEffect(() => {
     registry.draggable.register(published);
     return () => registry.draggable.unregister(published);
-  });
+  }, [published, registry.draggable]);
 }
