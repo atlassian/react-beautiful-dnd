@@ -26,6 +26,7 @@ export type DraggableEntry = {|
 
 export type DraggableAPI = {|
   register: (entry: DraggableEntry) => void,
+  update: (entry: DraggableEntry, last: DraggableEntry) => void,
   unregister: (entry: DraggableEntry) => void,
   exists: (id: DraggableId) => boolean,
   getById: (id: DraggableId) => DraggableEntry,

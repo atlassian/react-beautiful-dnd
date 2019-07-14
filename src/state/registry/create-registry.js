@@ -69,6 +69,23 @@ export default function createRegistry(): Registry {
       entries.draggables[entry.descriptor.id] = entry;
       notify();
     },
+    update: (entry: DraggableEntry, last: DraggableEntry) => {
+      const current: ?DraggableEntry = entries.draggables[last.descriptor.id];
+
+      // item already removed
+      if (!current) {
+        return;
+      }
+
+      // id already used for another mount
+      if (current.uniqueId !== entry.uniqueId) {
+        return;
+      }
+
+      // We are safe to delete the old entry and add a new one
+      delete entries.draggables[last.descriptor.id];
+      entries.draggables[entry.descriptor.id] = entry;
+    },
     unregister: (entry: DraggableEntry) => {
       const current: DraggableEntry = getDraggableById(entry.descriptor.id);
 

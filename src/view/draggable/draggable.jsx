@@ -2,9 +2,9 @@
 import { useRef } from 'react';
 import { useMemo, useCallback } from 'use-memo-one';
 import getStyle from './get-style';
-import useDraggableDimensionPublisher, {
-  type Args as DimensionPublisherArgs,
-} from '../use-draggable-dimension-publisher/use-draggable-dimension-publisher';
+import useDraggablePublisher, {
+  type Args as PublisherArgs,
+} from '../use-draggable-publisher/use-draggable-publisher';
 import AppContext from '../context/app-context';
 import type {
   Props,
@@ -60,7 +60,7 @@ export default function Draggable(props: Props) {
   // Being super sure that isClone is not changing during a draggable lifecycle
   useClonePropValidation(isClone);
   if (!isClone) {
-    const forPublisher: DimensionPublisherArgs = useMemo(
+    const forPublisher: PublisherArgs = useMemo(
       () => ({
         draggableId,
         index,
@@ -78,7 +78,7 @@ export default function Draggable(props: Props) {
         shouldRespectForcePress,
       ],
     );
-    useDraggableDimensionPublisher(forPublisher);
+    useDraggablePublisher(forPublisher);
   }
   /* eslint-enable react-hooks/rules-of-hooks */
 

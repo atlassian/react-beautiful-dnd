@@ -2,6 +2,7 @@
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import { useMemo, useCallback } from 'use-memo-one';
+import { useRef } from 'react';
 import type {
   DraggableDescriptor,
   DraggableDimension,
@@ -29,7 +30,7 @@ export type Args = {|
   ...DraggableOptions,
 |};
 
-export default function useDraggableDimensionPublisher(args: Args) {
+export default function useDraggablePublisher(args: Args) {
   const uniqueId: Id = useUniqueId('draggable');
 
   const {
@@ -79,7 +80,7 @@ export default function useDraggableDimensionPublisher(args: Args) {
     [descriptor, getDraggableRef],
   );
 
-  const published: DraggableEntry = useMemo(
+  const entry: DraggableEntry = useMemo(
     () => ({
       uniqueId,
       descriptor,
@@ -89,8 +90,24 @@ export default function useDraggableDimensionPublisher(args: Args) {
     [descriptor, getDimension, options, uniqueId],
   );
 
+  const publishedRef = useRef<DraggableEntry>(entry);
+  const isFirstPublishRef = useRef<boolean>(true);
+
+  // mounting and unmounting
   useLayoutEffect(() => {
-    registry.draggable.register(published);
-    return () => registry.draggable.unregister(published);
-  }, [published, registry.draggable]);
+    registry.draggable.register(publishedRef.current);
+    return () => registry.draggable.unregister(publishedRef.current);
+  }, [registry.draggable]);
+
+  // updates while mounted
+  useLayoutEffect(() => {
+    if (isFirstPublishRef.current) {
+      isFirstPublishRef.current = false;
+      return;
+    }
+
+    const last: DraggableEntry = publishedRef.current;
+    publishedRef.current = entry;
+    registry.draggable.update(entry, last);
+  }, [entry, registry.draggable]);
 }
