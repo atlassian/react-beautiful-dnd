@@ -25,6 +25,12 @@ export type DraggableDescriptor = {|
   type: TypeId,
 |};
 
+export type DraggableOptions = {|
+  canDragInteractiveElements: boolean,
+  shouldRespectForcePress: boolean,
+  isEnabled: boolean,
+|};
+
 export type Direction = 'horizontal' | 'vertical';
 
 export type VerticalAxis = {|
