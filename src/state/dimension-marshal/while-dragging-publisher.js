@@ -9,11 +9,7 @@ import type {
   DraggableDescriptor,
   Critical,
 } from '../../types';
-import type {
-  Entries,
-  DroppableEntry,
-  RecollectDroppableOptions,
-} from './dimension-marshal-types';
+import type { RecollectDroppableOptions } from './dimension-marshal-types';
 import * as timings from '../../debug/timings';
 import { origin } from '../position';
 import { warning } from '../../dev-warning';

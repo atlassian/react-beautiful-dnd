@@ -4,7 +4,6 @@ import invariant from 'tiny-invariant';
 import type {
   DimensionMarshal,
   Callbacks,
-  GetDraggableDimensionFn,
   StartPublishingResult,
 } from './dimension-marshal-types';
 import createPublisher, {
@@ -19,12 +18,9 @@ import type {
 import type {
   DroppableId,
   DroppableDescriptor,
-  DraggableDescriptor,
   LiftRequest,
   Critical,
 } from '../../types';
-import { values } from '../../native-with-fallback';
-import { warning } from '../../dev-warning';
 
 type Collection = {|
   critical: Critical,
@@ -154,14 +150,7 @@ export default (registry: Registry, callbacks: Callbacks) => {
   };
 
   const marshal: DimensionMarshal = {
-    // dimension registration
-    // registerDraggable,
-    // updateDraggable,
-    // unregisterDraggable,
-    // registerDroppable,
-    // unregisterDroppable,
-
-    // // droppable changes
+    // Droppable changes
     updateDroppableIsEnabled,
     updateDroppableIsCombineEnabled,
     scrollDroppable,

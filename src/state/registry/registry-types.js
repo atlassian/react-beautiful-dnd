@@ -12,11 +12,15 @@ import type {
   DroppableDimension,
 } from '../../types';
 
+export type GetDraggableDimensionFn = (
+  windowScroll: Position,
+) => DraggableDimension;
+
 export type DraggableEntry = {|
   uniqueId: Id,
   descriptor: DraggableDescriptor,
   options: DraggableOptions,
-  getDimension: (windowScroll: Position) => DraggableDimension,
+  getDimension: GetDraggableDimensionFn,
 |};
 
 export type DraggableAPI = {|
