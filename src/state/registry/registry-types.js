@@ -60,6 +60,14 @@ export type DroppableEntry = {|
   callbacks: DroppableCallbacks,
 |};
 
+export type DraggableEntryMap = {
+  [id: DraggableId]: DraggableEntry,
+};
+
+export type DroppableEntryMap = {
+  [id: DroppableId]: DroppableEntry,
+};
+
 export type DroppableAPI = {|
   register: (entry: DroppableEntry) => void,
   unregister: (entry: DroppableEntry) => void,
@@ -69,9 +77,22 @@ export type DroppableAPI = {|
   getAllByType: (type: TypeId) => DroppableEntry[],
 |};
 
+export type RegistryEvent =
+  | {|
+      type: 'ADDITION',
+      value: DraggableEntry,
+    |}
+  | {|
+      type: 'REMOVAL',
+      value: DraggableId,
+    |};
+
+export type Subscribe = (event: RegistryEvent) => void;
+export type Unsubscribe = () => void;
+
 export type Registry = {|
   draggable: DraggableAPI,
   droppable: DroppableAPI,
-  subscribe: (cb: () => void) => () => void,
+  subscribe: (cb: Subscribe) => Unsubscribe,
   clean: () => void,
 |};

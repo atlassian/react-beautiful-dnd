@@ -8,30 +8,27 @@ import type {
   DroppableDimension,
   DraggableDescriptor,
   Critical,
+  DraggableIdMap,
 } from '../../types';
 import type { RecollectDroppableOptions } from './dimension-marshal-types';
+import type {
+  Registry,
+  DraggableEntry,
+  DraggableEntryMap,
+} from '../registry/registry-types';
 import * as timings from '../../debug/timings';
 import { origin } from '../position';
 import { warning } from '../../dev-warning';
 
 export type WhileDraggingPublisher = {|
-  add: (descriptor: DraggableDescriptor) => void,
-  remove: (descriptor: DraggableDescriptor) => void,
+  add: (entry: DraggableEntry) => void,
+  remove: (id: DraggableId) => void,
   stop: () => void,
 |};
 
-type DraggableMap = {
-  [id: DraggableId]: DraggableDescriptor,
-};
-
-type DroppableMap = {
-  [id: DroppableId]: true,
-};
-
 type Staging = {|
-  additions: DraggableMap,
-  removals: DraggableMap,
-  modified: DroppableMap,
+  additions: DraggableEntryMap,
+  removals: DraggableIdMap,
 |};
 
 type Callbacks = {|
@@ -41,19 +38,21 @@ type Callbacks = {|
 |};
 
 type Args = {|
-  getEntries: () => Entries,
+  registry: Registry,
   callbacks: Callbacks,
 |};
 
 const clean = (): Staging => ({
   additions: {},
   removals: {},
-  modified: {},
 });
 
 const timingKey: string = 'Publish collection from DOM';
 
-export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
+export default function createPublisher({
+  registry,
+  callbacks,
+}: Args): WhileDraggingPublisher {
   const advancedUsageWarning = (() => {
     // noop for production
     if (process.env.NODE_ENV === 'production') {
@@ -95,7 +94,7 @@ export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
       timings.start(timingKey);
 
       const entries: Entries = getEntries();
-      const { additions, removals, modified } = staging;
+      const { additions, removals } = staging;
 
       const added: DraggableDimension[] = Object.keys(additions)
         .map(
@@ -137,22 +136,21 @@ export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
     });
   };
 
-  const add = (descriptor: DraggableDescriptor) => {
-    staging.additions[descriptor.id] = descriptor;
-    staging.modified[descriptor.droppableId] = true;
+  const add = (entry: DraggableEntry) => {
+    const id: DraggableId = entry.descriptor.id;
+    staging.additions[id] = entry;
 
-    if (staging.removals[descriptor.id]) {
-      delete staging.removals[descriptor.id];
+    if (staging.removals[id]) {
+      delete staging.removals[id];
     }
     collect();
   };
 
-  const remove = (descriptor: DraggableDescriptor) => {
-    staging.removals[descriptor.id] = descriptor;
-    staging.modified[descriptor.droppableId] = true;
+  const remove = (id: DraggableId) => {
+    staging.removals[id] = true;
 
-    if (staging.additions[descriptor.id]) {
-      delete staging.additions[descriptor.id];
+    if (staging.additions[id]) {
+      delete staging.additions[id];
     }
     collect();
   };
@@ -172,4 +170,4 @@ export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
     remove,
     stop,
   };
-};
+}

@@ -9,24 +9,18 @@ import type {
   DraggableEntry,
   DroppableEntry,
   DroppableHandler,
+  RegistryEvent,
+  Subscribe,
+  Unsubscribe,
+  DraggableEntryMap,
+  DroppableEntryMap,
 } from './registry-types';
 import { values } from '../../native-with-fallback';
-
-type DraggableEntryMap = {
-  [id: DraggableId]: DraggableEntry,
-};
-
-type DroppableEntryMap = {
-  [id: DroppableId]: DroppableEntry,
-};
 
 type EntryMap = {
   draggables: DraggableEntryMap,
   droppables: DroppableEntryMap,
 };
-
-type Subscriber = () => void;
-type Unsubscribe = () => void;
 
 export default function createRegistry(): Registry {
   const entries: EntryMap = {
@@ -34,9 +28,9 @@ export default function createRegistry(): Registry {
     droppables: {},
   };
 
-  const subscribers: Subscriber[] = [];
+  const subscribers: Subscribe[] = [];
 
-  function subscribe(cb: Subscriber): Unsubscribe {
+  function subscribe(cb: Subscribe): Unsubscribe {
     subscribers.push(cb);
 
     return function unsubscribe(): void {
@@ -50,8 +44,8 @@ export default function createRegistry(): Registry {
     };
   }
 
-  function notify() {
-    subscribers.forEach(cb => cb());
+  function notify(event: RegistryEvent) {
+    subscribers.forEach(cb => cb(event));
   }
 
   function findDraggableById(id: DraggableId): ?DraggableEntry {
@@ -67,7 +61,7 @@ export default function createRegistry(): Registry {
   const draggableAPI: DraggableAPI = {
     register: (entry: DraggableEntry) => {
       entries.draggables[entry.descriptor.id] = entry;
-      notify();
+      notify({ type: 'ADDITION', value: entry });
     },
     update: (entry: DraggableEntry, last: DraggableEntry) => {
       const current: ?DraggableEntry = entries.draggables[last.descriptor.id];
@@ -87,15 +81,16 @@ export default function createRegistry(): Registry {
       entries.draggables[entry.descriptor.id] = entry;
     },
     unregister: (entry: DraggableEntry) => {
-      const current: DraggableEntry = getDraggableById(entry.descriptor.id);
+      const draggableId: DraggableId = entry.descriptor.id;
+      const current: DraggableEntry = getDraggableById(draggableId);
 
       // already changed
       if (entry.uniqueId !== current.uniqueId) {
         return;
       }
 
-      delete entries.draggables[entry.descriptor.id];
-      notify();
+      delete entries.draggables[draggableId];
+      notify({ type: 'REMOVAL', value: draggableId });
     },
     getById: getDraggableById,
     findById: findDraggableById,
