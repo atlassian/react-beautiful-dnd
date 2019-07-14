@@ -10,12 +10,13 @@ import * as dataAttr from '../data-attributes';
 import { origin } from '../../state/position';
 import getScroll from './get-scroll';
 import type {
-  DimensionMarshal,
+  DroppableEntry,
   DroppableCallbacks,
   RecollectDroppableOptions,
-} from '../../state/dimension-marshal/dimension-marshal-types';
+} from '../../state/registry/registry-types';
 import getEnv, { type Env } from './get-env';
 import type {
+  Id,
   DroppableId,
   TypeId,
   DroppableDimension,
@@ -32,6 +33,7 @@ import getListenerOptions from './get-listener-options';
 import useRequiredContext from '../use-required-context';
 import usePreviousRef from '../use-previous-ref';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
+import useUniqueId from '../use-unique-id';
 
 type Props = {|
   droppableId: DroppableId,
@@ -58,8 +60,10 @@ const getClosestScrollableFromDrag = (dragging: ?WhileDragging): ?Element =>
 export default function useDroppableDimensionPublisher(args: Props) {
   const whileDraggingRef = useRef<?WhileDragging>(null);
   const appContext: AppContextValue = useRequiredContext(AppContext);
-  const marshal: DimensionMarshal = appContext.marshal;
+  const uniqueId: Id = useUniqueId('droppable');
+  const { registry, marshal } = appContext;
   const previousRef = usePreviousRef(args);
+
   const descriptor = useMemo<DroppableDescriptor>(
     () => ({
       id: args.droppableId,
@@ -247,12 +251,21 @@ export default function useDroppableDimensionPublisher(args: Props) {
     };
   }, [dragStopped, getDimensionAndWatchScroll, recollect, scroll]);
 
+  const entry: DroppableEntry = useMemo(
+    () => ({
+      uniqueId,
+      descriptor,
+      callbacks,
+    }),
+    [callbacks, descriptor, uniqueId],
+  );
+
   // Register with the marshal and let it know of:
   // - any descriptor changes
   // - when it unmounts
   useLayoutEffect(() => {
-    publishedDescriptorRef.current = descriptor;
-    marshal.registerDroppable(descriptor, callbacks);
+    publishedDescriptorRef.current = entry.descriptor;
+    registry.droppable.register(entry);
 
     return () => {
       if (whileDraggingRef.current) {
@@ -262,9 +275,9 @@ export default function useDroppableDimensionPublisher(args: Props) {
         dragStopped();
       }
 
-      marshal.unregisterDroppable(descriptor);
+      registry.droppable.unregister(entry);
     };
-  }, [callbacks, descriptor, dragStopped, marshal]);
+  }, [callbacks, descriptor, dragStopped, entry, marshal, registry.droppable]);
 
   // update is enabled with the marshal
   // only need to update when there is a drag

@@ -1,5 +1,4 @@
 // @flow
-import { useRef } from 'react';
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import { useMemo, useCallback } from 'use-memo-one';
@@ -7,28 +6,44 @@ import type {
   DraggableDescriptor,
   DraggableDimension,
   DraggableId,
+  Id,
+  DraggableOptions,
 } from '../../types';
-import type { DimensionMarshal } from '../../state/dimension-marshal/dimension-marshal-types';
+import type {
+  Registry,
+  DraggableEntry,
+} from '../../state/registry/registry-types';
 import useRequiredContext from '../use-required-context';
 import AppContext, { type AppContextValue } from '../context/app-context';
-import getDimension from './get-dimension';
+import makeDimension from './get-dimension';
 import DroppableContext, {
   type DroppableContextValue,
 } from '../context/droppable-context';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
+import useUniqueId from '../use-unique-id';
 
 export type Args = {|
   draggableId: DraggableId,
   index: number,
   getDraggableRef: () => ?HTMLElement,
+  ...DraggableOptions,
 |};
 
 export default function useDraggableDimensionPublisher(args: Args) {
-  const { draggableId, index, getDraggableRef } = args;
+  const uniqueId: Id = useUniqueId('draggable');
+
+  const {
+    draggableId,
+    index,
+    getDraggableRef,
+    canDragInteractiveElements,
+    shouldRespectForcePress,
+    isEnabled,
+  } = args;
 
   // App context
   const appContext: AppContextValue = useRequiredContext(AppContext);
-  const marshal: DimensionMarshal = appContext.marshal;
+  const registry: Registry = appContext.registry;
 
   // Droppable context
   const droppableContext: DroppableContextValue = useRequiredContext(
@@ -46,34 +61,36 @@ export default function useDraggableDimensionPublisher(args: Args) {
     return result;
   }, [draggableId, droppableId, index, type]);
 
-  const publishedDescriptorRef = useRef<DraggableDescriptor>(descriptor);
-
-  const makeDimension = useCallback(
-    (windowScroll?: Position): DraggableDimension => {
-      const latest: DraggableDescriptor = publishedDescriptorRef.current;
-      const el: ?HTMLElement = getDraggableRef();
-      invariant(el, 'Cannot get dimension when no ref is set');
-      return getDimension(latest, el, windowScroll);
-    },
-    [getDraggableRef],
+  const options: DraggableOptions = useMemo(
+    () => ({
+      canDragInteractiveElements,
+      shouldRespectForcePress,
+      isEnabled,
+    }),
+    [canDragInteractiveElements, isEnabled, shouldRespectForcePress],
   );
 
-  // handle mounting / unmounting
+  const getDimension = useCallback(
+    (windowScroll?: Position): DraggableDimension => {
+      const el: ?HTMLElement = getDraggableRef();
+      invariant(el, 'Cannot get dimension when no ref is set');
+      return makeDimension(descriptor, el, windowScroll);
+    },
+    [descriptor, getDraggableRef],
+  );
+
+  const published: DraggableEntry = useMemo(
+    () => ({
+      uniqueId,
+      descriptor,
+      options,
+      getDimension,
+    }),
+    [descriptor, getDimension, options, uniqueId],
+  );
+
   useLayoutEffect(() => {
-    marshal.registerDraggable(publishedDescriptorRef.current, makeDimension);
-    return () => marshal.unregisterDraggable(publishedDescriptorRef.current);
-  }, [makeDimension, marshal]);
-
-  // handle updates to descriptor
-  useLayoutEffect(() => {
-    // this will happen when mounting
-    if (publishedDescriptorRef.current === descriptor) {
-      return;
-    }
-
-    const previous: DraggableDescriptor = publishedDescriptorRef.current;
-    publishedDescriptorRef.current = descriptor;
-
-    marshal.updateDraggable(previous, descriptor, makeDimension);
-  }, [descriptor, makeDimension, marshal]);
+    registry.draggable.register(published);
+    return () => registry.draggable.unregister(published);
+  });
 }

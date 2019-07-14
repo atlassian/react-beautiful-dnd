@@ -13,7 +13,6 @@ import type {
   DragHandleProps,
 } from './draggable-types';
 import { useValidation, useClonePropValidation } from './use-validation';
-import { serialize } from '../draggable-options';
 import useRequiredContext from '../use-required-context';
 
 function preventHtml5Dnd(event: DragEvent) {
@@ -66,8 +65,18 @@ export default function Draggable(props: Props) {
         draggableId,
         index,
         getDraggableRef: getRef,
+        canDragInteractiveElements,
+        shouldRespectForcePress,
+        isEnabled,
       }),
-      [draggableId, getRef, index],
+      [
+        canDragInteractiveElements,
+        draggableId,
+        getRef,
+        index,
+        isEnabled,
+        shouldRespectForcePress,
+      ],
     );
     useDraggableDimensionPublisher(forPublisher);
   }
@@ -120,11 +129,6 @@ export default function Draggable(props: Props) {
       draggableProps: {
         'data-rbd-draggable-context-id': contextId,
         'data-rbd-draggable-id': draggableId,
-        'data-rbd-draggable-options': serialize({
-          canDragInteractiveElements,
-          shouldRespectForcePress,
-          isEnabled,
-        }),
         style,
         onTransitionEnd,
       },
@@ -132,17 +136,7 @@ export default function Draggable(props: Props) {
     };
 
     return result;
-  }, [
-    canDragInteractiveElements,
-    contextId,
-    dragHandleProps,
-    draggableId,
-    isEnabled,
-    mapped,
-    onMoveEnd,
-    setRef,
-    shouldRespectForcePress,
-  ]);
+  }, [contextId, dragHandleProps, draggableId, mapped, onMoveEnd, setRef]);
 
   return children(provided, mapped.snapshot);
 }

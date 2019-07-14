@@ -11,6 +11,8 @@ import scrollWindow from '../window/scroll-window';
 import createAutoScroller from '../../state/auto-scroller';
 import useStyleMarshal from '../use-style-marshal/use-style-marshal';
 import useFocusMarshal from '../use-focus-marshal';
+import useRegistry from '../../state/registry/use-registry';
+import type { Registry } from '../../state/registry/registry-types';
 import type { FocusMarshal } from '../use-focus-marshal/focus-marshal-types';
 import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
 import type { StyleMarshal } from '../use-style-marshal/style-marshal-types';
@@ -115,10 +117,12 @@ export default function App(props: Props) {
       ),
     [lazyDispatch],
   );
-  const dimensionMarshal: DimensionMarshal = useMemo<DimensionMarshal>(
-    () => createDimensionMarshal(callbacks),
-    [callbacks],
-  );
+
+  const registry: Registry = useRegistry();
+
+  const dimensionMarshal: DimensionMarshal = useMemo<DimensionMarshal>(() => {
+    return createDimensionMarshal(registry, callbacks);
+  }, [registry, callbacks]);
 
   const autoScroller: AutoScroller = useMemo<AutoScroller>(
     () =>
@@ -198,6 +202,7 @@ export default function App(props: Props) {
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
       liftInstructionId,
+      registry,
     }),
     [
       contextId,
@@ -206,12 +211,14 @@ export default function App(props: Props) {
       getCanLift,
       getIsMovementAllowed,
       liftInstructionId,
+      registry,
     ],
   );
 
   useSensorMarshal({
     contextId,
     store,
+    registry,
     customSensors: sensors,
     // default to 'true' unless 'false' is explicitly passed
     enableDefaultSensors: props.enableDefaultSensors !== false,

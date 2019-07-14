@@ -1,12 +1,12 @@
 // @flow
 import type { Position } from 'css-box-model';
 import * as timings from '../../debug/timings';
+import type { StartPublishingResult } from './dimension-marshal-types';
 import type {
-  Entries,
-  DroppableEntry,
+  Registry,
   DraggableEntry,
-  StartPublishingResult,
-} from './dimension-marshal-types';
+  DroppableEntry,
+} from '../registry/registry-types';
 import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import { values } from '../../native-with-fallback';
 import type {
@@ -23,13 +23,13 @@ import getViewport from '../../view/window/get-viewport';
 type Args = {|
   critical: Critical,
   scrollOptions: ScrollOptions,
-  entries: Entries,
+  registry: Registry,
 |};
 
 export default ({
   critical,
   scrollOptions,
-  entries,
+  registry,
 }: Args): StartPublishingResult => {
   const timingKey: string = 'Initial collection from DOM';
   timings.start(timingKey);
@@ -38,7 +38,8 @@ export default ({
 
   const home: DroppableDescriptor = critical.droppable;
 
-  const droppables: DroppableDimension[] = values(entries.droppables)
+  const droppables: DroppableDimension[] = registry.droppable
+    .getAll()
     // Exclude things of the wrong type
     .filter(
       (entry: DroppableEntry): boolean => entry.descriptor.type === home.type,
@@ -47,7 +48,8 @@ export default ({
       entry.callbacks.getDimensionAndWatchScroll(windowScroll, scrollOptions),
     );
 
-  const draggables: DraggableDimension[] = values(entries.draggables)
+  const draggables: DraggableDimension[] = registry.draggable
+    .getAll()
     .filter(
       (entry: DraggableEntry): boolean =>
         entry.descriptor.type === critical.draggable.type,

@@ -33,39 +33,39 @@ export type RecollectDroppableOptions = {|
   withoutPlaceholder: boolean,
 |};
 
-export type DroppableCallbacks = {|
-  // a drag is starting
-  getDimensionAndWatchScroll: GetDroppableDimensionFn,
-  recollect: (options: RecollectDroppableOptions) => DroppableDimension,
-  // scroll a droppable
-  scroll: (change: Position) => void,
-  // If the Droppable is listening for scroll events - it needs to stop!
-  // Can be called on droppables that have not been asked to watch scroll
-  dragStopped: () => void,
-|};
+// export type DroppableCallbacks = {|
+//   // a drag is starting
+//   getDimensionAndWatchScroll: GetDroppableDimensionFn,
+//   recollect: (options: RecollectDroppableOptions) => DroppableDimension,
+//   // scroll a droppable
+//   scroll: (change: Position) => void,
+//   // If the Droppable is listening for scroll events - it needs to stop!
+//   // Can be called on droppables that have not been asked to watch scroll
+//   dragStopped: () => void,
+// |};
 
-export type DroppableEntry = {|
-  descriptor: DroppableDescriptor,
-  callbacks: DroppableCallbacks,
-|};
+// export type DroppableEntry = {|
+//   descriptor: DroppableDescriptor,
+//   callbacks: DroppableCallbacks,
+// |};
 
-export type DraggableEntry = {|
-  descriptor: DraggableDescriptor,
-  getDimension: GetDraggableDimensionFn,
-|};
+// export type DraggableEntry = {|
+//   descriptor: DraggableDescriptor,
+//   getDimension: GetDraggableDimensionFn,
+// |};
 
-export type DraggableEntryMap = {
-  [key: DraggableId]: DraggableEntry,
-};
+// export type DraggableEntryMap = {
+//   [key: DraggableId]: DraggableEntry,
+// };
 
-export type DroppableEntryMap = {
-  [key: DroppableId]: DroppableEntry,
-};
+// export type DroppableEntryMap = {
+//   [key: DroppableId]: DroppableEntry,
+// };
 
-export type Entries = {|
-  droppables: DroppableEntryMap,
-  draggables: DraggableEntryMap,
-|};
+// export type Entries = {|
+//   droppables: DroppableEntryMap,
+//   draggables: DraggableEntryMap,
+// |};
 
 export type StartPublishingResult = {|
   critical: Critical,
@@ -75,21 +75,21 @@ export type StartPublishingResult = {|
 
 export type DimensionMarshal = {|
   // Draggable
-  registerDraggable: (
-    descriptor: DraggableDescriptor,
-    getDimension: GetDraggableDimensionFn,
-  ) => void,
-  updateDraggable: (
-    previous: DraggableDescriptor,
-    descriptor: DraggableDescriptor,
-    getDimension: GetDraggableDimensionFn,
-  ) => void,
-  unregisterDraggable: (descriptor: DraggableDescriptor) => void,
-  // Droppable
-  registerDroppable: (
-    descriptor: DroppableDescriptor,
-    callbacks: DroppableCallbacks,
-  ) => void,
+  // registerDraggable: (
+  //   descriptor: DraggableDescriptor,
+  //   getDimension: GetDraggableDimensionFn,
+  // ) => void,
+  // updateDraggable: (
+  //   previous: DraggableDescriptor,
+  //   descriptor: DraggableDescriptor,
+  //   getDimension: GetDraggableDimensionFn,
+  // ) => void,
+  // unregisterDraggable: (descriptor: DraggableDescriptor) => void,
+  // // Droppable
+  // registerDroppable: (
+  //   descriptor: DroppableDescriptor,
+  //   callbacks: DroppableCallbacks,
+  // ) => void,
   // it is possible for a droppable to change whether it is enabled during a drag
   updateDroppableIsEnabled: (id: DroppableId, isEnabled: boolean) => void,
   // it is also possible to update whether combining is enabled

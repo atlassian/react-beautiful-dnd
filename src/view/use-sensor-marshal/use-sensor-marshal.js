@@ -19,7 +19,6 @@ import type {
 } from '../../types';
 import create, { type Lock, type LockAPI } from './lock';
 import type { Store, Action } from '../../state/store-types';
-import tryGetDraggable from './try-get-draggable';
 import canStartDrag from '../../state/can-start-drag';
 import {
   move as moveAction,
@@ -31,17 +30,21 @@ import {
   lift as liftAction,
   type LiftArgs as LiftActionArgs,
 } from '../../state/action-creators';
+import type {
+  Registry,
+  DraggableEntry,
+} from '../../state/registry/registry-types';
 import useMouseSensor from './sensors/use-mouse-sensor';
 import useKeyboardSensor from './sensors/use-keyboard-sensor';
 import useTouchSensor from './sensors/use-touch-sensor';
 import useValidateSensorHooks from './use-validate-sensor-hooks';
 import isEventInInteractiveElement from './is-event-in-interactive-element';
-import getDataFromDraggable from './get-data-from-draggable';
 import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 import { noop } from '../../empty';
 import tryGetClosestDraggableIdFromEvent from './try-get-closest-draggable-id-from-event';
+import tryGetDraggable from './try-get-draggable';
 
 function preventDefault(event: Event) {
   event.preventDefault();
@@ -100,6 +103,7 @@ function isActive({
 type TryStartArgs = {|
   lockAPI: LockAPI,
   contextId: ContextId,
+  registry: Registry,
   store: Store,
   draggableId: DraggableId,
   forceSensorStop: ?() => void,
@@ -110,6 +114,7 @@ function tryStart({
   lockAPI,
   contextId,
   store,
+  registry,
   draggableId,
   forceSensorStop,
   sourceEvent,
@@ -119,37 +124,36 @@ function tryStart({
     return null;
   }
 
-  // TODO: can we get this from the dimension marshal?
-  const draggable: ?HTMLElement = tryGetDraggable(contextId, draggableId);
+  const entry: ?DraggableEntry = registry.draggable.findById(draggableId);
 
-  if (!draggable) {
+  if (!entry) {
     warning(`Unable to find draggable with id: ${draggableId}`);
     return null;
   }
 
-  const {
-    id,
-    isEnabled,
-    canDragInteractiveElements,
-    shouldRespectForcePress,
-  } = getDataFromDraggable(draggable);
+  const el: ?HTMLElement = tryGetDraggable(contextId, entry.descriptor.id);
+
+  if (!el) {
+    warning(`Unable to find draggable element with id: ${draggableId}`);
+    return null;
+  }
 
   // draggable is not enabled - cannot start
-  if (!isEnabled) {
+  if (!entry.options.isEnabled) {
     return null;
   }
 
   // do not allow dragging from interactive elements
   if (
     sourceEvent &&
-    !canDragInteractiveElements &&
-    isEventInInteractiveElement(draggable, sourceEvent)
+    !entry.options.canDragInteractiveElements &&
+    isEventInInteractiveElement(el, sourceEvent)
   ) {
     return null;
   }
 
   // Application might now allow dragging right now
-  if (!canStartDrag(store.getState(), id)) {
+  if (!canStartDrag(store.getState(), draggableId)) {
     return null;
   }
 
@@ -158,7 +162,8 @@ function tryStart({
   let phase: LockPhase = 'PRE_DRAG';
 
   function getShouldRespectForcePress(): boolean {
-    return shouldRespectForcePress;
+    const item: DraggableEntry = registry.draggable.getById(draggableId);
+    return item.options.shouldRespectForcePress;
   }
 
   function isLockActive(): boolean {
@@ -238,7 +243,11 @@ function tryStart({
     });
 
     const api = lift({
-      liftActionArgs: { id, clientSelection, movementMode: 'FLUID' },
+      liftActionArgs: {
+        id: draggableId,
+        clientSelection,
+        movementMode: 'FLUID',
+      },
       cleanup: () => move.cancel(),
       actions: { move },
     });
@@ -259,8 +268,8 @@ function tryStart({
 
     return lift({
       liftActionArgs: {
-        id,
-        clientSelection: getBorderBoxCenterPosition(draggable),
+        id: draggableId,
+        clientSelection: getBorderBoxCenterPosition(el),
         movementMode: 'SNAP',
       },
       cleanup: noop,
@@ -301,6 +310,7 @@ function tryStart({
 
 type SensorMarshalArgs = {|
   contextId: ContextId,
+  registry: Registry,
   store: Store,
   customSensors: ?(Sensor[]),
   enableDefaultSensors: boolean,
@@ -315,6 +325,7 @@ const defaultSensors: Sensor[] = [
 export default function useSensorMarshal({
   contextId,
   store,
+  registry,
   customSensors,
   enableDefaultSensors,
 }: SensorMarshalArgs) {
@@ -362,6 +373,7 @@ export default function useSensorMarshal({
     ): ?PreDragActions =>
       tryStart({
         lockAPI,
+        registry,
         contextId,
         store,
         draggableId,
@@ -369,7 +381,7 @@ export default function useSensorMarshal({
         sourceEvent:
           options && options.sourceEvent ? options.sourceEvent : null,
       }),
-    [contextId, lockAPI, store],
+    [contextId, lockAPI, registry, store],
   );
 
   const tryGetClosestDraggableId = useCallback(
