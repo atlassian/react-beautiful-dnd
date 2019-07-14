@@ -158,6 +158,10 @@ export type DraggableIdMap = {
   [id: DraggableId]: true,
 };
 
+export type DroppableIdMap = {
+  [id: DroppableId]: true,
+};
+
 export type DraggableDimensionMap = { [key: DraggableId]: DraggableDimension };
 export type DroppableDimensionMap = { [key: DroppableId]: DroppableDimension };
 

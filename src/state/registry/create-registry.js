@@ -1,16 +1,14 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { Id, TypeId, DraggableId, DroppableId } from '../../types';
+import type { TypeId, DraggableId, DroppableId } from '../../types';
 import type {
   Registry,
   DraggableAPI,
   DroppableAPI,
-  DroppableEvent,
   DraggableEntry,
   DroppableEntry,
-  DroppableHandler,
   RegistryEvent,
-  Subscribe,
+  Subscriber,
   Unsubscribe,
   DraggableEntryMap,
   DroppableEntryMap,
@@ -28,9 +26,9 @@ export default function createRegistry(): Registry {
     droppables: {},
   };
 
-  const subscribers: Subscribe[] = [];
+  const subscribers: Subscriber[] = [];
 
-  function subscribe(cb: Subscribe): Unsubscribe {
+  function subscribe(cb: Subscriber): Unsubscribe {
     subscribers.push(cb);
 
     return function unsubscribe(): void {
@@ -45,7 +43,9 @@ export default function createRegistry(): Registry {
   }
 
   function notify(event: RegistryEvent) {
-    subscribers.forEach(cb => cb(event));
+    if (subscribers.length) {
+      subscribers.forEach(cb => cb(event));
+    }
   }
 
   function findDraggableById(id: DraggableId): ?DraggableEntry {
@@ -90,7 +90,7 @@ export default function createRegistry(): Registry {
       }
 
       delete entries.draggables[draggableId];
-      notify({ type: 'REMOVAL', value: draggableId });
+      notify({ type: 'REMOVAL', value: entry.descriptor });
     },
     getById: getDraggableById,
     findById: findDraggableById,

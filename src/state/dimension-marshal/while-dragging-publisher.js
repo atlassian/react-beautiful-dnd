@@ -1,17 +1,18 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   DraggableId,
   DroppableId,
+  DraggableDescriptor,
   Published,
   DraggableDimension,
   DroppableDimension,
-  DraggableDescriptor,
+  DroppableIdMap,
   Critical,
   DraggableIdMap,
 } from '../../types';
 import type { RecollectDroppableOptions } from './dimension-marshal-types';
 import type {
+  DroppableEntry,
   Registry,
   DraggableEntry,
   DraggableEntryMap,
@@ -22,13 +23,14 @@ import { warning } from '../../dev-warning';
 
 export type WhileDraggingPublisher = {|
   add: (entry: DraggableEntry) => void,
-  remove: (id: DraggableId) => void,
+  remove: (descriptor: DraggableDescriptor) => void,
   stop: () => void,
 |};
 
 type Staging = {|
   additions: DraggableEntryMap,
   removals: DraggableIdMap,
+  modified: DroppableIdMap,
 |};
 
 type Callbacks = {|
@@ -45,6 +47,7 @@ type Args = {|
 const clean = (): Staging => ({
   additions: {},
   removals: {},
+  modified: {},
 });
 
 const timingKey: string = 'Publish collection from DOM';
@@ -93,14 +96,13 @@ export default function createPublisher({
       const critical: Critical = callbacks.getCritical();
       timings.start(timingKey);
 
-      const entries: Entries = getEntries();
-      const { additions, removals } = staging;
+      const { additions, removals, modified } = staging;
 
       const added: DraggableDimension[] = Object.keys(additions)
         .map(
           // Using the origin as the window scroll. This will be adjusted when processing the published values
           (id: DraggableId): DraggableDimension =>
-            entries.draggables[id].getDimension(origin),
+            registry.draggable.getById(id).getDimension(origin),
         )
         // Dimensions are not guarenteed to be ordered in the same order as keys
         // So we need to sort them so they are in the correct order
@@ -111,8 +113,7 @@ export default function createPublisher({
 
       const updated: DroppableDimension[] = Object.keys(modified).map(
         (id: DroppableId) => {
-          const entry: ?DroppableEntry = entries.droppables[id];
-          invariant(entry, 'Cannot find dynamically added droppable in cache');
+          const entry: DroppableEntry = registry.droppable.getById(id);
           const isHome: boolean = entry.descriptor.id === critical.droppable.id;
 
           // need to keep the placeholder when in home list
@@ -139,6 +140,7 @@ export default function createPublisher({
   const add = (entry: DraggableEntry) => {
     const id: DraggableId = entry.descriptor.id;
     staging.additions[id] = entry;
+    staging.modified[entry.descriptor.droppableId] = true;
 
     if (staging.removals[id]) {
       delete staging.removals[id];
@@ -146,11 +148,12 @@ export default function createPublisher({
     collect();
   };
 
-  const remove = (id: DraggableId) => {
-    staging.removals[id] = true;
+  const remove = (descriptor: DraggableDescriptor) => {
+    staging.removals[descriptor.id] = true;
+    staging.modified[descriptor.droppableId] = true;
 
-    if (staging.additions[id]) {
-      delete staging.additions[id];
+    if (staging.additions[descriptor.id]) {
+      delete staging.additions[descriptor.id];
     }
     collect();
   };

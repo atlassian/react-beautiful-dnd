@@ -5,7 +5,6 @@ import type {
   CollectingState,
   DropPendingState,
   Published,
-  Critical,
   Scrollable,
   DraggableId,
   DraggableDimension,
@@ -17,11 +16,7 @@ import type {
 import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
 import adjustAdditionsForScrollChanges from '../publish-while-dragging/update-draggables/adjust-additions-for-scroll-changes';
-import {
-  toDraggableMap,
-  toDraggableList,
-  toDroppableMap,
-} from '../dimension-structures';
+import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
 import scrollDroppable from '../droppable/scroll-droppable';
 

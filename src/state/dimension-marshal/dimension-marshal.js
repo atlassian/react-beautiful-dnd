@@ -14,16 +14,21 @@ import type {
   Registry,
   DroppableEntry,
   DraggableEntry,
+  Subscriber,
+  Unsubscribe,
+  RegistryEvent,
 } from '../registry/registry-types';
 import type {
   DroppableId,
   DroppableDescriptor,
   LiftRequest,
   Critical,
+  DraggableId,
 } from '../../types';
 
 type Collection = {|
   critical: Critical,
+  unsubscribe: Unsubscribe,
 |};
 
 export default (registry: Registry, callbacks: Callbacks) => {
@@ -114,8 +119,30 @@ export default (registry: Registry, callbacks: Callbacks) => {
       .getAllByType(home.type)
       .forEach((entry: DroppableEntry) => entry.callbacks.dragStopped());
 
+    // Unsubscribe from registry updates
+    collection.unsubscribe();
     // Finally - clear our collection
     collection = null;
+  };
+
+  const subscriber: Subscriber = (event: RegistryEvent) => {
+    invariant(
+      collection,
+      'Should only be subscribed when a collection is occurring',
+    );
+    // The dragging item can be add and removed when using a clone
+    const criticalId: DraggableId = collection.critical.draggable.id;
+
+    if (event.type === 'ADDITION') {
+      if (event.value.descriptor.id !== criticalId) {
+        publisher.add(event.value);
+      }
+    }
+    if (event.type === 'REMOVAL') {
+      if (event.value.id !== criticalId) {
+        publisher.remove(event.value);
+      }
+    }
   };
 
   const startPublishing = (request: LiftRequest): StartPublishingResult => {
@@ -135,8 +162,11 @@ export default (registry: Registry, callbacks: Callbacks) => {
       droppable: home.descriptor,
     };
 
+    const unsubscribe = registry.subscribe(subscriber);
+
     collection = {
       critical,
+      unsubscribe,
     };
 
     return getInitialPublish({

@@ -84,15 +84,15 @@ export type RegistryEvent =
     |}
   | {|
       type: 'REMOVAL',
-      value: DraggableId,
+      value: DraggableDescriptor,
     |};
 
-export type Subscribe = (event: RegistryEvent) => void;
+export type Subscriber = (event: RegistryEvent) => void;
 export type Unsubscribe = () => void;
 
 export type Registry = {|
   draggable: DraggableAPI,
   droppable: DroppableAPI,
-  subscribe: (cb: Subscribe) => Unsubscribe,
+  subscribe: (cb: Subscriber) => Unsubscribe,
   clean: () => void,
 |};
