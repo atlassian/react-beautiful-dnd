@@ -8,7 +8,6 @@ import setWindowScroll from '../../../utils/set-window-scroll';
 import {
   dispatchWindowEvent,
   dispatchWindowKeyDownEvent,
-  dispatchWindowMouseEvent,
 } from '../../../utils/user-input-util';
 import {
   callbacksCalled,
