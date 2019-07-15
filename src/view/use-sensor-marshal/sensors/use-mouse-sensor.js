@@ -8,6 +8,7 @@ import type {
   FluidDragActions,
   DraggableId,
   SensorAPI,
+  DraggableOptions,
 } from '../../../types';
 import type {
   EventBinding,
@@ -177,41 +178,28 @@ function getCaptureBindings({
         }
       },
     },
+
     // Need to opt out of dragging if the user is a force press
     // Only for safari which has decided to introduce its own custom way of doing things
     // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
     {
-      eventName: 'webkitmouseforcechanged',
-      fn: (event: MouseForceChangedEvent) => {
-        if (
-          event.webkitForce == null ||
-          (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
-        ) {
-          warning(
-            'handling a mouse force changed event when it is not supported',
-          );
-          return;
-        }
-
-        const forcePressThreshold: number = (MouseEvent: any)
-          .WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
-        const isForcePressing: boolean =
-          event.webkitForce >= forcePressThreshold;
-
+      eventName: 'webkitmouseforcedown',
+      // it is considered a indirect cancel so we do not
+      // prevent default in any situation.
+      fn: (event: Event) => {
         const phase: Phase = getPhase();
         invariant(phase.type !== 'IDLE', 'Unexpected phase');
 
-        // might not be respecting force press
-        if (!phase.actions.shouldRespectForcePress()) {
-          event.preventDefault();
+        if (phase.actions.shouldRespectForcePress()) {
+          cancel();
           return;
         }
 
-        if (isForcePressing) {
-          // it is considered a indirect cancel so we do not
-          // prevent default in any situation.
-          cancel();
-        }
+        // This technically doesn't do anything.
+        // It won't do anything if `webkitmouseforcewillbegin` is prevented.
+        // But it is a good signal that we want to opt out of this
+
+        event.preventDefault();
       },
     },
     // Cancel on page visibility change
@@ -282,6 +270,40 @@ export default function useMouseSensor(api: SensorAPI) {
     [api],
   );
 
+  const preventForcePressBinding: EventBinding = useMemo(
+    () => ({
+      eventName: 'webkitmouseforcewillbegin',
+      fn: (event: Event) => {
+        if (event.defaultPrevented) {
+          return;
+        }
+
+        const id: ?DraggableId = api.tryGetClosestDraggableId(event);
+
+        if (!id) {
+          return;
+        }
+
+        const options: ?DraggableOptions = api.tryGetOptionsForDraggable(id);
+
+        if (!options) {
+          return;
+        }
+
+        if (options.shouldRespectForcePress) {
+          return;
+        }
+
+        if (!api.canGetLock(id)) {
+          return;
+        }
+
+        event.preventDefault();
+      },
+    }),
+    [api],
+  );
+
   const listenForCapture = useCallback(
     function listenForCapture() {
       const options: EventOptions = {
@@ -291,11 +313,11 @@ export default function useMouseSensor(api: SensorAPI) {
 
       unbindEventsRef.current = bindEvents(
         window,
-        [startCaptureBinding],
+        [preventForcePressBinding, startCaptureBinding],
         options,
       );
     },
-    [startCaptureBinding],
+    [preventForcePressBinding, startCaptureBinding],
   );
 
   const stop = useCallback(() => {

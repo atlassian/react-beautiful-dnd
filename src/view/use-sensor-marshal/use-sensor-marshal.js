@@ -16,6 +16,7 @@ import type {
   SensorAPI,
   TryGetLock,
   TryGetLockOptions,
+  DraggableOptions,
 } from '../../types';
 import create, { type Lock, type LockAPI } from './lock';
 import type { Store, Action } from '../../state/store-types';
@@ -100,6 +101,46 @@ function isActive({
   return true;
 }
 
+type CanStartArgs = {|
+  lockAPI: LockAPI,
+  contextId: ContextId,
+  registry: Registry,
+  store: Store,
+  draggableId: DraggableId,
+|};
+
+function canStart({
+  lockAPI,
+  contextId,
+  store,
+  registry,
+  draggableId,
+}: CanStartArgs): boolean {
+  // lock is already claimed - cannot start
+  if (lockAPI.isClaimed()) {
+    return false;
+  }
+
+  const entry: ?DraggableEntry = registry.draggable.findById(draggableId);
+
+  if (!entry) {
+    warning(`Unable to find draggable with id: ${draggableId}`);
+    return false;
+  }
+
+  // draggable is not enabled - cannot start
+  if (!entry.options.isEnabled) {
+    return false;
+  }
+
+  // Application might now allow dragging right now
+  if (!canStartDrag(store.getState(), draggableId)) {
+    return false;
+  }
+
+  return true;
+}
+
 type TryStartArgs = {|
   lockAPI: LockAPI,
   contextId: ContextId,
@@ -119,18 +160,19 @@ function tryStart({
   forceSensorStop,
   sourceEvent,
 }: TryStartArgs): ?PreDragActions {
-  // lock is already claimed - cannot start
-  if (lockAPI.isClaimed()) {
+  const shouldStart: boolean = canStart({
+    lockAPI,
+    contextId,
+    store,
+    registry,
+    draggableId,
+  });
+
+  if (!shouldStart) {
     return null;
   }
 
-  const entry: ?DraggableEntry = registry.draggable.findById(draggableId);
-
-  if (!entry) {
-    warning(`Unable to find draggable with id: ${draggableId}`);
-    return null;
-  }
-
+  const entry: DraggableEntry = registry.draggable.getById(draggableId);
   const el: ?HTMLElement = tryGetDraggable(contextId, entry.descriptor.id);
 
   if (!el) {
@@ -138,22 +180,12 @@ function tryStart({
     return null;
   }
 
-  // draggable is not enabled - cannot start
-  if (!entry.options.isEnabled) {
-    return null;
-  }
-
-  // do not allow dragging from interactive elements
+  // Do not allow dragging from interactive elements
   if (
     sourceEvent &&
     !entry.options.canDragInteractiveElements &&
     isEventInInteractiveElement(el, sourceEvent)
   ) {
-    return null;
-  }
-
-  // Application might now allow dragging right now
-  if (!canStartDrag(store.getState(), draggableId)) {
     return null;
   }
 
@@ -365,6 +397,19 @@ export default function useSensorMarshal({
     return lockAPI.tryAbandon;
   }, [lockAPI.tryAbandon]);
 
+  const canGetLock = useCallback(
+    (draggableId: DraggableId): boolean => {
+      return canStart({
+        lockAPI,
+        registry,
+        contextId,
+        store,
+        draggableId,
+      });
+    },
+    [contextId, lockAPI, registry, store],
+  );
+
   const tryGetLock: TryGetLock = useCallback(
     (
       draggableId: DraggableId,
@@ -390,12 +435,27 @@ export default function useSensorMarshal({
     [contextId],
   );
 
+  const tryGetOptionsForDraggable = useCallback(
+    (id: DraggableId): ?DraggableOptions => {
+      const entry: ?DraggableEntry = registry.draggable.findById(id);
+      return entry ? entry.options : null;
+    },
+    [registry.draggable],
+  );
+
   const api: SensorAPI = useMemo(
     () => ({
+      canGetLock,
       tryGetLock,
       tryGetClosestDraggableId,
+      tryGetOptionsForDraggable,
     }),
-    [tryGetClosestDraggableId, tryGetLock],
+    [
+      canGetLock,
+      tryGetClosestDraggableId,
+      tryGetLock,
+      tryGetOptionsForDraggable,
+    ],
   );
 
   // Bad ass

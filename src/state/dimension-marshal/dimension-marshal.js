@@ -131,6 +131,7 @@ export default (registry: Registry, callbacks: Callbacks) => {
       'Should only be subscribed when a collection is occurring',
     );
     // The dragging item can be add and removed when using a clone
+    // We do not publish updates for the critical item
     const criticalId: DraggableId = collection.critical.draggable.id;
 
     if (event.type === 'ADDITION') {
