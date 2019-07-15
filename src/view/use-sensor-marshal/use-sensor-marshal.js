@@ -103,7 +103,6 @@ function isActive({
 
 type CanStartArgs = {|
   lockAPI: LockAPI,
-  contextId: ContextId,
   registry: Registry,
   store: Store,
   draggableId: DraggableId,
@@ -111,7 +110,6 @@ type CanStartArgs = {|
 
 function canStart({
   lockAPI,
-  contextId,
   store,
   registry,
   draggableId,
@@ -162,7 +160,6 @@ function tryStart({
 }: TryStartArgs): ?PreDragActions {
   const shouldStart: boolean = canStart({
     lockAPI,
-    contextId,
     store,
     registry,
     draggableId,
@@ -402,12 +399,11 @@ export default function useSensorMarshal({
       return canStart({
         lockAPI,
         registry,
-        contextId,
         store,
         draggableId,
       });
     },
-    [contextId, lockAPI, registry, store],
+    [lockAPI, registry, store],
   );
 
   const tryGetLock: TryGetLock = useCallback(
