@@ -10,7 +10,6 @@ import {
 import type {
   Axis,
   DragImpact,
-  Displacement,
   DroppableDimension,
   DraggableDimension,
   DraggableDimensionMap,

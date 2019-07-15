@@ -57,7 +57,7 @@ type WhileDragging = {|
 const getClosestScrollableFromDrag = (dragging: ?WhileDragging): ?Element =>
   (dragging && dragging.env.closestScrollable) || null;
 
-export default function useDroppableDimensionPublisher(args: Props) {
+export default function useDroppablePublisher(args: Props) {
   const whileDraggingRef = useRef<?WhileDragging>(null);
   const appContext: AppContextValue = useRequiredContext(AppContext);
   const uniqueId: Id = useUniqueId('droppable');

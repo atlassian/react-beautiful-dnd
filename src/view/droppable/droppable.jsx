@@ -5,7 +5,7 @@ import { useMemo, useCallback } from 'use-memo-one';
 import React, { useRef, useContext, type Node } from 'react';
 import type { DraggableId } from '../../types';
 import type { Props, Provided, UseClone } from './droppable-types';
-import useDroppableDimensionPublisher from '../use-droppable-dimension-publisher';
+import useDroppablePublisher from '../use-droppable-publisher';
 import Placeholder from '../placeholder';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import DroppableContext, {
@@ -74,7 +74,7 @@ export default function Droppable(props: Props) {
     }
   }, [isMovementAllowed, updateViewportMaxScroll]);
 
-  useDroppableDimensionPublisher({
+  useDroppablePublisher({
     droppableId,
     type,
     mode,
