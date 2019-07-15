@@ -70,6 +70,8 @@ export default ({
     displacedBy: impact.displacedBy,
     viewport: scrolledViewport.frame,
     last,
+    // we want the addition to be animated
+    forceShouldAnimate: true,
   });
   const withDroppableScroll: DisplacementGroups = getDisplacementGroups({
     afterDragging: getDraggables(last.all, draggables),
@@ -77,11 +79,14 @@ export default ({
     displacedBy: impact.displacedBy,
     viewport: viewport.frame,
     last,
+    // we want the addition to be animated
+    forceShouldAnimate: true,
   });
 
   const invisible: DraggableIdMap = {};
   const visible: DisplacementMap = {};
   const groups: DisplacementGroups[] = [
+    // this will populate the previous entries with the correct animation values
     last,
     withViewportScroll,
     withDroppableScroll,
