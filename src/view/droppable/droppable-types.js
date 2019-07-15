@@ -21,7 +21,7 @@ export type DroppableProps = {|
   // used for shared global styles
   'data-rbd-droppable-context-id': ContextId,
   // Used to lookup. Currently not used for drag and drop lifecycle
-  'data-rbd-droppable-droppable-id': DroppableId,
+  'data-rbd-droppable-id': DroppableId,
 |};
 
 export type Provided = {|

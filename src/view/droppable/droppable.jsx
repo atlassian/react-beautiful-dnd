@@ -109,7 +109,7 @@ export default function Droppable(props: Props) {
       innerRef: setDroppableRef,
       placeholder,
       droppableProps: {
-        'data-rbd-droppable-droppable-id': droppableId,
+        'data-rbd-droppable-id': droppableId,
         'data-rbd-droppable-context-id': contextId,
       },
     }),
