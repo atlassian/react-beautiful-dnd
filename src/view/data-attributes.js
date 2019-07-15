@@ -16,7 +16,6 @@ export const draggable = (() => {
     base,
     contextId: `${base}-context-id`,
     id: `${base}-id`,
-    options: `${base}-options`,
   };
 })();
 
