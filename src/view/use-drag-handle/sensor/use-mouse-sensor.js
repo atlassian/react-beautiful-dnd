@@ -10,7 +10,6 @@ import createEventMarshal, {
 import type { Callbacks } from '../drag-handle-types';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import createScheduler from '../util/create-scheduler';
-import { warning } from '../../../dev-warning';
 import * as keyCodes from '../../key-codes';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import createPostDragEventPreventer, {
@@ -18,6 +17,8 @@ import createPostDragEventPreventer, {
 } from '../util/create-post-drag-event-preventer';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
+import getDragHandleRef from '../util/get-drag-handle-ref';
+import useLayoutEffect from '../../use-isomorphic-layout-effect';
 
 export type Args = {|
   callbacks: Callbacks,
@@ -32,10 +33,6 @@ export type Args = {|
 export type OnMouseDown = (event: MouseEvent) => void;
 
 // Custom event format for force press inputs
-type MouseForceChangedEvent = MouseEvent & {
-  webkitForce?: number,
-};
-
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 const primaryButton: number = 0;
 const noop = () => {};
@@ -51,6 +48,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     getShouldRespectForcePress,
     onCaptureStart,
     onCaptureEnd,
+    getDraggableRef,
   } = args;
   const pendingRef = useRef<?Position>(null);
   const isDraggingRef = useRef<boolean>(false);
@@ -247,35 +245,20 @@ export default function useMouseSensor(args: Args): OnMouseDown {
       // Need to opt out of dragging if the user is a force press
       // Only for safari which has decided to introduce its own custom way of doing things
       // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
+      // NOTE: this function is back-ported from the `virtual` branch
       {
-        eventName: 'webkitmouseforcechanged',
-        fn: (event: MouseForceChangedEvent) => {
-          if (
-            event.webkitForce == null ||
-            (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
-          ) {
-            warning(
-              'handling a mouse force changed event when it is not supported',
-            );
-            return;
-          }
-
-          const forcePressThreshold: number = (MouseEvent: any)
-            .WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
-          const isForcePressing: boolean =
-            event.webkitForce >= forcePressThreshold;
-
-          // New behaviour
-          if (!getShouldRespectForcePress()) {
-            event.preventDefault();
-            return;
-          }
-
-          if (isForcePressing) {
-            // it is considered a indirect cancel so we do not
-            // prevent default in any situation.
+        eventName: 'webkitmouseforcedown',
+        fn: (event: Event) => {
+          if (getShouldRespectForcePress()) {
             cancel();
+            return;
           }
+
+          // This technically doesn't do anything.
+          // It won't do anything if `webkitmouseforcewillbegin` is prevented.
+          // But it is a good signal that we want to opt out of this
+
+          event.preventDefault();
         },
       },
       // Cancel on page visibility change
@@ -316,6 +299,29 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     },
     [bindWindowEvents, onCaptureStart, stop],
   );
+
+  // Hack for preventing force press
+  // Backported from 'virtual' branch
+  useLayoutEffect(() => {
+    const draggable: ?HTMLElement = getDraggableRef();
+    invariant(draggable, 'unable to find draggable');
+    const handle: HTMLElement = getDragHandleRef(draggable);
+    const bindings = [
+      {
+        eventName: 'webkitmouseforcewillbegin',
+        fn: (event: Event) => {
+          if (!getShouldRespectForcePress()) {
+            event.preventDefault();
+          }
+        },
+        options: { capture: true, passive: false },
+      },
+    ];
+
+    bindEvents(handle, bindings);
+
+    return () => unbindEvents(handle, bindings);
+  }, [getDraggableRef, getShouldRespectForcePress]);
 
   const onMouseDown = useCallback(
     (event: MouseEvent) => {
