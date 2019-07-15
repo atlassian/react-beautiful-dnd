@@ -4,10 +4,7 @@ import { type ReactWrapper } from 'enzyme';
 import * as keyCodes from '../../../../src/view/key-codes';
 import getWindowScroll from '../../../../src/view/window/get-window-scroll';
 import setWindowScroll from '../../../utils/set-window-scroll';
-import {
-  timeForLongPress,
-  forcePressThreshold,
-} from '../../../../src/view/use-drag-handle/sensor/use-touch-sensor';
+import { timeForLongPress } from '../../../../src/view/use-drag-handle/sensor/use-touch-sensor';
 import {
   dispatchWindowEvent,
   dispatchWindowKeyDownEvent,

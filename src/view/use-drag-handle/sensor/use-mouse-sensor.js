@@ -300,11 +300,15 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     [bindWindowEvents, onCaptureStart, stop],
   );
 
+  const draggable: ?HTMLElement = getDraggableRef();
+
   // Hack for preventing force press
   // Backported from 'virtual' branch
   useLayoutEffect(() => {
-    const draggable: ?HTMLElement = getDraggableRef();
-    invariant(draggable, 'unable to find draggable');
+    // there might not be a draggable ref if disabled
+    if (!draggable) {
+      return () => {};
+    }
     const handle: HTMLElement = getDragHandleRef(draggable);
     const bindings = [
       {
@@ -321,7 +325,7 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     bindEvents(handle, bindings);
 
     return () => unbindEvents(handle, bindings);
-  }, [getDraggableRef, getShouldRespectForcePress]);
+  }, [draggable, getShouldRespectForcePress]);
 
   const onMouseDown = useCallback(
     (event: MouseEvent) => {
