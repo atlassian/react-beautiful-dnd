@@ -308,32 +308,44 @@ export default function useTouchSensor(args: Args): OnTouchStart {
       // Need to opt out of dragging if the user is a force press
       // Only for webkit which has decided to introduce its own custom way of doing things
       // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
+      // NOTE: this function is back-ported from the `virtual` branch
       {
         eventName: 'touchforcechange',
         fn: (event: TouchEvent) => {
-          // Not respecting force touches - prevent the event
-          if (!getShouldRespectForcePress()) {
-            event.preventDefault();
-            return;
-          }
-
-          // A force push action will no longer fire after a touchmove
-          if (hasMovedRef.current) {
-            // This is being super safe. While this situation should not occur we
-            // are still expressing that we want to opt out of force pressing
-            event.preventDefault();
-            return;
-          }
-
-          // A drag could be pending or has already started but no movement has occurred
-
           const touch: TouchWithForce = (event.touches[0]: any);
+          const isForcePress: boolean = touch.force >= forcePressThreshold;
 
-          if (touch.force >= forcePressThreshold) {
-            // this is an indirect cancel so we do not preventDefault
-            // we also want to allow the force press to occur
-            cancel();
+          if (!isForcePress) {
+            return;
           }
+
+          const shouldRespect: boolean = getShouldRespectForcePress();
+
+          if (pendingRef.current) {
+            if (shouldRespect) {
+              cancel();
+            }
+            // If not respecting we just let the event go through
+            // It will not have an impact on the browser until
+            // there has been a sufficient time ellapsed
+            return;
+          }
+
+          // DRAGGING
+
+          if (shouldRespect) {
+            if (hasMovedRef.current) {
+              // After the user has moved we do not allow the dragging item to be force pressed
+              // This prevents strange behaviour such as a link preview opening mid drag
+              event.preventDefault();
+              return;
+            }
+            // indirect cancel
+            cancel();
+            return;
+          }
+          // not respecting during a drag
+          event.preventDefault();
         },
       },
       // Cancel on page visibility change
