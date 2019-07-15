@@ -8,7 +8,6 @@ import type {
   DroppableDimensionMap,
 } from '../../../../../src/types';
 import moveCrossAxis from '../../../../../src/state/move-in-direction/move-cross-axis';
-import noImpact from '../../../../../src/state/no-impact';
 import getViewport from '../../../../../src/view/window/get-viewport';
 import {
   getPreset,
@@ -28,6 +27,7 @@ it('should return null if there are draggables in a destination list but none ar
     descriptor: {
       id: 'custom',
       type: 'TYPE',
+      mode: 'STANDARD',
     },
     borderBox: {
       left: preset.home.client.borderBox.left + 1,
@@ -59,7 +59,7 @@ it('should return null if there are draggables in a destination list but none ar
     [preset.home.descriptor.id]: preset.home,
     [custom.descriptor.id]: custom,
   };
-  const { onLift } = getHomeOnLift({
+  const { afterCritical } = getLiftEffect({
     draggable: preset.inHome1,
     draggables,
     home: preset.home,
@@ -73,9 +73,8 @@ it('should return null if there are draggables in a destination list but none ar
     isOver: preset.home,
     draggables,
     droppables,
-    previousImpact: noImpact,
     viewport,
-    onLift,
+    afterCritical,
   });
 
   expect(result).toBe(null);

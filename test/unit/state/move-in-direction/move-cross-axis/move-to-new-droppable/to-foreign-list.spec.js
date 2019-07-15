@@ -7,16 +7,13 @@ import type {
   DragImpact,
   DroppableDimension,
   DisplacedBy,
-  Displacement,
 } from '../../../../../../src/types';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
 import { goIntoStart } from '../../../../../../src/state/get-center-from-impact/move-relative-to';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import moveToNewDroppable from '../../../../../../src/state/move-in-direction/move-cross-axis/move-to-new-droppable';
-import { noMovement } from '../../../../../../src/state/no-impact';
 import {
   add,
   negate,
@@ -30,7 +27,11 @@ import {
   getPreset,
   makeScrollable,
 } from '../../../../../utils/dimension';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
+import { getForcedDisplacement } from '../../../../../utils/impact';
+import {
+  emptyGroups,
+  noDisplacedBy,
+} from '../../../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -38,7 +39,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
     const viewport: Viewport = preset.viewport;
 
     describe('moving into an unpopulated list', () => {
-      const { onLift, impact: homeImpact } = getHomeOnLift({
+      const { afterCritical } = getLiftEffect({
         draggable: preset.inHome1,
         home: preset.home,
         draggables: preset.draggables,
@@ -53,19 +54,21 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
           moveRelativeTo: null,
           destination: preset.emptyForeign,
           insideDestination: [],
-          previousImpact: homeImpact,
           viewport,
-          onLift,
+          afterCritical,
         });
         invariant(result);
 
         const expected: DragImpact = {
-          movement: noMovement,
-          destination: {
-            droppableId: preset.emptyForeign.descriptor.id,
-            index: 0,
+          displaced: emptyGroups,
+          displacedBy: noDisplacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.emptyForeign.descriptor.id,
+              index: 0,
+            },
           },
-          merge: null,
         };
 
         expect(result).toEqual(expected);
@@ -112,9 +115,8 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
               moveRelativeTo: null,
               destination: preset.emptyForeign,
               insideDestination: [],
-              previousImpact: homeImpact,
               viewport,
-              onLift,
+              afterCritical,
             });
             expect(result).toBeTruthy();
           }
@@ -137,9 +139,8 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
               moveRelativeTo: null,
               destination: scrolled,
               insideDestination: [],
-              previousImpact: homeImpact,
               viewport,
-              onLift,
+              afterCritical,
             });
             expect(result).toBeTruthy();
           }
@@ -160,9 +161,8 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
               moveRelativeTo: null,
               destination: scrolled,
               insideDestination: [],
-              previousImpact: homeImpact,
               viewport,
-              onLift,
+              afterCritical,
             });
 
             expect(result).toBe(null);
@@ -195,9 +195,8 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
               destination: preset.emptyForeign,
               moveRelativeTo: null,
               insideDestination: [],
-              previousImpact: homeImpact,
               viewport,
-              onLift,
+              afterCritical,
             });
 
             expect(result).toBeTruthy();
@@ -216,9 +215,8 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
               destination: preset.emptyForeign,
               moveRelativeTo: null,
               insideDestination: [],
-              previousImpact: homeImpact,
               viewport: scrolled,
-              onLift,
+              afterCritical,
             });
 
             expect(result).toBeTruthy();
@@ -237,9 +235,8 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
               moveRelativeTo: null,
               destination: preset.emptyForeign,
               insideDestination: [],
-              previousImpact: homeImpact,
               viewport: scrolled,
-              onLift,
+              afterCritical,
             });
 
             expect(result).toBe(null);
@@ -253,6 +250,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
             descriptor: {
               id: 'small',
               type: preset.home.descriptor.type,
+              mode: 'STANDARD',
             },
             // currently no room in the box
             borderBox: {
@@ -272,9 +270,8 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
             moveRelativeTo: null,
             destination: smallDroppable,
             insideDestination: [],
-            previousImpact: homeImpact,
             viewport,
-            onLift,
+            afterCritical,
           });
 
           expect(result).toBeTruthy();
@@ -283,7 +280,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
     });
 
     describe('is going before a target', () => {
-      const { onLift, impact: homeImpact } = getHomeOnLift({
+      const { afterCritical } = getLiftEffect({
         draggable: preset.inHome1,
         home: preset.home,
         draggables: preset.draggables,
@@ -305,29 +302,28 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
           moveRelativeTo: preset.inForeign2,
           destination: preset.foreign,
           insideDestination: preset.inForeignList,
-          previousImpact: homeImpact,
           viewport,
-          onLift,
+          afterCritical,
         });
         invariant(result);
 
-        // ordered by closest impacted
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign2),
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
+          displaced: getForcedDisplacement({
+            // ordered by closest impacted
+            visible: [
+              { dimension: preset.inForeign2 },
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign2.descriptor.index,
+            },
           },
-          destination: {
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign2.descriptor.index,
-          },
-          merge: null,
         };
 
         expect(result).toEqual(expected);
@@ -337,7 +333,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
     describe('is going after a target', () => {
       it('should move the target and everything below it forward', () => {
         // moving inHome3 relative to inForeign1 (will go after inForeign1)
-        const { onLift, impact: homeImpact } = getHomeOnLift({
+        const { afterCritical } = getLiftEffect({
           draggable: preset.inHome1,
           home: preset.home,
           draggables: preset.draggables,
@@ -356,29 +352,28 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
           moveRelativeTo: preset.inForeign1,
           destination: preset.foreign,
           insideDestination: preset.inForeignList,
-          previousImpact: homeImpact,
           viewport,
-          onLift,
+          afterCritical,
         });
 
-        // ordered by closest impacted
-        // everything after inForeign1
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign2),
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
+          displaced: getForcedDisplacement({
+            // everything after inForeign1
+            // ordered by closest impacted
+            visible: [
+              { dimension: preset.inForeign2 },
+              { dimension: preset.inForeign3 },
+              { dimension: preset.inForeign4 },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign2.descriptor.index,
+            },
           },
-          destination: {
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign2.descriptor.index,
-          },
-          merge: null,
         };
         expect(result).toEqual(expected);
       });
@@ -389,7 +384,7 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
         // Moving inHome4 relative to inForeign1
         // Stripping out all the other items in the foreign so that we
         // are sure to move after the last item (inForeign1)
-        const { onLift, impact: homeImpact } = getHomeOnLift({
+        const { afterCritical } = getLiftEffect({
           draggable: preset.inHome4,
           home: preset.home,
           draggables: preset.draggables,
@@ -407,23 +402,21 @@ import getVisibleDisplacement from '../../../../../utils/get-displacement/get-vi
           moveRelativeTo: preset.inForeign1,
           destination: preset.foreign,
           insideDestination: [preset.inForeign1],
-          previousImpact: homeImpact,
           viewport,
-          onLift,
+          afterCritical,
         });
         invariant(result);
 
         const expected: DragImpact = {
-          movement: {
-            displaced: [],
-            map: {},
-            displacedBy,
+          displaced: emptyGroups,
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: preset.foreign.descriptor.id,
+              index: preset.inForeign1.descriptor.index + 1,
+            },
           },
-          destination: {
-            droppableId: preset.foreign.descriptor.id,
-            index: preset.inForeign1.descriptor.index + 1,
-          },
-          merge: null,
         };
         expect(result).toEqual(expected);
       });
