@@ -35,11 +35,6 @@ function isSloppyClickThresholdExceeded(
     Math.abs(current.y - original.y) >= sloppyClickThreshold
   );
 }
-
-type MouseForceChangedEvent = MouseEvent & {
-  webkitForce?: number,
-};
-
 type Idle = {|
   type: 'IDLE',
 |};

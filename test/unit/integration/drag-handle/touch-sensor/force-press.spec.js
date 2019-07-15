@@ -24,8 +24,30 @@ function getForceChange(force: number): Event {
   return event;
 }
 
+// Note: this behaviour is a bit strange as we are working around a safari issue
+// https://github.com/atlassian/react-beautiful-dnd/issues/1401
 describe('force press not respected (default)', () => {
-  it('should abort the force press when a force press is not respected', () => {
+  it('should not abort presses that do not have enought pressure', () => {
+    const { getByText } = render(<App />);
+    const handle: HTMLElement = getByText('item: 0');
+
+    touch.preLift(handle);
+
+    const first: Event = getForceChange(forcePressThreshold - 1);
+    fireEvent(handle, first);
+    expect(first.defaultPrevented).toBe(false);
+
+    touch.lift(handle);
+
+    const second: Event = getForceChange(forcePressThreshold - 1);
+    fireEvent(handle, second);
+    expect(second.defaultPrevented).toBe(false);
+
+    // force presses did not abort the pending or actual drag
+    expect(isDragging(handle)).toBe(true);
+  });
+
+  it('should not prevent a force press when pending (strange I know)', () => {
     const { getByText } = render(<App />);
     const handle: HTMLElement = getByText('item: 0');
 
@@ -33,15 +55,32 @@ describe('force press not respected (default)', () => {
 
     const first: Event = getForceChange(forcePressThreshold);
     fireEvent(handle, first);
-    expect(first.defaultPrevented).toBe(true);
+    expect(first.defaultPrevented).toBe(false);
 
     touch.lift(handle);
+    // did not prevent lifting
+    expect(isDragging(handle)).toBe(true);
+  });
 
+  it('prevent a force press when dragging', () => {
+    const { getByText } = render(<App />);
+    const handle: HTMLElement = getByText('item: 0');
+
+    touch.preLift(handle);
+
+    const first: Event = getForceChange(forcePressThreshold);
+    fireEvent(handle, first);
+    expect(first.defaultPrevented).toBe(false);
+
+    touch.lift(handle);
+    expect(isDragging(handle)).toBe(true);
+
+    // this force press will be prevented
     const second: Event = getForceChange(forcePressThreshold);
     fireEvent(handle, second);
     expect(second.defaultPrevented).toBe(true);
 
-    // force presses did not abort the pending or actual drag
+    // force presses did not abort the drag
     expect(isDragging(handle)).toBe(true);
   });
 });
