@@ -44,11 +44,6 @@ export default (dispatch: Function): DimensionMarshal => {
 const preset = getPreset();
 
 export const getMarshalStub = (): DimensionMarshal => ({
-  registerDraggable: jest.fn(),
-  updateDraggable: jest.fn(),
-  unregisterDraggable: jest.fn(),
-  registerDroppable: jest.fn(),
-  unregisterDroppable: jest.fn(),
   updateDroppableScroll: jest.fn(),
   updateDroppableIsEnabled: jest.fn(),
   updateDroppableIsCombineEnabled: jest.fn(),
