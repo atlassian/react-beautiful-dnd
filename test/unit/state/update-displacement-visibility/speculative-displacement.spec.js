@@ -63,15 +63,7 @@ import { getForcedDisplacement } from '../../../utils/impact';
     const homeCrossAxisEnd: number = 100;
     const foreignCrossAxisStart: number = 100;
     const foreignCrossAxisEnd: number = 200;
-
-    const sizeOfInHome1: number = 50;
-    // would normally be visible in viewport
-    const sizeOfInForeign1: number = sizeOfInHome1;
-    const sizeOfInForeign2: number = sizeOfInHome1;
-    // would normally NOT be visible in viewport
-    const sizeOfInForeign3: number = 10;
-    const sizeOfInForeign4: number = 60;
-    const sizeOfInForeign5: number = 100;
+    const itemSize: number = 50;
 
     const home: DroppableDimension = getDroppableDimension({
       descriptor: {
@@ -98,7 +90,7 @@ import { getForcedDisplacement } from '../../../utils/impact';
         [axis.crossAxisStart]: homeCrossAxisStart,
         [axis.crossAxisEnd]: homeCrossAxisEnd,
         [axis.start]: 0,
-        [axis.end]: sizeOfInHome1,
+        [axis.end]: itemSize,
       },
     });
     const inForeign1: DraggableDimension = getDraggableDimension({
@@ -112,7 +104,7 @@ import { getForcedDisplacement } from '../../../utils/impact';
         [axis.crossAxisStart]: foreignCrossAxisStart,
         [axis.crossAxisEnd]: foreignCrossAxisEnd,
         [axis.start]: 0,
-        [axis.end]: sizeOfInForeign1,
+        [axis.end]: itemSize,
       },
     });
     const inForeign2: DraggableDimension = getDraggableDimension({
@@ -126,7 +118,7 @@ import { getForcedDisplacement } from '../../../utils/impact';
         [axis.crossAxisStart]: foreignCrossAxisStart,
         [axis.crossAxisEnd]: foreignCrossAxisEnd,
         [axis.start]: inForeign1.page.borderBox[axis.end],
-        [axis.end]: inForeign1.page.borderBox[axis.end] + sizeOfInForeign2,
+        [axis.end]: inForeign1.page.borderBox[axis.end] + itemSize,
       },
     });
     const inForeign3: DraggableDimension = getDraggableDimension({
@@ -140,7 +132,7 @@ import { getForcedDisplacement } from '../../../utils/impact';
         [axis.crossAxisStart]: foreignCrossAxisStart,
         [axis.crossAxisEnd]: foreignCrossAxisEnd,
         [axis.start]: inForeign2.page.borderBox[axis.end],
-        [axis.end]: inForeign2.page.borderBox[axis.end] + sizeOfInForeign3,
+        [axis.end]: inForeign2.page.borderBox[axis.end] + itemSize,
       },
     });
     const inForeign4: DraggableDimension = getDraggableDimension({
@@ -154,7 +146,7 @@ import { getForcedDisplacement } from '../../../utils/impact';
         [axis.crossAxisStart]: foreignCrossAxisStart,
         [axis.crossAxisEnd]: foreignCrossAxisEnd,
         [axis.start]: inForeign3.page.borderBox[axis.end],
-        [axis.end]: inForeign3.page.borderBox[axis.end] + sizeOfInForeign4,
+        [axis.end]: inForeign3.page.borderBox[axis.end] + itemSize,
       },
     });
     const inForeign5: DraggableDimension = getDraggableDimension({
@@ -168,7 +160,7 @@ import { getForcedDisplacement } from '../../../utils/impact';
         [axis.crossAxisStart]: foreignCrossAxisStart,
         [axis.crossAxisEnd]: foreignCrossAxisEnd,
         [axis.start]: inForeign4.page.borderBox[axis.end],
-        [axis.end]: inForeign4.page.borderBox[axis.end] + sizeOfInForeign5,
+        [axis.end]: inForeign4.page.borderBox[axis.end] + itemSize,
       },
     });
     const draggables: DraggableDimensionMap = toDraggableMap([
@@ -195,9 +187,8 @@ import { getForcedDisplacement } from '../../../utils/impact';
           [axis.end]: 10000,
         },
       });
-      // when moving into the foreign list there will be enough room for inHome1 and inForeign1
-      // inHome1 and inForeign1 can be visible in the viewport at the same time
-      const sizeOfViewport: number = sizeOfInForeign1 + sizeOfInForeign2 - 1;
+      // Viewport is big enough to fit inForeign1 and inForeign2
+      const sizeOfViewport: number = itemSize + itemSize - 1;
 
       const viewport: Viewport = createViewport({
         frame: getRect({
@@ -280,26 +271,21 @@ import { getForcedDisplacement } from '../../../utils/impact';
         viewport,
         destination: foreign,
         draggables,
-        maxScrollChange: patch(axis.line, sizeOfInHome1),
+        maxScrollChange: patch(axis.line, itemSize),
       });
 
-      // const displaced: Displacement[] = [
-      //   getVisibleDisplacement(inForeign2),
-      //   getNotAnimatedDisplacement(inForeign3),
-      //   getNotAnimatedDisplacement(inForeign4),
-      //   getNotVisibleDisplacement(inForeign5),
-      // ];
       const expected: DragImpact = {
         // unchanged locations
         ...previousImpact,
         displaced: getForcedDisplacement({
           visible: [
-            // already visibly displaced
+            // already visibly displaced: inside viewport
             { dimension: inForeign2, shouldAnimate: true },
-            // speculatively increased. Forced to animate
-            { dimension: inForeign3, shouldAnimate: true },
-            { dimension: inForeign4, shouldAnimate: true },
+            // speculatively increased. Forced to not animate
+            { dimension: inForeign3, shouldAnimate: false },
+            { dimension: inForeign4, shouldAnimate: false },
           ],
+          // Bigger than 2x the size of the viewport - outside of the overscanning reach
           invisible: [inForeign5],
         }),
       };
@@ -309,7 +295,7 @@ import { getForcedDisplacement } from '../../../utils/impact';
     it('should increase the visible displacement in the droppable by the amount of the max scroll change', () => {
       // when moving into the foreign list there will be enough room for inHome1 and inForeign1
       // inHome1 and inForeign1 can be visible in the viewport at the same time
-      const sizeOfDroppable: number = sizeOfInForeign1 + sizeOfInForeign2 - 1;
+      const sizeOfDroppable: number = itemSize + itemSize - 1;
 
       const foreign: DroppableDimension = getDroppableDimension({
         descriptor: {
@@ -422,7 +408,7 @@ import { getForcedDisplacement } from '../../../utils/impact';
         viewport,
         destination: foreign,
         draggables,
-        maxScrollChange: patch(axis.line, sizeOfInHome1),
+        maxScrollChange: patch(axis.line, itemSize),
       });
 
       const expected: DragImpact = {
@@ -432,9 +418,9 @@ import { getForcedDisplacement } from '../../../utils/impact';
           visible: [
             // already visibly displaced
             { dimension: inForeign2, shouldAnimate: true },
-            // speculatively increased
-            { dimension: inForeign3, shouldAnimate: true },
-            { dimension: inForeign4, shouldAnimate: true },
+            // speculatively increased. Forced to not animate
+            { dimension: inForeign3, shouldAnimate: false },
+            { dimension: inForeign4, shouldAnimate: false },
           ],
           // not speculatively increased
           invisible: [inForeign5],
