@@ -1,30 +1,20 @@
 // @flow
-import type { Id, DraggableDimension } from '../../../../src/types';
 import type {
   Registry,
   DraggableEntry,
 } from '../../../../src/state/registry/registry-types';
 import createRegistry from '../../../../src/state/registry/create-registry';
 import { getPreset } from '../../../utils/dimension';
+import { getDraggableEntry } from './util';
 
 const preset = getPreset();
 
-function getDraggableEntry(uniqueId: Id, dimension: DraggableDimension) {
-  return {
-    uniqueId,
-    descriptor: dimension.descriptor,
-    options: {
-      canDragInteractiveElements: true,
-      shouldRespectForcePress: false,
-      isEnabled: true,
-    },
-    getDimension: () => dimension,
-  };
-}
-
 it('should allow registration', () => {
   const registry: Registry = createRegistry();
-  const entry: DraggableEntry = getDraggableEntry('1', preset.inHome1);
+  const entry: DraggableEntry = getDraggableEntry({
+    uniqueId: '1',
+    dimension: preset.inHome1,
+  });
 
   registry.draggable.register(entry);
 
@@ -33,7 +23,10 @@ it('should allow registration', () => {
 
 it('should allow unregistration', () => {
   const registry: Registry = createRegistry();
-  const entry: DraggableEntry = getDraggableEntry('1', preset.inHome1);
+  const entry: DraggableEntry = getDraggableEntry({
+    uniqueId: '1',
+    dimension: preset.inHome1,
+  });
 
   registry.draggable.register(entry);
   registry.draggable.unregister(entry);
@@ -43,7 +36,10 @@ it('should allow unregistration', () => {
 
 it('should allow for updating existing entries', () => {
   const registry: Registry = createRegistry();
-  const initial: DraggableEntry = getDraggableEntry('1', preset.inHome1);
+  const initial: DraggableEntry = getDraggableEntry({
+    uniqueId: '1',
+    dimension: preset.inHome1,
+  });
   const updated: DraggableEntry = {
     uniqueId: initial.uniqueId,
     descriptor: preset.inHome1.descriptor,
@@ -64,7 +60,10 @@ it('should allow for updating existing entries', () => {
 
 it('should throw away updates if the uniqueId is outdated', () => {
   const registry: Registry = createRegistry();
-  const initial: DraggableEntry = getDraggableEntry('1', preset.inHome1);
+  const initial: DraggableEntry = getDraggableEntry({
+    uniqueId: '1',
+    dimension: preset.inHome1,
+  });
   const updated: DraggableEntry = {
     // new uniqueId
     uniqueId: '2',
@@ -86,8 +85,14 @@ it('should throw away updates if the uniqueId is outdated', () => {
 
 it('should allow for entry overwriting', () => {
   const registry: Registry = createRegistry();
-  const entry1: DraggableEntry = getDraggableEntry('1', preset.inHome1);
-  const entry2: DraggableEntry = getDraggableEntry('1', preset.inHome1);
+  const entry1: DraggableEntry = getDraggableEntry({
+    uniqueId: '1',
+    dimension: preset.inHome1,
+  });
+  const entry2: DraggableEntry = getDraggableEntry({
+    uniqueId: '1',
+    dimension: preset.inHome1,
+  });
 
   registry.draggable.register(entry1);
   registry.draggable.register(entry2);
@@ -98,8 +103,14 @@ it('should allow for entry overwriting', () => {
 
 it('should not unregister with an outdated uniqueId', () => {
   const registry: Registry = createRegistry();
-  const entry1: DraggableEntry = getDraggableEntry('1', preset.inHome1);
-  const entry2: DraggableEntry = getDraggableEntry('2', preset.inHome1);
+  const entry1: DraggableEntry = getDraggableEntry({
+    uniqueId: '1',
+    dimension: preset.inHome1,
+  });
+  const entry2: DraggableEntry = getDraggableEntry({
+    uniqueId: '2',
+    dimension: preset.inHome1,
+  });
 
   registry.draggable.register(entry1);
   registry.draggable.register(entry2);

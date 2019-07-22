@@ -38,6 +38,7 @@ export default function createRegistry(): Registry {
       if (index === -1) {
         return;
       }
+
       subscribers.splice(index, 1);
     };
   }
@@ -136,9 +137,8 @@ export default function createRegistry(): Registry {
 
   function clean(): void {
     // kill entries
-    Object.keys((key: string) => {
-      entries[key] = {};
-    });
+    entries.draggables = {};
+    entries.droppables = {};
     // remove all subscribers
     subscribers.length = 0;
   }
