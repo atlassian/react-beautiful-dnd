@@ -10,7 +10,6 @@ import createEventMarshal, {
 import type { Callbacks } from '../drag-handle-types';
 import { bindEvents, unbindEvents } from '../util/bind-events';
 import createScheduler from '../util/create-scheduler';
-import { warning } from '../../../dev-warning';
 import * as keyCodes from '../../key-codes';
 import supportedPageVisibilityEventName from '../util/supported-page-visibility-event-name';
 import createPostDragEventPreventer, {
@@ -32,10 +31,6 @@ export type Args = {|
 export type OnMouseDown = (event: MouseEvent) => void;
 
 // Custom event format for force press inputs
-type MouseForceChangedEvent = MouseEvent & {
-  webkitForce?: number,
-};
-
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 const primaryButton: number = 0;
 const noop = () => {};
@@ -48,7 +43,8 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     canStartCapturing,
     getWindow,
     callbacks,
-    getShouldRespectForcePress,
+    // Currently always respecting force press due to safari bug (see below)
+    // getShouldRespectForcePress,
     onCaptureStart,
     onCaptureEnd,
   } = args;
@@ -248,34 +244,13 @@ export default function useMouseSensor(args: Args): OnMouseDown {
       // Only for safari which has decided to introduce its own custom way of doing things
       // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
       {
-        eventName: 'webkitmouseforcechanged',
-        fn: (event: MouseForceChangedEvent) => {
-          if (
-            event.webkitForce == null ||
-            (MouseEvent: any).WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN == null
-          ) {
-            warning(
-              'handling a mouse force changed event when it is not supported',
-            );
-            return;
-          }
-
-          const forcePressThreshold: number = (MouseEvent: any)
-            .WEBKIT_FORCE_AT_FORCE_MOUSE_DOWN;
-          const isForcePressing: boolean =
-            event.webkitForce >= forcePressThreshold;
-
-          // New behaviour
-          if (!getShouldRespectForcePress()) {
-            event.preventDefault();
-            return;
-          }
-
-          if (isForcePressing) {
-            // it is considered a indirect cancel so we do not
-            // prevent default in any situation.
-            cancel();
-          }
+        eventName: 'webkitmouseforcedown',
+        fn: () => {
+          // In order to opt out of force press correctly we need to call
+          // event.preventDefault() on webkitmouseforcewillbegin
+          // We have no way of doing this in this branch so we are always respecting force touches
+          // There is a correct fix in the `virtual` branch
+          cancel();
         },
       },
       // Cancel on page visibility change
@@ -293,7 +268,6 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     stop,
     callbacks,
     getWindow,
-    getShouldRespectForcePress,
   ]);
 
   const bindWindowEvents = useCallback(() => {
