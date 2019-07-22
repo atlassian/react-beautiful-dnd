@@ -1,23 +1,23 @@
 // @flow
 import invariant from 'tiny-invariant';
-import type { State } from '../../../../src/types';
-import type { Store } from '../../../../src/state/store-types';
-import middleware from '../../../../src/state/middleware/drop-animation-finish';
-import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
-import createStore from './util/create-store';
-import passThrough from './util/pass-through-middleware';
-import { add } from '../../../../src/state/position';
+import type { State } from '../../../../../src/types';
+import type { Store } from '../../../../../src/state/store-types';
+import middleware from '../../../../../src/state/middleware/drop/drop-animation-finish-middleware';
+import dropMiddleware from '../../../../../src/state/middleware/drop/drop-middleware';
+import createStore from '../util/create-store';
+import passThrough from '../util/pass-through-middleware';
+import { add } from '../../../../../src/state/position';
 import {
   initialPublish,
   completeDrop,
   move,
   dropAnimationFinished,
   drop,
-} from '../../../../src/state/action-creators';
+} from '../../../../../src/state/action-creators';
 import {
   initialPublishArgs,
   getCompletedArgs,
-} from '../../../utils/preset-action-args';
+} from '../../../../utils/preset-action-args';
 
 it('should fire a complete drop action when a drop animation finish action is fired', () => {
   const mock = jest.fn();

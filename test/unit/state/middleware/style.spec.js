@@ -20,7 +20,6 @@ const getMarshalStub = (): StyleMarshal => ({
   dragging: jest.fn(),
   dropping: jest.fn(),
   resting: jest.fn(),
-  styleContext: 'why hello there',
 });
 
 it('should use the dragging styles on an initial publish', () => {

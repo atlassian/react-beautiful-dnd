@@ -7,7 +7,7 @@ import {
   updateDroppableIsCombineEnabled,
 } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/responders';
-import messagePreset from '../../../../../src/state/middleware/util/screen-reader-message-preset';
+import messagePreset from '../../../../../src/screen-reader-message-preset';
 import {
   preset,
   getDragStart,

@@ -144,8 +144,8 @@ it('should log a warning if items are added that do not have consecutive indexes
 
   const marshal: DimensionMarshal = createMarshal(
     getPopulatedRegistry(dimensions),
+    // lazy use of store.dispatch
     action =>
-      // lazy use of store.dispatch
       // eslint-disable-next-line no-use-before-define
       store.dispatch(action),
   );
