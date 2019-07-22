@@ -84,7 +84,7 @@ export default function createRegistry(): Registry {
       const draggableId: DraggableId = entry.descriptor.id;
       const current: DraggableEntry = getDraggableById(draggableId);
 
-      // already changed
+      // outdated uniqueId
       if (entry.uniqueId !== current.uniqueId) {
         return;
       }
