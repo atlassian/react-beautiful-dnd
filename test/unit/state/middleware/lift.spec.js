@@ -18,9 +18,7 @@ import {
   type AnimateDropArgs,
   type InitialPublishArgs,
 } from '../../../../src/state/action-creators';
-import getDimensionMarshal, {
-  populateMarshal,
-} from '../../../utils/dimension-marshal';
+import { createMarshal } from '../../../utils/dimension-marshal';
 import {
   preset,
   liftArgs,
@@ -28,12 +26,18 @@ import {
   getCompletedArgs,
   copy,
 } from '../../../utils/preset-action-args';
+import { populate } from '../../../utils/registry';
+import type { Registry } from '../../../../src/state/registry/registry-types';
+import createRegistry from '../../../../src/state/registry/create-registry';
 
-const getMarshal = (dispatch: Action => void): DimensionMarshal => {
-  const marshal: DimensionMarshal = getDimensionMarshal(dispatch);
-  populateMarshal(marshal);
+const getPopulatedRegistry = (dimensions?: DimensionMap): Registry => {
+  const registry: Registry = createRegistry();
+  populate(registry, dimensions);
+  return registry;
+};
 
-  return marshal;
+const getBasicMarshal = (dispatch: Action => void): DimensionMarshal => {
+  return createMarshal(getPopulatedRegistry(), dispatch);
 };
 
 beforeEach(() => {
@@ -52,7 +56,7 @@ it('should throw if a drag cannot be started when a lift action occurs', () => {
   const store: Store = createStore(
     passThrough(mock),
     middleware(
-      getMarshal((action: Action) => {
+      getBasicMarshal((action: Action) => {
         store.dispatch(action);
       }),
     ),
@@ -72,7 +76,7 @@ it('should flush any animating drops', () => {
   const store: Store = createStore(
     passThrough(mock),
     middleware(
-      getMarshal((action: Action) => {
+      getBasicMarshal((action: Action) => {
         store.dispatch(action);
       }),
     ),
@@ -110,7 +114,7 @@ it('should publish the initial dimensions when lifting', () => {
   const store: Store = createStore(
     passThrough(mock),
     middleware(
-      getMarshal((action: Action) => {
+      getBasicMarshal((action: Action) => {
         store.dispatch(action);
       }),
     ),
@@ -125,7 +129,7 @@ it('should publish the initial dimensions when lifting', () => {
 });
 
 it('should log a warning if items are added that do not have consecutive indexes', () => {
-  jest.spyOn(console, 'warn').mockImplementation(() => {});
+  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
   const mock = jest.fn();
   const customInHome2: DraggableDimension = {
@@ -138,12 +142,13 @@ it('should log a warning if items are added that do not have consecutive indexes
   const dimensions: DimensionMap = copy(preset.dimensions);
   dimensions.draggables[preset.inHome2.descriptor.id] = customInHome2;
 
-  const marshal: DimensionMarshal = getDimensionMarshal(action =>
-    // lazy use of store.dispatch
-    // eslint-disable-next-line no-use-before-define
-    store.dispatch(action),
+  const marshal: DimensionMarshal = createMarshal(
+    getPopulatedRegistry(dimensions),
+    action =>
+      // lazy use of store.dispatch
+      // eslint-disable-next-line no-use-before-define
+      store.dispatch(action),
   );
-  populateMarshal(marshal, dimensions);
   const store: Store = createStore(passThrough(mock), middleware(marshal));
   const initial: InitialPublishArgs = {
     ...initialPublishArgs,
@@ -158,10 +163,10 @@ it('should log a warning if items are added that do not have consecutive indexes
   expect(store.getState().phase).toBe('DRAGGING');
 
   // a warning is logged
-  expect(console.warn).toHaveBeenCalled();
-  expect(console.warn.mock.calls[0][0]).toEqual(
+  expect(warn).toHaveBeenCalled();
+  expect(warn.mock.calls[0][0]).toEqual(
     expect.stringContaining('0, [🔥2], [🔥2], 3'),
   );
 
-  console.warn.mockRestore();
+  warn.mockRestore();
 });
