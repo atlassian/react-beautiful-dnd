@@ -451,7 +451,10 @@ export default function useMouseSensor(api: SensorAPI) {
     const unbind = bindEvents(window, [
       {
         eventName: 'touchmove',
-        fn: noop,
+        // using a new noop function for each usage as a single `removeEventListener()`
+        // call will remove all handlers with the same reference
+        // https://codesandbox.io/s/removing-multiple-handlers-with-same-reference-fxe15
+        fn: () => {},
         options: { capture: false, passive: false },
       },
     ]);
