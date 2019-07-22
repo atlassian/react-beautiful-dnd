@@ -96,14 +96,28 @@ You can also disable all of the prebuilt sensors ([mouse](/docs/sensors/mouse.md
 A `sensor` is provided with a an object (`SensorAPI`) which is used to try to get a **lock**
 
 ```js
-type SensorAPI = {|
+export type SensorAPI = {|
   tryGetLock: TryGetLock,
-  tryGetClosestDraggableId: (event: Event) => ?DraggableId,
+  canGetLock: (id: DraggableId) => boolean,
+  isLockClaimed: () => boolean,
+  tryReleaseLock: () => void,
+  findClosestDraggableId: (event: Event) => ?DraggableId,
+  findOptionsForDraggable: (id: DraggableId) => ?DraggableOptions,
+|};
+
+export type DraggableOptions = {|
+  canDragInteractiveElements: boolean,
+  shouldRespectForcePress: boolean,
+  isEnabled: boolean,
 |};
 ```
 
-- `tryGetLock` (`TryGetLock`): a function that is used to **try** and get a **lock** for a `<Draggable />`.
-- `tryGetClosestDraggableId(event)`: a function that will try to find the closest `draggableId` based on an event. It will look upwards from the `event.target` to try and find a _drag handle_
+- `tryGetLock` (`TryGetLock`): a function that is used to **try** and get a **lock** for a `<Draggable />`
+- `canGetLock(id)`: returns whether a lock _could_ be claimed for a given `DraggableId`
+- `isLockClaimed()`: returns `true` if any sensor currently has a lock
+- `tryReleaseLock()`: will release any active lock. This can be useful for programmatically cancelling a drag.
+- `findClosestDraggableId(event)`: a function that will try to find the closest `draggableId` based on an event. It will look upwards from the `event.target` to try and find a _drag handle_
+- `findOptionsForDraggable(id)`: tries to lookup `DraggableOptions` associated with a `<Draggable />`
 
 ```js
 export type TryGetLock = (

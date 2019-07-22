@@ -44,7 +44,7 @@ import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 import { noop } from '../../empty';
-import tryGetClosestDraggableIdFromEvent from './try-get-closest-draggable-id-from-event';
+import findClosestDraggableIdFromEvent from './try-get-closest-draggable-id-from-event';
 import tryGetDraggable from './try-get-draggable';
 
 function preventDefault(event: Event) {
@@ -425,13 +425,13 @@ export default function useSensorMarshal({
     [contextId, lockAPI, registry, store],
   );
 
-  const tryGetClosestDraggableId = useCallback(
+  const findClosestDraggableId = useCallback(
     (event: Event): ?DraggableId =>
-      tryGetClosestDraggableIdFromEvent(contextId, event),
+      findClosestDraggableIdFromEvent(contextId, event),
     [contextId],
   );
 
-  const tryGetOptionsForDraggable = useCallback(
+  const findOptionsForDraggable = useCallback(
     (id: DraggableId): ?DraggableOptions => {
       const entry: ?DraggableEntry = registry.draggable.findById(id);
       return entry ? entry.options : null;
@@ -439,18 +439,25 @@ export default function useSensorMarshal({
     [registry.draggable],
   );
 
+  const tryReleaseLock = useCallback(lockAPI.tryAbandon, [lockAPI]);
+  const isLockClaimed = useCallback(lockAPI.isClaimed, [lockAPI]);
+
   const api: SensorAPI = useMemo(
     () => ({
       canGetLock,
       tryGetLock,
-      tryGetClosestDraggableId,
-      tryGetOptionsForDraggable,
+      findClosestDraggableId,
+      findOptionsForDraggable,
+      tryReleaseLock,
+      isLockClaimed,
     }),
     [
       canGetLock,
-      tryGetClosestDraggableId,
       tryGetLock,
-      tryGetOptionsForDraggable,
+      findClosestDraggableId,
+      findOptionsForDraggable,
+      tryReleaseLock,
+      isLockClaimed,
     ],
   );
 

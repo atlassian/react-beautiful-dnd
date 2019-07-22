@@ -18,7 +18,6 @@ import bindEvents from '../../event-bindings/bind-events';
 import * as keyCodes from '../../key-codes';
 import preventStandardKeyEvents from './util/prevent-standard-key-events';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
-import { warning } from '../../../dev-warning';
 import useLayoutEffect from '../../use-isomorphic-layout-effect';
 import { noop } from '../../../empty';
 
@@ -227,7 +226,7 @@ export default function useMouseSensor(api: SensorAPI) {
           return;
         }
 
-        const draggableId: ?DraggableId = api.tryGetClosestDraggableId(event);
+        const draggableId: ?DraggableId = api.findClosestDraggableId(event);
 
         if (!draggableId) {
           return;
@@ -273,13 +272,13 @@ export default function useMouseSensor(api: SensorAPI) {
           return;
         }
 
-        const id: ?DraggableId = api.tryGetClosestDraggableId(event);
+        const id: ?DraggableId = api.findClosestDraggableId(event);
 
         if (!id) {
           return;
         }
 
-        const options: ?DraggableOptions = api.tryGetOptionsForDraggable(id);
+        const options: ?DraggableOptions = api.findOptionsForDraggable(id);
 
         if (!options) {
           return;

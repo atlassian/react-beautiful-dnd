@@ -155,7 +155,7 @@ export default function useKeyboardSensor(api: SensorAPI) {
           return;
         }
 
-        const draggableId: ?DraggableId = api.tryGetClosestDraggableId(event);
+        const draggableId: ?DraggableId = api.findClosestDraggableId(event);
 
         if (!draggableId) {
           return;
