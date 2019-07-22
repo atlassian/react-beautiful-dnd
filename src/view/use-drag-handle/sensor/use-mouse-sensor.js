@@ -17,8 +17,6 @@ import createPostDragEventPreventer, {
 } from '../util/create-post-drag-event-preventer';
 import isSloppyClickThresholdExceeded from '../util/is-sloppy-click-threshold-exceeded';
 import preventStandardKeyEvents from '../util/prevent-standard-key-events';
-import getDragHandleRef from '../util/get-drag-handle-ref';
-import useLayoutEffect from '../../use-isomorphic-layout-effect';
 
 export type Args = {|
   callbacks: Callbacks,
@@ -45,10 +43,10 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     canStartCapturing,
     getWindow,
     callbacks,
-    getShouldRespectForcePress,
+    // Currently always respecting force press due to safari bug (see below)
+    // getShouldRespectForcePress,
     onCaptureStart,
     onCaptureEnd,
-    getDraggableRef,
   } = args;
   const pendingRef = useRef<?Position>(null);
   const isDraggingRef = useRef<boolean>(false);
@@ -245,20 +243,14 @@ export default function useMouseSensor(args: Args): OnMouseDown {
       // Need to opt out of dragging if the user is a force press
       // Only for safari which has decided to introduce its own custom way of doing things
       // https://developer.apple.com/library/content/documentation/AppleApplications/Conceptual/SafariJSProgTopics/RespondingtoForceTouchEventsfromJavaScript.html
-      // NOTE: this function is back-ported from the `virtual` branch
       {
         eventName: 'webkitmouseforcedown',
-        fn: (event: Event) => {
-          if (getShouldRespectForcePress()) {
-            cancel();
-            return;
-          }
-
-          // This technically doesn't do anything.
-          // It won't do anything if `webkitmouseforcewillbegin` is prevented.
-          // But it is a good signal that we want to opt out of this
-
-          event.preventDefault();
+        fn: () => {
+          // In order to opt out of force press correctly we need to call
+          // event.preventDefault() on webkitmouseforcewillbegin
+          // We have no way of doing this in this branch so we are always respecting force touches
+          // There is a correct fix in the `virtual` branch
+          cancel();
         },
       },
       // Cancel on page visibility change
@@ -276,7 +268,6 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     stop,
     callbacks,
     getWindow,
-    getShouldRespectForcePress,
   ]);
 
   const bindWindowEvents = useCallback(() => {
@@ -299,33 +290,6 @@ export default function useMouseSensor(args: Args): OnMouseDown {
     },
     [bindWindowEvents, onCaptureStart, stop],
   );
-
-  const draggable: ?HTMLElement = getDraggableRef();
-
-  // Hack for preventing force press
-  // Backported from 'virtual' branch
-  useLayoutEffect(() => {
-    // there might not be a draggable ref if disabled
-    if (!draggable) {
-      return () => {};
-    }
-    const handle: HTMLElement = getDragHandleRef(draggable);
-    const bindings = [
-      {
-        eventName: 'webkitmouseforcewillbegin',
-        fn: (event: Event) => {
-          if (!getShouldRespectForcePress()) {
-            event.preventDefault();
-          }
-        },
-        options: { capture: true, passive: false },
-      },
-    ];
-
-    bindEvents(handle, bindings);
-
-    return () => unbindEvents(handle, bindings);
-  }, [draggable, getShouldRespectForcePress]);
 
   const onMouseDown = useCallback(
     (event: MouseEvent) => {
