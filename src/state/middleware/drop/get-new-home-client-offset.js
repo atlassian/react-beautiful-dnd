@@ -51,17 +51,5 @@ export default ({
     draggable.client.borderBox.center,
   );
 
-  // console.warn('TODO: check this is not needed');
-  // const combine: ?Combine = tryGetCombine(impact);
-
-  // // When dropping with a merge we want to drop the dragging item
-  // // into the new home location of the target.
-  // // The target will move as a result of a drop if it started displaced
-  // if (combine && didStartDisplaced(combine.draggableId, afterCritical)) {
-  //   console.log('lol');
-  //   return offset;
-  //   return subtract(offset, afterCritical.displacedBy.point);
-  // }
-
   return offset;
 };
