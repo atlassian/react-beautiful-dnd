@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { mount, type ReactWrapper } from 'enzyme';
+import { render } from '@testing-library/react';
 import AnimateInOut, {
   type AnimateProvided,
 } from '../../../../src/view/animate-in-out/animate-in-out';
@@ -16,63 +16,67 @@ class Child extends React.Component<ChildProps> {
 }
 
 it('should render children', () => {
-  const wrapper: ReactWrapper<*> = mount(
+  const { getByText } = render(
     <AnimateInOut on="hey" shouldAnimate={false}>
       {(provided: AnimateProvided) => <Child provided={provided} />}
     </AnimateInOut>,
   );
 
-  expect(wrapper.find(Child)).toHaveLength(1);
-  wrapper.unmount();
+  expect(getByText('none')).toBeTruthy();
 });
 
 it('should allow children not to be rendered', () => {
   {
-    const wrapper: ReactWrapper<*> = mount(
+    const { unmount, container } = render(
       <AnimateInOut on={null} shouldAnimate={false}>
         {(provided: AnimateProvided) => <Child provided={provided} />}
       </AnimateInOut>,
     );
 
-    expect(wrapper.find(Child)).toHaveLength(0);
-    wrapper.unmount();
+    expect(container.innerHTML).toEqual('');
+    unmount();
   }
   // initial animation set to true
   {
-    const wrapper: ReactWrapper<*> = mount(
+    const { container, unmount } = render(
       <AnimateInOut on={null} shouldAnimate>
         {(provided: AnimateProvided) => <Child provided={provided} />}
       </AnimateInOut>,
     );
 
-    expect(wrapper.find(Child)).toHaveLength(0);
-    wrapper.unmount();
+    expect(container.innerHTML).toEqual('');
+    unmount();
   }
 });
 
 it('should allow children not to be rendered after a close animation', () => {
-  const wrapper: ReactWrapper<*> = mount(
-    <AnimateInOut on="hey" shouldAnimate>
-      {(provided: AnimateProvided) => <Child provided={provided} />}
-    </AnimateInOut>,
-  );
-  expect(wrapper.find(Child)).toHaveLength(1);
+  const child = jest
+    .fn()
+    .mockImplementation((provided: AnimateProvided) => (
+      <Child provided={provided} />
+    ));
+
+  type Props = {|
+    on: ?mixed,
+    shouldAnimate: boolean,
+  |};
+  function App({ on, shouldAnimate }: Props) {
+    return (
+      <AnimateInOut on={on} shouldAnimate={shouldAnimate}>
+        {(provided: AnimateProvided) => child(provided)}
+      </AnimateInOut>
+    );
+  }
+
+  const { rerender, container } = render(<App on="hey" shouldAnimate />);
+  expect(container.textContent).toEqual('open');
 
   // data is gone - will animate closed
-  wrapper.setProps({
-    on: null,
-  });
-  expect(wrapper.find(Child)).toHaveLength(1);
+  rerender(<App on={null} shouldAnimate />);
+  expect(container.textContent).toEqual('close');
 
   // letting animate-in-out know that the animation is finished
-  wrapper
-    .find(Child)
-    .props()
-    .provided.onClose();
+  child.mock.calls[child.mock.calls.length - 1][0].onClose();
 
-  // let enzyme know that the react tree has changed
-  wrapper.update();
-
-  expect(wrapper.find(Child)).toHaveLength(0);
-  wrapper.unmount();
+  expect(container.innerHTML).toEqual('');
 });
