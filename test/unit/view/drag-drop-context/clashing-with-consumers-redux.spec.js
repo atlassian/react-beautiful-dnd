@@ -1,7 +1,7 @@
 // @flow
 /* eslint-disable react/no-multi-comp */
 import React, { Component } from 'react';
-import { mount } from 'enzyme';
+import { render } from '@testing-library/react';
 import { Provider, connect } from 'react-redux';
 import { createStore } from 'redux';
 import { Droppable, Draggable, DragDropContext } from '../../../../src';
@@ -31,7 +31,7 @@ function mapStateToProps(state: AppState): AppState {
 const Connected = connect(mapStateToProps)(Unconnected);
 
 it('should avoid clashes with parent redux applications', () => {
-  class Container extends Component<*> {
+  class App extends Component<*> {
     render() {
       return (
         <Provider store={store}>
@@ -62,13 +62,15 @@ it('should avoid clashes with parent redux applications', () => {
       );
     }
   }
-  const wrapper = mount(<Container />);
+  const { container, unmount } = render(<App />);
 
-  expect(wrapper.find(Container).text()).toBe(original.foo);
+  expect(container.textContent).toBe(original.foo);
+
+  unmount();
 });
 
 it('should avoid clashes with child redux applications', () => {
-  class Container extends Component<*> {
+  class App extends Component<*> {
     render() {
       return (
         <DragDropContext onDragEnd={() => {}}>
@@ -99,7 +101,7 @@ it('should avoid clashes with child redux applications', () => {
       );
     }
   }
-  const wrapper = mount(<Container />);
+  const { container } = render(<App />);
 
-  expect(wrapper.find(Container).text()).toBe(original.foo);
+  expect(container.textContent).toBe(original.foo);
 });

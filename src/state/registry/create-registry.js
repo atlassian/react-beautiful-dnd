@@ -55,7 +55,7 @@ export default function createRegistry(): Registry {
 
   function getDraggableById(id: DraggableId): DraggableEntry {
     const entry: ?DraggableEntry = findDraggableById(id);
-    invariant(entry, `Cannot find entry with id [${id}]`);
+    invariant(entry, `Cannot find draggable entry with id [${id}]`);
     return entry;
   }
 
@@ -83,7 +83,12 @@ export default function createRegistry(): Registry {
     },
     unregister: (entry: DraggableEntry) => {
       const draggableId: DraggableId = entry.descriptor.id;
-      const current: DraggableEntry = getDraggableById(draggableId);
+      const current: ?DraggableEntry = findDraggableById(draggableId);
+
+      // can occur if cleaned before unregistration
+      if (!current) {
+        return;
+      }
 
       // outdated uniqueId
       if (entry.uniqueId !== current.uniqueId) {
@@ -108,7 +113,7 @@ export default function createRegistry(): Registry {
 
   function getDroppableById(id: DroppableId): DroppableEntry {
     const entry: ?DroppableEntry = findDroppableById(id);
-    invariant(entry, `Cannot find entry with id [${id}]`);
+    invariant(entry, `Cannot find droppable entry with id [${id}]`);
     return entry;
   }
 
@@ -117,7 +122,12 @@ export default function createRegistry(): Registry {
       entries.droppables[entry.descriptor.id] = entry;
     },
     unregister: (entry: DroppableEntry) => {
-      const current: DroppableEntry = getDroppableById(entry.descriptor.id);
+      const current: ?DroppableEntry = findDroppableById(entry.descriptor.id);
+
+      // can occur if cleaned before an unregistry
+      if (!current) {
+        return;
+      }
 
       // already changed
       if (entry.uniqueId !== current.uniqueId) {

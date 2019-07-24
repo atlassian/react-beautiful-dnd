@@ -80,7 +80,9 @@ beforeEach(() => {
 
 afterEach(() => {
   // cleanup
+  // $ExpectError - mocked console
   console.error.mockRestore();
+  // $ExpectError - mocked console
   console.warn.mockRestore();
   jest.useRealTimers();
 });

@@ -74,3 +74,18 @@ it('should not unregister with an outdated uniqueId', () => {
   registry.droppable.unregister(entry1);
   expect(registry.droppable.findById(entry1.descriptor.id)).toBe(entry2);
 });
+
+it('should allow unregistrations when there is no entry', () => {
+  const registry: Registry = createRegistry();
+  const entry1: DroppableEntry = getDroppableEntry({
+    uniqueId: '1',
+    dimension: preset.home,
+  });
+
+  // no registration
+  expect(registry.droppable.findById(entry1.descriptor.id)).toBe(null);
+
+  expect(() => {
+    registry.droppable.unregister(entry1);
+  }).not.toThrow();
+});

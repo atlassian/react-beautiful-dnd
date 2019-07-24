@@ -123,3 +123,19 @@ it('should not unregister with an outdated uniqueId', () => {
   registry.draggable.unregister(entry1);
   expect(registry.draggable.findById(entry1.descriptor.id)).toBe(entry2);
 });
+
+it('should allow unregistrations when there is no entry', () => {
+  // this can happen if an unregistration occurs after a .clean
+  const registry: Registry = createRegistry();
+  const entry1: DraggableEntry = getDraggableEntry({
+    uniqueId: '1',
+    dimension: preset.inHome1,
+  });
+
+  // no registration
+  expect(registry.draggable.findById(entry1.descriptor.id)).toBe(null);
+
+  expect(() => {
+    registry.draggable.unregister(entry1);
+  }).not.toThrow();
+});
