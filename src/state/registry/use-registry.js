@@ -10,7 +10,9 @@ export default function useRegistry(): Registry {
   useEffect(() => {
     return function unmount() {
       // clean up the registry to avoid any leaks
-      registry.clean();
+      // doing it after an animation frame so that other things unmounting
+      // can continue to interact with the registry
+      requestAnimationFrame(registry.clean);
     };
   }, [registry]);
 

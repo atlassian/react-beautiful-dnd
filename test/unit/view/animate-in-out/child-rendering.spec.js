@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import AnimateInOut, {
   type AnimateProvided,
 } from '../../../../src/view/animate-in-out/animate-in-out';
@@ -76,7 +76,9 @@ it('should allow children not to be rendered after a close animation', () => {
   expect(container.textContent).toEqual('close');
 
   // letting animate-in-out know that the animation is finished
-  child.mock.calls[child.mock.calls.length - 1][0].onClose();
+  act(() => {
+    child.mock.calls[child.mock.calls.length - 1][0].onClose();
+  });
 
   expect(container.innerHTML).toEqual('');
 });
