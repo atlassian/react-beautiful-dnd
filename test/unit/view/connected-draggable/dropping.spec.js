@@ -58,7 +58,7 @@ it('should move to the new home offset', () => {
 });
 
 it('should maintain combine information', () => {
-  const { impact: homeImpact } = getHomeOnLift({
+  const { afterCritical, impact: homeImpact } = getLiftEffect({
     draggable: preset.inHome1,
     home: preset.home,
     draggables: preset.draggables,
@@ -70,8 +70,8 @@ it('should maintain combine information', () => {
   };
   const impact: DragImpact = {
     ...homeImpact,
-    destination: null,
-    merge: {
+    at: {
+      type: 'COMBINE',
       whenEntered: forward,
       combine,
     },
@@ -81,6 +81,7 @@ it('should maintain combine information', () => {
     ...withoutCombine,
     completed: {
       critical: withoutCombine.completed.critical,
+      afterCritical,
       impact,
       result: {
         ...withoutCombine.completed.result,

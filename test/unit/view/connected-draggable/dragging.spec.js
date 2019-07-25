@@ -85,7 +85,7 @@ draggingStates.forEach((current: IsDraggingState) => {
 
     it('should indicate when over a droppable', () => {
       const selector: Selector = makeMapStateToProps();
-      const { impact: homeImpact } = getHomeOnLift({
+      const { impact: homeImpact } = getLiftEffect({
         draggable: preset.inHome1,
         draggables: preset.draggables,
         viewport: preset.viewport,

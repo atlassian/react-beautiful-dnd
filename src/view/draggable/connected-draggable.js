@@ -32,6 +32,7 @@ import type {
 import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import StoreContext from '../context/store-context';
 import whatIsDraggedOverFromResult from '../../state/droppable/what-is-dragged-over-from-result';
+import { tryGetCombine } from '../../state/get-impact-location';
 
 const getCombineWithFromResult = (result: DropResult): ?DraggableId => {
   return result.combine ? result.combine.draggableId : null;
@@ -216,6 +217,8 @@ function getSecondarySelector(): TrySelect {
     const isAfterCriticalInVirtualList: boolean = Boolean(
       afterCritical.inVirtualList && afterCritical.effected[ownId],
     );
+    // TODO:
+    const combine: ?Combine = tryGetCombine(impact);
 
     if (!displacement) {
       if (!isAfterCriticalInVirtualList) {

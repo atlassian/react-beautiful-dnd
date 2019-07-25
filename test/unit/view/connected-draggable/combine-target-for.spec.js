@@ -23,8 +23,8 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
   describe(`in phase: ${withoutMerge.phase}`, () => {
     const impact: DragImpact = {
       ...withoutMerge.impact,
-      destination: null,
-      merge: {
+      at: {
+        type: 'COMBINE',
         whenEntered: forward,
         combine: {
           draggableId: preset.inHome2.descriptor.id,
@@ -42,7 +42,7 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
       const expected: MapProps = {
         mapped: {
           type: 'SECONDARY',
-          offset: impact.movement.displacedBy.point,
+          offset: impact.displacedBy.point,
           shouldAnimateDisplacement: false,
           combineTargetFor: preset.inHome1.descriptor.id,
           snapshot: getSecondarySnapshot({
@@ -58,7 +58,7 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
       const expected: MapProps = {
         mapped: {
           type: 'SECONDARY',
-          offset: impact.movement.displacedBy.point,
+          offset: impact.displacedBy.point,
           shouldAnimateDisplacement: false,
           combineTargetFor: preset.inHome1.descriptor.id,
           snapshot: getSecondarySnapshot({
