@@ -207,6 +207,12 @@ function getSecondarySelector(): TrySelect {
     }),
   );
 
+  const getFallback = (combineTargetFor: ?DraggableId): ?MapProps => {
+    return combineTargetFor
+      ? getMemoizedProps(origin, combineTargetFor, true)
+      : null;
+  };
+
   const getProps = (
     ownId: DraggableId,
     draggingId: DraggableId,
@@ -222,16 +228,9 @@ function getSecondarySelector(): TrySelect {
       ? draggingId
       : null;
 
-    function getFallback() {
-      if (combineTargetFor) {
-        return getMemoizedProps(origin, combineTargetFor, true);
-      }
-      return null;
-    }
-
     if (!displacement) {
       if (!isAfterCriticalInVirtualList) {
-        return getFallback();
+        return getFallback(combineTargetFor);
       }
 
       // when not over a list we close the gap
@@ -242,7 +241,7 @@ function getSecondarySelector(): TrySelect {
     }
 
     if (isAfterCriticalInVirtualList) {
-      return getFallback();
+      return getFallback(combineTargetFor);
     }
     const displaceBy: Position = impact.displacedBy.point;
     const offset: Position = memoizedOffset(displaceBy.x, displaceBy.y);
