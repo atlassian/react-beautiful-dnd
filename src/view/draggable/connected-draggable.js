@@ -217,28 +217,41 @@ function getSecondarySelector(): TrySelect {
     const isAfterCriticalInVirtualList: boolean = Boolean(
       afterCritical.inVirtualList && afterCritical.effected[ownId],
     );
-    // TODO:
-    const combine: ?Combine = tryGetCombine(impact);
+
+    const combineTargetFor: ?DraggableId = tryGetCombine(impact)
+      ? draggingId
+      : null;
+
+    function getFallback() {
+      if (combineTargetFor) {
+        return getMemoizedProps(origin, combineTargetFor, true);
+      }
+      return null;
+    }
 
     if (!displacement) {
       if (!isAfterCriticalInVirtualList) {
-        return null;
+        return getFallback();
       }
 
       // when not over a list we close the gap
 
       const change: Position = negate(afterCritical.displacedBy.point);
       const offset: Position = memoizedOffset(change.x, change.y);
-      return getMemoizedProps(offset, null, true);
+      return getMemoizedProps(offset, combineTargetFor, true);
     }
 
     if (isAfterCriticalInVirtualList) {
-      return null;
+      return getFallback();
     }
     const displaceBy: Position = impact.displacedBy.point;
     const offset: Position = memoizedOffset(displaceBy.x, displaceBy.y);
 
-    return getMemoizedProps(offset, null, displacement.shouldAnimate);
+    return getMemoizedProps(
+      offset,
+      combineTargetFor,
+      displacement.shouldAnimate,
+    );
   };
 
   const selector: TrySelect = (state: State, ownProps: OwnProps): ?MapProps => {

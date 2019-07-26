@@ -1,11 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
-import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
-import {
-  getMarshalStub,
-  getDroppableCallbacks,
-} from '../../../utils/dimension-marshal';
 import { DragDropContext } from '../../../../src';
 import { getPreset } from '../../../utils/dimension';
 import forceUpdate from '../../../utils/force-update';
@@ -16,21 +11,12 @@ import DroppableContext, {
 } from '../../../../src/view/context/droppable-context';
 
 const preset = getPreset();
-// creating our own marshal so we can publish a droppable
-// so that the draggable can publish itself
-const marshal: DimensionMarshal = getMarshalStub();
 
 const droppableContext: DroppableContextValue = {
   type: preset.home.descriptor.type,
   droppableId: preset.home.descriptor.id,
+  isUsingCloneFor: null,
 };
-
-// registering a fake droppable so that when a draggable
-// registers itself the marshal can find its parent
-marshal.registerDroppable(
-  preset.home.descriptor,
-  getDroppableCallbacks(preset.home),
-);
 
 class Person extends Component<{ name: string, provided: Provided }> {
   render() {
