@@ -8,7 +8,7 @@ import type {
   DroppableDimensionMap,
   DragImpact,
   Viewport,
-  OnLift,
+  LiftEffect,
 } from '../../../types';
 import getBestCrossAxisDroppable from './get-best-cross-axis-droppable';
 import getClosestDraggable from './get-closest-draggable';
@@ -29,11 +29,9 @@ type Args = {|
   // all the dimensions in the system
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
-  // any previous impact
-  previousImpact: DragImpact,
   // the current viewport
   viewport: Viewport,
-  onLift: OnLift,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
@@ -43,9 +41,8 @@ export default ({
   isOver,
   draggables,
   droppables,
-  previousImpact,
   viewport,
-  onLift,
+  afterCritical,
 }: Args): ?PublicResult => {
   // not considering the container scroll changes as container scrolling cancels a keyboard drag
 
@@ -72,7 +69,7 @@ export default ({
     viewport,
     destination,
     insideDestination,
-    onLift,
+    afterCritical,
   });
 
   const impact: ?DragImpact = moveToNewDroppable({
@@ -82,9 +79,8 @@ export default ({
     draggables,
     moveRelativeTo,
     insideDestination,
-    previousImpact,
     viewport,
-    onLift,
+    afterCritical,
   });
 
   if (!impact) {
@@ -96,7 +92,7 @@ export default ({
     draggable,
     droppable: destination,
     draggables,
-    onLift,
+    afterCritical,
   });
 
   const clientSelection: Position = getClientFromPageBorderBoxCenter({

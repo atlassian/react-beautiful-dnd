@@ -57,7 +57,6 @@ export default class Task extends Component<Props> {
                   isDragging={snapshot.isDragging}
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
-                  aria-roledescription="Draggable task. Press space bar to lift"
                   blur={blur}
                 >
                   {this.props.task.content}

@@ -5,27 +5,25 @@ import type {
   Axis,
   DragImpact,
   DisplacedBy,
-  Displacement,
   DimensionMap,
 } from '../../../../../src/types';
 import { vertical, horizontal } from '../../../../../src/state/axis';
 import { negate, subtract, origin } from '../../../../../src/state/position';
 import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
 import { getPreset, makeScrollable } from '../../../../utils/dimension';
-import getNotAnimatedDisplacement from '../../../../utils/get-displacement/get-not-animated-displacement';
 import getClientBorderBoxCenter from '../../../../../src/state/get-center-from-impact/get-client-border-box-center';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
 import noImpact from '../../../../../src/state/no-impact';
-import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
-import getDisplacementMap from '../../../../../src/state/get-displacement-map';
+import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get-new-home-client-offset';
 import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
+import { getForcedDisplacement } from '../../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
-    const { onLift, impact: homeImpact } = getHomeOnLift({
+    const { afterCritical, impact: homeImpact } = getLiftEffect({
       draggable: preset.inHome1,
       draggables: preset.draggables,
       home: preset.home,
@@ -42,7 +40,7 @@ import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
         draggable: preset.inHome1,
         dimensions: preset.dimensions,
         viewport: preset.viewport,
-        onLift,
+        afterCritical,
       });
 
       expect(offset).toEqual(origin);
@@ -50,20 +48,20 @@ import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
 
     it('should return the difference between the current client position and where it needs to be', () => {
       // inHome1 in inHome2 position
-      const displaced: Displacement[] = [
-        getNotAnimatedDisplacement(preset.inHome3),
-        getNotAnimatedDisplacement(preset.inHome4),
-      ];
       const pastInHome2: DragImpact = {
-        movement: {
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
-        },
-        merge: null,
-        destination: {
-          index: preset.inHome2.descriptor.index,
-          droppableId: preset.home.descriptor.id,
+        displaced: getForcedDisplacement({
+          visible: [
+            { dimension: preset.inHome3, shouldAnimate: false },
+            { dimension: preset.inHome4, shouldAnimate: false },
+          ],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            index: preset.inHome2.descriptor.index,
+            droppableId: preset.home.descriptor.id,
+          },
         },
       };
 
@@ -71,7 +69,7 @@ import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
         impact: pastInHome2,
         draggable: preset.inHome1,
         draggables: preset.draggables,
-        onLift,
+        afterCritical,
         droppable: preset.home,
         viewport: preset.viewport,
       });
@@ -80,7 +78,7 @@ import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
         draggable: preset.inHome1,
         dimensions: preset.dimensions,
         viewport: preset.viewport,
-        onLift,
+        afterCritical,
       });
 
       const diff: Position = subtract(
@@ -93,19 +91,17 @@ import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
     it('should account for a collapsing home draggable when merging', () => {
       // inHome1 merging with inHome3
       // inHome1 will collapse on drop and this needs to be accounted for
-      const displaced: Displacement[] = [
-        // inHome2 is no longer displaced
-        getNotAnimatedDisplacement(preset.inHome3),
-        getNotAnimatedDisplacement(preset.inHome4),
-      ];
       const mergingWithInHome3: DragImpact = {
-        movement: {
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
-        },
-        destination: null,
-        merge: {
+        displacedBy,
+        displaced: getForcedDisplacement({
+          // inHome2 is no longer displaced
+          visible: [
+            { dimension: preset.inHome3, shouldAnimate: false },
+            { dimension: preset.inHome4, shouldAnimate: false },
+          ],
+        }),
+        at: {
+          type: 'COMBINE',
           whenEntered: forward,
           combine: {
             draggableId: preset.inHome3.descriptor.id,
@@ -118,7 +114,7 @@ import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
         impact: mergingWithInHome3,
         draggable: preset.inHome1,
         draggables: preset.draggables,
-        onLift,
+        afterCritical,
         droppable: preset.home,
         viewport: preset.viewport,
       });
@@ -127,15 +123,14 @@ import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
         draggable: preset.inHome1,
         dimensions: preset.dimensions,
         viewport: preset.viewport,
-        onLift,
+        afterCritical,
       });
-
-      const diff: Position = subtract(
+      const offset: Position = subtract(
         currentClientCenter,
         preset.inHome1.client.borderBox.center,
       );
-      const withCollapsingHome: Position = subtract(diff, displacedBy.point);
-      expect(offsetFromHome).toEqual(withCollapsingHome);
+
+      expect(offsetFromHome).toEqual(offset);
     });
 
     it('should account for the scroll of your home list if you are not over any list', () => {
@@ -156,7 +151,7 @@ import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
         draggable: preset.inHome1,
         dimensions: withScrolledHome,
         viewport: preset.viewport,
-        onLift,
+        afterCritical,
       });
       const withoutScroll: Position = getNewHomeClientOffset({
         impact: noImpact,
@@ -164,7 +159,7 @@ import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
         // no droppable scroll
         dimensions: preset.dimensions,
         viewport: preset.viewport,
-        onLift,
+        afterCritical,
       });
 
       const diff: Position = subtract(withScroll, withoutScroll);

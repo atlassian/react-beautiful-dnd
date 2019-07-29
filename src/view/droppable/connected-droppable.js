@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 // eslint-disable-next-line no-unused-vars
 import { Component } from 'react';
 import { connect } from 'react-redux';
@@ -20,6 +21,8 @@ import type {
   Selector,
   DispatchProps,
   StateSnapshot,
+  UseClone,
+  RenderClone,
 } from './droppable-types';
 import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
@@ -27,6 +30,7 @@ import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../state/action-creators';
 import StoreContext from '../context/store-context';
 import whatIsDraggedOverFromResult from '../../state/droppable/what-is-dragged-over-from-result';
+import getHomeLocation from '../../state/get-home-location';
 
 const isMatchingType = (type: TypeId, critical: Critical): boolean =>
   type === critical.droppable.type;
@@ -47,6 +51,7 @@ export const makeMapStateToProps = (): Selector => {
       draggingOverWith: null,
       draggingFromThisWith: null,
     },
+    useClone: null,
   };
 
   const idleWithoutAnimation = {
@@ -60,14 +65,24 @@ export const makeMapStateToProps = (): Selector => {
       isDraggingOver: boolean,
       dragging: DraggableDimension,
       snapshot: StateSnapshot,
+      whenDraggingClone: ?RenderClone,
     ): MapProps => {
       const isHome: boolean = dragging.descriptor.droppableId === id;
 
       if (isHome) {
+        const useClone: ?UseClone = whenDraggingClone
+          ? {
+              render: whenDraggingClone,
+              draggableId: dragging.descriptor.id,
+              source: getHomeLocation(dragging.descriptor),
+            }
+          : null;
+
         return {
           placeholder: dragging.placeholder,
           shouldAnimatePlaceholder: false,
           snapshot,
+          useClone,
         };
       }
 
@@ -81,6 +96,7 @@ export const makeMapStateToProps = (): Selector => {
         // Animating placeholder in foreign list
         shouldAnimatePlaceholder: true,
         snapshot,
+        useClone: null,
       };
     },
   );
@@ -111,6 +127,7 @@ export const makeMapStateToProps = (): Selector => {
 
     const id: DroppableId = ownProps.droppableId;
     const type: TypeId = ownProps.type;
+    const whenDraggingClone: ?RenderClone = ownProps.whenDraggingClone;
 
     if (state.isDragging) {
       const critical: Critical = state.critical;
@@ -126,7 +143,13 @@ export const makeMapStateToProps = (): Selector => {
 
       // Snapshot based on current impact
       const snapshot: StateSnapshot = getSnapshot(id, isDraggingOver, dragging);
-      return getMapProps(id, isDraggingOver, dragging, snapshot);
+      return getMapProps(
+        id,
+        isDraggingOver,
+        dragging,
+        snapshot,
+        whenDraggingClone,
+      );
     }
 
     if (state.phase === 'DROP_ANIMATING') {
@@ -154,6 +177,7 @@ export const makeMapStateToProps = (): Selector => {
         whatIsDraggedOver(completed.impact) === id,
         dragging,
         snapshot,
+        whenDraggingClone,
       );
     }
 
@@ -171,7 +195,9 @@ export const makeMapStateToProps = (): Selector => {
 
       // Looking at impact as this controls the placeholder
       const wasOver: boolean = whatIsDraggedOver(completed.impact) === id;
-      const wasCombining: boolean = Boolean(completed.impact.merge);
+      const wasCombining: boolean = Boolean(
+        completed.impact.at && completed.impact.at.type === 'COMBINE',
+      );
 
       // need to cut any animations: sadly a memoization fail
       // we need to do this for all lists as there might be
@@ -200,12 +226,20 @@ const mapDispatchToProps: DispatchProps = {
   updateViewportMaxScroll: updateViewportMaxScrollAction,
 };
 
+function getBody(): HTMLElement {
+  invariant(document.body, 'document.body is not ready');
+  return document.body;
+}
+
 const defaultProps = ({
+  mode: 'STANDARD',
   type: 'DEFAULT',
   direction: 'vertical',
   isDropDisabled: false,
   isCombineEnabled: false,
   ignoreContainerClipping: false,
+  whenDraggingClone: null,
+  getContainerForClone: getBody,
 }: DefaultProps);
 
 // Abstract class allows to specify props and defaults to component.
@@ -220,7 +254,7 @@ class DroppableType extends Component<OwnProps> {
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
-const ConnectedDroppable: typeof DroppableType = (connect(
+const ConnectedDroppable: typeof DroppableType = connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
   // no dispatch props for droppable
@@ -237,7 +271,7 @@ const ConnectedDroppable: typeof DroppableType = (connect(
     // Switching to a strictEqual as we return a memoized object on changes
     areStatePropsEqual: isStrictEqual,
   },
-): any)(Droppable);
+)(Droppable);
 
 ConnectedDroppable.defaultProps = defaultProps;
 

@@ -22,6 +22,7 @@ import getResponders from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
 import getCompletedWithResult from './util/get-completed-with-result';
 import getSimpleStatePreset from '../../../../utils/get-simple-state-preset';
+import { tryGetDestination } from '../../../../../src/state/get-impact-location';
 
 const result: DropResult = {
   ...getDragStart(),
@@ -80,7 +81,7 @@ it('should use the drop result and not the final impact', () => {
 
   const state: State = store.getState();
   invariant(state.phase === 'DRAGGING');
-  const destination: ?DraggableLocation = state.impact.destination;
+  const destination: ?DraggableLocation = tryGetDestination(state.impact);
   invariant(destination);
   const fakeResult: DropResult = {
     ...getDragStart(),

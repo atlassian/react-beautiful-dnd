@@ -5,7 +5,6 @@ import type {
   DragImpact,
   DisplacedBy,
   DroppableDimensionMap,
-  Displacement,
 } from '../../../../../src/types';
 import { vertical, horizontal } from '../../../../../src/state/axis';
 import { getPreset, enableCombining } from '../../../../utils/dimension';
@@ -16,16 +15,15 @@ import {
 import getDragImpact from '../../../../../src/state/get-drag-impact';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { patch, subtract, add } from '../../../../../src/state/position';
-import getDisplacementMap from '../../../../../src/state/get-displacement-map';
-import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import afterPoint from '../../../../utils/after-point';
 import beforePoint from '../../../../utils/before-point';
-import getVisibleDisplacement from '../../../../utils/get-displacement/get-visible-displacement';
+import { getForcedDisplacement } from '../../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
-    const { onLift } = getHomeOnLift({
+    const { afterCritical } = getLiftEffect({
       draggable: preset.inHome1,
       home: preset.home,
       draggables: preset.draggables,
@@ -43,26 +41,23 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
       preset.inHome1.displaceBy,
     );
 
-    const whenEnteredForeign: DragImpact = (() => {
-      const displaced: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
-      const impact: DragImpact = {
-        movement: {
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
-        },
+    const whenEnteredForeign: DragImpact = {
+      displaced: getForcedDisplacement({
+        visible: [
+          { dimension: preset.inForeign3, shouldAnimate: true },
+          { dimension: preset.inForeign4, shouldAnimate: true },
+        ],
+      }),
+      displacedBy,
+      at: {
+        type: 'REORDER',
         // in position of inForeign3
         destination: {
           index: preset.inForeign3.descriptor.index,
           droppableId: preset.inForeign3.descriptor.droppableId,
         },
-        merge: null,
-      };
-      return impact;
-    })();
+      },
+    };
 
     // moving onto a displaced inForeign3
     describe('combining with displaced item', () => {
@@ -80,30 +75,25 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
         patch(axis.line, preset.inForeign3.page.borderBox[axis.size] * 0.666),
       );
 
-      const combineWithDisplacedInForeign3: DragImpact = (() => {
-        const displaced: Displacement[] = [
+      const combineWithDisplacedInForeign3: DragImpact = {
+        displaced: getForcedDisplacement({
           // inForeign3 is still displaced - we are just merging with it
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
-        const impact: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          destination: null,
+          visible: [
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
+        }),
+        displacedBy,
+        at: {
+          type: 'COMBINE',
+          whenEntered: forward,
           // now merging with inForeign3
-          merge: {
-            whenEntered: forward,
-            combine: {
-              draggableId: preset.inForeign3.descriptor.id,
-              droppableId: preset.inForeign3.descriptor.droppableId,
-            },
+          combine: {
+            draggableId: preset.inForeign3.descriptor.id,
+            droppableId: preset.inForeign3.descriptor.droppableId,
           },
-        };
-        return impact;
-      })();
+        },
+      };
 
       it('should combine when moving forward onto a displaced start edge', () => {
         // it should not merge when before the item
@@ -119,7 +109,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             userDirection: forward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(whenEnteredForeign);
         }
@@ -133,7 +123,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             userDirection: forward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(combineWithDisplacedInForeign3);
         }
@@ -150,7 +140,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             userDirection: forward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(combineWithDisplacedInForeign3);
         }
@@ -166,23 +156,22 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             userDirection: forward,
-            onLift,
+            afterCritical,
           });
-          const displaced: Displacement[] = [
-            getVisibleDisplacement(preset.inForeign4),
-          ];
+
           const expected: DragImpact = {
-            movement: {
-              displaced,
-              map: getDisplacementMap(displaced),
-              displacedBy,
+            displaced: getForcedDisplacement({
+              visible: [{ dimension: preset.inForeign4 }],
+            }),
+            displacedBy,
+            at: {
+              type: 'REORDER',
+              // now in spot of inForeign4
+              destination: {
+                index: preset.inForeign4.descriptor.index,
+                droppableId: preset.inForeign4.descriptor.droppableId,
+              },
             },
-            // now in spot of inForeign4
-            destination: {
-              index: preset.inForeign4.descriptor.index,
-              droppableId: preset.inForeign4.descriptor.droppableId,
-            },
-            merge: null,
           };
           expect(impact).toEqual(expected);
         }
@@ -197,7 +186,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
           previousImpact: whenEnteredForeign,
           viewport: preset.viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
         expect(initial).toEqual(combineWithDisplacedInForeign3);
         // on start edge, but in backward direction
@@ -210,7 +199,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: initial,
             viewport: preset.viewport,
             userDirection: backward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(combineWithDisplacedInForeign3);
         }
@@ -224,7 +213,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: initial,
             viewport: preset.viewport,
             userDirection: backward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(combineWithDisplacedInForeign3);
         }
@@ -241,7 +230,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: initial,
             viewport: preset.viewport,
             userDirection: backward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(combineWithDisplacedInForeign3);
         }
@@ -259,29 +248,24 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
         endOfInForeign2,
         patch(axis.line, preset.inForeign2.page.borderBox[axis.size] * 0.666),
       );
-      const combineWithInForeign2: DragImpact = (() => {
-        const displaced: Displacement[] = [
-          getVisibleDisplacement(preset.inForeign3),
-          getVisibleDisplacement(preset.inForeign4),
-        ];
-        const impact: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
+      const combineWithInForeign2: DragImpact = {
+        displaced: getForcedDisplacement({
+          visible: [
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
+        }),
+        displacedBy,
+        // now merging with inForeign2
+        at: {
+          type: 'COMBINE',
+          whenEntered: backward,
+          combine: {
+            draggableId: preset.inForeign2.descriptor.id,
+            droppableId: preset.inForeign2.descriptor.droppableId,
           },
-          destination: null,
-          // now merging with inForeign2
-          merge: {
-            whenEntered: backward,
-            combine: {
-              draggableId: preset.inForeign2.descriptor.id,
-              droppableId: preset.inForeign2.descriptor.droppableId,
-            },
-          },
-        };
-        return impact;
-      })();
+        },
+      };
 
       it('should combine with an item when moving backwards onto the end edge', () => {
         // before is not far enough
@@ -294,7 +278,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             userDirection: backward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(whenEnteredForeign);
         }
@@ -308,7 +292,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             userDirection: backward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(combineWithInForeign2);
         }
@@ -325,7 +309,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             userDirection: backward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(combineWithInForeign2);
         }
@@ -339,24 +323,25 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             userDirection: backward,
-            onLift,
+            afterCritical,
           });
-          const displaced: Displacement[] = [
-            getVisibleDisplacement(preset.inForeign2),
-            getVisibleDisplacement(preset.inForeign3),
-            getVisibleDisplacement(preset.inForeign4),
-          ];
+
           const expected: DragImpact = {
-            movement: {
-              displaced,
-              map: getDisplacementMap(displaced),
-              displacedBy,
+            displaced: getForcedDisplacement({
+              visible: [
+                { dimension: preset.inForeign2 },
+                { dimension: preset.inForeign3 },
+                { dimension: preset.inForeign4 },
+              ],
+            }),
+            displacedBy,
+            at: {
+              type: 'REORDER',
+              destination: {
+                index: preset.inForeign2.descriptor.index,
+                droppableId: preset.inForeign2.descriptor.droppableId,
+              },
             },
-            destination: {
-              index: preset.inForeign2.descriptor.index,
-              droppableId: preset.inForeign2.descriptor.droppableId,
-            },
-            merge: null,
           };
           expect(impact).toEqual(expected);
         }
@@ -371,7 +356,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
           previousImpact: whenEnteredForeign,
           viewport: preset.viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
         expect(initial).toEqual(combineWithInForeign2);
         // forward movement on bottom edge
@@ -384,7 +369,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: initial,
             viewport: preset.viewport,
             userDirection: forward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(combineWithInForeign2);
         }
@@ -398,7 +383,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: initial,
             viewport: preset.viewport,
             userDirection: forward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(combineWithInForeign2);
         }
@@ -412,7 +397,7 @@ import getVisibleDisplacement from '../../../../utils/get-displacement/get-visib
             previousImpact: initial,
             viewport: preset.viewport,
             userDirection: forward,
-            onLift,
+            afterCritical,
           });
           expect(impact).toEqual(combineWithInForeign2);
         }

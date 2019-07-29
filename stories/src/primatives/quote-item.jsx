@@ -5,12 +5,15 @@ import { colors } from '@atlaskit/theme';
 import { borderRadius, grid } from '../constants';
 import type { Quote, AuthorColors } from '../types';
 import type { DraggableProvided } from '../../../src';
+import useLayoutEffect from '../../../src/view/use-isomorphic-layout-effect';
 
 type Props = {
   quote: Quote,
   isDragging: boolean,
   provided: DraggableProvided,
+  isClone?: boolean,
   isGroupedOver?: boolean,
+  style?: Object,
 };
 
 const getBackgroundColor = (
@@ -32,6 +35,28 @@ const getBackgroundColor = (
 const getBorderColor = (isDragging: boolean, authorColors: AuthorColors) =>
   isDragging ? authorColors.hard : 'transparent';
 
+const imageSize: number = 40;
+
+const CloneBadge = styled.div`
+  background: ${colors.G100};
+  bottom: ${grid / 2}px;
+  border: 2px solid ${colors.G200};
+  border-radius: 50%;
+  box-sizing: border-box;
+  font-size: 10px;
+  position: absolute;
+  right: -${imageSize / 3}px;
+  top: -${imageSize / 3}px;
+  transform: rotate(40deg);
+
+  height: ${imageSize}px;
+  width: ${imageSize}px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const Container = styled.a`
   border-radius: ${borderRadius}px;
   border: 2px solid transparent;
@@ -40,8 +65,9 @@ const Container = styled.a`
     getBackgroundColor(props.isDragging, props.isGroupedOver, props.colors)};
   box-shadow: ${({ isDragging }) =>
     isDragging ? `2px 2px 1px ${colors.N70}` : 'none'};
+  box-sizing: border-box;
   padding: ${grid}px;
-  min-height: 40px;
+  min-height: ${imageSize}px;
   margin-bottom: ${grid}px;
   user-select: none;
 
@@ -65,8 +91,8 @@ const Container = styled.a`
 `;
 
 const Avatar = styled.img`
-  width: 40px;
-  height: 40px;
+  width: ${imageSize}px;
+  height: ${imageSize}px;
   border-radius: 50%;
   margin-right: ${grid}px;
   flex-shrink: 0;
@@ -105,6 +131,7 @@ const Footer = styled.div`
 `;
 
 const Author = styled.small`
+  color: ${props => props.colors.hard};
   flex-grow: 0;
   margin: 0;
   background-color: ${props => props.colors.soft};
@@ -122,6 +149,17 @@ const QuoteId = styled.small`
   text-align: right;
 `;
 
+function getStyle(provided: DraggableProvided, style: ?Object) {
+  if (!style) {
+    return provided.draggableProps.style;
+  }
+
+  return {
+    ...provided.draggableProps.style,
+    ...style,
+  };
+}
+
 // Previously this extended React.Component
 // That was a good thing, because using React.PureComponent can hide
 // issues with the selectors. However, moving it over does can considerable
@@ -130,19 +168,28 @@ const QuoteId = styled.small`
 // things we should be doing in the selector as we do not know if consumers
 // will be using PureComponent
 function QuoteItem(props: Props) {
-  const { quote, isDragging, isGroupedOver, provided } = props;
+  const { quote, isDragging, isGroupedOver, provided, style, isClone } = props;
+
+  useLayoutEffect(() => {
+    console.log('mounting', quote.id);
+    return () => console.log('unmounting', quote.id);
+  }, [quote.id]);
 
   return (
     <Container
       href={quote.author.url}
       isDragging={isDragging}
       isGroupedOver={isGroupedOver}
+      isClone={isClone}
       colors={quote.author.colors}
       ref={provided.innerRef}
       {...provided.draggableProps}
       {...provided.dragHandleProps}
+      style={getStyle(provided, style)}
+      data-is-dragging={isDragging}
     >
       <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
+      {isClone ? <CloneBadge>Clone</CloneBadge> : null}
       <Content>
         <BlockQuote>{quote.content}</BlockQuote>
         <Footer>

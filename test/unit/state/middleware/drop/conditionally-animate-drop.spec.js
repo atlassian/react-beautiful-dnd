@@ -23,7 +23,7 @@ import {
   getDragStart,
   initialPublishArgs,
   homeImpact,
-  onLift,
+  afterCritical,
   critical,
   getCompletedArgs,
   getDropImpactForReason,
@@ -38,10 +38,10 @@ import type {
   DragImpact,
   State,
   Combine,
-  CombineImpact,
 } from '../../../../../src/types';
 import getDropImpact from '../../../../../src/state/middleware/drop/get-drop-impact';
 import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get-new-home-client-offset';
+import { tryGetCombine } from '../../../../../src/state/get-impact-location';
 
 ['DROP', 'CANCEL'].forEach((reason: DropReason) => {
   describe(`with drop reason: ${reason}`, () => {
@@ -98,6 +98,7 @@ import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get
         result,
         impact: getDropImpactForReason(reason),
         critical,
+        afterCritical,
       };
       const args: AnimateDropArgs = {
         completed,
@@ -150,10 +151,7 @@ import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get
       invariant(current.isDragging);
 
       // if (reason === 'DROP') {
-      // impact is cleared when cancelling
-      const merge: ?CombineImpact = current.impact.merge;
-      invariant(merge);
-      const combine: Combine = merge.combine;
+      const combine: ?Combine = tryGetCombine(current.impact);
       invariant(combine);
       // moved forwards past in home2, and then backwards onto it
       expect(combine).toEqual({
@@ -170,12 +168,13 @@ import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get
         home: preset.home,
         viewport: preset.viewport,
         onLiftImpact: homeImpact,
-        onLift,
+        afterCritical,
       }).impact;
 
       const completed: CompletedDrag = {
         critical,
         impact: combineDropImpact,
+        afterCritical,
         result: {
           ...getDragStart(),
           // we are using snap movements
@@ -192,7 +191,7 @@ import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get
           draggable: preset.inHome1,
           dimensions: preset.dimensions,
           viewport: preset.viewport,
-          onLift,
+          afterCritical,
         }),
         // $ExpectError - wrong type
         dropDuration: expect.any(Number),

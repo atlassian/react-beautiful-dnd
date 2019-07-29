@@ -4,11 +4,6 @@ import invariant from 'tiny-invariant';
 import type {
   DimensionMarshal,
   Callbacks,
-  GetDraggableDimensionFn,
-  DroppableCallbacks,
-  Entries,
-  DroppableEntry,
-  DraggableEntry,
   StartPublishingResult,
 } from './dimension-marshal-types';
 import createPublisher, {
@@ -16,41 +11,27 @@ import createPublisher, {
 } from './while-dragging-publisher';
 import getInitialPublish from './get-initial-publish';
 import type {
+  Registry,
+  DroppableEntry,
+  DraggableEntry,
+  Subscriber,
+  Unsubscribe,
+  RegistryEvent,
+} from '../registry/registry-types';
+import type {
   DroppableId,
   DroppableDescriptor,
-  DraggableDescriptor,
   LiftRequest,
   Critical,
+  DraggableId,
 } from '../../types';
-import { values } from '../../native-with-fallback';
-import { warning } from '../../dev-warning';
 
 type Collection = {|
   critical: Critical,
+  unsubscribe: Unsubscribe,
 |};
 
-const throwIfAddOrRemoveOfWrongType = (
-  collection: Collection,
-  descriptor: DraggableDescriptor,
-) => {
-  invariant(
-    collection.critical.draggable.type === descriptor.type,
-    `We have detected that you have added a Draggable during a drag.
-      This is not of the same type as the dragging item
-
-      Dragging type: ${collection.critical.draggable.type}.
-      Added type: ${descriptor.type}
-
-      We are not allowing this as you can run into problems if your change
-      has shifted the positioning of other Droppables, or has changed the size of the page`,
-  );
-};
-
-export default (callbacks: Callbacks) => {
-  const entries: Entries = {
-    droppables: {},
-    draggables: {},
-  };
+export default (registry: Registry, callbacks: Callbacks) => {
   let collection: ?Collection = null;
 
   const publisher: WhileDraggingPublisher = createPublisher({
@@ -65,151 +46,12 @@ export default (callbacks: Callbacks) => {
         return collection.critical;
       },
     },
-    getEntries: (): Entries => entries,
+    registry,
   });
-
-  const registerDraggable = (
-    descriptor: DraggableDescriptor,
-    getDimension: GetDraggableDimensionFn,
-  ) => {
-    // Not checking if the draggable already exists.
-    // - This allows for overwriting in particular circumstances.
-    // Not checking if a parent droppable exists.
-    // - In React 16 children are mounted before their parents
-
-    const entry: DraggableEntry = {
-      descriptor,
-      getDimension,
-    };
-    entries.draggables[descriptor.id] = entry;
-
-    if (!collection) {
-      return;
-    }
-
-    throwIfAddOrRemoveOfWrongType(collection, descriptor);
-
-    // A Draggable has been added during a collection - need to act!
-    publisher.add(descriptor);
-  };
-
-  const updateDraggable = (
-    published: DraggableDescriptor,
-    descriptor: DraggableDescriptor,
-    getDimension: GetDraggableDimensionFn,
-  ) => {
-    const existing: ?DraggableEntry = entries.draggables[published.id];
-
-    invariant(
-      existing,
-      'Cannot update draggable registration as no published registration was found',
-    );
-
-    // If consumers are not using keys correctly then there can be timing issues
-    // Note: there will still be a crash if starting a drag during the drop animation
-    if (existing.descriptor === published) {
-      // id might have changed so we are removing the old entry
-      delete entries.draggables[published.id];
-    } else {
-      warning(`
-        Detected incorrect usage of 'key' on '<Draggable draggableId="${published.id}"$ />
-
-        Your 'key' should be:
-        - Unique for each Draggable in a list
-        - Not be based on the index of the Draggable
-
-        Usually you want your 'key' to just be the 'draggableId'
-
-        More information: https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/api/draggable.md#keys-for-a-list-of-draggable-
-      `);
-    }
-
-    // adding new entry
-    const entry: DraggableEntry = {
-      descriptor,
-      getDimension,
-    };
-    entries.draggables[descriptor.id] = entry;
-
-    // it is fine if these are updated during a drag
-    // this can happen as the index changes
-  };
-
-  const unregisterDraggable = (descriptor: DraggableDescriptor) => {
-    const entry: ?DraggableEntry = entries.draggables[descriptor.id];
-    invariant(
-      entry,
-      `Cannot unregister Draggable with id:
-      ${descriptor.id} as it is not registered`,
-    );
-
-    // Entry has already been overwritten.
-    // This can happen when a new Draggable with the same draggableId
-    // is mounted before the old Draggable has been removed.
-    if (entry.descriptor !== descriptor) {
-      return;
-    }
-
-    delete entries.draggables[descriptor.id];
-
-    if (!collection) {
-      return;
-    }
-
-    invariant(
-      collection.critical.draggable.id !== descriptor.id,
-      'Cannot remove the dragging item during a drag',
-    );
-
-    throwIfAddOrRemoveOfWrongType(collection, descriptor);
-
-    publisher.remove(descriptor);
-  };
-
-  const registerDroppable = (
-    descriptor: DroppableDescriptor,
-    droppableCallbacks: DroppableCallbacks,
-  ) => {
-    const id: DroppableId = descriptor.id;
-
-    // Not checking if there is already a droppable published with the same id
-    // In some situations a Droppable might be published with the same id as
-    // a Droppable that is about to be unmounted - but has not unpublished yet
-
-    entries.droppables[id] = {
-      descriptor,
-      callbacks: droppableCallbacks,
-    };
-
-    invariant(!collection, 'Cannot add a Droppable during a drag');
-  };
-
-  const unregisterDroppable = (descriptor: DroppableDescriptor) => {
-    const entry: ?DroppableEntry = entries.droppables[descriptor.id];
-
-    invariant(
-      entry,
-      `Cannot unregister Droppable with id ${descriptor.id} as as it is not registered`,
-    );
-
-    // entry has already been overwritten
-    // in which can we will not remove it
-    if (entry.descriptor !== descriptor) {
-      return;
-    }
-
-    // Not checking if this will leave orphan draggables as react
-    // unmounts parents before it unmounts children:
-    // https://twitter.com/alexandereardon/status/941514612624703488
-
-    delete entries.droppables[descriptor.id];
-
-    invariant(!collection, 'Cannot add a Droppable during a drag');
-  };
 
   const updateDroppableIsEnabled = (id: DroppableId, isEnabled: boolean) => {
     invariant(
-      entries.droppables[id],
+      registry.droppable.exists(id),
       `Cannot update is enabled flag of Droppable ${id} as it is not registered`,
     );
 
@@ -228,43 +70,38 @@ export default (callbacks: Callbacks) => {
     id: DroppableId,
     isCombineEnabled: boolean,
   ) => {
-    invariant(
-      entries.droppables[id],
-      `Cannot update isCombineEnabled flag of Droppable ${id} as it is not registered`,
-    );
-
     // no need to update
     if (!collection) {
       return;
     }
 
+    invariant(
+      registry.droppable.exists(id),
+      `Cannot update isCombineEnabled flag of Droppable ${id} as it is not registered`,
+    );
+
     callbacks.updateDroppableIsCombineEnabled({ id, isCombineEnabled });
   };
 
   const updateDroppableScroll = (id: DroppableId, newScroll: Position) => {
-    invariant(
-      entries.droppables[id],
-      `Cannot update the scroll on Droppable ${id} as it is not registered`,
-    );
-
     // no need to update the application state if a collection is not occurring
     if (!collection) {
       return;
     }
 
+    invariant(
+      registry.droppable.exists(id),
+      `Cannot update the scroll on Droppable ${id} as it is not registered`,
+    );
+
     callbacks.updateDroppableScroll({ id, offset: newScroll });
   };
 
   const scrollDroppable = (id: DroppableId, change: Position) => {
-    const entry: ?DroppableEntry = entries.droppables[id];
-
-    invariant(entry, `Cannot scroll Droppable ${id} as it is not registered`);
-
     if (!collection) {
       return;
     }
-
-    entry.callbacks.scroll(change);
+    registry.droppable.getById(id).callbacks.scroll(change);
   };
 
   const stopPublishing = () => {
@@ -278,14 +115,35 @@ export default (callbacks: Callbacks) => {
     // Tell all droppables to stop watching scroll
     // all good if they where not already listening
     const home: DroppableDescriptor = collection.critical.droppable;
-    values(entries.droppables)
-      .filter(
-        (entry: DroppableEntry): boolean => entry.descriptor.type === home.type,
-      )
+    registry.droppable
+      .getAllByType(home.type)
       .forEach((entry: DroppableEntry) => entry.callbacks.dragStopped());
 
+    // Unsubscribe from registry updates
+    collection.unsubscribe();
     // Finally - clear our collection
     collection = null;
+  };
+
+  const subscriber: Subscriber = (event: RegistryEvent) => {
+    invariant(
+      collection,
+      'Should only be subscribed when a collection is occurring',
+    );
+    // The dragging item can be add and removed when using a clone
+    // We do not publish updates for the critical item
+    const criticalId: DraggableId = collection.critical.draggable.id;
+
+    if (event.type === 'ADDITION') {
+      if (event.value.descriptor.id !== criticalId) {
+        publisher.add(event.value);
+      }
+    }
+    if (event.type === 'REMOVAL') {
+      if (event.value.id !== criticalId) {
+        publisher.remove(event.value);
+      }
+    }
   };
 
   const startPublishing = (request: LiftRequest): StartPublishingResult => {
@@ -293,37 +151,34 @@ export default (callbacks: Callbacks) => {
       !collection,
       'Cannot start capturing critical dimensions as there is already a collection',
     );
-    const entry: ?DraggableEntry = entries.draggables[request.draggableId];
-    invariant(entry, 'Cannot find critical draggable entry');
-    const home: ?DroppableEntry =
-      entries.droppables[entry.descriptor.droppableId];
-    invariant(home, 'Cannot find critical droppable entry');
+    const entry: DraggableEntry = registry.draggable.getById(
+      request.draggableId,
+    );
+    const home: DroppableEntry = registry.droppable.getById(
+      entry.descriptor.droppableId,
+    );
 
     const critical: Critical = {
       draggable: entry.descriptor,
       droppable: home.descriptor,
     };
 
+    const unsubscribe = registry.subscribe(subscriber);
+
     collection = {
       critical,
+      unsubscribe,
     };
 
     return getInitialPublish({
       critical,
-      entries,
+      registry,
       scrollOptions: request.scrollOptions,
     });
   };
 
   const marshal: DimensionMarshal = {
-    // dimension registration
-    registerDraggable,
-    updateDraggable,
-    unregisterDraggable,
-    registerDroppable,
-    unregisterDroppable,
-
-    // droppable changes
+    // Droppable changes
     updateDroppableIsEnabled,
     updateDroppableIsCombineEnabled,
     scrollDroppable,

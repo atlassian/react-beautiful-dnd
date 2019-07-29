@@ -29,8 +29,9 @@ import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
 import update from './post-reducer/when-moving/update';
 import refreshSnap from './post-reducer/when-moving/refresh-snap';
-import getHomeOnLift from './get-home-on-lift';
+import getLiftEffect from './get-lift-effect';
 import patchDimensionMap from './patch-dimension-map';
+import publishWhileDraggingInVirtual from './publish-while-dragging-in-virtual';
 
 const isSnapping = (state: StateWhenUpdatesAllowed): boolean =>
   state.movementMode === 'SNAP';
@@ -103,7 +104,7 @@ export default (state: State = idle, action: Action): State => {
       dimensions.droppables,
     ).every((item: DroppableDimension) => !item.isFixedOnPage);
 
-    const { impact, onLift } = getHomeOnLift({
+    const { impact, afterCritical } = getLiftEffect({
       draggable,
       home,
       draggables: dimensions.draggables,
@@ -120,7 +121,7 @@ export default (state: State = idle, action: Action): State => {
       current: initial,
       isWindowScrollAllowed,
       impact,
-      onLift,
+      afterCritical,
       onLiftImpact: impact,
       viewport,
       userDirection: forward,
@@ -161,7 +162,7 @@ export default (state: State = idle, action: Action): State => {
       `Unexpected ${action.type} received in phase ${state.phase}`,
     );
 
-    return publishWhileDragging({
+    return publishWhileDraggingInVirtual({
       state,
       published: action.payload,
     });
@@ -420,10 +421,10 @@ export default (state: State = idle, action: Action): State => {
     // Moving into a new phase
     const result: DropAnimatingState = {
       phase: 'DROP_ANIMATING',
-      dimensions: state.dimensions,
       completed,
       dropDuration,
       newHomeClientOffset,
+      dimensions: state.dimensions,
     };
 
     return result;

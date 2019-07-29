@@ -2,33 +2,34 @@
 import { offset, type Position, type BoxModel } from 'css-box-model';
 import type {
   Axis,
+  DragImpact,
+  DraggableId,
   DraggableDimension,
   DraggableDimensionMap,
-  DragMovement,
   DroppableDimension,
-  OnLift,
+  LiftEffect,
 } from '../../../types';
 import { goBefore, goAfter, goIntoStart } from '../move-relative-to';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
 import { negate } from '../../position';
-import didStartDisplaced from '../../starting-displaced/did-start-displaced';
+import didStartAfterCritical from '../../did-start-after-critical';
 
 type NewHomeArgs = {|
-  movement: DragMovement,
+  impact: DragImpact,
   draggable: DraggableDimension,
   draggables: DraggableDimensionMap,
   droppable: DroppableDimension,
-  onLift: OnLift,
+  afterCritical: LiftEffect,
 |};
 
 // Returns the client offset required to move an item from its
 // original client position to its final resting position
 export default ({
-  movement,
+  impact,
   draggable,
   draggables,
   droppable,
-  onLift,
+  afterCritical,
 }: NewHomeArgs): Position => {
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     droppable.descriptor.id,
@@ -47,30 +48,27 @@ export default ({
     });
   }
 
-  const { displaced, displacedBy } = movement;
+  const { displaced, displacedBy } = impact;
+  const closestAfter: ?DraggableId = displaced.all[0];
 
   // go before the first displaced item
   // items can only be displaced forwards
-  if (displaced.length) {
-    const closestAfter: DraggableDimension =
-      draggables[displaced[0].draggableId];
+  if (closestAfter) {
+    const closest: DraggableDimension = draggables[closestAfter];
     // want to go before where it would be with the displacement
 
     // target is displaced and is already in it's starting position
-    if (didStartDisplaced(closestAfter.descriptor.id, onLift)) {
+    if (didStartAfterCritical(closestAfter, afterCritical)) {
       return goBefore({
         axis,
-        moveRelativeTo: closestAfter.page,
+        moveRelativeTo: closest.page,
         isMoving: draggablePage,
       });
     }
 
     // target has been displaced during the drag and it is not in its starting position
     // we need to account for the displacement
-    const withDisplacement: BoxModel = offset(
-      closestAfter.page,
-      displacedBy.point,
-    );
+    const withDisplacement: BoxModel = offset(closest.page, displacedBy.point);
 
     return goBefore({
       axis,
@@ -90,11 +88,14 @@ export default ({
     return draggablePage.borderBox.center;
   }
 
-  if (didStartDisplaced(last.descriptor.id, onLift)) {
+  if (didStartAfterCritical(last.descriptor.id, afterCritical)) {
     // if the item started displaced and it is no longer displaced then
     // we need to go after it it's non-displaced position
 
-    const page: BoxModel = offset(last.page, negate(onLift.displacedBy.point));
+    const page: BoxModel = offset(
+      last.page,
+      negate(afterCritical.displacedBy.point),
+    );
     return goAfter({
       axis,
       moveRelativeTo: page,

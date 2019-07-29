@@ -1,41 +1,36 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   DraggableId,
   DroppableId,
+  DraggableDescriptor,
   Published,
   DraggableDimension,
   DroppableDimension,
-  DraggableDescriptor,
+  DroppableIdMap,
   Critical,
+  DraggableIdMap,
 } from '../../types';
+import type { RecollectDroppableOptions } from './dimension-marshal-types';
 import type {
-  Entries,
   DroppableEntry,
-  RecollectDroppableOptions,
-} from './dimension-marshal-types';
+  Registry,
+  DraggableEntry,
+  DraggableEntryMap,
+} from '../registry/registry-types';
 import * as timings from '../../debug/timings';
 import { origin } from '../position';
 import { warning } from '../../dev-warning';
 
 export type WhileDraggingPublisher = {|
-  add: (descriptor: DraggableDescriptor) => void,
+  add: (entry: DraggableEntry) => void,
   remove: (descriptor: DraggableDescriptor) => void,
   stop: () => void,
 |};
 
-type DraggableMap = {
-  [id: DraggableId]: DraggableDescriptor,
-};
-
-type DroppableMap = {
-  [id: DroppableId]: true,
-};
-
 type Staging = {|
-  additions: DraggableMap,
-  removals: DraggableMap,
-  modified: DroppableMap,
+  additions: DraggableEntryMap,
+  removals: DraggableIdMap,
+  modified: DroppableIdMap,
 |};
 
 type Callbacks = {|
@@ -45,7 +40,7 @@ type Callbacks = {|
 |};
 
 type Args = {|
-  getEntries: () => Entries,
+  registry: Registry,
   callbacks: Callbacks,
 |};
 
@@ -57,7 +52,10 @@ const clean = (): Staging => ({
 
 const timingKey: string = 'Publish collection from DOM';
 
-export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
+export default function createPublisher({
+  registry,
+  callbacks,
+}: Args): WhileDraggingPublisher {
   const advancedUsageWarning = (() => {
     // noop for production
     if (process.env.NODE_ENV === 'production') {
@@ -98,14 +96,13 @@ export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
       const critical: Critical = callbacks.getCritical();
       timings.start(timingKey);
 
-      const entries: Entries = getEntries();
       const { additions, removals, modified } = staging;
 
       const added: DraggableDimension[] = Object.keys(additions)
         .map(
           // Using the origin as the window scroll. This will be adjusted when processing the published values
           (id: DraggableId): DraggableDimension =>
-            entries.draggables[id].getDimension(origin),
+            registry.draggable.getById(id).getDimension(origin),
         )
         // Dimensions are not guarenteed to be ordered in the same order as keys
         // So we need to sort them so they are in the correct order
@@ -116,8 +113,7 @@ export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
 
       const updated: DroppableDimension[] = Object.keys(modified).map(
         (id: DroppableId) => {
-          const entry: ?DroppableEntry = entries.droppables[id];
-          invariant(entry, 'Cannot find dynamically added droppable in cache');
+          const entry: DroppableEntry = registry.droppable.getById(id);
           const isHome: boolean = entry.descriptor.id === critical.droppable.id;
 
           // need to keep the placeholder when in home list
@@ -141,18 +137,19 @@ export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
     });
   };
 
-  const add = (descriptor: DraggableDescriptor) => {
-    staging.additions[descriptor.id] = descriptor;
-    staging.modified[descriptor.droppableId] = true;
+  const add = (entry: DraggableEntry) => {
+    const id: DraggableId = entry.descriptor.id;
+    staging.additions[id] = entry;
+    staging.modified[entry.descriptor.droppableId] = true;
 
-    if (staging.removals[descriptor.id]) {
-      delete staging.removals[descriptor.id];
+    if (staging.removals[id]) {
+      delete staging.removals[id];
     }
     collect();
   };
 
   const remove = (descriptor: DraggableDescriptor) => {
-    staging.removals[descriptor.id] = descriptor;
+    staging.removals[descriptor.id] = true;
     staging.modified[descriptor.droppableId] = true;
 
     if (staging.additions[descriptor.id]) {
@@ -176,4 +173,4 @@ export default ({ getEntries, callbacks }: Args): WhileDraggingPublisher => {
     remove,
     stop,
   };
-};
+}

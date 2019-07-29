@@ -82,6 +82,13 @@ module.exports = {
         message:
           'Must use `useLayoutEffect` as the name of the import from `*use-isomorphic-layout-effect` to leverage `eslint-plugin-react-hooks`',
       },
+
+      // No Array.from as it pulls in a large amount of babel helpers
+      {
+        selector: 'MemberExpression[object.name="Array"][property.name="from"]',
+        message:
+          'Not allowing using of Array.from to save kbs. Please use native-with-fallback/from',
+      },
     ],
 
     // Allowing Math.pow rather than forcing `**`
@@ -162,6 +169,6 @@ module.exports = {
     // Enforce rules of hooks
     'react-hooks/rules-of-hooks': 'error',
     // Second argument to hook functions
-    'react-hooks/exhaustive-deps': 'warn',
+    'react-hooks/exhaustive-deps': 'error',
   },
 };

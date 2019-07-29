@@ -7,20 +7,19 @@ import type {
   DimensionMap,
   DraggableDimension,
   DroppableId,
-  OnLift,
-  CombineImpact,
+  LiftEffect,
+  Combine,
 } from '../../../types';
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import { subtract } from '../../position';
 import getClientBorderBoxCenter from '../../get-center-from-impact/get-client-border-box-center';
-import didStartDisplaced from '../../starting-displaced/did-start-displaced';
 
 type Args = {|
   impact: DragImpact,
   draggable: DraggableDimension,
   dimensions: DimensionMap,
   viewport: Viewport,
-  onLift: OnLift,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
@@ -28,7 +27,7 @@ export default ({
   draggable,
   dimensions,
   viewport,
-  onLift,
+  afterCritical,
 }: Args): Position => {
   const { draggables, droppables } = dimensions;
   const droppableId: ?DroppableId = whatIsDraggedOver(impact);
@@ -42,7 +41,7 @@ export default ({
     draggable,
     draggables,
     // if there is no destination, then we will be dropping back into the home
-    onLift,
+    afterCritical,
     droppable: destination || home,
     viewport,
   });
@@ -51,15 +50,6 @@ export default ({
     newClientCenter,
     draggable.client.borderBox.center,
   );
-
-  const merge: ?CombineImpact = impact.merge;
-
-  // When dropping with a merge we want to drop the dragging item
-  // into the new home location of the target.
-  // The target will move as a result of a drop if it started displaced
-  if (merge && didStartDisplaced(merge.combine.draggableId, onLift)) {
-    return subtract(offset, onLift.displacedBy.point);
-  }
 
   return offset;
 };

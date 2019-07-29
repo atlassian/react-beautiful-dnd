@@ -43,18 +43,23 @@ All of our built in screen reader messages use `id`'s to identify `<Draggable />
 
 ### Step 1: Introduce draggable item
 
-When a user `tabs` to a `<Draggable />`, we need to tell them how to start a drag. We do this by using the `aria-roledescription` property on a _drag handle_.
+When a user `tabs` to a _drag handle_, we need to tell them how to start a drag. We do this by using the `liftInstruction` property on a `<DragDropContext />`. All _drag handles_ share the same lift announcement message.
 
-**Default message**: "Draggable item. Press space bar to lift"
+**Default message**: "Draggable item. Ensure your screen reader is not in browse mode and then press spacebar to lift."
 
 We tell the user the following:
 
 - The item is draggable
+- To disable _browse mode_
 - How to start a drag
 
 You don't need to give all the drag movement instructions at this point, let's wait until the user decides to start a drag.
 
 Think about substituting the word "item" for a noun that matches your problem domain, for example, "task" or "issue". You might also want to drop the word "item" altogether.
+
+#### Disabling browse mode
+
+Screen readers can run in [various modes](https://www.accessibility-developer-guide.com/knowledge/desktop-screen-readers/browse-focus-modes/). In order for the keyboard shortcuts to work correctly the user needs to leave the _browse mode_ as it remaps a lot of keyboard shortcuts. Alternatively you could use `aria-role="application"` on the `<body>` element, but this can wreck the standard screen reader usage of your page.
 
 ### Step 2: Start drag
 

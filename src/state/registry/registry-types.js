@@ -1,0 +1,98 @@
+// @flow
+import type { Position } from 'css-box-model';
+import type {
+  Id,
+  DraggableId,
+  DraggableDescriptor,
+  DraggableOptions,
+  DraggableDimension,
+  DroppableId,
+  ScrollOptions,
+  DroppableDescriptor,
+  DroppableDimension,
+  TypeId,
+} from '../../types';
+
+export type GetDraggableDimensionFn = (
+  windowScroll: Position,
+) => DraggableDimension;
+
+export type DraggableEntry = {|
+  uniqueId: Id,
+  descriptor: DraggableDescriptor,
+  options: DraggableOptions,
+  getDimension: GetDraggableDimensionFn,
+|};
+
+export type DraggableAPI = {|
+  register: (entry: DraggableEntry) => void,
+  update: (entry: DraggableEntry, last: DraggableEntry) => void,
+  unregister: (entry: DraggableEntry) => void,
+  exists: (id: DraggableId) => boolean,
+  getById: (id: DraggableId) => DraggableEntry,
+  findById: (id: DraggableId) => ?DraggableEntry,
+  getAllByType: (type: TypeId) => DraggableEntry[],
+|};
+
+export type GetDroppableDimensionFn = (
+  windowScroll: Position,
+  options: ScrollOptions,
+) => DroppableDimension;
+
+export type RecollectDroppableOptions = {|
+  withoutPlaceholder: boolean,
+|};
+
+export type DroppableCallbacks = {|
+  // a drag is starting
+  getDimensionAndWatchScroll: GetDroppableDimensionFn,
+  recollect: (options: RecollectDroppableOptions) => DroppableDimension,
+  // scroll a droppable
+  scroll: (change: Position) => void,
+  // If the Droppable is listening for scroll events - it needs to stop!
+  // Can be called on droppables that have not been asked to watch scroll
+  dragStopped: () => void,
+|};
+
+export type DroppableEntry = {|
+  uniqueId: Id,
+  descriptor: DroppableDescriptor,
+  callbacks: DroppableCallbacks,
+|};
+
+export type DraggableEntryMap = {
+  [id: DraggableId]: DraggableEntry,
+};
+
+export type DroppableEntryMap = {
+  [id: DroppableId]: DroppableEntry,
+};
+
+export type DroppableAPI = {|
+  register: (entry: DroppableEntry) => void,
+  unregister: (entry: DroppableEntry) => void,
+  exists: (id: DraggableId) => boolean,
+  getById: (id: DroppableId) => DroppableEntry,
+  findById: (id: DroppableId) => ?DroppableEntry,
+  getAllByType: (type: TypeId) => DroppableEntry[],
+|};
+
+export type RegistryEvent =
+  | {|
+      type: 'ADDITION',
+      value: DraggableEntry,
+    |}
+  | {|
+      type: 'REMOVAL',
+      value: DraggableDescriptor,
+    |};
+
+export type Subscriber = (event: RegistryEvent) => void;
+export type Unsubscribe = () => void;
+
+export type Registry = {|
+  draggable: DraggableAPI,
+  droppable: DroppableAPI,
+  subscribe: (cb: Subscriber) => Unsubscribe,
+  clean: () => void,
+|};

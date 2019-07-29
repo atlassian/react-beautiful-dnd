@@ -2,7 +2,6 @@
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import noImpact from '../../../../../../src/state/no-impact';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import type {
   Axis,
@@ -12,7 +11,6 @@ import type {
   DraggableDimensionMap,
   DroppableDimensionMap,
   Viewport,
-  Displacement,
   DisplacedBy,
 } from '../../../../../../src/types';
 import { backward } from '../../../../../../src/state/user-direction/user-direction-preset';
@@ -21,15 +19,15 @@ import {
   getDraggableDimension,
 } from '../../../../../utils/dimension';
 import getViewport from '../../../../../../src/view/window/get-viewport';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
-import getNotVisibleDisplacement from '../../../../../utils/get-displacement/get-not-visible-displacement';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
+import { getForcedDisplacement } from '../../../../../utils/impact';
+import noAfterCritical from '../../../../../utils/no-after-critical';
 
 const viewport: Viewport = getViewport();
 
 // this is just an application of get-displacement.spec
 
-[vertical, horizontal].forEach((axis: Axis) => {
+[vertical /* , horizontal */].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const crossAxisStart: number = 0;
     const crossAxisEnd: number = 100;
@@ -39,6 +37,7 @@ const viewport: Viewport = getViewport();
         descriptor: {
           id: 'my-custom-droppable',
           type: 'TYPE',
+          mode: 'STANDARD',
         },
         direction: axis.direction,
         borderBox: {
@@ -132,32 +131,36 @@ const viewport: Viewport = getViewport();
       const customDroppables: DroppableDimensionMap = {
         [droppable.descriptor.id]: droppable,
       };
-      const displaced: Displacement[] = [
-        getVisibleDisplacement(visible),
-        getVisibleDisplacement(partialVisible),
-        getNotVisibleDisplacement(notVisible1),
-      ];
       // dragging notVisible2 backwards into first position
       const displacedBy: DisplacedBy = getDisplacedBy(
         axis,
         notVisible2.displaceBy,
       );
       const expected: DragImpact = {
-        movement: {
-          // ordered by closest to current position
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
+        displaced: getForcedDisplacement({
+          visible: [
+            {
+              dimension: visible,
+              shouldAnimate: true,
+            },
+            {
+              dimension: partialVisible,
+              shouldAnimate: true,
+            },
+          ],
+          invisible: [notVisible1],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            droppableId: droppable.descriptor.id,
+            index: 0,
+          },
         },
-        // moved into the first position
-        destination: {
-          droppableId: droppable.descriptor.id,
-          index: 0,
-        },
-        merge: null,
       };
 
-      const { onLift, impact: homeImpact } = getHomeOnLift({
+      const { afterCritical, impact: homeImpact } = getLiftEffect({
         draggable: notVisible2,
         home: droppable,
         draggables: customDraggables,
@@ -172,7 +175,7 @@ const viewport: Viewport = getViewport();
         previousImpact: homeImpact,
         viewport,
         userDirection: backward,
-        onLift,
+        afterCritical,
       });
 
       expect(impact).toEqual(expected);
@@ -183,6 +186,7 @@ const viewport: Viewport = getViewport();
         descriptor: {
           id: 'my-custom-droppable',
           type: 'TYPE',
+          mode: 'STANDARD',
         },
         direction: axis.direction,
         borderBox: {
@@ -264,24 +268,29 @@ const viewport: Viewport = getViewport();
         axis,
         notVisible2.displaceBy,
       );
-      const displaced: Displacement[] = [
-        getVisibleDisplacement(visible),
-        getVisibleDisplacement(partialVisible),
-        getNotVisibleDisplacement(notVisible1),
-      ];
       const expected: DragImpact = {
-        movement: {
-          // ordered by closest to current position
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
+        // no longer the same due to visibility overscanning
+        displaced: getForcedDisplacement({
+          visible: [
+            {
+              dimension: visible,
+              shouldAnimate: true,
+            },
+            {
+              dimension: partialVisible,
+              shouldAnimate: true,
+            },
+          ],
+          invisible: [notVisible1],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            droppableId: droppable.descriptor.id,
+            index: 0,
+          },
         },
-        // moved into the first position
-        destination: {
-          droppableId: droppable.descriptor.id,
-          index: 0,
-        },
-        merge: null,
       };
 
       const impact: DragImpact = getDragImpact({
@@ -294,10 +303,7 @@ const viewport: Viewport = getViewport();
         previousImpact: noImpact,
         viewport,
         userDirection: backward,
-        onLift: {
-          displacedBy,
-          wasDisplaced: {},
-        },
+        afterCritical: noAfterCritical,
       });
 
       expect(impact).toEqual(expected);

@@ -21,9 +21,9 @@ describe('home list', () => {
   const ownProps: OwnProps = getOwnProps(preset.home);
   ownProps.isDropDisabled = true;
   const selector: Selector = makeMapStateToProps();
-  const defaultDisabledProps: MapProps = selector(state.idle, ownProps);
 
   it('should have the expected disabled props while resting', () => {
+    const defaultDisabledProps: MapProps = selector(state.idle, ownProps);
     expect(defaultDisabledProps).toEqual(resting);
   });
 
@@ -45,6 +45,7 @@ describe('home list', () => {
         draggingOverWith: null,
         draggingFromThisWith: preset.inHome1.descriptor.id,
       },
+      useClone: null,
     };
 
     const result: MapProps = selector(getNoWhere(), ownProps);

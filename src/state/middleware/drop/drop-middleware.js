@@ -23,6 +23,7 @@ import { isEqual } from '../../position';
 import getDropDuration from './get-drop-duration';
 import getNewHomeClientOffset from './get-new-home-client-offset';
 import getDropImpact, { type Result } from './get-drop-impact';
+import { tryGetCombine, tryGetDestination } from '../../get-impact-location';
 
 export default ({ getState, dispatch }: MiddlewareStore) => (
   next: Dispatch,
@@ -64,27 +65,27 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
 
   const critical: Critical = state.critical;
   const dimensions: DimensionMap = state.dimensions;
+  const draggable: DraggableDimension =
+    dimensions.draggables[state.critical.draggable.id];
   // Only keeping impact when doing a user drop - otherwise we are cancelling
 
   const { impact, didDropInsideDroppable }: Result = getDropImpact({
     reason,
     lastImpact: state.impact,
-    onLift: state.onLift,
+    afterCritical: state.afterCritical,
     onLiftImpact: state.onLiftImpact,
     home: state.dimensions.droppables[state.critical.droppable.id],
     viewport: state.viewport,
     draggables: state.dimensions.draggables,
   });
 
-  const draggable: DraggableDimension =
-    dimensions.draggables[state.critical.draggable.id];
-
   // only populating destination / combine if 'didDropInsideDroppable' is true
   const destination: ?DraggableLocation = didDropInsideDroppable
-    ? impact.destination
+    ? tryGetDestination(impact)
     : null;
-  const combine: ?Combine =
-    didDropInsideDroppable && impact.merge ? impact.merge.combine : null;
+  const combine: ?Combine = didDropInsideDroppable
+    ? tryGetCombine(impact)
+    : null;
 
   const source: DraggableLocation = {
     index: critical.draggable.index,
@@ -107,11 +108,12 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     draggable,
     dimensions,
     viewport: state.viewport,
-    onLift: state.onLift,
+    afterCritical: state.afterCritical,
   });
 
   const completed: CompletedDrag = {
     critical: state.critical,
+    afterCritical: state.afterCritical,
     result,
     impact,
   };

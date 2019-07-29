@@ -1,6 +1,6 @@
 // @flow
 import React, { useMemo } from 'react';
-import { mount, type ReactWrapper } from 'enzyme';
+import { render } from '@testing-library/react';
 import type {
   MapProps,
   OwnProps,
@@ -19,6 +19,8 @@ import { getMarshalStub } from '../../../../utils/dimension-marshal';
 import AppContext, {
   type AppContextValue,
 } from '../../../../../src/view/context/app-context';
+import createRegistry from '../../../../../src/state/registry/create-registry';
+import useFocusMarshal from '../../../../../src/view/use-focus-marshal';
 
 type MountArgs = {|
   WrappedComponent?: any,
@@ -38,14 +40,20 @@ type AppProps = {|
 
 function App(props: AppProps) {
   const { WrappedComponent, isMovementAllowed, ...rest } = props;
+  const contextId = '1';
+
+  const focus = useFocusMarshal(contextId);
   const context: AppContextValue = useMemo(
     () => ({
-      marshal: getMarshalStub(),
-      style: '1',
+      focus,
+      contextId,
       canLift: () => true,
       isMovementAllowed,
+      liftInstructionId: 'fake-id',
+      marshal: getMarshalStub(),
+      registry: createRegistry(),
     }),
-    [isMovementAllowed],
+    [focus, isMovementAllowed],
   );
 
   return (
@@ -65,8 +73,8 @@ export default ({
   mapProps = homeAtRest,
   dispatchProps = defaultDispatchProps,
   isMovementAllowed = () => true,
-}: MountArgs = {}): ReactWrapper<*> =>
-  mount(
+}: MountArgs = {}) =>
+  render(
     <App
       {...ownProps}
       {...mapProps}

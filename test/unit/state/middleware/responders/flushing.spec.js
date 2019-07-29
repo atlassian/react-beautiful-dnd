@@ -112,6 +112,7 @@ it('should work across multiple drags', () => {
     responders.onDragStart.mockReset();
     // $FlowFixMe - responder does not have mockReset property
     responders.onDragUpdate.mockReset();
+    // $FlowFixMe - responder does not have mockReset property
     responders.onDragEnd.mockReset();
   });
 });

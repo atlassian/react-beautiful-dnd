@@ -4,7 +4,6 @@ import { getRect, type Position, type BoxModel, offset } from 'css-box-model';
 import type {
   Axis,
   DragImpact,
-  Displacement,
   DroppableDimension,
   DraggableDimension,
   DraggableDimensionMap,
@@ -17,7 +16,6 @@ import {
   getDroppableDimension,
 } from '../../../../../utils/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import { createViewport } from '../../../../../utils/viewport';
 import moveToNextPlace from '../../../../../../src/state/move-in-direction/move-to-next-place';
 import { type PublicResult } from '../../../../../../src/state/move-in-direction/move-in-direction-types';
@@ -29,9 +27,10 @@ import {
   isPartiallyVisible,
 } from '../../../../../../src/state/visibility/is-visible';
 import { toDraggableMap } from '../../../../../../src/state/dimension-structures';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
+import { getForcedDisplacement } from '../../../../../utils/impact';
+import { emptyGroups } from '../../../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   const viewport: Viewport = createViewport({
@@ -50,6 +49,7 @@ import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-ce
     descriptor: {
       id: 'home - much bigger than viewport',
       type: 'huge',
+      mode: 'STANDARD',
     },
     direction: axis.direction,
     borderBox: {
@@ -64,6 +64,7 @@ import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-ce
     descriptor: {
       id: 'foreign - much bigger than viewport',
       type: 'huge',
+      mode: 'STANDARD',
     },
     direction: axis.direction,
     borderBox: {
@@ -95,7 +96,7 @@ import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-ce
   // in home list moving forward
   const displacedBy: DisplacedBy = getDisplacedBy(axis, inHome.displaceBy);
   const draggables: DraggableDimensionMap = toDraggableMap([inHome, inForeign]);
-  const { onLift } = getHomeOnLift({
+  const { afterCritical } = getLiftEffect({
     draggable: inHome,
     draggables,
     home,
@@ -144,17 +145,18 @@ import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-ce
           inHome.page.borderBox.center;
         const previousClientSelection: Position =
           inHome.client.borderBox.center;
-        const displaced: Displacement[] = [getVisibleDisplacement(inForeign)];
+
         const previousImpact: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: foreign.descriptor.id,
-            index: inForeign.descriptor.index,
+          displaced: getForcedDisplacement({
+            visible: [{ dimension: inForeign }],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: foreign.descriptor.id,
+              index: inForeign.descriptor.index,
+            },
           },
         };
 
@@ -167,20 +169,19 @@ import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-ce
           viewport,
           previousPageBorderBoxCenter,
           previousClientSelection,
-          onLift,
+          afterCritical,
         });
         invariant(result);
 
         const expectedImpact: DragImpact = {
-          movement: {
-            displaced: [],
-            map: {},
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: foreign.descriptor.id,
-            index: inForeign.descriptor.index + 1,
+          displaced: emptyGroups,
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: foreign.descriptor.id,
+              index: inForeign.descriptor.index + 1,
+            },
           },
         };
         // if the item would have been visible - where would the center have been?
@@ -189,7 +190,7 @@ import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-ce
           draggable: inHome,
           droppable: foreign,
           draggables,
-          onLift,
+          afterCritical,
         });
         const expectedScrollJump: Position = subtract(
           nonVisibleCenter,
@@ -251,20 +252,19 @@ import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-ce
       it('should request a jump scroll for movement that is outside of the viewport', () => {
         // after non-displaced inForeign
         const previousImpact: DragImpact = {
-          movement: {
-            displaced: [],
-            map: {},
-            displacedBy: getDisplacedBy(axis, inHome.displaceBy),
+          displaced: emptyGroups,
+          displacedBy: getDisplacedBy(axis, inHome.displaceBy),
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: foreign.descriptor.id,
+              index: inForeign.descriptor.index + 1,
+            },
           },
-          destination: {
-            droppableId: foreign.descriptor.id,
-            index: inForeign.descriptor.index + 1,
-          },
-          merge: null,
         };
         const previousPageBorderBoxCenter: Position = getPageBorderBoxCenter({
           impact: previousImpact,
-          onLift,
+          afterCritical,
           draggable: inHome,
           droppable: foreign,
           draggables,
@@ -292,26 +292,24 @@ import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-ce
           viewport: scrolled,
           previousPageBorderBoxCenter,
           previousClientSelection,
-          onLift,
+          afterCritical,
         });
         invariant(result);
 
-        const expectedDisplaced: Displacement[] = [
-          // Even though the item started in an invisible place we force
-          // the displacement to be visible.
-          getVisibleDisplacement(inForeign),
-        ];
         const expectedImpact: DragImpact = {
-          movement: {
-            displaced: expectedDisplaced,
-            map: getDisplacementMap(expectedDisplaced),
-            displacedBy,
-          },
-          merge: null,
-          // moving into place of inForeign
-          destination: {
-            droppableId: foreign.descriptor.id,
-            index: inForeign.descriptor.index,
+          displaced: getForcedDisplacement({
+            // Even though the item started in an invisible place we force
+            // the displacement to be visible.
+            visible: [{ dimension: inForeign }],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            // moving into place of inForeign
+            destination: {
+              droppableId: foreign.descriptor.id,
+              index: inForeign.descriptor.index,
+            },
           },
         };
         // if the item would have been visible - where would the center have been?
@@ -320,7 +318,7 @@ import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-ce
           draggable: inHome,
           droppable: foreign,
           draggables,
-          onLift,
+          afterCritical,
         });
         const expectedScrollJump: Position = subtract(
           nonVisibleCenter,

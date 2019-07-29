@@ -7,11 +7,12 @@ import type {
 } from '../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../../utils/dimension';
 import { goAfter } from '../../../../../../src/state/get-center-from-impact/move-relative-to';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import { negate } from '../../../../../../src/state/position';
+import { emptyGroups } from '../../../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -19,7 +20,7 @@ import { negate } from '../../../../../../src/state/position';
 
     describe('last item is the dragging item', () => {
       it('should return to the original center', () => {
-        const { onLift, impact: homeImpact } = getHomeOnLift({
+        const { afterCritical, impact: homeImpact } = getLiftEffect({
           draggable: preset.inHome4,
           home: preset.home,
           draggables: preset.draggables,
@@ -27,7 +28,7 @@ import { negate } from '../../../../../../src/state/position';
         });
         const result: Position = getPageBorderBoxCenter({
           impact: homeImpact,
-          onLift,
+          afterCritical,
           draggable: preset.inHome4,
           draggables: preset.draggables,
           droppable: preset.home,
@@ -39,7 +40,7 @@ import { negate } from '../../../../../../src/state/position';
 
     describe('last item started displaced', () => {
       it('should go after the item in its current non-displaced location', () => {
-        const { onLift } = getHomeOnLift({
+        const { afterCritical } = getLiftEffect({
           draggable: preset.inHome1,
           home: preset.home,
           draggables: preset.draggables,
@@ -49,22 +50,21 @@ import { negate } from '../../../../../../src/state/position';
           axis,
           preset.inHome1.displaceBy,
         );
+
         const impact: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced: [],
-            map: {},
+          displaced: emptyGroups,
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              index: preset.inHome4.descriptor.index,
+              droppableId: preset.inHome4.descriptor.id,
+            },
           },
-          // currently in position of inHome4
-          destination: {
-            index: preset.inHome4.descriptor.index,
-            droppableId: preset.inHome4.descriptor.id,
-          },
-          merge: null,
         };
         const result: Position = getPageBorderBoxCenter({
           impact,
-          onLift,
+          afterCritical,
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppable: preset.home,
@@ -84,7 +84,7 @@ import { negate } from '../../../../../../src/state/position';
 
     describe('last item did not start displaced', () => {
       it('should go after the item in its current non-displaced location', () => {
-        const { onLift } = getHomeOnLift({
+        const { afterCritical } = getLiftEffect({
           draggable: preset.inHome1,
           home: preset.home,
           draggables: preset.draggables,
@@ -95,21 +95,20 @@ import { negate } from '../../../../../../src/state/position';
           preset.inHome1.displaceBy,
         );
         const impact: DragImpact = {
-          movement: {
-            displacedBy,
-            displaced: [],
-            map: {},
+          displaced: emptyGroups,
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            // currently after inForeign4
+            destination: {
+              index: preset.inForeign4.descriptor.index + 1,
+              droppableId: preset.inForeign4.descriptor.id,
+            },
           },
-          // currently after inForeign4
-          destination: {
-            index: preset.inForeign4.descriptor.index + 1,
-            droppableId: preset.inForeign4.descriptor.id,
-          },
-          merge: null,
         };
         const result: Position = getPageBorderBoxCenter({
           impact,
-          onLift,
+          afterCritical,
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppable: preset.foreign,

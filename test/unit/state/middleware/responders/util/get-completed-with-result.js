@@ -14,6 +14,7 @@ export default (result: DropResult, state: State): CompletedDrag => {
   );
 
   return {
+    afterCritical: state.afterCritical,
     critical: state.critical,
     result,
     impact: state.impact,

@@ -21,6 +21,7 @@ export type {
   DragStart,
   DragUpdate,
   DropResult,
+  Direction,
   ResponderProvided,
   Announce,
   DraggableLocation,
@@ -28,6 +29,8 @@ export type {
   OnDragStartResponder,
   OnDragUpdateResponder,
   OnDragEndResponder,
+  SensorAPI,
+  Sensor,
 } from './types';
 
 // Droppable types
@@ -41,12 +44,10 @@ export type {
 export type {
   Provided as DraggableProvided,
   StateSnapshot as DraggableStateSnapshot,
+  DragHandleProps,
   DropAnimation,
   DraggableProps,
   DraggableStyle,
   DraggingStyle,
   NotDraggingStyle,
 } from './view/draggable/draggable-types';
-
-// DragHandle types
-export type { DragHandleProps } from './view/use-drag-handle/drag-handle-types';

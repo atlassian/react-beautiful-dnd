@@ -11,6 +11,7 @@ import moveInDirection from '../../../../src/state/move-in-direction';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import { getPreset, disableDroppable } from '../../../utils/dimension';
 import getStatePreset from '../../../utils/get-simple-state-preset';
+import { tryGetDestination } from '../../../../src/state/get-impact-location';
 
 describe('on the vertical axis', () => {
   const preset = getPreset(vertical);
@@ -27,7 +28,7 @@ describe('on the vertical axis', () => {
       droppableId: preset.home.descriptor.id,
       index: 1,
     };
-    expect(result.impact.destination).toEqual(expected);
+    expect(tryGetDestination(result.impact)).toEqual(expected);
   });
 
   it('should move backwards on a MOVE_UP', () => {
@@ -41,7 +42,7 @@ describe('on the vertical axis', () => {
       droppableId: preset.home.descriptor.id,
       index: 0,
     };
-    expect(result.impact.destination).toEqual(expected);
+    expect(tryGetDestination(result.impact)).toEqual(expected);
   });
 
   it('should move cross axis forwards on a MOVE_RIGHT', () => {
@@ -55,7 +56,7 @@ describe('on the vertical axis', () => {
       droppableId: preset.foreign.descriptor.id,
       index: 1,
     };
-    expect(result.impact.destination).toEqual(expected);
+    expect(tryGetDestination(result.impact)).toEqual(expected);
   });
 
   it('should move cross axis backwards on a MOVE_LEFT', () => {
@@ -69,7 +70,7 @@ describe('on the vertical axis', () => {
       droppableId: preset.home.descriptor.id,
       index: 0,
     };
-    expect(result.impact.destination).toEqual(expected);
+    expect(tryGetDestination(result.impact)).toEqual(expected);
   });
 });
 
@@ -88,7 +89,7 @@ describe('on the horizontal axis', () => {
       droppableId: preset.home.descriptor.id,
       index: 1,
     };
-    expect(result.impact.destination).toEqual(expected);
+    expect(tryGetDestination(result.impact)).toEqual(expected);
   });
 
   it('should move backwards on a MOVE_LEFT', () => {
@@ -102,7 +103,7 @@ describe('on the horizontal axis', () => {
       droppableId: preset.home.descriptor.id,
       index: 0,
     };
-    expect(result.impact.destination).toEqual(expected);
+    expect(tryGetDestination(result.impact)).toEqual(expected);
   });
 
   it('should move cross axis forwards on a MOVE_DOWN', () => {
@@ -116,7 +117,7 @@ describe('on the horizontal axis', () => {
       droppableId: preset.foreign.descriptor.id,
       index: 1,
     };
-    expect(result.impact.destination).toEqual(expected);
+    expect(tryGetDestination(result.impact)).toEqual(expected);
   });
 
   it('should move cross axis backwards on a MOVE_UP', () => {
@@ -130,7 +131,7 @@ describe('on the horizontal axis', () => {
       droppableId: preset.home.descriptor.id,
       index: 0,
     };
-    expect(result.impact.destination).toEqual(expected);
+    expect(tryGetDestination(result.impact)).toEqual(expected);
   });
 });
 
@@ -143,7 +144,7 @@ describe('on the horizontal axis', () => {
       const custom: DraggingState = state.dragging();
 
       // no destination when lifting in disabled droppable
-      custom.impact.destination = null;
+      custom.impact.at = null;
       // disabling the droppable for good measure
       const critical: DroppableDimension =
         custom.dimensions.droppables[custom.critical.droppable.id];
@@ -181,7 +182,7 @@ describe('on the horizontal axis', () => {
         droppableId: preset.foreign.descriptor.id,
         index: 1,
       };
-      expect(result.impact.destination).toEqual(expected);
+      expect(tryGetDestination(result.impact)).toEqual(expected);
     });
   });
 });

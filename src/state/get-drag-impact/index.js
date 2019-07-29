@@ -9,15 +9,14 @@ import type {
   UserDirection,
   DragImpact,
   Viewport,
-  OnLift,
+  LiftEffect,
 } from '../../types';
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
 import withDroppableScroll from '../with-scroll-change/with-droppable-scroll';
-import getCombineImpact from './get-combine-impact';
 import getReorderImpact from './get-reorder-impact';
+import getCombineImpact from './get-combine-impact';
 import noImpact from '../no-impact';
-import removeDraggableFromList from '../remove-draggable-from-list';
 
 type Args = {|
   pageBorderBoxCenter: Position,
@@ -28,7 +27,7 @@ type Args = {|
   previousImpact: DragImpact,
   viewport: Viewport,
   userDirection: UserDirection,
-  onLift: OnLift,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
@@ -39,7 +38,7 @@ export default ({
   previousImpact,
   viewport,
   userDirection,
-  onLift,
+  afterCritical,
 }: Args): DragImpact => {
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
@@ -59,10 +58,7 @@ export default ({
     destination.descriptor.id,
     draggables,
   );
-  const insideDestinationWithoutDraggable: DraggableDimension[] = removeDraggableFromList(
-    draggable,
-    insideDestination,
-  );
+
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
   const pageBorderBoxCenterWithDroppableScrollChange: Position = withDroppableScroll(
@@ -71,27 +67,25 @@ export default ({
   );
 
   // checking combine first so we combine before any reordering
-  const withMerge: ?DragImpact = getCombineImpact({
-    pageBorderBoxCenterWithDroppableScrollChange,
-    previousImpact,
-    destination,
-    insideDestinationWithoutDraggable,
-    userDirection,
-    onLift,
-  });
-
-  if (withMerge) {
-    return withMerge;
-  }
-
-  return getReorderImpact({
-    pageBorderBoxCenterWithDroppableScrollChange,
-    destination,
-    draggable,
-    insideDestinationWithoutDraggable,
-    previousImpact,
-    viewport,
-    userDirection,
-    onLift,
-  });
+  return (
+    getCombineImpact({
+      pageBorderBoxCenterWithDroppableScrollChange,
+      draggable,
+      previousImpact,
+      destination,
+      insideDestination,
+      userDirection,
+      afterCritical,
+    }) ||
+    getReorderImpact({
+      pageBorderBoxCenterWithDroppableScrollChange,
+      draggable,
+      destination,
+      insideDestination,
+      last: previousImpact.displaced,
+      viewport,
+      userDirection,
+      afterCritical,
+    })
+  );
 };

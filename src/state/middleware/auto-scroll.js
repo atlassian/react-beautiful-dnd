@@ -4,7 +4,7 @@ import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
 import type { Action, Dispatch, MiddlewareStore } from '../store-types';
 import type { State } from '../../types';
 
-const shouldEnd = (action: Action): boolean =>
+const shouldStop = (action: Action): boolean =>
   action.type === 'DROP_COMPLETE' ||
   action.type === 'DROP_ANIMATE' ||
   action.type === 'CLEAN';
@@ -15,7 +15,7 @@ const shouldCancelPending = (action: Action): boolean =>
 export default (autoScroller: AutoScroller) => (store: MiddlewareStore) => (
   next: Dispatch,
 ) => (action: Action): any => {
-  if (shouldEnd(action)) {
+  if (shouldStop(action)) {
     autoScroller.stop();
     next(action);
     return;

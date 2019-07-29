@@ -19,7 +19,7 @@ import {
   type IsDraggingState,
   withImpact,
 } from '../../../utils/dragging-state';
-import noImpact from '../../../../src/state/no-impact';
+import noImpact, { emptyGroups } from '../../../../src/state/no-impact';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import withCombineImpact from './util/with-combine-impact';
 import restingProps from './util/resting-props';
@@ -37,6 +37,7 @@ describe('home list', () => {
       draggingOverWith: preset.inHome1.descriptor.id,
       draggingFromThisWith: preset.inHome1.descriptor.id,
     },
+    useClone: null,
   };
 
   describe('is dragging over', () => {
@@ -110,6 +111,7 @@ describe('home list', () => {
         draggingOverWith: null,
         draggingFromThisWith: preset.inHome1.descriptor.id,
       },
+      useClone: null,
     };
 
     it('should indicate that it is not being dragged over', () => {
@@ -156,16 +158,15 @@ describe('foreign list', () => {
       preset.inHome1.displaceBy,
     );
     const overForeign: DragImpact = {
-      movement: {
-        displaced: [],
-        map: {},
-        displacedBy,
+      displaced: emptyGroups,
+      displacedBy,
+      at: {
+        type: 'REORDER',
+        destination: {
+          index: 0,
+          droppableId: preset.foreign.descriptor.id,
+        },
       },
-      destination: {
-        index: 0,
-        droppableId: preset.foreign.descriptor.id,
-      },
-      merge: null,
     };
 
     const isOverForeignMapProps: MapProps = {
@@ -176,6 +177,7 @@ describe('foreign list', () => {
         draggingFromThisWith: null,
         draggingOverWith: preset.inHome1.descriptor.id,
       },
+      useClone: null,
     };
 
     it('should indicate that it is being dragged over', () => {

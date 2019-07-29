@@ -1,9 +1,11 @@
 // @flow
 import invariant from 'tiny-invariant';
+import ReactDOM from 'react-dom';
 import { useMemo, useCallback } from 'use-memo-one';
 import React, { useRef, useContext, type Node } from 'react';
-import type { Props, Provided } from './droppable-types';
-import useDroppableDimensionPublisher from '../use-droppable-dimension-publisher';
+import type { DraggableId } from '../../types';
+import type { Props, Provided, UseClone } from './droppable-types';
+import useDroppablePublisher from '../use-droppable-publisher';
 import Placeholder from '../placeholder';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import DroppableContext, {
@@ -12,14 +14,19 @@ import DroppableContext, {
 // import useAnimateInOut from '../use-animate-in-out/use-animate-in-out';
 import getMaxWindowScroll from '../window/get-max-window-scroll';
 import useValidation from './use-validation';
+import type {
+  StateSnapshot as DraggableStateSnapshot,
+  Provided as DraggableProvided,
+} from '../draggable/draggable-types';
 import AnimateInOut, {
   type AnimateProvided,
 } from '../animate-in-out/animate-in-out';
+import { PrivateDraggable } from '../draggable/draggable-api';
 
 export default function Droppable(props: Props) {
   const appContext: ?AppContextValue = useContext<?AppContextValue>(AppContext);
   invariant(appContext, 'Could not find app context');
-  const { style: styleContext, isMovementAllowed } = appContext;
+  const { contextId, isMovementAllowed } = appContext;
   const droppableRef = useRef<?HTMLElement>(null);
   const placeholderRef = useRef<?HTMLElement>(null);
 
@@ -30,14 +37,19 @@ export default function Droppable(props: Props) {
     children,
     droppableId,
     type,
+    mode,
     direction,
     ignoreContainerClipping,
     isDropDisabled,
     isCombineEnabled,
     // map props
     snapshot,
+    useClone,
     // dispatch props
     updateViewportMaxScroll,
+
+    // clone (ownProps)
+    getContainerForClone,
   } = props;
 
   const getDroppableRef = useCallback(
@@ -62,9 +74,10 @@ export default function Droppable(props: Props) {
     }
   }, [isMovementAllowed, updateViewportMaxScroll]);
 
-  useDroppableDimensionPublisher({
+  useDroppablePublisher({
     droppableId,
     type,
+    mode,
     direction,
     isDropDisabled,
     isCombineEnabled,
@@ -72,11 +85,6 @@ export default function Droppable(props: Props) {
     getDroppableRef,
     getPlaceholderRef,
   });
-
-  // const instruction: ?AnimateProvided = useAnimateInOut({
-  //   on: props.placeholder,
-  //   shouldAnimate: props.shouldAnimatePlaceholder,
-  // });
 
   const placeholder: Node = (
     <AnimateInOut
@@ -89,7 +97,7 @@ export default function Droppable(props: Props) {
           onClose={onClose}
           innerRef={setPlaceholderRef}
           animate={animate}
-          styleContext={styleContext}
+          contextId={contextId}
           onTransitionEnd={onPlaceholderTransitionEnd}
         />
       )}
@@ -101,18 +109,22 @@ export default function Droppable(props: Props) {
       innerRef: setDroppableRef,
       placeholder,
       droppableProps: {
-        'data-react-beautiful-dnd-droppable': styleContext,
+        'data-rbd-droppable-id': droppableId,
+        'data-rbd-droppable-context-id': contextId,
       },
     }),
-    [placeholder, setDroppableRef, styleContext],
+    [contextId, droppableId, placeholder, setDroppableRef],
   );
+
+  const isUsingCloneFor: ?DraggableId = useClone ? useClone.draggableId : null;
 
   const droppableContext: ?DroppableContextValue = useMemo(
     () => ({
       droppableId,
       type,
+      isUsingCloneFor,
     }),
-    [droppableId, type],
+    [droppableId, isUsingCloneFor, type],
   );
 
   useValidation({
@@ -121,9 +133,36 @@ export default function Droppable(props: Props) {
     getPlaceholderRef: () => placeholderRef.current,
   });
 
+  function getClone(): ?Node {
+    if (!useClone) {
+      return null;
+    }
+    const { draggableId, source, render } = useClone;
+
+    const node: Node = (
+      <PrivateDraggable
+        draggableId={draggableId}
+        index={source.index}
+        isClone
+        isEnabled
+        // not important as drag has already started
+        shouldRespectForcePress={false}
+        canDragInteractiveElements
+      >
+        {(
+          draggableProvided: DraggableProvided,
+          draggableSnapshot: DraggableStateSnapshot,
+        ) => render(draggableProvided, draggableSnapshot, source)}
+      </PrivateDraggable>
+    );
+
+    return ReactDOM.createPortal(node, getContainerForClone());
+  }
+
   return (
     <DroppableContext.Provider value={droppableContext}>
       {children(provided, snapshot)}
+      {getClone()}
     </DroppableContext.Provider>
   );
 }

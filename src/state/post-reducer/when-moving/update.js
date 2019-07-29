@@ -99,7 +99,7 @@ export default ({
       previousImpact: state.impact,
       viewport,
       userDirection,
-      onLift: state.onLift,
+      afterCritical: state.afterCritical,
     });
 
   const withUpdatedPlaceholders: DroppableDimensionMap = recomputePlaceholders({

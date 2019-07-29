@@ -6,7 +6,7 @@ import type {
   DraggableDimensionMap,
   DragImpact,
   Viewport,
-  OnLift,
+  LiftEffect,
 } from '../../../types';
 import type { PublicResult } from '../move-in-direction-types';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
@@ -28,7 +28,7 @@ type Args = {|
   viewport: Viewport,
   previousClientSelection: Position,
   previousPageBorderBoxCenter: Position,
-  onLift: OnLift,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
@@ -40,7 +40,7 @@ export default ({
   viewport,
   previousPageBorderBoxCenter,
   previousClientSelection,
-  onLift,
+  afterCritical,
 }: Args): ?PublicResult => {
   if (!destination.isEnabled) {
     return null;
@@ -54,7 +54,6 @@ export default ({
 
   const impact: ?DragImpact =
     moveToNextCombine({
-      isInHomeList,
       isMovingForward,
       draggable,
       destination,
@@ -69,7 +68,8 @@ export default ({
       destination,
       insideDestination,
       previousImpact,
-      onLift,
+      viewport,
+      afterCritical,
     });
 
   if (!impact) {
@@ -81,7 +81,7 @@ export default ({
     draggable,
     droppable: destination,
     draggables,
-    onLift,
+    afterCritical,
   });
 
   const isVisibleInNewLocation: boolean = isTotallyVisibleInNewLocation({
@@ -122,7 +122,6 @@ export default ({
     destination,
     draggables,
     maxScrollChange: distance,
-    onLift,
   });
 
   return {

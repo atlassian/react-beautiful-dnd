@@ -10,7 +10,6 @@ import type {
   DroppableDimension,
   DisplacedBy,
   DraggableDimensionMap,
-  Displacement,
 } from '../../../../src/types';
 import {
   getPreset,
@@ -23,19 +22,16 @@ import { createViewport } from '../../../utils/viewport';
 import { origin, patch } from '../../../../src/state/position';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import { toDraggableMap } from '../../../../src/state/dimension-structures';
-import getDisplacementMap from '../../../../src/state/get-displacement-map';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import getVisibleDisplacement from '../../../utils/get-displacement/get-visible-displacement';
-import getNotVisibleDisplacement from '../../../utils/get-displacement/get-not-visible-displacement';
-import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-animated-displacement';
 import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
+import { getForcedDisplacement } from '../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     it('should do nothing when there is no displacement', () => {
       const preset = getPreset(axis);
-      const { onLift, impact: homeImpact } = getHomeOnLift({
+      const { impact: homeImpact } = getLiftEffect({
         draggable: preset.inHome1,
         draggables: preset.draggables,
         home: preset.home,
@@ -48,7 +44,6 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
         destination: preset.home,
         draggables: preset.draggables,
         maxScrollChange: { x: 1000, y: 1000 },
-        onLift,
       });
       expect(impact1).toEqual(homeImpact);
 
@@ -58,7 +53,6 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
         destination: preset.home,
         draggables: preset.draggables,
         maxScrollChange: { x: 1000, y: 1000 },
-        onLift,
       });
       expect(impact2).toEqual(noImpact);
     });
@@ -69,20 +63,13 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
     const homeCrossAxisEnd: number = 100;
     const foreignCrossAxisStart: number = 100;
     const foreignCrossAxisEnd: number = 200;
-
-    const sizeOfInHome1: number = 50;
-    // would normally be visible in viewport
-    const sizeOfInForeign1: number = sizeOfInHome1;
-    const sizeOfInForeign2: number = sizeOfInHome1;
-    // would normally not be visible in viewport
-    const sizeOfInForeign3: number = 10;
-    const sizeOfInForeign4: number = 60;
-    const sizeOfInForeign5: number = 100;
+    const itemSize: number = 50;
 
     const home: DroppableDimension = getDroppableDimension({
       descriptor: {
         id: 'home',
         type: typeId,
+        mode: 'STANDARD',
       },
       direction: axis.direction,
       borderBox: {
@@ -103,7 +90,7 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
         [axis.crossAxisStart]: homeCrossAxisStart,
         [axis.crossAxisEnd]: homeCrossAxisEnd,
         [axis.start]: 0,
-        [axis.end]: sizeOfInHome1,
+        [axis.end]: itemSize,
       },
     });
     const inForeign1: DraggableDimension = getDraggableDimension({
@@ -117,7 +104,7 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
         [axis.crossAxisStart]: foreignCrossAxisStart,
         [axis.crossAxisEnd]: foreignCrossAxisEnd,
         [axis.start]: 0,
-        [axis.end]: sizeOfInForeign1,
+        [axis.end]: itemSize,
       },
     });
     const inForeign2: DraggableDimension = getDraggableDimension({
@@ -131,7 +118,7 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
         [axis.crossAxisStart]: foreignCrossAxisStart,
         [axis.crossAxisEnd]: foreignCrossAxisEnd,
         [axis.start]: inForeign1.page.borderBox[axis.end],
-        [axis.end]: inForeign1.page.borderBox[axis.end] + sizeOfInForeign2,
+        [axis.end]: inForeign1.page.borderBox[axis.end] + itemSize,
       },
     });
     const inForeign3: DraggableDimension = getDraggableDimension({
@@ -145,7 +132,7 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
         [axis.crossAxisStart]: foreignCrossAxisStart,
         [axis.crossAxisEnd]: foreignCrossAxisEnd,
         [axis.start]: inForeign2.page.borderBox[axis.end],
-        [axis.end]: inForeign2.page.borderBox[axis.end] + sizeOfInForeign3,
+        [axis.end]: inForeign2.page.borderBox[axis.end] + itemSize,
       },
     });
     const inForeign4: DraggableDimension = getDraggableDimension({
@@ -159,7 +146,7 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
         [axis.crossAxisStart]: foreignCrossAxisStart,
         [axis.crossAxisEnd]: foreignCrossAxisEnd,
         [axis.start]: inForeign3.page.borderBox[axis.end],
-        [axis.end]: inForeign3.page.borderBox[axis.end] + sizeOfInForeign4,
+        [axis.end]: inForeign3.page.borderBox[axis.end] + itemSize,
       },
     });
     const inForeign5: DraggableDimension = getDraggableDimension({
@@ -173,7 +160,7 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
         [axis.crossAxisStart]: foreignCrossAxisStart,
         [axis.crossAxisEnd]: foreignCrossAxisEnd,
         [axis.start]: inForeign4.page.borderBox[axis.end],
-        [axis.end]: inForeign4.page.borderBox[axis.end] + sizeOfInForeign5,
+        [axis.end]: inForeign4.page.borderBox[axis.end] + itemSize,
       },
     });
     const draggables: DraggableDimensionMap = toDraggableMap([
@@ -190,6 +177,7 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
         descriptor: {
           id: foreignId,
           type: 'huge',
+          mode: 'STANDARD',
         },
         direction: axis.direction,
         borderBox: {
@@ -199,9 +187,8 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
           [axis.end]: 10000,
         },
       });
-      // when moving into the foreign list there will be enough room for inHome1 and inForeign1
-      // inHome1 and inForeign1 can be visible in the viewport at the same time
-      const sizeOfViewport: number = sizeOfInForeign1 + sizeOfInForeign2 - 1;
+      // Viewport is big enough to fit inForeign1 and inForeign2
+      const sizeOfViewport: number = itemSize + itemSize - 1;
 
       const viewport: Viewport = createViewport({
         frame: getRect({
@@ -261,33 +248,22 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
 
       // inHome1 has moved into the foreign list below inForeign1
       const displacedBy: DisplacedBy = getDisplacedBy(axis, inHome1.displaceBy);
-      const { onLift } = getHomeOnLift({
-        draggable: inHome1,
-        draggables,
-        home,
-        viewport,
-      });
 
-      // moved inHome1 over foreign
-      const initial: Displacement[] = [
-        // would normally be visible in viewport
-        getVisibleDisplacement(inForeign2),
-        // normally not visible in viewport
-        getNotVisibleDisplacement(inForeign3),
-        getNotVisibleDisplacement(inForeign4),
-        getNotVisibleDisplacement(inForeign5),
-      ];
       const previousImpact: DragImpact = {
-        movement: {
-          displaced: initial,
-          map: getDisplacementMap(initial),
-          displacedBy,
+        displaced: getForcedDisplacement({
+          // would normally be visible in viewport
+          visible: [{ dimension: inForeign2 }],
+          // normally not visible in viewport
+          invisible: [inForeign3, inForeign4, inForeign5],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            droppableId: foreign.descriptor.id,
+            index: inForeign2.descriptor.index,
+          },
         },
-        destination: {
-          droppableId: foreign.descriptor.id,
-          index: inForeign2.descriptor.index,
-        },
-        merge: null,
       };
 
       const result: DragImpact = speculativelyIncrease({
@@ -295,40 +271,37 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
         viewport,
         destination: foreign,
         draggables,
-        maxScrollChange: patch(axis.line, sizeOfInHome1),
-        onLift,
+        maxScrollChange: patch(axis.line, itemSize),
       });
 
-      const displaced: Displacement[] = [
-        // already visibly displaced
-        getVisibleDisplacement(inForeign2),
-        // speculatively increased
-        getNotAnimatedDisplacement(inForeign3),
-        getNotAnimatedDisplacement(inForeign4),
-        // not speculatively increased
-        getNotVisibleDisplacement(inForeign5),
-      ];
       const expected: DragImpact = {
         // unchanged locations
         ...previousImpact,
-        movement: {
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
-        },
+        displaced: getForcedDisplacement({
+          visible: [
+            // already visibly displaced: inside viewport
+            { dimension: inForeign2, shouldAnimate: true },
+            // speculatively increased. Forced to not animate
+            { dimension: inForeign3, shouldAnimate: false },
+            { dimension: inForeign4, shouldAnimate: false },
+          ],
+          // Bigger than 2x the size of the viewport - outside of the overscanning reach
+          invisible: [inForeign5],
+        }),
       };
-      expect(expected).toEqual(result);
+      expect(result).toEqual(expected);
     });
 
     it('should increase the visible displacement in the droppable by the amount of the max scroll change', () => {
       // when moving into the foreign list there will be enough room for inHome1 and inForeign1
       // inHome1 and inForeign1 can be visible in the viewport at the same time
-      const sizeOfDroppable: number = sizeOfInForeign1 + sizeOfInForeign2 - 1;
+      const sizeOfDroppable: number = itemSize + itemSize - 1;
 
       const foreign: DroppableDimension = getDroppableDimension({
         descriptor: {
           id: foreignId,
           type: 'huge',
+          mode: 'STANDARD',
         },
         direction: axis.direction,
         // large subject
@@ -412,32 +385,22 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
 
       // inHome1 has moved into the foreign list below inForeign1
       const displacedBy: DisplacedBy = getDisplacedBy(axis, inHome1.displaceBy);
-      const { onLift } = getHomeOnLift({
-        draggable: inHome1,
-        draggables,
-        home,
-        viewport,
-      });
 
-      const initial: Displacement[] = [
-        // would normally be visible in viewport
-        getVisibleDisplacement(inForeign2),
-        // normally not visible in viewport
-        getNotVisibleDisplacement(inForeign3),
-        getNotVisibleDisplacement(inForeign4),
-        getNotVisibleDisplacement(inForeign5),
-      ];
       const previousImpact: DragImpact = {
-        movement: {
-          displaced: initial,
-          map: getDisplacementMap(initial),
-          displacedBy,
+        displaced: getForcedDisplacement({
+          // would normally be visible in viewport
+          visible: [{ dimension: inForeign2 }],
+          // normally not visible in viewport
+          invisible: [inForeign3, inForeign4, inForeign5],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            droppableId: foreign.descriptor.id,
+            index: inForeign2.descriptor.index,
+          },
         },
-        destination: {
-          droppableId: foreign.descriptor.id,
-          index: inForeign2.descriptor.index,
-        },
-        merge: null,
       };
 
       const result: DragImpact = speculativelyIncrease({
@@ -445,29 +408,25 @@ import getHomeOnLift from '../../../../src/state/get-home-on-lift';
         viewport,
         destination: foreign,
         draggables,
-        maxScrollChange: patch(axis.line, sizeOfInHome1),
-        onLift,
+        maxScrollChange: patch(axis.line, itemSize),
       });
 
-      const displaced: Displacement[] = [
-        // already visibly displaced
-        getVisibleDisplacement(inForeign2),
-        // speculatively increased
-        getNotAnimatedDisplacement(inForeign3),
-        getNotAnimatedDisplacement(inForeign4),
-        // not speculatively increased
-        getNotVisibleDisplacement(inForeign5),
-      ];
       const expected: DragImpact = {
         // unchanged locations
         ...previousImpact,
-        movement: {
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
-        },
+        displaced: getForcedDisplacement({
+          visible: [
+            // already visibly displaced
+            { dimension: inForeign2, shouldAnimate: true },
+            // speculatively increased. Forced to not animate
+            { dimension: inForeign3, shouldAnimate: false },
+            { dimension: inForeign4, shouldAnimate: false },
+          ],
+          // not speculatively increased
+          invisible: [inForeign5],
+        }),
       };
-      expect(expected).toEqual(result);
+      expect(result).toEqual(expected);
     });
   });
 });

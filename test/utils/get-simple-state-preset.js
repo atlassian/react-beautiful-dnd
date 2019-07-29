@@ -4,7 +4,7 @@ import { getPreset } from './dimension';
 import { vertical } from '../../src/state/axis';
 import getViewport from '../../src/view/window/get-viewport';
 import { add } from '../../src/state/position';
-import getHomeOnLift from '../../src/state/get-home-on-lift';
+import getLiftEffect from '../../src/state/get-lift-effect';
 import getHomeLocation from '../../src/state/get-home-location';
 import { forward } from '../../src/state/user-direction/user-direction-preset';
 import type {
@@ -75,7 +75,7 @@ export default (axis?: Axis = vertical) => {
       page,
     };
 
-    const { impact, onLift } = getHomeOnLift({
+    const { impact, afterCritical } = getLiftEffect({
       draggable,
       home: droppable,
       draggables: preset.dimensions.draggables,
@@ -91,7 +91,7 @@ export default (axis?: Axis = vertical) => {
       initial,
       current: initial,
       impact,
-      onLift,
+      afterCritical,
       onLiftImpact: impact,
       userDirection: forward,
       isWindowScrollAllowed: true,
@@ -155,7 +155,7 @@ export default (axis?: Axis = vertical) => {
     const home: DroppableDimension =
       preset.droppables[draggable.descriptor.droppableId];
 
-    const { impact } = getHomeOnLift({
+    const { impact, afterCritical } = getLiftEffect({
       draggable,
       home,
       draggables: preset.dimensions.draggables,
@@ -184,6 +184,7 @@ export default (axis?: Axis = vertical) => {
 
     const completed: CompletedDrag = {
       critical: ourCritical,
+      afterCritical,
       impact,
       result,
     };

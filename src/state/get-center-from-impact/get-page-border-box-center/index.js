@@ -5,9 +5,8 @@ import type {
   DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
-  CombineImpact,
-  DraggableLocation,
-  OnLift,
+  ImpactLocation,
+  LiftEffect,
 } from '../../../types';
 import whenCombining from './when-combining';
 import whenReordering from './when-reordering';
@@ -15,7 +14,7 @@ import withDroppableDisplacement from '../../with-scroll-change/with-droppable-d
 
 type Args = {|
   impact: DragImpact,
-  onLift: OnLift,
+  afterCritical: LiftEffect,
   draggable: DraggableDimension,
   droppable: ?DroppableDimension,
   draggables: DraggableDimensionMap,
@@ -26,37 +25,34 @@ const getResultWithoutDroppableDisplacement = ({
   draggable,
   droppable,
   draggables,
-  onLift,
+  afterCritical,
 }: Args): Position => {
-  const merge: ?CombineImpact = impact.merge;
-  const destination: ?DraggableLocation = impact.destination;
-
   const original: Position = draggable.page.borderBox.center;
+  const at: ?ImpactLocation = impact.at;
 
   if (!droppable) {
     return original;
   }
 
-  if (destination) {
+  if (!at) {
+    return original;
+  }
+
+  if (at.type === 'REORDER') {
     return whenReordering({
-      movement: impact.movement,
+      impact,
       draggable,
       draggables,
       droppable,
-      onLift,
+      afterCritical,
     });
   }
 
-  if (merge) {
-    return whenCombining({
-      movement: impact.movement,
-      combine: merge.combine,
-      draggables,
-      onLift,
-    });
-  }
-
-  return original;
+  return whenCombining({
+    impact,
+    draggables,
+    afterCritical,
+  });
 };
 
 export default (args: Args): Position => {

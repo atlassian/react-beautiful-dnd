@@ -2,26 +2,24 @@
 import type {
   DisplacedBy,
   Axis,
-  Displacement,
   DragImpact,
   DroppableDimension,
   DroppableDimensionMap,
 } from '../../../src/types';
 import { getPreset } from '../../utils/dimension';
 import getDisplacedBy from '../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../src/state/get-displacement-map';
 import { horizontal, vertical } from '../../../src/state/axis';
 import recomputePlaceholders from '../../../src/state/recompute-placeholders';
 import noImpact from '../../../src/state/no-impact';
-import getVisibleDisplacement from '../../utils/get-displacement/get-visible-displacement';
 import { addPlaceholder } from '../../../src/state/droppable/with-placeholder';
 import patchDroppableMap from '../../../src/state/patch-droppable-map';
-import getHomeOnLift from '../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../src/state/get-lift-effect';
+import { getForcedDisplacement } from '../../utils/impact';
 
 [horizontal, vertical].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
-    const { impact: homeImpact } = getHomeOnLift({
+    const { impact: homeImpact } = getLiftEffect({
       draggable: preset.inHome1,
       draggables: preset.draggables,
       home: preset.home,
@@ -65,22 +63,22 @@ import getHomeOnLift from '../../../src/state/get-home-on-lift';
         axis,
         preset.inHome1.displaceBy,
       );
-      const displaced: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign1),
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const overForeign: DragImpact = {
-        movement: {
-          displacedBy,
-          displaced,
-          map: getDisplacementMap(displaced),
-        },
-        merge: null,
-        destination: {
-          index: preset.inForeign1.descriptor.index,
-          droppableId: preset.foreign.descriptor.id,
+        displaced: getForcedDisplacement({
+          visible: [
+            { dimension: preset.inForeign1 },
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            index: preset.inForeign1.descriptor.index,
+            droppableId: preset.foreign.descriptor.id,
+          },
         },
       };
 
@@ -102,22 +100,23 @@ import getHomeOnLift from '../../../src/state/get-home-on-lift';
         patchDroppableMap(preset.droppables, withPlaceholder),
       );
 
-      // now moving forward (should not add another placeholder)
-      const displaced2: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const overForeign2: DragImpact = {
-        movement: {
-          displacedBy,
-          displaced: displaced2,
-          map: getDisplacementMap(displaced2),
-        },
-        merge: null,
-        destination: {
-          index: preset.inForeign2.descriptor.index,
-          droppableId: preset.foreign.descriptor.id,
+        displaced: getForcedDisplacement({
+          // now moving forward (should not add another placeholder)
+          visible: [
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            index: preset.inForeign2.descriptor.index,
+            droppableId: preset.foreign.descriptor.id,
+          },
         },
       };
       const second: DroppableDimensionMap = recomputePlaceholders({
@@ -136,22 +135,22 @@ import getHomeOnLift from '../../../src/state/get-home-on-lift';
         axis,
         preset.inHome1.displaceBy,
       );
-      const displaced: Displacement[] = [
-        getVisibleDisplacement(preset.inForeign1),
-        getVisibleDisplacement(preset.inForeign2),
-        getVisibleDisplacement(preset.inForeign3),
-        getVisibleDisplacement(preset.inForeign4),
-      ];
       const overForeign: DragImpact = {
-        movement: {
-          displacedBy,
-          displaced,
-          map: getDisplacementMap(displaced),
-        },
-        merge: null,
-        destination: {
-          index: preset.inForeign1.descriptor.index,
-          droppableId: preset.foreign.descriptor.id,
+        displaced: getForcedDisplacement({
+          visible: [
+            { dimension: preset.inForeign1 },
+            { dimension: preset.inForeign2 },
+            { dimension: preset.inForeign3 },
+            { dimension: preset.inForeign4 },
+          ],
+        }),
+        displacedBy,
+        at: {
+          type: 'REORDER',
+          destination: {
+            index: preset.inForeign1.descriptor.index,
+            droppableId: preset.foreign.descriptor.id,
+          },
         },
       };
 

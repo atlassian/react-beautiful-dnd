@@ -387,6 +387,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'home',
       type: 'TYPE',
+      mode: 'STANDARD',
     },
     borderBox: {
       [axis.start]: droppableBorderBoxStart,
@@ -403,6 +404,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'foreign',
       type: 'TYPE',
+      mode: 'STANDARD',
     },
     borderBox: {
       [axis.start]: droppableBorderBoxStart,
@@ -419,6 +421,7 @@ export const getPreset = (axis?: Axis = vertical) => {
     descriptor: {
       id: 'empty-foreign',
       type: 'TYPE',
+      mode: 'STANDARD',
     },
     borderBox: {
       [axis.start]: droppableBorderBoxStart,

@@ -11,7 +11,7 @@ import { horizontal, vertical } from '../../../../src/state/axis';
 import getDragImpact from '../../../../src/state/get-drag-impact';
 import noImpact from '../../../../src/state/no-impact';
 import { disableDroppable, getPreset } from '../../../utils/dimension';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
 
 const dontCareAboutDirection: UserDirection = {
   vertical: 'down',
@@ -22,7 +22,7 @@ const dontCareAboutDirection: UserDirection = {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
 
-    const { onLift, impact: homeImpact } = getHomeOnLift({
+    const { afterCritical, impact: homeImpact } = getLiftEffect({
       draggable: preset.inHome1,
       home: preset.home,
       draggables: preset.draggables,
@@ -48,7 +48,7 @@ const dontCareAboutDirection: UserDirection = {
         previousImpact: homeImpact,
         viewport: preset.viewport,
         userDirection: dontCareAboutDirection,
-        onLift,
+        afterCritical,
       });
 
       expect(impact).toEqual(noImpact);
@@ -72,7 +72,7 @@ const dontCareAboutDirection: UserDirection = {
         previousImpact: homeImpact,
         viewport: preset.viewport,
         userDirection: dontCareAboutDirection,
-        onLift,
+        afterCritical,
       });
 
       expect(impact).toEqual(noImpact);

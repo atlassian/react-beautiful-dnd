@@ -76,6 +76,8 @@ type Props = {|
   style?: Object,
   // may not be provided - and might be null
   ignoreContainerClipping?: boolean,
+
+  useClone?: boolean,
 |};
 
 type QuoteListProps = {|
@@ -136,6 +138,7 @@ export default function QuoteList(props: Props) {
     style,
     quotes,
     title,
+    useClone,
   } = props;
 
   return (
@@ -145,6 +148,18 @@ export default function QuoteList(props: Props) {
       ignoreContainerClipping={ignoreContainerClipping}
       isDropDisabled={isDropDisabled}
       isCombineEnabled={isCombineEnabled}
+      whenDraggingClone={
+        useClone
+          ? (provided, snapshot, source) => (
+              <QuoteItem
+                quote={quotes[source.index]}
+                provided={provided}
+                isDragging={snapshot.isDragging}
+                isClone
+              />
+            )
+          : null
+      }
     >
       {(
         dropProvided: DroppableProvided,

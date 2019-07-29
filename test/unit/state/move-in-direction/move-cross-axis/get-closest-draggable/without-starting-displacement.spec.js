@@ -17,7 +17,7 @@ import {
 import { expandByPosition } from '../../../../../../src/state/spacing';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import getViewport from '../../../../../../src/view/window/get-viewport';
-import noOnLift from '../../../../../utils/no-on-lift';
+import { noAfterCritical } from '../../../../../../src/state/no-impact';
 
 const viewport: Viewport = getViewport();
 
@@ -39,6 +39,7 @@ const viewport: Viewport = getViewport();
       descriptor: {
         id: 'droppable',
         type: 'TYPE',
+        mode: 'STANDARD',
       },
       direction: axis.direction,
       borderBox,
@@ -182,7 +183,7 @@ const viewport: Viewport = getViewport();
         destination: droppable,
         insideDestination,
         viewport,
-        onLift: noOnLift,
+        afterCritical: noAfterCritical,
       });
       expect(result1).toBe(visible1);
 
@@ -197,7 +198,7 @@ const viewport: Viewport = getViewport();
         destination: droppable,
         insideDestination,
         viewport,
-        onLift: noOnLift,
+        afterCritical: noAfterCritical,
       });
       expect(result2).toBe(visible2);
     });
@@ -213,7 +214,7 @@ const viewport: Viewport = getViewport();
         destination: droppable,
         insideDestination: [],
         viewport,
-        onLift: noOnLift,
+        afterCritical: noAfterCritical,
       });
 
       expect(result).toBe(null);
@@ -249,7 +250,7 @@ const viewport: Viewport = getViewport();
         destination: scrolled,
         insideDestination,
         viewport,
-        onLift: noOnLift,
+        afterCritical: noAfterCritical,
       });
 
       expect(result).toBe(visible2);
@@ -260,7 +261,7 @@ const viewport: Viewport = getViewport();
         destination: droppable,
         insideDestination,
         viewport,
-        onLift: noOnLift,
+        afterCritical: noAfterCritical,
       });
       expect(result1).toBe(visible1);
     });
@@ -278,7 +279,7 @@ const viewport: Viewport = getViewport();
           destination: droppable,
           insideDestination,
           viewport,
-          onLift: noOnLift,
+          afterCritical: noAfterCritical,
         });
 
         expect(result).toBe(visible1);
@@ -296,7 +297,7 @@ const viewport: Viewport = getViewport();
           destination: droppable,
           insideDestination,
           viewport,
-          onLift: noOnLift,
+          afterCritical: noAfterCritical,
         });
 
         expect(result).toBe(visible1);
@@ -314,7 +315,7 @@ const viewport: Viewport = getViewport();
           destination: droppable,
           insideDestination,
           viewport,
-          onLift: noOnLift,
+          afterCritical: noAfterCritical,
         });
 
         expect(result).toBe(visible2);
@@ -332,7 +333,7 @@ const viewport: Viewport = getViewport();
           destination: droppable,
           insideDestination,
           viewport,
-          onLift: noOnLift,
+          afterCritical: noAfterCritical,
         });
 
         expect(result).toBe(visible2);
@@ -350,7 +351,7 @@ const viewport: Viewport = getViewport();
           destination: droppable,
           insideDestination,
           viewport,
-          onLift: noOnLift,
+          afterCritical: noAfterCritical,
         });
 
         expect(result).toBe(visible2);
@@ -372,7 +373,7 @@ const viewport: Viewport = getViewport();
           destination: droppable,
           insideDestination: notVisible,
           viewport,
-          onLift: noOnLift,
+          afterCritical: noAfterCritical,
         });
 
         expect(result).toBe(null);
@@ -393,7 +394,7 @@ const viewport: Viewport = getViewport();
         destination: droppable,
         insideDestination,
         viewport,
-        onLift: noOnLift,
+        afterCritical: noAfterCritical,
       });
 
       expect(result).toBe(visible1);
@@ -411,7 +412,7 @@ const viewport: Viewport = getViewport();
         destination: droppable,
         insideDestination,
         viewport,
-        onLift: noOnLift,
+        afterCritical: noAfterCritical,
       });
       expect(result2).toBe(visible2);
     });

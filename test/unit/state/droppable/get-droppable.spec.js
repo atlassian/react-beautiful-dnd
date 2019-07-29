@@ -21,6 +21,7 @@ import type {
 const descriptor: DroppableDescriptor = {
   id: 'drop-1',
   type: 'TYPE',
+  mode: 'STANDARD',
 };
 
 const margin: Spacing = {

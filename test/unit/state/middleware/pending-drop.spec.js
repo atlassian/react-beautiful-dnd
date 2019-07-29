@@ -45,8 +45,8 @@ it('should trigger a drop on a dynamic publish if a drop pending is waiting', ()
   expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
 
   expect(mock).toHaveBeenCalledWith(
+    // $ExpectError - this calculation is not completed by this module and it is non trival
     completeDrop({
-      // $ExpectError - this calculation is not completed by this module and it is non trival
       completed: expect.any(Object),
       shouldFlush: false,
     }),

@@ -5,10 +5,14 @@ export type Id = string;
 export type DraggableId = Id;
 export type DroppableId = Id;
 export type TypeId = Id;
+export type ContextId = Id;
+export type ElementId = Id;
 
+export type DroppableMode = 'STANDARD' | 'VIRTUAL';
 export type DroppableDescriptor = {|
   id: DroppableId,
   type: TypeId,
+  mode: DroppableMode,
 |};
 
 export type DraggableDescriptor = {|
@@ -19,6 +23,12 @@ export type DraggableDescriptor = {|
   // This is technically redundant but it avoids
   // needing to look up a parent droppable just to get its type
   type: TypeId,
+|};
+
+export type DraggableOptions = {|
+  canDragInteractiveElements: boolean,
+  shouldRespectForcePress: boolean,
+  isEnabled: boolean,
 |};
 
 export type Direction = 'horizontal' | 'vertical';
@@ -144,12 +154,19 @@ export type DraggableLocation = {|
   index: number,
 |};
 
+export type DraggableIdMap = {
+  [id: DraggableId]: true,
+};
+
+export type DroppableIdMap = {
+  [id: DroppableId]: true,
+};
+
 export type DraggableDimensionMap = { [key: DraggableId]: DraggableDimension };
 export type DroppableDimensionMap = { [key: DroppableId]: DroppableDimension };
 
 export type Displacement = {|
   draggableId: DraggableId,
-  isVisible: boolean,
   shouldAnimate: boolean,
 |};
 
@@ -158,15 +175,6 @@ export type DisplacementMap = { [key: DraggableId]: Displacement };
 export type DisplacedBy = {|
   value: number,
   point: Position,
-|};
-
-export type DragMovement = {|
-  // The draggables that need to move in response to a drag.
-  // Ordered by closest draggable to the *current* location of the dragging item
-  displaced: Displacement[],
-  // displaced as a map
-  map: DisplacementMap,
-  displacedBy: DisplacedBy,
 |};
 
 export type VerticalUserDirection = 'up' | 'down';
@@ -181,19 +189,35 @@ export type Combine = {|
   draggableId: DraggableId,
   droppableId: DroppableId,
 |};
+export type DisplacementGroups = {|
+  all: DraggableId[],
+  visible: DisplacementMap,
+  invisible: DraggableIdMap,
+|};
+
+export type ReorderImpact = {|
+  type: 'REORDER',
+  destination: DraggableLocation,
+|};
 
 export type CombineImpact = {|
-  // This has an impact on the hitbox for a grouping action
+  type: 'COMBINE',
   whenEntered: UserDirection,
   combine: Combine,
 |};
 
+export type ImpactLocation = ReorderImpact | CombineImpact;
+
+export type Displaced = {|
+  forwards: DisplacementGroups,
+  backwards: DisplacementGroups,
+|};
+
 export type DragImpact = {|
-  movement: DragMovement,
-  // a reorder location
-  destination: ?DraggableLocation,
-  // a merge location
-  merge: ?CombineImpact,
+  // TODO: Displaced
+  displaced: DisplacementGroups,
+  displacedBy: DisplacedBy,
+  at: ?ImpactLocation,
 |};
 
 export type ClientPositions = {|
@@ -272,6 +296,12 @@ export type Viewport = {|
   scroll: ScrollDetails,
 |};
 
+export type LiftEffect = {|
+  inVirtualList: boolean,
+  effected: DraggableIdMap,
+  displacedBy: DisplacedBy,
+|};
+
 export type DimensionMap = {|
   draggables: DraggableDimensionMap,
   droppables: DroppableDimensionMap,
@@ -287,21 +317,13 @@ export type CompletedDrag = {|
   critical: Critical,
   result: DropResult,
   impact: DragImpact,
+  afterCritical: LiftEffect,
 |};
 
 export type IdleState = {|
   phase: 'IDLE',
   completed: ?CompletedDrag,
   shouldFlush: boolean,
-|};
-
-export type DraggableIdMap = {
-  [id: DraggableId]: true,
-};
-
-export type OnLift = {|
-  wasDisplaced: DraggableIdMap,
-  displacedBy: DisplacedBy,
 |};
 
 export type DraggingState = {|
@@ -315,7 +337,7 @@ export type DraggingState = {|
   userDirection: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
-  onLift: OnLift,
+  afterCritical: LiftEffect,
   onLiftImpact: DragImpact,
   // when there is a fixed list we want to opt out of this behaviour
   isWindowScrollAllowed: boolean,
@@ -394,3 +416,61 @@ export type Responders = {|
   // always required
   onDragEnd: OnDragEndResponder,
 |};
+
+// ## Sensors
+export type StopDragOptions = {|
+  shouldBlockNextClick: boolean,
+|};
+
+type DragActions = {|
+  drop: (args?: StopDragOptions) => void,
+  cancel: (args?: StopDragOptions) => void,
+  isActive: () => boolean,
+  shouldRespectForcePress: () => boolean,
+|};
+
+export type FluidDragActions = {|
+  ...DragActions,
+  move: (clientSelection: Position) => void,
+|};
+
+export type SnapDragActions = {|
+  ...DragActions,
+  moveUp: () => void,
+  moveDown: () => void,
+  moveRight: () => void,
+  moveLeft: () => void,
+|};
+
+export type PreDragActions = {|
+  // discover if the lock is still active
+  isActive: () => boolean,
+  // whether it has been indicated if force press should be respected
+  shouldRespectForcePress: () => boolean,
+  // lift the current item
+  fluidLift: (clientSelection: Position) => FluidDragActions,
+  snapLift: () => SnapDragActions,
+  // cancel the pre drag without starting a drag. Releases the lock
+  abort: () => void,
+|};
+
+export type TryGetLockOptions = {
+  sourceEvent?: Event,
+};
+
+export type TryGetLock = (
+  draggableId: DraggableId,
+  forceStop?: () => void,
+  options?: TryGetLockOptions,
+) => ?PreDragActions;
+
+export type SensorAPI = {|
+  tryGetLock: TryGetLock,
+  canGetLock: (id: DraggableId) => boolean,
+  isLockClaimed: () => boolean,
+  tryReleaseLock: () => void,
+  findClosestDraggableId: (event: Event) => ?DraggableId,
+  findOptionsForDraggable: (id: DraggableId) => ?DraggableOptions,
+|};
+
+export type Sensor = (api: SensorAPI) => void;

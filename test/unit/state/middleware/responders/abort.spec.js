@@ -21,6 +21,7 @@ import createStore from '../util/create-store';
 import getAnnounce from './util/get-announce-stub';
 import createResponders from './util/get-responders-stub';
 import getCompletedWithResult from './util/get-completed-with-result';
+import { tryGetDestination } from '../../../../../src/state/get-impact-location';
 
 jest.useFakeTimers();
 
@@ -61,7 +62,7 @@ it('should publish an onDragEnd with no destination even if there is a current d
     droppableId: initialPublishArgs.critical.droppable.id,
     index: initialPublishArgs.critical.draggable.index,
   };
-  expect(state.impact.destination).toEqual(home);
+  expect(tryGetDestination(state.impact)).toEqual(home);
 
   store.dispatch(clean());
   const expected: DropResult = {
@@ -101,6 +102,7 @@ it('should not publish an onDragEnd if aborted after a drop', () => {
     }),
   );
   expect(responders.onDragEnd).toHaveBeenCalledTimes(1);
+  // $ExpectError - mock
   responders.onDragEnd.mockReset();
 
   // abort

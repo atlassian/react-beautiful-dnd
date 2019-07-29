@@ -1,5 +1,5 @@
 // @flow
-import { useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import invariant from 'tiny-invariant';
 import type { Props } from './draggable-types';
 import checkIsValidInnerRef from '../check-is-valid-inner-ref';
@@ -12,31 +12,29 @@ function checkOwnProps(props: Props) {
     'Draggable requires an integer index prop',
   );
   invariant(props.draggableId, 'Draggable requires a draggableId');
-  invariant(
-    typeof props.isDragDisabled === 'boolean',
-    'isDragDisabled must be a boolean',
-  );
 }
-
-function checkForOutdatedProps(props: Props) {
-  if (Object.prototype.hasOwnProperty.call(props, 'shouldRespectForceTouch')) {
-    warning(
-      'shouldRespectForceTouch has been renamed to shouldRespectForcePress',
-    );
-  }
-}
-
-export default function useValidation(
-  props: Props,
-  getRef: () => ?HTMLElement,
-) {
+export function useValidation(props: Props, getRef: () => ?HTMLElement) {
   // running after every update in development
   useEffect(() => {
     // wrapping entire block for better minification
     if (process.env.NODE_ENV !== 'production') {
       checkOwnProps(props);
-      checkForOutdatedProps(props);
-      checkIsValidInnerRef(getRef());
+
+      // TODO: run check when virtual?
+      if (props.mapped.type !== 'DRAGGING') {
+        checkIsValidInnerRef(getRef());
+      }
     }
   });
+}
+
+// we expect isClone not to change for entire component's life
+export function useClonePropValidation(isClone: boolean) {
+  const initialRef = useRef<boolean>(isClone);
+
+  useEffect(() => {
+    if (isClone !== initialRef.current) {
+      warning('Draggable isClone prop value changed during component life');
+    }
+  }, [isClone]);
 }

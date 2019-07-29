@@ -1,6 +1,7 @@
 // @flow
 import * as keyCodes from '../../src/view/key-codes';
 import { timings } from '../../src/animation';
+import { getDroppableSelector, getHandleSelector } from './util';
 
 beforeEach(() => {
   cy.visit('/iframe.html?id=board--simple');
@@ -8,19 +9,19 @@ beforeEach(() => {
 
 it('should move between lists', () => {
   // first list has item with id:2
-  cy.get('[data-react-beautiful-dnd-droppable]')
+  cy.get(getDroppableSelector())
     .eq(1)
     .as('first-list')
     .should('contain', 'id:2');
 
   // second list does not have item with id:2
-  cy.get('[data-react-beautiful-dnd-droppable]')
+  cy.get(getDroppableSelector())
     .eq(2)
     .as('second-list')
     .should('not.contain', 'id:2');
 
   cy.get('@first-list')
-    .find('[data-react-beautiful-dnd-drag-handle]')
+    .find(getHandleSelector())
     .first()
     .should('contain', 'id:2')
     .focus()

@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { mount, type ReactWrapper } from 'enzyme';
+import { render } from '@testing-library/react';
 import AnimateInOut, {
   type AnimateProvided,
 } from '../../../../src/view/animate-in-out/animate-in-out';
@@ -8,26 +8,26 @@ import AnimateInOut, {
 it('should allow children not to be rendered (no animation allowed)', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
 
-  const wrapper: ReactWrapper<*> = mount(
+  const { container } = render(
     <AnimateInOut on={null} shouldAnimate={false}>
       {child}
     </AnimateInOut>,
   );
 
-  expect(wrapper.children()).toHaveLength(0);
+  expect(container.innerHTML).toBe('');
   expect(child).not.toHaveBeenCalled();
 });
 
 it('should allow children not to be rendered (even when animation is allowed)', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
 
-  const wrapper: ReactWrapper<*> = mount(
+  const { container } = render(
     <AnimateInOut on={null} shouldAnimate>
       {child}
     </AnimateInOut>,
   );
 
-  expect(wrapper.children()).toHaveLength(0);
+  expect(container.innerHTML).toBe('');
   expect(child).not.toHaveBeenCalled();
 });
 
@@ -35,7 +35,7 @@ it('should pass data through to children', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
-  const wrapper: ReactWrapper<*> = mount(
+  render(
     <AnimateInOut on={data} shouldAnimate={false}>
       {child}
     </AnimateInOut>,
@@ -48,15 +48,13 @@ it('should pass data through to children', () => {
     onClose: expect.any(Function),
   };
   expect(child).toHaveBeenCalledWith(expected);
-
-  wrapper.unmount();
 });
 
 it('should open instantly if required', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
-  const wrapper: ReactWrapper<*> = mount(
+  render(
     <AnimateInOut on={data} shouldAnimate={false}>
       {child}
     </AnimateInOut>,
@@ -69,15 +67,13 @@ it('should open instantly if required', () => {
     onClose: expect.any(Function),
   };
   expect(child).toHaveBeenCalledWith(expected);
-
-  wrapper.unmount();
 });
 
 it('should animate open if requested', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
-  const wrapper: ReactWrapper<*> = mount(
+  render(
     <AnimateInOut on={data} shouldAnimate>
       {child}
     </AnimateInOut>,
@@ -90,19 +86,20 @@ it('should animate open if requested', () => {
     onClose: expect.any(Function),
   };
   expect(child).toHaveBeenCalledWith(expected);
-
-  wrapper.unmount();
 });
 
 it('should close instantly if required', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
+  function App({ value }: { value: ?Object }) {
+    return (
+      <AnimateInOut on={value} shouldAnimate={false}>
+        {child}
+      </AnimateInOut>
+    );
+  }
 
-  const wrapper: ReactWrapper<*> = mount(
-    <AnimateInOut on={data} shouldAnimate={false}>
-      {child}
-    </AnimateInOut>,
-  );
+  const { rerender, container } = render(<App value={data} />);
 
   const initial: AnimateProvided = {
     data,
@@ -111,14 +108,13 @@ it('should close instantly if required', () => {
     onClose: expect.any(Function),
   };
   expect(child).toHaveBeenCalledWith(initial);
+  expect(container.innerHTML).toEqual('<div>hi</div>');
   child.mockClear();
 
   // start closing
-  wrapper.setProps({
-    // data is gone! this should trigger a close
-    on: null,
-  });
-  expect(wrapper.children()).toHaveLength(0);
+  // data is gone! this should trigger a close
+  rerender(<App value={null} />);
+  expect(container.innerHTML).toEqual('');
   expect(child).not.toHaveBeenCalled();
 });
 
@@ -126,10 +122,21 @@ it('should animate closed if required', () => {
   const child = jest.fn().mockReturnValue(<div>hi</div>);
   const data = { hello: 'world' };
 
-  const wrapper: ReactWrapper<*> = mount(
-    <AnimateInOut on={data} shouldAnimate={false}>
-      {child}
-    </AnimateInOut>,
+  type Props = {|
+    value: ?Object,
+    shouldAnimate: boolean,
+  |};
+
+  function App({ value, shouldAnimate }: Props) {
+    return (
+      <AnimateInOut on={value} shouldAnimate={shouldAnimate}>
+        {child}
+      </AnimateInOut>
+    );
+  }
+
+  const { container, rerender } = render(
+    <App value={data} shouldAnimate={false} />,
   );
 
   const initial: AnimateProvided = {
@@ -140,14 +147,13 @@ it('should animate closed if required', () => {
   };
   expect(child).toHaveBeenCalledWith(initial);
   expect(child).toHaveBeenCalledTimes(1);
+  expect(container.innerHTML).toEqual('<div>hi</div>');
   child.mockClear();
 
   // start closing
-  wrapper.setProps({
-    shouldAnimate: true,
-    // data is gone! this should trigger a close
-    on: null,
-  });
+  // data is gone! this should trigger a close
+  rerender(<App value={null} shouldAnimate />);
+
   const second: AnimateProvided = {
     // data is still provided to child for final render
     data,
@@ -163,9 +169,7 @@ it('should animate closed if required', () => {
   child.mockClear();
   // this will trigger a setState that will stop rendering the child
   provided.onClose();
-  // tell enzyme to reconcile the react tree due to the setState
-  wrapper.update();
 
-  expect(wrapper.children()).toHaveLength(0);
+  expect(container.innerHTML).toEqual('');
   expect(child).not.toHaveBeenCalled();
 });

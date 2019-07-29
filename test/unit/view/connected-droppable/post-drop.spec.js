@@ -27,6 +27,7 @@ const isOverHomeMapProps: MapProps = {
     draggingOverWith: preset.inHome1.descriptor.id,
     draggingFromThisWith: preset.inHome1.descriptor.id,
   },
+  useClone: null,
 };
 
 describe('was over - reordering', () => {
@@ -75,8 +76,8 @@ describe('was over - merging', () => {
     const base: DropAnimatingState = state.dropAnimating();
     const combineImpact: DragImpact = {
       ...base.completed.impact,
-      destination: null,
-      merge: {
+      at: {
+        type: 'COMBINE',
         whenEntered: forward,
         combine,
       },
@@ -145,8 +146,8 @@ describe('flushed', () => {
     const base: DropAnimatingState = state.dropAnimating();
     const combineImpact: DragImpact = {
       ...base.completed.impact,
-      destination: null,
-      merge: {
+      at: {
+        type: 'COMBINE',
         whenEntered: forward,
         combine,
       },

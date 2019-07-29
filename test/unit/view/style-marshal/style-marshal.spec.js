@@ -1,6 +1,7 @@
 // @flow
 import React, { type Node } from 'react';
 import { mount, type ReactWrapper } from 'enzyme';
+import type { ContextId } from '../../../../src/types';
 import useStyleMarshal from '../../../../src/view/use-style-marshal';
 import getStyles, {
   type Styles,
@@ -12,37 +13,37 @@ const getMarshal = (myMock): StyleMarshal => myMock.mock.calls[0][0];
 const getMock = () => jest.fn().mockImplementation(() => null);
 
 type Props = {|
-  uniqueId: number,
+  contextId: ContextId,
   children: (marshal: StyleMarshal) => Node,
 |};
 
 function WithMarshal(props: Props) {
-  const marshal: StyleMarshal = useStyleMarshal(props.uniqueId);
+  const marshal: StyleMarshal = useStyleMarshal(props.contextId);
   return props.children(marshal);
 }
 
-const getDynamicStyleTagSelector = (uniqueId: number) =>
-  `style[${prefix}-dynamic="${uniqueId}"]`;
+const getDynamicStyleTagSelector = (contextId: ContextId) =>
+  `style[${prefix}-dynamic="${contextId}"]`;
 
-const getAlwaysStyleTagSelector = (uniqueId: number) =>
-  `style[${prefix}-always="${uniqueId}"]`;
+const getAlwaysStyleTagSelector = (contextId: ContextId) =>
+  `style[${prefix}-always="${contextId}"]`;
 
-const getDynamicStyleFromTag = (uniqueId: number): string => {
-  const selector: string = getDynamicStyleTagSelector(uniqueId);
+const getDynamicStyleFromTag = (contextId: ContextId): string => {
+  const selector: string = getDynamicStyleTagSelector(contextId);
   const el: HTMLStyleElement = (document.querySelector(selector): any);
   return el.innerHTML;
 };
 
-const getAlwaysStyleFromTag = (uniqueId: number): string => {
-  const selector: string = getAlwaysStyleTagSelector(uniqueId);
+const getAlwaysStyleFromTag = (contextId: ContextId): string => {
+  const selector: string = getAlwaysStyleTagSelector(contextId);
   const el: HTMLStyleElement = (document.querySelector(selector): any);
   return el.innerHTML;
 };
 
 it('should not mount style tags until mounted', () => {
-  const uniqueId: number = 1;
-  const dynamicSelector: string = getDynamicStyleTagSelector(uniqueId);
-  const alwaysSelector: string = getAlwaysStyleTagSelector(uniqueId);
+  const contextId: ContextId = '1';
+  const dynamicSelector: string = getDynamicStyleTagSelector(contextId);
+  const alwaysSelector: string = getAlwaysStyleTagSelector(contextId);
 
   // initially there is no style tag
   expect(document.querySelector(dynamicSelector)).toBeFalsy();
@@ -50,7 +51,7 @@ it('should not mount style tags until mounted', () => {
 
   // now mounting
   const wrapper: ReactWrapper<*> = mount(
-    <WithMarshal uniqueId={uniqueId}>{getMock()}</WithMarshal>,
+    <WithMarshal contextId={contextId}>{getMock()}</WithMarshal>,
   );
 
   // elements should now exist
@@ -65,82 +66,82 @@ it('should not mount style tags until mounted', () => {
 });
 
 it('should apply the resting dyanmic styles by default', () => {
-  const uniqueId: number = 2;
+  const contextId: ContextId = '2';
   const wrapper: ReactWrapper<*> = mount(
-    <WithMarshal uniqueId={uniqueId}>{getMock()}</WithMarshal>,
+    <WithMarshal contextId={contextId}>{getMock()}</WithMarshal>,
   );
 
-  const active: string = getDynamicStyleFromTag(uniqueId);
-  expect(active).toEqual(getStyles(`${uniqueId}`).resting);
+  const active: string = getDynamicStyleFromTag(contextId);
+  expect(active).toEqual(getStyles(`${contextId}`).resting);
 
   wrapper.unmount();
 });
 
 it('should apply the resting always styles by default', () => {
-  const uniqueId: number = 2;
+  const contextId: ContextId = '2';
   const wrapper: ReactWrapper<*> = mount(
-    <WithMarshal uniqueId={uniqueId}>{getMock()}</WithMarshal>,
+    <WithMarshal contextId={contextId}>{getMock()}</WithMarshal>,
   );
 
-  const always: string = getAlwaysStyleFromTag(uniqueId);
-  expect(always).toEqual(getStyles(`${uniqueId}`).always);
+  const always: string = getAlwaysStyleFromTag(contextId);
+  expect(always).toEqual(getStyles(`${contextId}`).always);
 
   wrapper.unmount();
 });
 
 it('should apply the dragging styles when asked', () => {
-  const uniqueId: number = 2;
+  const contextId: ContextId = '2';
   const mock = getMock();
   const wrapper: ReactWrapper<*> = mount(
-    <WithMarshal uniqueId={uniqueId}>{mock}</WithMarshal>,
+    <WithMarshal contextId={contextId}>{mock}</WithMarshal>,
   );
   const marshal: StyleMarshal = getMarshal(mock);
 
   marshal.dragging();
 
-  const active: string = getDynamicStyleFromTag(uniqueId);
-  expect(active).toEqual(getStyles(`${uniqueId}`).dragging);
+  const active: string = getDynamicStyleFromTag(contextId);
+  expect(active).toEqual(getStyles(`${contextId}`).dragging);
 
   wrapper.unmount();
 });
 
 it('should apply the drop animating styles when asked', () => {
-  const uniqueId: number = 2;
+  const contextId: ContextId = '2';
   const mock = getMock();
   const wrapper: ReactWrapper<*> = mount(
-    <WithMarshal uniqueId={uniqueId}>{mock}</WithMarshal>,
+    <WithMarshal contextId={contextId}>{mock}</WithMarshal>,
   );
   const marshal: StyleMarshal = getMarshal(mock);
 
   marshal.dropping('DROP');
-  const active: string = getDynamicStyleFromTag(uniqueId);
-  expect(active).toEqual(getStyles(`${uniqueId}`).dropAnimating);
+  const active: string = getDynamicStyleFromTag(contextId);
+  expect(active).toEqual(getStyles(`${contextId}`).dropAnimating);
 
   wrapper.unmount();
 });
 
 it('should apply the user cancel styles when asked', () => {
-  const uniqueId: number = 2;
+  const contextId: ContextId = '2';
   const mock = getMock();
   const wrapper: ReactWrapper<*> = mount(
-    <WithMarshal uniqueId={uniqueId}>{mock}</WithMarshal>,
+    <WithMarshal contextId={contextId}>{mock}</WithMarshal>,
   );
   const marshal: StyleMarshal = getMarshal(mock);
 
   marshal.dropping('CANCEL');
-  const active: string = getDynamicStyleFromTag(uniqueId);
-  expect(active).toEqual(getStyles(`${uniqueId}`).userCancel);
+  const active: string = getDynamicStyleFromTag(contextId);
+  expect(active).toEqual(getStyles(`${contextId}`).userCancel);
 
   wrapper.unmount();
 });
 
 it('should remove the style tag from the head when unmounting', () => {
-  const uniqueId: number = 2;
+  const contextId: ContextId = '2';
   const wrapper: ReactWrapper<*> = mount(
-    <WithMarshal uniqueId={uniqueId}>{getMock()}</WithMarshal>,
+    <WithMarshal contextId={contextId}>{getMock()}</WithMarshal>,
   );
-  const selector1: string = getDynamicStyleTagSelector(uniqueId);
-  const selector2: string = getAlwaysStyleTagSelector(uniqueId);
+  const selector1: string = getDynamicStyleTagSelector(contextId);
+  const selector2: string = getAlwaysStyleTagSelector(contextId);
 
   // the style tag exists
   expect(document.querySelector(selector1)).toBeTruthy();
@@ -154,23 +155,23 @@ it('should remove the style tag from the head when unmounting', () => {
 });
 
 it('should allow subsequent updates', () => {
-  const uniqueId: number = 10;
-  const styles: Styles = getStyles(`${uniqueId}`);
+  const contextId: ContextId = '10';
+  const styles: Styles = getStyles(`${contextId}`);
   const mock = getMock();
   const wrapper: ReactWrapper<*> = mount(
-    <WithMarshal uniqueId={uniqueId}>{mock}</WithMarshal>,
+    <WithMarshal contextId={contextId}>{mock}</WithMarshal>,
   );
   const marshal: StyleMarshal = getMarshal(mock);
 
   Array.from({ length: 4 }).forEach(() => {
     marshal.resting();
-    expect(getDynamicStyleFromTag(uniqueId)).toEqual(styles.resting);
+    expect(getDynamicStyleFromTag(contextId)).toEqual(styles.resting);
 
     marshal.dragging();
-    expect(getDynamicStyleFromTag(uniqueId)).toEqual(styles.dragging);
+    expect(getDynamicStyleFromTag(contextId)).toEqual(styles.dragging);
 
     marshal.dropping('DROP');
-    expect(getDynamicStyleFromTag(uniqueId)).toEqual(styles.dropAnimating);
+    expect(getDynamicStyleFromTag(contextId)).toEqual(styles.dropAnimating);
   });
 
   wrapper.unmount();

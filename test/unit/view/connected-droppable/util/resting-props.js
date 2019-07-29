@@ -9,6 +9,7 @@ const restingProps: MapProps = {
     draggingOverWith: null,
     draggingFromThisWith: null,
   },
+  useClone: null,
 };
 
 export default restingProps;

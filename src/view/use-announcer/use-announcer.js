@@ -2,30 +2,16 @@
 import { useRef, useEffect } from 'react';
 import invariant from 'tiny-invariant';
 import { useMemo, useCallback } from 'use-memo-one';
-import type { Announce } from '../../types';
+import type { Announce, ContextId } from '../../types';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';
+import visuallyHidden from '../visually-hidden-style';
 
-// https://allyjs.io/tutorials/hiding-elements.html
-// Element is visually hidden but is readable by screen readers
-const visuallyHidden: Object = {
-  position: 'absolute',
-  width: '1px',
-  height: '1px',
-  margin: '-1px',
-  border: '0',
-  padding: '0',
-  overflow: 'hidden',
-  clip: 'rect(0 0 0 0)',
-  // for if 'clip' is ever removed
-  'clip-path': 'inset(100%)',
-};
+export const getId = (contextId: ContextId): string =>
+  `rbd-announcement-${contextId}`;
 
-export const getId = (uniqueId: number): string =>
-  `react-beautiful-dnd-announcement-${uniqueId}`;
-
-export default function useAnnouncer(uniqueId: number): Announce {
-  const id: string = useMemo(() => getId(uniqueId), [uniqueId]);
+export default function useAnnouncer(contextId: ContextId): Announce {
+  const id: string = useMemo(() => getId(contextId), [contextId]);
   const ref = useRef<?HTMLElement>(null);
 
   useEffect(() => {
@@ -52,12 +38,16 @@ export default function useAnnouncer(uniqueId: number): Announce {
     getBodyElement().appendChild(el);
 
     return () => {
-      const toBeRemoved: ?HTMLElement = ref.current;
-      invariant(toBeRemoved, 'Cannot unmount announcement node');
+      // unmounting after a timeout to let any annoucements
+      // during a mount be published
+      setTimeout(function remove() {
+        const toBeRemoved: ?HTMLElement = ref.current;
+        invariant(toBeRemoved, 'Cannot unmount announcement node');
 
-      // Remove from body
-      getBodyElement().removeChild(toBeRemoved);
-      ref.current = null;
+        // Remove from body
+        getBodyElement().removeChild(toBeRemoved);
+        ref.current = null;
+      });
     };
   }, [id]);
 

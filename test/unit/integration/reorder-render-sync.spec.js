@@ -1,7 +1,8 @@
 // @flow
 import React from 'react';
 import { getRect } from 'css-box-model';
-import { mount, type ReactWrapper } from 'enzyme';
+// import { mount, type ReactWrapper } from 'enzyme';
+import { render, fireEvent } from '@testing-library/react';
 import {
   DragDropContext,
   Draggable,
@@ -9,15 +10,13 @@ import {
   type DropResult,
 } from '../../../src';
 import { getComputedSpacing } from '../../utils/dimension';
-import { withKeyboard } from '../../utils/user-input-util';
 import * as keyCodes from '../../../src/view/key-codes';
+import { simpleLift, keyboard } from './drag-handle/controls';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 
-const pressSpacebar = withKeyboard(keyCodes.space);
-const pressArrowDown = withKeyboard(keyCodes.arrowDown);
-
 const reorder = (list: any[], startIndex: number, endIndex: number): any[] => {
+  // eslint-disable-next-line no-restricted-syntax
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
@@ -43,7 +42,7 @@ class TaskItem extends React.Component<TaskItemProps> {
     const provided: DraggableProvided = this.props.provided;
     return (
       <div
-        className="drag-handle"
+        data-testid="drag-handle"
         ref={ref => {
           task.setRef(ref);
           provided.innerRef(ref);
@@ -186,7 +185,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
     second.onRender.mockClear();
   };
 
-  const wrapper: ReactWrapper<*> = mount(<App />);
+  const { getAllByTestId, unmount } = render(<App />);
 
   // clearing the initial render before a drag
   expect(first.onRender).toHaveBeenCalledTimes(1);
@@ -194,7 +193,9 @@ it('should call the onBeforeDragStart before connected components are updated, a
   clearRenderMocks();
 
   // start a drag
-  pressSpacebar(wrapper.find('.drag-handle').first());
+  const handle: HTMLElement = getAllByTestId('drag-handle')[0];
+  simpleLift(keyboard, handle);
+
   // flushing onDragStart
   jest.runOnlyPendingTimers();
 
@@ -204,7 +205,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
   expect(second.onRender).toHaveBeenCalledTimes(1);
   clearRenderMocks();
 
-  pressArrowDown(wrapper.find('.drag-handle').first());
+  fireEvent.keyDown(handle, { keyCode: keyCodes.arrowDown });
   // flushing keyboard movement
   requestAnimationFrame.step();
 
@@ -215,7 +216,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
   clearRenderMocks();
 
   // drop (there is no animation because already in the home spot)
-  pressSpacebar(wrapper.find('.drag-handle').first());
+  keyboard.drop(handle);
 
   // only a single render for the reorder and connected component update
   expect(first.onRender).toHaveBeenCalledTimes(1);
@@ -228,5 +229,5 @@ it('should call the onBeforeDragStart before connected components are updated, a
   expect(first.onRender).toHaveBeenCalledTimes(0);
   expect(second.onRender).toHaveBeenCalledTimes(0);
 
-  wrapper.unmount();
+  unmount();
 });

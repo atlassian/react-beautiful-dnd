@@ -217,14 +217,9 @@ If the user force presses on the element before they have moved the element (eve
 
 Any force press action will cancel an existing or pending drag
 
-#### Focus retention when moving between lists
+#### Focus retention
 
-When moving a `<Draggable />` from one list to another the default browser behaviour is for the _drag handle_ element to lose focus. This is because the old element is being destroyed and a new one is being created. The loss of focus is not good when dragging with a keyboard as the user is then unable to continue to interact with the element. To improve this user experience we automatically give a _drag handle_ focus when:
-
-- It was unmounted at the end of a drag
-- It had focus
-- It is enabled when mounted
-- No other elements have gained browser focus before the drag handle has mounted
+See [/docs/guides/focus.md]
 
 #### Extending `DraggableProps.style`
 
@@ -311,14 +306,19 @@ It is an assumption that `<Draggable />`s are _visible siblings_ of one another.
 
 ```js
 type DragHandleProps = {|
-  onFocus: () => void,
-  onBlur: () => void,
-  onMouseDown: (event: MouseEvent) => void,
-  onKeyDown: (event: KeyboardEvent) => void,
-  onTouchStart: (event: TouchEvent) => void,
-  'data-react-beautiful-dnd-drag-handle': string,
-  'aria-roledescription': string,
+  // what draggable the handle belongs to
+  'data-rbd-drag-handle-draggable-id': DraggableId,
+
+  // What DragDropContext the drag handle is in
+  'data-rbd-drag-handle-context-id': ContextId,
+
+  // Id of hidden element that contains the lift instruction (nicer screen reader text)
+  'aria-labelledby': ElementId,
+
+  // Allow tabbing to this element
   tabIndex: number,
+
+  // Stop html5 drag and drop
   draggable: boolean,
   onDragStart: (event: DragEvent) => void,
 |};
@@ -353,42 +353,6 @@ Controlling a whole draggable by just a part of it
     </div>
   )}
 </Draggable>
-```
-
-#### `dragHandleProps` monkey patching
-
-You can override some of the `dragHandleProps` props with your own behavior if you need to.
-
-```js
-const myOnMouseDown = event => console.log('mouse down on', event.target);
-
-<Draggable draggableId="draggable-1" index={0}>
-  {(provided, snapshot) => {
-    const onMouseDown = (() => {
-      // dragHandleProps might be null
-      if (!provided.dragHandleProps) {
-        return onMouseDown;
-      }
-
-      // creating a new onMouseDown function that calls myOnMouseDown as well as the drag handle one.
-      return event => {
-        provided.dragHandleProps.onMouseDown(event);
-        myOnMouseDown(event);
-      };
-    })();
-
-    return (
-      <div
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-        onMouseDown={onMouseDown}
-      >
-        Drag me!
-      </div>
-    );
-  }}
-</Draggable>;
 ```
 
 ### 2. Snapshot: (DraggableStateSnapshot)

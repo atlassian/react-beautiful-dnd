@@ -2,10 +2,10 @@
 import { JSDOM } from 'jsdom';
 import checkDoctype from '../../../../src/view/drag-drop-context/check-doctype';
 
-jest.spyOn(console, 'warn').mockImplementation(() => {});
+const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
 afterEach(() => {
-  console.warn.mockClear();
+  warn.mockClear();
 });
 
 it('should pass if using a html doctype', () => {
@@ -13,7 +13,7 @@ it('should pass if using a html doctype', () => {
 
   checkDoctype(jsdom.window.document);
 
-  expect(console.warn).not.toHaveBeenCalled();
+  expect(warn).not.toHaveBeenCalled();
 });
 
 it('should fail if there is no doctype', () => {
@@ -21,7 +21,7 @@ it('should fail if there is no doctype', () => {
 
   checkDoctype(jsdom.window.document);
 
-  expect(console.warn).toHaveBeenCalled();
+  expect(warn).toHaveBeenCalled();
 });
 
 it('should fail if there is a non-html5 doctype', () => {
@@ -32,5 +32,5 @@ it('should fail if there is a non-html5 doctype', () => {
 
   checkDoctype(jsdom.window.document);
 
-  expect(console.warn).toHaveBeenCalled();
+  expect(warn).toHaveBeenCalled();
 });

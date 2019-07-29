@@ -10,13 +10,24 @@ import canStartDrag from '../../state/can-start-drag';
 import scrollWindow from '../window/scroll-window';
 import createAutoScroller from '../../state/auto-scroller';
 import useStyleMarshal from '../use-style-marshal/use-style-marshal';
+import useFocusMarshal from '../use-focus-marshal';
+import useRegistry from '../../state/registry/use-registry';
+import type { Registry } from '../../state/registry/registry-types';
+import type { FocusMarshal } from '../use-focus-marshal/focus-marshal-types';
 import type { AutoScroller } from '../../state/auto-scroller/auto-scroller-types';
 import type { StyleMarshal } from '../use-style-marshal/style-marshal-types';
 import type {
   DimensionMarshal,
   Callbacks as DimensionMarshalCallbacks,
 } from '../../state/dimension-marshal/dimension-marshal-types';
-import type { DraggableId, State, Responders, Announce } from '../../types';
+import type {
+  DraggableId,
+  State,
+  Responders,
+  Announce,
+  Sensor,
+  ElementId,
+} from '../../types';
 import type { Store, Action } from '../../state/store-types';
 import StoreContext from '../context/store-context';
 import {
@@ -30,17 +41,24 @@ import {
 } from '../../state/action-creators';
 import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
+import useDragHandleDescription from '../use-lift-instruction';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
 import usePrevious from '../use-previous-ref';
 import { warning } from '../../dev-warning';
+import useSensorMarshal from '../use-sensor-marshal/use-sensor-marshal';
 
 type Props = {|
   ...Responders,
-  uniqueId: number,
+  contextId: string,
   setOnError: (onError: Function) => void,
   // we do not technically need any children for this component
   children: Node | null,
+
+  // sensors
+  sensors?: Sensor[],
+  enableDefaultSensors?: ?boolean,
+  liftInstruction: string,
 |};
 
 const createResponders = (props: Props): Responders => ({
@@ -60,7 +78,7 @@ function getStore(lazyRef: LazyStoreRef): Store {
 }
 
 export default function App(props: Props) {
-  const { uniqueId, setOnError } = props;
+  const { contextId, setOnError, sensors, liftInstruction } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
@@ -72,8 +90,13 @@ export default function App(props: Props) {
     return createResponders(lastPropsRef.current);
   }, [lastPropsRef]);
 
-  const announce: Announce = useAnnouncer(uniqueId);
-  const styleMarshal: StyleMarshal = useStyleMarshal(uniqueId);
+  const announce: Announce = useAnnouncer(contextId);
+
+  const liftInstructionId: ElementId = useDragHandleDescription(
+    contextId,
+    liftInstruction,
+  );
+  const styleMarshal: StyleMarshal = useStyleMarshal(contextId);
 
   const lazyDispatch: Action => void = useCallback((action: Action): void => {
     getStore(lazyStoreRef).dispatch(action);
@@ -94,10 +117,12 @@ export default function App(props: Props) {
       ),
     [lazyDispatch],
   );
-  const dimensionMarshal: DimensionMarshal = useMemo<DimensionMarshal>(
-    () => createDimensionMarshal(callbacks),
-    [callbacks],
-  );
+
+  const registry: Registry = useRegistry();
+
+  const dimensionMarshal: DimensionMarshal = useMemo<DimensionMarshal>(() => {
+    return createDimensionMarshal(registry, callbacks);
+  }, [registry, callbacks]);
 
   const autoScroller: AutoScroller = useMemo<AutoScroller>(
     () =>
@@ -115,16 +140,26 @@ export default function App(props: Props) {
     [dimensionMarshal.scrollDroppable, lazyDispatch],
   );
 
+  const focusMarshal: FocusMarshal = useFocusMarshal(contextId);
+
   const store: Store = useMemo<Store>(
     () =>
       createStore({
-        dimensionMarshal,
-        styleMarshal,
         announce,
         autoScroller,
+        dimensionMarshal,
+        focusMarshal,
         getResponders,
+        styleMarshal,
       }),
-    [announce, autoScroller, dimensionMarshal, getResponders, styleMarshal],
+    [
+      announce,
+      autoScroller,
+      dimensionMarshal,
+      focusMarshal,
+      getResponders,
+      styleMarshal,
+    ],
   );
 
   // Checking for unexpected store changes
@@ -162,17 +197,32 @@ export default function App(props: Props) {
   const appContext: AppContextValue = useMemo(
     () => ({
       marshal: dimensionMarshal,
-      style: styleMarshal.styleContext,
+      focus: focusMarshal,
+      contextId,
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
+      liftInstructionId,
+      registry,
     }),
     [
+      contextId,
       dimensionMarshal,
+      focusMarshal,
       getCanLift,
       getIsMovementAllowed,
-      styleMarshal.styleContext,
+      liftInstructionId,
+      registry,
     ],
   );
+
+  useSensorMarshal({
+    contextId,
+    store,
+    registry,
+    customSensors: sensors,
+    // default to 'true' unless 'false' is explicitly passed
+    enableDefaultSensors: props.enableDefaultSensors !== false,
+  });
 
   // Clean store when unmounting
   useEffect(() => {

@@ -6,7 +6,7 @@ import type {
 } from '../../../../../src/types';
 import { horizontal, vertical } from '../../../../../src/state/axis';
 import getDragImpact from '../../../../../src/state/get-drag-impact';
-import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
 import { enableCombining, getPreset } from '../../../../utils/dimension';
 
@@ -15,7 +15,7 @@ import { enableCombining, getPreset } from '../../../../utils/dimension';
     const preset = getPreset(axis);
 
     it('should not allow combining with the dragging item', () => {
-      const { onLift, impact: homeImpact } = getHomeOnLift({
+      const { afterCritical, impact: homeImpact } = getLiftEffect({
         draggable: preset.inHome1,
         home: preset.home,
         draggables: preset.draggables,
@@ -35,7 +35,7 @@ import { enableCombining, getPreset } from '../../../../utils/dimension';
         previousImpact: homeImpact,
         viewport: preset.viewport,
         userDirection: forward,
-        onLift,
+        afterCritical,
       });
       expect(impact).toEqual(homeImpact);
     });

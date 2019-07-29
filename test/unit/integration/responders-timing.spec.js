@@ -2,16 +2,13 @@
 import React from 'react';
 import { getRect } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import { mount, type ReactWrapper } from 'enzyme';
+import { render } from '@testing-library/react';
 import { DragDropContext, Draggable, Droppable } from '../../../src';
 import { getComputedSpacing } from '../../utils/dimension';
-import { withKeyboard } from '../../utils/user-input-util';
-import * as keyCodes from '../../../src/view/key-codes';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import type { Responders } from '../../../src/types';
-
-const pressSpacebar = withKeyboard(keyCodes.space);
+import { simpleLift, keyboard } from './drag-handle/controls';
 
 type ItemProps = {|
   provided: DraggableProvided,
@@ -24,7 +21,7 @@ class Item extends React.Component<ItemProps> {
     const provided: DraggableProvided = this.props.provided;
     return (
       <div
-        className="drag-handle"
+        data-testid="drag-handle"
         ref={provided.innerRef}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
@@ -77,7 +74,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
   jest
     .spyOn(window, 'getComputedStyle')
     .mockImplementation(() => getComputedSpacing({}));
-  const wrapper: ReactWrapper<*> = mount(
+  const { getByTestId } = render(
     <DragDropContext {...responders}>
       <Droppable droppableId="droppable">
         {(droppableProvided: DroppableProvided) => (
@@ -104,7 +101,8 @@ it('should call the onBeforeDragStart before connected components are updated, a
   onItemRender.mockClear();
 
   // start a drag
-  pressSpacebar(wrapper.find('.drag-handle'));
+  const handle: HTMLElement = getByTestId('drag-handle');
+  simpleLift(keyboard, handle);
   // flushing onDragStart
   jest.runOnlyPendingTimers();
 

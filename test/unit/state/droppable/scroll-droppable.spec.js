@@ -21,6 +21,7 @@ import getMaxScroll from '../../../../src/state/get-max-scroll';
 const descriptor: DroppableDescriptor = {
   id: 'drop-1',
   type: 'TYPE',
+  mode: 'STANDARD',
 };
 
 it('should update the frame scroll and the subject', () => {

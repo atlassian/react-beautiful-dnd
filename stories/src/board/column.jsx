@@ -36,6 +36,7 @@ type Props = {|
   index: number,
   isScrollable?: boolean,
   isCombineEnabled?: boolean,
+  useClone?: boolean,
 |};
 
 export default class Column extends Component<Props> {
@@ -64,6 +65,7 @@ export default class Column extends Component<Props> {
               quotes={quotes}
               internalScroll={this.props.isScrollable}
               isCombineEnabled={Boolean(this.props.isCombineEnabled)}
+              useClone={Boolean(this.props.useClone)}
             />
           </Container>
         )}

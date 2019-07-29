@@ -4,7 +4,8 @@ import invariant from 'tiny-invariant';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 import { resetServerContext } from '../../../../src';
-import App from './app';
+import App from '../app';
+import { noop } from '../../../../src/empty';
 
 beforeEach(() => {
   // Reset server context between tests to prevent state being shared between them
@@ -22,16 +23,16 @@ it('should support hydrating a server side rendered application', () => {
   // we need to mock out the warnings caused by useLayoutEffect
   // This will not happen on the client as the string is rendered
   // on the server
-  jest.spyOn(console, 'error').mockImplementation(() => {});
+  const error = jest.spyOn(console, 'error').mockImplementation(noop);
 
   const serverHTML: string = ReactDOMServer.renderToString(<App />);
 
-  console.error.mock.calls.forEach(call => {
+  error.mock.calls.forEach(call => {
     expect(
       call[0].includes('Warning: useLayoutEffect does nothing on the server'),
     ).toBe(true);
   });
-  console.error.mockRestore();
+  error.mockRestore();
 
   // would be done client side
   // would have a fresh server context on the client

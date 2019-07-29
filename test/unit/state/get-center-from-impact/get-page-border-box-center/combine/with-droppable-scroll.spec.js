@@ -5,18 +5,16 @@ import type {
   DragImpact,
   DisplacedBy,
   DroppableDimension,
-  Displacement,
 } from '../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset, makeScrollable } from '../../../../../utils/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import { negate, add } from '../../../../../../src/state/position';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
 import { forward } from '../../../../../../src/state/user-direction/user-direction-preset';
-import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/get-not-animated-displacement';
+import { getForcedDisplacement } from '../../../../../utils/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -29,7 +27,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       axis,
       preset.inHome1.displaceBy,
     );
-    const { onLift } = getHomeOnLift({
+    const { afterCritical } = getLiftEffect({
       draggable: preset.inHome1,
       home: withCombineEnabled,
       draggables: preset.draggables,
@@ -38,19 +36,26 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
 
     it('should account for any scroll in the droppable being dropped into (into foreign list)', () => {
       // combining with inHome2
-      const displaced: Displacement[] = [
-        getNotAnimatedDisplacement(preset.inHome2),
-        getNotAnimatedDisplacement(preset.inHome3),
-        getNotAnimatedDisplacement(preset.inHome4),
-      ];
       const impact: DragImpact = {
-        movement: {
-          displacedBy,
-          displaced,
-          map: getDisplacementMap(displaced),
-        },
-        destination: null,
-        merge: {
+        displaced: getForcedDisplacement({
+          visible: [
+            {
+              dimension: preset.inHome2,
+              shouldAnimate: false,
+            },
+            {
+              dimension: preset.inHome3,
+              shouldAnimate: false,
+            },
+            {
+              dimension: preset.inHome4,
+              shouldAnimate: false,
+            },
+          ],
+        }),
+        displacedBy,
+        at: {
+          type: 'COMBINE',
           whenEntered: forward,
           // combining with inHome2
           combine: {
@@ -65,7 +70,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
       {
         const result: Position = getPageBorderBoxCenter({
           impact,
-          onLift,
+          afterCritical,
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppable: withCombineEnabled,
@@ -90,7 +95,7 @@ import getNotAnimatedDisplacement from '../../../../../utils/get-displacement/ge
           draggable: preset.inHome1,
           draggables: preset.dimensions.draggables,
           droppable: scrolled,
-          onLift,
+          afterCritical,
         });
 
         expect(result).toEqual(add(inHome2Center, displacement));

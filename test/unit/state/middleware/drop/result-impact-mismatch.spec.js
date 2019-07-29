@@ -14,6 +14,10 @@ import createStore from '../util/create-store';
 import passThrough from '../util/pass-through-middleware';
 import type { State, CompletedDrag } from '../../../../../src/types';
 import type { Store } from '../../../../../src/state/store-types';
+import {
+  tryGetDestination,
+  tryGetCombine,
+} from '../../../../../src/state/get-impact-location';
 
 it('should clear any destination from a final impact if not dropping on a droppable', () => {
   const mock = jest.fn();
@@ -23,14 +27,14 @@ it('should clear any destination from a final impact if not dropping on a droppa
   expect(store.getState().phase).toBe('DRAGGING');
   const initial: State = store.getState();
   invariant(initial.phase === 'DRAGGING');
-  invariant(initial.impact.destination !== null);
+  invariant(tryGetDestination !== null);
 
   // no destination
   store.dispatch(move({ client: { x: 10000, y: 10000 } }));
   {
     const current: State = store.getState();
     invariant(current.phase === 'DRAGGING');
-    expect(current.impact.destination).toBe(null);
+    expect(tryGetDestination(current.impact)).toBe(null);
   }
 
   // drop
@@ -41,7 +45,9 @@ it('should clear any destination from a final impact if not dropping on a droppa
   const completed: CompletedDrag = args.completed;
 
   // the impact has the home destination for animation
-  expect(completed.impact.destination).toBe(initial.impact.destination);
+  expect(tryGetDestination(completed.impact)).toBe(
+    tryGetDestination(initial.impact),
+  );
   // but the consumer will be told that there was no destination
   expect(completed.result.destination).toBe(null);
 });
@@ -54,7 +60,7 @@ it('should clear any destination from a final impact canceling', () => {
   expect(store.getState().phase).toBe('DRAGGING');
   const initial: State = store.getState();
   invariant(initial.phase === 'DRAGGING');
-  invariant(initial.impact.destination !== null);
+  invariant(tryGetDestination(initial.impact) !== null);
 
   // cancel
   store.dispatch(drop({ reason: 'CANCEL' }));
@@ -64,7 +70,9 @@ it('should clear any destination from a final impact canceling', () => {
   const completed: CompletedDrag = args.completed;
 
   // the impact has the home destination for animation
-  expect(completed.impact.destination).toBe(initial.impact.destination);
+  expect(tryGetDestination(completed.impact)).toBe(
+    tryGetDestination(initial.impact),
+  );
   // but the consumer will be told that there was no destination
   expect(completed.result.destination).toBe(null);
 });
@@ -86,15 +94,15 @@ it('should clear any combine from a final impact if cancelling', () => {
   expect(store.getState().phase).toBe('DRAGGING');
   const initial: State = store.getState();
   invariant(initial.phase === 'DRAGGING');
-  invariant(initial.impact.destination !== null);
+  invariant(tryGetDestination(initial.impact) !== null);
 
   // moving onto a combine
   store.dispatch(moveDown());
   {
     const current: State = store.getState();
     invariant(current.phase === 'DRAGGING');
-    expect(current.impact.destination).toBe(null);
-    expect(current.impact.merge).toBeTruthy();
+    expect(tryGetDestination(current.impact)).toBe(null);
+    expect(tryGetCombine(current.impact)).toBeTruthy();
   }
 
   // drop
@@ -105,9 +113,11 @@ it('should clear any combine from a final impact if cancelling', () => {
   const completed: CompletedDrag = args.completed;
 
   // the combine has been removed
-  expect(completed.impact.merge).toBe(null);
+  expect(tryGetCombine(completed.impact)).toBe(null);
   // for animation purposes it has a final impact of moving back to the starting position
-  expect(completed.impact.destination).toBe(initial.impact.destination);
+  expect(tryGetDestination(completed.impact)).toBe(
+    tryGetDestination(initial.impact),
+  );
   // the consumer will be told that there was no combine
   expect(completed.result.combine).toBe(null);
 });

@@ -1,6 +1,37 @@
 // @flow
-export const prefix: string = 'data-react-beautiful-dnd';
-export const dragHandle: string = `${prefix}-drag-handle`;
-export const draggable: string = `${prefix}-draggable`;
-export const droppable: string = `${prefix}-droppable`;
-export const placeholder: string = `${prefix}-placeholder`;
+export const prefix: string = 'data-rbd';
+export const dragHandle = (() => {
+  const base = `${prefix}-drag-handle`;
+
+  return {
+    base,
+    draggableId: `${base}-draggable-id`,
+    contextId: `${base}-context-id`,
+  };
+})();
+
+export const draggable = (() => {
+  const base: string = `${prefix}-draggable`;
+  return {
+    base,
+    contextId: `${base}-context-id`,
+    id: `${base}-id`,
+  };
+})();
+
+export const droppable = (() => {
+  const base: string = `${prefix}-droppable`;
+  return {
+    base,
+    contextId: `${base}-context-id`,
+    id: `${base}-id`,
+  };
+})();
+
+export const placeholder = {
+  contextId: `${prefix}-placeholder-context-id`,
+};
+
+export const scrollContainer = {
+  contextId: `${prefix}-scroll-container-context-id`,
+};

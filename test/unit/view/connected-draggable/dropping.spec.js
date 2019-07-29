@@ -16,7 +16,7 @@ import type {
 } from '../../../../src/types';
 import { curves, combine as combineStyle } from '../../../../src/animation';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { getDraggingSnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
@@ -58,7 +58,7 @@ it('should move to the new home offset', () => {
 });
 
 it('should maintain combine information', () => {
-  const { impact: homeImpact } = getHomeOnLift({
+  const { afterCritical, impact: homeImpact } = getLiftEffect({
     draggable: preset.inHome1,
     home: preset.home,
     draggables: preset.draggables,
@@ -70,8 +70,8 @@ it('should maintain combine information', () => {
   };
   const impact: DragImpact = {
     ...homeImpact,
-    destination: null,
-    merge: {
+    at: {
+      type: 'COMBINE',
       whenEntered: forward,
       combine,
     },
@@ -81,6 +81,7 @@ it('should maintain combine information', () => {
     ...withoutCombine,
     completed: {
       critical: withoutCombine.completed.critical,
+      afterCritical,
       impact,
       result: {
         ...withoutCombine.completed.result,

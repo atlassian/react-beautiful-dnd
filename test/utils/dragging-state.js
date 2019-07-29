@@ -33,14 +33,6 @@ export const withImpact = (
     impact,
   }: any);
 
-// export const dropAnimatingWithResult = (
-//   current: DropAnimatingState,
-//   result: PendingDrop,
-// ): DropAnimatingState => ({
-//   ...current,
-//   pending,
-// });
-
 export const move = (
   previous: IsDraggingState,
   offset: Position,

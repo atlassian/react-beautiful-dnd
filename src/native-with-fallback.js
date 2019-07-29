@@ -14,6 +14,7 @@ export function values<T>(map: Map<T>): T[] {
 // Could also extend to pass index and list
 type PredicateFn<T> = (value: T) => boolean;
 
+// TODO: swap order
 export function findIndex<T>(
   list: Array<T>,
   predicate: PredicateFn<T>,
@@ -42,4 +43,11 @@ export function find<T>(list: Array<T>, predicate: PredicateFn<T>): ?T {
   }
   // Array.prototype.find returns undefined when nothing is found
   return undefined;
+}
+
+// Using this rather than Array.from as Array.from adds 2kb to the gzip
+// document.querySelector actually returns Element[], but flow thinks it is HTMLElement[]
+// So we downcast the result to Element[]
+export function toArray(list: NodeList<HTMLElement>): Element[] {
+  return Array.prototype.slice.call(list);
 }

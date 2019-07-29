@@ -8,7 +8,7 @@ import type {
 } from '../../../../../../src/types';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import { toDraggableMap } from '../../../../../../src/state/dimension-structures';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import getClosestDraggable from '../../../../../../src/state/move-in-direction/move-cross-axis/get-closest-draggable';
 import { negate, patch } from '../../../../../../src/state/position';
 import scrollViewport from '../../../../../../src/state/scroll-viewport';
@@ -19,7 +19,7 @@ import {
   getDraggableDimension,
   getDroppableDimension,
 } from '../../../../../utils/dimension';
-import noOnLift from '../../../../../utils/no-on-lift';
+import { noAfterCritical } from '../../../../../../src/state/no-impact';
 
 const viewport: Viewport = getViewport();
 
@@ -42,6 +42,7 @@ const viewport: Viewport = getViewport();
       descriptor: {
         id: 'home',
         type: 'TYPE',
+        mode: 'STANDARD',
       },
       direction: axis.direction,
       borderBox,
@@ -50,7 +51,7 @@ const viewport: Viewport = getViewport();
     // dragging item
     const inHome1: DraggableDimension = getDraggableDimension({
       descriptor: {
-        id: 'visible1',
+        id: 'inHome1',
         droppableId: home.descriptor.id,
         type: home.descriptor.type,
         index: 2,
@@ -58,14 +59,14 @@ const viewport: Viewport = getViewport();
       borderBox: {
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
-        [axis.start]: 20,
-        [axis.end]: 40,
+        [axis.start]: 0,
+        [axis.end]: 20,
       },
     });
 
     const inHome2: DraggableDimension = getDraggableDimension({
       descriptor: {
-        id: 'visible1',
+        id: 'inHome2',
         droppableId: home.descriptor.id,
         type: home.descriptor.type,
         index: 2,
@@ -80,7 +81,7 @@ const viewport: Viewport = getViewport();
 
     const inHome3: DraggableDimension = getDraggableDimension({
       descriptor: {
-        id: 'visible1',
+        id: 'inHome3',
         droppableId: home.descriptor.id,
         type: home.descriptor.type,
         index: 2,
@@ -88,13 +89,13 @@ const viewport: Viewport = getViewport();
       borderBox: {
         [axis.crossAxisStart]: crossAxisStart,
         [axis.crossAxisEnd]: crossAxisEnd,
-        [axis.start]: 20,
-        [axis.end]: 40,
+        [axis.start]: 40,
+        [axis.end]: 60,
       },
     });
 
     const insideDestination: DraggableDimension[] = [inHome1, inHome2, inHome3];
-    const { onLift } = getHomeOnLift({
+    const { afterCritical } = getLiftEffect({
       draggable: inHome1,
       home,
       viewport,
@@ -114,7 +115,7 @@ const viewport: Viewport = getViewport();
           destination: home,
           insideDestination,
           viewport,
-          onLift,
+          afterCritical,
         });
         expect(result).toEqual(inHome3);
       }
@@ -125,7 +126,7 @@ const viewport: Viewport = getViewport();
           destination: home,
           insideDestination,
           viewport,
-          onLift: noOnLift,
+          afterCritical: noAfterCritical,
         });
         expect(result).toEqual(inHome2);
       }
@@ -144,9 +145,9 @@ const viewport: Viewport = getViewport();
         destination: home,
         insideDestination,
         viewport: scrolled,
-        onLift: noOnLift,
+        afterCritical: noAfterCritical,
       });
-      expect(result).toEqual(inHome3);
+      expect(result).toEqual(inHome2);
 
       // validate visibility
       {
@@ -162,7 +163,7 @@ const viewport: Viewport = getViewport();
 
         const inVisibleLocation: Spacing = offsetByPosition(
           inHome2.page.borderBox,
-          negate(onLift.displacedBy.point),
+          negate(afterCritical.displacedBy.point),
         );
         // visible when not scrolled
         expect(
@@ -191,7 +192,7 @@ const viewport: Viewport = getViewport();
           destination: home,
           insideDestination,
           viewport: scrolled,
-          onLift: noOnLift,
+          afterCritical: noAfterCritical,
         });
         expect(validate).toEqual(inHome2);
       }

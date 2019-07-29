@@ -1,6 +1,7 @@
 // @flow
 import * as keyCodes from '../../src/view/key-codes';
 import { timings } from '../../src/animation';
+import { getHandleSelector } from './util';
 
 beforeEach(() => {
   cy.visit('/iframe.html?id=board--simple');
@@ -11,15 +12,15 @@ it('should reorder lists', () => {
   cy.get('h4')
     .eq(0)
     .as('first')
-    .should('have.text', 'Jake');
+    .should('contain', 'Jake');
 
   cy.get('h4')
     .eq(1)
-    .should('have.text', 'BMO');
+    .should('contain', 'BMO');
 
   // reorder operation
   cy.get('@first')
-    .closest('[data-react-beautiful-dnd-drag-handle]')
+    .closest(getHandleSelector())
     .focus()
     .trigger('keydown', { keyCode: keyCodes.space })
     .trigger('keydown', { keyCode: keyCodes.arrowRight, force: true })
@@ -31,10 +32,10 @@ it('should reorder lists', () => {
   // note: not using get aliases as they where returning incorrect results
   cy.get('h4')
     .eq(0)
-    .should('have.text', 'BMO');
+    .should('contain', 'BMO');
 
   // index of the drag handle has changed
   cy.get('h4')
     .eq(1)
-    .should('have.text', 'Jake');
+    .should('contain', 'Jake');
 });

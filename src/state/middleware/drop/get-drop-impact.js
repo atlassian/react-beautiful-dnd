@@ -5,20 +5,19 @@ import type {
   Viewport,
   DroppableDimension,
   DraggableDimensionMap,
-  OnLift,
+  LiftEffect,
 } from '../../../types';
-import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import recompute from '../../update-displacement-visibility/recompute';
-import { noMovement } from '../../no-impact';
+import { emptyGroups } from '../../no-impact';
 
 type Args = {|
+  draggables: DraggableDimensionMap,
+  home: DroppableDimension,
   reason: DropReason,
   lastImpact: DragImpact,
   onLiftImpact: DragImpact,
   viewport: Viewport,
-  home: DroppableDimension,
-  draggables: DraggableDimensionMap,
-  onLift: OnLift,
+  afterCritical: LiftEffect,
 |};
 
 export type Result = {|
@@ -27,45 +26,40 @@ export type Result = {|
 |};
 
 export default ({
+  draggables,
   reason,
   lastImpact,
   home,
   viewport,
-  draggables,
   onLiftImpact,
-  onLift,
 }: Args): Result => {
-  const didDropInsideDroppable: boolean =
-    reason === 'DROP' && Boolean(whatIsDraggedOver(lastImpact));
-
-  if (!didDropInsideDroppable) {
+  if (!lastImpact.at || reason !== 'DROP') {
     // Dropping outside of a list or the drag was cancelled
 
     // Going to use the on lift impact
     // Need to recompute the visibility of the original impact
     // What is visible can be different to when  the drag started
 
-    const impact: DragImpact = recompute({
+    const recomputedHomeImpact: DragImpact = recompute({
+      draggables,
       impact: onLiftImpact,
       destination: home,
       viewport,
-      draggables,
-      onLift,
       // We need the draggables to animate back to their positions
       forceShouldAnimate: true,
     });
 
     return {
-      impact,
-      didDropInsideDroppable,
+      impact: recomputedHomeImpact,
+      didDropInsideDroppable: false,
     };
   }
 
   // use the existing impact
-  if (lastImpact.destination) {
+  if (lastImpact.at.type === 'REORDER') {
     return {
       impact: lastImpact,
-      didDropInsideDroppable,
+      didDropInsideDroppable: true,
     };
   }
 
@@ -73,11 +67,11 @@ export default ({
   // will animate closed
   const withoutMovement: DragImpact = {
     ...lastImpact,
-    movement: noMovement,
+    displaced: emptyGroups,
   };
 
   return {
     impact: withoutMovement,
-    didDropInsideDroppable,
+    didDropInsideDroppable: true,
   };
 };
