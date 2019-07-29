@@ -82,7 +82,6 @@ export type OwnProps = {|
   ...DefaultProps,
   children: (Provided, StateSnapshot) => Node,
   droppableId: DroppableId,
-  // TODO: hoist these types up?
   whenDraggingClone: ?RenderClone,
 |};
 

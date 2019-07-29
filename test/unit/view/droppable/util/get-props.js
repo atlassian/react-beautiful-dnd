@@ -5,17 +5,21 @@ import type {
   OwnProps,
   DispatchProps,
 } from '../../../../../src/view/droppable/droppable-types';
+import getBodyElement from '../../../../../src/view/get-body-element';
 
 export const preset = getPreset();
 
 export const homeOwnProps: OwnProps = {
   droppableId: preset.home.descriptor.id,
   type: preset.home.descriptor.type,
+  mode: preset.home.descriptor.mode,
   isDropDisabled: false,
   isCombineEnabled: false,
   direction: preset.home.axis.direction,
   ignoreContainerClipping: false,
   children: () => null,
+  getContainerForClone: getBodyElement,
+  whenDraggingClone: null,
 };
 
 export const foreignOwnProps: OwnProps = {
@@ -33,6 +37,7 @@ export const homeAtRest: MapProps = {
     draggingOverWith: null,
     draggingFromThisWith: null,
   },
+  useClone: null,
 };
 
 export const isOverHome: MapProps = {
@@ -44,6 +49,7 @@ export const isOverHome: MapProps = {
     draggingOverWith: preset.inHome1.descriptor.id,
     draggingFromThisWith: preset.inHome1.descriptor.id,
   },
+  useClone: null,
 };
 
 export const isNotOverHome: MapProps = {
@@ -55,6 +61,7 @@ export const isNotOverHome: MapProps = {
     draggingOverWith: null,
     draggingFromThisWith: preset.inHome1.descriptor.id,
   },
+  useClone: null,
 };
 
 export const homePostDropAnimation: MapProps = {
@@ -65,6 +72,7 @@ export const homePostDropAnimation: MapProps = {
     draggingOverWith: null,
     draggingFromThisWith: null,
   },
+  useClone: null,
 };
 
 export const isOverForeign: MapProps = {
@@ -75,6 +83,7 @@ export const isOverForeign: MapProps = {
     draggingOverWith: preset.inHome1.descriptor.id,
     draggingFromThisWith: null,
   },
+  useClone: null,
 };
 
 export const isNotOverForeign: MapProps = {
@@ -85,6 +94,7 @@ export const isNotOverForeign: MapProps = {
     draggingOverWith: null,
     draggingFromThisWith: null,
   },
+  useClone: null,
 };
 
 export const dispatchProps: DispatchProps = {

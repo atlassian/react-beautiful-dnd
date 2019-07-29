@@ -7,8 +7,11 @@ import { simpleLift, keyboard } from '../controls';
 jest.useFakeTimers();
 
 it('should not prevent clicks after a drag', () => {
-  const onDragEnd = jest.fn();
+  // clearing any pending listeners that have leaked from other tests
+  fireEvent.click(window);
+
   const onDragStart = jest.fn();
+  const onDragEnd = jest.fn();
   const { getByText } = render(
     <App onDragStart={onDragStart} onDragEnd={onDragEnd} />,
   );
