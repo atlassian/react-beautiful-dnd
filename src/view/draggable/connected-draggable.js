@@ -207,6 +207,8 @@ function getSecondarySelector(): TrySelect {
     }),
   );
 
+  // Is we are the combine target for something then we need to publish that
+  // otherwise we will return null to get the default props
   const getFallback = (combineTargetFor: ?DraggableId): ?MapProps => {
     return combineTargetFor
       ? getMemoizedProps(origin, combineTargetFor, true)
