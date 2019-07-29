@@ -23,7 +23,6 @@ class Person extends Component<{ name: string, provided: Provided }> {
     return (
       <div
         ref={ref => provided.innerRef(ref)}
-        data-testid="person"
         {...provided.draggableProps}
         {...provided.dragHandleProps}
       >

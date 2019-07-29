@@ -254,7 +254,7 @@ class DroppableType extends Component<OwnProps> {
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
-const ConnectedDroppable: typeof DroppableType = (connect(
+const ConnectedDroppable: typeof DroppableType = connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
   // no dispatch props for droppable
@@ -271,7 +271,7 @@ const ConnectedDroppable: typeof DroppableType = (connect(
     // Switching to a strictEqual as we return a memoized object on changes
     areStatePropsEqual: isStrictEqual,
   },
-): any)(Droppable);
+)(Droppable);
 
 ConnectedDroppable.defaultProps = defaultProps;
 

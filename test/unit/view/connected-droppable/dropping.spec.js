@@ -17,6 +17,7 @@ import { withImpact } from '../../../utils/dragging-state';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import noImpact from '../../../../src/state/no-impact';
 import cloneImpact from '../../../utils/clone-impact';
+import { tryGetDestination } from '../../../../src/state/get-impact-location';
 
 const state = getStatePreset();
 const preset = state.preset;
@@ -31,6 +32,7 @@ describe('home list', () => {
         draggingOverWith: preset.inHome1.descriptor.id,
         draggingFromThisWith: preset.inHome1.descriptor.id,
       },
+      useClone: null,
     };
 
     it('should not break memoization from a reorder', () => {
@@ -50,8 +52,8 @@ describe('home list', () => {
       const selector: Selector = makeMapStateToProps();
       const combine: DragImpact = {
         ...state.dragging().impact,
-        destination: null,
-        merge: {
+        at: {
+          type: 'COMBINE',
           whenEntered: forward,
           combine: {
             draggableId: preset.inHome2.descriptor.id,
@@ -85,7 +87,9 @@ describe('home list', () => {
 
       const stateWhenDropping: DropAnimatingState = state.userCancel();
       // the impact has the home destination
-      expect(stateWhenDropping.completed.impact.destination).toBeTruthy();
+      expect(
+        tryGetDestination(stateWhenDropping.completed.impact),
+      ).toBeTruthy();
       // the user facing result has been cleared
       expect(stateWhenDropping.completed.result.destination).toBe(null);
 
@@ -101,6 +105,7 @@ describe('home list', () => {
           isDraggingOver: false,
           draggingOverWith: null,
         },
+        useClone: null,
       };
       expect(whileDropping).toEqual(expected);
     });
@@ -118,6 +123,7 @@ describe('home list', () => {
           draggingOverWith: null,
           draggingFromThisWith: preset.inHome1.descriptor.id,
         },
+        useClone: null,
       };
 
       const whileDragging: DraggingState = {

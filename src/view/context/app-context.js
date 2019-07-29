@@ -6,12 +6,12 @@ import type { FocusMarshal } from '../use-focus-marshal/focus-marshal-types';
 import type { Registry } from '../../state/registry/registry-types';
 
 export type AppContextValue = {|
-  marshal: DimensionMarshal,
   focus: FocusMarshal,
   contextId: ContextId,
   canLift: (id: DraggableId) => boolean,
   isMovementAllowed: () => boolean,
   liftInstructionId: ElementId,
+  marshal: DimensionMarshal,
   registry: Registry,
 |};
 
