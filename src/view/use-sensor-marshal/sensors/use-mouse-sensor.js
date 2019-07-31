@@ -102,7 +102,9 @@ function getCaptureBindings({
         // preventing default as we are using this event
         event.preventDefault();
 
-        const actions: FluidDragActions = phase.actions.fluidLift(pending);
+        // Lifting at the current point to prevent the draggable item from
+        // jumping by the sloppyClickThreshold
+        const actions: FluidDragActions = phase.actions.fluidLift(point);
 
         setPhase({
           type: 'DRAGGING',

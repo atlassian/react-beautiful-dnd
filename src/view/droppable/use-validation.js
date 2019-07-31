@@ -17,7 +17,7 @@ function isBoolean(value: mixed): boolean {
   return typeof value === 'boolean';
 }
 
-function run(args: Args, checks: CheckFn[]) {
+function runChecks(args: Args, checks: CheckFn[]) {
   checks.forEach((check: CheckFn) => check(args));
 }
 
@@ -86,14 +86,14 @@ export default function useValidation(args: Args) {
   useEffect(() => {
     // wrapping entire block for better minification
     if (process.env.NODE_ENV !== 'production') {
-      run(args, shared);
+      runChecks(args, shared);
 
       if (args.props.mode === 'STANDARD') {
-        run(args, standard);
+        runChecks(args, standard);
       }
 
       if (args.props.mode === 'VIRTUAL') {
-        run(args, virtual);
+        runChecks(args, virtual);
       }
     }
   });

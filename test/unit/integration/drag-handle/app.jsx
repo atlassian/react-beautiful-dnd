@@ -21,11 +21,11 @@ export type Item = {|
   shouldRespectForcePress?: boolean,
 |};
 
-type RenderItem = (
+export type RenderItem = (
   item: Item,
 ) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot) => Node;
 
-const defaultItemRender: RenderItem = (item: Item) => (
+export const defaultItemRender: RenderItem = (item: Item) => (
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
 ) => (
@@ -56,12 +56,9 @@ type Props = {|
 function noop() {}
 
 function getItems() {
-  return Array.from(
-    { length: 3 },
-    (v, k): Item => ({
-      id: `${k}`,
-    }),
-  );
+  return Array.from({ length: 3 }, (v, k): Item => ({
+    id: `${k}`,
+  }));
 }
 
 export default function App(props: Props) {

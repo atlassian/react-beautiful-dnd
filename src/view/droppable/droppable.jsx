@@ -30,7 +30,11 @@ export default function Droppable(props: Props) {
   const droppableRef = useRef<?HTMLElement>(null);
   const placeholderRef = useRef<?HTMLElement>(null);
 
-  // Note: Running validation at the end as it uses some placeholder things
+  useValidation({
+    props,
+    getDroppableRef: () => droppableRef.current,
+    getPlaceholderRef: () => placeholderRef.current,
+  });
 
   const {
     // own props
@@ -126,12 +130,6 @@ export default function Droppable(props: Props) {
     }),
     [droppableId, isUsingCloneFor, type],
   );
-
-  useValidation({
-    props,
-    getDroppableRef: () => droppableRef.current,
-    getPlaceholderRef: () => placeholderRef.current,
-  });
 
   function getClone(): ?Node {
     if (!useClone) {
