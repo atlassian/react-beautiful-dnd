@@ -47,7 +47,10 @@ type Props = {|
   items?: Item[],
   anotherChild?: Node,
   renderItem?: RenderItem,
+
+  // droppable
   direction?: Direction,
+  isCombineEnabled?: boolean,
 
   sensors?: Sensor[],
   enableDefaultSensors?: boolean,
@@ -61,6 +64,13 @@ function getItems() {
   }));
 }
 
+function withDefaultBool(value: ?boolean, defaultValue: boolean) {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  return defaultValue;
+}
+
 export default function App(props: Props) {
   const onDragStart = props.onDragStart || noop;
   const onDragUpdate = props.onDragUpdate || noop;
@@ -69,6 +79,10 @@ export default function App(props: Props) {
   const [items] = useState(() => props.items || getItems());
   const render = props.renderItem || defaultItemRender;
   const direction: Direction = props.direction || 'vertical';
+  const isCombineEnabled: boolean = withDefaultBool(
+    props.isCombineEnabled,
+    false,
+  );
 
   return (
     <DragDropContext
@@ -78,7 +92,11 @@ export default function App(props: Props) {
       sensors={sensors}
       enableDefaultSensors={props.enableDefaultSensors}
     >
-      <Droppable droppableId="droppable" direction={direction}>
+      <Droppable
+        droppableId="droppable"
+        direction={direction}
+        isCombineEnabled={isCombineEnabled}
+      >
         {(droppableProvided: DroppableProvided) => (
           <div
             {...droppableProvided.droppableProps}
@@ -90,16 +108,14 @@ export default function App(props: Props) {
                 draggableId={item.id}
                 index={index}
                 isDragDisabled={item.isEnabled === false}
-                disableInteractiveElementBlocking={
-                  typeof item.canDragInteractiveElements === 'boolean'
-                    ? item.canDragInteractiveElements
-                    : false
-                }
-                shouldRespectForcePress={
-                  typeof item.shouldRespectForcePress === 'boolean'
-                    ? item.shouldRespectForcePress
-                    : false
-                }
+                disableInteractiveElementBlocking={withDefaultBool(
+                  item.canDragInteractiveElements,
+                  false,
+                )}
+                shouldRespectForcePress={withDefaultBool(
+                  item.shouldRespectForcePress,
+                  false,
+                )}
               >
                 {render(item)}
               </Draggable>

@@ -18,7 +18,7 @@ export function simpleLift(control: Control, handle: HTMLElement) {
   control.lift(handle);
 }
 
-function getTransitionEnd(): Event {
+export function getTransitionEnd(): Event {
   const event: Event = new Event('transitionend', {
     bubbles: true,
     cancelable: true,
