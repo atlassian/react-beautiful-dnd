@@ -14,8 +14,7 @@ function printFatalError(error: Error) {
   console.error(
     ...getFormattedMessage(
       `
-        An error has occurred while a drag is occurring.
-        Any existing drag will be cancelled.
+        An fatal error has occurred. Any existing drag will be cancelled.
 
         > ${error.message}
         `,

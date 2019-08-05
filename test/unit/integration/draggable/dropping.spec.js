@@ -2,21 +2,12 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { type Position } from 'css-box-model';
-import App, {
-  defaultItemRender,
-  type RenderItem,
-  type Item,
-} from '../drag-handle/app';
+import App, { type RenderItem } from '../drag-handle/app';
 import {
   type DraggableStateSnapshot,
   type DropAnimation,
 } from '../../../../src';
-import {
-  simpleLift,
-  mouse,
-  keyboard,
-  getTransitionEnd,
-} from '../drag-handle/controls';
+import { simpleLift, mouse, getTransitionEnd } from '../drag-handle/controls';
 import { isDragging, isDropAnimating } from '../drag-handle/util';
 import {
   transitions,
@@ -25,7 +16,6 @@ import {
   combine,
 } from '../../../../src/animation';
 import { zIndexOptions } from '../../../../src/view/draggable/get-style';
-import { getComputedSpacing } from '../../../utils/dimension';
 import {
   renderItemAndSpyOnSnapshot,
   withPoorCombineDimensionMocks,

@@ -5,7 +5,7 @@ import { find, toArray } from '../../native-with-fallback';
 import { warning } from '../../dev-warning';
 import isHtmlElement from '../is-type-of-element/is-html-element';
 
-export default function tryGetDraggable(
+export default function findDraggable(
   contextId: ContextId,
   draggableId: DraggableId,
 ): ?HTMLElement {

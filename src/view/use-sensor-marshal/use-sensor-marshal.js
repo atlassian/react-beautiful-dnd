@@ -45,7 +45,7 @@ import { warning } from '../../dev-warning';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 import { noop } from '../../empty';
 import findClosestDraggableIdFromEvent from './try-get-closest-draggable-id-from-event';
-import tryGetDraggable from './try-get-draggable';
+import findDraggable from '../get-elements/find-draggable';
 
 function preventDefault(event: Event) {
   event.preventDefault();
@@ -170,7 +170,7 @@ function tryStart({
   }
 
   const entry: DraggableEntry = registry.draggable.getById(draggableId);
-  const el: ?HTMLElement = tryGetDraggable(contextId, entry.descriptor.id);
+  const el: ?HTMLElement = findDraggable(contextId, entry.descriptor.id);
 
   if (!el) {
     warning(`Unable to find draggable element with id: ${draggableId}`);

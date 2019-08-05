@@ -4,10 +4,8 @@ import { useMemo, useCallback } from 'use-memo-one';
 import type { DraggableId, ContextId } from '../../types';
 import type { FocusMarshal, Unregister } from './focus-marshal-types';
 import { dragHandle as dragHandleAttr } from '../data-attributes';
-import { warning } from '../../dev-warning';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
-import { find, toArray } from '../../native-with-fallback';
-import isHtmlElement from '../is-type-of-element/is-html-element';
+import findDragHandle from '../get-elements/find-drag-handle';
 
 type Entry = {|
   id: DraggableId,
@@ -17,38 +15,6 @@ type Entry = {|
 type EntryMap = {
   [id: DraggableId]: Entry,
 };
-
-function getDragHandle(
-  contextId: ContextId,
-  draggableId: DraggableId,
-): ?HTMLElement {
-  // find the drag handle
-  const selector: string = `[${dragHandleAttr.contextId}="${contextId}"]`;
-  const possible: Element[] = toArray(document.querySelectorAll(selector));
-
-  if (!possible.length) {
-    warning(`Unable to find any drag handles in the context "${contextId}"`);
-    return null;
-  }
-
-  const handle: ?Element = find(possible, (el: Element): boolean => {
-    return el.getAttribute(dragHandleAttr.draggableId) === draggableId;
-  });
-
-  if (!handle) {
-    warning(
-      `Unable to find drag handle with id "${draggableId}" as no handle with a matching id was found`,
-    );
-    return null;
-  }
-
-  if (!isHtmlElement(handle)) {
-    warning('drag handle needs to be a HTMLElement');
-    return null;
-  }
-
-  return handle;
-}
 
 export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
   const entriesRef = useRef<EntryMap>({});
@@ -75,7 +41,7 @@ export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
 
   const tryGiveFocus = useCallback(
     function tryGiveFocus(tryGiveFocusTo: DraggableId) {
-      const handle: ?HTMLElement = getDragHandle(contextId, tryGiveFocusTo);
+      const handle: ?HTMLElement = findDragHandle(contextId, tryGiveFocusTo);
 
       if (handle && handle !== document.activeElement) {
         handle.focus();

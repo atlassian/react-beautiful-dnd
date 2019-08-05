@@ -49,7 +49,7 @@ export default function Draggable(props: Props) {
   } = props;
 
   // Validating props and innerRef
-  useValidation(props, getRef);
+  useValidation(props, contextId, getRef);
 
   // Clones do not speak to the dimension marshal
   // We are violating the rules of hooks here: conditional hooks.
