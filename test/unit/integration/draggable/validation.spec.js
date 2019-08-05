@@ -53,7 +53,7 @@ it('should log an error if no draggableId is provided', () => {
   expect(error).toHaveBeenCalled();
 });
 
-it('should log an error if index is not a number', () => {
+it('should log an error if index is not an integer', () => {
   function App(props: { index: mixed }) {
     return (
       <DragDropContext onDragEnd={() => {}}>
@@ -85,7 +85,7 @@ it('should log an error if index is not a number', () => {
     );
   }
 
-  ['1', undefined, false, {}].forEach((value: mixed) => {
+  ['1', 1.33, undefined, false, {}].forEach((value: mixed) => {
     const { unmount } = render(<App index={value} />);
 
     expect(error).toHaveBeenCalled();
