@@ -29,11 +29,17 @@ export function useValidation(
         `${prefix(id)} requires an integer index prop`,
       );
 
-      if (props.mapped.type !== 'DRAGGING') {
-        // Checking provided ref (only when not dragging as it might be removed)
-        checkIsValidInnerRef(getRef());
+      if (props.mapped.type === 'DRAGGING') {
+        return;
+      }
 
-        // Checking that drag handle is provided
+      // Checking provided ref (only when not dragging as it might be removed)
+      checkIsValidInnerRef(getRef());
+
+      // Checking that drag handle is provided
+      // Only running check when enabled.
+      // When not enabled there is no drag handle props
+      if (props.isEnabled) {
         invariant(
           findDragHandle(contextId, id),
           `${prefix(id)} Unable to find drag handle`,

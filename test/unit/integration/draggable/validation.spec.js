@@ -1,5 +1,5 @@
 // @flow
-import React, { type Node } from 'react';
+import React from 'react';
 import { render } from '@testing-library/react';
 import {
   DragDropContext,
@@ -10,59 +10,227 @@ import {
 } from '../../../../src';
 import { noop } from '../../../../src/empty';
 
-type Props = {|
-  children: (provided: DraggableProvided) => Node,
-|};
+const error = jest.spyOn(console, 'error').mockImplementation(noop);
+const warn = jest.spyOn(console, 'warn').mockImplementation(noop);
 
-function App(props: Props) {
-  return (
-    <DragDropContext onDragEnd={() => {}}>
-      <Droppable droppableId="droppable">
-        {(provided: DroppableProvided) => (
-          <div ref={provided.innerRef} {...provided.droppableProps}>
-            <Draggable draggableId="draggable" index={0}>
-              {props.children}
-            </Draggable>
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
-  );
-}
+afterEach(() => {
+  error.mockClear();
+  warn.mockClear();
+});
 
-it('should throw if no draggableId is provided', () => {});
-
-it('should throw if index is not a number', () => {});
-
-it('should throw if innerRef is not provided', () => {});
-
-it('should throw if innerRef is an SVG', () => {});
-
-it.only('should throw if no drag handle props are applied', () => {
-  const error = jest.spyOn(console, 'error').mockImplementation(noop);
-  const warn = jest.spyOn(console, 'warn').mockImplementation(noop);
-  function MyApp() {
+it('should log an error if no draggableId is provided', () => {
+  function App() {
     return (
-      <App>
-        {(provided: DraggableProvided) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            /* not being applied */
-            /* {...dragProvided.dragHandleProps} */
-          >
-            Drag me!
-          </div>
-        )}
-      </App>
+      <DragDropContext onDragEnd={() => {}}>
+        <Droppable droppableId="droppable">
+          {(droppableProvided: DroppableProvided) => (
+            <div
+              ref={droppableProvided.innerRef}
+              {...droppableProvided.droppableProps}
+            >
+              {/* $ExpectError no draggable id */}
+              <Draggable index={0}>
+                {(provided: DraggableProvided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                  >
+                    Drag me!
+                  </div>
+                )}
+              </Draggable>
+              {droppableProvided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     );
   }
 
-  render(<MyApp />);
-  expect(error).toHaveBeenCalled();
+  render(<App />);
 
-  error.mockRestore();
-  warn.mockRestore();
+  expect(error).toHaveBeenCalled();
 });
 
-it('should not throw if draggable is disabled as there will be no drag handle', () => {});
+it('should log an error if index is not a number', () => {
+  function App(props: { index: mixed }) {
+    return (
+      <DragDropContext onDragEnd={() => {}}>
+        <Droppable droppableId="droppable">
+          {(droppableProvided: DroppableProvided) => (
+            <div
+              ref={droppableProvided.innerRef}
+              {...droppableProvided.droppableProps}
+            >
+              <Draggable
+                draggableId="draggable"
+                index={((props.index: any): number)}
+              >
+                {(provided: DraggableProvided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                  >
+                    Drag me!
+                  </div>
+                )}
+              </Draggable>
+              {droppableProvided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    );
+  }
+
+  ['1', undefined, false, {}].forEach((value: mixed) => {
+    const { unmount } = render(<App index={value} />);
+
+    expect(error).toHaveBeenCalled();
+
+    unmount();
+    error.mockClear();
+  });
+});
+
+it('should log an error if innerRef is not provided', () => {
+  function App() {
+    return (
+      <DragDropContext onDragEnd={() => {}}>
+        <Droppable droppableId="droppable">
+          {(droppableProvided: DroppableProvided) => (
+            <div
+              ref={droppableProvided.innerRef}
+              {...droppableProvided.droppableProps}
+            >
+              <Draggable draggableId="draggable" index={0}>
+                {(provided: DraggableProvided) => (
+                  <div
+                    /* not providing a ref */
+                    /* ref={provided.innerRef} */
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                  >
+                    Drag me!
+                  </div>
+                )}
+              </Draggable>
+              {droppableProvided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    );
+  }
+
+  render(<App />);
+
+  expect(error).toHaveBeenCalled();
+});
+
+it('should log an error if innerRef is an SVG', () => {
+  function App() {
+    return (
+      <DragDropContext onDragEnd={() => {}}>
+        <Droppable droppableId="droppable">
+          {(droppableProvided: DroppableProvided) => (
+            <div
+              ref={droppableProvided.innerRef}
+              {...droppableProvided.droppableProps}
+            >
+              <Draggable draggableId="draggable" index={0}>
+                {(provided: DraggableProvided) => (
+                  <svg
+                    // $ExpectError - invalid ref type
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                  >
+                    Drag me!
+                  </svg>
+                )}
+              </Draggable>
+              {droppableProvided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    );
+  }
+
+  render(<App />);
+
+  expect(error).toHaveBeenCalled();
+});
+
+it('should log an error if no drag handle props are applied', () => {
+  function App() {
+    return (
+      <DragDropContext onDragEnd={() => {}}>
+        <Droppable droppableId="droppable">
+          {(droppableProvided: DroppableProvided) => (
+            <div
+              ref={droppableProvided.innerRef}
+              {...droppableProvided.droppableProps}
+            >
+              <Draggable draggableId="draggable" index={0}>
+                {(provided: DraggableProvided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    /* not being applied */
+                    /* {...dragProvided.dragHandleProps} */
+                  >
+                    Drag me!
+                  </div>
+                )}
+              </Draggable>
+              {droppableProvided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    );
+  }
+
+  render(<App />);
+
+  expect(error).toHaveBeenCalled();
+});
+
+it('should log an error if the draggable is disabled as there will be no drag handle', () => {
+  function App() {
+    return (
+      <DragDropContext onDragEnd={() => {}}>
+        <Droppable droppableId="droppable">
+          {(droppableProvided: DroppableProvided) => (
+            <div
+              ref={droppableProvided.innerRef}
+              {...droppableProvided.droppableProps}
+            >
+              <Draggable draggableId="draggable" index={0} isDragDisabled>
+                {(provided: DraggableProvided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                  >
+                    Drag me!
+                  </div>
+                )}
+              </Draggable>
+              {droppableProvided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    );
+  }
+
+  error.mockRestore();
+  render(<App />);
+
+  expect(error).not.toHaveBeenCalled();
+});
