@@ -17,7 +17,7 @@ import type { Provided as DraggableProvided } from '../../../src/view/draggable/
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import { getComputedSpacing } from '../../utils/dimension';
 import tryCleanPrototypeStubs from '../../utils/try-clean-prototype-stubs';
-import { simpleLift, mouse } from './drag-handle/controls';
+import { simpleLift, mouse } from './utils/controls';
 
 const draggableId: DraggableId = 'drag-1';
 const droppableId: DroppableId = 'drop-1';

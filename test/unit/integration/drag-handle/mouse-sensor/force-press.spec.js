@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
-import { mouse, simpleLift } from '../controls';
-import App, { type Item } from '../app';
-import { isDragging, getDropReason } from '../util';
+import { mouse, simpleLift } from '../../utils/controls';
+import App, { type Item } from '../../utils/app';
+import { isDragging } from '../../utils/helpers';
 
 describe('force press is not respected', () => {
   it('should prevent the default of a `webkitmouseforcewillbegin` event', () => {

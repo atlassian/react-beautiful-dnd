@@ -12,7 +12,7 @@ import type {
 import type { Responders } from '../../../src/types';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import { getComputedSpacing } from '../../utils/dimension';
-import { simpleLift, keyboard } from './drag-handle/controls';
+import { simpleLift, keyboard } from './utils/controls';
 
 // Both list and item will have the same dimensions
 jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() =>

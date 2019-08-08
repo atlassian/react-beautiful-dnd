@@ -8,7 +8,7 @@ import { getComputedSpacing } from '../../utils/dimension';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import type { Responders } from '../../../src/types';
-import { simpleLift, keyboard } from './drag-handle/controls';
+import { simpleLift, keyboard } from './utils/controls';
 
 type ItemProps = {|
   provided: DraggableProvided,

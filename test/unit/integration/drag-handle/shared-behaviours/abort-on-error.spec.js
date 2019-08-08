@@ -2,10 +2,10 @@
 import invariant from 'tiny-invariant';
 import React, { useState, useRef } from 'react';
 import { render, act } from '@testing-library/react';
-import { isDragging, getOffset } from '../util';
-import App from '../app';
+import { isDragging, getOffset } from '../../utils/helpers';
+import App from '../../utils/app';
 import { noop } from '../../../../../src/empty';
-import { forEachSensor, simpleLift, type Control } from '../controls';
+import { forEachSensor, simpleLift, type Control } from '../../utils/controls';
 
 jest.spyOn(console, 'error').mockImplementation(noop);
 

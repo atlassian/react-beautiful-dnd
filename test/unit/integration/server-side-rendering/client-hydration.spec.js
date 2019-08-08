@@ -4,7 +4,7 @@ import invariant from 'tiny-invariant';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 import { resetServerContext } from '../../../../src';
-import App from '../app';
+import App from '../utils/app';
 import { noop } from '../../../../src/empty';
 
 beforeEach(() => {

@@ -2,10 +2,10 @@
 import invariant from 'tiny-invariant';
 import React from 'react';
 import { render } from '@testing-library/react';
-import { isDragging } from '../util';
-import App from '../app';
+import { isDragging } from '../../utils/helpers';
+import App from '../../utils/app';
 import type { SensorAPI } from '../../../../../src/types';
-import { forEachSensor, type Control, simpleLift } from '../controls';
+import { forEachSensor, type Control, simpleLift } from '../../utils/controls';
 
 forEachSensor((control: Control) => {
   it('should not start a drag if another sensor is capturing', () => {

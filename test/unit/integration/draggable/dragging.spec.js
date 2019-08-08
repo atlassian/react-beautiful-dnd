@@ -1,23 +1,18 @@
 // @flow
 import React from 'react';
 import { render } from '@testing-library/react';
-import App, { type RenderItem } from '../drag-handle/app';
+import App, { type RenderItem } from '../utils/app';
 import { type DraggableStateSnapshot } from '../../../../src';
+import { simpleLift, mouse, keyboard, expandedMouse } from '../utils//controls';
 import {
-  simpleLift,
-  mouse,
-  keyboard,
-  expandedMouse,
-} from '../drag-handle/controls';
-import { isDragging } from '../drag-handle/util';
-import { transitions, combine } from '../../../../src/animation';
-import { zIndexOptions } from '../../../../src/view/draggable/get-style';
-import {
+  isDragging,
   renderItemAndSpy,
   withPoorDimensionMocks,
   getSnapshotsFor,
   getLast,
-} from './util';
+} from '../utils//helpers';
+import { transitions, combine } from '../../../../src/animation';
+import { zIndexOptions } from '../../../../src/view/draggable/get-style';
 
 it('should move to a provided offset', () => {
   const { getByText } = render(<App />);

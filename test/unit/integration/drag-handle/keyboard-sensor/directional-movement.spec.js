@@ -2,8 +2,8 @@
 import React from 'react';
 import { fireEvent, render, createEvent } from '@testing-library/react';
 import * as keyCodes from '../../../../../src/view/key-codes';
-import App from '../app';
-import { simpleLift, keyboard } from '../controls';
+import App from '../../utils/app';
+import { simpleLift, keyboard } from '../../utils/controls';
 
 jest.useFakeTimers();
 

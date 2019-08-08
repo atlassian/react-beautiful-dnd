@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
-import App from '../app';
-import { touch } from '../controls';
-import { isDragging } from '../util';
+import App from '../../utils/app';
+import { touch } from '../../utils/controls';
+import { isDragging } from '../../utils/helpers';
 
 jest.useFakeTimers();
 

@@ -1,13 +1,13 @@
 // @flow
 import React from 'react';
 import { render } from '@testing-library/react';
-import { forEachSensor, type Control, simpleLift } from '../controls';
-import { isDragging } from '../util';
+import { forEachSensor, type Control, simpleLift } from '../../utils/controls';
+import { isDragging } from '../../utils/helpers';
 import {
   type DraggableProvided,
   type DraggableStateSnapshot,
 } from '../../../../../src';
-import App, { type Item } from '../app';
+import App, { type Item } from '../../utils/app';
 import { interactiveTagNames } from '../../../../../src/view/use-sensor-marshal/is-event-in-interactive-element';
 
 const mixedCase = (obj: Object): string[] => [

@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import { render } from '@testing-library/react';
-import { isDragging } from '../util';
-import App from '../app';
-import { forEachSensor, simpleLift, type Control } from '../controls';
+import { isDragging } from '../../utils/helpers';
+import App from '../../utils/app';
+import { forEachSensor, simpleLift, type Control } from '../../utils/controls';
 
 forEachSensor((control: Control) => {
   it('should not abort a drag if a parent render occurs', () => {

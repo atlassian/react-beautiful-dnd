@@ -7,8 +7,8 @@ import {
   sloppyClickThreshold,
   primaryButton,
 } from '../../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
-import { isDragging } from '../util';
-import App from '../app';
+import { isDragging } from '../../utils/helpers';
+import App from '../../utils/app';
 // blocking announcement messages
 jest.spyOn(console, 'warn').mockImplementation((message: string) => {
   invariant(

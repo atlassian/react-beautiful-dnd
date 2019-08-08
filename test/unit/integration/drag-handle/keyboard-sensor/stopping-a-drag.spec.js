@@ -1,10 +1,10 @@
 // @flow
 import React from 'react';
 import { render, createEvent, fireEvent } from '@testing-library/react';
-import App from '../app';
-import { getDropReason } from '../util';
+import App from '../../utils/app';
+import { getDropReason } from '../../utils/helpers';
 import * as keyCodes from '../../../../../src/view/key-codes';
-import { simpleLift, keyboard } from '../controls';
+import { simpleLift, keyboard } from '../../utils/controls';
 import supportedEventName from '../../../../../src/view/use-sensor-marshal/sensors/util/supported-page-visibility-event-name';
 
 it('should prevent default on the event that causes a drop', () => {

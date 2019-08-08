@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
 import { render } from '@testing-library/react';
-import App, { type RenderItem } from '../drag-handle/app';
-import { renderItemAndSpy, atRest, getSnapshotsFor } from './util';
+import App, { type RenderItem } from '../utils/app';
+import { renderItemAndSpy, atRest, getSnapshotsFor } from '../utils/helpers';
 
 it('should have no movement when at rest', () => {
   const { getByText } = render(<App />);

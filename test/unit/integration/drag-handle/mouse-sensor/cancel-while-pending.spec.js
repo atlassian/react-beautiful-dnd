@@ -2,10 +2,10 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
-import App from '../app';
-import { isDragging } from '../util';
+import App from '../../utils/app';
+import { isDragging } from '../../utils/helpers';
 import supportedEventName from '../../../../../src/view/use-sensor-marshal/sensors/util/supported-page-visibility-event-name';
-import { mouse } from '../controls';
+import { mouse } from '../../utils/controls';
 
 const events: string[] = ['keydown', 'resize', supportedEventName];
 

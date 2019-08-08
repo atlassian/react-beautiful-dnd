@@ -2,10 +2,10 @@
 import React from 'react';
 import { createEvent, fireEvent, render } from '@testing-library/react';
 import * as keyCodes from '../../../../../src/view/key-codes';
-import App from '../app';
-import { isDragging, getDropReason } from '../util';
+import App from '../../utils/app';
+import { isDragging, getDropReason } from '../../utils/helpers';
 import supportedEventName from '../../../../../src/view/use-sensor-marshal/sensors/util/supported-page-visibility-event-name';
-import { forEachSensor, simpleLift, type Control } from '../controls';
+import { forEachSensor, simpleLift, type Control } from '../../utils/controls';
 
 forEachSensor((control: Control) => {
   it('should cancel when pressing escape', () => {

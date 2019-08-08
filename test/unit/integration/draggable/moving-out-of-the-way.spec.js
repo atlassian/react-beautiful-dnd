@@ -1,10 +1,13 @@
 // @flow
 import { render } from '@testing-library/react';
 import React from 'react';
-import App from '../drag-handle/app';
-import { expandedMouse } from '../drag-handle/controls';
-import { isDragging } from '../drag-handle/util';
-import { renderItemAndSpy, withPoorDimensionMocks } from './util';
+import App from '../utils/app';
+import { expandedMouse } from '../utils//controls';
+import {
+  isDragging,
+  renderItemAndSpy,
+  withPoorDimensionMocks,
+} from '../utils//helpers';
 
 it('should move out of the way when requested', () => {
   withPoorDimensionMocks(preset => {

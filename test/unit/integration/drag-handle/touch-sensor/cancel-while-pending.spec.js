@@ -1,10 +1,10 @@
 // @flow
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
-import App from '../app';
-import { isDragging } from '../util';
+import App from '../../utils/app';
+import { isDragging } from '../../utils/helpers';
 import supportedEventName from '../../../../../src/view/use-sensor-marshal/sensors/util/supported-page-visibility-event-name';
-import { touch } from '../controls';
+import { touch } from '../../utils/controls';
 
 jest.useFakeTimers();
 

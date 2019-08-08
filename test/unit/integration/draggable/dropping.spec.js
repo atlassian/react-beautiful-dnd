@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { type Position } from 'css-box-model';
-import App, { type RenderItem } from '../drag-handle/app';
+import App, { type RenderItem } from '../utils/app';
 import {
   type DraggableStateSnapshot,
   type DropAnimation,
@@ -12,8 +12,16 @@ import {
   mouse,
   getTransitionEnd,
   expandedMouse,
-} from '../drag-handle/controls';
-import { isDragging, isDropAnimating, isCombining } from '../drag-handle/util';
+} from '../utils//controls';
+import {
+  isDragging,
+  isDropAnimating,
+  isCombining,
+  renderItemAndSpy,
+  withPoorDimensionMocks,
+  getLast,
+  getSnapshotsFor,
+} from '../utils//helpers';
 import {
   transitions,
   timings,
@@ -21,12 +29,6 @@ import {
   combine,
 } from '../../../../src/animation';
 import { zIndexOptions } from '../../../../src/view/draggable/get-style';
-import {
-  renderItemAndSpy,
-  withPoorDimensionMocks,
-  getLast,
-  getSnapshotsFor,
-} from './util';
 
 it('should animate a drop to the required offset', () => {
   const { getByText } = render(<App />);

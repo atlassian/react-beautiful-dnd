@@ -8,7 +8,7 @@ import type {
   SnapDragActions,
   Sensor,
 } from '../../../../../src/types';
-import App from '../app';
+import App from '../../utils/app';
 
 it('should not allow double lifting', () => {
   let api: SensorAPI;

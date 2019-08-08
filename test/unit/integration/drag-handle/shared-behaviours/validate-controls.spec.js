@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import { render } from '@testing-library/react';
-import { isDragging, getDropReason } from '../util';
-import App from '../app';
-import { forEachSensor, type Control } from '../controls';
+import { isDragging, getDropReason } from '../../utils/helpers';
+import App from '../../utils/app';
+import { forEachSensor, type Control } from '../../utils/controls';
 
 forEachSensor((control: Control) => {
   it('should control a successful drag through the sensor', () => {

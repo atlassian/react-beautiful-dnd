@@ -3,9 +3,9 @@ import React from 'react';
 import { createEvent, fireEvent, render } from '@testing-library/react';
 import * as keyCodes from '../../../../../src/view/key-codes';
 import { sloppyClickThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
-import App from '../app';
-import { isDragging, getDropReason } from '../util';
-import { simpleLift, mouse } from '../controls';
+import App from '../../utils/app';
+import { isDragging, getDropReason } from '../../utils/helpers';
+import { simpleLift, mouse } from '../../utils/controls';
 
 it('should not prevent a subsequent click if aborting during a pending drag', () => {
   const { getByText } = render(<App />);

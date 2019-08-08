@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
 import { fireEvent, render, createEvent } from '@testing-library/react';
-import App from '../app';
-import { touch, simpleLift } from '../controls';
+import App from '../../utils/app';
+import { touch, simpleLift } from '../../utils/controls';
 
 jest.useFakeTimers();
 
