@@ -3,13 +3,20 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import App, { type RenderItem } from '../drag-handle/app';
 import { type DraggableStateSnapshot } from '../../../../src';
-import { simpleLift, mouse, keyboard } from '../drag-handle/controls';
+import {
+  simpleLift,
+  mouse,
+  keyboard,
+  expandedMouse,
+} from '../drag-handle/controls';
 import { isDragging } from '../drag-handle/util';
 import { transitions, combine } from '../../../../src/animation';
 import { zIndexOptions } from '../../../../src/view/draggable/get-style';
 import {
-  renderItemAndSpyOnSnapshot,
-  withPoorCombineDimensionMocks,
+  renderItemAndSpy,
+  withPoorDimensionMocks,
+  getSnapshotsFor,
+  getLast,
 } from './util';
 
 it('should move to a provided offset', () => {
@@ -32,20 +39,19 @@ it('should move to a provided offset', () => {
 });
 
 it('should pass on the snapshot', () => {
-  const capture = jest.fn();
-  const renderItem: RenderItem = renderItemAndSpyOnSnapshot(capture);
+  const spy = jest.fn();
+  const renderItem: RenderItem = renderItemAndSpy(spy);
 
   const { getByText } = render(<App renderItem={renderItem} />);
   const handle: HTMLElement = getByText('item: 0');
-  expect(capture).toHaveBeenCalledTimes(1);
+  expect(getSnapshotsFor('0', spy)).toHaveLength(1);
 
   simpleLift(mouse, handle);
   expect(isDragging(handle)).toBe(true);
-  expect(capture).toHaveBeenCalledTimes(2);
+  expect(getSnapshotsFor('0', spy)).toHaveLength(2);
 
   {
-    const snapshot = capture.mock.calls[capture.mock.calls.length - 1][0];
-
+    const snapshot = getLast(getSnapshotsFor('0', spy));
     const lift: DraggableStateSnapshot = {
       isDragging: true,
       isDropAnimating: false,
@@ -61,8 +67,7 @@ it('should pass on the snapshot', () => {
   mouse.move(handle);
 
   {
-    const snapshot = capture.mock.calls[capture.mock.calls.length - 1][0];
-
+    const snapshot = getLast(getSnapshotsFor('0', spy));
     const move: DraggableStateSnapshot = {
       isDragging: true,
       isDropAnimating: false,
@@ -89,22 +94,23 @@ it('should animate movements when in snap mode', () => {
 });
 
 it('should update the snapshot and opacity when combining with another item', () => {
-  withPoorCombineDimensionMocks(() => {
-    const snapshotSpy = jest.fn();
-    const renderItem: RenderItem = renderItemAndSpyOnSnapshot(snapshotSpy);
+  withPoorDimensionMocks(preset => {
+    const spy = jest.fn();
+    const renderItem: RenderItem = renderItemAndSpy(spy);
+    const box1 = preset.inHome1.page.borderBox;
+    const box2 = preset.inHome2.page.borderBox;
 
     const { getByText } = render(
       <App renderItem={renderItem} isCombineEnabled />,
     );
     const handle: HTMLElement = getByText('item: 0');
 
-    simpleLift(mouse, handle);
+    expandedMouse.powerLift(handle, box1.center);
 
-    snapshotSpy.mockClear();
+    // this will combine with the second item
+    expandedMouse.move(handle, box2.center);
 
-    mouse.move(handle);
-
-    const snapshot = snapshotSpy.mock.calls[0][0];
+    const snapshot = getLast(getSnapshotsFor('0', spy));
 
     const expected: DraggableStateSnapshot = {
       isDragging: true,

@@ -11,6 +11,14 @@ export function isDropAnimating(el: HTMLElement): boolean {
   return el.getAttribute('data-is-drop-animating') === 'true';
 }
 
+export function isCombining(el: HTMLElement): boolean {
+  return el.getAttribute('data-is-combining') === 'true';
+}
+
+export function isCombineTarget(el: HTMLElement): boolean {
+  return el.getAttribute('data-is-combine-target') === 'true';
+}
+
 export function getOffset(el: HTMLElement): Position {
   const style: CSSStyleDeclaration = el.style;
 

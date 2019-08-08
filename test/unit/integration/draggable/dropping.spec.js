@@ -7,8 +7,13 @@ import {
   type DraggableStateSnapshot,
   type DropAnimation,
 } from '../../../../src';
-import { simpleLift, mouse, getTransitionEnd } from '../drag-handle/controls';
-import { isDragging, isDropAnimating } from '../drag-handle/util';
+import {
+  simpleLift,
+  mouse,
+  getTransitionEnd,
+  expandedMouse,
+} from '../drag-handle/controls';
+import { isDragging, isDropAnimating, isCombining } from '../drag-handle/util';
 import {
   transitions,
   timings,
@@ -17,8 +22,10 @@ import {
 } from '../../../../src/animation';
 import { zIndexOptions } from '../../../../src/view/draggable/get-style';
 import {
-  renderItemAndSpyOnSnapshot,
-  withPoorCombineDimensionMocks,
+  renderItemAndSpy,
+  withPoorDimensionMocks,
+  getLast,
+  getSnapshotsFor,
 } from './util';
 
 it('should animate a drop to the required offset', () => {
@@ -50,16 +57,16 @@ it('should animate a drop to the required offset', () => {
 });
 
 it('should provide the correct snapshot to consumers', () => {
-  const snapshotSpy = jest.fn();
-  const renderItem: RenderItem = renderItemAndSpyOnSnapshot(snapshotSpy);
+  const spy = jest.fn();
+  const renderItem: RenderItem = renderItemAndSpy(spy);
 
   const { getByText } = render(<App renderItem={renderItem} />);
   const handle: HTMLElement = getByText('item: 0');
-  expect(snapshotSpy).toHaveBeenCalledTimes(1);
+  expect(getSnapshotsFor('0', spy)).toHaveLength(1);
 
   simpleLift(mouse, handle);
   expect(isDragging(handle)).toBe(true);
-  expect(snapshotSpy).toHaveBeenCalledTimes(2);
+  expect(getSnapshotsFor('0', spy)).toHaveLength(2);
 
   mouse.move(handle);
 
@@ -67,7 +74,7 @@ it('should provide the correct snapshot to consumers', () => {
   fireEvent.mouseUp(handle);
   expect(isDropAnimating(handle)).toBe(true);
 
-  const snapshot = snapshotSpy.mock.calls[snapshotSpy.mock.calls.length - 1][0];
+  const snapshot = getLast(getSnapshotsFor('0', spy));
 
   const dropping: DropAnimation = {
     duration: timings.minDropTime,
@@ -91,47 +98,73 @@ it('should provide the correct snapshot to consumers', () => {
 });
 
 it('should animate scale and opacity when combining', () => {
-  withPoorCombineDimensionMocks(() => {
-    const snapshotSpy = jest.fn();
-    const renderItem: RenderItem = renderItemAndSpyOnSnapshot(snapshotSpy);
+  withPoorDimensionMocks(preset => {
+    const spy = jest.fn();
+    const renderItem: RenderItem = renderItemAndSpy(spy);
+    const box0 = preset.inHome1.client.borderBox;
+    const box1 = preset.inHome2.client.borderBox;
 
     const { getByText } = render(
       <App renderItem={renderItem} isCombineEnabled />,
     );
     const handle: HTMLElement = getByText('item: 0');
 
-    simpleLift(mouse, handle);
+    // lift
+    expandedMouse.powerLift(handle, box0.center);
+    expect(isDragging(handle)).toBe(true);
 
-    mouse.move(handle);
-    fireEvent.mouseUp(handle);
+    // move into combine
+    expandedMouse.move(handle, box1.center);
+    expect(isCombining(handle)).toBe(true);
 
-    const snapshot =
-      snapshotSpy.mock.calls[snapshotSpy.mock.calls.length - 1][0];
+    expandedMouse.startDrop(handle);
 
-    const dropping: DropAnimation = {
-      // force cast to number :D
-      duration: ((expect.any(Number): any): number),
-      curve: curves.drop,
-      // will be moving to center
-      moveTo: ((expect.any(Object): any): Position),
-      opacity: 0,
-      scale: combine.scale.drop,
-    };
-    const expected: DraggableStateSnapshot = {
-      isDragging: true,
-      isDropAnimating: true,
-      dropAnimation: dropping,
-      draggingOver: 'droppable',
-      combineWith: '1',
-      combineTargetFor: null,
-      mode: 'FLUID',
-    };
-    expect(snapshot).toEqual(expected);
-    expect(handle.style.opacity).toBe(`${combine.opacity.drop}`);
-    expect(handle.style.transition).toBe(transitions.drop(0.34));
-    expect(handle.style.transform).toEqual(
-      expect.stringContaining(`scale(${combine.scale.drop})`),
-    );
+    {
+      const snapshot = getLast(getSnapshotsFor('0', spy));
+      const dropping: DropAnimation = {
+        // force cast to number :D
+        duration: ((expect.any(Number): any): number),
+        curve: curves.drop,
+        // will be moving to center
+        moveTo: ((expect.any(Object): any): Position),
+        opacity: 0,
+        scale: combine.scale.drop,
+      };
+      const expected: DraggableStateSnapshot = {
+        isDragging: true,
+        isDropAnimating: true,
+        dropAnimation: dropping,
+        draggingOver: 'droppable',
+        combineWith: '1',
+        combineTargetFor: null,
+        mode: 'FLUID',
+      };
+      expect(snapshot).toEqual(expected);
+      expect(handle.style.opacity).toBe(`${combine.opacity.drop}`);
+      expect(handle.style.transition).toBe(transitions.drop(0.33));
+      expect(handle.style.transform).toEqual(
+        expect.stringContaining(`scale(${combine.scale.drop})`),
+      );
+    }
+
+    expandedMouse.finishDrop(handle);
+
+    {
+      const snapshot = getLast(getSnapshotsFor('0', spy));
+      const expected: DraggableStateSnapshot = {
+        isDragging: false,
+        isDropAnimating: false,
+        dropAnimation: null,
+        draggingOver: null,
+        combineWith: null,
+        combineTargetFor: null,
+        mode: null,
+      };
+      expect(snapshot).toEqual(expected);
+      expect(handle.style.opacity).toBe('');
+      expect(handle.style.transition).toBe('');
+      expect(handle.style.transform).toEqual('');
+    }
   });
 });
 

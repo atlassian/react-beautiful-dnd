@@ -34,6 +34,8 @@ export const defaultItemRender: RenderItem = (item: Item) => (
     {...provided.dragHandleProps}
     data-is-dragging={snapshot.isDragging}
     data-is-drop-animating={snapshot.isDropAnimating}
+    data-is-combining={Boolean(snapshot.combineWith)}
+    data-is-combine-target={Boolean(snapshot.combineTargetFor)}
     ref={provided.innerRef}
   >
     item: {item.id}
