@@ -93,7 +93,7 @@
     "eslint-config-prettier": "^5.1.0",
     "eslint-plugin-cypress": "^2.2.1",
     "eslint-plugin-emotion": "^10.0.7",
-    "eslint-plugin-flowtype": "^3.10.1",
+    "eslint-plugin-flowtype": "^4.0.0",
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-jest": "^22.6.4",
     "eslint-plugin-jsx-a11y": "^6.2.1",
