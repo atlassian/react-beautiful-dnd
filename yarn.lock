@@ -5450,12 +5450,12 @@ eslint-plugin-emotion@^10.0.7:
   resolved "https://registry.yarnpkg.com/eslint-plugin-emotion/-/eslint-plugin-emotion-10.0.7.tgz#e14d54a2f23c9701d66851a87a5eb35adb10c2a7"
   integrity sha512-4uasPp7SDt/iYnu+icSq1ZTjGSnk4ZTrHSGXCE790gUfGFZ+Br/VpUfklb5oHeSFVUoRjoTulaEbIrp2Mfo3vA==
 
-eslint-plugin-flowtype@^3.10.1:
-  version "3.10.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-flowtype/-/eslint-plugin-flowtype-3.10.1.tgz#f83d4c9a4594b3444433c8efb1caf91dcc0be32a"
-  integrity sha512-TnwILo1XT5w6Fgz8j+NEqivmgsYJA7FYFnnE2jdXot/H7Pb9C2Fp+Tqdzb//O+PSVi5X2ureYqCCn7KDfon4iQ==
+eslint-plugin-flowtype@^4.0.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-flowtype/-/eslint-plugin-flowtype-4.1.0.tgz#3509c1826157bf1a8a60fa67064adb675eacebd0"
+  integrity sha512-Hswk3614J3Tk78stSJ6eAH6JoQOIdJckImMKkkzbbaWwvvN05QMulmhFdP5bwt2iApmUq/0ZWPaKsk/czmacSQ==
   dependencies:
-    lodash "^4.17.11"
+    lodash "^4.17.15"
 
 eslint-plugin-import@^2.17.3:
   version "2.17.3"
@@ -8271,6 +8271,11 @@ lodash@4.17.11, lodash@^4.15.0, lodash@^4.17.10, lodash@^4.17.11:
   version "4.17.11"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
   integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
+
+lodash@^4.17.15:
+  version "4.17.15"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
+  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
 
 log-symbols@2.2.0, log-symbols@^2.2.0:
   version "2.2.0"
