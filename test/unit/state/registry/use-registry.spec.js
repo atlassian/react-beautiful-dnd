@@ -7,7 +7,7 @@ import type {
   DraggableEntry,
 } from '../../../../src/state/registry/registry-types';
 import type { DraggableId } from '../../../../src/types';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import { getDraggableEntry } from './util';
 import useRegistry from '../../../../src/state/registry/use-registry';
 

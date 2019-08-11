@@ -9,7 +9,7 @@ import middleware from '../../../../../src/state/middleware/responders';
 import {
   getDragStart,
   initialPublishArgs,
-} from '../../../../utils/preset-action-args';
+} from '../../../../util/preset-action-args';
 import createStore from '../util/create-store';
 import type {
   Responders,

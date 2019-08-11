@@ -1,5 +1,5 @@
 // @flow
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
 import type { State } from '../../../../src/types';
 import type {
@@ -8,7 +8,7 @@ import type {
   MapProps,
 } from '../../../../src/view/droppable/droppable-types';
 import getOwnProps from './util/get-own-props';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 
 const preset = getPreset();
 const state = getStatePreset();

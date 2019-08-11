@@ -2,8 +2,8 @@
 import type { Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import publish from '../../../../src/state/publish-while-dragging';
-import { getPreset } from '../../../utils/dimension';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import { getPreset } from '../../../util/dimension';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import { empty, shift, withScrollables, scrollableHome } from './util';
 import { patch, add, origin, negate } from '../../../../src/state/position';
 import type {

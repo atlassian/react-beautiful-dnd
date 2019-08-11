@@ -11,7 +11,7 @@ import type {
   DraggingState,
 } from '../../../../../src/types';
 import { makeMapStateToProps } from '../../../../../src/view/draggable/connected-draggable';
-import getSimpleStatePreset from '../../../../utils/get-simple-state-preset';
+import getSimpleStatePreset from '../../../../util/get-simple-state-preset';
 
 const state = getSimpleStatePreset();
 const dragging: DraggingState = state.dragging();

@@ -12,8 +12,8 @@ import type {
 } from '../../../../src/view/droppable/droppable-types';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
-import { getPreset } from '../../../utils/dimension';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import { getPreset } from '../../../util/dimension';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import getOwnProps from './util/get-own-props';
 
 const preset = getPreset();

@@ -8,7 +8,7 @@ import { horizontal, vertical } from '../../../../../src/state/axis';
 import getDragImpact from '../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
-import { enableCombining, getPreset } from '../../../../utils/dimension';
+import { enableCombining, getPreset } from '../../../../util/dimension';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

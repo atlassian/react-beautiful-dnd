@@ -6,11 +6,11 @@ import type {
   DisplacedBy,
 } from '../../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../../src/state/axis';
-import { getPreset } from '../../../../../../utils/dimension';
+import { getPreset } from '../../../../../../util/dimension';
 import moveToNextIndex from '../../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-index';
 import getDisplacedBy from '../../../../../../../src/state/get-displaced-by';
 import getLiftEffect from '../../../../../../../src/state/get-lift-effect';
-import { getForcedDisplacement } from '../../../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../../../util/impact';
 import { emptyGroups } from '../../../../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {

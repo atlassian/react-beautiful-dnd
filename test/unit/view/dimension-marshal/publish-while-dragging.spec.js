@@ -12,16 +12,16 @@ import type {
   Published,
   Viewport,
 } from '../../../../src/types';
-import { critical, preset } from '../../../utils/preset-action-args';
+import { critical, preset } from '../../../util/preset-action-args';
 import {
   getDroppableCallbacks,
   populateMarshal,
   type DimensionWatcher,
   getCallbacksStub,
-} from '../../../utils/dimension-marshal';
+} from '../../../util/dimension-marshal';
 import { defaultRequest, withExpectedAdvancedUsageWarning } from './util';
-import { makeScrollable } from '../../../utils/dimension';
-import { setViewport } from '../../../utils/viewport';
+import { makeScrollable } from '../../../util/dimension';
+import { setViewport } from '../../../util/viewport';
 
 const viewport: Viewport = preset.viewport;
 setViewport(viewport);

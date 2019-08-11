@@ -1,7 +1,7 @@
 // @flow
 
 import invariant from 'tiny-invariant';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import type { DropPendingState, DraggingState } from '../../../../src/types';
 import publish from '../../../../src/state/publish-while-dragging';
 import { empty } from './util';

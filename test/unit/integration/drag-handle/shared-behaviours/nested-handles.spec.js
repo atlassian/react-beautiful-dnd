@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import { render } from '@testing-library/react';
-import { forEachSensor, type Control, simpleLift } from '../../utils/controls';
-import { isDragging } from '../../utils/helpers';
-import Board from '../../utils/board';
+import { forEachSensor, type Control, simpleLift } from '../../util/controls';
+import { isDragging } from '../../util/helpers';
+import Board from '../../util/board';
 
 forEachSensor((control: Control) => {
   it('should not start a drag on a parent if a child drag handle has already received the event', () => {

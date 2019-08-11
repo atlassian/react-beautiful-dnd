@@ -7,7 +7,7 @@ import type {
   Sensor,
   PreDragActions,
 } from '../../../../../src/types';
-import App from '../../utils/app';
+import App from '../../util/app';
 
 it('should correctly state whether a lock is claimed', () => {
   let first: SensorAPI;

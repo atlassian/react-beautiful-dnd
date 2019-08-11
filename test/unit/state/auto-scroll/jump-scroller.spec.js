@@ -12,16 +12,16 @@ import type {
   Viewport,
 } from '../../../../src/types';
 import { add, patch, subtract, negate } from '../../../../src/state/position';
-import { createViewport, withWindowScrollSize } from '../../../utils/viewport';
+import { createViewport, withWindowScrollSize } from '../../../util/viewport';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import { vertical, horizontal } from '../../../../src/state/axis';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import {
   getPreset,
   addDroppable,
   getDroppableDimension,
   getFrame,
-} from '../../../utils/dimension';
+} from '../../../util/dimension';
 import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
 import jumpScroller, {

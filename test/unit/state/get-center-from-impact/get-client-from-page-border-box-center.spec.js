@@ -2,7 +2,7 @@
 import type { Position } from 'css-box-model';
 import type { DraggableDimension, Viewport } from '../../../../src/types';
 import { add } from '../../../../src/state/position';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import getClientFromPageBorderBoxCenter from '../../../../src/state/get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
 

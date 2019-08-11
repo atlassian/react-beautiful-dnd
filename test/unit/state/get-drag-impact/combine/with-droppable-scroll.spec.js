@@ -12,7 +12,7 @@ import getDragImpact from '../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import { patch } from '../../../../../src/state/position';
 import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
-import { getPreset, makeScrollable } from '../../../../utils/dimension';
+import { getPreset, makeScrollable } from '../../../../util/dimension';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

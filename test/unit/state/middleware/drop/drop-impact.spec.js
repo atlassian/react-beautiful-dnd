@@ -9,11 +9,11 @@ import getDropImpact, {
 } from '../../../../../src/state/middleware/drop/get-drop-impact';
 import noImpact, { emptyGroups } from '../../../../../src/state/no-impact';
 import getLiftEffect from '../../../../../src/state/get-lift-effect';
-import { getPreset } from '../../../../utils/dimension';
+import { getPreset } from '../../../../util/dimension';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { vertical } from '../../../../../src/state/axis';
 import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
-import { getForcedDisplacement } from '../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../util/impact';
 
 const preset = getPreset();
 

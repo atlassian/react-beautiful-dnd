@@ -23,7 +23,7 @@ import AppContext, {
 import DroppableContext, {
   type DroppableContextValue,
 } from '../../../../../src/view/context/droppable-context';
-import { getMarshalStub } from '../../../../utils/dimension-marshal';
+import { getMarshalStub } from '../../../../util/dimension-marshal';
 
 type MountConnected = {|
   ownProps?: OwnProps,

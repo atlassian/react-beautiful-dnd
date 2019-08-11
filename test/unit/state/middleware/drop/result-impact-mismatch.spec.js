@@ -8,8 +8,8 @@ import {
   moveDown,
 } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/drop';
-import { enableCombining } from '../../../../utils/dimension';
-import { initialPublishArgs } from '../../../../utils/preset-action-args';
+import { enableCombining } from '../../../../util/dimension';
+import { initialPublishArgs } from '../../../../util/preset-action-args';
 import createStore from '../util/create-store';
 import passThrough from '../util/pass-through-middleware';
 import type { State, CompletedDrag } from '../../../../../src/types';

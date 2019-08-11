@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import { getPreset, addDroppable } from '../../../utils/dimension';
+import { getPreset, addDroppable } from '../../../util/dimension';
 import type {
   DraggableDimension,
   CollectingState,
@@ -11,12 +11,12 @@ import type {
   Displacement,
 } from '../../../../src/types';
 import { scrollableForeign, empty } from './util';
-import getSimpleStatePreset from '../../../utils/get-simple-state-preset';
+import getSimpleStatePreset from '../../../util/get-simple-state-preset';
 import publish from '../../../../src/state/publish-while-dragging';
 import getDisplacementMap from '../../../../src/state/get-displacement-map';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-animated-displacement';
-import getVisibleDisplacement from '../../../utils/get-displacement/get-visible-displacement';
+import getNotAnimatedDisplacement from '../../../util/get-displacement/get-not-animated-displacement';
+import getVisibleDisplacement from '../../../util/get-displacement/get-visible-displacement';
 import { vertical } from '../../../../src/state/axis';
 import type { PublicResult } from '../../../../src/state/move-in-direction/move-in-direction-types';
 import moveInDirection from '../../../../src/state/move-in-direction';

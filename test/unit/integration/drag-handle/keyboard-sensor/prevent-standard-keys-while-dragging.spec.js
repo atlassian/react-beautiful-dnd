@@ -2,9 +2,9 @@
 import React from 'react';
 import { createEvent, fireEvent, render } from '@testing-library/react';
 import * as keyCodes from '../../../../../src/view/key-codes';
-import App from '../../utils/app';
-import { isDragging } from '../../utils/helpers';
-import { simpleLift, keyboard } from '../../utils/controls';
+import App from '../../util/app';
+import { isDragging } from '../../util/helpers';
+import { simpleLift, keyboard } from '../../util/controls';
 
 it('should prevent enter or tab being pressed during a drag', () => {
   const { getByText } = render(<App />);

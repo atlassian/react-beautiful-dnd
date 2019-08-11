@@ -2,9 +2,9 @@
 import React from 'react';
 import { createEvent, fireEvent, render } from '@testing-library/react';
 import * as keyCodes from '../../../../../src/view/key-codes';
-import App from '../../utils/app';
-import { simpleLift, keyboard } from '../../utils/controls';
-import { isDragging } from '../../utils/helpers';
+import App from '../../util/app';
+import { simpleLift, keyboard } from '../../util/controls';
+import { isDragging } from '../../util/helpers';
 
 it('should prevent using keyboard keys that modify scroll', () => {
   const keys: number[] = [

@@ -8,7 +8,7 @@ import type {
   PreDragActions,
   SnapDragActions,
 } from '../../../../../src/types';
-import App from '../../utils/app';
+import App from '../../util/app';
 
 it('should block a single click if requested', () => {
   let api: SensorAPI;

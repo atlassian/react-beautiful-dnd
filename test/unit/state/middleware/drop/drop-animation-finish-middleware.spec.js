@@ -17,7 +17,7 @@ import {
 import {
   initialPublishArgs,
   getCompletedArgs,
-} from '../../../../utils/preset-action-args';
+} from '../../../../util/preset-action-args';
 
 it('should fire a complete drop action when a drop animation finish action is fired', () => {
   const mock = jest.fn();

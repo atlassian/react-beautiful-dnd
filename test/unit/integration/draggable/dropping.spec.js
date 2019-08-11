@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { type Position } from 'css-box-model';
-import App, { type RenderItem } from '../utils/app';
+import App, { type RenderItem } from '../util/app';
 import {
   type DraggableStateSnapshot,
   type DropAnimation,
@@ -12,7 +12,7 @@ import {
   mouse,
   getTransitionEnd,
   expandedMouse,
-} from '../utils/controls';
+} from '../util/controls';
 import {
   isDragging,
   isDropAnimating,
@@ -21,7 +21,7 @@ import {
   withPoorDimensionMocks,
   getLast,
   getSnapshotsFor,
-} from '../utils/helpers';
+} from '../util/helpers';
 import {
   transitions,
   timings,

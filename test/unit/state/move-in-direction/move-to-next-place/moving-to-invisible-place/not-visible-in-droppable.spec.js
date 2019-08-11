@@ -21,9 +21,9 @@ import {
   getDraggableDimension,
   getDroppableDimension,
   getFrame,
-} from '../../../../../utils/dimension';
+} from '../../../../../util/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
-import { createViewport } from '../../../../../utils/viewport';
+import { createViewport } from '../../../../../util/viewport';
 import moveToNextPlace from '../../../../../../src/state/move-in-direction/move-to-next-place';
 import { type PublicResult } from '../../../../../../src/state/move-in-direction/move-in-direction-types';
 import { origin, subtract, patch } from '../../../../../../src/state/position';
@@ -36,7 +36,7 @@ import { toDraggableMap } from '../../../../../../src/state/dimension-structures
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
-import { getForcedDisplacement } from '../../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../../util/impact';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {

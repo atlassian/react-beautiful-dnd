@@ -6,18 +6,18 @@ import type {
   OwnProps,
   MapProps,
 } from '../../../../src/view/draggable/draggable-types';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import {
   move,
   draggingStates,
   withImpact,
   type IsDraggingState,
-} from '../../../utils/dragging-state';
+} from '../../../util/dragging-state';
 import getOwnProps from './util/get-own-props';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { getDraggingSnapshot } from './util/get-snapshot';
-import { getForcedDisplacement } from '../../../utils/impact';
+import { getForcedDisplacement } from '../../../util/impact';
 
 const preset = getPreset();
 const ownProps: OwnProps = getOwnProps(preset.inHome1);

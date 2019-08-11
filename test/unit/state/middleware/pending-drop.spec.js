@@ -14,7 +14,7 @@ import middleware from '../../../../src/state/middleware/pending-drop';
 import {
   initialPublishWithScrollables,
   publishAdditionArgs,
-} from '../../../utils/preset-action-args';
+} from '../../../util/preset-action-args';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
 

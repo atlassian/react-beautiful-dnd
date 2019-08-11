@@ -9,12 +9,12 @@ import type {
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import { getPreset, makeScrollable } from '../../../../../utils/dimension';
+import { getPreset, makeScrollable } from '../../../../../util/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import { negate, add } from '../../../../../../src/state/position';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
 import { forward } from '../../../../../../src/state/user-direction/user-direction-preset';
-import { getForcedDisplacement } from '../../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../../util/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

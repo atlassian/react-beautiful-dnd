@@ -1,10 +1,10 @@
 // @flow
 import type { DisplacedBy, Axis, DragImpact } from '../../../../src/types';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import recompute from '../../../../src/state/update-displacement-visibility/recompute';
 import { horizontal, vertical } from '../../../../src/state/axis';
-import { getForcedDisplacement } from '../../../utils/impact';
+import { getForcedDisplacement } from '../../../util/impact';
 
 [horizontal, vertical].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

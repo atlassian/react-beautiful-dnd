@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
 import { createEvent, fireEvent, render } from '@testing-library/react';
-import App from '../../utils/app';
-import { isDragging } from '../../utils/helpers';
+import App from '../../util/app';
+import { isDragging } from '../../util/helpers';
 import { timeForLongPress } from '../../../../../src/view/use-sensor-marshal/sensors/use-touch-sensor';
 
 jest.useFakeTimers();

@@ -15,17 +15,17 @@ import {
   getPreset,
   getDraggableDimension,
   getDroppableDimension,
-} from '../../../utils/dimension';
+} from '../../../util/dimension';
 import speculativelyIncrease from '../../../../src/state/update-displacement-visibility/speculatively-increase';
 import noImpact from '../../../../src/state/no-impact';
-import { createViewport } from '../../../utils/viewport';
+import { createViewport } from '../../../util/viewport';
 import { origin, patch } from '../../../../src/state/position';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import { toDraggableMap } from '../../../../src/state/dimension-structures';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
-import { getForcedDisplacement } from '../../../utils/impact';
+import { getForcedDisplacement } from '../../../util/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

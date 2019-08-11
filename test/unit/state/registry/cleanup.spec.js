@@ -4,7 +4,7 @@ import type {
   DraggableEntry,
 } from '../../../../src/state/registry/registry-types';
 import createRegistry from '../../../../src/state/registry/create-registry';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import { getDraggableEntry, getDroppableEntry } from './util';
 
 const preset = getPreset();

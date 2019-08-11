@@ -7,10 +7,10 @@ import type {
   DroppableCallbacks,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import type { DroppableDimension } from '../../../../src/types';
-import { getDroppableDimension } from '../../../utils/dimension';
-import { getMarshalStub } from '../../../utils/dimension-marshal';
-import tryCleanPrototypeStubs from '../../../utils/try-clean-prototype-stubs';
-import { setViewport } from '../../../utils/viewport';
+import { getDroppableDimension } from '../../../util/dimension';
+import { getMarshalStub } from '../../../util/dimension-marshal';
+import tryCleanPrototypeStubs from '../../../util/try-clean-prototype-stubs';
+import { setViewport } from '../../../util/viewport';
 import {
   App,
   bigClient,

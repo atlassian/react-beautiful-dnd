@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import getStatePreset from '../../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../../util/get-simple-state-preset';
 import type {
   Published,
   DraggableDimension,
@@ -10,7 +10,7 @@ import type {
   DisplacedBy,
 } from '../../../../../src/types';
 import publish from '../../../../../src/state/publish-while-dragging';
-import { getPreset } from '../../../../utils/dimension';
+import { getPreset } from '../../../../util/dimension';
 import { empty, withScrollables, scrollableHome } from '../util';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { vertical } from '../../../../../src/state/axis';

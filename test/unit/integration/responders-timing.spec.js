@@ -4,11 +4,11 @@ import { getRect } from 'css-box-model';
 import invariant from 'tiny-invariant';
 import { render } from '@testing-library/react';
 import { DragDropContext, Draggable, Droppable } from '../../../src';
-import { getComputedSpacing } from '../../utils/dimension';
+import { getComputedSpacing } from '../../util/dimension';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 import type { Responders } from '../../../src/types';
-import { simpleLift, keyboard } from './utils/controls';
+import { simpleLift, keyboard } from './util/controls';
 
 type ItemProps = {|
   provided: DraggableProvided,

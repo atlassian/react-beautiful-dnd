@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import type {
   Published,
   DraggableDimension,
@@ -13,12 +13,12 @@ import type {
   CollectingState,
 } from '../../../../src/types';
 import publish from '../../../../src/state/publish-while-dragging';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import { empty, withScrollables, scrollableHome } from './util';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { vertical } from '../../../../src/state/axis';
 import getDisplacementMap from '../../../../src/state/get-displacement-map';
-import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-animated-displacement';
+import getNotAnimatedDisplacement from '../../../util/get-displacement/get-not-animated-displacement';
 
 const state = getStatePreset();
 const preset = getPreset(vertical);

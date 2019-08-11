@@ -9,7 +9,7 @@ import {
   type DraggableStateSnapshot,
   type DraggableId,
 } from '../../../../src';
-import { getComputedSpacing, getPreset } from '../../../utils/dimension';
+import { getComputedSpacing, getPreset } from '../../../util/dimension';
 
 export function getOffset(el: HTMLElement): Position {
   const style: CSSStyleDeclaration = el.style;

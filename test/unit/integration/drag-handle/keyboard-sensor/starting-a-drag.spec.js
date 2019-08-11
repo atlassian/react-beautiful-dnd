@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
 import { render, createEvent, fireEvent } from '@testing-library/react';
-import App from '../../utils/app';
-import { isDragging } from '../../utils/helpers';
+import App from '../../util/app';
+import { isDragging } from '../../util/helpers';
 import * as keyCodes from '../../../../../src/view/key-codes';
 
 it('should prevent the default keyboard action when lifting', () => {

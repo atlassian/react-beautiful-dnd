@@ -1,5 +1,5 @@
 // @flow
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import isHomeOf from '../../../../src/state/droppable/is-home-of';
 
 const preset = getPreset();

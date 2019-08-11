@@ -12,9 +12,9 @@ import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { patch } from '../../../../../../src/state/position';
 import { backward } from '../../../../../../src/state/user-direction/user-direction-preset';
-import { getPreset } from '../../../../../utils/dimension';
+import { getPreset } from '../../../../../util/dimension';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
-import { getForcedDisplacement } from '../../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../../util/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

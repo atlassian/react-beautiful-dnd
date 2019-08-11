@@ -5,16 +5,16 @@ import type {
   DimensionMarshal,
   DroppableCallbacks,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
-import { getMarshalStub } from '../../../utils/dimension-marshal';
-import { setViewport } from '../../../utils/viewport';
+import { getMarshalStub } from '../../../util/dimension-marshal';
+import { setViewport } from '../../../util/viewport';
 import {
   preset,
   scheduled,
   ScrollableItem,
   WithAppContext,
 } from './util/shared';
-import forceUpdate from '../../../utils/force-update';
-import PassThroughProps from '../../../utils/pass-through-props';
+import forceUpdate from '../../../util/force-update';
+import PassThroughProps from '../../../util/pass-through-props';
 
 setViewport(preset.viewport);
 

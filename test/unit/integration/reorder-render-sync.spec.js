@@ -9,9 +9,9 @@ import {
   Droppable,
   type DropResult,
 } from '../../../src';
-import { getComputedSpacing } from '../../utils/dimension';
+import { getComputedSpacing } from '../../util/dimension';
 import * as keyCodes from '../../../src/view/key-codes';
-import { simpleLift, keyboard } from './utils/controls';
+import { simpleLift, keyboard } from './util/controls';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
 

@@ -10,18 +10,18 @@ import type {
   DraggableDimensionMap,
 } from '../../../../src/types';
 import { vertical, horizontal } from '../../../../src/state/axis';
-import { createViewport } from '../../../utils/viewport';
+import { createViewport } from '../../../util/viewport';
 import { origin, patch } from '../../../../src/state/position';
 import {
   getDroppableDimension,
   getDraggableDimension,
-} from '../../../utils/dimension';
+} from '../../../util/dimension';
 import { emptyGroups } from '../../../../src/state/no-impact';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { toDraggableMap } from '../../../../src/state/dimension-structures';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
 import getDisplacementGroups from '../../../../src/state/get-displacement-groups';
-import { getForcedDisplacement } from '../../../utils/impact';
+import { getForcedDisplacement } from '../../../util/impact';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 
 [vertical, horizontal].forEach((axis: Axis) => {

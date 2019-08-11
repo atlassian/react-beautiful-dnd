@@ -4,8 +4,8 @@ import {
   getCallbacksStub,
   getDroppableCallbacks,
   populateMarshal,
-} from '../../../utils/dimension-marshal';
-import { copy, critical, preset } from '../../../utils/preset-action-args';
+} from '../../../util/dimension-marshal';
+import { copy, critical, preset } from '../../../util/preset-action-args';
 import type {
   DimensionMarshal,
   DroppableCallbacks,
@@ -18,7 +18,7 @@ import type {
   DimensionMap,
   Viewport,
 } from '../../../../src/types';
-import { setViewport } from '../../../utils/viewport';
+import { setViewport } from '../../../util/viewport';
 
 const viewport: Viewport = preset.viewport;
 setViewport(viewport);

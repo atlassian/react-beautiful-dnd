@@ -1,8 +1,8 @@
 // @flow
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import noImpact from '../../../../src/state/no-impact';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import type {
   Selector,
   OwnProps,
@@ -14,7 +14,7 @@ import {
   draggingStates,
   withImpact,
   type IsDraggingState,
-} from '../../../utils/dragging-state';
+} from '../../../util/dragging-state';
 import getOwnProps from './util/get-own-props';
 import getDraggingMapProps from './util/get-dragging-map-props';
 import getLiftEffect from '../../../../src/state/get-lift-effect';

@@ -2,7 +2,7 @@
 import { getRect, type Rect, type Spacing } from 'css-box-model';
 import type { DroppableDimension, Axis } from '../../../../src/types';
 import { isTotallyVisibleOnAxis } from '../../../../src/state/visibility/is-visible';
-import { getDroppableDimension } from '../../../utils/dimension';
+import { getDroppableDimension } from '../../../util/dimension';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import { offsetByPosition } from '../../../../src/state/spacing';
 import { patch } from '../../../../src/state/position';

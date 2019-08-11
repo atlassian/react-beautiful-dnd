@@ -1,5 +1,5 @@
 // @flow
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
 import type { State, DraggingState } from '../../../../src/types';
 import type {
@@ -8,10 +8,10 @@ import type {
   MapProps,
 } from '../../../../src/view/droppable/droppable-types';
 import getOwnProps from './util/get-own-props';
-import { getPreset, disableDroppable } from '../../../utils/dimension';
+import { getPreset, disableDroppable } from '../../../util/dimension';
 import resting from './util/resting-props';
 import noImpact from '../../../../src/state/no-impact';
-import cloneImpact from '../../../utils/clone-impact';
+import cloneImpact from '../../../util/clone-impact';
 import patchDimensionMap from '../../../../src/state/patch-dimension-map';
 
 const preset = getPreset();

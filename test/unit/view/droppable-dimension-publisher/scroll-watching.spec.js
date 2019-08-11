@@ -7,8 +7,8 @@ import type {
   DimensionMarshal,
   DroppableCallbacks,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
-import { getMarshalStub } from '../../../utils/dimension-marshal';
-import { setViewport } from '../../../utils/viewport';
+import { getMarshalStub } from '../../../util/dimension-marshal';
+import { setViewport } from '../../../util/viewport';
 import {
   immediate,
   preset,

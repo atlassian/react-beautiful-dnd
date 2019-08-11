@@ -7,7 +7,7 @@ import type {
   DroppableDimensionMap,
 } from '../../../../../src/types';
 import { vertical, horizontal } from '../../../../../src/state/axis';
-import { getPreset, enableCombining } from '../../../../utils/dimension';
+import { getPreset, enableCombining } from '../../../../util/dimension';
 import {
   forward,
   backward,
@@ -16,9 +16,9 @@ import getDragImpact from '../../../../../src/state/get-drag-impact';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { patch, subtract, add } from '../../../../../src/state/position';
 import getLiftEffect from '../../../../../src/state/get-lift-effect';
-import afterPoint from '../../../../utils/after-point';
-import beforePoint from '../../../../utils/before-point';
-import { getForcedDisplacement } from '../../../../utils/impact';
+import afterPoint from '../../../../util/after-point';
+import beforePoint from '../../../../util/before-point';
+import { getForcedDisplacement } from '../../../../util/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

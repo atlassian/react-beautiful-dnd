@@ -5,7 +5,7 @@ import type { Responders, DropResult } from '../../../../../src/types';
 import {
   initialPublishArgs,
   getDragStart,
-} from '../../../../utils/preset-action-args';
+} from '../../../../util/preset-action-args';
 import {
   initialPublish,
   completeDrop,

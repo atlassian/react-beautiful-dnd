@@ -11,10 +11,10 @@ import {
   forward,
   backward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
-import { getPreset } from '../../../../../utils/dimension';
+import { getPreset } from '../../../../../util/dimension';
 import moveToNextCombine from '../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-combine/index';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
-import { getForcedDisplacement } from '../../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../../util/impact';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
 
 const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({

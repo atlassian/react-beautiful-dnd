@@ -14,7 +14,7 @@ import {
   initialPublishArgs,
   animateDropArgs,
   getCompletedArgs,
-} from '../../../utils/preset-action-args';
+} from '../../../util/preset-action-args';
 
 const getMarshalStub = (): StyleMarshal => ({
   dragging: jest.fn(),

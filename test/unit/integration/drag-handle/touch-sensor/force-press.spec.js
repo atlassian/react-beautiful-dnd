@@ -1,10 +1,10 @@
 // @flow
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
-import App, { type Item } from '../../utils/app';
-import { touch, simpleLift } from '../../utils/controls';
+import App, { type Item } from '../../util/app';
+import { touch, simpleLift } from '../../util/controls';
 import { forcePressThreshold } from '../../../../../src/view/use-sensor-marshal/sensors/use-touch-sensor';
-import { isDragging } from '../../utils/helpers';
+import { isDragging } from '../../util/helpers';
 
 jest.useFakeTimers();
 

@@ -9,14 +9,14 @@ import type {
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import { getPreset } from '../../../../../utils/dimension';
+import { getPreset } from '../../../../../util/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import {
   forward,
   backward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
 import { subtract, add } from '../../../../../../src/state/position';
-import { getForcedDisplacement } from '../../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../../util/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

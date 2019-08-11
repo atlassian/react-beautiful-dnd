@@ -15,7 +15,7 @@ import {
   dispatchProps as defaultDispatchProps,
 } from './get-props';
 import getStubber from './get-stubber';
-import { getMarshalStub } from '../../../../utils/dimension-marshal';
+import { getMarshalStub } from '../../../../util/dimension-marshal';
 import AppContext, {
   type AppContextValue,
 } from '../../../../../src/view/context/app-context';

@@ -7,11 +7,11 @@ import type {
 } from '../../../../src/view/draggable/draggable-types';
 import { getDispatchPropsStub } from './util/get-props';
 import type { Viewport } from '../../../../src/types';
-import { getPreset } from '../../../utils/dimension';
-import { setViewport } from '../../../utils/viewport';
+import { getPreset } from '../../../util/dimension';
+import { setViewport } from '../../../util/viewport';
 import mount from './util/mount';
 import Item from './util/item';
-import { withKeyboard } from '../../../utils/user-input-util';
+import { withKeyboard } from '../../../util/user-input-util';
 import * as keyCodes from '../../../../src/view/key-codes';
 
 const pressSpacebar = withKeyboard(keyCodes.space);

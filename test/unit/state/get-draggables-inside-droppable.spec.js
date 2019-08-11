@@ -1,7 +1,7 @@
 // @flow
 import getDraggablesInsideDroppable from '../../../src/state/get-draggables-inside-droppable';
 import scrollDroppable from '../../../src/state/droppable/scroll-droppable';
-import { getPreset, makeScrollable } from '../../utils/dimension';
+import { getPreset, makeScrollable } from '../../util/dimension';
 import type {
   DraggableDimension,
   DroppableDimension,

@@ -23,15 +23,15 @@ import {
   makeScrollable,
   getFrame,
   addDroppable,
-} from '../../../../utils/dimension';
+} from '../../../../util/dimension';
 import { isEqual, noSpacing } from '../../../../../src/state/spacing';
-import getStatePreset from '../../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../../util/get-simple-state-preset';
 import publish from '../../../../../src/state/publish-while-dragging';
 import { empty, adjustBox } from '../util';
 import { addPlaceholder } from '../../../../../src/state/droppable/with-placeholder';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import getDisplacementMap from '../../../../../src/state/get-displacement-map';
-import getVisibleDisplacement from '../../../../utils/get-displacement/get-visible-displacement';
+import getVisibleDisplacement from '../../../../util/get-displacement/get-visible-displacement';
 
 const preset = getPreset();
 const state = getStatePreset();

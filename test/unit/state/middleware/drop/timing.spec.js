@@ -10,7 +10,7 @@ import {
 } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/drop';
 import { add } from '../../../../../src/state/position';
-import { initialPublishArgs } from '../../../../utils/preset-action-args';
+import { initialPublishArgs } from '../../../../util/preset-action-args';
 import createStore from '../util/create-store';
 import passThrough from '../util/pass-through-middleware';
 import type { State } from '../../../../../src/types';

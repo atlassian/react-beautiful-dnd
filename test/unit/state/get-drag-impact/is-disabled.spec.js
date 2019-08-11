@@ -10,7 +10,7 @@ import type {
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getDragImpact from '../../../../src/state/get-drag-impact';
 import noImpact from '../../../../src/state/no-impact';
-import { disableDroppable, getPreset } from '../../../utils/dimension';
+import { disableDroppable, getPreset } from '../../../util/dimension';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
 
 const dontCareAboutDirection: UserDirection = {

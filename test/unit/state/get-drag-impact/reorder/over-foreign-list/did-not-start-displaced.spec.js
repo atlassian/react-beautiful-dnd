@@ -3,7 +3,7 @@ import { type Position } from 'css-box-model';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import { patch } from '../../../../../../src/state/position';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
-import { getPreset } from '../../../../../utils/dimension';
+import { getPreset } from '../../../../../util/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import type {
   Axis,
@@ -16,9 +16,9 @@ import {
   forward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import afterPoint from '../../../../../utils/after-point';
-import beforePoint from '../../../../../utils/before-point';
-import { getForcedDisplacement } from '../../../../../utils/impact';
+import afterPoint from '../../../../../util/after-point';
+import beforePoint from '../../../../../util/before-point';
+import { getForcedDisplacement } from '../../../../../util/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

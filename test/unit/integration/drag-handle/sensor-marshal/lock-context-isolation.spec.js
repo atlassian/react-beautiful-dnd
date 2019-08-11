@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import React from 'react';
 import { render } from '@testing-library/react';
 import type { SensorAPI, Sensor } from '../../../../../src/types';
-import App from '../../utils/app';
+import App from '../../util/app';
 
 it('should allow different locks in different DragDropContexts', () => {
   let first: SensorAPI;

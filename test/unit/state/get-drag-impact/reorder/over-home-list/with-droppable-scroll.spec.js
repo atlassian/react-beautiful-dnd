@@ -18,10 +18,10 @@ import {
   forward,
 } from '../../../../../../src/state/user-direction/user-direction-preset';
 import getViewport from '../../../../../../src/view/window/get-viewport';
-import { getPreset, makeScrollable } from '../../../../../utils/dimension';
+import { getPreset, makeScrollable } from '../../../../../util/dimension';
 
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import { getForcedDisplacement } from '../../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../../util/impact';
 
 const viewport: Viewport = getViewport();
 

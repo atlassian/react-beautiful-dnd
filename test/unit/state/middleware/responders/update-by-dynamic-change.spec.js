@@ -9,11 +9,11 @@ import {
   type InitialPublishArgs,
 } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/responders';
-import { getPreset, makeScrollable } from '../../../../utils/dimension';
+import { getPreset, makeScrollable } from '../../../../util/dimension';
 import {
   initialPublishWithScrollables,
   publishAdditionArgs,
-} from '../../../../utils/preset-action-args';
+} from '../../../../util/preset-action-args';
 import createStore from '../util/create-store';
 import getAnnounce from './util/get-announce-stub';
 import createResponders from './util/get-responders-stub';
@@ -26,8 +26,8 @@ import type {
   DroppableDimension,
 } from '../../../../../src/types';
 import type { Store } from '../../../../../src/state/store-types';
-import getNotAnimatedDisplacement from '../../../../utils/get-displacement/get-not-animated-displacement';
-import getVisibleDisplacement from '../../../../utils/get-displacement/get-visible-displacement';
+import getNotAnimatedDisplacement from '../../../../util/get-displacement/get-not-animated-displacement';
+import getVisibleDisplacement from '../../../../util/get-displacement/get-visible-displacement';
 
 jest.useFakeTimers();
 const preset = getPreset();

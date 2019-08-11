@@ -10,7 +10,7 @@ import type {
 import { vertical, horizontal } from '../../../../../src/state/axis';
 import { negate, subtract, origin } from '../../../../../src/state/position';
 import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
-import { getPreset, makeScrollable } from '../../../../utils/dimension';
+import { getPreset, makeScrollable } from '../../../../util/dimension';
 import getClientBorderBoxCenter from '../../../../../src/state/get-center-from-impact/get-client-border-box-center';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
@@ -18,7 +18,7 @@ import noImpact from '../../../../../src/state/no-impact';
 import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import getNewHomeClientOffset from '../../../../../src/state/middleware/drop/get-new-home-client-offset';
 import patchDimensionMap from '../../../../../src/state/patch-dimension-map';
-import { getForcedDisplacement } from '../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../util/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

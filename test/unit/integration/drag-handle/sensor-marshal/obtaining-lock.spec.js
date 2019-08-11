@@ -9,8 +9,8 @@ import type {
   SnapDragActions,
   Sensor,
 } from '../../../../../src/types';
-import App from '../../utils/app';
-import { isDragging, isDropAnimating } from '../../utils/helpers';
+import App from '../../util/app';
+import { isDragging, isDropAnimating } from '../../util/helpers';
 
 function noop() {}
 

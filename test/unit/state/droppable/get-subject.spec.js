@@ -14,7 +14,7 @@ import type {
   ScrollSize,
 } from '../../../../src/types';
 import getSubject from '../../../../src/state/droppable/util/get-subject';
-import { withAssortedSpacing } from '../../../utils/dimension';
+import { withAssortedSpacing } from '../../../util/dimension';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import { origin, negate, patch } from '../../../../src/state/position';
 import { offsetByPosition } from '../../../../src/state/spacing';

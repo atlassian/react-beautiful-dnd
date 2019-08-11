@@ -9,8 +9,8 @@ import type {
 import type { PublicResult } from '../../../../src/state/move-in-direction/move-in-direction-types';
 import moveInDirection from '../../../../src/state/move-in-direction';
 import { vertical, horizontal } from '../../../../src/state/axis';
-import { getPreset, disableDroppable } from '../../../utils/dimension';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import { getPreset, disableDroppable } from '../../../util/dimension';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import { tryGetDestination } from '../../../../src/state/get-impact-location';
 
 describe('on the vertical axis', () => {

@@ -4,11 +4,11 @@ import { mount } from 'enzyme';
 import React from 'react';
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import type { DroppableDescriptor } from '../../../../src/types';
-import { getMarshalStub } from '../../../utils/dimension-marshal';
-import forceUpdate from '../../../utils/force-update';
+import { getMarshalStub } from '../../../util/dimension-marshal';
+import forceUpdate from '../../../util/force-update';
 import { preset, ScrollableItem, WithAppContext } from './util/shared';
-import { setViewport } from '../../../utils/viewport';
-import PassThroughProps from '../../../utils/pass-through-props';
+import { setViewport } from '../../../util/viewport';
+import PassThroughProps from '../../../util/pass-through-props';
 
 setViewport(preset.viewport);
 

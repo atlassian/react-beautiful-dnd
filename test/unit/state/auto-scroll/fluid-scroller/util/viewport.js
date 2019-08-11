@@ -2,7 +2,7 @@
 import { getRect } from 'css-box-model';
 import type { Viewport } from '../../../../../../src/types';
 import { origin } from '../../../../../../src/state/position';
-import { createViewport } from '../../../../../utils/viewport';
+import { createViewport } from '../../../../../util/viewport';
 
 export const windowScrollSize = {
   scrollHeight: 2000,

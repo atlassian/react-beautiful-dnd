@@ -6,8 +6,8 @@ import type {
   DimensionMarshal,
   DroppableCallbacks,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
-import { getMarshalStub } from '../../../utils/dimension-marshal';
-import { setViewport } from '../../../utils/viewport';
+import { getMarshalStub } from '../../../util/dimension-marshal';
+import { setViewport } from '../../../util/viewport';
 import {
   App,
   immediate,
@@ -18,7 +18,7 @@ import {
   ScrollableItem,
   WithAppContext,
 } from './util/shared';
-import tryCleanPrototypeStubs from '../../../utils/try-clean-prototype-stubs';
+import tryCleanPrototypeStubs from '../../../util/try-clean-prototype-stubs';
 
 setViewport(preset.viewport);
 

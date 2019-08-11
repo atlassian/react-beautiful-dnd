@@ -10,9 +10,9 @@ import type {
 import type { DroppableDimension, ScrollSize } from '../../../../src/types';
 import { negate } from '../../../../src/state/position';
 import { offsetByPosition } from '../../../../src/state/spacing';
-import { getDroppableDimension } from '../../../utils/dimension';
-import { getMarshalStub } from '../../../utils/dimension-marshal';
-import setWindowScroll from '../../../utils/set-window-scroll';
+import { getDroppableDimension } from '../../../util/dimension';
+import { getMarshalStub } from '../../../util/dimension-marshal';
+import setWindowScroll from '../../../util/set-window-scroll';
 import {
   App,
   ScrollableItem,
@@ -27,8 +27,8 @@ import {
   descriptor,
   smallFrameClient,
 } from './util/shared';
-import { setViewport } from '../../../utils/viewport';
-import tryCleanPrototypeStubs from '../../../utils/try-clean-prototype-stubs';
+import { setViewport } from '../../../util/viewport';
+import tryCleanPrototypeStubs from '../../../util/try-clean-prototype-stubs';
 
 beforeEach(() => {
   setViewport(preset.viewport);

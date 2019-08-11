@@ -3,7 +3,7 @@ import type { Position } from 'css-box-model';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getDragImpact from '../../../../src/state/get-drag-impact';
 import noImpact from '../../../../src/state/no-impact';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import type { Axis, DragImpact } from '../../../../src/types';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import getLiftEffect from '../../../../src/state/get-lift-effect';

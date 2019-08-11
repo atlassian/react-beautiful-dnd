@@ -13,7 +13,7 @@ import getDistanceThresholds, {
 } from '../../../../../src/state/auto-scroller/fluid-scroller/get-scroll/get-scroll-on-axis/get-distance-thresholds';
 import { patch, origin } from '../../../../../src/state/position';
 import getArgsMock from './util/get-args-mock';
-import { getDroppableDimension } from '../../../../utils/dimension';
+import { getDroppableDimension } from '../../../../util/dimension';
 
 forEach(({ axis, state }: BlockFnArgs) => {
   const custom: DroppableDimension = getDroppableDimension({

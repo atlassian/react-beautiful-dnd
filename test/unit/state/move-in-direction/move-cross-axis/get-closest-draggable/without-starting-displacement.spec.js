@@ -13,7 +13,7 @@ import {
   getDroppableDimension,
   getDraggableDimension,
   withAssortedSpacing,
-} from '../../../../../utils/dimension';
+} from '../../../../../util/dimension';
 import { expandByPosition } from '../../../../../../src/state/spacing';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import getViewport from '../../../../../../src/view/window/get-viewport';

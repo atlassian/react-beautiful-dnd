@@ -8,7 +8,7 @@ import type {
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import { getPreset } from '../../../../../utils/dimension';
+import { getPreset } from '../../../../../util/dimension';
 import { goAfter } from '../../../../../../src/state/get-center-from-impact/move-relative-to';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import { negate } from '../../../../../../src/state/position';

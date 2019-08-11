@@ -7,7 +7,7 @@ import type {
 } from '../../../../src/types';
 
 import publish from '../../../../src/state/publish-while-dragging';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import { empty, withScrollables } from './util';
 
 const state = getStatePreset();

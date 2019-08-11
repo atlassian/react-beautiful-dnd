@@ -8,14 +8,14 @@ import {
   getPreset,
   getDraggableDimension,
   getComputedSpacing,
-} from '../../utils/dimension';
+} from '../../util/dimension';
 import type {
   DimensionMarshal,
   GetDraggableDimensionFn,
 } from '../../../src/state/dimension-marshal/dimension-marshal-types';
-import forceUpdate from '../../utils/force-update';
-import tryCleanPrototypeStubs from '../../utils/try-clean-prototype-stubs';
-import { getMarshalStub } from '../../utils/dimension-marshal';
+import forceUpdate from '../../util/force-update';
+import tryCleanPrototypeStubs from '../../util/try-clean-prototype-stubs';
+import { getMarshalStub } from '../../util/dimension-marshal';
 import type {
   DraggableId,
   DraggableDimension,

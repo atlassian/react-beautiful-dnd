@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import { render } from '@testing-library/react';
-import { isDragging } from '../../utils/helpers';
-import App from '../../utils/app';
-import { forEachSensor, simpleLift, type Control } from '../../utils/controls';
+import { isDragging } from '../../util/helpers';
+import App from '../../util/app';
+import { forEachSensor, simpleLift, type Control } from '../../util/controls';
 
 function getCallCount(myMock): number {
   return myMock.mock.calls.length;

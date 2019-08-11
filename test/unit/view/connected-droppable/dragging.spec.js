@@ -1,5 +1,5 @@
 // @flow
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
 import type {
   DraggingState,
@@ -13,12 +13,12 @@ import type {
   MapProps,
 } from '../../../../src/view/droppable/droppable-types';
 import getOwnProps from './util/get-own-props';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import {
   move,
   type IsDraggingState,
   withImpact,
-} from '../../../utils/dragging-state';
+} from '../../../util/dragging-state';
 import noImpact, { emptyGroups } from '../../../../src/state/no-impact';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import withCombineImpact from './util/with-combine-impact';

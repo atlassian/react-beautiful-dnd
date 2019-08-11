@@ -6,7 +6,7 @@ import {
 } from '../../../../src/state/visibility/is-visible';
 import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 import { offsetByPosition } from '../../../../src/state/spacing';
-import { getDroppableDimension, getFrame } from '../../../utils/dimension';
+import { getDroppableDimension, getFrame } from '../../../util/dimension';
 import type { DroppableDimension } from '../../../../src/types';
 
 const viewport: Rect = getRect({

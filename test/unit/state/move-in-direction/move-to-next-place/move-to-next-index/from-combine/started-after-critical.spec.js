@@ -9,11 +9,11 @@ import {
   forward,
   backward,
 } from '../../../../../../../src/state/user-direction/user-direction-preset';
-import { getPreset } from '../../../../../../utils/dimension';
+import { getPreset } from '../../../../../../util/dimension';
 import moveToNextIndex from '../../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-index/index';
 import getDisplacedBy from '../../../../../../../src/state/get-displaced-by';
 import getLiftEffect from '../../../../../../../src/state/get-lift-effect';
-import { getForcedDisplacement } from '../../../../../../utils/impact';
+import { getForcedDisplacement } from '../../../../../../util/impact';
 
 const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
   ...droppable,

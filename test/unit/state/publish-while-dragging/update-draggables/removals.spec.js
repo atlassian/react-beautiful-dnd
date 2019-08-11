@@ -1,6 +1,6 @@
 // @flow
 import invariant from 'tiny-invariant';
-import getStatePreset from '../../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../../util/get-simple-state-preset';
 import type {
   Published,
   DraggableId,
@@ -11,8 +11,8 @@ import type {
   CollectingState,
 } from '../../../../../src/types';
 import publish from '../../../../../src/state/publish-while-dragging';
-import { getPreset } from '../../../../utils/dimension';
-import { copy } from '../../../../utils/preset-action-args';
+import { getPreset } from '../../../../util/dimension';
+import { copy } from '../../../../util/preset-action-args';
 import { empty, withScrollables, scrollableForeign } from '../util';
 
 const state = getStatePreset();

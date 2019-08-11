@@ -15,8 +15,8 @@ import {
   makeScrollable,
   addDroppable,
   getFrame,
-} from '../../../../utils/dimension';
-import getStatePreset from '../../../../utils/get-simple-state-preset';
+} from '../../../../util/dimension';
+import getStatePreset from '../../../../util/get-simple-state-preset';
 import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
 import getDroppable from '../../../../../src/state/droppable/get-droppable';
 import publish from '../../../../../src/state/publish-while-dragging';

@@ -9,8 +9,8 @@ import type {
   FluidDragActions,
   Sensor,
 } from '../../../../../src/types';
-import App from '../../utils/app';
-import { getOffset } from '../../utils/helpers';
+import App from '../../util/app';
+import { getOffset } from '../../util/helpers';
 import { add } from '../../../../../src/state/position';
 
 function noop() {}

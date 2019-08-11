@@ -1,14 +1,14 @@
 // @flow
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import noImpact from '../../../../src/state/no-impact';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import {
   draggingStates,
   withImpact,
   move,
   type IsDraggingState,
-} from '../../../utils/dragging-state';
+} from '../../../util/dragging-state';
 import getOwnProps from './util/get-own-props';
 import type {
   Selector,
@@ -23,9 +23,9 @@ import type {
 } from '../../../../src/types';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import getHomeLocation from '../../../../src/state/get-home-location';
-import cloneImpact from '../../../utils/clone-impact';
+import cloneImpact from '../../../util/clone-impact';
 import { getSecondarySnapshot } from './util/get-snapshot';
-import { getForcedDisplacement } from '../../../utils/impact';
+import { getForcedDisplacement } from '../../../util/impact';
 
 const preset = getPreset();
 const state = getStatePreset();

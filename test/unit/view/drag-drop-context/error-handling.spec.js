@@ -11,7 +11,7 @@ import type {
   Provided as DraggableProvided,
   StateSnapshot as DraggableStateSnapshot,
 } from '../../../../src/view/draggable/draggable-types';
-import { getComputedSpacing } from '../../../utils/dimension';
+import { getComputedSpacing } from '../../../util/dimension';
 
 type Props = {|
   provided: DraggableProvided,

@@ -8,7 +8,7 @@ import type {
   SnapDragActions,
   Sensor,
 } from '../../../../../src/types';
-import App from '../../utils/app';
+import App from '../../util/app';
 
 function noop() {}
 

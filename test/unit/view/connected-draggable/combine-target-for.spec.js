@@ -7,12 +7,12 @@ import type {
 } from '../../../../src/view/draggable/draggable-types';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import {
   draggingStates,
   withImpact,
   type IsDraggingState,
-} from '../../../utils/dragging-state';
+} from '../../../util/dragging-state';
 import getOwnProps from './util/get-own-props';
 import { getSecondarySnapshot } from './util/get-snapshot';
 

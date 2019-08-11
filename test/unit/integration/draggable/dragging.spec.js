@@ -1,16 +1,16 @@
 // @flow
 import React from 'react';
 import { render } from '@testing-library/react';
-import App, { type RenderItem } from '../utils/app';
+import App, { type RenderItem } from '../util/app';
 import { type DraggableStateSnapshot } from '../../../../src';
-import { simpleLift, mouse, keyboard, expandedMouse } from '../utils/controls';
+import { simpleLift, mouse, keyboard, expandedMouse } from '../util/controls';
 import {
   isDragging,
   renderItemAndSpy,
   withPoorDimensionMocks,
   getSnapshotsFor,
   getLast,
-} from '../utils/helpers';
+} from '../util/helpers';
 import { transitions, combine } from '../../../../src/animation';
 import { zIndexOptions } from '../../../../src/view/draggable/get-style';
 

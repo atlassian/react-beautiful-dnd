@@ -6,14 +6,14 @@ import type {
   LiftEffect,
 } from '../../../../src/types';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import getHomeLocation from '../../../../src/state/get-home-location';
 import {
   getForcedDisplacement,
   getDraggableIdMap,
   getDraggableIds,
-} from '../../../utils/impact';
+} from '../../../util/impact';
 
 const preset = getPreset();
 

@@ -5,7 +5,7 @@ import {
   disableDroppable,
   getDroppableDimension,
   getPreset,
-} from '../../utils/dimension';
+} from '../../util/dimension';
 import type {
   DraggableId,
   DraggableDimension,

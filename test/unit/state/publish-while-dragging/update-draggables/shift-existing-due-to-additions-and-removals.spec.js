@@ -1,7 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
 import invariant from 'tiny-invariant';
-import getStatePreset from '../../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../../util/get-simple-state-preset';
 import type {
   Published,
   DraggableDimension,
@@ -12,7 +12,7 @@ import type {
   DraggableId,
 } from '../../../../../src/types';
 import publish from '../../../../../src/state/publish-while-dragging';
-import { getPreset } from '../../../../utils/dimension';
+import { getPreset } from '../../../../util/dimension';
 import { patch, negate } from '../../../../../src/state/position';
 import getDraggablesInsideDroppable from '../../../../../src/state/get-draggables-inside-droppable';
 import { empty, shift, withScrollables, scrollableHome } from '../util';

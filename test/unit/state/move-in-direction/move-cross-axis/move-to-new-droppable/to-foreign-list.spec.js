@@ -26,8 +26,8 @@ import {
   getDroppableDimension,
   getPreset,
   makeScrollable,
-} from '../../../../../utils/dimension';
-import { getForcedDisplacement } from '../../../../../utils/impact';
+} from '../../../../../util/dimension';
+import { getForcedDisplacement } from '../../../../../util/impact';
 import {
   emptyGroups,
   noDisplacedBy,

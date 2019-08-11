@@ -2,7 +2,7 @@
 import React, { Component, type Node } from 'react';
 import { render } from '@testing-library/react';
 import { DragDropContext } from '../../../../src';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import Draggable from '../../../../src/view/draggable/connected-draggable';
 import type { Provided } from '../../../../src/view/draggable/draggable-types';
 import DroppableContext, {

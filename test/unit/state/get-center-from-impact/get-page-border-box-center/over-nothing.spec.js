@@ -3,7 +3,7 @@ import type { Position } from 'css-box-model';
 import { horizontal, vertical } from '../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../src/state/get-center-from-impact/get-page-border-box-center';
 import getLiftEffect from '../../../../../src/state/get-lift-effect';
-import { getPreset } from '../../../../utils/dimension';
+import { getPreset } from '../../../../util/dimension';
 import type { Axis } from '../../../../../src/types';
 
 [vertical, horizontal].forEach((axis: Axis) => {

@@ -4,7 +4,7 @@ import {
   getPreset,
   makeScrollable,
   addDroppable,
-} from '../../../utils/dimension';
+} from '../../../util/dimension';
 import type {
   Published,
   DraggableDimension,

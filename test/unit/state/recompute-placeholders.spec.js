@@ -6,7 +6,7 @@ import type {
   DroppableDimension,
   DroppableDimensionMap,
 } from '../../../src/types';
-import { getPreset } from '../../utils/dimension';
+import { getPreset } from '../../util/dimension';
 import getDisplacedBy from '../../../src/state/get-displaced-by';
 import { horizontal, vertical } from '../../../src/state/axis';
 import recomputePlaceholders from '../../../src/state/recompute-placeholders';
@@ -14,7 +14,7 @@ import noImpact from '../../../src/state/no-impact';
 import { addPlaceholder } from '../../../src/state/droppable/with-placeholder';
 import patchDroppableMap from '../../../src/state/patch-droppable-map';
 import getLiftEffect from '../../../src/state/get-lift-effect';
-import { getForcedDisplacement } from '../../utils/impact';
+import { getForcedDisplacement } from '../../util/impact';
 
 [horizontal, vertical].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

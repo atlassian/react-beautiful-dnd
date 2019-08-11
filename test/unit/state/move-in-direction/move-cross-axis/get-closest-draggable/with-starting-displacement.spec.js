@@ -18,7 +18,7 @@ import getViewport from '../../../../../../src/view/window/get-viewport';
 import {
   getDraggableDimension,
   getDroppableDimension,
-} from '../../../../../utils/dimension';
+} from '../../../../../util/dimension';
 import { noAfterCritical } from '../../../../../../src/state/no-impact';
 
 const viewport: Viewport = getViewport();

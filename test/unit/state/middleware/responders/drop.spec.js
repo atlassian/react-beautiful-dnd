@@ -13,7 +13,7 @@ import createStore from '../util/create-store';
 import {
   initialPublishArgs,
   getDragStart,
-} from '../../../../utils/preset-action-args';
+} from '../../../../util/preset-action-args';
 import {
   initialPublish,
   completeDrop,
@@ -21,7 +21,7 @@ import {
 import getResponders from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
 import getCompletedWithResult from './util/get-completed-with-result';
-import getSimpleStatePreset from '../../../../utils/get-simple-state-preset';
+import getSimpleStatePreset from '../../../../util/get-simple-state-preset';
 import { tryGetDestination } from '../../../../../src/state/get-impact-location';
 
 const result: DropResult = {

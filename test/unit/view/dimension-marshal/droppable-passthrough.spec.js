@@ -1,6 +1,6 @@
 // @flow
 import createDimensionMarshal from '../../../../src/state/dimension-marshal/dimension-marshal';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import type {
   Callbacks,
   DimensionMarshal,
@@ -9,7 +9,7 @@ import {
   populateMarshal,
   getCallbacksStub,
   type DimensionWatcher,
-} from '../../../utils/dimension-marshal';
+} from '../../../util/dimension-marshal';
 import { critical, defaultRequest, justCritical } from './util';
 
 const preset = getPreset();

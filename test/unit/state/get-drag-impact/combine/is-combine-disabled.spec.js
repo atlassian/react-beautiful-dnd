@@ -11,9 +11,9 @@ import getDragImpact from '../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import { patch } from '../../../../../src/state/position';
 import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
-import beforePoint from '../../../../utils/before-point';
-import { enableCombining, getPreset } from '../../../../utils/dimension';
-import { getForcedDisplacement } from '../../../../utils/impact';
+import beforePoint from '../../../../util/before-point';
+import { enableCombining, getPreset } from '../../../../util/dimension';
+import { getForcedDisplacement } from '../../../../util/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

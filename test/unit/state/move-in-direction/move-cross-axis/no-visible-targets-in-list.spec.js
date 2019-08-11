@@ -13,7 +13,7 @@ import {
   getPreset,
   getDroppableDimension,
   getDraggableDimension,
-} from '../../../../utils/dimension';
+} from '../../../../util/dimension';
 import getLiftEffect from '../../../../../src/state/get-lift-effect';
 
 const preset = getPreset();

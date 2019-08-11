@@ -7,8 +7,8 @@ import {
   getDraggableDimension,
   addDroppable,
   getFrame,
-} from '../../../../utils/dimension';
-import getStatePreset from '../../../../utils/get-simple-state-preset';
+} from '../../../../util/dimension';
+import getStatePreset from '../../../../util/get-simple-state-preset';
 import { empty, withScrollables, scrollableHome } from '../util';
 import { add, negate } from '../../../../../src/state/position';
 import scrollViewport from '../../../../../src/state/scroll-viewport';

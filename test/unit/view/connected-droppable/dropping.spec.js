@@ -11,12 +11,12 @@ import type {
   MapProps,
 } from '../../../../src/view/droppable/droppable-types';
 import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import getOwnProps from './util/get-own-props';
-import { withImpact } from '../../../utils/dragging-state';
+import { withImpact } from '../../../util/dragging-state';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import noImpact from '../../../../src/state/no-impact';
-import cloneImpact from '../../../utils/clone-impact';
+import cloneImpact from '../../../util/clone-impact';
 import { tryGetDestination } from '../../../../src/state/get-impact-location';
 
 const state = getStatePreset();

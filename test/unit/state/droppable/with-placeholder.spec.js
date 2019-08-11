@@ -13,7 +13,7 @@ import type {
 import {
   getDroppableDimension,
   getDraggableDimension,
-} from '../../../utils/dimension';
+} from '../../../util/dimension';
 import {
   addPlaceholder,
   removePlaceholder,

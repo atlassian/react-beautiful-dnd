@@ -16,7 +16,7 @@ import {
   initialPublishArgs,
   getCompletedArgs,
   userCancelArgs,
-} from '../../../utils/preset-action-args';
+} from '../../../util/preset-action-args';
 
 const getMarshal = (stopPublishing: Function): DimensionMarshal => {
   const fake: DimensionMarshal = ({

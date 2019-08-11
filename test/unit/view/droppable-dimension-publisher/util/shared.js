@@ -3,7 +3,7 @@
 import { createBox, type Spacing, type BoxModel } from 'css-box-model';
 import React, { useMemo, type Node } from 'react';
 import useDroppableDimensionPublisher from '../../../../../src/view/use-droppable-dimension-publisher/use-droppable-dimension-publisher';
-import { getComputedSpacing, getPreset } from '../../../../utils/dimension';
+import { getComputedSpacing, getPreset } from '../../../../util/dimension';
 import { type DimensionMarshal } from '../../../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
   ScrollOptions,
@@ -11,7 +11,7 @@ import type {
   DroppableDescriptor,
   TypeId,
 } from '../../../../../src/types';
-import createRef from '../../../../utils/create-ref';
+import createRef from '../../../../util/create-ref';
 import AppContext, {
   type AppContextValue,
 } from '../../../../../src/view/context/app-context';

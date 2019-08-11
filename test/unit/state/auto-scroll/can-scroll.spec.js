@@ -14,9 +14,9 @@ import {
   getPreset,
   getDroppableDimension,
   getFrame,
-} from '../../../utils/dimension';
+} from '../../../util/dimension';
 import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
-import { createViewport } from '../../../utils/viewport';
+import { createViewport } from '../../../util/viewport';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
 
 const origin: Position = { x: 0, y: 0 };

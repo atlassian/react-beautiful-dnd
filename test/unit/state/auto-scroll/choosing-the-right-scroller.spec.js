@@ -5,8 +5,8 @@ import type {
   Viewport,
   MovementMode,
 } from '../../../../src/types';
-import { createViewport } from '../../../utils/viewport';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import { createViewport } from '../../../util/viewport';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import getScroller, { type Args } from '../../../../src/state/auto-scroller';
 import type { AutoScroller } from '../../../../src/state/auto-scroller/auto-scroller-types';
 import { origin } from '../../../../src/state/position';

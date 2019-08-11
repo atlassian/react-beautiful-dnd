@@ -1,13 +1,13 @@
 // @flow
 import React from 'react';
 import { render } from '@testing-library/react';
-import { forEachSensor, type Control, simpleLift } from '../../utils/controls';
-import { isDragging } from '../../utils/helpers';
+import { forEachSensor, type Control, simpleLift } from '../../util/controls';
+import { isDragging } from '../../util/helpers';
 import {
   type DraggableProvided,
   type DraggableStateSnapshot,
 } from '../../../../../src';
-import App, { type Item } from '../../utils/app';
+import App, { type Item } from '../../util/app';
 
 forEachSensor((control: Control) => {
   beforeEach(() => {

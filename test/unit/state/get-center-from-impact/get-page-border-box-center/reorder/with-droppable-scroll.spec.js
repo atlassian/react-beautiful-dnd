@@ -9,7 +9,7 @@ import type {
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-page-border-box-center';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import { getPreset, makeScrollable } from '../../../../../utils/dimension';
+import { getPreset, makeScrollable } from '../../../../../util/dimension';
 import { goIntoStart } from '../../../../../../src/state/get-center-from-impact/move-relative-to';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import { negate, add } from '../../../../../../src/state/position';

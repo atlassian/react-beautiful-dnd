@@ -9,7 +9,7 @@ import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/d
 import middleware from '../../../../src/state/middleware/lift';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
-import { setViewport, resetViewport } from '../../../utils/viewport';
+import { setViewport, resetViewport } from '../../../util/viewport';
 import {
   lift,
   initialPublish,
@@ -18,15 +18,15 @@ import {
   type AnimateDropArgs,
   type InitialPublishArgs,
 } from '../../../../src/state/action-creators';
-import { createMarshal } from '../../../utils/dimension-marshal';
+import { createMarshal } from '../../../util/dimension-marshal';
 import {
   preset,
   liftArgs,
   initialPublishArgs,
   getCompletedArgs,
   copy,
-} from '../../../utils/preset-action-args';
-import { populate } from '../../../utils/registry';
+} from '../../../util/preset-action-args';
+import { populate } from '../../../util/registry';
 import type { Registry } from '../../../../src/state/registry/registry-types';
 import createRegistry from '../../../../src/state/registry/create-registry';
 

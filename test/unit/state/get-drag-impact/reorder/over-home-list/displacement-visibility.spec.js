@@ -17,11 +17,11 @@ import { backward } from '../../../../../../src/state/user-direction/user-direct
 import {
   getDroppableDimension,
   getDraggableDimension,
-} from '../../../../../utils/dimension';
+} from '../../../../../util/dimension';
 import getViewport from '../../../../../../src/view/window/get-viewport';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import { getForcedDisplacement } from '../../../../../utils/impact';
-import noAfterCritical from '../../../../../utils/no-after-critical';
+import { getForcedDisplacement } from '../../../../../util/impact';
+import noAfterCritical from '../../../../../util/no-after-critical';
 
 const viewport: Viewport = getViewport();
 

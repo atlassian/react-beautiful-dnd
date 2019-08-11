@@ -1,10 +1,10 @@
 // @flow
 import React from 'react';
 import { render, createEvent, fireEvent } from '@testing-library/react';
-import App from '../../utils/app';
-import { getDropReason } from '../../utils/helpers';
+import App from '../../util/app';
+import { getDropReason } from '../../util/helpers';
 import * as keyCodes from '../../../../../src/view/key-codes';
-import { simpleLift, touch } from '../../utils/controls';
+import { simpleLift, touch } from '../../util/controls';
 import supportedEventName from '../../../../../src/view/use-sensor-marshal/sensors/util/supported-page-visibility-event-name';
 
 jest.useFakeTimers();

@@ -11,9 +11,9 @@ import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { add, negate, patch, subtract } from '../../../../src/state/position';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import { isPartiallyVisible } from '../../../../src/state/visibility/is-visible';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import { offsetByPosition } from '../../../../src/state/spacing';
-import { getForcedDisplacement } from '../../../utils/impact';
+import { getForcedDisplacement } from '../../../util/impact';
 import getDisplacementGroups from '../../../../src/state/get-displacement-groups';
 import { emptyGroups } from '../../../../src/state/no-impact';
 
