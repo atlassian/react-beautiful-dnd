@@ -2,12 +2,12 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 import App from '../utils/app';
-import { expandedMouse } from '../utils//controls';
+import { expandedMouse } from '../utils/controls';
 import {
   isDragging,
   renderItemAndSpy,
   withPoorDimensionMocks,
-} from '../utils//helpers';
+} from '../utils/helpers';
 
 it('should move out of the way when requested', () => {
   withPoorDimensionMocks(preset => {

@@ -12,7 +12,7 @@ import {
   mouse,
   getTransitionEnd,
   expandedMouse,
-} from '../utils//controls';
+} from '../utils/controls';
 import {
   isDragging,
   isDropAnimating,
@@ -21,7 +21,7 @@ import {
   withPoorDimensionMocks,
   getLast,
   getSnapshotsFor,
-} from '../utils//helpers';
+} from '../utils/helpers';
 import {
   transitions,
   timings,
