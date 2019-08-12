@@ -69,7 +69,11 @@ export const renderItemAndSpy = (mock: JestMockFn<*, *>): RenderItem => (
   };
 };
 
-type Call = [DraggableProvided, DraggableStateSnapshot, ?DraggableLocation];
+export type Call = [
+  DraggableProvided,
+  DraggableStateSnapshot,
+  ?DraggableLocation,
+];
 
 export const getCallsFor = (
   id: DraggableId,
