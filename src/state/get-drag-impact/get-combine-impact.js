@@ -99,7 +99,6 @@ export default ({
   afterCritical,
 }: Args): ?DragImpact => {
   if (!destination.isCombineEnabled) {
-    console.log('not enabled');
     return null;
   }
 
@@ -131,8 +130,6 @@ export default ({
       });
     },
   );
-
-  console.log('combine with?', combineWith);
 
   if (!combineWith) {
     return null;
