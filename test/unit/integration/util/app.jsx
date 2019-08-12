@@ -9,6 +9,7 @@ import {
   type DraggableStateSnapshot,
   type Sensor,
   type Direction,
+  type DraggableLocation,
 } from '../../../../src';
 
 export type Item = {|
@@ -23,11 +24,16 @@ export type Item = {|
 
 export type RenderItem = (
   item: Item,
-) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot) => Node;
+) => (
+  provided: DraggableProvided,
+  snapshot: DraggableStateSnapshot,
+  location?: DraggableLocation,
+) => Node;
 
 export const defaultItemRender: RenderItem = (item: Item) => (
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
+  location?: DraggableLocation,
 ) => (
   <div
     {...provided.draggableProps}
@@ -36,6 +42,8 @@ export const defaultItemRender: RenderItem = (item: Item) => (
     data-is-drop-animating={snapshot.isDropAnimating}
     data-is-combining={Boolean(snapshot.combineWith)}
     data-is-combine-target={Boolean(snapshot.combineTargetFor)}
+    data-is-clone={Boolean(location)}
+    data-testid={item.id}
     ref={provided.innerRef}
   >
     item: {item.id}
@@ -53,6 +61,8 @@ type Props = {|
   // droppable
   direction?: Direction,
   isCombineEnabled?: boolean,
+  getContainerForClone?: () => HTMLElement,
+  useClone?: boolean,
 
   sensors?: Sensor[],
   enableDefaultSensors?: boolean,
@@ -79,12 +89,27 @@ export default function App(props: Props) {
   const onDragEnd = props.onDragEnd || noop;
   const sensors: Sensor[] = props.sensors || [];
   const [items] = useState(() => props.items || getItems());
-  const render = props.renderItem || defaultItemRender;
+  const render: RenderItem = props.renderItem || defaultItemRender;
   const direction: Direction = props.direction || 'vertical';
   const isCombineEnabled: boolean = withDefaultBool(
     props.isCombineEnabled,
     false,
   );
+  const renderClone = (() => {
+    const useClone: boolean = withDefaultBool(props.useClone, false);
+    if (!useClone) {
+      return null;
+    }
+
+    return function result(
+      provided: DraggableProvided,
+      snapshot: DraggableStateSnapshot,
+      location: DraggableLocation,
+    ): Node {
+      const item: Item = items[location.index];
+      return render(item)(provided, snapshot, location);
+    };
+  })();
 
   return (
     <DragDropContext
@@ -98,6 +123,8 @@ export default function App(props: Props) {
         droppableId="droppable"
         direction={direction}
         isCombineEnabled={isCombineEnabled}
+        whenDraggingClone={renderClone}
+        getContainerForClone={props.getContainerForClone}
       >
         {(droppableProvided: DroppableProvided) => (
           <div

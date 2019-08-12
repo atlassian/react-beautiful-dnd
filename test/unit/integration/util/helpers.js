@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position, BoxModel } from 'css-box-model';
-import type { DropReason } from '../../../../src/types';
+import type { DropReason, DraggableLocation } from '../../../../src/types';
 import * as attributes from '../../../../src/view/data-attributes';
 import { defaultItemRender, type RenderItem, type Item } from './app';
 import {
@@ -49,22 +49,32 @@ export function isCombineTarget(el: HTMLElement): boolean {
   return el.getAttribute('data-is-combine-target') === 'true';
 }
 
+export function isClone(el: HTMLElement): boolean {
+  return el.getAttribute('data-is-clone') === 'true';
+}
+
 const preset = getPreset();
 
 export const renderItemAndSpy = (mock: JestMockFn<*, *>): RenderItem => (
   item: Item,
 ) => {
   const render = defaultItemRender(item);
-  return (provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
-    mock(provided, snapshot);
-    return render(provided, snapshot);
+  return (
+    provided: DraggableProvided,
+    snapshot: DraggableStateSnapshot,
+    location?: DraggableLocation,
+  ) => {
+    mock(provided, snapshot, location);
+    return render(provided, snapshot, location);
   };
 };
+
+type Call = [DraggableProvided, DraggableStateSnapshot, ?DraggableLocation];
 
 export const getCallsFor = (
   id: DraggableId,
   mock: JestMockFn<*, *>,
-): [DraggableProvided, DraggableStateSnapshot][] => {
+): Call[] => {
   return mock.mock.calls.filter(call => {
     const provided: DraggableProvided = call[0];
     return provided.draggableProps['data-rbd-draggable-id'] === id;
@@ -89,7 +99,7 @@ export const getSnapshotsFor = (
   });
 };
 
-export function getLast<T>(values: T[]): ?T {
+export function getLast(values: Call[]): ?Call {
   return values[values.length - 1] || null;
 }
 
