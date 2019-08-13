@@ -170,5 +170,7 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
     // Second argument to hook functions
     'react-hooks/exhaustive-deps': 'error',
+
+    'react/jsx-props-no-spreading': 'off',
   },
 };
