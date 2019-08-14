@@ -90,7 +90,7 @@ function App(props: Props) {
       <Droppable
         droppableId="droppable"
         mode="VIRTUAL"
-        whenDraggingClone={(
+        renderClone={(
           provided: DraggableProvided,
           snapshot: DraggableStateSnapshot,
           source: DraggableLocation,

@@ -39,6 +39,7 @@ it('should update the snapshot of an item being combined with', () => {
     const expected: DraggableStateSnapshot = {
       isDragging: false,
       isDropAnimating: false,
+      isClone: false,
       dropAnimation: null,
       draggingOver: null,
       combineWith: null,

@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
-import type { DraggableId } from '../../types';
+import { useMemo } from 'use-memo-one';
+import type { DraggableId, DraggableDescriptor } from '../../types';
 import type { PublicOwnProps, PrivateOwnProps } from './draggable-types';
 import ConnectedDraggable from './connected-draggable';
 import useRequiredContext from '../use-required-context';
@@ -13,6 +14,21 @@ export function PrivateDraggable(props: PrivateOwnProps) {
     DroppableContext,
   );
 
+  const descriptor: DraggableDescriptor = useMemo(
+    () => ({
+      id: props.draggableId,
+      index: props.index,
+      type: droppableContext.type,
+      droppableId: droppableContext.droppableId,
+    }),
+    [
+      props.draggableId,
+      props.index,
+      droppableContext.type,
+      droppableContext.droppableId,
+    ],
+  );
+
   // The droppable can render a clone of the draggable item.
   // In that case we unmount the existing dragging item
   const isUsingCloneFor: ?DraggableId = droppableContext.isUsingCloneFor;
@@ -20,7 +36,7 @@ export function PrivateDraggable(props: PrivateOwnProps) {
     return null;
   }
 
-  return <ConnectedDraggable {...props} />;
+  return <ConnectedDraggable {...props} descriptor={descriptor} />;
 }
 
 export function PublicDraggable(props: PublicOwnProps) {

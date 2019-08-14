@@ -148,11 +148,11 @@ export default function QuoteList(props: Props) {
       ignoreContainerClipping={ignoreContainerClipping}
       isDropDisabled={isDropDisabled}
       isCombineEnabled={isCombineEnabled}
-      whenDraggingClone={
+      renderClone={
         useClone
-          ? (provided, snapshot, source) => (
+          ? (provided, snapshot) => (
               <QuoteItem
-                quote={quotes[source.index]}
+                quote={quotes[snapshot.descriptor.index]}
                 provided={provided}
                 isDragging={snapshot.isDragging}
                 isClone

@@ -19,7 +19,7 @@ export const homeOwnProps: OwnProps = {
   ignoreContainerClipping: false,
   children: () => null,
   getContainerForClone: getBodyElement,
-  whenDraggingClone: null,
+  renderClone: null,
 };
 
 export const foreignOwnProps: OwnProps = {

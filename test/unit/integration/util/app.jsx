@@ -24,16 +24,11 @@ export type Item = {|
 
 export type RenderItem = (
   item: Item,
-) => (
-  provided: DraggableProvided,
-  snapshot: DraggableStateSnapshot,
-  location?: DraggableLocation,
-) => Node;
+) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot) => Node;
 
 export const defaultItemRender: RenderItem = (item: Item) => (
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
-  location?: DraggableLocation,
 ) => (
   <div
     {...provided.draggableProps}
@@ -42,7 +37,7 @@ export const defaultItemRender: RenderItem = (item: Item) => (
     data-is-drop-animating={snapshot.isDropAnimating}
     data-is-combining={Boolean(snapshot.combineWith)}
     data-is-combine-target={Boolean(snapshot.combineTargetFor)}
-    data-is-clone={Boolean(location)}
+    data-is-clone={snapshot.isClone}
     data-testid={item.id}
     ref={provided.innerRef}
   >
@@ -104,10 +99,9 @@ export default function App(props: Props) {
     return function result(
       provided: DraggableProvided,
       snapshot: DraggableStateSnapshot,
-      location: DraggableLocation,
     ): Node {
-      const item: Item = items[location.index];
-      return render(item)(provided, snapshot, location);
+      const item: Item = items[snapshot.descriptor.index];
+      return render(item)(provided, snapshot);
     };
   })();
 
@@ -123,7 +117,7 @@ export default function App(props: Props) {
         droppableId="droppable"
         direction={direction}
         isCombineEnabled={isCombineEnabled}
-        whenDraggingClone={renderClone}
+        renderClone={renderClone}
         getContainerForClone={props.getContainerForClone}
       >
         {(droppableProvided: DroppableProvided) => (

@@ -59,21 +59,13 @@ export const renderItemAndSpy = (mock: JestMockFn<*, *>): RenderItem => (
   item: Item,
 ) => {
   const render = defaultItemRender(item);
-  return (
-    provided: DraggableProvided,
-    snapshot: DraggableStateSnapshot,
-    location?: DraggableLocation,
-  ) => {
-    mock(provided, snapshot, location);
-    return render(provided, snapshot, location);
+  return (provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
+    mock(provided, snapshot);
+    return render(provided, snapshot);
   };
 };
 
-export type Call = [
-  DraggableProvided,
-  DraggableStateSnapshot,
-  ?DraggableLocation,
-];
+export type Call = [DraggableProvided, DraggableStateSnapshot];
 
 export const getCallsFor = (
   id: DraggableId,
@@ -103,7 +95,7 @@ export const getSnapshotsFor = (
   });
 };
 
-export function getLast(values: Call[]): ?Call {
+export function getLast<T>(values: T[]): ?T {
   return values[values.length - 1] || null;
 }
 

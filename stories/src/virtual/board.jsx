@@ -118,7 +118,7 @@ const Column = React.memo(function Column(props: ColumnProps) {
       <Droppable
         droppableId={columnId}
         mode="VIRTUAL"
-        whenDraggingClone={(
+        renderClone={(
           provided: DraggableProvided,
           snapshot: DraggableStateSnapshot,
           source: DraggableLocation,

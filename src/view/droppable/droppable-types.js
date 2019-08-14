@@ -33,8 +33,7 @@ export type Provided = {|
 export type RenderClone = (
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
-  source: DraggableLocation,
-) => Node;
+) => Node | null;
 
 export type UseClone = {|
   draggableId: DraggableId,
@@ -69,7 +68,7 @@ export type DefaultProps = {|
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
   direction: Direction,
-  whenDraggingClone: ?RenderClone,
+  renderClone: ?RenderClone,
   ignoreContainerClipping: boolean,
   getContainerForClone: () => HTMLElement,
 |};
@@ -82,7 +81,7 @@ export type OwnProps = {|
   ...DefaultProps,
   children: (Provided, StateSnapshot) => Node,
   droppableId: DroppableId,
-  whenDraggingClone: ?RenderClone,
+  renderClone: ?RenderClone,
 |};
 
 export type Props = {|

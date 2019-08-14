@@ -28,17 +28,19 @@ export default function Draggable(props: Props) {
   const getRef = useCallback((): ?HTMLElement => ref.current, []);
 
   // context
-  const { contextId, liftInstructionId } = useRequiredContext(AppContext);
+  const { contextId, liftInstructionId, registry } = useRequiredContext(
+    AppContext,
+  );
 
   // props
   const {
     // ownProps
     children,
+    descriptor,
     draggableId,
     isEnabled,
     shouldRespectForcePress,
     canDragInteractiveElements,
-    index,
     isClone,
 
     // mapProps
@@ -62,20 +64,20 @@ export default function Draggable(props: Props) {
   if (!isClone) {
     const forPublisher: PublisherArgs = useMemo(
       () => ({
-        draggableId,
-        index,
+        descriptor,
+        registry,
         getDraggableRef: getRef,
         canDragInteractiveElements,
         shouldRespectForcePress,
         isEnabled,
       }),
       [
-        canDragInteractiveElements,
-        draggableId,
+        descriptor,
+        registry,
         getRef,
-        index,
-        isEnabled,
+        canDragInteractiveElements,
         shouldRespectForcePress,
+        isEnabled,
       ],
     );
     useDraggablePublisher(forPublisher);

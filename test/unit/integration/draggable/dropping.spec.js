@@ -88,6 +88,7 @@ it('should provide the correct snapshot to consumers', () => {
   const expected: DraggableStateSnapshot = {
     isDragging: true,
     isDropAnimating: true,
+    isClone: false,
     dropAnimation: dropping,
     // due to the movement we are no longer over a droppable due
     // do not dimensions being set
@@ -135,6 +136,7 @@ it('should animate scale and opacity when combining', () => {
       const expected: DraggableStateSnapshot = {
         isDragging: true,
         isDropAnimating: true,
+        isClone: false,
         dropAnimation: dropping,
         draggingOver: 'droppable',
         combineWith: '1',
@@ -156,6 +158,7 @@ it('should animate scale and opacity when combining', () => {
       const expected: DraggableStateSnapshot = {
         isDragging: false,
         isDropAnimating: false,
+        isClone: false,
         dropAnimation: null,
         draggingOver: null,
         combineWith: null,

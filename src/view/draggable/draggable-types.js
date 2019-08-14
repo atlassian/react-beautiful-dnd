@@ -9,6 +9,7 @@ import type {
   MovementMode,
   ContextId,
   ElementId,
+  DraggableDescriptor,
 } from '../../types';
 import { dropAnimationFinished } from '../../state/action-creators';
 
@@ -97,6 +98,8 @@ export type DropAnimation = {|
 export type StateSnapshot = {|
   isDragging: boolean,
   isDropAnimating: boolean,
+  isClone: boolean,
+  descriptor: DraggableDescriptor,
   dropAnimation: ?DropAnimation,
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
@@ -154,7 +157,6 @@ export type PublicOwnProps = {|
 export type PrivateOwnProps = {|
   ...PublicOwnProps,
   isClone: boolean,
-
   // no longer optional
   isEnabled: boolean,
   canDragInteractiveElements: boolean,
@@ -163,6 +165,7 @@ export type PrivateOwnProps = {|
 
 export type OwnProps = {|
   ...PrivateOwnProps,
+  descriptor: DraggableDescriptor,
 |};
 
 export type Props = {|

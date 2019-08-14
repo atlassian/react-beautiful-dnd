@@ -18,6 +18,7 @@ export type {
   DraggableId,
   DroppableId,
   MovementMode,
+  DraggableDescriptor,
   DragStart,
   DragUpdate,
   DropResult,

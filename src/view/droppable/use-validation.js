@@ -69,8 +69,8 @@ const standard: CheckFn[] = [
 const virtual: CheckFn[] = [
   function hasClone({ props }: Args) {
     invariant(
-      props.whenDraggingClone,
-      'Must provide a clone render function (whenDraggingClone) for virtual lists',
+      props.renderClone,
+      'Must provide a clone render function (renderClone) for virtual lists',
     );
   },
   function hasNoPlaceholder({ getPlaceholderRef }: Args) {
