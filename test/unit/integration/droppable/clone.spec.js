@@ -2,7 +2,7 @@
 import React from 'react';
 import invariant from 'tiny-invariant';
 import { render } from '@testing-library/react';
-import { type DraggableLocation } from '../../../../src';
+import { type DraggableStateSnapshot } from '../../../../src';
 import { simpleLift, keyboard, expandedMouse } from '../util/controls';
 import getBodyElement from '../../../../src/view/get-body-element';
 import {
@@ -67,15 +67,27 @@ it('should give the clone the starting location', () => {
   const renderItem: RenderItem = renderItemAndSpy(spy);
   const { getByTestId } = render(<App renderItem={renderItem} useClone />);
 
-  simpleLift(keyboard, getByTestId('0'));
+  simpleLift(keyboard, getByTestId('1'));
 
-  const last: ?Call = getLast(getCallsFor('0', spy));
+  const last: ?Call = getLast(getCallsFor('1', spy));
   invariant(last);
-  const expected: DraggableLocation = {
-    droppableId: 'droppable',
-    index: 0,
+  const expected: DraggableStateSnapshot = {
+    descriptor: {
+      id: '1',
+      index: 1,
+      droppableId: 'droppable',
+      type: 'DEFAULT',
+    },
+    isClone: true,
+    isDragging: true,
+    isDropAnimating: false,
+    dropAnimation: null,
+    combineTargetFor: null,
+    combineWith: null,
+    draggingOver: 'droppable',
+    mode: 'SNAP',
   };
-  expect(last[2]).toEqual(expected);
+  expect(last[1]).toEqual(expected);
 });
 
 // this test is indirectly validating that a clone does not talk the registry or marshal

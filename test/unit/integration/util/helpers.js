@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position, BoxModel } from 'css-box-model';
-import type { DropReason, DraggableLocation } from '../../../../src/types';
+import type { DropReason, DraggableDescriptor } from '../../../../src/types';
 import * as attributes from '../../../../src/view/data-attributes';
 import { defaultItemRender, type RenderItem, type Item } from './app';
 import {
@@ -163,7 +163,11 @@ export const withPoorDimensionMocks = (fn: (typeof preset) => void): void => {
   }
 };
 
-export const atRest: DraggableStateSnapshot = {
+export const getAtRest = (
+  descriptor: DraggableDescriptor,
+): DraggableStateSnapshot => ({
+  descriptor,
+  isClone: false,
   isDragging: false,
   isDropAnimating: false,
   dropAnimation: null,
@@ -171,4 +175,4 @@ export const atRest: DraggableStateSnapshot = {
   combineWith: null,
   combineTargetFor: null,
   mode: null,
-};
+});
