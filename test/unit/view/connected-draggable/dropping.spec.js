@@ -44,7 +44,6 @@ it('should move to the new home offset', () => {
       combineWith: null,
       dropping,
       snapshot: getDraggingSnapshot({
-        descriptor: preset.inHome1.descriptor,
         draggingOver: preset.home.descriptor.id,
         mode: current.completed.result.mode,
         combineWith: null,
@@ -111,7 +110,6 @@ it('should maintain combine information', () => {
       combineWith: preset.inHome2.descriptor.id,
       dropping,
       snapshot: getDraggingSnapshot({
-        descriptor: preset.inHome1.descriptor,
         mode: withCombine.completed.result.mode,
         combineWith: preset.inHome2.descriptor.id,
         dropping,

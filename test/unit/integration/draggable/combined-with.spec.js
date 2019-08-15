@@ -37,12 +37,6 @@ it('should update the snapshot of an item being combined with', () => {
 
     const snapshot = getLast(getSnapshotsFor('1', spy));
     const expected: DraggableStateSnapshot = {
-      descriptor: {
-        id: '1',
-        droppableId: 'droppable',
-        type: 'DEFAULT',
-        index: 1,
-      },
       isDragging: false,
       isDropAnimating: false,
       isClone: false,

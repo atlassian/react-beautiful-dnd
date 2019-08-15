@@ -1,11 +1,13 @@
 // @flow
 import { useRef } from 'react';
 import { useMemo, useCallback } from 'use-memo-one';
+import type { DraggableDescriptor } from '../../types';
 import getStyle from './get-style';
 import useDraggablePublisher, {
   type Args as PublisherArgs,
 } from '../use-draggable-publisher/use-draggable-publisher';
 import AppContext from '../context/app-context';
+import DroppableContext from '../context/droppable-context';
 import type {
   Props,
   Provided,
@@ -31,12 +33,22 @@ export default function Draggable(props: Props) {
   const { contextId, liftInstructionId, registry } = useRequiredContext(
     AppContext,
   );
+  const { type, droppableId } = useRequiredContext(DroppableContext);
+
+  const descriptor: DraggableDescriptor = useMemo(
+    () => ({
+      id: props.draggableId,
+      index: props.index,
+      type,
+      droppableId,
+    }),
+    [props.draggableId, props.index, type, droppableId],
+  );
 
   // props
   const {
     // ownProps
     children,
-    descriptor,
     draggableId,
     isEnabled,
     shouldRespectForcePress,
@@ -140,5 +152,5 @@ export default function Draggable(props: Props) {
     return result;
   }, [contextId, dragHandleProps, draggableId, mapped, onMoveEnd, setRef]);
 
-  return children(provided, mapped.snapshot);
+  return children(provided, mapped.snapshot, descriptor);
 }

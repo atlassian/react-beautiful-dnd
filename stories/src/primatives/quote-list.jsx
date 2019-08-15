@@ -150,9 +150,9 @@ export default function QuoteList(props: Props) {
       isCombineEnabled={isCombineEnabled}
       renderClone={
         useClone
-          ? (provided, snapshot) => (
+          ? (provided, snapshot, descriptor) => (
               <QuoteItem
-                quote={quotes[snapshot.descriptor.index]}
+                quote={quotes[descriptor.index]}
                 provided={provided}
                 isDragging={snapshot.isDragging}
                 isClone

@@ -9,7 +9,7 @@ import {
   type DraggableStateSnapshot,
   type Sensor,
   type Direction,
-  type DraggableLocation,
+  type DraggableDescriptor,
 } from '../../../../src';
 
 export type Item = {|
@@ -99,8 +99,9 @@ export default function App(props: Props) {
     return function result(
       provided: DraggableProvided,
       snapshot: DraggableStateSnapshot,
+      descriptor: DraggableDescriptor,
     ): Node {
-      const item: Item = items[snapshot.descriptor.index];
+      const item: Item = items[descriptor.index];
       return render(item)(provided, snapshot);
     };
   })();

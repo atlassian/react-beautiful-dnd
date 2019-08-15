@@ -10,6 +10,7 @@ import type {
   ContextId,
   DraggableLocation,
   DroppableMode,
+  DraggableDescriptor,
 } from '../../types';
 import type {
   StateSnapshot as DraggableStateSnapshot,
@@ -33,6 +34,7 @@ export type Provided = {|
 export type RenderClone = (
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
+  descriptor: DraggableDescriptor,
 ) => Node | null;
 
 export type UseClone = {|

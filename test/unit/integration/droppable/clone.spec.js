@@ -72,12 +72,6 @@ it('should give the clone the starting location', () => {
   const last: ?Call = getLast(getCallsFor('1', spy));
   invariant(last);
   const expected: DraggableStateSnapshot = {
-    descriptor: {
-      id: '1',
-      index: 1,
-      droppableId: 'droppable',
-      type: 'DEFAULT',
-    },
     isClone: true,
     isDragging: true,
     isDropAnimating: false,

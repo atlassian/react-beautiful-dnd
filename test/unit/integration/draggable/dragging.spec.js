@@ -2,10 +2,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import App, { type RenderItem } from '../util/app';
-import {
-  type DraggableStateSnapshot,
-  type DraggableDescriptor,
-} from '../../../../src';
+import { type DraggableStateSnapshot } from '../../../../src';
 import { simpleLift, mouse, keyboard, expandedMouse } from '../util/controls';
 import {
   isDragging,
@@ -16,13 +13,6 @@ import {
 } from '../util/helpers';
 import { transitions, combine } from '../../../../src/animation';
 import { zIndexOptions } from '../../../../src/view/draggable/get-style';
-
-const descriptor: DraggableDescriptor = {
-  id: '0',
-  index: 0,
-  type: 'DEFAULT',
-  droppableId: 'droppable',
-};
 
 it('should move to a provided offset', () => {
   const { getByText } = render(<App />);
@@ -58,7 +48,6 @@ it('should pass on the snapshot', () => {
   {
     const snapshot = getLast(getSnapshotsFor('0', spy));
     const lift: DraggableStateSnapshot = {
-      descriptor,
       isDragging: true,
       isDropAnimating: false,
       isClone: false,
@@ -76,7 +65,6 @@ it('should pass on the snapshot', () => {
   {
     const snapshot = getLast(getSnapshotsFor('0', spy));
     const move: DraggableStateSnapshot = {
-      descriptor,
       isDragging: true,
       isDropAnimating: false,
       isClone: false,
@@ -122,7 +110,6 @@ it('should update the snapshot and opacity when combining with another item', ()
     const snapshot = getLast(getSnapshotsFor('0', spy));
 
     const expected: DraggableStateSnapshot = {
-      descriptor,
       isDragging: true,
       isDropAnimating: false,
       isClone: false,

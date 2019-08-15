@@ -23,7 +23,6 @@ it('should return the default map props and not break memoization', () => {
       shouldAnimateDisplacement: true,
       combineTargetFor: null,
       snapshot: getSecondarySnapshot({
-        descriptor: preset.inHome1.descriptor,
         combineTargetFor: null,
       }),
     },

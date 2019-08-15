@@ -1,12 +1,13 @@
 // @flow
 import invariant from 'tiny-invariant';
 import type { Position, BoxModel } from 'css-box-model';
-import type { DropReason, DraggableDescriptor } from '../../../../src/types';
+import type { DropReason } from '../../../../src/types';
 import * as attributes from '../../../../src/view/data-attributes';
 import { defaultItemRender, type RenderItem, type Item } from './app';
 import {
   type DraggableProvided,
   type DraggableStateSnapshot,
+  type DraggableDescriptor,
   type DraggableId,
 } from '../../../../src';
 import { getComputedSpacing, getPreset } from '../../../util/dimension';
@@ -65,7 +66,11 @@ export const renderItemAndSpy = (mock: JestMockFn<*, *>): RenderItem => (
   };
 };
 
-export type Call = [DraggableProvided, DraggableStateSnapshot];
+export type Call = [
+  DraggableProvided,
+  DraggableStateSnapshot,
+  DraggableDescriptor,
+];
 
 export const getCallsFor = (
   id: DraggableId,
@@ -163,10 +168,7 @@ export const withPoorDimensionMocks = (fn: (typeof preset) => void): void => {
   }
 };
 
-export const getAtRest = (
-  descriptor: DraggableDescriptor,
-): DraggableStateSnapshot => ({
-  descriptor,
+export const atRest: DraggableStateSnapshot = {
   isClone: false,
   isDragging: false,
   isDropAnimating: false,
@@ -175,4 +177,4 @@ export const getAtRest = (
   combineWith: null,
   combineTargetFor: null,
   mode: null,
-});
+};

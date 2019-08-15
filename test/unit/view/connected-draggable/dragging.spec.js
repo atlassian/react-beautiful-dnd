@@ -45,7 +45,6 @@ draggingStates.forEach((current: IsDraggingState) => {
           combineWith: null,
           forceShouldAnimate: null,
           snapshot: getDraggingSnapshot({
-            descriptor: preset.inHome1.descriptor,
             mode: 'FLUID',
             draggingOver: preset.home.descriptor.id,
             combineWith: null,

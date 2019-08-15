@@ -86,12 +86,6 @@ it('should provide the correct snapshot to consumers', () => {
     scale: null,
   };
   const expected: DraggableStateSnapshot = {
-    descriptor: {
-      id: '0',
-      index: 0,
-      type: 'DEFAULT',
-      droppableId: 'droppable',
-    },
     isDragging: true,
     isDropAnimating: true,
     isClone: false,
@@ -140,12 +134,6 @@ it('should animate scale and opacity when combining', () => {
         scale: combine.scale.drop,
       };
       const expected: DraggableStateSnapshot = {
-        descriptor: {
-          id: '0',
-          index: 0,
-          type: 'DEFAULT',
-          droppableId: 'droppable',
-        },
         isDragging: true,
         isDropAnimating: true,
         isClone: false,
@@ -168,12 +156,6 @@ it('should animate scale and opacity when combining', () => {
     {
       const snapshot = getLast(getSnapshotsFor('0', spy));
       const expected: DraggableStateSnapshot = {
-        descriptor: {
-          id: '0',
-          index: 0,
-          type: 'DEFAULT',
-          droppableId: 'droppable',
-        },
         isDragging: false,
         isDropAnimating: false,
         isClone: false,

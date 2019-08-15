@@ -99,7 +99,6 @@ export type StateSnapshot = {|
   isDragging: boolean,
   isDropAnimating: boolean,
   isClone: boolean,
-  descriptor: DraggableDescriptor,
   dropAnimation: ?DropAnimation,
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
@@ -141,7 +140,11 @@ export type MapProps = {|
   // secondary: ?SecondaryMapProps,
 |};
 
-export type ChildrenFn = (Provided, StateSnapshot) => Node | null;
+export type ChildrenFn = (
+  Provided,
+  StateSnapshot,
+  DraggableDescriptor,
+) => Node | null;
 
 export type PublicOwnProps = {|
   draggableId: DraggableId,
@@ -165,7 +168,6 @@ export type PrivateOwnProps = {|
 
 export type OwnProps = {|
   ...PrivateOwnProps,
-  descriptor: DraggableDescriptor,
 |};
 
 export type Props = {|

@@ -10,7 +10,6 @@ import isStrictEqual from '../is-strict-equal';
 import { curves, combine } from '../../animation';
 import { dropAnimationFinished as dropAnimationFinishedAction } from '../../state/action-creators';
 import type {
-  TypeId,
   State,
   DraggableId,
   DroppableId,
@@ -21,7 +20,6 @@ import type {
   MovementMode,
   DropResult,
   LiftEffect,
-  DraggableDescriptor,
 } from '../../types';
 import type {
   MapProps,
@@ -56,14 +54,12 @@ function getDraggableSelector(): TrySelect {
 
   const getMemoizedSnapshot = memoizeOne(
     (
-      descriptor: DraggableDescriptor,
       mode: MovementMode,
       isClone: boolean,
       draggingOver: ?DroppableId,
       combineWith: ?DraggableId,
       dropping: ?DropAnimation,
     ): StateSnapshot => ({
-      descriptor,
       isDragging: true,
       isClone,
       isDropAnimating: Boolean(dropping),
@@ -76,7 +72,6 @@ function getDraggableSelector(): TrySelect {
   );
 
   const getMemoizedProps = memoizeOne((
-    descriptor: DraggableDescriptor,
     offset: Position,
     mode: MovementMode,
     dimension: DraggableDimension,
@@ -97,7 +92,6 @@ function getDraggableSelector(): TrySelect {
       dimension,
       forceShouldAnimate,
       snapshot: getMemoizedSnapshot(
-        descriptor,
         mode,
         isClone,
         draggingOver,
@@ -124,7 +118,6 @@ function getDraggableSelector(): TrySelect {
       const forceShouldAnimate: ?boolean = state.forceShouldAnimate;
 
       return getMemoizedProps(
-        ownProps.descriptor,
         memoizedOffset(offset.x, offset.y),
         state.movementMode,
         dimension,
@@ -142,7 +135,6 @@ function getDraggableSelector(): TrySelect {
         return null;
       }
 
-      const descriptor: DraggableDescriptor = ownProps.descriptor;
       const isClone: boolean = ownProps.isClone;
       const dimension: DraggableDimension =
         state.dimensions.draggables[ownProps.draggableId];
@@ -173,7 +165,6 @@ function getDraggableSelector(): TrySelect {
           mode,
           forceShouldAnimate: null,
           snapshot: getMemoizedSnapshot(
-            descriptor,
             mode,
             isClone,
             draggingOver,
@@ -190,12 +181,8 @@ function getDraggableSelector(): TrySelect {
   return selector;
 }
 
-function getSecondarySnapshot(
-  descriptor: DraggableDescriptor,
-  combineTargetFor: ?DraggableId,
-): StateSnapshot {
+function getSecondarySnapshot(combineTargetFor: ?DraggableId): StateSnapshot {
   return {
-    descriptor,
     isDragging: false,
     isDropAnimating: false,
     isClone: false,
@@ -207,6 +194,16 @@ function getSecondarySnapshot(
   };
 }
 
+const atRest: MapProps = {
+  mapped: {
+    type: 'SECONDARY',
+    offset: origin,
+    combineTargetFor: null,
+    shouldAnimateDisplacement: true,
+    snapshot: getSecondarySnapshot(null),
+  },
+};
+
 function getSecondarySelector(): TrySelect {
   const memoizedOffset = memoizeOne((x: number, y: number): Position => ({
     x,
@@ -217,7 +214,6 @@ function getSecondarySelector(): TrySelect {
 
   const getMemoizedProps = memoizeOne(
     (
-      descriptor: DraggableDescriptor,
       offset: Position,
       combineTargetFor: ?DraggableId = null,
       shouldAnimateDisplacement: boolean,
@@ -227,31 +223,28 @@ function getSecondarySelector(): TrySelect {
         offset,
         combineTargetFor,
         shouldAnimateDisplacement,
-        snapshot: getMemoizedSnapshot(descriptor, combineTargetFor),
+        snapshot: getMemoizedSnapshot(combineTargetFor),
       },
     }),
   );
 
   // Is we are the combine target for something then we need to publish that
   // otherwise we will return null to get the default props
-  const getFallback = (
-    descriptor: DraggableDescriptor,
-    combineTargetFor: ?DraggableId,
-  ): ?MapProps => {
+  const getFallback = (combineTargetFor: ?DraggableId): ?MapProps => {
     return combineTargetFor
-      ? getMemoizedProps(descriptor, origin, combineTargetFor, true)
+      ? getMemoizedProps(origin, combineTargetFor, true)
       : null;
   };
 
   const getProps = (
-    descriptor: DraggableDescriptor,
+    ownId: DraggableId,
     draggingId: DraggableId,
     impact: DragImpact,
     afterCritical: LiftEffect,
   ): ?MapProps => {
-    const displacement: ?Displacement = impact.displaced.visible[descriptor.id];
+    const displacement: ?Displacement = impact.displaced.visible[ownId];
     const isAfterCriticalInVirtualList: boolean = Boolean(
-      afterCritical.inVirtualList && afterCritical.effected[descriptor.id],
+      afterCritical.inVirtualList && afterCritical.effected[ownId],
     );
 
     const combineTargetFor: ?DraggableId = tryGetCombine(impact)
@@ -260,24 +253,23 @@ function getSecondarySelector(): TrySelect {
 
     if (!displacement) {
       if (!isAfterCriticalInVirtualList) {
-        return getFallback(descriptor, combineTargetFor);
+        return getFallback(combineTargetFor);
       }
 
       // when not over a list we close the gap
 
       const change: Position = negate(afterCritical.displacedBy.point);
       const offset: Position = memoizedOffset(change.x, change.y);
-      return getMemoizedProps(descriptor, offset, combineTargetFor, true);
+      return getMemoizedProps(offset, combineTargetFor, true);
     }
 
     if (isAfterCriticalInVirtualList) {
-      return getFallback(descriptor, combineTargetFor);
+      return getFallback(combineTargetFor);
     }
     const displaceBy: Position = impact.displacedBy.point;
     const offset: Position = memoizedOffset(displaceBy.x, displaceBy.y);
 
     return getMemoizedProps(
-      descriptor,
       offset,
       combineTargetFor,
       displacement.shouldAnimate,
@@ -293,7 +285,7 @@ function getSecondarySelector(): TrySelect {
       }
 
       return getProps(
-        ownProps.descriptor,
+        ownProps.draggableId,
         state.critical.draggable.id,
         state.impact,
         state.afterCritical,
@@ -308,7 +300,7 @@ function getSecondarySelector(): TrySelect {
         return null;
       }
       return getProps(
-        ownProps.descriptor,
+        ownProps.draggableId,
         completed.result.draggableId,
         completed.impact,
         completed.afterCritical,
@@ -325,28 +317,13 @@ function getSecondarySelector(): TrySelect {
 // Returning a function to ensure each
 // Draggable gets its own selector
 export const makeMapStateToProps = (): Selector => {
-  const getRestingMapProps = memoizeOne(
-    (descriptor: DraggableDescriptor): MapProps => ({
-      mapped: {
-        type: 'SECONDARY',
-        offset: origin,
-        combineTargetFor: null,
-        shouldAnimateDisplacement: true,
-        snapshot: getSecondarySnapshot(descriptor, null),
-      },
-    }),
-  );
-
   const draggingSelector: TrySelect = getDraggableSelector();
   const secondarySelector: TrySelect = getSecondarySelector();
 
-  const selector = (state: State, ownProps: OwnProps): MapProps => {
-    return (
-      draggingSelector(state, ownProps) ||
-      secondarySelector(state, ownProps) ||
-      getRestingMapProps(ownProps.descriptor)
-    );
-  };
+  const selector = (state: State, ownProps: OwnProps): MapProps =>
+    draggingSelector(state, ownProps) ||
+    secondarySelector(state, ownProps) ||
+    atRest;
 
   return selector;
 };

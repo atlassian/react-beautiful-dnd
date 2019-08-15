@@ -47,7 +47,6 @@ it('should use result for providing data and not the impact', () => {
       combineWith: null,
       dropping,
       snapshot: getDraggingSnapshot({
-        descriptor: preset.inHome1.descriptor,
         mode: current.completed.result.mode,
         // using result
         draggingOver: null,

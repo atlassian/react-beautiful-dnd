@@ -11,7 +11,6 @@ import type {
 } from '../../../../../src/types';
 
 type GetDraggingSnapshotArgs = {|
-  descriptor: DraggableDescriptor,
   mode: MovementMode,
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
@@ -20,14 +19,12 @@ type GetDraggingSnapshotArgs = {|
 |};
 
 export const getDraggingSnapshot = ({
-  descriptor,
   mode,
   draggingOver,
   combineWith,
   dropping,
   isClone,
 }: GetDraggingSnapshotArgs): StateSnapshot => ({
-  descriptor,
   isDragging: true,
   isDropAnimating: Boolean(dropping),
   dropAnimation: dropping,
@@ -39,15 +36,12 @@ export const getDraggingSnapshot = ({
 });
 
 type GetSecondarySnapshotArgs = {|
-  descriptor: DraggableDescriptor,
   combineTargetFor: ?DraggableId,
 |};
 
 export const getSecondarySnapshot = ({
-  descriptor,
   combineTargetFor,
 }: GetSecondarySnapshotArgs): StateSnapshot => ({
-  descriptor,
   isDragging: false,
   isClone: false,
   isDropAnimating: false,

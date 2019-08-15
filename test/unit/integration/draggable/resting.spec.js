@@ -2,7 +2,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import App, { type RenderItem } from '../util/app';
-import { renderItemAndSpy, getAtRest, getSnapshotsFor } from '../util/helpers';
+import { renderItemAndSpy, atRest, getSnapshotsFor } from '../util/helpers';
 
 it('should have no movement when at rest', () => {
   const { getByText } = render(<App />);
@@ -21,12 +21,5 @@ it('should have a resting snapshot', () => {
 
   const snapshots = getSnapshotsFor('0', snapshotSpy);
   expect(snapshots).toHaveLength(1);
-  expect(snapshots[0]).toEqual(
-    getAtRest({
-      id: '0',
-      index: 0,
-      droppableId: 'droppable',
-      type: 'DEFAULT',
-    }),
-  );
+  expect(snapshots[0]).toEqual(atRest);
 });
