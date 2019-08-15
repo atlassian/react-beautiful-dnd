@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { useMemo, useCallback } from 'use-memo-one';
 import React, { useRef, useContext, type Node } from 'react';
 import type { DraggableId } from '../../types';
-import type { Props, Provided, UseClone } from './droppable-types';
+import type { Props, Provided } from './droppable-types';
 import useDroppablePublisher from '../use-droppable-publisher';
 import Placeholder from '../placeholder';
 import AppContext, { type AppContextValue } from '../context/app-context';
@@ -135,12 +135,12 @@ export default function Droppable(props: Props) {
     if (!useClone) {
       return null;
     }
-    const { draggableId, source, render } = useClone;
+    const { dragging, render } = useClone;
 
     const node: Node = (
       <PrivateDraggable
-        draggableId={draggableId}
-        index={source.index}
+        draggableId={dragging.id}
+        index={dragging.index}
         isClone
         isEnabled
         // not important as drag has already started
@@ -150,7 +150,7 @@ export default function Droppable(props: Props) {
         {(
           draggableProvided: DraggableProvided,
           draggableSnapshot: DraggableStateSnapshot,
-        ) => render(draggableProvided, draggableSnapshot, source)}
+        ) => render(draggableProvided, draggableSnapshot, dragging)}
       </PrivateDraggable>
     );
 

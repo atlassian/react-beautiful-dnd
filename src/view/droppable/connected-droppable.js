@@ -30,7 +30,6 @@ import whatIsDraggedOver from '../../state/droppable/what-is-dragged-over';
 import { updateViewportMaxScroll as updateViewportMaxScrollAction } from '../../state/action-creators';
 import StoreContext from '../context/store-context';
 import whatIsDraggedOverFromResult from '../../state/droppable/what-is-dragged-over-from-result';
-import getHomeLocation from '../../state/get-home-location';
 
 const isMatchingType = (type: TypeId, critical: Critical): boolean =>
   type === critical.droppable.type;
@@ -73,8 +72,7 @@ export const makeMapStateToProps = (): Selector => {
         const useClone: ?UseClone = renderClone
           ? {
               render: renderClone,
-              draggableId: dragging.descriptor.id,
-              source: getHomeLocation(dragging.descriptor),
+              dragging: dragging.descriptor,
             }
           : null;
 

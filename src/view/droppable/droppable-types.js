@@ -8,9 +8,8 @@ import type {
   Placeholder,
   State,
   ContextId,
-  DraggableLocation,
-  DroppableMode,
   DraggableDescriptor,
+  DroppableMode,
 } from '../../types';
 import type {
   StateSnapshot as DraggableStateSnapshot,
@@ -38,8 +37,7 @@ export type RenderClone = (
 ) => Node | null;
 
 export type UseClone = {|
-  draggableId: DraggableId,
-  source: DraggableLocation,
+  dragging: DraggableDescriptor,
   render: RenderClone,
 |};
 
