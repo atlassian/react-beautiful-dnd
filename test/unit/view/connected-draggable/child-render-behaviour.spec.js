@@ -1,7 +1,7 @@
 // @flow
 import React, { Component, type Node } from 'react';
 import { render } from '@testing-library/react';
-import { DragDropContext } from '../../../../src';
+import { DragDropContext, type DraggableDescriptor } from '../../../../src';
 import { getPreset } from '../../../util/dimension';
 import Draggable from '../../../../src/view/draggable/connected-draggable';
 import type { Provided } from '../../../../src/view/draggable/draggable-types';
@@ -37,11 +37,22 @@ type Props = {|
   children: (currentUser: string, dragProvided: Provided) => Node,
 |};
 
+const descriptor: DraggableDescriptor = {
+  id: 'drag-1',
+  index: 0,
+  droppableId: droppableContext.droppableId,
+  type: droppableContext.type,
+};
+
 function App({ currentUser, children }: Props) {
   return (
     <DragDropContext onDragEnd={() => {}}>
       <DroppableContext.Provider value={droppableContext}>
-        <Draggable draggableId="drag-1" index={0}>
+        <Draggable
+          draggableId={descriptor.id}
+          index={descriptor.index}
+          descriptor={descriptor}
+        >
           {dragProvided => children(currentUser, dragProvided)}
         </Draggable>
       </DroppableContext.Provider>

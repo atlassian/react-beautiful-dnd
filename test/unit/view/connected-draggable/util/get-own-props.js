@@ -13,4 +13,7 @@ export default (dimension: DraggableDimension): OwnProps => ({
   isEnabled: true,
   canDragInteractiveElements: false,
   shouldRespectForcePress: true,
+
+  // Own props
+  descriptor: dimension.descriptor,
 });

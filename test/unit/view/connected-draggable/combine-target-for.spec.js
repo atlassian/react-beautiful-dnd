@@ -46,6 +46,7 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
           shouldAnimateDisplacement: false,
           combineTargetFor: preset.inHome1.descriptor.id,
           snapshot: getSecondarySnapshot({
+            descriptor: ownProps.descriptor,
             combineTargetFor: preset.inHome1.descriptor.id,
           }),
         },
@@ -62,6 +63,7 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
           shouldAnimateDisplacement: false,
           combineTargetFor: preset.inHome1.descriptor.id,
           snapshot: getSecondarySnapshot({
+            descriptor: ownProps.descriptor,
             combineTargetFor: preset.inHome1.descriptor.id,
           }),
         },

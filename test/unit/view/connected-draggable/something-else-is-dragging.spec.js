@@ -117,6 +117,7 @@ draggingStates.forEach((current: IsDraggingState) => {
             offset: displacedBy.point,
             combineTargetFor: null,
             snapshot: getSecondarySnapshot({
+              descriptor: ownProps.descriptor,
               combineTargetFor: null,
             }),
           },
@@ -149,6 +150,7 @@ draggingStates.forEach((current: IsDraggingState) => {
             offset: displacedBy.point,
             combineTargetFor: null,
             snapshot: getSecondarySnapshot({
+              descriptor: ownProps.descriptor,
               combineTargetFor: null,
             }),
           },
@@ -201,6 +203,7 @@ draggingStates.forEach((current: IsDraggingState) => {
             shouldAnimateDisplacement: true,
             combineTargetFor: null,
             snapshot: getSecondarySnapshot({
+              descriptor: ownProps.descriptor,
               combineTargetFor: null,
             }),
           },
