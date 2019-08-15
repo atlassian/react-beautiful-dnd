@@ -8,6 +8,8 @@ import DroppableContext, {
   type DroppableContextValue,
 } from '../context/droppable-context';
 
+// We can use this to render a draggable with more control
+// It is used by a Droppable to render a clone
 export function PrivateDraggable(props: PrivateOwnProps) {
   const droppableContext: DroppableContextValue = useRequiredContext(
     DroppableContext,
@@ -22,6 +24,7 @@ export function PrivateDraggable(props: PrivateOwnProps) {
   return <ConnectedDraggable {...props} />;
 }
 
+// What we give to consumers
 export function PublicDraggable(props: PublicOwnProps) {
   // default values for props
   const isEnabled: boolean =

@@ -120,7 +120,7 @@ export default function Droppable(props: Props) {
     [contextId, droppableId, placeholder, setDroppableRef],
   );
 
-  const isUsingCloneFor: ?DraggableId = useClone ? useClone.draggableId : null;
+  const isUsingCloneFor: ?DraggableId = useClone ? useClone.dragging.id : null;
 
   const droppableContext: ?DroppableContextValue = useMemo(
     () => ({
