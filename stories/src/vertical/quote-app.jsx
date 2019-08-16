@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import type { Quote } from '../types';
 import type { DropResult } from '../../../src/types';
@@ -22,35 +22,24 @@ type Props = {|
   listStyle?: Object,
 |};
 
-type State = {|
-  quotes: Quote[],
-|};
+export default function QuoteApp(props: Props) {
+  const [quotes, setQuotes] = useState(() => props.initial);
 
-export default class QuoteApp extends Component<Props, State> {
-  /* eslint-disable react/sort-comp */
-  static defaultProps = {
-    isCombineEnabled: false,
-  };
-
-  state: State = {
-    quotes: this.props.initial,
-  };
-
-  onDragStart = () => {
+  function onDragStart() {
     // Add a little vibration if the browser supports it.
     // Add's a nice little physical feedback
     if (window.navigator.vibrate) {
       window.navigator.vibrate(100);
     }
-  };
+  }
 
-  onDragEnd = (result: DropResult) => {
+  function onDragEnd(result: DropResult) {
     // combining item
     if (result.combine) {
       // super simple: just removing the dragging item
-      const quotes: Quote[] = [...this.state.quotes];
-      quotes.splice(result.source.index, 1);
-      this.setState({ quotes });
+      const newQuotes: Quote[] = [...quotes];
+      newQuotes.splice(result.source.index, 1);
+      setQuotes(newQuotes);
       return;
     }
 
@@ -63,34 +52,26 @@ export default class QuoteApp extends Component<Props, State> {
       return;
     }
 
-    const quotes = reorder(
-      this.state.quotes,
+    const newQuotes = reorder(
+      quotes,
       result.source.index,
       result.destination.index,
     );
 
-    this.setState({
-      quotes,
-    });
-  };
-
-  render() {
-    const { quotes } = this.state;
-
-    return (
-      <DragDropContext
-        onDragStart={this.onDragStart}
-        onDragEnd={this.onDragEnd}
-      >
-        <Root>
-          <QuoteList
-            listId="list"
-            style={this.props.listStyle}
-            quotes={quotes}
-            isCombineEnabled={this.props.isCombineEnabled}
-          />
-        </Root>
-      </DragDropContext>
-    );
+    setQuotes(newQuotes);
   }
+
+  return (
+    <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+      <Root>
+        <QuoteList
+          useClone
+          listId="list"
+          style={props.listStyle}
+          quotes={quotes}
+          isCombineEnabled={props.isCombineEnabled}
+        />
+      </Root>
+    </DragDropContext>
+  );
 }
