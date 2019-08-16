@@ -16,6 +16,7 @@ import {
   isDropAnimating,
 } from '../util/helpers';
 import App, { type RenderItem } from '../util/app';
+import { withError } from '../../../util/console';
 
 it('should no longer render the original draggable while dragging', () => {
   const { getByTestId } = render(<App useClone />);
@@ -106,7 +107,14 @@ it('should allow reordering other items when dropping', () => {
 
     // starting a new drag with item 1 (which is in index 0 visually now)
     // using box0.center as the lifting point
-    expandedMouse.powerLift(getByTestId('1'), box0.center);
-    throw new Error('TODO');
+    // we are relying on a sync render from a dispatched action
+    // act(() => {}); is joining the two into one update which is
+    // causing unexpected mounting behaviour
+    withError(() => {
+      expandedMouse.rawPowerLift(getByTestId('1'), box0.center);
+    });
+
+    expect(isDragging(getByTestId('1'))).toBe(true);
+    expect(isDragging(getByTestId('0'))).toBe(false);
   });
 });

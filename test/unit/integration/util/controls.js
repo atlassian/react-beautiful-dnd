@@ -66,6 +66,25 @@ export const expandedMouse = {
       clientY: point.y + sloppyClickThreshold,
     });
   },
+  rawPowerLift: (handle: HTMLElement, point: Position) => {
+    const mousedown: MouseEvent = new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
+      clientX: point.x,
+      clientY: point.y,
+    });
+
+    handle.dispatchEvent(mousedown);
+
+    const mousemove: MouseEvent = new MouseEvent('mousemove', {
+      bubbles: true,
+      cancelable: true,
+      clientX: point.x,
+      clientY: point.y + sloppyClickThreshold,
+    });
+
+    handle.dispatchEvent(mousemove);
+  },
   move: (handle: HTMLElement, point: Position) => {
     fireEvent.mouseMove(handle, { clientX: point.x, clientY: point.y });
     // movements are throttled by raf

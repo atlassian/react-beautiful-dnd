@@ -170,11 +170,6 @@ function getStyle(provided: DraggableProvided, style: ?Object) {
 function QuoteItem(props: Props) {
   const { quote, isDragging, isGroupedOver, provided, style, isClone } = props;
 
-  useLayoutEffect(() => {
-    console.log('mounting', quote.id);
-    return () => console.log('unmounting', quote.id);
-  }, [quote.id]);
-
   return (
     <Container
       href={quote.author.url}

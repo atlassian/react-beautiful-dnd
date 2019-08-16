@@ -1,5 +1,6 @@
 // @flow
 import React, { useState, type Node } from 'react';
+import { useCallback } from 'use-memo-one';
 import {
   DragDropContext,
   Droppable,
@@ -10,7 +11,9 @@ import {
   type Sensor,
   type Direction,
   type DraggableDescriptor,
+  type DropResult,
 } from '../../../../src';
+import reorder from '../../../util/reorder';
 
 export type Item = {|
   id: string,
@@ -79,11 +82,27 @@ function withDefaultBool(value: ?boolean, defaultValue: boolean) {
 }
 
 export default function App(props: Props) {
+  const [items, setItems] = useState(() => props.items || getItems());
   const onDragStart = props.onDragStart || noop;
   const onDragUpdate = props.onDragUpdate || noop;
-  const onDragEnd = props.onDragEnd || noop;
+  const onDragEndProp = props.onDragEnd;
+
+  const onDragEnd = (result: DropResult) => {
+    if (result.destination) {
+      const reordered: Item[] = reorder(
+        items,
+        result.source.index,
+        result.destination.index,
+      );
+      setItems(reordered);
+    }
+
+    if (onDragEndProp) {
+      onDragEndProp(result);
+    }
+  };
+
   const sensors: Sensor[] = props.sensors || [];
-  const [items] = useState(() => props.items || getItems());
   const render: RenderItem = props.renderItem || defaultItemRender;
   const direction: Direction = props.direction || 'vertical';
   const isCombineEnabled: boolean = withDefaultBool(
