@@ -7,12 +7,8 @@ import {
   type DraggableStateSnapshot,
   type DropAnimation,
 } from '../../../../src';
-import {
-  simpleLift,
-  mouse,
-  getTransitionEnd,
-  expandedMouse,
-} from '../util/controls';
+import { simpleLift, mouse, getTransitionEnd } from '../util/controls';
+import expandedMouse from '../util/expanded-mouse';
 import {
   isDragging,
   isDropAnimating,
