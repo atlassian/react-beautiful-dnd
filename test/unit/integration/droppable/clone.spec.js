@@ -3,7 +3,8 @@ import React from 'react';
 import invariant from 'tiny-invariant';
 import { render } from '@testing-library/react';
 import { type DraggableStateSnapshot } from '../../../../src';
-import { simpleLift, keyboard, expandedMouse } from '../util/controls';
+import { simpleLift, keyboard } from '../util/controls';
+import expandedMouse from '../util/expanded-mouse';
 import getBodyElement from '../../../../src/view/get-body-element';
 import {
   withPoorDimensionMocks,

@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import type { DraggableStateSnapshot } from '../../../../src';
 import App, { type RenderItem } from '../util/app';
-import { expandedMouse } from '../util/controls';
+import expandedMouse from '../util/expanded-mouse';
 import {
   isDragging,
   renderItemAndSpy,
