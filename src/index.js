@@ -51,4 +51,5 @@ export type {
   DraggableStyle,
   DraggingStyle,
   NotDraggingStyle,
+  ChildrenFn as DraggableChildrenFn,
 } from './view/draggable/draggable-types';

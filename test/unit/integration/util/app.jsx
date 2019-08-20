@@ -1,6 +1,5 @@
 // @flow
 import React, { useState, type Node } from 'react';
-import { useCallback } from 'use-memo-one';
 import {
   DragDropContext,
   Droppable,
@@ -27,7 +26,11 @@ export type Item = {|
 
 export type RenderItem = (
   item: Item,
-) => (provided: DraggableProvided, snapshot: DraggableStateSnapshot) => Node;
+) => (
+  provided: DraggableProvided,
+  snapshot: DraggableStateSnapshot,
+  descriptor: DraggableDescriptor,
+) => Node;
 
 export const defaultItemRender: RenderItem = (item: Item) => (
   provided: DraggableProvided,
@@ -121,7 +124,7 @@ export default function App(props: Props) {
       descriptor: DraggableDescriptor,
     ): Node {
       const item: Item = items[descriptor.index];
-      return render(item)(provided, snapshot);
+      return render(item)(provided, snapshot, descriptor);
     };
   })();
 

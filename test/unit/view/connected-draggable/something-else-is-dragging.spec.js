@@ -39,56 +39,39 @@ const displacedBy: DisplacedBy = getDisplacedBy(
   preset.inHome1.displaceBy,
 );
 
+it('should not break memoization on multiple calls', () => {
+  const selector: Selector = makeMapStateToProps();
+  const defaultMapProps: MapProps = selector(state.idle, ownProps);
+
+  expect(
+    selector(
+      withImpact(move(state.dragging(), { x: 1, y: 2 }), noImpact),
+      ownProps,
+    ),
+  ).toBe(defaultMapProps);
+  expect(
+    selector(
+      withImpact(move(state.dragging(), { x: 1, y: 3 }), noImpact),
+      ownProps,
+    ),
+  ).toBe(defaultMapProps);
+  expect(
+    selector(
+      withImpact(move(state.dragging(), { x: 1, y: 4 }), noImpact),
+      ownProps,
+    ),
+  ).toBe(defaultMapProps);
+});
+
 draggingStates.forEach((current: IsDraggingState) => {
   describe(`in phase: ${current.phase}`, () => {
-    describe('nothing impacted by drag', () => {
-      it('should return the default props if not impacted by the drag', () => {
-        const selector: Selector = makeMapStateToProps();
-        const defaultMapProps: MapProps = selector(state.idle, ownProps);
+    it('should return the default props if not impacted by the drag', () => {
+      const selector: Selector = makeMapStateToProps();
+      const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
-        expect(selector(withImpact(state.dragging(), noImpact), ownProps)).toBe(
-          defaultMapProps,
-        );
-      });
-
-      it('should not break memoization on mulitple calls', () => {
-        const selector: Selector = makeMapStateToProps();
-        const defaultMapProps: MapProps = selector(state.idle, ownProps);
-
-        expect(
-          selector(
-            withImpact(move(state.dragging(), { x: 1, y: 2 }), noImpact),
-            ownProps,
-          ),
-        ).toBe(defaultMapProps);
-        expect(
-          selector(
-            withImpact(move(state.dragging(), { x: 1, y: 3 }), noImpact),
-            ownProps,
-          ),
-        ).toBe(defaultMapProps);
-        expect(
-          selector(
-            withImpact(move(state.dragging(), { x: 1, y: 4 }), noImpact),
-            ownProps,
-          ),
-        ).toBe(defaultMapProps);
-      });
-
-      it('should not break memoization moving between different dragging phases', () => {
-        const selector: Selector = makeMapStateToProps();
-        const defaultMapProps: MapProps = selector(state.idle, ownProps);
-
-        expect(selector(withImpact(state.dragging(), noImpact), ownProps)).toBe(
-          defaultMapProps,
-        );
-        expect(
-          selector(withImpact(state.collecting(), noImpact), ownProps),
-        ).toBe(defaultMapProps);
-        expect(
-          selector(withImpact(state.dropPending(), noImpact), ownProps),
-        ).toBe(defaultMapProps);
-      });
+      expect(selector(withImpact(state.dragging(), noImpact), ownProps)).toBe(
+        defaultMapProps,
+      );
     });
 
     describe('being displaced by drag', () => {
@@ -255,42 +238,55 @@ draggingStates.forEach((current: IsDraggingState) => {
   });
 });
 
-describe('something else impacted by drag (testing for memoization leaks)', () => {
-  it('should not break memoization moving between different dragging phases', () => {
-    const selector: Selector = makeMapStateToProps();
-    const impact: DragImpact = {
-      displaced: getForcedDisplacement({
-        visible: [
-          { dimension: preset.inHome2, shouldAnimate: false },
-          { dimension: preset.inHome3, shouldAnimate: false },
-          { dimension: preset.inHome4, shouldAnimate: false },
-        ],
-      }),
-      displacedBy,
-      at: {
-        type: 'REORDER',
-        destination: inHome1Location,
-      },
-    };
-    // drag should have no impact on inForeign1
-    const unrelatedToDrag: OwnProps = getOwnProps(preset.inForeign1);
-    const unrelatedDefault: MapProps = selector(state.idle, unrelatedToDrag);
+it('should not break memoization moving between different dragging phases (no impact)', () => {
+  const selector: Selector = makeMapStateToProps();
+  const defaultMapProps: MapProps = selector(state.idle, ownProps);
 
-    const first: MapProps = selector(
-      withImpact(state.dragging(), impact),
-      unrelatedToDrag,
-    );
-    const second: MapProps = selector(
-      withImpact(state.collecting(), impact),
-      unrelatedToDrag,
-    );
-    const third: MapProps = selector(
-      withImpact(state.dropPending(), impact),
-      unrelatedToDrag,
-    );
+  expect(selector(withImpact(state.dragging(), noImpact), ownProps)).toBe(
+    defaultMapProps,
+  );
+  expect(selector(withImpact(state.collecting(), noImpact), ownProps)).toBe(
+    defaultMapProps,
+  );
+  expect(selector(withImpact(state.dropPending(), noImpact), ownProps)).toBe(
+    defaultMapProps,
+  );
+});
 
-    expect(first).toBe(unrelatedDefault);
-    expect(second).toBe(unrelatedDefault);
-    expect(third).toBe(unrelatedDefault);
-  });
+it('should not break memoization moving between different dragging phases (something else impacted)', () => {
+  const selector: Selector = makeMapStateToProps();
+  const impact: DragImpact = {
+    displaced: getForcedDisplacement({
+      visible: [
+        { dimension: preset.inHome2, shouldAnimate: false },
+        { dimension: preset.inHome3, shouldAnimate: false },
+        { dimension: preset.inHome4, shouldAnimate: false },
+      ],
+    }),
+    displacedBy,
+    at: {
+      type: 'REORDER',
+      destination: inHome1Location,
+    },
+  };
+  // drag should have no impact on inForeign1
+  const unrelatedToDrag: OwnProps = getOwnProps(preset.inForeign1);
+  const unrelatedDefault: MapProps = selector(state.idle, unrelatedToDrag);
+
+  const first: MapProps = selector(
+    withImpact(state.dragging(), impact),
+    unrelatedToDrag,
+  );
+  const second: MapProps = selector(
+    withImpact(state.collecting(), impact),
+    unrelatedToDrag,
+  );
+  const third: MapProps = selector(
+    withImpact(state.dropPending(), impact),
+    unrelatedToDrag,
+  );
+
+  expect(first).toBe(unrelatedDefault);
+  expect(second).toBe(unrelatedDefault);
+  expect(third).toBe(unrelatedDefault);
 });

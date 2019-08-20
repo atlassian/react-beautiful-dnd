@@ -60,9 +60,13 @@ export const renderItemAndSpy = (mock: JestMockFn<*, *>): RenderItem => (
   item: Item,
 ) => {
   const render = defaultItemRender(item);
-  return (provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
-    mock(provided, snapshot);
-    return render(provided, snapshot);
+  return (
+    provided: DraggableProvided,
+    snapshot: DraggableStateSnapshot,
+    descriptor: DraggableDescriptor,
+  ) => {
+    mock(provided, snapshot, descriptor);
+    return render(provided, snapshot, descriptor);
   };
 };
 
@@ -97,6 +101,15 @@ export const getSnapshotsFor = (
 ): DraggableStateSnapshot[] => {
   return getCallsFor(id, mock).map(call => {
     return call[1];
+  });
+};
+
+export const getDescriptorsFor = (
+  id: DraggableId,
+  mock: JestMockFn<*, *>,
+): DraggableDescriptor[] => {
+  return getCallsFor(id, mock).map(call => {
+    return call[2];
   });
 };
 

@@ -53,6 +53,15 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
       expect(result).toEqual(expected);
     });
 
+    it('should give resting props if not the combine target', () => {
+      const selector: Selector = makeMapStateToProps();
+      const unrelatedOwnProps: OwnProps = getOwnProps(preset.inForeign1);
+      const atRest: MapProps = selector(withoutMerge, unrelatedOwnProps);
+      const result: MapProps = selector(withMerge, unrelatedOwnProps);
+
+      expect(result).toBe(atRest);
+    });
+
     it('should not break memoization on multiple calls with the same impact', () => {
       const selector: Selector = makeMapStateToProps();
       const expected: MapProps = {

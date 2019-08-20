@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import Draggable from './draggable';
 import { origin, negate } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
-import { curves, combine } from '../../animation';
+import * as animation from '../../animation';
 import { dropAnimationFinished as dropAnimationFinishedAction } from '../../state/action-creators';
 import type {
   State,
@@ -20,6 +20,7 @@ import type {
   MovementMode,
   DropResult,
   LiftEffect,
+  Combine,
 } from '../../types';
 import type {
   MapProps,
@@ -148,10 +149,10 @@ function getDraggableSelector(): TrySelect {
       // not memoized as it is the only execution
       const dropping: DropAnimation = {
         duration,
-        curve: curves.drop,
+        curve: animation.curves.drop,
         moveTo: state.newHomeClientOffset,
-        opacity: combineWith ? combine.opacity.drop : null,
-        scale: combineWith ? combine.scale.drop : null,
+        opacity: combineWith ? animation.combine.opacity.drop : null,
+        scale: combineWith ? animation.combine.scale.drop : null,
       };
 
       return {
@@ -247,9 +248,9 @@ function getSecondarySelector(): TrySelect {
       afterCritical.inVirtualList && afterCritical.effected[ownId],
     );
 
-    const combineTargetFor: ?DraggableId = tryGetCombine(impact)
-      ? draggingId
-      : null;
+    const combine: ?Combine = tryGetCombine(impact);
+    const combineTargetFor: ?DraggableId =
+      combine && combine.draggableId === ownId ? draggingId : null;
 
     if (!displacement) {
       if (!isAfterCriticalInVirtualList) {

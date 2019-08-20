@@ -11,11 +11,10 @@ import type {
   DraggableDescriptor,
   DroppableMode,
 } from '../../types';
-import type {
-  StateSnapshot as DraggableStateSnapshot,
-  Provided as DraggableProvided,
-} from '../draggable/draggable-types';
+import type { ChildrenFn } from '../draggable/draggable-types';
 import { updateViewportMaxScroll } from '../../state/action-creators';
+
+export type DraggableChildrenFn = ChildrenFn;
 
 export type DroppableProps = {|
   // used for shared global styles
@@ -30,15 +29,9 @@ export type Provided = {|
   droppableProps: DroppableProps,
 |};
 
-export type RenderClone = (
-  provided: DraggableProvided,
-  snapshot: DraggableStateSnapshot,
-  descriptor: DraggableDescriptor,
-) => Node | null;
-
 export type UseClone = {|
   dragging: DraggableDescriptor,
-  render: RenderClone,
+  render: DraggableChildrenFn,
 |};
 
 export type StateSnapshot = {|
@@ -68,7 +61,7 @@ export type DefaultProps = {|
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
   direction: Direction,
-  renderClone: ?RenderClone,
+  renderClone: ?DraggableChildrenFn,
   ignoreContainerClipping: boolean,
   getContainerForClone: () => HTMLElement,
 |};
@@ -81,7 +74,7 @@ export type OwnProps = {|
   ...DefaultProps,
   children: (Provided, StateSnapshot) => Node,
   droppableId: DroppableId,
-  renderClone: ?RenderClone,
+  renderClone: ?DraggableChildrenFn,
 |};
 
 export type Props = {|

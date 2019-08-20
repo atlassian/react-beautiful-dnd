@@ -22,7 +22,7 @@ import type {
   DispatchProps,
   StateSnapshot,
   UseClone,
-  RenderClone,
+  DraggableChildrenFn,
 } from './droppable-types';
 import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
@@ -64,7 +64,7 @@ export const makeMapStateToProps = (): Selector => {
       isDraggingOver: boolean,
       dragging: DraggableDimension,
       snapshot: StateSnapshot,
-      renderClone: ?RenderClone,
+      renderClone: ?DraggableChildrenFn,
     ): MapProps => {
       const isHome: boolean = dragging.descriptor.droppableId === id;
 
@@ -125,7 +125,7 @@ export const makeMapStateToProps = (): Selector => {
 
     const id: DroppableId = ownProps.droppableId;
     const type: TypeId = ownProps.type;
-    const renderClone: ?RenderClone = ownProps.renderClone;
+    const renderClone: ?DraggableChildrenFn = ownProps.renderClone;
 
     if (state.isDragging) {
       const critical: Critical = state.critical;
