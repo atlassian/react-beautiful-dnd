@@ -84,6 +84,10 @@ export default ({
     return withMerge;
   }
 
+  if (destination.isCombineOnly) {
+    return noImpact;
+  }
+
   return getReorderImpact({
     pageBorderBoxCenterWithDroppableScrollChange,
     destination,

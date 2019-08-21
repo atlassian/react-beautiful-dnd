@@ -26,6 +26,7 @@ import {
   updateDroppableScroll,
   updateDroppableIsEnabled,
   updateDroppableIsCombineEnabled,
+  updateDroppableIsCombineOnly,
   collectionStarting,
 } from '../../state/action-creators';
 import isMovementAllowed from '../../state/is-movement-allowed';
@@ -87,6 +88,7 @@ export default function App(props: Props) {
           updateDroppableScroll,
           updateDroppableIsEnabled,
           updateDroppableIsCombineEnabled,
+          updateDroppableIsCombineOnly,
           collectionStarting,
         },
         // $FlowFixMe - not sure why this is wrong

@@ -291,6 +291,39 @@ export default (state: State = idle, action: Action): State => {
     return postDroppableChange(state, updated, true);
   }
 
+  if (action.type === 'UPDATE_DROPPABLE_IS_COMBINE_ONLY') {
+    // Things are locked at this point
+    if (state.phase === 'DROP_PENDING') {
+      return state;
+    }
+
+    invariant(
+      isMovementAllowed(state),
+      `Attempting to move in an unsupported phase ${state.phase}`,
+    );
+
+    const { id, isCombineOnly } = action.payload;
+    const target: ?DroppableDimension = state.dimensions.droppables[id];
+
+    invariant(
+      target,
+      `Cannot find Droppable[id: ${id}] to toggle its isCombineOnly state`,
+    );
+
+    invariant(
+      target.isCombineOnly !== isCombineOnly,
+      `Trying to set droppable isCombineOnly to ${String(isCombineOnly)}
+      but it is already ${String(target.isCombineOnly)}`,
+    );
+
+    const updated: DroppableDimension = {
+      ...target,
+      isCombineOnly,
+    };
+
+    return postDroppableChange(state, updated, true);
+  }
+
   if (action.type === 'MOVE_BY_WINDOW_SCROLL') {
     // No longer accepting changes
     if (state.phase === 'DROP_PENDING' || state.phase === 'DROP_ANIMATING') {

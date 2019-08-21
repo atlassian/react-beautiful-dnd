@@ -29,19 +29,19 @@ export default ({
   insideDestination: originalInsideDestination,
   previousImpact,
 }: Args): ?DragImpact => {
-  if (!destination.isCombineEnabled) {
+  if (!destination.isCombineEnabled && !destination.isCombineOnly) {
     return null;
   }
 
   // we move from a merge to a reorder
-  if (previousImpact.merge) {
+  if (previousImpact.merge && false) {
     return null;
   }
 
   // we are on a location, and we are trying to combine onto a sibling
   // that sibling might be displaced
 
-  const location: ?DraggableLocation = previousImpact.destination;
+  const location: ?DraggableLocation = previousImpact.destination || previousImpact.merge;
   invariant(location, 'Need a previous location to move from into a combine');
 
   const currentIndex: number = location.index;

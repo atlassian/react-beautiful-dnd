@@ -111,15 +111,32 @@ export type UpdateDroppableIsCombineEnabledArgs = {|
   isCombineEnabled: boolean,
 |};
 
+export type UpdateDroppableIsCombineOnlyArgs = {|
+  id: DroppableId,
+  isCombineOnly: boolean,
+|};
+
 export type UpdateDroppableIsCombineEnabledAction = {|
   type: 'UPDATE_DROPPABLE_IS_COMBINE_ENABLED',
   payload: UpdateDroppableIsCombineEnabledArgs,
+|};
+
+export type UpdateDroppableIsCombineOnlyAction = {|
+  type: 'UPDATE_DROPPABLE_IS_COMBINE_ONLY',
+  payload: UpdateDroppableIsCombineOnlyArgs,
 |};
 
 export const updateDroppableIsCombineEnabled = (
   args: UpdateDroppableIsCombineEnabledArgs,
 ): UpdateDroppableIsCombineEnabledAction => ({
   type: 'UPDATE_DROPPABLE_IS_COMBINE_ENABLED',
+  payload: args,
+});
+
+export const updateDroppableIsCombineOnly = (
+  args: UpdateDroppableIsCombineOnlyArgs,
+): UpdateDroppableIsCombineOnlyAction => ({
+  type: 'UPDATE_DROPPABLE_IS_COMBINE_ONLY',
   payload: args,
 });
 
@@ -320,6 +337,7 @@ export type Action =
   | UpdateDroppableScrollAction
   | UpdateDroppableIsEnabledAction
   | UpdateDroppableIsCombineEnabledAction
+  | UpdateDroppableIsCombineOnlyAction
   | MoveByWindowScrollAction
   | UpdateViewportMaxScrollAction
   // | PostJumpScrollAction

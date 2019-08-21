@@ -16,6 +16,10 @@ function checkOwnProps(props: Props) {
     'isCombineEnabled must be a boolean',
   );
   invariant(
+    typeof props.isCombineOnly === 'boolean',
+    'isCombineOnly must be a boolean',
+  );
+  invariant(
     typeof props.ignoreContainerClipping === 'boolean',
     'ignoreContainerClipping must be a boolean',
   );

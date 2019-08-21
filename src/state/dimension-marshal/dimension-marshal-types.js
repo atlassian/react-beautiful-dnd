@@ -4,6 +4,7 @@ import type {
   UpdateDroppableScrollArgs,
   UpdateDroppableIsEnabledArgs,
   UpdateDroppableIsCombineEnabledArgs,
+  UpdateDroppableIsCombineOnlyArgs,
 } from '../action-creators';
 import type {
   DraggableDescriptor,
@@ -97,6 +98,10 @@ export type DimensionMarshal = {|
     id: DroppableId,
     isEnabled: boolean,
   ) => void,
+  updateDroppableIsCombineOnly: (
+    id: DroppableId,
+    isEnabled: boolean,
+  ) => void,
   updateDroppableScroll: (id: DroppableId, newScroll: Position) => void,
   scrollDroppable: (id: DroppableId, change: Position) => void,
   unregisterDroppable: (descriptor: DroppableDescriptor) => void,
@@ -112,5 +117,8 @@ export type Callbacks = {|
   updateDroppableIsEnabled: (args: UpdateDroppableIsEnabledArgs) => mixed,
   updateDroppableIsCombineEnabled: (
     args: UpdateDroppableIsCombineEnabledArgs,
+  ) => mixed,
+  updateDroppableIsCombineOnly: (
+    args: UpdateDroppableIsCombineOnlyArgs,
   ) => mixed,
 |};

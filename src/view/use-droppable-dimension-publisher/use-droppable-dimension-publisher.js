@@ -37,6 +37,7 @@ type Props = {|
   direction: Direction,
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
+  isCombineOnly: boolean,
   ignoreContainerClipping: boolean,
   getPlaceholderRef: () => ?HTMLElement,
   getDroppableRef: () => ?HTMLElement,
@@ -140,6 +141,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
         direction: previous.direction,
         isDropDisabled: previous.isDropDisabled,
         isCombineEnabled: previous.isCombineEnabled,
+        isCombineOnly: previous.isCombineOnly,
         shouldClipSubject: !previous.ignoreContainerClipping,
       });
 
@@ -181,6 +183,7 @@ export default function useDroppableDimensionPublisher(args: Props) {
           direction: previous.direction,
           isDropDisabled: previous.isDropDisabled,
           isCombineEnabled: previous.isCombineEnabled,
+          isCombineOnly: previous.isCombineOnly,
           shouldClipSubject: !previous.ignoreContainerClipping,
         });
 
@@ -275,5 +278,9 @@ export default function useDroppableDimensionPublisher(args: Props) {
       publishedDescriptorRef.current.id,
       args.isCombineEnabled,
     );
-  }, [args.isCombineEnabled, marshal]);
+    marshal.updateDroppableIsCombineOnly(
+      publishedDescriptorRef.current.id,
+      args.isCombineOnly,
+    );
+  }, [args.isCombineEnabled, args.isCombineOnly, marshal]);
 }

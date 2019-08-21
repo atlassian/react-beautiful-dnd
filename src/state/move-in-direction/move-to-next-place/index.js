@@ -60,17 +60,7 @@ export default ({
       destination,
       insideDestination,
       previousImpact,
-    }) ||
-    moveToNextIndex({
-      isMovingForward,
-      isInHomeList,
-      draggable,
-      draggables,
-      destination,
-      insideDestination,
-      previousImpact,
-      onLift,
-    });
+    })
 
   if (!impact) {
     return null;

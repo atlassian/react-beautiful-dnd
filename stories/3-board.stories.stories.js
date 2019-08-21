@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
-import { storiesOf } from '@storybook/react';
+import {storiesOf} from '@storybook/react';
 import Board from './src/board/board';
-import { authorQuoteMap, generateQuoteMap } from './src/data';
+import {authorQuoteMap, generateQuoteMap} from './src/data';
 
 const data = {
   medium: generateQuoteMap(100),
@@ -21,4 +21,7 @@ storiesOf('board', module)
   ))
   .add('with combine enabled', () => (
     <Board initial={authorQuoteMap} isCombineEnabled />
+  ))
+  .add('with combine only', () => (
+    <Board initial={authorQuoteMap} isCombineOnly />
   ));
