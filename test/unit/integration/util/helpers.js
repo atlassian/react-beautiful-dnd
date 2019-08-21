@@ -54,6 +54,11 @@ export function isClone(el: HTMLElement): boolean {
   return el.getAttribute('data-is-clone') === 'true';
 }
 
+export function isOver(el: HTMLElement): ?string {
+  const value: ?string = el.getAttribute('data-is-over');
+  return value || null;
+}
+
 const preset = getPreset();
 
 export const renderItemAndSpy = (mock: JestMockFn<*, *>): RenderItem => (

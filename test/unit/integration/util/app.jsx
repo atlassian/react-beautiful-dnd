@@ -43,6 +43,7 @@ export const defaultItemRender: RenderItem = (item: Item) => (
     data-is-drop-animating={snapshot.isDropAnimating}
     data-is-combining={Boolean(snapshot.combineWith)}
     data-is-combine-target={Boolean(snapshot.combineTargetFor)}
+    data-is-over={snapshot.draggingOver}
     data-is-clone={snapshot.isClone}
     data-testid={item.id}
     ref={provided.innerRef}
