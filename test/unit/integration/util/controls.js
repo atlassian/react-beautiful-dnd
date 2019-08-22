@@ -18,14 +18,14 @@ export function simpleLift(control: Control, handle: HTMLElement) {
   control.lift(handle);
 }
 
-export function getTransitionEnd(): Event {
+export function getTransitionEnd(propertyName?: string = 'transform'): Event {
   const event: Event = new Event('transitionend', {
     bubbles: true,
     cancelable: true,
   });
   // cheating and adding property to event as TransitionEvent constructor does not exist
   // $ExpectError - being amazing
-  event.propertyName = 'transform';
+  event.propertyName = propertyName;
   return event;
 }
 export const mouse: Control = {
