@@ -79,7 +79,9 @@ export default function Droppable(props: Props) {
   //   on: props.placeholder,
   //   shouldAnimate: props.shouldAnimatePlaceholder,
   // });
-
+  const isPlaceholderUsed = isCombineOnly
+    ? Boolean(snapshot.draggingFromThisWith)
+    : true;
   const placeholder: Node = (
     <AnimateInOut
       on={props.placeholder}
@@ -93,6 +95,7 @@ export default function Droppable(props: Props) {
           animate={animate}
           styleContext={styleContext}
           onTransitionEnd={onPlaceholderTransitionEnd}
+          isPlaceholderUsed={isPlaceholderUsed}
         />
       )}
     </AnimateInOut>

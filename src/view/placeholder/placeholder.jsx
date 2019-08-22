@@ -30,6 +30,7 @@ export type Props = {|
   animate: InOutAnimationMode,
   onClose: () => void,
   innerRef?: () => ?HTMLElement,
+  isPlaceholderUsed: boolean,
   onTransitionEnd: () => void,
   styleContext: string,
 |};
@@ -57,12 +58,17 @@ const getSize = ({
   isAnimatingOpenOnMount,
   placeholder,
   animate,
+  isPlaceholderUsed,
 }: HelperArgs): Size => {
   if (isAnimatingOpenOnMount) {
     return empty;
   }
 
   if (animate === 'close') {
+    return empty;
+  }
+
+  if (!isPlaceholderUsed) {
     return empty;
   }
 
@@ -77,8 +83,9 @@ const getStyle = ({
   isAnimatingOpenOnMount,
   placeholder,
   animate,
+  isPlaceholderUsed,
 }: HelperArgs): PlaceholderStyle => {
-  const size: Size = getSize({ isAnimatingOpenOnMount, placeholder, animate });
+  const size: Size = getSize({ isAnimatingOpenOnMount, placeholder, animate, isPlaceholderUsed });
 
   return {
     display: placeholder.display,
@@ -182,6 +189,7 @@ function Placeholder(props: Props): Node {
     isAnimatingOpenOnMount,
     animate: props.animate,
     placeholder: props.placeholder,
+    isPlaceholderUsed: props.isPlaceholderUsed,
   });
 
   return React.createElement(props.placeholder.tagName, {
