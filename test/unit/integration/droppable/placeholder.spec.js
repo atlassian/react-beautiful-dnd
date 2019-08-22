@@ -61,7 +61,9 @@ it('should always render a placeholder in the home list while dragging', () => {
       expandedMouse.powerLift(handle, box0.center);
       expandedMouse.move(handle, droppable.client.borderBox.center);
 
+      // doesn't matter what we are over
       expect(isOver(handle)).toBe(droppable.descriptor.id);
+      // there is always a placeholder in home
       expect(hasPlaceholder(preset.home.descriptor.id, container)).toBe(true);
 
       unmount();
@@ -69,8 +71,15 @@ it('should always render a placeholder in the home list while dragging', () => {
   });
 });
 
-it('should not render a placeholder in a foreign list if not dragging over', () => {});
+it('should not render a placeholder in a foreign list if not dragging over', () => {
+  withPoorBoardDimensions(preset => {
+    const { container, getByTestId } = render(<Board />);
+    const handle: HTMLElement = getByTestId(preset.inHome1.descriptor.id);
+    const box0 = preset.inHome1.client.borderBox;
 
-it('should render a placeholder when dragging over nothing', () => {});
+    expandedMouse.powerLift(handle, box0.center);
 
-it('should render a placeholder when dragging over a foreign list', () => {});
+    expect(isOver(handle)).toBe(preset.home.descriptor.id);
+    expect(hasPlaceholder(preset.foreign.descriptor.id, container)).toBe(false);
+  });
+});
