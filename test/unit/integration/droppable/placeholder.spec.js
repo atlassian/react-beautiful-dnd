@@ -178,7 +178,7 @@ it('should animate the home placeholder closed after dropping into a foreign lis
   });
 });
 
-it.only('should flush a home placeholder collapse animation if starting a new drag', () => {
+it('should flush a home placeholder collapse animation if starting a new drag', () => {
   withPoorBoardDimensions(preset => {
     const { container, getByTestId } = render(<Board />);
     {
@@ -195,17 +195,19 @@ it.only('should flush a home placeholder collapse animation if starting a new dr
         preset.home.descriptor.id,
         container,
       );
+      // animating height closed
       expect(placeholder.style.height).toBe('0px');
     }
     {
-      console.log('second lift');
       const handle: HTMLElement = getByTestId(preset.inForeign1.descriptor.id);
-      expandedMouse.powerLift(
+
+      // using raw power lift as we don't want to combine renders
+      // (we need a render to flush the placeholder out)
+      expandedMouse.rawPowerLift(
         handle,
         preset.inForeign1.client.borderBox.center,
       );
 
-      console.log('running assertion');
       // placeholder is gone from home (it got flushed)
       expect(hasPlaceholder(preset.home.descriptor.id, container)).toBe(false);
     }

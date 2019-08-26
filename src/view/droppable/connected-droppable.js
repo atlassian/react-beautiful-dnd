@@ -188,7 +188,6 @@ export const makeMapStateToProps = (): Selector => {
       const isHome: boolean = completed.critical.droppable.id === id;
 
       if (wasOver) {
-        console.warn('was over', id);
         // if reordering we need to cut an animation immediately
         // if merging: animate placeholder closed after drop
         return wasCombining ? idleWithAnimation : idleWithoutAnimation;
@@ -197,7 +196,6 @@ export const makeMapStateToProps = (): Selector => {
       // we need to animate the home placeholder closed if it is not
       // being dropped into
       if (isHome) {
-        console.warn('idle with animation - home that was not over');
         return idleWithAnimation;
       }
 
