@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import type { DimensionMarshal } from '../dimension-marshal/dimension-marshal-types';
 import type { State, ScrollOptions, LiftRequest } from '../../types';
 import type { MiddlewareStore, Action, Dispatch } from '../store-types';
-import { completeDrop, initialPublish } from '../action-creators';
+import { completeDrop, initialPublish, flush } from '../action-creators';
 import validateDimensions from './util/validate-dimensions';
 
 export default (marshal: DimensionMarshal) => ({
@@ -20,11 +20,15 @@ export default (marshal: DimensionMarshal) => ({
   // flush dropping animation if needed
   // this can change the descriptor of the dragging item
   // Will call the onDragEnd responders
+
   if (initial.phase === 'DROP_ANIMATING') {
-    dispatch(completeDrop({ completed: initial.completed, shouldFlush: true }));
+    dispatch(completeDrop({ completed: initial.completed }));
   }
 
-  invariant(getState().phase === 'IDLE', 'Incorrect phase to start a drag');
+  invariant(getState().phase === 'IDLE', 'Unexpected phase to start a drag');
+
+  // Removing any placeholders before we capture any starting dimensions
+  dispatch(flush());
 
   // will communicate with the marshal to start requesting dimensions
   const scrollOptions: ScrollOptions = {

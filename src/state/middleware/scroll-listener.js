@@ -8,7 +8,7 @@ import getScrollListener from '../../view/scroll-listener';
 const shouldEnd = (action: Action): boolean =>
   action.type === 'DROP_COMPLETE' ||
   action.type === 'DROP_ANIMATE' ||
-  action.type === 'CLEAN';
+  action.type === 'FLUSH';
 
 export default (store: MiddlewareStore) => {
   const listener = getScrollListener({

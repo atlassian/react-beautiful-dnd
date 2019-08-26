@@ -22,7 +22,7 @@ export default (marshal: FocusMarshal) => {
       return;
     }
 
-    if (action.type === 'CLEAN') {
+    if (action.type === 'FLUSH') {
       isWatching = false;
       marshal.tryRestoreFocusRecorded();
       return;

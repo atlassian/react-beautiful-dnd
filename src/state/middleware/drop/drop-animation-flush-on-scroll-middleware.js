@@ -23,7 +23,7 @@ export default (store: MiddlewareStore) => {
 
   return (next: Dispatch) => (action: Action): any => {
     if (
-      action.type === 'CLEAN' ||
+      action.type === 'FLUSH' ||
       action.type === 'DROP_COMPLETE' ||
       action.type === 'DROP_ANIMATION_FINISHED'
     ) {

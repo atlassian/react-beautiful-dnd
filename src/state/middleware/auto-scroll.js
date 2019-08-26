@@ -7,7 +7,7 @@ import type { State } from '../../types';
 const shouldStop = (action: Action): boolean =>
   action.type === 'DROP_COMPLETE' ||
   action.type === 'DROP_ANIMATE' ||
-  action.type === 'CLEAN';
+  action.type === 'FLUSH';
 
 const shouldCancelPending = (action: Action): boolean =>
   action.type === 'COLLECTION_STARTING';

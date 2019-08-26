@@ -42,7 +42,7 @@ const getDraggable = (
 // Returning a function to ensure each
 // Droppable gets its own selector
 export const makeMapStateToProps = (): Selector => {
-  const idle: MapProps = {
+  const idleWithAnimation: MapProps = {
     placeholder: null,
     shouldAnimatePlaceholder: true,
     snapshot: {
@@ -54,7 +54,7 @@ export const makeMapStateToProps = (): Selector => {
   };
 
   const idleWithoutAnimation = {
-    ...idle,
+    ...idleWithAnimation,
     shouldAnimatePlaceholder: false,
   };
 
@@ -86,7 +86,8 @@ export const makeMapStateToProps = (): Selector => {
 
       // not over foreign list - return idle
       if (!isDraggingOver) {
-        return idle;
+        // TODO: needs to be with animation
+        return idleWithAnimation;
       }
 
       return {
@@ -130,7 +131,7 @@ export const makeMapStateToProps = (): Selector => {
     if (state.isDragging) {
       const critical: Critical = state.critical;
       if (!isMatchingType(type, critical)) {
-        return idle;
+        return idleWithoutAnimation;
       }
 
       const dragging: DraggableDimension = getDraggable(
@@ -147,7 +148,7 @@ export const makeMapStateToProps = (): Selector => {
     if (state.phase === 'DROP_ANIMATING') {
       const completed: CompletedDrag = state.completed;
       if (!isMatchingType(type, completed.critical)) {
-        return idle;
+        return idleWithoutAnimation;
       }
 
       const dragging: DraggableDimension = getDraggable(
@@ -173,16 +174,10 @@ export const makeMapStateToProps = (): Selector => {
       );
     }
 
-    // An error occurred and we need to clear everything
-    // TODO: validate and add test
-    if (state.phase === 'IDLE' && !state.completed && state.shouldFlush) {
-      return idleWithoutAnimation;
-    }
-
-    if (state.phase === 'IDLE' && state.completed) {
+    if (state.phase === 'IDLE' && state.completed && !state.shouldFlush) {
       const completed: CompletedDrag = state.completed;
       if (!isMatchingType(type, completed.critical)) {
-        return idle;
+        return idleWithoutAnimation;
       }
 
       // Looking at impact as this controls the placeholder
@@ -190,25 +185,27 @@ export const makeMapStateToProps = (): Selector => {
       const wasCombining: boolean = Boolean(
         completed.impact.at && completed.impact.at.type === 'COMBINE',
       );
-
-      // need to cut any animations: sadly a memoization fail
-      // we need to do this for all lists as there might be
-      // lists that are still animating a placeholder closed
-      if (state.shouldFlush) {
-        return idleWithoutAnimation;
-      }
+      const isHome: boolean = completed.critical.droppable.id === id;
 
       if (wasOver) {
+        console.warn('was over', id);
         // if reordering we need to cut an animation immediately
         // if merging: animate placeholder closed after drop
-        return wasCombining ? idle : idleWithoutAnimation;
+        return wasCombining ? idleWithAnimation : idleWithoutAnimation;
       }
 
-      // keep default value
-      return idle;
+      // we need to animate the home placeholder closed if it is not
+      // being dropped into
+      if (isHome) {
+        console.warn('idle with animation - home that was not over');
+        return idleWithAnimation;
+      }
+
+      return idleWithoutAnimation;
     }
 
-    return idle;
+    // default: including when flushed
+    return idleWithoutAnimation;
   };
 
   return selector;

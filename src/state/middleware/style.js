@@ -14,7 +14,7 @@ export default (marshal: StyleMarshal) => () => (next: Dispatch) => (
   }
 
   // this will clear any styles immediately before a reorder
-  if (action.type === 'CLEAN' || action.type === 'DROP_COMPLETE') {
+  if (action.type === 'FLUSH' || action.type === 'DROP_COMPLETE') {
     marshal.resting();
   }
 

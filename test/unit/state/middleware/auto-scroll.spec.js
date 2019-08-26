@@ -15,7 +15,7 @@ import {
   collectionStarting,
   initialPublish,
   moveDown,
-  clean,
+  flush,
 } from '../../../../src/state/action-creators';
 
 const shouldCancelPending: Action[] = [collectionStarting()];
@@ -25,7 +25,7 @@ const shouldStop: Action[] = [
   animateDrop(userCancelArgs),
   completeDrop(getCompletedArgs('CANCEL')),
   completeDrop(getCompletedArgs('DROP')),
-  clean(),
+  flush(),
 ];
 
 const getScrollerStub = (): AutoScroller => ({

@@ -24,7 +24,7 @@ export type PlaceholderStyle = {|
   flexShrink: '0',
   flexGrow: '0',
   pointerEvents: 'none',
-  transition: string,
+  transition: ?string,
 |};
 export type Props = {|
   placeholder: PlaceholderType,
@@ -110,7 +110,7 @@ const getStyle = ({
     pointerEvents: 'none',
 
     // Animate the placeholder size and margin
-    transition: transitions.placeholder,
+    transition: animate !== 'none' ? transitions.placeholder : null,
   };
 };
 

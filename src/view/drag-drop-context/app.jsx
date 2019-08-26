@@ -31,13 +31,13 @@ import type {
 import type { Store, Action } from '../../state/store-types';
 import StoreContext from '../context/store-context';
 import {
-  clean,
   move,
   publishWhileDragging,
   updateDroppableScroll,
   updateDroppableIsEnabled,
   updateDroppableIsCombineEnabled,
   collectionStarting,
+  flush,
 } from '../../state/action-creators';
 import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
@@ -176,7 +176,7 @@ export default function App(props: Props) {
     const current: Store = getStore(lazyStoreRef);
     const state: State = current.getState();
     if (state.phase !== 'IDLE') {
-      current.dispatch(clean({ shouldFlush: true }));
+      current.dispatch(flush());
     }
   }, []);
 

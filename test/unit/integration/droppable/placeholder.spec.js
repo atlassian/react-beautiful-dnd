@@ -205,6 +205,7 @@ it.only('should flush a home placeholder collapse animation if starting a new dr
         preset.inForeign1.client.borderBox.center,
       );
 
+      console.log('running assertion');
       // placeholder is gone from home (it got flushed)
       expect(hasPlaceholder(preset.home.descriptor.id, container)).toBe(false);
     }

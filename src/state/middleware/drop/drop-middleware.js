@@ -126,7 +126,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
     Boolean(result.combine);
 
   if (!isAnimationRequired) {
-    dispatch(completeDrop({ completed, shouldFlush: false }));
+    dispatch(completeDrop({ completed }));
     return;
   }
 
