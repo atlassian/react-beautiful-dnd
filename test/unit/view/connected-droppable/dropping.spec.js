@@ -1,6 +1,5 @@
 // @flow
 import type {
-  State,
   DragImpact,
   DraggingState,
   DropAnimatingState,
@@ -153,14 +152,20 @@ describe('home list', () => {
     });
   });
 });
-it('should return the default props for every phase for a foreign list', () => {
+
+it('should return the dragging props for every dragging phase for a foreign list', () => {
   const ownProps: OwnProps = getOwnProps(preset.foreign);
   const selector: Selector = makeMapStateToProps();
   const defaultProps: MapProps = selector(state.idle, ownProps);
 
-  [...state.allPhases(), ...state.allPhases().reverse()].forEach(
-    (current: State) => {
-      expect(selector(current, ownProps)).toBe(defaultProps);
-    },
-  );
+  const dragging: MapProps = selector(state.dragging(), ownProps);
+  // flag swapped when drag starts
+  const expected: MapProps = {
+    ...defaultProps,
+    shouldAnimatePlaceholder: true,
+  };
+  expect(dragging).toEqual(expected);
+
+  expect(selector(state.dropAnimating(), ownProps)).toBe(dragging);
+  expect(selector(state.userCancel(), ownProps)).toBe(dragging);
 });

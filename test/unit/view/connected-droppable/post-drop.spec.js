@@ -36,7 +36,7 @@ describe('was over - reordering', () => {
     const selector: Selector = makeMapStateToProps();
     // initial value: not animated
     const atRest: MapProps = selector(state.idle, ownProps);
-    expect(atRest.shouldAnimatePlaceholder).toBe(true);
+    expect(atRest.shouldAnimatePlaceholder).toBe(false);
 
     // while dropping
     const dropping: DropAnimatingState = state.dropAnimating(
@@ -52,13 +52,7 @@ describe('was over - reordering', () => {
       shouldFlush: false,
     };
     const postDrop: MapProps = selector(idle, ownProps);
-    const expected: MapProps = {
-      ...atRest,
-      shouldAnimatePlaceholder: false,
-    };
-    expect(postDrop).toEqual(expected);
-    // this will cause a memoization break for the next drag
-    expect(postDrop).not.toEqual(atRest);
+    expect(postDrop).toBe(atRest);
   });
 });
 
@@ -104,8 +98,12 @@ describe('was over - merging', () => {
       shouldFlush: false,
     };
     const postDrop: MapProps = selector(idle, ownProps);
-    // no memoization break for the next drag - returned at rest props
-    expect(postDrop).toBe(atRest);
+    // we animate the placeholder closed after dropping
+    const expected: MapProps = {
+      ...atRest,
+      shouldAnimatePlaceholder: true,
+    };
+    expect(postDrop).toEqual(expected);
   });
 });
 
@@ -118,7 +116,11 @@ describe('was not over', () => {
     // while dropping
     const dropping: DropAnimatingState = state.dropAnimating();
     const whileDropping: MapProps = selector(dropping, ownProps);
-    expect(whileDropping).toEqual(atRest);
+    const expected: MapProps = {
+      ...atRest,
+      shouldAnimatePlaceholder: true,
+    };
+    expect(whileDropping).toEqual(expected);
 
     // drop complete
     const idle: IdleState = {
@@ -127,7 +129,6 @@ describe('was not over', () => {
       shouldFlush: false,
     };
     const postDrop: MapProps = selector(idle, ownProps);
-    // no memoization break for the next drag - returned at rest props
     expect(postDrop).toBe(atRest);
   });
 });
@@ -176,7 +177,7 @@ describe('flushed', () => {
       ...atRest,
       shouldAnimatePlaceholder: false,
     };
-    expect(postDrop).not.toBe(atRest);
+    expect(postDrop).toBe(atRest);
     expect(postDrop).toEqual(expected);
   });
 
@@ -196,7 +197,7 @@ describe('flushed', () => {
       ...atRest,
       shouldAnimatePlaceholder: false,
     };
-    expect(postDrop).not.toBe(atRest);
+    expect(postDrop).toBe(atRest);
     expect(postDrop).toEqual(expected);
   });
 });

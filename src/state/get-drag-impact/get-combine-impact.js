@@ -70,6 +70,7 @@ const isCombiningWith = ({
     return isWithin(start, start + twoThirdsOfSize)(targetCenter);
   }
   // combine when moving in the back 2/3 of the item
+  console.log('target center', end - twoThirdsOfSize, end, targetCenter);
   return isWithin(end - twoThirdsOfSize, end)(targetCenter);
 };
 

@@ -1,15 +1,16 @@
 // @flow
 import React from 'react';
 import invariant from 'tiny-invariant';
-import { render, fireEvent, act } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import * as attributes from '../../../../src/view/data-attributes';
 import type { DroppableId } from '../../../../src/types';
-import { isOver, isDragging } from '../util/helpers';
+import { isOver, isDragging, isCombining } from '../util/helpers';
 import expandedMouse from '../util/expanded-mouse';
 import Board, { withPoorBoardDimensions } from '../util/board';
 import { toDroppableList } from '../../../../src/state/dimension-structures';
 import { getTransitionEnd } from '../util/controls';
 import { withError } from '../../../util/console';
+import getDraggablesInsideDroppable from '../../../../src/state/get-draggables-inside-droppable';
 
 function findPlaceholder(
   droppableId: DroppableId,
