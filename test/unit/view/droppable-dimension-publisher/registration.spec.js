@@ -2,66 +2,88 @@
 /* eslint-disable react/no-multi-comp */
 import { mount } from 'enzyme';
 import React from 'react';
-import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import type { DroppableDescriptor } from '../../../../src/types';
-import { getMarshalStub } from '../../../util/dimension-marshal';
 import forceUpdate from '../../../util/force-update';
 import { preset, ScrollableItem, WithAppContext } from './util/shared';
 import { setViewport } from '../../../util/viewport';
 import PassThroughProps from '../../../util/pass-through-props';
+import type {
+  Registry,
+  DroppableEntry,
+} from '../../../../src/state/registry/registry-types';
+import createRegistry from '../../../../src/state/registry/create-registry';
 
 setViewport(preset.viewport);
 
 it('should register itself when mounting', () => {
-  const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
 
   mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext registry={registry}>
       <ScrollableItem />
     </WithAppContext>,
   );
 
-  expect(marshal.registerDroppable).toHaveBeenCalledTimes(1);
-  expect(marshal.registerDroppable.mock.calls[0][0]).toEqual(
-    preset.home.descriptor,
-  );
+  expect(registerSpy).toHaveBeenCalledTimes(1);
+
+  // $ExpectError: using awesome matchers
+  const expected: DroppableEntry = {
+    uniqueId: expect.any(String),
+    descriptor: preset.home.descriptor,
+    callbacks: expect.any(Object),
+  };
+
+  expect(registerSpy).toHaveBeenCalledWith(expected);
 });
 
 it('should unregister itself when unmounting', () => {
-  const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
+  const unregisterSpy = jest.spyOn(registry.droppable, 'unregister');
 
   const wrapper = mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext registry={registry}>
       <ScrollableItem />
     </WithAppContext>,
   );
-  expect(marshal.registerDroppable).toHaveBeenCalled();
-  expect(marshal.unregisterDroppable).not.toHaveBeenCalled();
+  expect(registerSpy).toHaveBeenCalled();
+  expect(unregisterSpy).not.toHaveBeenCalled();
+
+  const entry = registerSpy.mock.calls[0][0];
 
   wrapper.unmount();
-  expect(marshal.unregisterDroppable).toHaveBeenCalledTimes(1);
-  expect(marshal.unregisterDroppable).toHaveBeenCalledWith(
-    preset.home.descriptor,
-  );
+  expect(unregisterSpy).toHaveBeenCalledTimes(1);
+  expect(unregisterSpy).toHaveBeenCalledWith(entry);
 });
 
 it('should update its registration when a descriptor property changes', () => {
-  const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
+  const unregisterSpy = jest.spyOn(registry.droppable, 'unregister');
 
   const wrapper = mount(
     <PassThroughProps>
       {extra => (
-        <WithAppContext marshal={marshal}>
+        <WithAppContext registry={registry}>
           <ScrollableItem {...extra} />
         </WithAppContext>
       )}
     </PassThroughProps>,
   );
+
+  // $ExpectError: using awesome matchers
+  const expectedFirst: DroppableEntry = {
+    uniqueId: expect.any(String),
+    descriptor: preset.home.descriptor,
+    callbacks: expect.any(Object),
+  };
+
   // asserting shape of original publish
-  expect(marshal.registerDroppable.mock.calls[0][0]).toEqual(
-    preset.home.descriptor,
-  );
-  marshal.registerDroppable.mockClear();
+  const first = registerSpy.mock.calls[0][0];
+  expect(first).toEqual(expectedFirst);
+
+  registerSpy.mockClear();
 
   // updating the index
   wrapper.setProps({
@@ -73,28 +95,34 @@ it('should update its registration when a descriptor property changes', () => {
   };
 
   // old descriptor removed
-  expect(marshal.unregisterDroppable).toHaveBeenCalledTimes(1);
-  expect(marshal.unregisterDroppable).toHaveBeenCalledWith(
-    preset.home.descriptor,
-  );
+  expect(unregisterSpy).toHaveBeenCalledTimes(1);
+  expect(unregisterSpy).toHaveBeenCalledWith(first);
 
   // new descriptor added
-  expect(marshal.registerDroppable.mock.calls[0][0]).toEqual(updated);
+  // $ExpectError: using awesome matchers
+  const expectedSecond: DroppableEntry = {
+    uniqueId: first.uniqueId,
+    descriptor: updated,
+    callbacks: expect.any(Object),
+  };
+  expect(registerSpy.mock.calls[0][0]).toEqual(expectedSecond);
 });
 
 it('should not update its registration when a descriptor property does not change on an update', () => {
-  const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
+  const unregisterSpy = jest.spyOn(registry.droppable, 'unregister');
 
   const wrapper = mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext registry={registry}>
       <ScrollableItem />
     </WithAppContext>,
   );
-  expect(marshal.registerDroppable).toHaveBeenCalledTimes(1);
-  expect(marshal.unregisterDroppable).not.toHaveBeenCalled();
-  marshal.registerDroppable.mockClear();
+  expect(registerSpy).toHaveBeenCalledTimes(1);
+  expect(unregisterSpy).not.toHaveBeenCalled();
+  registerSpy.mockClear();
 
   forceUpdate(wrapper);
-  expect(marshal.unregisterDroppable).not.toHaveBeenCalled();
-  expect(marshal.registerDroppable).not.toHaveBeenCalled();
+  expect(unregisterSpy).not.toHaveBeenCalled();
+  expect(registerSpy).not.toHaveBeenCalled();
 });
