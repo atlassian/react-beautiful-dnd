@@ -2,10 +2,7 @@
 import { mount } from 'enzyme';
 import React from 'react';
 import invariant from 'tiny-invariant';
-import type {
-  DimensionMarshal,
-  DroppableCallbacks,
-} from '../../../../src/state/dimension-marshal/dimension-marshal-types';
+import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import { getMarshalStub } from '../../../util/dimension-marshal';
 import { setViewport } from '../../../util/viewport';
 import {
@@ -19,6 +16,11 @@ import {
   WithAppContext,
 } from './util/shared';
 import tryCleanPrototypeStubs from '../../../util/try-clean-prototype-stubs';
+import type {
+  Registry,
+  DroppableCallbacks,
+} from '../../../../src/state/registry/registry-types';
+import createRegistry from '../../../../src/state/registry/create-registry';
 
 setViewport(preset.viewport);
 
@@ -28,9 +30,11 @@ afterEach(() => {
 
 it('should throw if the droppable has no closest scrollable', () => {
   const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
   // no scroll parent
   const wrapper = mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext marshal={marshal} registry={registry}>
       <App parentIsScrollable={false} droppableIsScrollable={false} />,
     </WithAppContext>,
   );
@@ -51,8 +55,7 @@ it('should throw if the droppable has no closest scrollable', () => {
   expect(droppable.scrollTop).toBe(0);
   expect(droppable.scrollLeft).toBe(0);
 
-  const callbacks: DroppableCallbacks =
-    marshal.registerDroppable.mock.calls[0][1];
+  const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
   // request the droppable start listening for scrolling
   callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
 
@@ -69,8 +72,10 @@ it('should throw if the droppable has no closest scrollable', () => {
 describe('there is a closest scrollable', () => {
   it('should update the scroll of the closest scrollable', () => {
     const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext marshal={marshal} registry={registry}>
         <ScrollableItem />
       </WithAppContext>,
     );
@@ -84,7 +89,7 @@ describe('there is a closest scrollable', () => {
 
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
     // watch scroll will only be called after the dimension is requested
     callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
 
@@ -96,8 +101,10 @@ describe('there is a closest scrollable', () => {
 
   it('should throw if asked to scoll while scroll is not currently being watched', () => {
     const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext marshal={marshal} registry={registry}>
         <ScrollableItem />
       </WithAppContext>,
     );
@@ -111,7 +118,7 @@ describe('there is a closest scrollable', () => {
 
     // dimension not returned yet
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
     expect(() => callbacks.scroll({ x: 500, y: 1000 })).toThrow();
 
     // now watching scroll

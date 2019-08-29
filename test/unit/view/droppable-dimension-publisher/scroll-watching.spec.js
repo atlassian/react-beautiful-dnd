@@ -3,10 +3,7 @@ import { mount } from 'enzyme';
 import invariant from 'tiny-invariant';
 import React from 'react';
 import { type Position } from 'css-box-model';
-import type {
-  DimensionMarshal,
-  DroppableCallbacks,
-} from '../../../../src/state/dimension-marshal/dimension-marshal-types';
+import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import { getMarshalStub } from '../../../util/dimension-marshal';
 import { setViewport } from '../../../util/viewport';
 import {
@@ -16,6 +13,11 @@ import {
   ScrollableItem,
   WithAppContext,
 } from './util/shared';
+import type {
+  Registry,
+  DroppableCallbacks,
+} from '../../../../src/state/registry/registry-types';
+import createRegistry from '../../../../src/state/registry/create-registry';
 
 const scroll = (el: HTMLElement, target: Position) => {
   el.scrollTop = target.y;
@@ -28,8 +30,10 @@ setViewport(preset.viewport);
 describe('should immediately publish updates', () => {
   it('should immediately publish the scroll offset of the closest scrollable', () => {
     const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext marshal={marshal} registry={registry}>
         <ScrollableItem />
       </WithAppContext>,
     );
@@ -40,7 +44,7 @@ describe('should immediately publish updates', () => {
 
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
     // watch scroll will only be called after the dimension is requested
     callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
 
@@ -55,8 +59,10 @@ describe('should immediately publish updates', () => {
   it('should not fire a scroll if the value has not changed since the previous call', () => {
     // this can happen if you scroll backward and forward super quick
     const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext marshal={marshal} registry={registry}>
         <ScrollableItem />
       </WithAppContext>,
     );
@@ -66,7 +72,7 @@ describe('should immediately publish updates', () => {
     invariant(container);
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
 
     // watch scroll will only be called after the dimension is requested
     callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
@@ -78,6 +84,7 @@ describe('should immediately publish updates', () => {
       preset.home.descriptor.id,
       { x: 500, y: 1000 },
     );
+    // $ExpectError
     marshal.updateDroppableScroll.mockReset();
 
     // second event - scroll to same spot
@@ -96,8 +103,10 @@ describe('should immediately publish updates', () => {
 describe('should schedule publish updates', () => {
   it('should publish the scroll offset of the closest scrollable', () => {
     const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext marshal={marshal} registry={registry}>
         <ScrollableItem />
       </WithAppContext>,
     );
@@ -108,7 +117,7 @@ describe('should schedule publish updates', () => {
 
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
     // watch scroll will only be called after the dimension is requested
     callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
 
@@ -124,8 +133,10 @@ describe('should schedule publish updates', () => {
 
   it('should throttle multiple scrolls into a animation frame', () => {
     const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext marshal={marshal} registry={registry}>
         <ScrollableItem />
       </WithAppContext>,
     );
@@ -135,7 +146,7 @@ describe('should schedule publish updates', () => {
     invariant(container);
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
 
     // watch scroll will only be called after the dimension is requested
     callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
@@ -162,8 +173,10 @@ describe('should schedule publish updates', () => {
   it('should not fire a scroll if the value has not changed since the previous frame', () => {
     // this can happen if you scroll backward and forward super quick
     const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext marshal={marshal} registry={registry}>
         <ScrollableItem />
       </WithAppContext>,
     );
@@ -173,7 +186,7 @@ describe('should schedule publish updates', () => {
     invariant(container);
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
 
     // watch scroll will only be called after the dimension is requested
     callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
@@ -187,6 +200,7 @@ describe('should schedule publish updates', () => {
       preset.home.descriptor.id,
       { x: 500, y: 1000 },
     );
+    // $ExpectError
     marshal.updateDroppableScroll.mockReset();
 
     // second event
@@ -202,8 +216,10 @@ describe('should schedule publish updates', () => {
 
   it('should not publish a scroll update after requested not to update while an animation frame is occurring', () => {
     const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext marshal={marshal} registry={registry}>
         <ScrollableItem />
       </WithAppContext>,
     );
@@ -213,7 +229,7 @@ describe('should schedule publish updates', () => {
     invariant(container);
     // tell the droppable to watch for scrolling
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
 
     // watch scroll will only be called after the dimension is requested
     callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
@@ -222,6 +238,7 @@ describe('should schedule publish updates', () => {
     scroll(container, { x: 500, y: 1000 });
     requestAnimationFrame.step();
     expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
+    // $ExpectError
     marshal.updateDroppableScroll.mockReset();
 
     // second event
@@ -240,8 +257,10 @@ describe('should schedule publish updates', () => {
 it('should stop watching scroll when no longer required to publish', () => {
   // this can happen if you scroll backward and forward super quick
   const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
   const wrapper = mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext marshal={marshal} registry={registry}>
       <ScrollableItem />
     </WithAppContext>,
   );
@@ -250,8 +269,7 @@ it('should stop watching scroll when no longer required to publish', () => {
     .getDOMNode();
   invariant(container);
   // tell the droppable to watch for scrolling
-  const callbacks: DroppableCallbacks =
-    marshal.registerDroppable.mock.calls[0][1];
+  const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
 
   // watch scroll will only be called after the dimension is requested
   callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
@@ -259,6 +277,7 @@ it('should stop watching scroll when no longer required to publish', () => {
   // first event
   scroll(container, { x: 500, y: 1000 });
   expect(marshal.updateDroppableScroll).toHaveBeenCalledTimes(1);
+  // $ExpectError
   marshal.updateDroppableScroll.mockReset();
 
   callbacks.dragStopped();
@@ -271,8 +290,10 @@ it('should stop watching scroll when no longer required to publish', () => {
 it('should stop watching for scroll events when the component is unmounted', () => {
   jest.spyOn(console, 'warn').mockImplementation(() => {});
   const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
   const wrapper = mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext marshal={marshal} registry={registry}>
       <ScrollableItem />
     </WithAppContext>,
   );
@@ -281,8 +302,7 @@ it('should stop watching for scroll events when the component is unmounted', () 
     .getDOMNode();
   invariant(container);
   // tell the droppable to watch for scrolling
-  const callbacks: DroppableCallbacks =
-    marshal.registerDroppable.mock.calls[0][1];
+  const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
 
   // watch scroll will only be called after the dimension is requested
   callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
@@ -296,19 +316,21 @@ it('should stop watching for scroll events when the component is unmounted', () 
   expect(console.warn).toHaveBeenCalled();
 
   // cleanup
+  // $ExpectError
   console.warn.mockRestore();
 });
 
 it('should throw an error if asked to watch a scroll when already listening for scroll changes', () => {
   const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
   const wrapper = mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext marshal={marshal} registry={registry}>
       <ScrollableItem />
     </WithAppContext>,
   );
   // tell the droppable to watch for scrolling
-  const callbacks: DroppableCallbacks =
-    marshal.registerDroppable.mock.calls[0][1];
+  const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
 
   // watch scroll will only be called after the dimension is requested
   const request = () =>
@@ -324,8 +346,10 @@ it('should throw an error if asked to watch a scroll when already listening for 
 // if this is not the case then it will break in IE11
 it('should add and remove events with the same event options', () => {
   const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
   const wrapper = mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext marshal={marshal} registry={registry}>
       <ScrollableItem />
     </WithAppContext>,
   );
@@ -337,8 +361,7 @@ it('should add and remove events with the same event options', () => {
   jest.spyOn(container, 'removeEventListener');
 
   // tell the droppable to watch for scrolling
-  const callbacks: DroppableCallbacks =
-    marshal.registerDroppable.mock.calls[0][1];
+  const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
 
   // watch scroll will only be called after the dimension is requested
   callbacks.getDimensionAndWatchScroll(preset.windowScroll, scheduled);
