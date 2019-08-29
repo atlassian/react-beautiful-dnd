@@ -1,6 +1,6 @@
 // @flow
 import React, { useMemo } from 'react';
-import { render } from '@testing-library/react';
+import { mount } from 'enzyme';
 import type {
   MapProps,
   OwnProps,
@@ -74,7 +74,7 @@ export default ({
   dispatchProps = defaultDispatchProps,
   isMovementAllowed = () => true,
 }: MountArgs = {}) =>
-  render(
+  mount<any>(
     <App
       {...ownProps}
       {...mapProps}

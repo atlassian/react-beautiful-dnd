@@ -3,15 +3,10 @@ import { type Position } from 'css-box-model';
 import { mount, type ReactWrapper } from 'enzyme';
 import invariant from 'tiny-invariant';
 import React from 'react';
-import type {
-  DimensionMarshal,
-  DroppableCallbacks,
-} from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import type { DroppableDimension, ScrollSize } from '../../../../src/types';
 import { negate } from '../../../../src/state/position';
 import { offsetByPosition } from '../../../../src/state/spacing';
 import { getDroppableDimension } from '../../../util/dimension';
-import { getMarshalStub } from '../../../util/dimension-marshal';
 import setWindowScroll from '../../../util/set-window-scroll';
 import {
   App,
@@ -29,6 +24,11 @@ import {
 } from './util/shared';
 import { setViewport } from '../../../util/viewport';
 import tryCleanPrototypeStubs from '../../../util/try-clean-prototype-stubs';
+import type {
+  Registry,
+  DroppableCallbacks,
+} from '../../../../src/state/registry/registry-types';
+import createRegistry from '../../../../src/state/registry/create-registry';
 
 beforeEach(() => {
   setViewport(preset.viewport);
@@ -39,11 +39,13 @@ afterEach(() => {
 });
 
 it('should publish the dimensions of the target', () => {
-  const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
   const expected: DroppableDimension = getDroppableDimension({
     descriptor: {
       id: 'fake-id',
       type: 'fake',
+      mode: 'STANDARD',
     },
     borderBox: bigClient.borderBox,
     margin,
@@ -52,7 +54,7 @@ it('should publish the dimensions of the target', () => {
     windowScroll: { x: 0, y: 0 },
   });
   const wrapper: ReactWrapper<*> = mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext registry={registry}>
       <ScrollableItem
         droppableId={expected.descriptor.id}
         type={expected.descriptor.type}
@@ -67,8 +69,7 @@ it('should publish the dimensions of the target', () => {
     .mockImplementation(() => bigClient.borderBox);
 
   // pull the get dimension function out
-  const callbacks: DroppableCallbacks =
-    marshal.registerDroppable.mock.calls[0][1];
+  const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
   // execute it to get the dimension
   const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
     { x: 0, y: 0 },
@@ -83,7 +84,8 @@ it('should publish the dimensions of the target', () => {
 });
 
 it('should consider the window scroll when calculating dimensions', () => {
-  const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
   const windowScroll: Position = {
     x: 500,
     y: 1000,
@@ -93,6 +95,7 @@ it('should consider the window scroll when calculating dimensions', () => {
     descriptor: {
       id: 'fake-id',
       type: 'fake',
+      mode: 'STANDARD',
     },
     borderBox: bigClient.borderBox,
     margin,
@@ -102,7 +105,7 @@ it('should consider the window scroll when calculating dimensions', () => {
   });
 
   const wrapper: ReactWrapper<*> = mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext registry={registry}>
       <ScrollableItem
         droppableId={expected.descriptor.id}
         type={expected.descriptor.type}
@@ -117,8 +120,7 @@ it('should consider the window scroll when calculating dimensions', () => {
     .mockImplementation(() => bigClient.borderBox);
 
   // pull the get dimension function out
-  const callbacks: DroppableCallbacks =
-    marshal.registerDroppable.mock.calls[0][1];
+  const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
   // execute it to get the dimension
   const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
     windowScroll,
@@ -130,6 +132,8 @@ it('should consider the window scroll when calculating dimensions', () => {
 
 describe('no closest scrollable', () => {
   it('should return null for the closest scrollable if there is no scroll container', () => {
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     const expected: DroppableDimension = getDroppableDimension({
       descriptor,
       borderBox: bigClient.borderBox,
@@ -138,9 +142,8 @@ describe('no closest scrollable', () => {
       padding,
       windowScroll: preset.windowScroll,
     });
-    const marshal: DimensionMarshal = getMarshalStub();
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext registry={registry}>
         <App parentIsScrollable={false} />
       </WithAppContext>,
     );
@@ -152,7 +155,7 @@ describe('no closest scrollable', () => {
 
     // pull the get dimension function out
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
     // execute it to get the dimension
     const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
       preset.windowScroll,
@@ -194,10 +197,11 @@ describe('droppable is scrollable', () => {
         shouldClipSubject: true,
       },
     });
-    const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     // both the droppable and the parent are scrollable
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext registry={registry}>
         <App droppableIsScrollable />
       </WithAppContext>,
     );
@@ -217,7 +221,7 @@ describe('droppable is scrollable', () => {
 
     // pull the get dimension function out
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
     // execute it to get the dimension
     const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
       preset.windowScroll,
@@ -258,10 +262,11 @@ describe('droppable is scrollable', () => {
       windowScroll: preset.windowScroll,
     });
 
-    const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     // both the droppable and the parent are scrollable
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext registry={registry}>
         <App droppableIsScrollable />
       </WithAppContext>,
     );
@@ -283,7 +288,7 @@ describe('droppable is scrollable', () => {
 
     // pull the get dimension function out
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
     // execute it to get the dimension
     const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
       preset.windowScroll,
@@ -317,9 +322,10 @@ describe('parent of droppable is scrollable', () => {
       },
       windowScroll: preset.windowScroll,
     });
-    const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext registry={registry}>
         <App parentIsScrollable droppableIsScrollable={false} />
       </WithAppContext>,
     );
@@ -340,7 +346,7 @@ describe('parent of droppable is scrollable', () => {
     });
     // pull the get dimension function out
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
     // execute it to get the dimension
     const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
       preset.windowScroll,
@@ -374,9 +380,10 @@ describe('both droppable and parent is scrollable', () => {
       },
       windowScroll: preset.windowScroll,
     });
-    const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.droppable, 'register');
     const wrapper = mount(
-      <WithAppContext marshal={marshal}>
+      <WithAppContext registry={registry}>
         <App parentIsScrollable droppableIsScrollable />,
       </WithAppContext>,
     );
@@ -401,7 +408,7 @@ describe('both droppable and parent is scrollable', () => {
 
     // pull the get dimension function out
     const callbacks: DroppableCallbacks =
-      marshal.registerDroppable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].callbacks;
     // execute it to get the dimension
     expect(console.warn).not.toHaveBeenCalled();
     const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
@@ -411,6 +418,7 @@ describe('both droppable and parent is scrollable', () => {
     expect(console.warn).toHaveBeenCalled();
 
     expect(result).toEqual(expected);
+    // $FlowFixMe
     console.warn.mockRestore();
   });
 });
@@ -418,9 +426,10 @@ describe('both droppable and parent is scrollable', () => {
 it('should capture the initial scroll of the closest scrollable', () => {
   // in this case the parent of the droppable is the closest scrollable
   const frameScroll: Position = { x: 10, y: 20 };
-  const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
   const wrapper = mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext registry={registry}>
       <App parentIsScrollable droppableIsScrollable={false} />,
     </WithAppContext>,
   );
@@ -465,8 +474,7 @@ it('should capture the initial scroll of the closest scrollable', () => {
   });
 
   // pull the get dimension function out
-  const callbacks: DroppableCallbacks =
-    marshal.registerDroppable.mock.calls[0][1];
+  const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
   // execute it to get the dimension
   const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
     preset.windowScroll,
@@ -478,9 +486,10 @@ it('should capture the initial scroll of the closest scrollable', () => {
 
 it('should indicate if subject clipping is permitted based on the ignoreContainerClipping prop', () => {
   // in this case the parent of the droppable is the closest scrollable
-  const marshal: DimensionMarshal = getMarshalStub();
+  const registry: Registry = createRegistry();
+  const registerSpy = jest.spyOn(registry.droppable, 'register');
   const wrapper = mount(
-    <WithAppContext marshal={marshal}>
+    <WithAppContext registry={registry}>
       <App
         parentIsScrollable
         droppableIsScrollable={false}
@@ -526,8 +535,7 @@ it('should indicate if subject clipping is permitted based on the ignoreContaine
   });
 
   // pull the get dimension function out
-  const callbacks: DroppableCallbacks =
-    marshal.registerDroppable.mock.calls[0][1];
+  const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
   // execute it to get the dimension
   const result: DroppableDimension = callbacks.getDimensionAndWatchScroll(
     preset.windowScroll,

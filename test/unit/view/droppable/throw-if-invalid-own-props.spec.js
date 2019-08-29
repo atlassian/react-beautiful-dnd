@@ -8,6 +8,7 @@ beforeAll(() => {
 });
 
 afterAll(() => {
+  // $FlowFixMe
   console.error.mockReset();
 });
 

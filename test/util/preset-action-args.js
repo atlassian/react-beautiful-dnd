@@ -141,7 +141,7 @@ export const getCompletedArgs = (reason: DropReason): DropCompleteArgs => {
     afterCritical,
   };
 
-  return { completed, shouldFlush: false };
+  return { completed };
 };
 
 const droppedOnHome: CompletedDrag = {

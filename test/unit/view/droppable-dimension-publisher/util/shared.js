@@ -2,9 +2,10 @@
 /* eslint-disable react/no-multi-comp */
 import { createBox, type Spacing, type BoxModel } from 'css-box-model';
 import React, { useMemo, type Node } from 'react';
-import useDroppableDimensionPublisher from '../../../../../src/view/use-droppable-dimension-publisher/use-droppable-dimension-publisher';
+import useDroppablePublisher from '../../../../../src/view/use-droppable-publisher/use-droppable-publisher';
 import { getComputedSpacing, getPreset } from '../../../../util/dimension';
 import { type DimensionMarshal } from '../../../../../src/state/dimension-marshal/dimension-marshal-types';
+import type { Registry } from '../../../../../src/state/registry/registry-types';
 import type {
   ScrollOptions,
   DroppableId,
@@ -15,6 +16,8 @@ import createRef from '../../../../util/create-ref';
 import AppContext, {
   type AppContextValue,
 } from '../../../../../src/view/context/app-context';
+import { noop } from '../../../../../src/empty';
+import { getMarshalStub } from '../../../../util/dimension-marshal';
 
 export const scheduled: ScrollOptions = {
   shouldPublishImmediately: false,
@@ -72,19 +75,30 @@ const withSpacing = getComputedSpacing({ padding, margin, border });
 export const descriptor: DroppableDescriptor = preset.home.descriptor;
 
 type WithAppContextProps = {|
-  marshal: DimensionMarshal,
+  marshal?: DimensionMarshal,
+  registry: Registry,
   children: Node,
 |};
+
+const focusMarshal = {
+  register: () => noop,
+  tryRecordFocus: noop,
+  tryRestoreFocusRecorded: noop,
+  tryShiftRecord: noop,
+};
 
 export function WithAppContext(props: WithAppContextProps) {
   const context: AppContextValue = useMemo(
     () => ({
-      marshal: props.marshal,
-      style: 'fake',
+      focus: focusMarshal,
+      contextId: 'fake',
       canLift: () => true,
       isMovementAllowed: () => true,
+      liftInstructionId: '1',
+      marshal: props.marshal || getMarshalStub(),
+      registry: props.registry,
     }),
-    [props.marshal],
+    [props.marshal, props.registry],
   );
 
   return (
@@ -106,9 +120,10 @@ export function ScrollableItem(props: ScrollableItemProps) {
   // originally tests where made with this as the default
   const isScrollable: boolean = props.isScrollable !== false;
 
-  useDroppableDimensionPublisher({
+  useDroppablePublisher({
     droppableId: props.droppableId || descriptor.id,
     type: props.type || descriptor.type,
+    mode: 'STANDARD',
     direction: preset.home.axis.direction,
     isDropDisabled: props.isDropDisabled || false,
     ignoreContainerClipping: false,
@@ -154,9 +169,10 @@ export function App(props: AppProps) {
     showPlaceholder = false,
   } = props;
 
-  useDroppableDimensionPublisher({
+  useDroppablePublisher({
     droppableId: descriptor.id,
     direction: 'vertical',
+    mode: 'STANDARD',
     isDropDisabled: false,
     isCombineEnabled: false,
     type: descriptor.type,
