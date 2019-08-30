@@ -3,91 +3,72 @@ import React, { useRef, useCallback } from 'react';
 import invariant from 'tiny-invariant';
 import { type Spacing, type Rect } from 'css-box-model';
 import { mount, type ReactWrapper } from 'enzyme';
-import useDraggableDimensionPublisher from '../../../src/view/use-draggable-dimension-publisher';
+import { useMemo } from 'use-memo-one';
+import useDraggablePublisher from '../../../src/view/use-draggable-publisher';
 import {
   getPreset,
   getDraggableDimension,
   getComputedSpacing,
 } from '../../util/dimension';
-import type {
-  DimensionMarshal,
-  GetDraggableDimensionFn,
-} from '../../../src/state/dimension-marshal/dimension-marshal-types';
 import forceUpdate from '../../util/force-update';
 import tryCleanPrototypeStubs from '../../util/try-clean-prototype-stubs';
-import { getMarshalStub } from '../../util/dimension-marshal';
 import type {
   DraggableId,
   DraggableDimension,
   DraggableDescriptor,
+  DraggableOptions,
 } from '../../../src/types';
-import AppContext, {
-  type AppContextValue,
-} from '../../../src/view/context/app-context';
-import DroppableContext, {
-  type DroppableContextValue,
-} from '../../../src/view/context/droppable-context';
+import type {
+  Registry,
+  DraggableEntry,
+  GetDraggableDimensionFn,
+} from '../../../src/state/registry/registry-types';
+import createRegistry from '../../../src/state/registry/create-registry';
 
 const preset = getPreset();
 const noComputedSpacing = getComputedSpacing({});
 
 type ItemProps = {|
-  index: number,
-  draggableId: DraggableId,
-|};
-
-type AppProps = {|
-  marshal: DimensionMarshal,
   index?: number,
   draggableId?: DraggableId,
-  Component?: any,
+  registry: Registry,
 |};
 
+const defaultOptions: DraggableOptions = {
+  canDragInteractiveElements: false,
+  shouldRespectForcePress: false,
+  isEnabled: true,
+};
+
 function Item(props: ItemProps) {
+  const {
+    registry,
+    draggableId = preset.inHome1.descriptor.id,
+    index = preset.inHome1.descriptor.index,
+  } = props;
   const ref = useRef<?HTMLElement>(null);
   const setRef = useCallback((value: ?HTMLElement) => {
     ref.current = value;
   }, []);
   const getRef = useCallback((): ?HTMLElement => ref.current, []);
+  const descriptor: DraggableDescriptor = useMemo(
+    () => ({
+      id: draggableId,
+      index,
+      type: preset.inHome1.descriptor.type,
+      droppableId: preset.inHome1.descriptor.droppableId,
+    }),
+    [draggableId, index],
+  );
 
-  useDraggableDimensionPublisher({
-    draggableId: props.draggableId,
-    index: props.index,
+  useDraggablePublisher({
+    descriptor,
     getDraggableRef: getRef,
+    registry,
+    ...defaultOptions,
   });
 
   return <div ref={setRef}>hi</div>;
-}
-
-function App({
-  marshal,
-  draggableId = preset.inHome1.descriptor.id,
-  index = preset.inHome1.descriptor.index,
-  Component = Item,
-}: AppProps) {
-  const appContext: AppContextValue = {
-    marshal,
-    style: '1',
-    canLift: () => true,
-    isMovementAllowed: () => true,
-  };
-  const droppableContext: DroppableContextValue = {
-    type: preset.inHome1.descriptor.type,
-    droppableId: preset.inHome1.descriptor.droppableId,
-  };
-
-  const itemProps: ItemProps = {
-    draggableId,
-    index,
-  };
-
-  return (
-    <AppContext.Provider value={appContext}>
-      <DroppableContext.Provider value={droppableContext}>
-        <Component {...itemProps} />
-      </DroppableContext.Provider>
-    </AppContext.Provider>
-  );
 }
 
 beforeEach(() => {
@@ -103,69 +84,112 @@ afterEach(() => {
 
 describe('dimension registration', () => {
   it('should register itself when mounting', () => {
-    const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.draggable, 'register');
+    mount(<Item registry={registry} />);
 
-    mount(<App marshal={marshal} />);
-
-    expect(marshal.registerDraggable).toHaveBeenCalledTimes(1);
-    expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(
-      preset.inHome1.descriptor,
-    );
+    const expected: DraggableEntry = {
+      // $ExpectError
+      uniqueId: expect.any(String),
+      descriptor: preset.inHome1.descriptor,
+      options: defaultOptions,
+      // $ExpectError
+      getDimension: expect.any(Function),
+    };
+    expect(registerSpy).toHaveBeenCalledTimes(1);
+    expect(registerSpy).toHaveBeenCalledWith(expected);
   });
 
   it('should unregister itself when unmounting', () => {
-    const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.draggable, 'register');
+    const unregisterSpy = jest.spyOn(registry.draggable, 'unregister');
+    const wrapper = mount(<Item registry={registry} />);
 
-    const wrapper = mount(<App marshal={marshal} />);
-    expect(marshal.registerDraggable).toHaveBeenCalled();
-    expect(marshal.unregisterDraggable).not.toHaveBeenCalled();
+    const expected: DraggableEntry = {
+      // $ExpectError
+      uniqueId: expect.any(String),
+      descriptor: preset.inHome1.descriptor,
+      options: defaultOptions,
+      // $ExpectError
+      getDimension: expect.any(Function),
+    };
+
+    expect(unregisterSpy).not.toHaveBeenCalled();
+    expect(registerSpy).toHaveBeenCalledTimes(1);
+    expect(registerSpy).toHaveBeenCalledWith(expected);
+    const entry = registerSpy.mock.calls[0][0];
+    expect(entry).toEqual(expected);
 
     wrapper.unmount();
-    expect(marshal.unregisterDraggable).toHaveBeenCalledTimes(1);
-    expect(marshal.unregisterDraggable).toHaveBeenCalledWith(
-      preset.inHome1.descriptor,
-    );
+    expect(unregisterSpy).toHaveBeenCalledTimes(1);
+    expect(unregisterSpy.mock.calls[0][0]).toBe(entry);
   });
 
   it('should update its registration when a descriptor property changes', () => {
-    const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.draggable, 'register');
+    const updateSpy = jest.spyOn(registry.draggable, 'update');
+    const unregisterSpy = jest.spyOn(registry.draggable, 'unregister');
+    const wrapper = mount(<Item registry={registry} />);
 
-    const wrapper = mount(<App marshal={marshal} />);
+    const expectedInitial: DraggableEntry = {
+      // $ExpectError
+      uniqueId: expect.any(String),
+      descriptor: preset.inHome1.descriptor,
+      options: defaultOptions,
+      // $ExpectError
+      getDimension: expect.any(Function),
+    };
+
     // asserting shape of original publish
-    expect(marshal.registerDraggable.mock.calls[0][0]).toEqual(
-      preset.inHome1.descriptor,
-    );
-    marshal.registerDraggable.mockClear();
-    marshal.registerDroppable.mockClear();
+    expect(registerSpy).toHaveBeenCalledTimes(1);
+    expect(registerSpy).toHaveBeenCalledWith(expectedInitial);
+    const entry = registerSpy.mock.calls[0][0];
+    expect(entry).toEqual(expectedInitial);
+
+    expect(updateSpy).not.toHaveBeenCalled();
+    expect(unregisterSpy).not.toHaveBeenCalled();
+
+    registerSpy.mockReset();
 
     // updating the index
     wrapper.setProps({
       index: 1000,
     });
-    const newDescriptor: DraggableDescriptor = {
-      ...preset.inHome1.descriptor,
-      index: 1000,
-    };
 
     // Descriptor updated
-    expect(marshal.updateDraggable).toHaveBeenCalledWith(
-      preset.inHome1.descriptor,
-      newDescriptor,
-      expect.any(Function),
-    );
+    const expectedUpdate: DraggableEntry = {
+      uniqueId: entry.uniqueId,
+      descriptor: {
+        ...preset.inHome1.descriptor,
+        index: 1000,
+      },
+      options: defaultOptions,
+      // $ExpectError
+      getDimension: expect.any(Function),
+    };
+    expect(updateSpy).toHaveBeenCalledTimes(1);
+    // new descriptor
+    expect(updateSpy.mock.calls[0][0]).toEqual(expectedUpdate);
+    // late reference: same reference
+    expect(updateSpy.mock.calls[0][1]).toBe(entry);
+
     // Nothing else changed
-    expect(marshal.registerDraggable).not.toHaveBeenCalled();
-    expect(marshal.unregisterDraggable).not.toHaveBeenCalled();
+    expect(registerSpy).not.toHaveBeenCalled();
+    expect(unregisterSpy).not.toHaveBeenCalled();
   });
 
   it('should not update its registration when a descriptor property does not change on an update', () => {
-    const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.draggable, 'register');
+    const updateSpy = jest.spyOn(registry.draggable, 'update');
+    const wrapper = mount(<Item registry={registry} />);
 
-    const wrapper = mount(<App marshal={marshal} />);
-    expect(marshal.registerDraggable).toHaveBeenCalledTimes(1);
+    expect(registerSpy).toHaveBeenCalledTimes(1);
 
     forceUpdate(wrapper);
-    expect(marshal.updateDraggable).not.toHaveBeenCalled();
+    expect(updateSpy).not.toHaveBeenCalled();
   });
 });
 
@@ -195,15 +219,15 @@ describe('dimension publishing', () => {
         left: 0,
       },
     });
-
     jest
       .spyOn(window, 'getComputedStyle')
       .mockImplementation(() => noComputedSpacing);
-    const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.draggable, 'register');
 
     const wrapper: ReactWrapper<*> = mount(
-      <App
-        marshal={marshal}
+      <Item
+        registry={registry}
         draggableId={expected.descriptor.id}
         index={expected.descriptor.index}
       />,
@@ -213,7 +237,7 @@ describe('dimension publishing', () => {
 
     // pull the get dimension function out
     const getDimension: GetDraggableDimensionFn =
-      marshal.registerDraggable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].getDimension;
     // execute it to get the dimension
     const result: DraggableDimension = getDimension({ x: 0, y: 0 });
 
@@ -245,11 +269,12 @@ describe('dimension publishing', () => {
     jest
       .spyOn(window, 'getComputedStyle')
       .mockImplementation(() => getComputedSpacing({ margin }));
-    const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.draggable, 'register');
 
     const wrapper: ReactWrapper<*> = mount(
-      <App
-        marshal={marshal}
+      <Item
+        registry={registry}
         draggableId={expected.descriptor.id}
         index={expected.descriptor.index}
       />,
@@ -259,7 +284,7 @@ describe('dimension publishing', () => {
 
     // pull the get dimension function out
     const getDimension: GetDraggableDimensionFn =
-      marshal.registerDraggable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].getDimension;
     // execute it to get the dimension
     const result: DraggableDimension = getDimension({ x: 0, y: 0 });
 
@@ -267,7 +292,6 @@ describe('dimension publishing', () => {
   });
 
   it('should consider the window scroll when calculating dimensions', () => {
-    const marshal: DimensionMarshal = getMarshalStub();
     const expected: DraggableDimension = getDraggableDimension({
       descriptor: {
         id: 'fake-id',
@@ -286,12 +310,14 @@ describe('dimension publishing', () => {
     jest
       .spyOn(window, 'getComputedStyle')
       .mockImplementation(() => noComputedSpacing);
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.draggable, 'register');
 
     const wrapper: ReactWrapper<*> = mount(
-      <App
+      <Item
         draggableId={expected.descriptor.id}
         index={expected.descriptor.index}
-        marshal={marshal}
+        registry={registry}
       />,
     );
 
@@ -299,7 +325,7 @@ describe('dimension publishing', () => {
 
     // pull the get dimension function out
     const getDimension: GetDraggableDimensionFn =
-      marshal.registerDraggable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].getDimension;
     // execute it to get the dimension
     const result: DraggableDimension = getDimension(preset.windowScroll);
 
@@ -308,24 +334,41 @@ describe('dimension publishing', () => {
 
   it('should throw an error if no ref is provided when attempting to get a dimension', () => {
     function NoRefItem(props: ItemProps) {
+      const {
+        registry,
+        draggableId = preset.inHome1.descriptor.id,
+        index = preset.inHome1.descriptor.index,
+      } = props;
       const ref = useRef<?HTMLElement>(null);
       const getRef = useCallback((): ?HTMLElement => ref.current, []);
+      const descriptor: DraggableDescriptor = useMemo(
+        () => ({
+          id: draggableId,
+          index,
+          type: preset.inHome1.descriptor.type,
+          droppableId: preset.inHome1.descriptor.droppableId,
+        }),
+        [draggableId, index],
+      );
 
-      useDraggableDimensionPublisher({
-        draggableId: props.draggableId,
-        index: props.index,
+      useDraggablePublisher({
+        descriptor,
         getDraggableRef: getRef,
+        registry,
+        ...defaultOptions,
       });
 
+      // No ref
       return <div>hi</div>;
     }
-    const marshal: DimensionMarshal = getMarshalStub();
+    const registry: Registry = createRegistry();
+    const registerSpy = jest.spyOn(registry.draggable, 'register');
     const wrapper: ReactWrapper<*> = mount(
-      <App marshal={marshal} Component={NoRefItem} />,
+      <NoRefItem registry={registry} draggableId="draggable" />,
     );
     // pull the get dimension function out
     const getDimension: GetDraggableDimensionFn =
-      marshal.registerDraggable.mock.calls[0][1];
+      registerSpy.mock.calls[0][0].getDimension;
     // when we call the get dimension function without a ref things will explode
     expect(getDimension).toThrow();
     wrapper.unmount();
