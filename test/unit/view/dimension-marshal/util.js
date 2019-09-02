@@ -8,13 +8,6 @@ import type {
 
 const preset = getPreset();
 
-export const withExpectedAdvancedUsageWarning = (fn: Function) => {
-  jest.spyOn(console, 'warn').mockImplementation(() => {});
-  fn();
-  expect(console.warn).toHaveBeenCalled();
-  console.warn.mockRestore();
-};
-
 export const defaultRequest: LiftRequest = {
   draggableId: preset.inHome1.descriptor.id,
   scrollOptions: {

@@ -19,9 +19,10 @@ import {
   type DimensionWatcher,
   getCallbacksStub,
 } from '../../../util/dimension-marshal';
-import { defaultRequest, withExpectedAdvancedUsageWarning } from './util';
+import { defaultRequest } from './util';
 import { makeScrollable } from '../../../util/dimension';
 import { setViewport } from '../../../util/viewport';
+import { withWarn } from '../../../util/console';
 
 const viewport: Viewport = preset.viewport;
 setViewport(viewport);
@@ -108,7 +109,7 @@ describe('additions', () => {
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // Registering a new draggable (inserted before inHome1)
-    withExpectedAdvancedUsageWarning(() => {
+    withWarn(() => {
       marshal.registerDraggable(beforeInHome1.descriptor, () => beforeInHome1);
     });
     marshal.registerDraggable(beforeInHome2.descriptor, () => beforeInHome2);
@@ -187,7 +188,7 @@ describe('additions', () => {
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // publishing the higher index value first
-    withExpectedAdvancedUsageWarning(() => {
+    withWarn(() => {
       marshal.registerDraggable(beforeInHome2.descriptor, () => beforeInHome2);
     });
     // publishing the lower index value second
@@ -216,7 +217,7 @@ describe('droppables', () => {
     marshal.startPublishing(defaultRequest);
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
-    withExpectedAdvancedUsageWarning(() => {
+    withWarn(() => {
       marshal.unregisterDraggable(preset.inHome2.descriptor);
     });
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
@@ -248,7 +249,7 @@ describe('droppables', () => {
     marshal.startPublishing(defaultRequest);
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
-    withExpectedAdvancedUsageWarning(() => {
+    withWarn(() => {
       marshal.unregisterDraggable(preset.inForeign1.descriptor);
     });
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
@@ -282,7 +283,7 @@ describe('removals', () => {
     marshal.startPublishing(defaultRequest);
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
-    withExpectedAdvancedUsageWarning(() => {
+    withWarn(() => {
       marshal.unregisterDraggable(preset.inHome2.descriptor);
     });
     marshal.unregisterDraggable(preset.inHome3.descriptor);
@@ -361,7 +362,7 @@ describe('cancelling mid publish', () => {
       viewport,
     });
 
-    withExpectedAdvancedUsageWarning(() => {
+    withWarn(() => {
       marshal.registerDraggable(
         preset.inHome2.descriptor,
         () => preset.inHome2,
@@ -387,7 +388,7 @@ describe('subsequent', () => {
 
     marshal.startPublishing(defaultRequest);
 
-    withExpectedAdvancedUsageWarning(() => {
+    withWarn(() => {
       marshal.registerDraggable(
         preset.inHome2.descriptor,
         () => preset.inHome1,
@@ -409,7 +410,7 @@ describe('subsequent', () => {
 
     marshal.startPublishing(defaultRequest);
 
-    withExpectedAdvancedUsageWarning(() => {
+    withWarn(() => {
       marshal.registerDraggable(
         preset.inHome2.descriptor,
         () => preset.inHome1,

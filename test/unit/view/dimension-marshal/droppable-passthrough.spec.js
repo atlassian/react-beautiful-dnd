@@ -8,16 +8,8 @@ import type {
 import { getCallbacksStub } from '../../../util/dimension-marshal';
 import { critical, defaultRequest, justCritical } from './util';
 import createRegistry from '../../../../src/state/registry/create-registry';
-import type {
-  Registry,
-  DraggableEntry,
-} from '../../../../src/state/registry/registry-types';
-import {
-  getDraggableEntry,
-  getDroppableEntry,
-  populate,
-  type DimensionWatcher,
-} from '../../../util/registry';
+import type { Registry } from '../../../../src/state/registry/registry-types';
+import { populate, type DimensionWatcher } from '../../../util/registry';
 
 const preset = getPreset();
 
