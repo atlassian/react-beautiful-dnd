@@ -78,6 +78,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  // $FlowFixMe
   console.error.mockRestore();
   tryCleanPrototypeStubs();
 });
