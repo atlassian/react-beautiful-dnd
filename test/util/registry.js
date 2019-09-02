@@ -20,7 +20,7 @@ import { noop } from '../../src/empty';
 import { getPreset } from './dimension';
 
 type DraggableArgs = {
-  uniqueId: Id,
+  uniqueId?: Id,
   dimension: DraggableDimension,
 };
 
@@ -30,8 +30,15 @@ const defaultOptions: DraggableOptions = {
   isEnabled: true,
 };
 
+const getUniqueId = (() => {
+  let count: number = 0;
+  return function create(): Id {
+    return `unique-id-${count++}`;
+  };
+})();
+
 export function getDraggableEntry({
-  uniqueId,
+  uniqueId = getUniqueId(),
   dimension,
 }: DraggableArgs): DraggableEntry {
   return {
@@ -39,27 +46,6 @@ export function getDraggableEntry({
     descriptor: dimension.descriptor,
     options: defaultOptions,
     getDimension: () => dimension,
-  };
-}
-
-type DroppableArgs = {|
-  uniqueId: Id,
-  dimension: DroppableDimension,
-|};
-
-export function getDroppableEntry({
-  uniqueId,
-  dimension,
-}: DroppableArgs): DroppableEntry {
-  return {
-    uniqueId,
-    descriptor: dimension.descriptor,
-    callbacks: {
-      getDimensionAndWatchScroll: () => dimension,
-      recollect: () => dimension,
-      scroll: noop,
-      dragStopped: noop,
-    },
   };
 }
 
@@ -71,6 +57,22 @@ export const getDroppableCallbacks = (
   scroll: jest.fn(),
   dragStopped: jest.fn(),
 });
+
+type DroppableArgs = {|
+  uniqueId?: Id,
+  dimension: DroppableDimension,
+|};
+
+export function getDroppableEntry({
+  uniqueId = getUniqueId(),
+  dimension,
+}: DroppableArgs): DroppableEntry {
+  return {
+    uniqueId,
+    descriptor: dimension.descriptor,
+    callbacks: getDroppableCallbacks(dimension),
+  };
+}
 
 export type DimensionWatcher = {|
   draggable: {|
