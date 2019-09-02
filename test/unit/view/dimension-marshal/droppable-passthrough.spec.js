@@ -5,20 +5,31 @@ import type {
   Callbacks,
   DimensionMarshal,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
-import {
-  populateMarshal,
-  getCallbacksStub,
-  type DimensionWatcher,
-} from '../../../util/dimension-marshal';
+import { getCallbacksStub } from '../../../util/dimension-marshal';
 import { critical, defaultRequest, justCritical } from './util';
+import createRegistry from '../../../../src/state/registry/create-registry';
+import type {
+  Registry,
+  DraggableEntry,
+} from '../../../../src/state/registry/registry-types';
+import {
+  getDraggableEntry,
+  getDroppableEntry,
+  populate,
+  type DimensionWatcher,
+} from '../../../util/registry';
 
 const preset = getPreset();
 
 describe('force scrolling a droppable', () => {
   it('should scroll the droppable', () => {
+    const registry: Registry = createRegistry();
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    const watcher: DimensionWatcher = populateMarshal(marshal);
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    const watcher: DimensionWatcher = populate(registry);
 
     // initial lift
     marshal.startPublishing(defaultRequest);
@@ -34,8 +45,12 @@ describe('force scrolling a droppable', () => {
 
   it('should throw if the droppable cannot be found', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, justCritical);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, justCritical);
 
     // initial lift
     marshal.startPublishing(defaultRequest);
@@ -43,15 +58,17 @@ describe('force scrolling a droppable', () => {
     // scroll
     expect(() => {
       marshal.scrollDroppable(preset.foreign.descriptor.id, { x: 10, y: 20 });
-    }).toThrow(
-      'Invariant failed: Cannot scroll Droppable foreign as it is not registered',
-    );
+    }).toThrow();
   });
 
   it('should not scroll the droppable if no collection is occurring', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    const watcher: DimensionWatcher = populateMarshal(marshal);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    const watcher: DimensionWatcher = populate(registry);
 
     marshal.scrollDroppable(critical.droppable.id, { x: 10, y: 20 });
     expect(watcher.droppable.scroll).not.toHaveBeenCalled();
@@ -61,8 +78,12 @@ describe('force scrolling a droppable', () => {
 describe('responding to scroll changes', () => {
   it('should let consumers know', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    const watcher: DimensionWatcher = populateMarshal(marshal);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    const watcher: DimensionWatcher = populate(registry);
 
     // initial lift
     marshal.startPublishing(defaultRequest);
@@ -77,8 +98,12 @@ describe('responding to scroll changes', () => {
 
   it('should throw if the droppable cannot be found', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, justCritical);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, justCritical);
 
     // initial lift
     marshal.startPublishing(defaultRequest);
@@ -96,8 +121,12 @@ describe('responding to scroll changes', () => {
 
   it('should not let consumers know if know drag is occurring', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, justCritical);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, justCritical);
 
     marshal.updateDroppableScroll(critical.droppable.id, { x: 10, y: 20 });
     expect(callbacks.updateDroppableScroll).not.toHaveBeenCalled();
@@ -107,8 +136,12 @@ describe('responding to scroll changes', () => {
 describe('is enabled changes', () => {
   it('should let consumers know', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry);
 
     // initial lift
     marshal.startPublishing(defaultRequest);
@@ -123,8 +156,12 @@ describe('is enabled changes', () => {
 
   it('should throw if the droppable cannot be found', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, justCritical);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, justCritical);
 
     // initial lift
     marshal.startPublishing(defaultRequest);
@@ -139,8 +176,12 @@ describe('is enabled changes', () => {
 
   it('should not let consumers know if no collection is occurring', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, justCritical);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, justCritical);
 
     marshal.updateDroppableIsEnabled(critical.droppable.id, false);
     expect(callbacks.updateDroppableIsEnabled).not.toHaveBeenCalled();
