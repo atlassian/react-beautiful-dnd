@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import type {
   SensorAPI,
   PreDragActions,
@@ -146,8 +146,10 @@ it('should release a lock when cancelling or dropping a drag', () => {
     const second: ?PreDragActions = api.tryGetLock('1', noop);
     expect(second).toBe(null);
 
-    // calling canel or drop
-    drag[property]();
+    // calling cancel or drop
+    act(() => {
+      drag[property]();
+    });
 
     // can now get another lock
     const third: ?PreDragActions = api.tryGetLock('1', noop);

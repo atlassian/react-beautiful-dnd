@@ -6,18 +6,16 @@ import { expectIsFull } from './util/expect';
 import getPlaceholderStyle from './util/get-placeholder-style';
 import { placeholder } from './util/data';
 
-const styleContext: string = 'yolo';
-
 it('should only fire a single onClose event', () => {
   const onClose = jest.fn();
 
   const wrapper: ReactWrapper<*> = mount(
     <Placeholder
+      contextId="1"
       animate="none"
       placeholder={placeholder}
       onClose={onClose}
       onTransitionEnd={jest.fn()}
-      styleContext={styleContext}
     />,
   );
   expectIsFull(getPlaceholderStyle(wrapper));
@@ -55,10 +53,10 @@ it('should not fire an onClose if not closing when a transitionend occurs', () =
   const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="none"
+      contextId="1"
       placeholder={placeholder}
       onClose={onClose}
       onTransitionEnd={jest.fn()}
-      styleContext={styleContext}
     />,
   );
   const assert = () => {

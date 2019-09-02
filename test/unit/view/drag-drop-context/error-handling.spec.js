@@ -91,6 +91,7 @@ const whenIdle: DraggableStateSnapshot = {
   draggingOver: null,
   dropAnimation: null,
   isDropAnimating: false,
+  isClone: false,
   isDragging: false,
   combineWith: null,
   combineTargetFor: null,
