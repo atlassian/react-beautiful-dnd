@@ -5,7 +5,7 @@ import type {
 } from '../../../../src/state/registry/registry-types';
 import createRegistry from '../../../../src/state/registry/create-registry';
 import { getPreset } from '../../../util/dimension';
-import { getDroppableEntry } from './util';
+import { getDroppableEntry } from '../../../util/registry';
 
 const preset = getPreset();
 

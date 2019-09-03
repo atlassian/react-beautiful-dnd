@@ -8,7 +8,7 @@ import type {
 } from '../../../../src/state/registry/registry-types';
 import type { DraggableId } from '../../../../src/types';
 import { getPreset } from '../../../util/dimension';
-import { getDraggableEntry } from './util';
+import { getDraggableEntry } from '../../../util/registry';
 import useRegistry from '../../../../src/state/registry/use-registry';
 
 const preset = getPreset();
