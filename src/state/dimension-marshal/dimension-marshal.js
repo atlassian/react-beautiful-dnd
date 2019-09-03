@@ -25,11 +25,43 @@ import type {
   Critical,
   DraggableDescriptor,
 } from '../../types';
+import { warning } from '../../dev-warning';
 
 type Collection = {|
   critical: Critical,
   unsubscribe: Unsubscribe,
 |};
+
+function shouldPublishUpdate(
+  registry: Registry,
+  dragging: DraggableDescriptor,
+  entry: DraggableEntry,
+): boolean {
+  // do not publish updates for the critical draggable
+  if (entry.descriptor.id === dragging.id) {
+    return false;
+  }
+  // do not publish updates for draggables that are not of a type that we care about
+  if (entry.descriptor.type !== dragging.type) {
+    return false;
+  }
+
+  const home: DroppableEntry = registry.droppable.getById(
+    entry.descriptor.droppableId,
+  );
+
+  if (home.descriptor.mode !== 'VIRTUAL') {
+    warning(`
+      You are attempting to add or remove a Draggable [id: ${entry.descriptor.id}]
+      while a drag is occurring. This is only supported for virtual lists.
+
+      See https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/virtual-lists.md
+    `);
+    return false;
+  }
+
+  return true;
+}
 
 export default (registry: Registry, callbacks: Callbacks) => {
   let collection: ?Collection = null;
@@ -132,27 +164,15 @@ export default (registry: Registry, callbacks: Callbacks) => {
     );
     // The dragging item can be add and removed when using a clone
     // We do not publish updates for the critical item
-    const critical: DraggableDescriptor = collection.critical.draggable;
-
-    function canPublish(entry: DraggableEntry) {
-      // do not publish updates for the critical draggable
-      if (entry.descriptor.id === critical.id) {
-        return false;
-      }
-      // do not publish updates for draggables that are not of a type that we care about
-      if (entry.descriptor.type !== critical.type) {
-        return false;
-      }
-      return true;
-    }
+    const dragging: DraggableDescriptor = collection.critical.draggable;
 
     if (event.type === 'ADDITION') {
-      if (canPublish(event.value)) {
+      if (shouldPublishUpdate(registry, dragging, event.value)) {
         publisher.add(event.value);
       }
     }
     if (event.type === 'REMOVAL') {
-      if (canPublish(event.value)) {
+      if (shouldPublishUpdate(registry, dragging, event.value)) {
         publisher.remove(event.value);
       }
     }

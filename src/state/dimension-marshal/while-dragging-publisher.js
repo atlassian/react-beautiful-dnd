@@ -19,7 +19,6 @@ import type {
 } from '../registry/registry-types';
 import * as timings from '../../debug/timings';
 import { origin } from '../position';
-import { warning } from '../../dev-warning';
 
 export type WhileDraggingPublisher = {|
   add: (entry: DraggableEntry) => void,
@@ -56,36 +55,10 @@ export default function createPublisher({
   registry,
   callbacks,
 }: Args): WhileDraggingPublisher {
-  const advancedUsageWarning = (() => {
-    // noop for production
-    if (process.env.NODE_ENV === 'production') {
-      return () => {};
-    }
-
-    let hasAnnounced: boolean = false;
-
-    return () => {
-      if (hasAnnounced) {
-        return;
-      }
-
-      hasAnnounced = true;
-
-      warning(`
-        Advanced usage warning: you are adding or removing a dimension during a drag
-        This an advanced feature.
-
-        More information: https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/changes-while-dragging.md
-      `);
-    };
-  })();
-
   let staging: Staging = clean();
   let frameId: ?AnimationFrameID = null;
 
   const collect = () => {
-    advancedUsageWarning();
-
     if (frameId) {
       return;
     }
