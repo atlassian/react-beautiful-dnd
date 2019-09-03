@@ -15,14 +15,23 @@ import type {
 import { critical, preset } from '../../../util/preset-action-args';
 import {
   getDroppableCallbacks,
-  populateMarshal,
-  type DimensionWatcher,
   getCallbacksStub,
 } from '../../../util/dimension-marshal';
 import { defaultRequest } from './util';
 import { makeScrollable } from '../../../util/dimension';
 import { setViewport } from '../../../util/viewport';
 import { withWarn } from '../../../util/console';
+import type {
+  Registry,
+  DraggableEntry,
+} from '../../../../src/state/registry/registry-types';
+import createRegistry from '../../../../src/state/registry/create-registry';
+import {
+  getDraggableEntry,
+  getDroppableEntry,
+  populate,
+  type DimensionWatcher,
+} from '../../../util/registry';
 
 const viewport: Viewport = preset.viewport;
 setViewport(viewport);
@@ -49,6 +58,7 @@ const ofAnotherType: DroppableDimension = {
   descriptor: {
     type: 'some rogue type',
     id: 'another droppable',
+    mode: 'VIRTUAL',
   },
 };
 const inAnotherType: DraggableDimension = {
@@ -83,7 +93,7 @@ afterEach(() => {
 });
 
 describe('additions', () => {
-  it('should collect and publish the draggables', () => {
+  it.only('should collect and publish the draggables', () => {
     const beforeInHome1: DraggableDimension = {
       ...preset.inHome1,
       descriptor: {
@@ -100,9 +110,13 @@ describe('additions', () => {
         index: 1,
       },
     };
+    const registry: Registry = createRegistry();
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
@@ -110,9 +124,14 @@ describe('additions', () => {
 
     // Registering a new draggable (inserted before inHome1)
     withWarn(() => {
-      marshal.registerDraggable(beforeInHome1.descriptor, () => beforeInHome1);
+      registry.draggable.register(
+        getDraggableEntry({ dimension: beforeInHome1 }),
+      );
     });
-    marshal.registerDraggable(beforeInHome2.descriptor, () => beforeInHome2);
+    registry.draggable.register(
+      getDraggableEntry({ dimension: beforeInHome2 }),
+    );
+    expect(callbacks.collectionStarting).toHaveBeenCalled();
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
@@ -125,22 +144,24 @@ describe('additions', () => {
     expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
   });
 
-  it('should throw if trying to add a droppable', () => {
+  it.only('should not do anything if a droppable is added', () => {
+    const registry: Registry = createRegistry();
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
-    const register = () =>
-      marshal.registerDroppable(
-        anotherDroppable.descriptor,
-        getDroppableCallbacks(anotherDroppable),
-      );
+    registry.droppable.register(
+      getDroppableEntry({ dimension: anotherDroppable }),
+    );
 
-    expect(register).toThrow();
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
   });
 
   it('should throw if trying to add a draggable that does not have the same type as the dragging item', () => {
