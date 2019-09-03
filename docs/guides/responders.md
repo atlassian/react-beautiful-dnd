@@ -76,6 +76,7 @@ type DragStart = {|
   draggableId: DraggableId,
   type: TypeId,
   source: DraggableLocation,
+  mode: MovementMode,
 |};
 
 type DraggableLocation = {|

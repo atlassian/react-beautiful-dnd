@@ -10,6 +10,7 @@
 - 🎮 A drag'n'drop Checkers game
   - [Demo](https://checkers-game.netlify.com/)
   - [Source](https://github.com/emanuellarini/checkers)
+- [react-kanban](https://github.com/lourenci/react-kanban) - Another Kanban/Trello board lib for React, with customizations to use in projects.
 
 ## Addons
 
