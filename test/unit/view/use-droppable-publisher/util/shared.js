@@ -128,7 +128,6 @@ export function ScrollableItem(props: ScrollableItemProps) {
     isDropDisabled: props.isDropDisabled || false,
     ignoreContainerClipping: false,
     getDroppableRef: droppableRef.getRef,
-    getPlaceholderRef: placeholderRef.getRef,
     isCombineEnabled: props.isCombineEnabled || false,
   });
 
@@ -178,7 +177,6 @@ export function App(props: AppProps) {
     type: descriptor.type,
     ignoreContainerClipping,
     getDroppableRef: droppableRef.getRef,
-    getPlaceholderRef: placeholderRef.getRef,
   });
 
   return (
