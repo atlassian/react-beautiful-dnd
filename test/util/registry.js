@@ -11,13 +11,12 @@ import type {
 } from '../../src/types';
 import type {
   DroppableCallbacks,
-  RecollectDroppableOptions,
   Registry,
   DraggableEntry,
   DroppableEntry,
 } from '../../src/state/registry/registry-types';
-import { noop } from '../../src/empty';
 import { getPreset } from './dimension';
+import { origin } from '../../src/state/position';
 
 type DraggableArgs = {
   uniqueId?: Id,
@@ -53,7 +52,7 @@ export const getDroppableCallbacks = (
   dimension: DroppableDimension,
 ): DroppableCallbacks => ({
   getDimensionAndWatchScroll: jest.fn().mockReturnValue(dimension),
-  recollect: jest.fn().mockReturnValue(dimension),
+  getScrollWhileDragging: jest.fn().mockReturnValue(origin),
   scroll: jest.fn(),
   dragStopped: jest.fn(),
 });
@@ -81,7 +80,7 @@ export type DimensionWatcher = {|
   droppable: {|
     getDimensionAndWatchScroll: Function,
     scroll: Function,
-    recollect: Function,
+    getScrollWhileDragging: Function,
     dragStopped: Function,
   |},
 |};
@@ -100,7 +99,7 @@ export const populate = (
     droppable: {
       getDimensionAndWatchScroll: jest.fn(),
       scroll: jest.fn(),
-      recollect: jest.fn(),
+      getScrollWhileDragging: jest.fn(),
       dragStopped: jest.fn(),
     },
   };
@@ -115,9 +114,13 @@ export const populate = (
       scroll: (change: Position) => {
         watcher.droppable.scroll(id, change);
       },
-      recollect: (options: RecollectDroppableOptions) => {
-        watcher.droppable.recollect(id, options);
-        return droppable;
+      getScrollWhileDragging: () => {
+        const scroll: Position = droppable.frame
+          ? droppable.frame.scroll.current
+          : origin;
+
+        watcher.droppable.getScrollWhileDragging(id, scroll);
+        return scroll;
       },
       dragStopped: () => {
         watcher.droppable.dragStopped(id);
