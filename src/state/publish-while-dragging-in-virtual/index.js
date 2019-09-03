@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 import type {
   DimensionMap,
   DraggingState,
@@ -12,6 +13,7 @@ import type {
   DraggableDimensionMap,
   DroppableDimension,
   DragImpact,
+  DroppablePublish,
 } from '../../types';
 import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
@@ -19,6 +21,7 @@ import adjustAdditionsForScrollChanges from '../publish-while-dragging/update-dr
 import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
 import scrollDroppable from '../droppable/scroll-droppable';
+import { isEqual, subtract } from '../position';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -38,19 +41,23 @@ export default ({
   // The scroll might be different to what is currently in the state
   // We want to ensure the new draggables are in step with the state
   const withScrollChange: DroppableDimension[] = published.modified.map(
-    (droppable: DroppableDimension): DroppableDimension => {
+    (update: DroppablePublish): DroppableDimension => {
       const existing: DroppableDimension =
-        state.dimensions.droppables[droppable.descriptor.id];
+        state.dimensions.droppables[update.droppableId];
 
-      // TODO: need to ensure collector is okay with collecting from non-scroll containers
-      // TODO: collector should be updated to simply return a list of current scroll positions
       const frame: ?Scrollable = existing.frame;
-      if (!frame) {
-        return droppable;
+      invariant(frame, 'Expected Droppable to be a scroll container');
+
+      if (!isEqual(update.scroll, frame.scroll.current)) {
+        console.warn(
+          'scroll diff recorded',
+          subtract(frame.scroll.current, update.scroll),
+        );
       }
+
       const scrolled: DroppableDimension = scrollDroppable(
         existing,
-        frame.scroll.current,
+        update.scroll,
       );
       return scrolled;
     },

@@ -307,10 +307,14 @@ export type DimensionMap = {|
   droppables: DroppableDimensionMap,
 |};
 
+export type DroppablePublish = {|
+  droppableId: DroppableId,
+  scroll: Position,
+|};
 export type Published = {|
   additions: DraggableDimension[],
   removals: DraggableId[],
-  modified: DroppableDimension[],
+  modified: DroppablePublish[],
 |};
 
 export type CompletedDrag = {|

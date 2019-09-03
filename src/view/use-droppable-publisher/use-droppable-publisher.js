@@ -12,7 +12,6 @@ import getScroll from './get-scroll';
 import type {
   DroppableEntry,
   DroppableCallbacks,
-  RecollectDroppableOptions,
 } from '../../state/registry/registry-types';
 import getEnv, { type Env } from './get-env';
 import type {
@@ -27,7 +26,6 @@ import type {
 } from '../../types';
 import getDimension from './get-dimension';
 import AppContext, { type AppContextValue } from '../context/app-context';
-import withoutPlaceholder from './without-placeholder';
 import { warning } from '../../dev-warning';
 import getListenerOptions from './get-listener-options';
 import useRequiredContext from '../use-required-context';
@@ -43,7 +41,6 @@ type Props = {|
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
   ignoreContainerClipping: boolean,
-  getPlaceholderRef: () => ?HTMLElement,
   getDroppableRef: () => ?HTMLElement,
 |};
 
@@ -177,37 +174,18 @@ export default function useDroppablePublisher(args: Props) {
     },
     [appContext.contextId, descriptor, onClosestScroll, previousRef],
   );
-  const recollect = useCallback(
-    (options: RecollectDroppableOptions): DroppableDimension => {
-      const dragging: ?WhileDragging = whileDraggingRef.current;
-      const closest: ?Element = getClosestScrollableFromDrag(dragging);
-      invariant(
-        dragging && closest,
-        'Can only recollect Droppable client for Droppables that have a scroll container',
-      );
 
-      const previous: Props = previousRef.current;
+  const getScrollWhileDragging = useCallback((): Position => {
+    const dragging: ?WhileDragging = whileDraggingRef.current;
+    const closest: ?Element = getClosestScrollableFromDrag(dragging);
+    invariant(
+      dragging && closest,
+      'Can only recollect Droppable client for Droppables that have a scroll container',
+    );
 
-      const execute = (): DroppableDimension =>
-        getDimension({
-          ref: dragging.ref,
-          descriptor: dragging.descriptor,
-          env: dragging.env,
-          windowScroll: origin,
-          direction: previous.direction,
-          isDropDisabled: previous.isDropDisabled,
-          isCombineEnabled: previous.isCombineEnabled,
-          shouldClipSubject: !previous.ignoreContainerClipping,
-        });
+    return getScroll(closest);
+  }, []);
 
-      if (!options.withoutPlaceholder) {
-        return execute();
-      }
-
-      return withoutPlaceholder(previous.getPlaceholderRef(), execute);
-    },
-    [previousRef],
-  );
   const dragStopped = useCallback(() => {
     const dragging: ?WhileDragging = whileDraggingRef.current;
     invariant(dragging, 'Cannot stop drag when no active drag');
@@ -245,11 +223,11 @@ export default function useDroppablePublisher(args: Props) {
   const callbacks: DroppableCallbacks = useMemo(() => {
     return {
       getDimensionAndWatchScroll,
-      recollect,
+      getScrollWhileDragging,
       dragStopped,
       scroll,
     };
-  }, [dragStopped, getDimensionAndWatchScroll, recollect, scroll]);
+  }, [dragStopped, getDimensionAndWatchScroll, getScrollWhileDragging, scroll]);
 
   const entry: DroppableEntry = useMemo(
     () => ({

@@ -30,12 +30,6 @@ export default function Droppable(props: Props) {
   const droppableRef = useRef<?HTMLElement>(null);
   const placeholderRef = useRef<?HTMLElement>(null);
 
-  useValidation({
-    props,
-    getDroppableRef: () => droppableRef.current,
-    getPlaceholderRef: () => placeholderRef.current,
-  });
-
   const {
     // own props
     children,
@@ -60,16 +54,22 @@ export default function Droppable(props: Props) {
     (): ?HTMLElement => droppableRef.current,
     [],
   );
+  const setDroppableRef = useCallback((value: ?HTMLElement) => {
+    droppableRef.current = value;
+  }, []);
   const getPlaceholderRef = useCallback(
     (): ?HTMLElement => placeholderRef.current,
     [],
   );
-  const setDroppableRef = useCallback((value: ?HTMLElement) => {
-    droppableRef.current = value;
-  }, []);
   const setPlaceholderRef = useCallback((value: ?HTMLElement) => {
     placeholderRef.current = value;
   }, []);
+
+  useValidation({
+    props,
+    getDroppableRef,
+    getPlaceholderRef,
+  });
 
   const onPlaceholderTransitionEnd = useCallback(() => {
     // A placeholder change can impact the window's max scroll
@@ -87,7 +87,6 @@ export default function Droppable(props: Props) {
     isCombineEnabled,
     ignoreContainerClipping,
     getDroppableRef,
-    getPlaceholderRef,
   });
 
   const placeholder: Node = (

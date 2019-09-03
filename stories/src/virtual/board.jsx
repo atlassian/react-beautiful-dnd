@@ -57,7 +57,6 @@ const Container = styled.div`
 
 const Row = React.memo(({ data: quotes, index, style }) => {
   const quote: Quote = quotes[index];
-  console.log('style', style);
   const patchedStyle = {
     ...style,
     // marginBottom: grid,
@@ -66,7 +65,6 @@ const Row = React.memo(({ data: quotes, index, style }) => {
     width: `calc(${style.width} - ${grid * 2}px)`,
     height: style.height - grid,
   };
-  console.log('patched style', patchedStyle);
 
   return (
     <Draggable draggableId={quote.id} index={index} key={quote.id}>
@@ -178,7 +176,7 @@ function Board(props: Props) {
   }
 
   return (
-    <React.Fragment>
+    <>
       <DragDropContext onDragEnd={onDragEnd}>
         <Container>
           {ordered.map((key: string, index: number) => {
@@ -195,7 +193,7 @@ function Board(props: Props) {
           }
         `}
       />
-    </React.Fragment>
+    </>
   );
 }
 

@@ -1,16 +1,16 @@
 // @flow
+import type { Position } from 'css-box-model';
 import type {
   DraggableId,
   DroppableId,
   DraggableDescriptor,
   Published,
   DraggableDimension,
-  DroppableDimension,
+  DroppablePublish,
   DroppableIdMap,
   Critical,
   DraggableIdMap,
 } from '../../types';
-import type { RecollectDroppableOptions } from './dimension-marshal-types';
 import type {
   DroppableEntry,
   Registry,
@@ -35,7 +35,6 @@ type Staging = {|
 type Callbacks = {|
   publish: (args: Published) => mixed,
   collectionStarting: () => mixed,
-  getCritical: () => Critical,
 |};
 
 type Args = {|
@@ -66,7 +65,6 @@ export default function createPublisher({
     callbacks.collectionStarting();
     frameId = requestAnimationFrame(() => {
       frameId = null;
-      const critical: Critical = callbacks.getCritical();
       timings.start(timingKey);
 
       const { additions, removals, modified } = staging;
@@ -84,16 +82,15 @@ export default function createPublisher({
             a.descriptor.index - b.descriptor.index,
         );
 
-      const updated: DroppableDimension[] = Object.keys(modified).map(
+      const updated: DroppablePublish[] = Object.keys(modified).map(
         (id: DroppableId) => {
           const entry: DroppableEntry = registry.droppable.getById(id);
-          const isHome: boolean = entry.descriptor.id === critical.droppable.id;
 
-          // need to keep the placeholder when in home list
-          const options: RecollectDroppableOptions = {
-            withoutPlaceholder: !isHome,
+          const scroll: Position = entry.callbacks.getScrollWhileDragging();
+          return {
+            droppableId: id,
+            scroll,
           };
-          return entry.callbacks.recollect(options);
         },
       );
 

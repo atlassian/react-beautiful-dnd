@@ -14,10 +14,6 @@ import type {
   Viewport,
 } from '../../types';
 
-export type RecollectDroppableOptions = {|
-  withoutPlaceholder: boolean,
-|};
-
 export type StartPublishingResult = {|
   critical: Critical,
   dimensions: DimensionMap,

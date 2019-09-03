@@ -46,7 +46,7 @@ export type RecollectDroppableOptions = {|
 export type DroppableCallbacks = {|
   // a drag is starting
   getDimensionAndWatchScroll: GetDroppableDimensionFn,
-  recollect: (options: RecollectDroppableOptions) => DroppableDimension,
+  getScrollWhileDragging: () => Position,
   // scroll a droppable
   scroll: (change: Position) => void,
   // If the Droppable is listening for scroll events - it needs to stop!
