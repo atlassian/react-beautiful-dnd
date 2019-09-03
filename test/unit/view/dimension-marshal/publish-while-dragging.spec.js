@@ -164,25 +164,28 @@ describe('additions', () => {
     expect(callbacks.collectionStarting).not.toHaveBeenCalled();
   });
 
-  it('should throw if trying to add a draggable that does not have the same type as the dragging item', () => {
+  it.only('should not do anything if trying to add a draggable that does not have the same type as the dragging item', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
-    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
 
     // Registering a new draggable (inserted before inHome1)
-    const execute = () =>
-      marshal.registerDraggable(inAnotherType.descriptor, () => inAnotherType);
 
-    expect(execute).toThrow(
-      'This is not of the same type as the dragging item',
+    registry.draggable.register(
+      getDraggableEntry({ dimension: inAnotherType }),
     );
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
   });
 
-  it('should order published draggables by their index', () => {
+  it.only('should order published draggables by their index', () => {
     const beforeInHome1: DraggableDimension = {
       ...preset.inHome1,
       descriptor: {
@@ -201,8 +204,12 @@ describe('additions', () => {
       },
     };
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
@@ -210,10 +217,14 @@ describe('additions', () => {
 
     // publishing the higher index value first
     withWarn(() => {
-      marshal.registerDraggable(beforeInHome2.descriptor, () => beforeInHome2);
+      registry.draggable.register(
+        getDraggableEntry({ dimension: beforeInHome2 }),
+      );
     });
     // publishing the lower index value second
-    marshal.registerDraggable(beforeInHome1.descriptor, () => beforeInHome1);
+    registry.draggable.register(
+      getDraggableEntry({ dimension: beforeInHome1 }),
+    );
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
@@ -229,17 +240,23 @@ describe('additions', () => {
 });
 
 describe('droppables', () => {
-  it('should recollect droppables that had internal changes (home)', () => {
+  it.only('should recollect droppables that had internal changes (home)', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    const watcher: DimensionWatcher = populateMarshal(marshal, withScrollables);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    const watcher: DimensionWatcher = populate(registry, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     withWarn(() => {
-      marshal.unregisterDraggable(preset.inHome2.descriptor);
+      registry.draggable.unregister(
+        registry.draggable.getById(preset.inHome2.descriptor.id),
+      );
     });
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
     expect(watcher.droppable.recollect).not.toHaveBeenCalled();
@@ -261,17 +278,23 @@ describe('droppables', () => {
     expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
   });
 
-  it('should recollect droppables that had internal changes (foreign)', () => {
+  it.only('should recollect droppables that had internal changes (foreign)', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    const watcher: DimensionWatcher = populateMarshal(marshal, withScrollables);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    const watcher: DimensionWatcher = populate(registry, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     withWarn(() => {
-      marshal.unregisterDraggable(preset.inForeign1.descriptor);
+      registry.draggable.unregister(
+        registry.draggable.getById(preset.inForeign1.descriptor.id),
+      );
     });
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
     expect(watcher.droppable.recollect).not.toHaveBeenCalled();
@@ -295,20 +318,30 @@ describe('droppables', () => {
 });
 
 describe('removals', () => {
-  it('should publish a removal', () => {
+  it.only('should publish a removal', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     withWarn(() => {
-      marshal.unregisterDraggable(preset.inHome2.descriptor);
+      registry.draggable.unregister(
+        registry.draggable.getById(preset.inHome2.descriptor.id),
+      );
     });
-    marshal.unregisterDraggable(preset.inHome3.descriptor);
-    marshal.unregisterDraggable(preset.inForeign1.descriptor);
+    registry.draggable.unregister(
+      registry.draggable.getById(preset.inHome3.descriptor.id),
+    );
+    registry.draggable.unregister(
+      registry.draggable.getById(preset.inForeign1.descriptor.id),
+    );
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
@@ -325,9 +358,13 @@ describe('removals', () => {
     expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
   });
 
-  it('should throw if tying to remove a draggable of a different type', () => {
+  it.only('should do nothing if tying to remove a draggable of a different type', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
     const dimensions: DimensionMap = {
       draggables: {
         ...withScrollables.draggables,
@@ -338,27 +375,30 @@ describe('removals', () => {
         [ofAnotherType.descriptor.id]: ofAnotherType,
       },
     };
-    populateMarshal(marshal, dimensions);
+    populate(registry, dimensions);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
 
-    const unregister = () =>
-      marshal.unregisterDraggable(inAnotherType.descriptor);
-
-    expect(unregister).toThrow(
-      'This is not of the same type as the dragging item',
+    registry.draggable.unregister(
+      registry.draggable.getById(inAnotherType.descriptor.id),
     );
+
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
   });
 
-  it('should throw an error if trying to remove a critical dimension', () => {
+  it('should do nothing if trying to remove a critical dimension', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
 
     marshal.startPublishing(defaultRequest);
 
-    expect(() => marshal.unregisterDraggable(critical.draggable)).toThrow(
+    expect(() => registry.draggable.unregister(critical.draggable)).toThrow(
       'Cannot remove the dragging item during a drag',
     );
     expect(() => marshal.unregisterDroppable(critical.droppable)).toThrow(
@@ -370,9 +410,13 @@ describe('removals', () => {
 describe('cancelling mid publish', () => {
   it('should cancel any pending collections', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
 
-    populateMarshal(marshal, justCritical);
+    populate(registry, justCritical);
 
     const result: StartPublishingResult = marshal.startPublishing(
       defaultRequest,
@@ -404,8 +448,12 @@ describe('cancelling mid publish', () => {
 describe('subsequent', () => {
   it('should allow subsequent publishes in the same drag', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, justCritical);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, justCritical);
 
     marshal.startPublishing(defaultRequest);
 
@@ -426,8 +474,12 @@ describe('subsequent', () => {
 
   it('should allow subsequent publishes between drags', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, justCritical);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, justCritical);
 
     marshal.startPublishing(defaultRequest);
 
@@ -457,8 +509,12 @@ describe('advanced usage warning', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {});
 
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, justCritical);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, justCritical);
 
     marshal.startPublishing(defaultRequest);
     expect(console.warn).not.toHaveBeenCalled();

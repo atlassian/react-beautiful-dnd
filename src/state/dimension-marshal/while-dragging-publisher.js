@@ -23,7 +23,7 @@ import { warning } from '../../dev-warning';
 
 export type WhileDraggingPublisher = {|
   add: (entry: DraggableEntry) => void,
-  remove: (descriptor: DraggableDescriptor) => void,
+  remove: (entry: DraggableEntry) => void,
   stop: () => void,
 |};
 
@@ -148,7 +148,8 @@ export default function createPublisher({
     collect();
   };
 
-  const remove = (descriptor: DraggableDescriptor) => {
+  const remove = (entry: DraggableEntry) => {
+    const descriptor: DraggableDescriptor = entry.descriptor;
     staging.removals[descriptor.id] = true;
     staging.modified[descriptor.droppableId] = true;
 

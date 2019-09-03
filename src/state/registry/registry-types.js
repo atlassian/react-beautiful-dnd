@@ -84,7 +84,7 @@ export type RegistryEvent =
     |}
   | {|
       type: 'REMOVAL',
-      value: DraggableDescriptor,
+      value: DraggableEntry,
     |};
 
 export type Subscriber = (event: RegistryEvent) => void;

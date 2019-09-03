@@ -96,7 +96,7 @@ export default function createRegistry(): Registry {
       }
 
       delete entries.draggables[draggableId];
-      notify({ type: 'REMOVAL', value: entry.descriptor });
+      notify({ type: 'REMOVAL', value: entry });
     },
     getById: getDraggableById,
     findById: findDraggableById,

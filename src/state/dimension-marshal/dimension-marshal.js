@@ -23,7 +23,7 @@ import type {
   DroppableDescriptor,
   LiftRequest,
   Critical,
-  DraggableId,
+  DraggableDescriptor,
 } from '../../types';
 
 type Collection = {|
@@ -132,15 +132,27 @@ export default (registry: Registry, callbacks: Callbacks) => {
     );
     // The dragging item can be add and removed when using a clone
     // We do not publish updates for the critical item
-    const criticalId: DraggableId = collection.critical.draggable.id;
+    const critical: DraggableDescriptor = collection.critical.draggable;
+
+    function canPublish(entry: DraggableEntry) {
+      // do not publish updates for the critical draggable
+      if (entry.descriptor.id === critical.id) {
+        return false;
+      }
+      // do not publish updates for draggables that are not of a type that we care about
+      if (entry.descriptor.type !== critical.type) {
+        return false;
+      }
+      return true;
+    }
 
     if (event.type === 'ADDITION') {
-      if (event.value.descriptor.id !== criticalId) {
+      if (canPublish(event.value)) {
         publisher.add(event.value);
       }
     }
     if (event.type === 'REMOVAL') {
-      if (event.value.id !== criticalId) {
+      if (canPublish(event.value)) {
         publisher.remove(event.value);
       }
     }
