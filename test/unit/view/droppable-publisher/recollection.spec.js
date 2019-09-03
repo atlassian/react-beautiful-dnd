@@ -1,4 +1,5 @@
 // @flow
+import type { Position } from 'css-box-model';
 import { mount } from 'enzyme';
 import invariant from 'tiny-invariant';
 import React from 'react';
@@ -59,7 +60,7 @@ const expected: DroppableDimension = getDroppableDimension({
   },
 });
 
-it('should recollect a dimension if requested', () => {
+it('should recollect scroll if requested', () => {
   const marshal: DimensionMarshal = getMarshalStub();
   // both the droppable and the parent are scrollable
   const registry: Registry = createRegistry();
@@ -93,94 +94,11 @@ it('should recollect a dimension if requested', () => {
 
   expect(initial).toEqual(expected);
 
-  // recollection
-  const recollection: DroppableDimension = callbacks.recollect({
-    withoutPlaceholder: true,
-  });
-  expect(recollection.client).toEqual(initial.client);
-  // not considering window scroll when recollecting
-  expect(recollection.page).toEqual(initial.client);
-});
-
-it('should hide any placeholder when recollecting dimensions if requested', () => {
-  const marshal: DimensionMarshal = getMarshalStub();
-  // both the droppable and the parent are scrollable
-  const registry: Registry = createRegistry();
-  const registerSpy = jest.spyOn(registry.droppable, 'register');
-  const wrapper = mount(
-    <WithAppContext marshal={marshal} registry={registry}>
-      <App droppableIsScrollable showPlaceholder />
-    </WithAppContext>,
-  );
-  const el: ?HTMLElement = wrapper.find('.droppable').getDOMNode();
-  invariant(el);
-  const placeholderEl: ?HTMLElement = wrapper.find('.placeholder').getDOMNode();
-  invariant(placeholderEl);
-  // returning smaller border box as this is what occurs when the element is scrollable
-  jest
-    .spyOn(el, 'getBoundingClientRect')
-    .mockImplementation(() => smallFrameClient.borderBox);
-  // scrollWidth / scrollHeight are based on the paddingBox of an element
-  Object.defineProperty(el, 'scrollWidth', {
-    value: bigClient.paddingBox.width,
-  });
-  Object.defineProperty(el, 'scrollHeight', {
-    value: bigClient.paddingBox.height,
-  });
-
-  // will be called when unhiding the element
-  const spy = jest.spyOn(placeholderEl.style, 'display', 'set');
-  jest.spyOn(placeholderEl.style, 'display', 'get').mockReturnValue('original');
-
-  const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
-
-  callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
-  expect(spy).not.toHaveBeenCalled();
-
-  callbacks.recollect({ withoutPlaceholder: true });
-  // hidden at one point
-  expect(spy).toHaveBeenCalledWith('none');
-  // finishes back with the original value
-  expect(placeholderEl.style.display).toBe('original');
-});
-
-it('should not hide any placeholder when recollecting dimensions if requested', () => {
-  const marshal: DimensionMarshal = getMarshalStub();
-  // both the droppable and the parent are scrollable
-  const registry: Registry = createRegistry();
-  const registerSpy = jest.spyOn(registry.droppable, 'register');
-  const wrapper = mount(
-    <WithAppContext marshal={marshal} registry={registry}>
-      <App droppableIsScrollable showPlaceholder />
-    </WithAppContext>,
-  );
-  const el: ?HTMLElement = wrapper.find('.droppable').getDOMNode();
-  invariant(el);
-  const placeholderEl: ?HTMLElement = wrapper.find('.placeholder').getDOMNode();
-  invariant(placeholderEl);
-  // returning smaller border box as this is what occurs when the element is scrollable
-  jest
-    .spyOn(el, 'getBoundingClientRect')
-    .mockImplementation(() => smallFrameClient.borderBox);
-  // scrollWidth / scrollHeight are based on the paddingBox of an element
-  Object.defineProperty(el, 'scrollWidth', {
-    value: bigClient.paddingBox.width,
-  });
-  Object.defineProperty(el, 'scrollHeight', {
-    value: bigClient.paddingBox.height,
-  });
-
-  // will be called when unhiding the element
-  const spy = jest.spyOn(placeholderEl.style, 'display', 'set');
-
-  const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
-
-  callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
-  expect(spy).not.toHaveBeenCalled();
-
-  callbacks.recollect({ withoutPlaceholder: false });
-  // never touched
-  expect(spy).not.toHaveBeenCalled();
+  // ensuring that we have the updated scroll
+  const newScroll: Position = { x: 100, y: 200 };
+  callbacks.scroll(newScroll);
+  const result: Position = callbacks.getScrollWhileDragging();
+  expect(result).toEqual(newScroll);
 });
 
 it('should throw if there is no drag occurring when a recollection is requested', () => {
@@ -196,7 +114,7 @@ it('should throw if there is no drag occurring when a recollection is requested'
 
   const callbacks: DroppableCallbacks = registerSpy.mock.calls[0][0].callbacks;
 
-  expect(() => callbacks.recollect({ withoutPlaceholder: true })).toThrow();
+  expect(() => callbacks.getScrollWhileDragging()).toThrow();
 });
 
 it('should throw if there if recollecting from droppable that is not a scroll container', () => {
@@ -214,5 +132,5 @@ it('should throw if there if recollecting from droppable that is not a scroll co
 
   callbacks.getDimensionAndWatchScroll(preset.windowScroll, immediate);
 
-  expect(() => callbacks.recollect({ withoutPlaceholder: true })).toThrow();
+  expect(() => callbacks.getScrollWhileDragging()).toThrow();
 });
