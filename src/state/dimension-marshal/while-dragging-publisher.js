@@ -90,9 +90,9 @@ export default function createPublisher({
       return;
     }
 
+    callbacks.collectionStarting();
     frameId = requestAnimationFrame(() => {
       frameId = null;
-      callbacks.collectionStarting();
       const critical: Critical = callbacks.getCritical();
       timings.start(timingKey);
 
