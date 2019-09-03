@@ -34,20 +34,20 @@ const common = {
         use: [
           {
             loader: 'babel-loader',
-            options: {
-              compact: true,
-              babelrc: false,
-              presets: [
-                '@babel/react',
-                '@babel/flow',
-                ['@babel/env', { modules: false, loose: true }],
-              ],
-              plugins: [
-                ['@babel/proposal-class-properties', { loose: true }],
-                ['@babel/proposal-object-rest-spread', { loose: true }],
-              ],
-              comments: false,
-            },
+            // options: {
+            //   compact: true,
+            //   babelrc: false,
+            //   presets: [
+            //     '@babel/react',
+            //     '@babel/flow',
+            //     ['@babel/env', { modules: false, loose: true }],
+            //   ],
+            //   plugins: [
+            //     ['@babel/proposal-class-properties', { loose: true }],
+            //     ['@babel/proposal-object-rest-spread', { loose: true }],
+            //   ],
+            //   comments: false,
+            // },
           },
         ],
       },

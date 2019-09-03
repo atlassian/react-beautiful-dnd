@@ -2,12 +2,14 @@
 import express from 'express';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import uuidv4 from 'uuid/v4';
 import { resolve } from 'path';
 import Sample from './app';
 import { resetServerContext } from '../../src';
 
-const getNonce = () => Buffer.from(uuidv4()).toString('base64');
+let count = 0;
+function getNonce(): string {
+  return `ThisShouldBeACryptographicallySecurePseudoRandomNumber-${count++}`;
+}
 
 function getSample(policy?: string, nonce?: string) {
   resetServerContext();
