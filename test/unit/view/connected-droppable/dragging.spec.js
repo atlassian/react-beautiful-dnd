@@ -233,18 +233,23 @@ describe('foreign list', () => {
       impact: { ...noImpact },
     });
 
+    const isNotOver: MapProps = {
+      ...restingProps,
+      shouldAnimatePlaceholder: true,
+    };
+
     it('should indicate that it is not being dragged over', () => {
       const selector: Selector = makeMapStateToProps();
 
       const first: MapProps = selector(getNoWhere(), ownProps);
-      expect(first).toEqual(restingProps);
+      expect(first).toEqual(isNotOver);
     });
 
     it('should not break memoization between moves', () => {
       const selector: Selector = makeMapStateToProps();
 
       const first: MapProps = selector(getNoWhere(), ownProps);
-      expect(first).toEqual(restingProps);
+      expect(first).toEqual(isNotOver);
 
       expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(
         first,

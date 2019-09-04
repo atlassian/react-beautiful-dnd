@@ -61,6 +61,7 @@ export const makeMapStateToProps = (): Selector => {
   const getMapProps = memoizeOne(
     (
       id: DroppableId,
+      isEnabled: boolean,
       isDraggingOver: boolean,
       dragging: DraggableDimension,
       snapshot: StateSnapshot,
@@ -82,6 +83,10 @@ export const makeMapStateToProps = (): Selector => {
           snapshot,
           useClone,
         };
+      }
+
+      if (!isEnabled) {
+        return idleWithoutAnimation;
       }
 
       // not over foreign list - return idle
@@ -126,6 +131,7 @@ export const makeMapStateToProps = (): Selector => {
 
     const id: DroppableId = ownProps.droppableId;
     const type: TypeId = ownProps.type;
+    const isEnabled: boolean = !ownProps.isDropDisabled;
     const renderClone: ?DraggableChildrenFn = ownProps.renderClone;
 
     if (state.isDragging) {
@@ -142,7 +148,14 @@ export const makeMapStateToProps = (): Selector => {
 
       // Snapshot based on current impact
       const snapshot: StateSnapshot = getSnapshot(id, isDraggingOver, dragging);
-      return getMapProps(id, isDraggingOver, dragging, snapshot, renderClone);
+      return getMapProps(
+        id,
+        isEnabled,
+        isDraggingOver,
+        dragging,
+        snapshot,
+        renderClone,
+      );
     }
 
     if (state.phase === 'DROP_ANIMATING') {
@@ -167,6 +180,7 @@ export const makeMapStateToProps = (): Selector => {
 
       return getMapProps(
         id,
+        isEnabled,
         whatIsDraggedOver(completed.impact) === id,
         dragging,
         snapshot,
