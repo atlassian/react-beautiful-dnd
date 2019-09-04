@@ -1,25 +1,25 @@
 // @flow
 import React from 'react';
-import { mount } from 'enzyme';
+import { render } from '@testing-library/react';
 import DragDropContext from '../../../../src/view/drag-drop-context';
 
 it('should not throw when unmounting', () => {
-  const wrapper = mount(
+  const { unmount } = render(
     <DragDropContext onDragEnd={() => {}}>{null}</DragDropContext>,
   );
 
-  expect(() => wrapper.unmount()).not.toThrow();
+  expect(() => unmount()).not.toThrow();
 });
 
 it('should clean up any window event handlers', () => {
   jest.spyOn(window, 'addEventListener');
   jest.spyOn(window, 'removeEventListener');
 
-  const wrapper = mount(
+  const { unmount } = render(
     <DragDropContext onDragEnd={() => {}}>{null}</DragDropContext>,
   );
 
-  wrapper.unmount();
+  unmount();
 
   expect(window.addEventListener.mock.calls).toHaveLength(
     window.removeEventListener.mock.calls.length,

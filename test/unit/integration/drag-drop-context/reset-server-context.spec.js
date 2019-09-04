@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { mount, type ReactWrapper } from 'enzyme';
+import { render } from '@testing-library/react';
 import DragDropContext from '../../../../src/view/drag-drop-context';
 import { resetServerContext } from '../../../../src';
 import * as attributes from '../../../../src/view/data-attributes';
@@ -13,12 +13,12 @@ const doesStyleElementExist = (uniqueId: number): boolean =>
 it('should reset the style marshal context', () => {
   expect(doesStyleElementExist(1)).toBe(false);
 
-  const wrapper1: ReactWrapper<*> = mount(
+  const wrapper1 = render(
     <DragDropContext onDragEnd={() => {}}>{null}</DragDropContext>,
   );
   expect(doesStyleElementExist(0)).toBe(true);
 
-  const wrapper2: ReactWrapper<*> = mount(
+  const wrapper2 = render(
     <DragDropContext onDragEnd={() => {}}>{null}</DragDropContext>,
   );
   expect(doesStyleElementExist(1)).toBe(true);
@@ -32,7 +32,7 @@ it('should reset the style marshal context', () => {
   resetServerContext();
 
   // a new wrapper after the reset
-  const wrapper3: ReactWrapper<*> = mount(
+  const wrapper3 = render(
     <DragDropContext onDragEnd={() => {}}>{null}</DragDropContext>,
   );
 
