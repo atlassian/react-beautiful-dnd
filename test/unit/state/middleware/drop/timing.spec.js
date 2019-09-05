@@ -1,7 +1,7 @@
 // @flow
 import invariant from 'tiny-invariant';
 import {
-  clean,
+  flush,
   collectionStarting,
   drop,
   dropPending,
@@ -26,7 +26,7 @@ it('should throw an error if a drop action occurs while not in a phase where you
   }).not.toThrow();
 
   // drop animating
-  store.dispatch(clean());
+  store.dispatch(flush());
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
 

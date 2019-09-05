@@ -1,6 +1,6 @@
 // @flow
 import {
-  clean,
+  flush,
   completeDrop,
   initialPublish,
   moveDown,
@@ -61,7 +61,6 @@ it('should behave correctly across multiple drags', () => {
     store.dispatch(
       completeDrop({
         completed: getCompletedWithResult(result, store.getState()),
-        shouldFlush: false,
       }),
     );
     expect(responders.onDragEnd).toHaveBeenCalledWith(
@@ -71,7 +70,7 @@ it('should behave correctly across multiple drags', () => {
     expect(responders.onDragEnd).toHaveBeenCalledTimes(1);
 
     // cleanup
-    store.dispatch(clean());
+    store.dispatch(flush());
     // $ExpectError - unknown mock reset property
     responders.onDragStart.mockReset();
     // $ExpectError - unknown mock reset property

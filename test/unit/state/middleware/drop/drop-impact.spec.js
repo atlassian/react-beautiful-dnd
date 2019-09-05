@@ -1,9 +1,5 @@
 // @flow
-import type {
-  DisplacedBy,
-  Displacement,
-  DragImpact,
-} from '../../../../../src/types';
+import type { DisplacedBy, DragImpact } from '../../../../../src/types';
 import getDropImpact, {
   type Result,
 } from '../../../../../src/state/middleware/drop/get-drop-impact';

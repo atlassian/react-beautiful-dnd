@@ -47,7 +47,6 @@ it('should call the onDragEnd responder when a DROP_COMPLETE action occurs', () 
   store.dispatch(
     completeDrop({
       completed: getCompletedWithResult(result, store.getState()),
-      shouldFlush: false,
     }),
   );
   expect(responders.onDragEnd).toHaveBeenCalledWith(result, expect.any(Object));
@@ -65,7 +64,6 @@ it('should throw an exception if there was no drag start published', () => {
     store.dispatch(
       completeDrop({
         completed: borrowed,
-        shouldFlush: false,
       }),
     ),
   ).toThrow('Can only flush responders while dragging');
@@ -98,7 +96,6 @@ it('should use the drop result and not the final impact', () => {
   store.dispatch(
     completeDrop({
       completed: getCompletedWithResult(fakeResult, store.getState()),
-      shouldFlush: false,
     }),
   );
   expect(responders.onDragEnd).toHaveBeenCalledWith(

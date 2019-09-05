@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import type { Quote } from '../types';
 import {
@@ -7,10 +7,9 @@ import {
   Draggable,
   DragDropContext,
   type DroppableProvided,
-  type DroppableStateSnapshot,
   type DraggableProvided,
   type DraggableStateSnapshot,
-  type DraggableLocation,
+  type DraggableDescriptor,
   type DropResult,
 } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
@@ -20,35 +19,19 @@ type Props = {|
   initial: Quote[],
 |};
 
-type ItemProps = {|
-  provided: DraggableProvided,
-  quote: Quote,
-  style?: Object,
-|};
+// type ItemProps = {|
+//   provided: DraggableProvided,
+//   quote: Quote,
+//   style?: Object,
+// |};
 
-function Item(props: ItemProps) {
-  const { quote, provided, style } = props;
+type RowProps = {
+  data: Quote[],
+  index: number,
+  style: Object,
+};
 
-  useEffect(() => {
-    console.log('quote mounted', quote.id);
-    return () => console.log('quote unmounted', quote.id);
-  }, [quote.id]);
-  return (
-    <div
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
-      ref={provided.innerRef}
-      style={{
-        ...provided.draggableProps.style,
-        ...style,
-      }}
-    >
-      {quote.id}
-    </div>
-  );
-}
-
-const Row = React.memo(({ data: quotes, index, style }) => {
+const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
   const quote: Quote = quotes[index];
 
   return (
@@ -57,7 +40,6 @@ const Row = React.memo(({ data: quotes, index, style }) => {
         <QuoteItem
           provided={provided}
           quote={quote}
-          style={style}
           isDragging={snapshot.isDragging}
           style={{ margin: 0, ...style }}
         />
@@ -93,12 +75,12 @@ function App(props: Props) {
         renderClone={(
           provided: DraggableProvided,
           snapshot: DraggableStateSnapshot,
-          source: DraggableLocation,
+          descriptor: DraggableDescriptor,
         ) => (
           <QuoteItem
             provided={provided}
             isDragging={snapshot.isDragging}
-            quote={quotes[source.index]}
+            quote={quotes[descriptor.index]}
             style={{ margin: 0 }}
           />
         )}

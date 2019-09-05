@@ -72,7 +72,6 @@ const end = (store: Store) => {
   store.dispatch(
     completeDrop({
       completed: getCompletedWithResult(result, store.getState()),
-      shouldFlush: false,
     }),
   );
 };

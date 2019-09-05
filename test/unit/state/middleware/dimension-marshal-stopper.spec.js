@@ -5,7 +5,7 @@ import middleware from '../../../../src/state/middleware/dimension-marshal-stopp
 import dropMiddleware from '../../../../src/state/middleware/drop/drop-middleware';
 import createStore from './util/create-store';
 import {
-  clean,
+  flush,
   initialPublish,
   drop,
   completeDrop,
@@ -33,7 +33,7 @@ it('should stop a collection if a drag is aborted', () => {
   store.dispatch(initialPublish(initialPublishArgs));
 
   expect(stopPublishing).not.toHaveBeenCalled();
-  store.dispatch(clean());
+  store.dispatch(flush());
   expect(stopPublishing).toHaveBeenCalledTimes(1);
 });
 

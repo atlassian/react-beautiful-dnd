@@ -5,7 +5,6 @@ import type {
   CollectingState,
   DropPendingState,
   Published,
-  Scrollable,
   DraggableId,
   DraggableDimension,
   DroppableDimensionMap,
@@ -20,8 +19,6 @@ import adjustAdditionsForScrollChanges from '../publish-while-dragging/update-dr
 import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
 import scrollDroppable from '../droppable/scroll-droppable';
-import { isEqual, subtract } from '../position';
-import getFrame from '../get-frame';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -44,15 +41,6 @@ export default ({
     (update: DroppablePublish): DroppableDimension => {
       const existing: DroppableDimension =
         state.dimensions.droppables[update.droppableId];
-
-      const frame: Scrollable = getFrame(existing.frame);
-
-      if (!isEqual(update.scroll, frame.scroll.current)) {
-        console.warn(
-          'scroll diff recorded',
-          subtract(frame.scroll.current, update.scroll),
-        );
-      }
 
       const scrolled: DroppableDimension = scrollDroppable(
         existing,

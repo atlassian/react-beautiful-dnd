@@ -17,6 +17,7 @@ import {
   completeDrop,
   type AnimateDropArgs,
   type InitialPublishArgs,
+  flush,
 } from '../../../../src/state/action-creators';
 import { createMarshal } from '../../../util/dimension-marshal';
 import {
@@ -102,11 +103,11 @@ it('should flush any animating drops', () => {
   store.dispatch(lift(liftArgs));
   expect(mock).toHaveBeenCalledWith(lift(liftArgs));
   // the previous drag is flushed
-  expect(mock).toHaveBeenCalledWith(
-    completeDrop({ completed, shouldFlush: true }),
-  );
+  expect(mock).toHaveBeenCalledWith(completeDrop({ completed }));
+  // any animations are flushed
+  expect(mock).toHaveBeenCalledWith(flush());
   // the new lift continues
-  expect(mock).toHaveBeenCalledTimes(3);
+  expect(mock).toHaveBeenCalledTimes(4);
 });
 
 it('should publish the initial dimensions when lifting', () => {
@@ -123,8 +124,10 @@ it('should publish the initial dimensions when lifting', () => {
   // first lift is preparing
   store.dispatch(lift(liftArgs));
   expect(mock).toHaveBeenCalledWith(lift(liftArgs));
+  // last drag flushed
+  expect(mock).toHaveBeenCalledWith(flush());
   expect(mock).toHaveBeenCalledWith(initialPublish(initialPublishArgs));
-  expect(mock).toHaveBeenCalledTimes(2);
+  expect(mock).toHaveBeenCalledTimes(3);
   expect(store.getState().phase).toBe('DRAGGING');
 });
 
@@ -158,8 +161,9 @@ it('should log a warning if items are added that do not have consecutive indexes
   // first lift is preparing
   store.dispatch(lift(liftArgs));
   expect(mock).toHaveBeenCalledWith(lift(liftArgs));
+  expect(mock).toHaveBeenCalledWith(flush());
   expect(mock).toHaveBeenCalledWith(initialPublish(initial));
-  expect(mock).toHaveBeenCalledTimes(2);
+  expect(mock).toHaveBeenCalledTimes(3);
   expect(store.getState().phase).toBe('DRAGGING');
 
   // a warning is logged

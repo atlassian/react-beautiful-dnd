@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import {
   animateDrop,
-  clean,
+  flush,
   completeDrop,
   drop,
   initialPublish,
@@ -49,7 +49,7 @@ import { tryGetCombine } from '../../../../../src/state/get-impact-location';
       const mock = jest.fn();
       const store: Store = createStore(passThrough(mock), middleware);
 
-      store.dispatch(clean());
+      store.dispatch(flush());
       store.dispatch(initialPublish(initialPublishArgs));
       expect(store.getState().phase).toBe('DRAGGING');
 

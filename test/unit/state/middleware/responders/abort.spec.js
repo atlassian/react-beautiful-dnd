@@ -8,7 +8,7 @@ import type {
 } from '../../../../../src/types';
 import type { Store } from '../../../../../src/state/store-types';
 import {
-  clean,
+  flush,
   completeDrop,
   initialPublish,
 } from '../../../../../src/state/action-creators';
@@ -29,12 +29,12 @@ it('should call onDragEnd with the last published critical descriptor', () => {
   const responders: Responders = createResponders();
   const store: Store = createStore(middleware(() => responders, getAnnounce()));
 
-  store.dispatch(clean());
+  store.dispatch(flush());
   store.dispatch(initialPublish(initialPublishArgs));
   jest.runOnlyPendingTimers();
   expect(responders.onDragStart).toHaveBeenCalledTimes(1);
 
-  store.dispatch(clean());
+  store.dispatch(flush());
   const expected: DropResult = {
     ...getDragStart(),
     destination: null,
@@ -51,7 +51,7 @@ it('should publish an onDragEnd with no destination even if there is a current d
   const responders: Responders = createResponders();
   const store: Store = createStore(middleware(() => responders, getAnnounce()));
 
-  store.dispatch(clean());
+  store.dispatch(flush());
   store.dispatch(initialPublish(initialPublishArgs));
   jest.runOnlyPendingTimers();
 
@@ -64,7 +64,7 @@ it('should publish an onDragEnd with no destination even if there is a current d
   };
   expect(tryGetDestination(state.impact)).toEqual(home);
 
-  store.dispatch(clean());
+  store.dispatch(flush());
   const expected: DropResult = {
     ...getDragStart(),
     // destination has been cleared
@@ -83,7 +83,7 @@ it('should not publish an onDragEnd if aborted after a drop', () => {
   const store: Store = createStore(middleware(() => responders, getAnnounce()));
 
   // lift
-  store.dispatch(clean());
+  store.dispatch(flush());
   store.dispatch(initialPublish(initialPublishArgs));
   jest.runOnlyPendingTimers();
   expect(responders.onDragStart).toHaveBeenCalled();
@@ -98,7 +98,6 @@ it('should not publish an onDragEnd if aborted after a drop', () => {
   store.dispatch(
     completeDrop({
       completed: getCompletedWithResult(result, store.getState()),
-      shouldFlush: false,
     }),
   );
   expect(responders.onDragEnd).toHaveBeenCalledTimes(1);
@@ -106,7 +105,7 @@ it('should not publish an onDragEnd if aborted after a drop', () => {
   responders.onDragEnd.mockReset();
 
   // abort
-  store.dispatch(clean());
+  store.dispatch(flush());
   expect(responders.onDragEnd).not.toHaveBeenCalled();
 });
 
@@ -115,7 +114,7 @@ it('should publish an on drag end if aborted before the publish of an onDragStar
   const store: Store = createStore(middleware(() => responders, getAnnounce()));
 
   // lift
-  store.dispatch(clean());
+  store.dispatch(flush());
   store.dispatch(initialPublish(initialPublishArgs));
   // onDragStart not flushed yet
   expect(responders.onDragStart).not.toHaveBeenCalled();
@@ -130,7 +129,6 @@ it('should publish an on drag end if aborted before the publish of an onDragStar
   store.dispatch(
     completeDrop({
       completed: getCompletedWithResult(result, store.getState()),
-      shouldFlush: false,
     }),
   );
   expect(responders.onDragEnd).toHaveBeenCalledTimes(1);

@@ -8,7 +8,7 @@ import {
   initialPublish,
   animateDrop,
   completeDrop,
-  clean,
+  flush,
 } from '../../../../src/state/action-creators';
 import {
   initialPublishArgs,
@@ -64,7 +64,7 @@ it('should use the resting styles when aborting', () => {
   store.dispatch(initialPublish(initialPublishArgs));
 
   expect(marshal.resting).not.toHaveBeenCalled();
-  store.dispatch(clean());
+  store.dispatch(flush());
 
   expect(marshal.resting).toHaveBeenCalled();
 });

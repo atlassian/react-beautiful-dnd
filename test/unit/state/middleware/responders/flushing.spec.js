@@ -75,7 +75,6 @@ it('should flush any pending responders if a drop occurs', () => {
   store.dispatch(
     completeDrop({
       completed: getCompletedWithResult(result, store.getState()),
-      shouldFlush: false,
     }),
   );
   expect(responders.onDragStart).toHaveBeenCalledTimes(1);
@@ -98,7 +97,6 @@ it('should work across multiple drags', () => {
     store.dispatch(
       completeDrop({
         completed: getCompletedWithResult(result, store.getState()),
-        shouldFlush: false,
       }),
     );
     expect(responders.onDragStart).toHaveBeenCalledTimes(1);

@@ -24,6 +24,7 @@ import { offsetByPosition } from '../../src/state/spacing';
 import getHomeLocation from '../../src/state/get-home-location';
 import getLiftEffect from '../../src/state/get-lift-effect';
 import getDropImpact from '../../src/state/middleware/drop/get-drop-impact';
+import { origin } from '../../src/state/position';
 
 // In case a consumer needs the references
 export const preset = getPreset();
@@ -88,7 +89,7 @@ export const publishAdditionArgs: Published = (() => {
   return {
     removals: [],
     additions: [addition],
-    modified: [scrollableHome],
+    modified: [{ droppableId: scrollableHome.descriptor.id, scroll: origin }],
   };
 })();
 
