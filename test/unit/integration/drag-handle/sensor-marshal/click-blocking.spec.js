@@ -2,6 +2,7 @@
 import invariant from 'tiny-invariant';
 import React from 'react';
 import { render, fireEvent, createEvent } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
 import type {
   SensorAPI,
   Sensor,
@@ -28,7 +29,7 @@ it('should block a single click if requested', () => {
   const preDrag: ?PreDragActions = api.tryGetLock('0');
   invariant(preDrag);
   const drag: SnapDragActions = preDrag.snapLift();
-  drag.drop({ shouldBlockNextClick: true });
+  act(() => drag.drop({ shouldBlockNextClick: true }));
 
   // fire click
   const first: MouseEvent = createEvent.click(handle);
@@ -60,7 +61,7 @@ it('should not block any clicks if not requested', () => {
   const preDrag: ?PreDragActions = api.tryGetLock('0');
   invariant(preDrag);
   const drag: SnapDragActions = preDrag.snapLift();
-  drag.drop({ shouldBlockNextClick: false });
+  act(() => drag.drop({ shouldBlockNextClick: false }));
 
   // fire click
   const first: MouseEvent = createEvent.click(handle);

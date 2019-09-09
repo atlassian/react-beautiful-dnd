@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import { fireEvent, render, createEvent } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
 import App from '../../util/app';
 import { touch, simpleLift } from '../../util/controls';
 
@@ -11,7 +12,7 @@ it('should block a click after a drag', () => {
   const handle: HTMLElement = getByText('item: 0');
 
   simpleLift(touch, handle);
-  touch.drop(handle);
+  act(() => touch.drop(handle));
 
   const click: Event = createEvent.click(handle);
   fireEvent(handle, click);
@@ -26,7 +27,7 @@ it('should not block a click after an aborted pending drag', () => {
 
   // aborted before getting to a drag
   touch.preLift(handle);
-  touch.cancel(handle);
+  act(() => touch.cancel(handle));
 
   const click: Event = createEvent.click(handle);
   fireEvent(handle, click);
