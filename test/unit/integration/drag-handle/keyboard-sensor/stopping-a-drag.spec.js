@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, createEvent, fireEvent } from '@testing-library/react';
 import App from '../../util/app';
-import { getDropReason } from '../../util/helpers';
+import { getDropReason, isDragging } from '../../util/helpers';
 import * as keyCodes from '../../../../../src/view/key-codes';
 import { simpleLift, keyboard } from '../../util/controls';
 import supportedEventName from '../../../../../src/view/use-sensor-marshal/sensors/util/supported-page-visibility-event-name';
@@ -13,6 +13,7 @@ it('should prevent default on the event that causes a drop', () => {
   const handle: HTMLElement = getByText('item: 0');
 
   simpleLift(keyboard, handle);
+  expect(isDragging(handle)).toBe(true);
 
   const event: Event = createEvent.keyDown(handle, { keyCode: keyCodes.space });
   fireEvent(handle, event);
@@ -27,6 +28,7 @@ it('should prevent default on an escape press', () => {
   const handle: HTMLElement = getByText('item: 0');
 
   simpleLift(keyboard, handle);
+  expect(isDragging(handle)).toBe(true);
 
   const event: Event = createEvent.keyDown(handle, {
     keyCode: keyCodes.escape,
@@ -52,6 +54,7 @@ it('should not prevent the default behaviour for an indirect cancel', () => {
     const handle: HTMLElement = getByText('item: 0');
 
     simpleLift(keyboard, handle);
+    expect(isDragging(handle)).toBe(true);
 
     const event: Event = new Event(eventName, {
       bubbles: true,
