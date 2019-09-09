@@ -27,7 +27,7 @@ const viewport: Viewport = getViewport();
 
 // this is just an application of get-displacement.spec
 
-[vertical /* , horizontal */].forEach((axis: Axis) => {
+[vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const crossAxisStart: number = 0;
     const crossAxisEnd: number = 100;
@@ -234,9 +234,11 @@ const viewport: Viewport = getViewport();
         borderBox: {
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
-          // inside the droppable, but not in the visible area
-          [axis.start]: viewport.frame[axis.end] + 10,
-          [axis.end]: viewport.frame[axis.end] + 20,
+          [axis.start]:
+            viewport.frame[axis.end] + visible.page.marginBox[axis.size],
+          [axis.end]:
+            viewport.frame[axis.end] +
+            visible.page.marginBox[axis.crossAxisSize],
         },
       });
       const notVisible2: DraggableDimension = getDraggableDimension({
@@ -250,8 +252,12 @@ const viewport: Viewport = getViewport();
           [axis.crossAxisStart]: crossAxisStart,
           [axis.crossAxisEnd]: crossAxisEnd,
           // inside the droppable, but not in the visible area
-          [axis.start]: viewport.frame[axis.end] + 30,
-          [axis.end]: viewport.frame[axis.end] + 40,
+          [axis.start]:
+            viewport.frame[axis.end] + visible.page.marginBox[axis.size] + 1,
+          [axis.end]:
+            viewport.frame[axis.end] +
+            visible.page.marginBox[axis.crossAxisSize] +
+            1,
         },
       });
       const customDraggables: DraggableDimensionMap = {
@@ -263,25 +269,21 @@ const viewport: Viewport = getViewport();
       const customDroppables: DroppableDimensionMap = {
         [droppable.descriptor.id]: droppable,
       };
-      // dragging notVisible2 backwards into first position
-      const displacedBy: DisplacedBy = getDisplacedBy(
-        axis,
-        notVisible2.displaceBy,
-      );
+      const displacedBy: DisplacedBy = getDisplacedBy(axis, visible.displaceBy);
       const expected: DragImpact = {
         // no longer the same due to visibility overscanning
         displaced: getForcedDisplacement({
           visible: [
             {
-              dimension: visible,
-              shouldAnimate: true,
-            },
-            {
               dimension: partialVisible,
               shouldAnimate: true,
             },
+            {
+              dimension: notVisible1,
+              shouldAnimate: true,
+            },
           ],
-          invisible: [notVisible1],
+          invisible: [notVisible2],
         }),
         displacedBy,
         at: {
@@ -294,10 +296,8 @@ const viewport: Viewport = getViewport();
       };
 
       const impact: DragImpact = getDragImpact({
-        // moving backwards to near the start of the droppable
-        pageBorderBoxCenter: { x: 1, y: 1 },
-        // dragging the notVisible2 draggable backwards
-        draggable: notVisible2,
+        pageBorderBoxCenter: visible.page.borderBox.center,
+        draggable: visible,
         draggables: customDraggables,
         droppables: customDroppables,
         previousImpact: noImpact,

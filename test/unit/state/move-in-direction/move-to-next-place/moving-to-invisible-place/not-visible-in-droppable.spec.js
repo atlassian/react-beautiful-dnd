@@ -321,7 +321,7 @@ import { emptyGroups } from '../../../../../../src/state/no-impact';
           displaced: getForcedDisplacement({
             // Even though the item started in an invisible place we force
             // the displacement to be visible.
-            visible: [{ dimension: inForeign }],
+            visible: [{ dimension: inForeign, shouldAnimate: false }],
           }),
           displacedBy,
           at: {
