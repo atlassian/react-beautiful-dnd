@@ -5,7 +5,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import strip from 'rollup-plugin-strip';
-import { uglify } from 'rollup-plugin-uglify';
+import { terser } from 'rollup-plugin-terser';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 import json from 'rollup-plugin-json';
 import pkg from './package.json';
@@ -86,7 +86,7 @@ export default [
       strip({ debugger: true }),
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot(snapshotArgs),
-      uglify(),
+      terser(),
     ],
   },
 
