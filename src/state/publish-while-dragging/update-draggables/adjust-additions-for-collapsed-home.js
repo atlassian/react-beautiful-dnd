@@ -6,7 +6,7 @@ import type {
   DisplacedBy,
 } from '../../../types';
 import getDisplacedBy from '../../get-displaced-by';
-import offsetDraggable from './offset-draggable';
+import offsetDraggable from '../../publish-while-dragging-in-virtual/offset-draggable';
 
 type Args = {|
   additions: DraggableDimension[],

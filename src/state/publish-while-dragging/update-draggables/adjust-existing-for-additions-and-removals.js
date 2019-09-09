@@ -13,7 +13,7 @@ import type {
 import { toDraggableMap, toDroppableList } from '../../dimension-structures';
 import { patch, add, negate } from '../../position';
 import getDraggablesInsideDroppable from '../../get-draggables-inside-droppable';
-import offsetDraggable from './offset-draggable';
+import offsetDraggable from '../../publish-while-dragging-in-virtual/offset-draggable';
 
 type Args = {|
   droppables: DroppableDimensionMap,

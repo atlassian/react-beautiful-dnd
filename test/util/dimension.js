@@ -131,6 +131,22 @@ export const makeScrollable = (
   });
 };
 
+export const makeVirtual = (
+  droppable: DroppableDimension,
+  amount?: number,
+): DroppableDimension =>
+  // a virtual list also needs to be scrollable
+  makeScrollable(
+    {
+      ...droppable,
+      descriptor: {
+        ...droppable.descriptor,
+        mode: 'VIRTUAL',
+      },
+    },
+    amount,
+  );
+
 export const addDroppable = (
   base: DraggingState,
   droppable: DroppableDimension,

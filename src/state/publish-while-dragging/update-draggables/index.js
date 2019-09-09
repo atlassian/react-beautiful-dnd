@@ -8,7 +8,7 @@ import type {
   Viewport,
 } from '../../../types';
 import adjustExistingForAdditionsAndRemovals from './adjust-existing-for-additions-and-removals';
-import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-changes';
+import adjustAdditionsForScrollChanges from '../../publish-while-dragging-in-virtual/adjust-additions-for-scroll-changes';
 import adjustAdditionsForCollapsedHome from './adjust-additions-for-collapsed-home';
 import { toDraggableMap } from '../../dimension-structures';
 

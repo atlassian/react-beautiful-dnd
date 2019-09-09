@@ -11,6 +11,7 @@ import type {
   DraggableStateSnapshot,
   DroppableProvided,
   DraggableDescriptor,
+  DroppableStateSnapshot,
 } from '../../../src';
 import type { QuoteMap, Quote } from '../types';
 import Title from '../primatives/title';
@@ -18,6 +19,7 @@ import reorder, { reorderQuoteMap } from '../reorder';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
 import { grid, borderRadius } from '../constants';
+import { getBackgroundColor } from '../primatives/quote-list';
 
 type Props = {|
   initial: QuoteMap,
@@ -60,6 +62,8 @@ const Row = React.memo(({ data: quotes, index, style }) => {
   const patchedStyle = {
     ...style,
     // marginBottom: grid,
+    // marginLeft: grid,
+    // marginTop: grid,
     left: style.left + grid,
     top: style.top + grid,
     width: `calc(${style.width} - ${grid * 2}px)`,
@@ -95,17 +99,17 @@ const ColumnContainer = styled.div`
   flex-direction: column;
 `;
 
-const innerElementType = React.forwardRef(({ style, ...rest }, ref) => (
-  <div
-    ref={ref}
-    style={{
-      ...style,
-      width: 'auto',
-      padding: grid,
-    }}
-    {...rest}
-  />
-));
+// const innerElementType = React.forwardRef(({ style, ...rest }, ref) => (
+//   <div
+//     ref={ref}
+//     style={{
+//       ...style,
+//       width: 'auto',
+//       // padding: grid,
+//     }}
+//     {...rest}
+//   />
+// ));
 
 const Column = React.memo(function Column(props: ColumnProps) {
   const { columnId, quotes } = props;
@@ -129,14 +133,23 @@ const Column = React.memo(function Column(props: ColumnProps) {
           />
         )}
       >
-        {(droppableProvided: DroppableProvided) => (
+        {(
+          droppableProvided: DroppableProvided,
+          snapshot: DroppableStateSnapshot,
+        ) => (
           <List
             height={500}
             itemCount={quotes.length}
             itemSize={110}
             width={300}
-            innerRef={droppableProvided.innerRef}
-            innerElementType={innerElementType}
+            outerRef={droppableProvided.innerRef}
+            style={{
+              backgroundColor: getBackgroundColor(
+                snapshot.isDraggingOver,
+                Boolean(snapshot.draggingFromThisWith),
+              ),
+            }}
+            // innerElementType={innerElementType}
             itemData={quotes}
           >
             {Row}
@@ -179,7 +192,7 @@ function Board(props: Props) {
     <>
       <DragDropContext onDragEnd={onDragEnd}>
         <Container>
-          {ordered.map((key: string, index: number) => {
+          {ordered.map((key: string) => {
             const quotes: Quote[] = columns[key];
 
             return <Column key={key} quotes={quotes} columnId={key} />;

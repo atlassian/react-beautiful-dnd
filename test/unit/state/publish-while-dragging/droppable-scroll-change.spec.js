@@ -9,18 +9,19 @@ import type {
   DropPendingState,
   ScrollSize,
   Scrollable,
-} from '../../../../../src/types';
+} from '../../../../src/types';
 import {
   getPreset,
   makeScrollable,
   addDroppable,
   getFrame,
-} from '../../../../util/dimension';
-import getStatePreset from '../../../../util/get-simple-state-preset';
-import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
-import getDroppable from '../../../../../src/state/droppable/get-droppable';
-import publish from '../../../../../src/state/publish-while-dragging';
-import { empty, adjustBox } from '../util';
+  makeVirtual,
+} from '../../../util/dimension';
+import getStatePreset from '../../../util/get-simple-state-preset';
+import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
+import getDroppable from '../../../../src/state/droppable/get-droppable';
+import publish from '../../../../src/state/publish-while-dragging';
+import { empty, adjustBox } from './util';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -33,17 +34,13 @@ it('should adjust the current droppable scroll in response to a change', () => {
   const currentScroll: Position = { x: 0, y: 5 };
 
   // Dragging inHome2 and inHome1 is removed
-  const scrollableHome: DroppableDimension = makeScrollable(
+  const virtualHome: DroppableDimension = makeVirtual(
     preset.home,
     originalScroll.y,
   );
   const beforeRemoval: DroppableDimension = scrollDroppable(
-    scrollableHome,
+    virtualHome,
     originalScroll,
-  );
-  const afterRemoval: DroppableDimension = scrollDroppable(
-    scrollableHome,
-    currentScroll,
   );
 
   // $FlowFixMe - wrong type
@@ -56,7 +53,9 @@ it('should adjust the current droppable scroll in response to a change', () => {
   const published: Published = {
     ...empty,
     removals: [preset.inHome1.descriptor.id],
-    modified: [afterRemoval],
+    modified: [
+      { droppableId: virtualHome.descriptor.id, scroll: currentScroll },
+    ],
   };
 
   const result: DraggingState | DropPendingState = publish({

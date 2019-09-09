@@ -3,7 +3,7 @@
 import invariant from 'tiny-invariant';
 import getStatePreset from '../../../util/get-simple-state-preset';
 import type { DropPendingState, DraggingState } from '../../../../src/types';
-import publish from '../../../../src/state/publish-while-dragging';
+import publish from '../../../../src/state/publish-while-dragging-in-virtual';
 import { empty } from './util';
 
 const state = getStatePreset();

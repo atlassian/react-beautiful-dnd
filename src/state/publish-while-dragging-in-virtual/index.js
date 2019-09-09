@@ -15,7 +15,7 @@ import type {
 } from '../../types';
 import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
-import adjustAdditionsForScrollChanges from '../publish-while-dragging/update-draggables/adjust-additions-for-scroll-changes';
+import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-changes';
 import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
 import scrollDroppable from '../droppable/scroll-droppable';
@@ -34,6 +34,9 @@ export default ({
   timings.start(timingsKey);
 
   // TODO: update window scroll (needs to be a part of the published object)
+  // TODO: validate.
+  // - Check that all additions / removals have a droppable
+  // - Check that all droppables are virtual
 
   // The scroll might be different to what is currently in the state
   // We want to ensure the new draggables are in step with the state

@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import type {
   Viewport,
@@ -8,9 +7,10 @@ import type {
   Scrollable,
   DroppableDimensionMap,
   DroppableId,
-} from '../../../types';
-import { add } from '../../position';
+} from '../../types';
+import { add } from '../position';
 import offsetDraggable from './offset-draggable';
+import getFrame from '../get-frame';
 
 type Args = {|
   additions: DraggableDimension[],
@@ -39,10 +39,7 @@ export default ({
   return additions.map((draggable: DraggableDimension): DraggableDimension => {
     const droppableId: DroppableId = draggable.descriptor.droppableId;
     const modified: DroppableDimension = updatedDroppables[droppableId];
-
-    const frame: ?Scrollable = modified.frame;
-    invariant(frame);
-
+    const frame: Scrollable = getFrame(modified);
     const droppableScrollChange: Position = frame.scroll.diff.value;
 
     const totalChange: Position = add(

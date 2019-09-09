@@ -214,7 +214,6 @@ export type Displaced = {|
 |};
 
 export type DragImpact = {|
-  // TODO: Displaced
   displaced: DisplacementGroups,
   displacedBy: DisplacedBy,
   at: ?ImpactLocation,

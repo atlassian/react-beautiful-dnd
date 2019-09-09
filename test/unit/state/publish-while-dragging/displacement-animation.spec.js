@@ -5,22 +5,21 @@ import type {
   DraggableDimension,
   CollectingState,
   Published,
+  DisplacementGroups,
   DraggingState,
   DropPendingState,
   DragImpact,
-  Displacement,
 } from '../../../../src/types';
-import { scrollableForeign, empty } from './util';
+import { virtualForeign, empty } from './util';
 import getSimpleStatePreset from '../../../util/get-simple-state-preset';
-import publish from '../../../../src/state/publish-while-dragging';
-import getDisplacementMap from '../../../../src/state/get-displacement-map';
+import publish from '../../../../src/state/publish-while-dragging-in-virtual';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import getNotAnimatedDisplacement from '../../../util/get-displacement/get-not-animated-displacement';
-import getVisibleDisplacement from '../../../util/get-displacement/get-visible-displacement';
 import { vertical } from '../../../../src/state/axis';
 import type { PublicResult } from '../../../../src/state/move-in-direction/move-in-direction-types';
 import moveInDirection from '../../../../src/state/move-in-direction';
 import update from '../../../../src/state/post-reducer/when-moving/update';
+import { getForcedDisplacement } from '../../../util/impact';
+import { origin } from '../../../../src/state/position';
 
 const preset = getPreset(vertical);
 const state = getSimpleStatePreset(vertical);
@@ -32,7 +31,7 @@ it('should not animate any displacement', () => {
 
   const inHomeState: DraggingState = addDroppable(
     state.dragging(),
-    scrollableForeign,
+    virtualForeign,
   );
   const moveToForeign: ?PublicResult = moveInDirection({
     state: inHomeState,
@@ -42,23 +41,24 @@ it('should not animate any displacement', () => {
   const inForeignImpact: DragImpact = moveToForeign.impact;
   // validation
   {
-    const displaced: Displacement[] = [
-      // initial movement goes after inForeign1
-      getVisibleDisplacement(preset.inForeign2),
-      getVisibleDisplacement(preset.inForeign3),
-      getVisibleDisplacement(preset.inForeign4),
-    ];
+    const displaced: DisplacementGroups = getForcedDisplacement({
+      visible: [
+        // initial movement goes after inForeign1
+        { dimension: preset.inForeign2, shouldAnimate: true },
+        { dimension: preset.inForeign3, shouldAnimate: true },
+        { dimension: preset.inForeign4, shouldAnimate: true },
+      ],
+    });
     const impact: DragImpact = {
-      movement: {
-        displaced,
-        map: getDisplacementMap(displaced),
-        displacedBy: getDisplacedBy(vertical, preset.inHome1.displaceBy),
+      displaced,
+      displacedBy: getDisplacedBy(vertical, preset.inHome1.displaceBy),
+      at: {
+        type: 'REORDER',
+        destination: {
+          index: preset.inForeign2.descriptor.index,
+          droppableId: preset.foreign.descriptor.id,
+        },
       },
-      destination: {
-        index: preset.inForeign2.descriptor.index,
-        droppableId: preset.foreign.descriptor.id,
-      },
-      merge: null,
     };
     expect(impact).toEqual(inForeignImpact);
   }
@@ -88,7 +88,7 @@ it('should not animate any displacement', () => {
   const published: Published = {
     ...empty,
     additions: [added],
-    modified: [scrollableForeign],
+    modified: [{ droppableId: virtualForeign.descriptor.id, scroll: origin }],
   };
 
   const result: DraggingState | DropPendingState = publish({
@@ -97,22 +97,20 @@ it('should not animate any displacement', () => {
   });
   invariant(result.phase === 'DRAGGING');
 
-  const displaced: Displacement[] = [
-    // previously animated displacement is now forced to not animate
-    getNotAnimatedDisplacement(preset.inForeign2),
-    getNotAnimatedDisplacement(preset.inForeign3),
-    getNotAnimatedDisplacement(preset.inForeign4),
-    // newly added displacement forced not to animate
-    getNotAnimatedDisplacement(added),
-  ];
+  const displaced: DisplacementGroups = getForcedDisplacement({
+    visible: [
+      // original animation unchanged
+      { dimension: preset.inForeign2, shouldAnimate: true },
+      { dimension: preset.inForeign3, shouldAnimate: true },
+      { dimension: preset.inForeign4, shouldAnimate: true },
+      // addition can still animate
+      { dimension: added, shouldAnimate: true },
+    ],
+  });
   const expected: DragImpact = {
     // same destination
     ...inForeignImpact,
-    movement: {
-      displaced,
-      map: getDisplacementMap(displaced),
-      displacedBy: getDisplacedBy(vertical, preset.inHome1.displaceBy),
-    },
+    displaced,
   };
   expect(result.impact).toEqual(expected);
 });

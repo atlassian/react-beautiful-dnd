@@ -14,7 +14,7 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
-const getBackgroundColor = (
+export const getBackgroundColor = (
   isDraggingOver: boolean,
   isDraggingFrom: boolean,
 ): string => {
