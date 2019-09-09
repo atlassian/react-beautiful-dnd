@@ -8,7 +8,6 @@ import type {
   DraggableDimension,
   DroppableId,
   LiftEffect,
-  Combine,
 } from '../../../types';
 import whatIsDraggedOver from '../../droppable/what-is-dragged-over';
 import { subtract } from '../../position';

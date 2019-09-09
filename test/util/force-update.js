@@ -5,6 +5,4 @@ import type { ReactWrapper } from 'enzyme';
 // instead using wrapper.setProps({});
 // https://github.com/airbnb/enzyme/issues/1245
 
-export default (wrapper: ReactWrapper<*>) =>
-  // $ExpectError - I am a bad person
-  wrapper.setProps({});
+export default (wrapper: ReactWrapper<*>) => wrapper.setProps({});

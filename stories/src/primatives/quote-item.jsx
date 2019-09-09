@@ -5,7 +5,6 @@ import { colors } from '@atlaskit/theme';
 import { borderRadius, grid } from '../constants';
 import type { Quote, AuthorColors } from '../types';
 import type { DraggableProvided } from '../../../src';
-import useLayoutEffect from '../../../src/view/use-isomorphic-layout-effect';
 
 type Props = {
   quote: Quote,

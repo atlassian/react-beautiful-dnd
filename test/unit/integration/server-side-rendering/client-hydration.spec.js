@@ -6,6 +6,7 @@ import ReactDOMServer from 'react-dom/server';
 import { resetServerContext } from '../../../../src';
 import App from '../util/app';
 import { noop } from '../../../../src/empty';
+import getBodyElement from '../../../../src/view/get-body-element';
 
 beforeEach(() => {
   // Reset server context between tests to prevent state being shared between them
@@ -25,6 +26,7 @@ it('should support hydrating a server side rendered application', () => {
   // on the server
   const error = jest.spyOn(console, 'error').mockImplementation(noop);
 
+  resetServerContext();
   const serverHTML: string = ReactDOMServer.renderToString(<App />);
 
   error.mock.calls.forEach(call => {
@@ -39,6 +41,7 @@ it('should support hydrating a server side rendered application', () => {
   resetServerContext();
   const el = document.createElement('div');
   el.innerHTML = serverHTML;
+  getBodyElement().appendChild(el);
 
   expect(() => ReactDOM.hydrate(<App />, el)).not.toThrow();
 });

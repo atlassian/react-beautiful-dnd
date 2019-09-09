@@ -7,7 +7,6 @@ import type {
   MovementMode,
   DroppableId,
   DraggableId,
-  DraggableDescriptor,
 } from '../../../../../src/types';
 
 type GetDraggingSnapshotArgs = {|

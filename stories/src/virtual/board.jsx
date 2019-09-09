@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
@@ -15,7 +15,7 @@ import type {
 } from '../../../src';
 import type { QuoteMap, Quote } from '../types';
 import Title from '../primatives/title';
-import reorder, { reorderQuoteMap } from '../reorder';
+import { reorderQuoteMap } from '../reorder';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 import QuoteItem from '../primatives/quote-item';
 import { grid, borderRadius } from '../constants';
@@ -25,39 +25,17 @@ type Props = {|
   initial: QuoteMap,
 |};
 
-type ItemProps = {|
-  provided: DraggableProvided,
-  quote: Quote,
-  style?: Object,
-|};
-
-function Item(props: ItemProps) {
-  const { quote, provided, style } = props;
-
-  useEffect(() => {
-    console.log('quote mounted', quote.id);
-    return () => console.log('quote unmounted', quote.id);
-  }, [quote.id]);
-  return (
-    <div
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
-      ref={provided.innerRef}
-      style={{
-        ...provided.draggableProps.style,
-        ...style,
-      }}
-    >
-      {quote.id}
-    </div>
-  );
-}
-
 const Container = styled.div`
   display: flex;
 `;
 
-const Row = React.memo(({ data: quotes, index, style }) => {
+type RowProps = {
+  data: Quote[],
+  index: number,
+  style: Object,
+};
+
+const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
   const quote: Quote = quotes[index];
   const patchedStyle = {
     ...style,
@@ -98,18 +76,6 @@ const ColumnContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
-
-// const innerElementType = React.forwardRef(({ style, ...rest }, ref) => (
-//   <div
-//     ref={ref}
-//     style={{
-//       ...style,
-//       width: 'auto',
-//       // padding: grid,
-//     }}
-//     {...rest}
-//   />
-// ));
 
 const Column = React.memo(function Column(props: ColumnProps) {
   const { columnId, quotes } = props;
@@ -162,7 +128,7 @@ const Column = React.memo(function Column(props: ColumnProps) {
 
 function Board(props: Props) {
   const [columns, setColumns] = useState(() => props.initial);
-  const [ordered, setOrder] = useState(() => Object.keys(props.initial));
+  const [ordered] = useState(() => Object.keys(props.initial));
 
   function onDragEnd(result: DropResult) {
     if (!result.destination) {

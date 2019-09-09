@@ -110,7 +110,10 @@ function Controls(props: ControlProps) {
           actionsRef.current = lift(select.value);
         }}
       >
-        Lift 🏋️‍♀️
+        Lift{' '}
+        <span role="img" aria-label="drop">
+          🏋️‍♀️
+        </span>
       </ActionButton>
       <ActionButton
         type="button"
@@ -122,7 +125,10 @@ function Controls(props: ControlProps) {
         }
         disabled={!isDragging}
       >
-        Drop 🤾‍♂️
+        Drop{' '}
+        <span role="img" aria-label="drop">
+          🤾‍♂️
+        </span>
       </ActionButton>
       <ArrowBox>
         <ArrowButton

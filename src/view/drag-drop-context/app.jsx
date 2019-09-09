@@ -48,7 +48,7 @@ import usePrevious from '../use-previous-ref';
 import { warning } from '../../dev-warning';
 import useSensorMarshal from '../use-sensor-marshal/use-sensor-marshal';
 
-type Props = {|
+export type Props = {|
   ...Responders,
   contextId: string,
   setOnError: (onError: Function) => void,

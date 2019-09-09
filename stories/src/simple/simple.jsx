@@ -45,6 +45,7 @@ const getListStyle = isDraggingOver => ({
 export default class App extends Component {
   constructor(props, context) {
     super(props, context);
+    // eslint-disable-next-line react/state-in-constructor
     this.state = {
       items: getItems(10),
     };

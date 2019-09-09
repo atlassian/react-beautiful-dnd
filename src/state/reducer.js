@@ -20,7 +20,6 @@ import type {
 import type { Action } from './store-types';
 import type { PublicResult as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
 import scrollDroppable from './droppable/scroll-droppable';
-import publishWhileDragging from './publish-while-dragging';
 import moveInDirection from './move-in-direction';
 import { add, isEqual, origin } from './position';
 import scrollViewport from './scroll-viewport';

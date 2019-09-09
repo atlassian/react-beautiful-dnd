@@ -2,6 +2,10 @@
 # Issue with atlaskit/theme typing
 .*/node_modules/@atlaskit/theme
 
+[ignore]
+# Creating lots of invalid files
+.*/node_modules/jsonlint-mod/.*
+
 [libs]
 ./flow-typed/custom/
 

@@ -8,7 +8,6 @@ import type {
   DraggableDimension,
   DroppablePublish,
   DroppableIdMap,
-  Critical,
   DraggableIdMap,
 } from '../../types';
 import type {

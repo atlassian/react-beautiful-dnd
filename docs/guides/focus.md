@@ -18,6 +18,8 @@ If a _drag handle_ has browser focus when a drag starts then `rbd` will try to g
 
 Here is what is done:
 
-- Give focus to a _drag handle_ with a matching `DraggableId` after the drag starts. This might be a different element to the original _drag handle_ if you are using a [portal](TODO) or a [clone](TODO).
-- Give focus to a _drag handle_ with a matching `DraggableId` after the drag ends. Sometimes the original _drag handle_ element is lost during a drag, such as when using a [portal](TODO) or a [clone](TODO), or when moving a `Draggable` from one list to another as `React` will recreate the element.
-- If [combining](TODO) then focus is given to the combine target after a drag ends. This allows keyboard users to continue to engage with the application without needing to get the focus back to where they where the last interaction was
+- Give focus to a _drag handle_ with a matching `DraggableId` after the drag starts. This might be a different element to the original _drag handle_ if you are using a [portal](/docs/patterns/using-a-portal.md) or a [clone](/docs/patterns/using-a-clone.md).
+- Give focus to a _drag handle_ with a matching `DraggableId` after the drag ends. Sometimes the original _drag handle_ element is lost during a drag, such as when using a [portal](/docs/patterns/using-a-portal.md) or a [clone](/docs/patterns/using-a-clone.md), or when moving a `<Draggable />` from one list to another as `React` will recreate the element.
+- If [combining](/docs/guides/combining.md) then focus is given to the combine target after a drag ends. This allows keyboard users to continue to engage with the application without needing to get the focus back to where they where the last interaction was
+
+[← Back to documentation](/README.md#documentation-)

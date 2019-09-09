@@ -52,6 +52,9 @@ module.exports = {
     // Cannot reassign function parameters but allowing modification
     'no-param-reassign': ['error', { props: false }],
 
+    // Don't tell me what to do!
+    'max-classes-per-file': 'off',
+
     // Allowing ++ on numbers
     'no-plusplus': 'off',
 
@@ -172,5 +175,11 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'error',
 
     'react/jsx-props-no-spreading': 'off',
+
+    // using <React.Fragment> is fine
+    'react/jsx-fragments': 'off',
+
+    // all good to declare static class members in the class
+    'react/static-property-placement': 'off',
   },
 };

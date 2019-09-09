@@ -1,4 +1,9 @@
+// @flow
+/* eslint-disable import/no-unresolved */
+/* eslint-disable global-require */
+/* eslint-disable no-console */
 try {
+  // $ExpectError - file not be created
   const a11yReport = require('./test-reports/lighthouse/a11y.report.json');
   const a11yScore = a11yReport.categories.accessibility.score;
   const a11yScoreFormatted = `${a11yScore ? a11yScore * 100 : 0}%`;

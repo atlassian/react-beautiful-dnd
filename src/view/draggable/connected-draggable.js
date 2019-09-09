@@ -335,7 +335,7 @@ const mapDispatchToProps: DispatchProps = {
 
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
-// It avoids needing to do it own within `Draggable`
+// It avoids needing to do it own within `<Draggable />`
 const ConnectedDraggable = connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,

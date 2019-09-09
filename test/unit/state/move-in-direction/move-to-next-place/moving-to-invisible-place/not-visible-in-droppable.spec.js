@@ -297,10 +297,6 @@ import { emptyGroups } from '../../../../../../src/state/no-impact';
             viewport,
           },
         );
-        // const previousPageBorderBoxCenter: Position =
-        //   initiallyOutsideViewport.page.borderBox.center;
-        // const previousClientSelection: Position =
-        //   initiallyOutsideViewport.client.borderBox.center;
 
         // figure out where we would have been if it was visible
 
