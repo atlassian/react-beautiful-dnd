@@ -32,11 +32,11 @@ export function getOffset(el: HTMLElement): Position {
 }
 
 export function getDropReason(onDragEnd: JestMockFn<*, *>): DropReason {
-  const calls = onDragEnd.mock.calls[0];
+  const calls = onDragEnd.mock.calls;
 
   invariant(calls.length, 'There has been no calls to onDragEnd');
 
-  return calls[0].reason;
+  return calls[0][0].reason;
 }
 export function isDragging(el: HTMLElement): boolean {
   return el.getAttribute('data-is-dragging') === 'true';
