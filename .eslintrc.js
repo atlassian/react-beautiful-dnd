@@ -181,5 +181,8 @@ module.exports = {
 
     // all good to declare static class members in the class
     'react/static-property-placement': 'off',
+
+    // don't need to initialize state in a constructor
+    'react/state-in-constructor': 'off',
   },
 };
