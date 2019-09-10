@@ -35,7 +35,7 @@
   "scripts": {
     "test:accessibility": "lighthouse http://localhost:9002/iframe.html?id=single-vertical-list--basic --chrome-flags='--headless' --output=json --output=html --output-path=./test-reports/lighthouse/a11y.json && node a11y-audit-parse.js",
     "test": "jest --config ./jest.config.js",
-    "test:ci": "jest test --runInBand",
+    "test:ci": "jest test --maxWorkers=2",
     "test:browser": "cypress open",
     "test:browser:ci": "cypress run",
     "test:coverage": "yarn test --coverage --coveragePathIgnorePatterns=/debug",

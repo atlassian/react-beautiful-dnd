@@ -15,5 +15,13 @@ if (typeof document !== 'undefined') {
     // lots of tests can leave a post-drop click blocker
     // this cleans it up before every test
     fireEvent.click(window);
+
+    if (window.getComputedStyle.mockRestore) {
+      window.getComputedStyle.mockRestore();
+    }
+
+    if (Element.prototype.getBoundingClientRect.mockRestore) {
+      Element.prototype.getBoundingClientRect.mockRestore();
+    }
   });
 }
