@@ -22,4 +22,8 @@ Here is what is done:
 - Give focus to a _drag handle_ with a matching `DraggableId` after the drag ends. Sometimes the original _drag handle_ element is lost during a drag, such as when using a [portal](/docs/patterns/using-a-portal.md) or a [clone](/docs/patterns/using-a-clone.md), or when moving a `<Draggable />` from one list to another as `React` will recreate the element.
 - If [combining](/docs/guides/combining.md) then focus is given to the combine target after a drag ends. This allows keyboard users to continue to engage with the application without needing to get the focus back to where they where the last interaction was
 
+## Browser testing
+
+Fun fact: we test this behaviour using [`cypress.io`](http://cypress.io) to ensure that focus management behaves as we expect
+
 [← Back to documentation](/README.md#documentation-)
