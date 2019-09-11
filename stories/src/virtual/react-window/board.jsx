@@ -12,14 +12,14 @@ import type {
   DroppableProvided,
   DraggableDescriptor,
   DroppableStateSnapshot,
-} from '../../../src';
-import type { QuoteMap, Quote } from '../types';
-import Title from '../primatives/title';
-import { reorderQuoteMap } from '../reorder';
-import { DragDropContext, Droppable, Draggable } from '../../../src';
-import QuoteItem from '../primatives/quote-item';
-import { grid, borderRadius } from '../constants';
-import { getBackgroundColor } from '../primatives/quote-list';
+} from '../../../../src';
+import type { QuoteMap, Quote } from '../../types';
+import Title from '../../primatives/title';
+import { reorderQuoteMap } from '../../reorder';
+import { DragDropContext, Droppable, Draggable } from '../../../../src';
+import QuoteItem from '../../primatives/quote-item';
+import { grid, borderRadius } from '../../constants';
+import { getBackgroundColor } from '../../primatives/quote-list';
 
 type Props = {|
   initial: QuoteMap,
@@ -39,9 +39,6 @@ const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
   const quote: Quote = quotes[index];
   const patchedStyle = {
     ...style,
-    // marginBottom: grid,
-    // marginLeft: grid,
-    // marginTop: grid,
     left: style.left + grid,
     top: style.top + grid,
     width: `calc(${style.width} - ${grid * 2}px)`,
@@ -102,25 +99,28 @@ const Column = React.memo(function Column(props: ColumnProps) {
         {(
           droppableProvided: DroppableProvided,
           snapshot: DroppableStateSnapshot,
-        ) => (
-          <List
-            height={500}
-            itemCount={quotes.length}
-            itemSize={110}
-            width={300}
-            outerRef={droppableProvided.innerRef}
-            style={{
-              backgroundColor: getBackgroundColor(
-                snapshot.isDraggingOver,
-                Boolean(snapshot.draggingFromThisWith),
-              ),
-            }}
-            // innerElementType={innerElementType}
-            itemData={quotes}
-          >
-            {Row}
-          </List>
-        )}
+        ) => {
+          // console.log('placeholder', droppableProvided.placeholder);
+          return (
+            <List
+              height={500}
+              itemCount={quotes.length}
+              itemSize={110}
+              width={300}
+              outerRef={droppableProvided.innerRef}
+              style={{
+                backgroundColor: getBackgroundColor(
+                  snapshot.isDraggingOver,
+                  Boolean(snapshot.draggingFromThisWith),
+                ),
+                padding: grid,
+              }}
+              itemData={quotes}
+            >
+              {Row}
+            </List>
+          );
+        }}
       </Droppable>
     </ColumnContainer>
   );

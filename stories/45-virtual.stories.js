@@ -1,12 +1,12 @@
 // @flow
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import ReactWindow from './src/virtual/react-window';
+import List from './src/virtual/react-window/list';
 import { getQuotes, generateQuoteMap } from './src/data';
-import Board from './src/virtual/board';
+import Board from './src/virtual/react-window/board';
 
 storiesOf('Virtual', module)
-  .add('list with react-window', () => <ReactWindow initial={getQuotes(3)} />)
+  .add('list with react-window', () => <List initial={getQuotes(3)} />)
   .add('board with react-window', () => (
     <Board initial={generateQuoteMap(10)} />
   ));

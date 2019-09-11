@@ -1,7 +1,7 @@
 // @flow
 import React, { useState } from 'react';
 import { FixedSizeList as List, areEqual } from 'react-window';
-import type { Quote } from '../types';
+import type { Quote } from '../../types';
 import {
   Droppable,
   Draggable,
@@ -11,19 +11,13 @@ import {
   type DraggableStateSnapshot,
   type DraggableDescriptor,
   type DropResult,
-} from '../../../src';
-import QuoteItem from '../primatives/quote-item';
-import reorder from '../reorder';
+} from '../../../../src';
+import QuoteItem from '../../primatives/quote-item';
+import reorder from '../../reorder';
 
 type Props = {|
   initial: Quote[],
 |};
-
-// type ItemProps = {|
-//   provided: DraggableProvided,
-//   quote: Quote,
-//   style?: Object,
-// |};
 
 type RowProps = {
   data: Quote[],
