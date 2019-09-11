@@ -16,6 +16,8 @@ if (typeof document !== 'undefined') {
     // this cleans it up before every test
     fireEvent.click(window);
 
+    // Cleaning up any mocks
+
     if (window.getComputedStyle.mockRestore) {
       window.getComputedStyle.mockRestore();
     }
