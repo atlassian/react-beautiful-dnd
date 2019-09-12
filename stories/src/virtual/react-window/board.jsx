@@ -36,7 +36,13 @@ type RowProps = {
 };
 
 const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
-  const quote: Quote = quotes[index];
+  const quote: ?Quote = quotes[index];
+
+  // placeholder :D
+  if (!quote) {
+    return null;
+  }
+
   const patchedStyle = {
     ...style,
     left: style.left + grid,
@@ -100,11 +106,18 @@ const Column = React.memo(function Column(props: ColumnProps) {
           droppableProvided: DroppableProvided,
           snapshot: DroppableStateSnapshot,
         ) => {
-          // console.log('placeholder', droppableProvided.placeholder);
+          // TODO: should snapshot include `placeholder` data?
+          const itemCount: number = (() => {
+            if (snapshot.isDraggingOver && !snapshot.draggingFromThisWith) {
+              return quotes.length + 1;
+            }
+            return quotes.length;
+          })();
+
           return (
             <List
               height={500}
-              itemCount={quotes.length}
+              itemCount={itemCount}
               itemSize={110}
               width={300}
               outerRef={droppableProvided.innerRef}
@@ -113,6 +126,7 @@ const Column = React.memo(function Column(props: ColumnProps) {
                   snapshot.isDraggingOver,
                   Boolean(snapshot.draggingFromThisWith),
                 ),
+                transition: 'background-color 0.2s ease',
                 padding: grid,
               }}
               itemData={quotes}
