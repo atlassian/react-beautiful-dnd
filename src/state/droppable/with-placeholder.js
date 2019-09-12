@@ -22,6 +22,11 @@ const getRequiredGrowthForPlaceholder = (
   draggables: DraggableDimensionMap,
 ): ?Position => {
   const axis: Axis = droppable.axis;
+
+  if (droppable.descriptor.mode === 'VIRTUAL') {
+    return patch(axis.line, placeholderSize[axis.line]);
+  }
+
   // TODO: consider margin collapsing?
   // Using contentBox as that is where the Draggables will sit
   const availableSpace: number = droppable.subject.page.contentBox[axis.size];
