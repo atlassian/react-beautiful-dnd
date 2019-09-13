@@ -285,5 +285,9 @@ const gap: number = 10;
         expect(removed).toEqual(withFrame);
       });
     });
+
+    describe('virtual list', () => {
+      it('should increase the scrollable area by the size of the dragging item', () => {});
+    });
   });
 });

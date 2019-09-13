@@ -23,6 +23,8 @@ const getRequiredGrowthForPlaceholder = (
 ): ?Position => {
   const axis: Axis = droppable.axis;
 
+  // A virtual list will most likely not contain all of the Draggables
+  // so counting them does not help.
   if (droppable.descriptor.mode === 'VIRTUAL') {
     return patch(axis.line, placeholderSize[axis.line]);
   }
