@@ -1,5 +1,5 @@
 // @flow
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
@@ -20,10 +20,8 @@ import { DragDropContext, Droppable, Draggable } from '../../../../src';
 import QuoteItem from '../../primatives/quote-item';
 import { grid, borderRadius } from '../../constants';
 import { getBackgroundColor } from '../../primatives/quote-list';
-
-type Props = {|
-  initial: QuoteMap,
-|};
+import QuoteCountSlider from '../quote-count-chooser';
+import { generateQuoteMap } from '../../data';
 
 const Container = styled.div`
   display: flex;
@@ -140,9 +138,16 @@ const Column = React.memo(function Column(props: ColumnProps) {
   );
 });
 
-function Board(props: Props) {
-  const [columns, setColumns] = useState(() => props.initial);
-  const [ordered] = useState(() => Object.keys(props.initial));
+function Board() {
+  const [quoteMap, setQuoteMap] = useState(() => generateQuoteMap(10));
+  const columnKeys: string[] = useMemo(() => Object.keys(quoteMap).sort(), [
+    quoteMap,
+  ]);
+  const totalItemCount: number = useMemo(() => {
+    return columnKeys
+      .map((key: string): Quote[] => quoteMap[key])
+      .reduce((acc: number, quotes: Quote[]) => acc + quotes.length, 0);
+  }, [columnKeys, quoteMap]);
 
   function onDragEnd(result: DropResult) {
     if (!result.destination) {
@@ -160,24 +165,30 @@ function Board(props: Props) {
     }
 
     const updated = reorderQuoteMap({
-      quoteMap: columns,
+      quoteMap,
       source,
       destination,
     });
 
-    setColumns(updated.quoteMap);
+    setQuoteMap(updated.quoteMap);
   }
 
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>
         <Container>
-          {ordered.map((key: string) => {
-            const quotes: Quote[] = columns[key];
+          {columnKeys.map((key: string) => {
+            const quotes: Quote[] = quoteMap[key];
 
             return <Column key={key} quotes={quotes} columnId={key} />;
           })}
         </Container>
+        <QuoteCountSlider
+          count={totalItemCount}
+          onCountChange={(count: number) =>
+            setQuoteMap(generateQuoteMap(count))
+          }
+        />
       </DragDropContext>
       <Global
         styles={css`
