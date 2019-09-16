@@ -189,7 +189,10 @@ function reducer(state: State, action: Action) {
   return state;
 }
 
-function Board() {
+type Empty = {||};
+
+// eslint-disable-next-line no-unused-vars
+function Board(props: Empty) {
   const [state, dispatch] = useReducer(reducer, undefined, getInitialState);
 
   function onDragEnd(result: DropResult) {
