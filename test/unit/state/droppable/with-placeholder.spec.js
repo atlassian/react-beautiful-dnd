@@ -9,6 +9,7 @@ import type {
   DroppableSubject,
   DroppableDescriptor,
   Scrollable,
+  DisplacedBy,
 } from '../../../../src/types';
 import {
   getDroppableDimension,
@@ -21,6 +22,7 @@ import {
 import { toDraggableMap } from '../../../../src/state/dimension-structures';
 import { vertical, horizontal } from '../../../../src/state/axis';
 import { add, patch, origin, isEqual } from '../../../../src/state/position';
+import getDisplacedBy from '../../../../src/state/get-displaced-by';
 
 const crossAxisStart: number = 0;
 const crossAxisEnd: number = 100;
@@ -287,7 +289,88 @@ const gap: number = 10;
     });
 
     describe('virtual list', () => {
-      it('should increase the scrollable area by the size of the dragging item', () => {});
+      const virtual: DroppableDimension = getDroppableDimension({
+        descriptor: {
+          ...descriptor,
+          mode: 'VIRTUAL',
+        },
+        direction: axis.direction,
+        borderBox: withoutFrame.client.borderBox,
+        closest: {
+          borderBox: withoutFrame.client.borderBox,
+          scrollSize: {
+            scrollWidth: axis === vertical ? crossAxisSize : droppableSize,
+            scrollHeight: axis === vertical ? droppableSize : crossAxisSize,
+          },
+          scroll: origin,
+          shouldClipSubject: false,
+        },
+      });
+      const originalFrame: ?Scrollable = virtual.frame;
+      invariant(
+        originalFrame && isEqual(originalFrame.scroll.max, origin),
+        'expecting no max scroll',
+      );
+
+      it('should always grow the subject required', () => {
+        const inHome: DraggableDimension = getHomeDraggable(gap - 5);
+        const displacedBy: DisplacedBy = getDisplacedBy(
+          axis,
+          inHome.displaceBy,
+        );
+        // increasing by the whole amount, not just the gap
+        // for virtual lists we cannot count the size of existing items
+        // as they all might not be there
+        const increasedBy: Position = patch(axis.line, displacedBy.value);
+
+        const result: DroppableDimension = addPlaceholder(
+          virtual,
+          inHome,
+          withHomeDraggable(inHome),
+        );
+
+        const active: ?Rect = virtual.subject.active;
+        invariant(active);
+        const expected: DroppableSubject = {
+          // unchanged
+          page: virtual.subject.page,
+          // increased
+          active: getRect({
+            ...active,
+            [axis.end]: active[axis.end] + displacedBy.value,
+          }),
+          // added
+          withPlaceholder: {
+            increasedBy,
+            oldFrameMaxScroll: originalFrame.scroll.max,
+            placeholderSize: getPlaceholderSize(inHome),
+          },
+        };
+        expect(result.subject).toEqual(expected);
+        // max scroll change
+        const newFrame: ?Scrollable = result.frame;
+        invariant(newFrame);
+        expect(originalFrame.scroll.max).not.toEqual(newFrame.scroll.max);
+        expect(newFrame.scroll.max).toEqual(
+          add(originalFrame.scroll.max, increasedBy),
+        );
+        // no client change
+        expect(newFrame.frameClient).toEqual(newFrame.frameClient);
+      });
+
+      it('should restore the original frame when placeholder is no longer needed', () => {
+        const excess: number = 20;
+        const inHome: DraggableDimension = getHomeDraggable(gap + excess);
+
+        const added: DroppableDimension = addPlaceholder(
+          virtual,
+          inHome,
+          withHomeDraggable(inHome),
+        );
+        const removed: DroppableDimension = removePlaceholder(added);
+
+        expect(removed).toEqual(virtual);
+      });
     });
   });
 });

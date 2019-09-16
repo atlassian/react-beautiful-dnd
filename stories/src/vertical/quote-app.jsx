@@ -65,7 +65,6 @@ export default function QuoteApp(props: Props) {
     <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
       <Root>
         <QuoteList
-          useClone
           listId="list"
           style={props.listStyle}
           quotes={quotes}

@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, useMemo, useReducer } from 'react';
+import React, { useReducer } from 'react';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
