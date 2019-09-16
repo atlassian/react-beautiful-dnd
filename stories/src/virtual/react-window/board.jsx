@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useReducer } from 'react';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
@@ -138,16 +138,59 @@ const Column = React.memo(function Column(props: ColumnProps) {
   );
 });
 
-function Board() {
-  const [quoteMap, setQuoteMap] = useState(() => generateQuoteMap(10));
-  const columnKeys: string[] = useMemo(() => Object.keys(quoteMap).sort(), [
+type State = {|
+  itemCount: number,
+  quoteMap: QuoteMap,
+  columnKeys: string[],
+|};
+
+function getColumnKeys(quoteMap: QuoteMap): string[] {
+  return Object.keys(quoteMap).sort();
+}
+
+function getInitialState() {
+  const itemCount: number = 8;
+  const quoteMap: QuoteMap = generateQuoteMap(itemCount);
+  const columnKeys: string[] = getColumnKeys(quoteMap);
+  return {
+    itemCount,
     quoteMap,
-  ]);
-  const totalItemCount: number = useMemo(() => {
-    return columnKeys
-      .map((key: string): Quote[] => quoteMap[key])
-      .reduce((acc: number, quotes: Quote[]) => acc + quotes.length, 0);
-  }, [columnKeys, quoteMap]);
+    columnKeys,
+  };
+}
+
+type Action =
+  | {|
+      type: 'CHANGE_COUNT',
+      payload: number,
+    |}
+  | {|
+      type: 'REORDER',
+      payload: QuoteMap,
+    |};
+
+function reducer(state: State, action: Action) {
+  if (action.type === 'CHANGE_COUNT') {
+    const quoteMap: QuoteMap = generateQuoteMap(action.payload);
+    return {
+      itemCount: action.payload,
+      quoteMap,
+      columnKeys: getColumnKeys(quoteMap),
+    };
+  }
+  if (action.type === 'REORDER') {
+    return {
+      itemCount: state.itemCount,
+      quoteMap: action.payload,
+      columnKeys: getColumnKeys(action.payload),
+    };
+  }
+
+  return state;
+}
+
+function Board() {
+  const [state, dispatch] = useReducer(reducer, undefined, getInitialState);
 
   function onDragEnd(result: DropResult) {
     if (!result.destination) {
@@ -165,28 +208,28 @@ function Board() {
     }
 
     const updated = reorderQuoteMap({
-      quoteMap,
+      quoteMap: state.quoteMap,
       source,
       destination,
     });
 
-    setQuoteMap(updated.quoteMap);
+    dispatch({ type: 'REORDER', payload: updated.quoteMap });
   }
 
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>
         <Container>
-          {columnKeys.map((key: string) => {
-            const quotes: Quote[] = quoteMap[key];
+          {state.columnKeys.map((key: string) => {
+            const quotes: Quote[] = state.quoteMap[key];
 
             return <Column key={key} quotes={quotes} columnId={key} />;
           })}
         </Container>
         <QuoteCountSlider
-          count={totalItemCount}
+          count={state.itemCount}
           onCountChange={(count: number) =>
-            setQuoteMap(generateQuoteMap(count))
+            dispatch({ type: 'CHANGE_COUNT', payload: count })
           }
         />
       </DragDropContext>
