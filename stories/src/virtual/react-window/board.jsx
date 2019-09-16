@@ -149,7 +149,7 @@ function getColumnKeys(quoteMap: QuoteMap): string[] {
 }
 
 function getInitialState() {
-  const itemCount: number = 8;
+  const itemCount: number = 10000;
   const quoteMap: QuoteMap = generateQuoteMap(itemCount);
   const columnKeys: string[] = getColumnKeys(quoteMap);
   return {

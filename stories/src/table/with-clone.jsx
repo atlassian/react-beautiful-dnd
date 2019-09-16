@@ -3,16 +3,19 @@
 import React, { Component, Fragment, type Node } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@atlaskit/theme';
-import { DragDropContext, Droppable, Draggable } from '../../../src';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  type DraggableDescriptor,
+  type DropResult,
+  type DroppableProvided,
+  type DraggableProvided,
+  type DraggableStateSnapshot,
+} from '../../../src';
 import reorder from '../reorder';
 import { grid } from '../constants';
 import type { Quote } from '../types';
-import type {
-  DropResult,
-  DroppableProvided,
-  DraggableProvided,
-  DraggableStateSnapshot,
-} from '../../../src';
 
 const Table = styled.table`
   width: 500px;

@@ -1,7 +1,8 @@
 // @flow
-import React, { useCallback } from 'react';
+import React from 'react';
 import { css } from '@emotion/core';
-import rafSchd from 'raf-schd';
+import { colors } from '@atlaskit/theme';
+import { grid, borderRadius } from '../constants';
 
 type Props = {|
   count: number,
@@ -35,11 +36,28 @@ export default function QuoteCountChooser(props: Props) {
       <div
         css={css`
           align-self: center;
-          width: 300px;
+          background-color: ${colors.N0};
+          padding: ${grid}px;
+          border-radius: ${borderRadius}px;
         `}
       >
-        <h4>Quote count: {props.count}</h4>
-        <select onChange={onChange} value={props.count}>
+        <h4
+          css={css`
+            margin-bottom: ${grid}px;
+          `}
+        >
+          <a href="https://github.com/bvaughn/react-window">
+            <code>react-window</code>
+          </a>
+        </h4>
+        <select
+          onChange={onChange}
+          value={props.count}
+          css={css`
+            width: 200px;
+            font-size: 16px;
+          `}
+        >
           {options.map((option: Option) => (
             <option key={option.name} value={option.value}>
               {option.name} ({option.value})
