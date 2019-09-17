@@ -204,6 +204,14 @@ export default (state: State = idle, action: Action): State => {
     // We will be updating the scroll in response to dynamic changes
     // manually on the droppable so we can ignore this change
     if (state.phase === 'COLLECTING') {
+      if (state.movementMode === 'SNAP') {
+        return {
+          // thanks flow
+          phase: 'COLLECTING',
+          ...state,
+          scrollJumpRequest: null,
+        };
+      }
       return state;
     }
 
