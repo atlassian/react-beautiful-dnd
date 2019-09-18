@@ -13,6 +13,7 @@ type Props = {
   isClone?: boolean,
   isGroupedOver?: boolean,
   style?: Object,
+  index?: number,
 };
 
 const getBackgroundColor = (
@@ -167,7 +168,15 @@ function getStyle(provided: DraggableProvided, style: ?Object) {
 // things we should be doing in the selector as we do not know if consumers
 // will be using PureComponent
 function QuoteItem(props: Props) {
-  const { quote, isDragging, isGroupedOver, provided, style, isClone } = props;
+  const {
+    quote,
+    isDragging,
+    isGroupedOver,
+    provided,
+    style,
+    isClone,
+    index,
+  } = props;
 
   return (
     <Container
@@ -181,6 +190,8 @@ function QuoteItem(props: Props) {
       {...provided.dragHandleProps}
       style={getStyle(provided, style)}
       data-is-dragging={isDragging}
+      data-testid={quote.id}
+      data-index={index}
     >
       <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
       {isClone ? <CloneBadge>Clone</CloneBadge> : null}

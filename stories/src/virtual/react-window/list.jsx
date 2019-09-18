@@ -36,6 +36,7 @@ const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
           quote={quote}
           isDragging={snapshot.isDragging}
           style={{ margin: 0, ...style }}
+          index={index}
         />
       )}
     </Draggable>
@@ -76,6 +77,7 @@ function App(props: Props) {
             isDragging={snapshot.isDragging}
             quote={quotes[descriptor.index]}
             style={{ margin: 0 }}
+            index={descriptor.index}
           />
         )}
       >
