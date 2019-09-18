@@ -42,5 +42,6 @@ export default (autoScroller: AutoScroller) => (store: MiddlewareStore) => (
   // auto scroll happens in response to state changes
   // releasing all actions to the reducer first
   next(action);
+
   autoScroller.scroll(store.getState());
 };

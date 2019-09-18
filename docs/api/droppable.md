@@ -29,12 +29,16 @@ type Props = {|
   droppableId: DroppableId,
   // optional
   type?: TypeId,
+  mode?: DroppableMode,
   isDropDisabled?: boolean,
   isCombineEnabled?: boolean,
   direction?: Direction,
   ignoreContainerClipping?: boolean,
-  children: (Provided, StateSnapshot) => Node,
+  children: (DroppableProvided, DroppableStateSnapshot) => Node,
 |};
+
+type DroppableMode = 'STANDARD' | 'VIRTUAL';
+type Direction = 'horizontal' | 'vertical';
 ```
 
 ### Required props

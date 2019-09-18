@@ -56,6 +56,19 @@ const postDroppableChange = (
   });
 };
 
+function removeScrollJumpRequest(state: State): State {
+  if (state.isDragging && state.movementMode === 'SNAP') {
+    return {
+      // will be overwritten by spread
+      // needed for flow
+      phase: 'DRAGGING',
+      ...state,
+      scrollJumpRequest: null,
+    };
+  }
+  return state;
+}
+
 const idle: IdleState = { phase: 'IDLE', completed: null, shouldFlush: false };
 
 export default (state: State = idle, action: Action): State => {
@@ -198,21 +211,13 @@ export default (state: State = idle, action: Action): State => {
     // Cannot get this during a DROP_ANIMATING as the dimension
     // marshal will cancel any pending scroll updates
     if (state.phase === 'DROP_PENDING') {
-      return state;
+      return removeScrollJumpRequest(state);
     }
 
     // We will be updating the scroll in response to dynamic changes
     // manually on the droppable so we can ignore this change
     if (state.phase === 'COLLECTING') {
-      if (state.movementMode === 'SNAP') {
-        return {
-          // thanks flow
-          phase: 'COLLECTING',
-          ...state,
-          scrollJumpRequest: null,
-        };
-      }
-      return state;
+      return removeScrollJumpRequest(state);
     }
 
     invariant(
@@ -319,7 +324,7 @@ export default (state: State = idle, action: Action): State => {
 
     // nothing needs to be done
     if (isEqual(state.viewport.scroll.current, newScroll)) {
-      return state;
+      return removeScrollJumpRequest(state);
     }
 
     const viewport: Viewport = scrollViewport(state.viewport, newScroll);

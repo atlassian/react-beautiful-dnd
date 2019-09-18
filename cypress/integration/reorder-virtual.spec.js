@@ -24,10 +24,7 @@ describe('reorder: virtual', () => {
       .as('item-index')
       .should('equal', '0');
 
-    cy.get(getHandleSelector())
-      .last()
-      .as('last');
-
+    // lift
     cy.get('@item')
       .focus()
       .trigger('keydown', { keyCode: keyCodes.space })

@@ -219,7 +219,7 @@ Any force press action will cancel an existing or pending drag
 
 #### Focus retention
 
-See [/docs/guides/focus.md]
+See [our focus guide](/docs/guides/focus.md)
 
 #### Extending `DraggableProps.style`
 
