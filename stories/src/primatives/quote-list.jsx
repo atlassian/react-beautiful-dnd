@@ -73,6 +73,7 @@ type Props = {|
   scrollContainerStyle?: Object,
   isDropDisabled?: boolean,
   isCombineEnabled?: boolean,
+  isCombineOnly?: boolean,
   style?: Object,
   // may not be provided - and might be null
   ignoreContainerClipping?: boolean,
@@ -131,6 +132,7 @@ export default function QuoteList(props: Props) {
     scrollContainerStyle,
     isDropDisabled,
     isCombineEnabled,
+    isCombineOnly,
     listId = 'LIST',
     listType,
     style,
@@ -145,6 +147,7 @@ export default function QuoteList(props: Props) {
       ignoreContainerClipping={ignoreContainerClipping}
       isDropDisabled={isDropDisabled}
       isCombineEnabled={isCombineEnabled}
+      isCombineOnly={isCombineOnly}
     >
       {(
         dropProvided: DroppableProvided,

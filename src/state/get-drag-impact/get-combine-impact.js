@@ -78,7 +78,6 @@ type Args = {|
   previousImpact: DragImpact,
   destination: DroppableDimension,
   insideDestinationWithoutDraggable: DraggableDimension[],
-  isCombineOnly: ?boolean,
   userDirection: UserDirection,
   onLift: OnLift,
 |};
