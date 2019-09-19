@@ -57,6 +57,7 @@ it('should update the frame scroll and the subject', () => {
     direction: 'vertical',
     isEnabled: true,
     isCombineEnabled: false,
+    isCombineOnly: false,
     isFixedOnPage: false,
     closest: {
       client: frameClient,

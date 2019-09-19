@@ -61,6 +61,7 @@ type Props = {|
   listType?: string,
   internalScroll?: boolean,
   isCombineEnabled?: boolean,
+  isCombineOnly?: boolean,
 |};
 
 export default class AuthorList extends Component<Props> {

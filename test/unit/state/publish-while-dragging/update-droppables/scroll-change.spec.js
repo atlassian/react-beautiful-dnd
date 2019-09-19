@@ -89,6 +89,7 @@ it('should adjust for a new scroll size', () => {
     isEnabled: scrollableHome.isEnabled,
     direction: scrollableHome.axis.direction,
     isCombineEnabled: scrollableHome.isCombineEnabled,
+    isCombineOnly: scrollableHome.isCombineOnly,
     isFixedOnPage: scrollableHome.isFixedOnPage,
     client,
     page: withScroll(client, preset.windowScroll),
