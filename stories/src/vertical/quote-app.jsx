@@ -19,6 +19,7 @@ const Root = styled.div`
 type Props = {|
   initial: Quote[],
   isCombineEnabled?: boolean,
+  isCombineOnly?: boolean,
   listStyle?: Object,
 |};
 
@@ -30,6 +31,7 @@ export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
   static defaultProps = {
     isCombineEnabled: false,
+    isCombineOnly: false,
   };
 
   state: State = {
@@ -88,6 +90,7 @@ export default class QuoteApp extends Component<Props, State> {
             style={this.props.listStyle}
             quotes={quotes}
             isCombineEnabled={this.props.isCombineEnabled}
+            isCombineOnly={this.props.isCombineOnly}
           />
         </Root>
       </DragDropContext>

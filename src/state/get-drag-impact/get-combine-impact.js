@@ -38,6 +38,7 @@ type IsCombiningWithArgs = {|
   borderBox: Rect,
   displaceBy: Position,
   currentUserDirection: UserDirection,
+  isCombineOnly: ?boolean,
   oldMerge: ?CombineImpact,
 |};
 
@@ -48,12 +49,13 @@ const isCombiningWith = ({
   borderBox,
   displaceBy,
   currentUserDirection,
+  isCombineOnly,
   oldMerge,
 }: IsCombiningWithArgs): boolean => {
   const start: number = borderBox[axis.start] + displaceBy[axis.line];
   const end: number = borderBox[axis.end] + displaceBy[axis.line];
   const size: number = borderBox[axis.size];
-  const twoThirdsOfSize: number = size * 0.666;
+  const twoThirdsOfSize: number = size * (isCombineOnly ? 1 : 0.666);
 
   const whenEntered: UserDirection = getWhenEntered(
     id,
@@ -76,6 +78,7 @@ type Args = {|
   previousImpact: DragImpact,
   destination: DroppableDimension,
   insideDestinationWithoutDraggable: DraggableDimension[],
+  isCombineOnly: ?boolean,
   userDirection: UserDirection,
   onLift: OnLift,
 |};
@@ -84,10 +87,11 @@ export default ({
   previousImpact,
   destination,
   insideDestinationWithoutDraggable,
+  isCombineOnly,
   userDirection,
   onLift,
 }: Args): ?DragImpact => {
-  if (!destination.isCombineEnabled) {
+  if (!destination.isCombineEnabled && !destination.isCombineOnly) {
     return null;
   }
 
@@ -115,6 +119,7 @@ export default ({
         borderBox: child.page.borderBox,
         displaceBy,
         currentUserDirection: userDirection,
+        isCombineOnly,
         oldMerge,
       });
     },

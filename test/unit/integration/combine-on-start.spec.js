@@ -35,6 +35,7 @@ jest
 
 type State = {|
   isCombineEnabled: boolean,
+  isCombineOnly: boolean,
 |};
 
 class App extends React.Component<*, State> {

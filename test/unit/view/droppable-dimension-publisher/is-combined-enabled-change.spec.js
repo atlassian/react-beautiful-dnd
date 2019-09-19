@@ -103,6 +103,7 @@ it('should not publish updates when there is no change', () => {
   // no change
   wrapper.setProps({
     isCombineEnabled: true,
+    isCombineOnly: false,
   });
 
   expect(marshal.updateDroppableIsCombineEnabled).not.toHaveBeenCalled();

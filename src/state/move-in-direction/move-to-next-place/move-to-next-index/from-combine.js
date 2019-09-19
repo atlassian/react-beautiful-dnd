@@ -29,7 +29,7 @@ export default ({
   merge,
   onLift,
 }: Args): ?Instruction => {
-  if (!destination.isCombineEnabled) {
+  if (!destination.isCombineEnabled && !destination.isCombineOnly) {
     return null;
   }
 

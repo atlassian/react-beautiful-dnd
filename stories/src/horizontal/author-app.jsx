@@ -13,6 +13,7 @@ type Props = {|
   initial: Quote[],
   internalScroll?: boolean,
   isCombineEnabled?: boolean,
+  isCombineOnly?: boolean,
 |};
 
 type State = {|
@@ -28,6 +29,7 @@ export default class AuthorApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
   static defaultProps = {
     isCombineEnabled: false,
+    isCombineOnly: null,
   };
 
   state: State = {
@@ -72,6 +74,7 @@ export default class AuthorApp extends Component<Props, State> {
             listId="AUTHOR"
             internalScroll={this.props.internalScroll}
             isCombineEnabled={this.props.isCombineEnabled}
+            isCombineOnly={this.props.isCombineOnly}
             quotes={this.state.quotes}
           />
         </Root>

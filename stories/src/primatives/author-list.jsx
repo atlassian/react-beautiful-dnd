@@ -66,6 +66,7 @@ type Props = {|
 export default class AuthorList extends Component<Props> {
   static defaultProps = {
     isCombineEnabled: false,
+    isCombineOnly: false,
   };
   renderBoard = (dropProvided: DroppableProvided) => {
     const { quotes } = this.props;

@@ -73,6 +73,7 @@ describe('closest scrollable', () => {
         descriptor,
         isEnabled: true,
         isCombineEnabled: false,
+        isCombineOnly: false,
         isFixedOnPage: false,
         client,
         page,
@@ -92,6 +93,7 @@ describe('closest scrollable', () => {
       page,
       direction: 'vertical',
       isCombineEnabled: false,
+      isCombineOnly: false,
       isFixedOnPage: false,
       closest: {
         client,
@@ -168,6 +170,7 @@ describe('closest scrollable', () => {
         client: customClient,
         page: withScroll(customClient, windowScroll),
         isCombineEnabled: false,
+        isCombineOnly: false,
         isFixedOnPage: false,
         direction: 'vertical',
         closest: {

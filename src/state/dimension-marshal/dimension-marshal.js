@@ -241,6 +241,23 @@ export default (callbacks: Callbacks) => {
     callbacks.updateDroppableIsCombineEnabled({ id, isCombineEnabled });
   };
 
+  const updateDroppableIsCombineOnly = (
+    id: DroppableId,
+    isCombineOnly: boolean,
+  ) => {
+    invariant(
+      entries.droppables[id],
+      `Cannot update isCombineOnly flag of Droppable ${id} as it is not registered`,
+    );
+
+    // no need to update
+    if (!collection) {
+      return;
+    }
+
+    callbacks.updateDroppableIsCombineOnly({ id, isCombineOnly });
+  };
+
   const updateDroppableScroll = (id: DroppableId, newScroll: Position) => {
     invariant(
       entries.droppables[id],
@@ -326,6 +343,7 @@ export default (callbacks: Callbacks) => {
     // droppable changes
     updateDroppableIsEnabled,
     updateDroppableIsCombineEnabled,
+    updateDroppableIsCombineOnly,
     scrollDroppable,
     updateDroppableScroll,
 

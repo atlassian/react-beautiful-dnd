@@ -47,6 +47,15 @@ it('should throw if isCombineEnabled is set to null', () => {
   expect(() => mount({ ownProps })).toThrow();
 });
 
+it('should throw if isCombineOnly is set to null', () => {
+  const ownProps: OwnProps = {
+    ...defaultOwnProps,
+  };
+  // $ExpectError - null
+  ownProps.isCombineOnly = null;
+  expect(() => mount({ ownProps })).toThrow();
+});
+
 it('should throw if ignoreContainerClipping is set to null', () => {
   const ownProps: OwnProps = {
     ...defaultOwnProps,

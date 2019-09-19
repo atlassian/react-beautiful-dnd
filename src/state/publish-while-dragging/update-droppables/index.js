@@ -123,6 +123,7 @@ export default ({
         descriptor: provided.descriptor,
         isEnabled: provided.isEnabled,
         isCombineEnabled: provided.isCombineEnabled,
+        isCombineOnly: provided.isCombineOnly,
         isFixedOnPage: provided.isFixedOnPage,
         direction: provided.axis.direction,
         client,

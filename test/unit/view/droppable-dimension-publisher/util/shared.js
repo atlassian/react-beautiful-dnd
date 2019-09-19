@@ -97,6 +97,7 @@ type ScrollableItemProps = {|
   isScrollable?: boolean,
   isDropDisabled?: boolean,
   isCombineEnabled?: boolean,
+  isCombineOnly?: boolean,
   droppableId?: DroppableId,
 |};
 
@@ -115,6 +116,7 @@ export function ScrollableItem(props: ScrollableItemProps) {
     getDroppableRef: droppableRef.getRef,
     getPlaceholderRef: placeholderRef.getRef,
     isCombineEnabled: props.isCombineEnabled || false,
+    isCombineOnly: props.isCombineOnly || false,
   });
 
   return (
@@ -159,6 +161,7 @@ export function App(props: AppProps) {
     direction: 'vertical',
     isDropDisabled: false,
     isCombineEnabled: false,
+    isCombineOnly: false,
     type: descriptor.type,
     ignoreContainerClipping,
     getDroppableRef: droppableRef.getRef,
