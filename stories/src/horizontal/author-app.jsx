@@ -29,7 +29,7 @@ export default class AuthorApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
   static defaultProps = {
     isCombineEnabled: false,
-    isCombineOnly: null,
+    isCombineOnly: false,
   };
 
   state: State = {
