@@ -8,7 +8,7 @@ export type TypeId = Id;
 export type ContextId = Id;
 export type ElementId = Id;
 
-export type DroppableMode = 'STANDARD' | 'VIRTUAL';
+export type DroppableMode = 'standard' | 'virtual';
 export type DroppableDescriptor = {|
   id: DroppableId,
   type: TypeId,

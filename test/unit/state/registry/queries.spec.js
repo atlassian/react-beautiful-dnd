@@ -92,7 +92,7 @@ describe('droppable', () => {
       descriptor: {
         id: 'of another type',
         type: 'some other type',
-        mode: 'STANDARD',
+        mode: 'standard',
       },
     },
   });

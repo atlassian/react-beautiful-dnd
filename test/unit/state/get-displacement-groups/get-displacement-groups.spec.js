@@ -46,7 +46,7 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
       descriptor: {
         id: 'home',
         type: 'TYPE',
-        mode: 'STANDARD',
+        mode: 'standard',
       },
       direction: axis.direction,
       borderBox: {
@@ -61,7 +61,7 @@ import scrollViewport from '../../../../src/state/scroll-viewport';
       descriptor: {
         id: 'foreign',
         type: 'TYPE',
-        mode: 'STANDARD',
+        mode: 'standard',
       },
       direction: axis.direction,
       borderBox: {

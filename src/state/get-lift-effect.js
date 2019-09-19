@@ -53,7 +53,7 @@ export default ({ draggable, home, draggables, viewport }: Args): Result => {
     {},
   );
   const afterCritical: LiftEffect = {
-    inVirtualList: home.descriptor.mode === 'VIRTUAL',
+    inVirtualList: home.descriptor.mode === 'virtual',
     displacedBy,
     effected,
   };

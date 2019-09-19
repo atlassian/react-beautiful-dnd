@@ -42,7 +42,7 @@ const viewport: Viewport = getViewport();
       descriptor: {
         id: 'home',
         type: 'TYPE',
-        mode: 'STANDARD',
+        mode: 'standard',
       },
       direction: axis.direction,
       borderBox,

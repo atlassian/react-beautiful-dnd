@@ -35,7 +35,7 @@ const gap: number = 10;
     const descriptor: DroppableDescriptor = {
       id: 'foo',
       type: 'TYPE',
-      mode: 'STANDARD',
+      mode: 'standard',
     };
     const withoutFrame: DroppableDimension = getDroppableDimension({
       descriptor,
@@ -292,7 +292,7 @@ const gap: number = 10;
       const virtual: DroppableDimension = getDroppableDimension({
         descriptor: {
           ...descriptor,
-          mode: 'VIRTUAL',
+          mode: 'virtual',
         },
         direction: axis.direction,
         borderBox: withoutFrame.client.borderBox,

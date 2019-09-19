@@ -31,7 +31,7 @@ const scrollable: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'drop-1',
     type: 'TYPE',
-    mode: 'STANDARD',
+    mode: 'standard',
   },
   borderBox: {
     top: 0,

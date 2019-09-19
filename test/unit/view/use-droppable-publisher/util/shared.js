@@ -123,7 +123,7 @@ export function ScrollableItem(props: ScrollableItemProps) {
   useDroppablePublisher({
     droppableId: props.droppableId || descriptor.id,
     type: props.type || descriptor.type,
-    mode: 'STANDARD',
+    mode: 'standard',
     direction: preset.home.axis.direction,
     isDropDisabled: props.isDropDisabled || false,
     ignoreContainerClipping: false,
@@ -171,7 +171,7 @@ export function App(props: AppProps) {
   useDroppablePublisher({
     droppableId: descriptor.id,
     direction: 'vertical',
-    mode: 'STANDARD',
+    mode: 'standard',
     isDropDisabled: false,
     isCombineEnabled: false,
     type: descriptor.type,

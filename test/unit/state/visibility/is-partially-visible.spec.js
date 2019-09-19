@@ -17,7 +17,7 @@ const asBigAsViewport: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'same-as-viewport',
     type: 'TYPE',
-    mode: 'STANDARD',
+    mode: 'standard',
   },
   borderBox: viewport,
 });
@@ -47,7 +47,7 @@ const asBigAsInViewport1: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'subset',
     type: 'TYPE',
-    mode: 'STANDARD',
+    mode: 'standard',
   },
   borderBox: inViewport1,
 });
@@ -118,7 +118,7 @@ describe('is partially visible', () => {
         descriptor: {
           id: 'clipped',
           type: 'TYPE',
-          mode: 'STANDARD',
+          mode: 'standard',
         },
         borderBox: {
           top: viewport.top,
@@ -220,7 +220,7 @@ describe('is partially visible', () => {
       descriptor: {
         id: 'clipped',
         type: 'TYPE',
-        mode: 'STANDARD',
+        mode: 'standard',
       },
       borderBox,
       closest: {
@@ -322,7 +322,7 @@ describe('is partially visible', () => {
           descriptor: {
             id: 'clipped',
             type: 'TYPE',
-            mode: 'STANDARD',
+            mode: 'standard',
           },
           borderBox: {
             ...ourFrame,
@@ -469,7 +469,7 @@ describe('is partially visible', () => {
           descriptor: {
             id: 'droppable',
             type: 'TYPE',
-            mode: 'STANDARD',
+            mode: 'standard',
           },
           borderBox: {
             top: 0,
@@ -558,7 +558,7 @@ describe('is partially visible', () => {
         descriptor: {
           id: 'not-visible',
           type: 'TYPE',
-          mode: 'STANDARD',
+          mode: 'standard',
         },
         borderBox: notInViewport,
       });

@@ -54,8 +54,9 @@ export type DraggableProps = {|
   // inline style
   style: ?DraggableStyle,
   // used for shared global styles
-  'data-rbd-draggable-context-id': string,
-  'data-rbd-draggable-id': string,
+  'data-rbd-draggable-context-id': ContextId,
+  // used for lookups
+  'data-rbd-draggable-id': DraggableId,
   // used to know when a transition ends
   onTransitionEnd: ?(event: TransitionEvent) => void,
 |};

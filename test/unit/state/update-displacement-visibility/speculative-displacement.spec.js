@@ -69,7 +69,7 @@ import { getForcedDisplacement } from '../../../util/impact';
       descriptor: {
         id: 'home',
         type: typeId,
-        mode: 'STANDARD',
+        mode: 'standard',
       },
       direction: axis.direction,
       borderBox: {
@@ -177,7 +177,7 @@ import { getForcedDisplacement } from '../../../util/impact';
         descriptor: {
           id: foreignId,
           type: 'huge',
-          mode: 'STANDARD',
+          mode: 'standard',
         },
         direction: axis.direction,
         borderBox: {
@@ -301,7 +301,7 @@ import { getForcedDisplacement } from '../../../util/impact';
         descriptor: {
           id: foreignId,
           type: 'huge',
-          mode: 'STANDARD',
+          mode: 'standard',
         },
         direction: axis.direction,
         // large subject

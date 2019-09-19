@@ -45,7 +45,7 @@ it('should publish the dimensions of the target', () => {
     descriptor: {
       id: 'fake-id',
       type: 'fake',
-      mode: 'STANDARD',
+      mode: 'standard',
     },
     borderBox: bigClient.borderBox,
     margin,
@@ -95,7 +95,7 @@ it('should consider the window scroll when calculating dimensions', () => {
     descriptor: {
       id: 'fake-id',
       type: 'fake',
-      mode: 'STANDARD',
+      mode: 'standard',
     },
     borderBox: bigClient.borderBox,
     margin,

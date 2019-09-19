@@ -25,7 +25,7 @@ const getRequiredGrowthForPlaceholder = (
 
   // A virtual list will most likely not contain all of the Draggables
   // so counting them does not help.
-  if (droppable.descriptor.mode === 'VIRTUAL') {
+  if (droppable.descriptor.mode === 'virtual') {
     return patch(axis.line, placeholderSize[axis.line]);
   }
 

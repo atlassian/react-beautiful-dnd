@@ -50,7 +50,7 @@ function shouldPublishUpdate(
     entry.descriptor.droppableId,
   );
 
-  if (home.descriptor.mode !== 'VIRTUAL') {
+  if (home.descriptor.mode !== 'virtual') {
     warning(`
       You are attempting to add or remove a Draggable [id: ${entry.descriptor.id}]
       while a drag is occurring. This is only supported for virtual lists.

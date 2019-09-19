@@ -88,11 +88,11 @@ export default function useValidation(args: Args) {
     if (process.env.NODE_ENV !== 'production') {
       runChecks(args, shared);
 
-      if (args.props.mode === 'STANDARD') {
+      if (args.props.mode === 'standard') {
         runChecks(args, standard);
       }
 
-      if (args.props.mode === 'VIRTUAL') {
+      if (args.props.mode === 'virtual') {
         runChecks(args, virtual);
       }
     }

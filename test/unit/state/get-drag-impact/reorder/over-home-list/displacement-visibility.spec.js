@@ -37,7 +37,7 @@ const viewport: Viewport = getViewport();
         descriptor: {
           id: 'my-custom-droppable',
           type: 'TYPE',
-          mode: 'STANDARD',
+          mode: 'standard',
         },
         direction: axis.direction,
         borderBox: {
@@ -186,7 +186,7 @@ const viewport: Viewport = getViewport();
         descriptor: {
           id: 'my-custom-droppable',
           type: 'TYPE',
-          mode: 'STANDARD',
+          mode: 'standard',
         },
         direction: axis.direction,
         borderBox: {

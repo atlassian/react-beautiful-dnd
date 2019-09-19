@@ -29,7 +29,7 @@ type Props = {|
   // required
   draggableId: DraggableId,
   index: number,
-  children: (DraggableProvided, DraggableStateSnapshot) => Node,
+  children: DraggableChildrenFn,
   // optional
   isDragDisabled: ?boolean,
   disableInteractiveElementBlocking: ?boolean,
@@ -86,7 +86,11 @@ The `React` children of a `<Draggable />` must be a function that returns a `Rea
 </Draggable>
 ```
 
-The function is provided with two arguments:
+```js
+type DraggableChildrenFn = (DraggableProvided, DraggableStateSnapshot, DraggableDescriptor) => Node
+```
+
+The function is provided with three arguments:
 
 ### 1. provided: (DraggableProvided)
 
@@ -127,7 +131,10 @@ export type DraggableProps = {|
   // inline style
   style: ?DraggableStyle,
   // used for shared global styles
-  'data-react-beautiful-dnd-draggable': string,
+  'data-rbd-draggable-context-id': string,
+  'data-rbd-draggable-id': string,
+  // used to know when a transition ends
+  onTransitionEnd: ?(event: TransitionEvent) => void,
 |};
 ```
 
@@ -407,6 +414,10 @@ The `children` function is also provided with a small amount of state relating t
   }}
 </Draggable>
 ```
+
+### 3. descriptor: (DraggableDescriptor)
+
+
 
 ## Adding an `onClick` handler to a `<Draggable />` or a _drag handle_
 

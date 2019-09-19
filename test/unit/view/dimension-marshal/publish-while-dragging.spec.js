@@ -45,7 +45,7 @@ function makeVirtual(droppable: DroppableDimension): DroppableDimension {
     ...droppable,
     descriptor: {
       ...droppable.descriptor,
-      mode: 'VIRTUAL',
+      mode: 'virtual',
     },
   };
 }
@@ -70,7 +70,7 @@ const ofAnotherType: DroppableDimension = {
   descriptor: {
     type: 'some rogue type',
     id: 'another droppable',
-    mode: 'VIRTUAL',
+    mode: 'virtual',
   },
 };
 const inAnotherType: DraggableDimension = {
@@ -240,7 +240,7 @@ describe('draggable additions', () => {
       ...scrollableHome,
       descriptor: {
         ...scrollableHome.descriptor,
-        mode: 'STANDARD',
+        mode: 'standard',
       },
     };
     const map: DimensionMap = patchDimensionMap(withScrollables, notVirtual);

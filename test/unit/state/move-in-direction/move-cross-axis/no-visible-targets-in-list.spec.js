@@ -27,7 +27,7 @@ it('should return null if there are draggables in a destination list but none ar
     descriptor: {
       id: 'custom',
       type: 'TYPE',
-      mode: 'STANDARD',
+      mode: 'standard',
     },
     borderBox: {
       left: preset.home.client.borderBox.left + 1,

@@ -250,7 +250,7 @@ import {
             descriptor: {
               id: 'small',
               type: preset.home.descriptor.type,
-              mode: 'STANDARD',
+              mode: 'standard',
             },
             // currently no room in the box
             borderBox: {

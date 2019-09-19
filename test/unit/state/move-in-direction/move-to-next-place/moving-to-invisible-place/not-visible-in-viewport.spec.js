@@ -49,7 +49,7 @@ import { emptyGroups } from '../../../../../../src/state/no-impact';
     descriptor: {
       id: 'home - much bigger than viewport',
       type: 'huge',
-      mode: 'STANDARD',
+      mode: 'standard',
     },
     direction: axis.direction,
     borderBox: {
@@ -64,7 +64,7 @@ import { emptyGroups } from '../../../../../../src/state/no-impact';
     descriptor: {
       id: 'foreign - much bigger than viewport',
       type: 'huge',
-      mode: 'STANDARD',
+      mode: 'standard',
     },
     direction: axis.direction,
     borderBox: {

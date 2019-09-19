@@ -56,7 +56,7 @@ import { emptyGroups } from '../../../../../../src/state/no-impact';
     descriptor: {
       id: 'home',
       type: 'droppable',
-      mode: 'STANDARD',
+      mode: 'standard',
     },
     direction: axis.direction,
     borderBox: {
@@ -70,7 +70,7 @@ import { emptyGroups } from '../../../../../../src/state/no-impact';
     descriptor: {
       id: 'scrollable foriegn',
       type: 'droppable',
-      mode: 'STANDARD',
+      mode: 'standard',
     },
     direction: axis.direction,
     // huge subject that will be cut by frame

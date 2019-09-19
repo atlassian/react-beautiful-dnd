@@ -20,7 +20,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     descriptor: {
       id: 'scrollable that is similiar to the viewport',
       type: 'TYPE',
-      mode: 'STANDARD',
+      mode: 'standard',
     },
     direction: axis.direction,
     borderBox: {

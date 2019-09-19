@@ -85,8 +85,14 @@ export type MovementMode = 'FLUID' | 'SNAP';
 type DroppableProvided = {|
   innerRef: (?HTMLElement) => void,
   placeholder: ?ReactElement,
+  droppableProps: DroppableProps,
 |};
-
+type DroppableProps = {|
+  // used for shared global styles
+  'data-rbd-droppable-context-id': ContextId,
+  // Used to lookup. Currently not used for drag and drop lifecycle
+  'data-rbd-droppable-id': DroppableId,
+|};
 type DroppableStateSnapshot = {|
   isDraggingOver: boolean,
   draggingOverWith: ?DraggableId,
@@ -114,9 +120,12 @@ type DraggableStateSnapshot = {|
 |};
 
 export type DraggableProps = {|
+  type DraggableProps = {|
   style: ?DraggableStyle,
-  'data-react-beautiful-dnd-draggable': string,
+  'data-rbd-draggable-context-id': string,
+  'data-rbd-draggable-id': string,
   onTransitionEnd: ?(event: TransitionEvent) => void,
+|};
 |};
 type DraggableStyle = DraggingStyle | NotDraggingStyle;
 type DraggingStyle = {|
