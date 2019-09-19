@@ -142,6 +142,7 @@ it('should allow scrolling beyond the max position', () => {
     isEnabled: true,
     direction: 'vertical',
     isCombineEnabled: false,
+    isCombineOnly: false,
     isFixedOnPage: false,
     closest: {
       client: frameClient,

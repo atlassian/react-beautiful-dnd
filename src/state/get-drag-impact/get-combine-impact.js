@@ -87,7 +87,6 @@ export default ({
   previousImpact,
   destination,
   insideDestinationWithoutDraggable,
-  isCombineOnly,
   userDirection,
   onLift,
 }: Args): ?DragImpact => {
@@ -119,7 +118,7 @@ export default ({
         borderBox: child.page.borderBox,
         displaceBy,
         currentUserDirection: userDirection,
-        isCombineOnly,
+        isCombineOnly: destination.isCombineOnly,
         oldMerge,
       });
     },
