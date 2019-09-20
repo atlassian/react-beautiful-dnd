@@ -135,3 +135,26 @@ describe('force press respected', () => {
     expect(isDragging(handle)).toBe(true);
   });
 });
+
+it('should not listen to force press changes after a drag has started', () => {
+  const withForcePress: Item[] = [{ id: '0', shouldRespectForcePress: true }];
+
+  const { getByText, rerender } = render(<App items={withForcePress} />);
+  const handle: HTMLElement = getByText('item: 0');
+
+  simpleLift(touch, handle);
+
+  // changing
+  const withoutForcePress: Item[] = [
+    { id: '0', shouldRespectForcePress: false },
+  ];
+  rerender(<App items={withoutForcePress} />);
+
+  // even though the shouldRespectForcePress value has changed it will still use the original
+  // this is important as during a drag the dragging item can be removed from the registry and we
+  // don't want to look it up
+  fireEvent(handle, getForceChange(forcePressThreshold));
+
+  // drag is no more
+  expect(isDragging(handle)).toBe(false);
+});

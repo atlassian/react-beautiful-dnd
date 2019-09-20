@@ -86,7 +86,7 @@ const Column = React.memo(function Column(props: ColumnProps) {
       <Title>{columnId}</Title>
       <Droppable
         droppableId={columnId}
-        mode="VIRTUAL"
+        mode="virtual"
         renderClone={(
           provided: DraggableProvided,
           snapshot: DraggableStateSnapshot,

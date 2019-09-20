@@ -191,8 +191,8 @@ function tryStart({
   let phase: LockPhase = 'PRE_DRAG';
 
   function getShouldRespectForcePress(): boolean {
-    const item: DraggableEntry = registry.draggable.getById(draggableId);
-    return item.options.shouldRespectForcePress;
+    // not looking up the entry as it might have been removed in a virtual list
+    return entry.options.shouldRespectForcePress;
   }
 
   function isLockActive(): boolean {
