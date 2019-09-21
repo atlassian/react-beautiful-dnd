@@ -31,24 +31,22 @@ const getAlwaysStyleTagSelector = (contextId: ContextId) =>
 
 const getDynamicStyleTag = (contextId: ContextId): HTMLStyleElement => {
   const selector: string = getDynamicStyleTagSelector(contextId);
-  return document.querySelector(selector);
+  const el: HTMLStyleElement = (document.querySelector(selector): any);
+  return el;
 };
 
 const getAlwaysStyleTag = (contextId: ContextId): HTMLStyleElement => {
   const selector: string = getAlwaysStyleTagSelector(contextId);
-  return document.querySelector(selector);
+  const el: HTMLStyleElement = (document.querySelector(selector): any);
+  return el;
 };
 
 const getDynamicStyleFromTag = (contextId: ContextId): string => {
-  const selector: string = getDynamicStyleTagSelector(contextId);
-  const el: HTMLStyleElement = (document.querySelector(selector): any);
-  return el.innerHTML;
+  return getDynamicStyleTag(contextId).innerHTML;
 };
 
 const getAlwaysStyleFromTag = (contextId: ContextId): string => {
-  const selector: string = getAlwaysStyleTagSelector(contextId);
-  const el: HTMLStyleElement = (document.querySelector(selector): any);
-  return el.innerHTML;
+  return getAlwaysStyleTag(contextId).innerHTML;
 };
 
 it('should not mount style tags until mounted', () => {
@@ -189,7 +187,7 @@ it('should allow subsequent updates', () => {
 });
 
 it('should insert nonce into tag attribute', () => {
-  const contextId: number = 2;
+  const contextId: ContextId = '2';
   const nonce = 'ThisShouldBeACryptographicallySecurePseudoRandomNumber';
   const mock = getMock();
   const wrapper: ReactWrapper<*> = mount(

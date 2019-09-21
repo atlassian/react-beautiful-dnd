@@ -57,13 +57,11 @@
   },
   "dependencies": {
     "@babel/runtime-corejs2": "^7.6.0",
-    "babel-cli": "^6.26.0",
     "css-box-model": "^1.2.0",
     "memoize-one": "^5.1.1",
     "raf-schd": "^4.0.2",
     "react-redux": "^7.1.1",
     "redux": "^4.0.4",
-    "require-from-string": "^2.0.2",
     "tiny-invariant": "^1.0.6",
     "use-memo-one": "^1.1.1"
   },
@@ -120,6 +118,7 @@
     "react-dom": "^16.9.0",
     "react-test-renderer": "^16.9.0",
     "react-window": "^1.8.5",
+    "require-from-string": "^2.0.2",
     "rimraf": "^3.0.0",
     "rollup": "^1.21.2",
     "rollup-plugin-babel": "^4.3.3",
