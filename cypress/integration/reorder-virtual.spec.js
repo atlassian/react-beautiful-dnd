@@ -44,7 +44,7 @@ describe('reorder: virtual', () => {
       force: true,
     });
 
-    cy.get('@item-id').then(id => {
+    return cy.get('@item-id').then(id => {
       cy.get(getHandleSelector(id))
         .invoke('attr', 'data-index')
         .should('equal', `${movements}`);
