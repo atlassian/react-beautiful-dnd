@@ -193,7 +193,9 @@ it('should insert nonce into tag attribute', () => {
   const nonce = 'ThisShouldBeACryptographicallySecurePseudoRandomNumber';
   const mock = getMock();
   const wrapper: ReactWrapper<*> = mount(
-    <WithMarshal contextId={contextId}>{mock}</WithMarshal>,
+    <WithMarshal contextId={contextId} nonce={nonce}>
+      {mock}
+    </WithMarshal>,
   );
   const dynamicStyleTag = getDynamicStyleTag(contextId);
   const dynamicStyleTagNonce = dynamicStyleTag
