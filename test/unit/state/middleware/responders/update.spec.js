@@ -11,7 +11,7 @@ import { add } from '../../../../../src/state/position';
 import {
   getDragStart,
   initialPublishArgs,
-} from '../../../../utils/preset-action-args';
+} from '../../../../util/preset-action-args';
 import createStore from '../util/create-store';
 import getAnnounce from './util/get-announce-stub';
 import createResponders from './util/get-responders-stub';

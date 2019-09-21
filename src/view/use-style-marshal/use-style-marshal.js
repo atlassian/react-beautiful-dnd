@@ -4,7 +4,7 @@ import memoizeOne from 'memoize-one';
 import { useMemo, useCallback } from 'use-memo-one';
 import invariant from 'tiny-invariant';
 import type { StyleMarshal } from './style-marshal-types';
-import type { DropReason } from '../../types';
+import type { ContextId, DropReason } from '../../types';
 import getStyles, { type Styles } from './get-styles';
 import { prefix } from '../data-attributes';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
@@ -22,11 +22,8 @@ const createStyleEl = (nonce?: string): HTMLStyleElement => {
   return el;
 };
 
-export default function useStyleMarshal(uniqueId: number, nonce?: string) {
-  const uniqueContext: string = useMemo(() => `${uniqueId}`, [uniqueId]);
-  const styles: Styles = useMemo(() => getStyles(uniqueContext), [
-    uniqueContext,
-  ]);
+export default function useStyleMarshal(contextId: ContextId, nonce?: string) {
+  const styles: Styles = useMemo(() => getStyles(contextId), [contextId]);
   const alwaysRef = useRef<?HTMLStyleElement>(null);
   const dynamicRef = useRef<?HTMLStyleElement>(null);
 
@@ -61,8 +58,8 @@ export default function useStyleMarshal(uniqueId: number, nonce?: string) {
     dynamicRef.current = dynamic;
 
     // for easy identification
-    always.setAttribute(`${prefix}-always`, uniqueContext);
-    dynamic.setAttribute(`${prefix}-dynamic`, uniqueContext);
+    always.setAttribute(`${prefix}-always`, contextId);
+    dynamic.setAttribute(`${prefix}-dynamic`, contextId);
 
     // add style tags to head
     getHead().appendChild(always);
@@ -89,7 +86,7 @@ export default function useStyleMarshal(uniqueId: number, nonce?: string) {
     setDynamicStyle,
     styles.always,
     styles.resting,
-    uniqueContext,
+    contextId,
   ]);
 
   const dragging = useCallback(() => setDynamicStyle(styles.dragging), [
@@ -119,9 +116,8 @@ export default function useStyleMarshal(uniqueId: number, nonce?: string) {
       dragging,
       dropping,
       resting,
-      styleContext: uniqueContext,
     }),
-    [dragging, dropping, resting, uniqueContext],
+    [dragging, dropping, resting],
   );
 
   return marshal;

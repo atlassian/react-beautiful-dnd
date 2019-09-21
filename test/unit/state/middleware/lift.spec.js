@@ -1,33 +1,44 @@
 // @flow
-import type { CompletedDrag } from '../../../../src/types';
+import type {
+  CompletedDrag,
+  DraggableDimension,
+  DimensionMap,
+} from '../../../../src/types';
 import type { Action, Store } from '../../../../src/state/store-types';
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import middleware from '../../../../src/state/middleware/lift';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
-import { setViewport, resetViewport } from '../../../utils/viewport';
+import { setViewport, resetViewport } from '../../../util/viewport';
 import {
   lift,
   initialPublish,
   animateDrop,
   completeDrop,
   type AnimateDropArgs,
+  type InitialPublishArgs,
+  flush,
 } from '../../../../src/state/action-creators';
-import getDimensionMarshal, {
-  populateMarshal,
-} from '../../../utils/dimension-marshal';
+import { createMarshal } from '../../../util/dimension-marshal';
 import {
   preset,
   liftArgs,
   initialPublishArgs,
   getCompletedArgs,
-} from '../../../utils/preset-action-args';
+  copy,
+} from '../../../util/preset-action-args';
+import { populate } from '../../../util/registry';
+import type { Registry } from '../../../../src/state/registry/registry-types';
+import createRegistry from '../../../../src/state/registry/create-registry';
 
-const getMarshal = (dispatch: Action => void): DimensionMarshal => {
-  const marshal: DimensionMarshal = getDimensionMarshal(dispatch);
-  populateMarshal(marshal);
+const getPopulatedRegistry = (dimensions?: DimensionMap): Registry => {
+  const registry: Registry = createRegistry();
+  populate(registry, dimensions);
+  return registry;
+};
 
-  return marshal;
+const getBasicMarshal = (dispatch: Action => void): DimensionMarshal => {
+  return createMarshal(getPopulatedRegistry(), dispatch);
 };
 
 beforeEach(() => {
@@ -46,7 +57,7 @@ it('should throw if a drag cannot be started when a lift action occurs', () => {
   const store: Store = createStore(
     passThrough(mock),
     middleware(
-      getMarshal((action: Action) => {
+      getBasicMarshal((action: Action) => {
         store.dispatch(action);
       }),
     ),
@@ -66,7 +77,7 @@ it('should flush any animating drops', () => {
   const store: Store = createStore(
     passThrough(mock),
     middleware(
-      getMarshal((action: Action) => {
+      getBasicMarshal((action: Action) => {
         store.dispatch(action);
       }),
     ),
@@ -92,11 +103,11 @@ it('should flush any animating drops', () => {
   store.dispatch(lift(liftArgs));
   expect(mock).toHaveBeenCalledWith(lift(liftArgs));
   // the previous drag is flushed
-  expect(mock).toHaveBeenCalledWith(
-    completeDrop({ completed, shouldFlush: true }),
-  );
+  expect(mock).toHaveBeenCalledWith(completeDrop({ completed }));
+  // any animations are flushed
+  expect(mock).toHaveBeenCalledWith(flush());
   // the new lift continues
-  expect(mock).toHaveBeenCalledTimes(3);
+  expect(mock).toHaveBeenCalledTimes(4);
 });
 
 it('should publish the initial dimensions when lifting', () => {
@@ -104,7 +115,7 @@ it('should publish the initial dimensions when lifting', () => {
   const store: Store = createStore(
     passThrough(mock),
     middleware(
-      getMarshal((action: Action) => {
+      getBasicMarshal((action: Action) => {
         store.dispatch(action);
       }),
     ),
@@ -113,7 +124,53 @@ it('should publish the initial dimensions when lifting', () => {
   // first lift is preparing
   store.dispatch(lift(liftArgs));
   expect(mock).toHaveBeenCalledWith(lift(liftArgs));
+  // last drag flushed
+  expect(mock).toHaveBeenCalledWith(flush());
   expect(mock).toHaveBeenCalledWith(initialPublish(initialPublishArgs));
-  expect(mock).toHaveBeenCalledTimes(2);
+  expect(mock).toHaveBeenCalledTimes(3);
   expect(store.getState().phase).toBe('DRAGGING');
+});
+
+it('should log a warning if items are added that do not have consecutive indexes', () => {
+  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+  const mock = jest.fn();
+  const customInHome2: DraggableDimension = {
+    ...preset.inHome2,
+    descriptor: {
+      ...preset.inHome2.descriptor,
+      index: preset.inHome2.descriptor.index + 1,
+    },
+  };
+  const dimensions: DimensionMap = copy(preset.dimensions);
+  dimensions.draggables[preset.inHome2.descriptor.id] = customInHome2;
+
+  const marshal: DimensionMarshal = createMarshal(
+    getPopulatedRegistry(dimensions),
+    // lazy use of store.dispatch
+    action =>
+      // eslint-disable-next-line no-use-before-define
+      store.dispatch(action),
+  );
+  const store: Store = createStore(passThrough(mock), middleware(marshal));
+  const initial: InitialPublishArgs = {
+    ...initialPublishArgs,
+    dimensions,
+  };
+
+  // first lift is preparing
+  store.dispatch(lift(liftArgs));
+  expect(mock).toHaveBeenCalledWith(lift(liftArgs));
+  expect(mock).toHaveBeenCalledWith(flush());
+  expect(mock).toHaveBeenCalledWith(initialPublish(initial));
+  expect(mock).toHaveBeenCalledTimes(3);
+  expect(store.getState().phase).toBe('DRAGGING');
+
+  // a warning is logged
+  expect(warn).toHaveBeenCalled();
+  expect(warn.mock.calls[0][0]).toEqual(
+    expect.stringContaining('0, [🔥2], [🔥2], 3'),
+  );
+
+  warn.mockRestore();
 });

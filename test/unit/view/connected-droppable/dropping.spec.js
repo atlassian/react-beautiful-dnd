@@ -1,6 +1,5 @@
 // @flow
 import type {
-  State,
   DragImpact,
   DraggingState,
   DropAnimatingState,
@@ -11,12 +10,13 @@ import type {
   MapProps,
 } from '../../../../src/view/droppable/droppable-types';
 import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import getOwnProps from './util/get-own-props';
-import { withImpact } from '../../../utils/dragging-state';
+import { withImpact } from '../../../util/dragging-state';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import noImpact from '../../../../src/state/no-impact';
-import cloneImpact from '../../../utils/clone-impact';
+import cloneImpact from '../../../util/clone-impact';
+import { tryGetDestination } from '../../../../src/state/get-impact-location';
 
 const state = getStatePreset();
 const preset = state.preset;
@@ -31,6 +31,7 @@ describe('home list', () => {
         draggingOverWith: preset.inHome1.descriptor.id,
         draggingFromThisWith: preset.inHome1.descriptor.id,
       },
+      useClone: null,
     };
 
     it('should not break memoization from a reorder', () => {
@@ -50,8 +51,8 @@ describe('home list', () => {
       const selector: Selector = makeMapStateToProps();
       const combine: DragImpact = {
         ...state.dragging().impact,
-        destination: null,
-        merge: {
+        at: {
+          type: 'COMBINE',
           whenEntered: forward,
           combine: {
             draggableId: preset.inHome2.descriptor.id,
@@ -85,7 +86,9 @@ describe('home list', () => {
 
       const stateWhenDropping: DropAnimatingState = state.userCancel();
       // the impact has the home destination
-      expect(stateWhenDropping.completed.impact.destination).toBeTruthy();
+      expect(
+        tryGetDestination(stateWhenDropping.completed.impact),
+      ).toBeTruthy();
       // the user facing result has been cleared
       expect(stateWhenDropping.completed.result.destination).toBe(null);
 
@@ -101,6 +104,7 @@ describe('home list', () => {
           isDraggingOver: false,
           draggingOverWith: null,
         },
+        useClone: null,
       };
       expect(whileDropping).toEqual(expected);
     });
@@ -118,6 +122,7 @@ describe('home list', () => {
           draggingOverWith: null,
           draggingFromThisWith: preset.inHome1.descriptor.id,
         },
+        useClone: null,
       };
 
       const whileDragging: DraggingState = {
@@ -147,14 +152,20 @@ describe('home list', () => {
     });
   });
 });
-it('should return the default props for every phase for a foreign list', () => {
+
+it('should return the dragging props for every dragging phase for a foreign list', () => {
   const ownProps: OwnProps = getOwnProps(preset.foreign);
   const selector: Selector = makeMapStateToProps();
   const defaultProps: MapProps = selector(state.idle, ownProps);
 
-  [...state.allPhases(), ...state.allPhases().reverse()].forEach(
-    (current: State) => {
-      expect(selector(current, ownProps)).toBe(defaultProps);
-    },
-  );
+  const dragging: MapProps = selector(state.dragging(), ownProps);
+  // flag swapped when drag starts
+  const expected: MapProps = {
+    ...defaultProps,
+    shouldAnimatePlaceholder: true,
+  };
+  expect(dragging).toEqual(expected);
+
+  expect(selector(state.dropAnimating(), ownProps)).toBe(dragging);
+  expect(selector(state.userCancel(), ownProps)).toBe(dragging);
 });

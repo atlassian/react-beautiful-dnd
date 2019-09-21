@@ -52,6 +52,9 @@ module.exports = {
     // Cannot reassign function parameters but allowing modification
     'no-param-reassign': ['error', { props: false }],
 
+    // Don't tell me what to do!
+    'max-classes-per-file': 'off',
+
     // Allowing ++ on numbers
     'no-plusplus': 'off',
 
@@ -81,6 +84,13 @@ module.exports = {
           'ImportDeclaration[source.value=/use-isomorphic-layout-effect/] > ImportDefaultSpecifier[local.name!="useLayoutEffect"]',
         message:
           'Must use `useLayoutEffect` as the name of the import from `*use-isomorphic-layout-effect` to leverage `eslint-plugin-react-hooks`',
+      },
+
+      // No Array.from as it pulls in a large amount of babel helpers
+      {
+        selector: 'MemberExpression[object.name="Array"][property.name="from"]',
+        message:
+          'Not allowing using of Array.from to save kbs. Please use native-with-fallback/from',
       },
     ],
 
@@ -162,6 +172,17 @@ module.exports = {
     // Enforce rules of hooks
     'react-hooks/rules-of-hooks': 'error',
     // Second argument to hook functions
-    'react-hooks/exhaustive-deps': 'warn',
+    'react-hooks/exhaustive-deps': 'error',
+
+    'react/jsx-props-no-spreading': 'off',
+
+    // using <React.Fragment> is fine
+    'react/jsx-fragments': 'off',
+
+    // all good to declare static class members in the class
+    'react/static-property-placement': 'off',
+
+    // don't need to initialize state in a constructor
+    'react/state-in-constructor': 'off',
   },
 };

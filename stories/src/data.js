@@ -1,10 +1,16 @@
 // @flow
+/* eslint-disable import/no-unresolved */
+/* eslint-disable import/no-webpack-loader-syntax */
 import { colors } from '@atlaskit/theme';
 import type { Author, Quote, QuoteMap } from './types';
-import jakeImg from '../assets/jake.png';
-import finnImg from '../assets/finn.png';
-import bmoImg from '../assets/bmo.png';
-import princessImg from '../assets/princess.png';
+// $ExpectError - flow cannot resolve the import
+import finnImg from '!!url-loader!../static/media/finn-min.png';
+// $ExpectError - flow cannot resolve the import
+import bmoImg from '!!url-loader!../static/media/bmo-min.png';
+// $ExpectError - flow cannot resolve the import
+import princessImg from '!!url-loader!../static/media/princess-min.png';
+// $ExpectError - flow cannot resolve the import
+import jakeImg from '!!url-loader!../static/media/jake-min.png';
 
 const jake: Author = {
   id: '1',
@@ -13,7 +19,7 @@ const jake: Author = {
   avatarUrl: jakeImg,
   colors: {
     soft: colors.Y50,
-    hard: colors.Y200,
+    hard: colors.N400A,
   },
 };
 
@@ -24,7 +30,7 @@ const BMO: Author = {
   avatarUrl: bmoImg,
   colors: {
     soft: colors.G50,
-    hard: colors.G200,
+    hard: colors.N400A,
   },
 };
 
@@ -35,7 +41,7 @@ const finn: Author = {
   avatarUrl: finnImg,
   colors: {
     soft: colors.B50,
-    hard: colors.B200,
+    hard: colors.N400A,
   },
 };
 
@@ -46,7 +52,7 @@ const princess: Author = {
   avatarUrl: princessImg,
   colors: {
     soft: colors.P50,
-    hard: colors.P200,
+    hard: colors.N400A,
   },
 };
 

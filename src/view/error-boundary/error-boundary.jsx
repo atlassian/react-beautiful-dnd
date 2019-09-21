@@ -1,8 +1,10 @@
 // @flow
 import React, { type Node } from 'react';
+import type { ErrorMode } from '../../types';
 import { getFormattedMessage, warning } from '../../dev-warning';
 
 type Props = {|
+  mode: ErrorMode,
   children: (setOnError: Function) => Node,
 |};
 
@@ -14,8 +16,7 @@ function printFatalError(error: Error) {
   console.error(
     ...getFormattedMessage(
       `
-        An error has occurred while a drag is occurring.
-        Any existing drag will be cancelled.
+        A fatal error has occurred. Any existing drag will be cancelled.
 
         > ${error.message}
         `,
@@ -26,7 +27,7 @@ function printFatalError(error: Error) {
 }
 
 // Not the best marker, but using invariant as a signal for when to try to recover from an error
-function shouldRecover(error: Error): boolean {
+function isInvariant(error: Error): boolean {
   return error.message.indexOf('Invariant failed') !== -1;
 }
 
@@ -39,6 +40,14 @@ export default class ErrorBoundary extends React.Component<Props> {
   }
   componentWillUnmount() {
     window.removeEventListener('error', this.onFatalError);
+  }
+
+  componentDidCatch(error: Error) {
+    this.onFatalError(error);
+    // if it was not an invariant - throw
+    if (!isInvariant(error)) {
+      throw error;
+    }
   }
 
   setOnError = (fn: () => void) => {
@@ -55,18 +64,10 @@ export default class ErrorBoundary extends React.Component<Props> {
     }
 
     // If the failure was due to an invariant failure - then we handle the error
-    if (shouldRecover(error)) {
+    if (this.props.mode === 'RECOVER' && isInvariant(error)) {
       this.setState({});
     }
   };
-
-  componentDidCatch(error: Error) {
-    this.onFatalError(error);
-    // if it was not an invariant - throw
-    if (!shouldRecover(error)) {
-      throw error;
-    }
-  }
 
   render() {
     return this.props.children(this.setOnError);

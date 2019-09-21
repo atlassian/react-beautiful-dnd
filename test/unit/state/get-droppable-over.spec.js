@@ -5,7 +5,7 @@ import {
   disableDroppable,
   getDroppableDimension,
   getPreset,
-} from '../../utils/dimension';
+} from '../../util/dimension';
 import type {
   DraggableId,
   DraggableDimension,
@@ -70,6 +70,7 @@ describe('get droppable over', () => {
       descriptor: {
         id: 'partially hidden subject',
         type: 'TYPE',
+        mode: 'standard',
       },
       borderBox: {
         top: 0,
@@ -108,6 +109,7 @@ describe('get droppable over', () => {
       descriptor: {
         id: 'hidden subject',
         type: 'TYPE',
+        mode: 'standard',
       },
       borderBox: {
         top: 0,

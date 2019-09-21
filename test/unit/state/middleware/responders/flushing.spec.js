@@ -5,7 +5,7 @@ import type { Responders, DropResult } from '../../../../../src/types';
 import {
   initialPublishArgs,
   getDragStart,
-} from '../../../../utils/preset-action-args';
+} from '../../../../util/preset-action-args';
 import {
   initialPublish,
   completeDrop,
@@ -75,7 +75,6 @@ it('should flush any pending responders if a drop occurs', () => {
   store.dispatch(
     completeDrop({
       completed: getCompletedWithResult(result, store.getState()),
-      shouldFlush: false,
     }),
   );
   expect(responders.onDragStart).toHaveBeenCalledTimes(1);
@@ -98,7 +97,6 @@ it('should work across multiple drags', () => {
     store.dispatch(
       completeDrop({
         completed: getCompletedWithResult(result, store.getState()),
-        shouldFlush: false,
       }),
     );
     expect(responders.onDragStart).toHaveBeenCalledTimes(1);
@@ -112,6 +110,7 @@ it('should work across multiple drags', () => {
     responders.onDragStart.mockReset();
     // $FlowFixMe - responder does not have mockReset property
     responders.onDragUpdate.mockReset();
+    // $FlowFixMe - responder does not have mockReset property
     responders.onDragEnd.mockReset();
   });
 });

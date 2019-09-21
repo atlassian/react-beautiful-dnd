@@ -7,18 +7,31 @@ import type {
   Direction,
   Placeholder,
   State,
+  ContextId,
+  DraggableDescriptor,
+  DroppableMode,
 } from '../../types';
+import type { ChildrenFn } from '../draggable/draggable-types';
 import { updateViewportMaxScroll } from '../../state/action-creators';
+
+export type DraggableChildrenFn = ChildrenFn;
 
 export type DroppableProps = {|
   // used for shared global styles
-  'data-react-beautiful-dnd-droppable': string,
+  'data-rbd-droppable-context-id': ContextId,
+  // Used to lookup. Currently not used for drag and drop lifecycle
+  'data-rbd-droppable-id': DroppableId,
 |};
 
 export type Provided = {|
   innerRef: (?HTMLElement) => void,
   placeholder: ?Node,
   droppableProps: DroppableProps,
+|};
+
+export type UseClone = {|
+  dragging: DraggableDescriptor,
+  render: DraggableChildrenFn,
 |};
 
 export type StateSnapshot = {|
@@ -39,14 +52,18 @@ export type MapProps = {|
   shouldAnimatePlaceholder: boolean,
   // snapshot based on redux state to be provided to consumers
   snapshot: StateSnapshot,
+  useClone: ?UseClone,
 |};
 
 export type DefaultProps = {|
+  mode: DroppableMode,
   type: TypeId,
   isDropDisabled: boolean,
   isCombineEnabled: boolean,
   direction: Direction,
+  renderClone: ?DraggableChildrenFn,
   ignoreContainerClipping: boolean,
+  getContainerForClone: () => HTMLElement,
 |};
 
 export type DispatchProps = {|
@@ -57,6 +74,7 @@ export type OwnProps = {|
   ...DefaultProps,
   children: (Provided, StateSnapshot) => Node,
   droppableId: DroppableId,
+  renderClone: ?DraggableChildrenFn,
 |};
 
 export type Props = {|

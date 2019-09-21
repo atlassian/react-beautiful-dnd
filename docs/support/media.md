@@ -19,8 +19,9 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - [Dragging React performance forward](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33)
 - [Grabbing the flame 🔥](https://medium.com/@alexandereardon/grabbing-the-flame-290c794fe852)
 
-## React ecosystem
+## Other
 
+- [What does react-beautiful-dnd cost to maintain?](https://dev.to/alexandereardon/what-does-react-beautiful-dnd-cost-to-maintain-52e8)
 - [Deep Sea Fishing with React Hooks](https://www.youtube.com/watch?v=MVi17tk3VsI)
 
 ## Podcasts
@@ -48,7 +49,9 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - React Status [issue 114](https://react.statuscode.com/issues/114)
 - React Status [issue 129](https://react.statuscode.com/issues/129)
 - React Status [issue 134](https://react.statuscode.com/issues/134)
+- React Status [issue 139](https://react.statuscode.com/issues/139)
 - Fullstack React [issue 72](http://newsletter.fullstackreact.com/issues/72)
+- React Digest [issue 201](https://www.reactdigest.net/digests/201)
 - HashBang Weekly [issue 52](http://hashbangweekly.okgrow.com/2018/01/22/issue-52)
 - CSS Animation Weekly [issue 60](http://weekly.cssanimation.rocks/issues/css-animation-weekly-60-working-with-animations-skeleton-screens-and-rethinking-drag-and-drop-73446)
 - Codrops [collective 340](https://tympanus.net/codrops/collective/collective-340/)
@@ -57,9 +60,14 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - sidebar.io - [28/8/16](https://sidebar.io/?after=2017-08-21&before=2017-08-21)
 - Best of JS [issue 25](https://weekly.bestofjs.org/issues/25/)
 - BxJS Weekly [episode 59](https://dev.to/yamalight/bxjs-weekly-episode-59-javascript-news-podcast-b28)
+- FASination Daily [May 21st](http://opensource.faseidl.com/#/)
+- The Week of React [issue 57](http://www.theweekofreact.com/issues/fold-up-images-in-react-using-webassembly-w-react-react-europe-livestream-more-179542)
+- React Digest [issue 201](https://reactdigest.net/digests/201)
 
 ## Articles, tutorials and blogs
 
+- CSS-Tricks [tweet](https://twitter.com/css/status/1138866065965010945)
+- dev.to 7 most popular DEV posts [May 27th, 2019](https://dev.to/devteam/the-7-most-popular-dev-posts-from-the-past-week-2ice)
 - [React Drag and Drop - Multiple Horizontal Lists](https://www.youtube.com/watch?v=RI9kA09Egas)
 - [Building a Drag-and-Drop Game with react-beautiful-dnd](https://able.bio/drenther/building-a-drag-and-drop-game-with-react-beautiful-dnd--094r3g8)
 - [Let's Create a Trello Clone with React + Redux](https://www.youtube.com/watch?v=RDQGPs7StNA)

@@ -5,8 +5,8 @@ import type {
   MapProps,
 } from '../../../../src/view/draggable/draggable-types';
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
-import { getPreset } from '../../../utils/dimension';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import { getPreset } from '../../../util/dimension';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import getOwnProps from './util/get-own-props';
 import { getSecondarySnapshot } from './util/get-snapshot';
 

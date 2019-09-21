@@ -43,7 +43,7 @@ const getStyle = (
   }
   const { moveTo, curve, duration } = dropping;
   const translate = `translate(${moveTo.x}px, ${moveTo.y}px)`;
-  const rotate = 'rotate(0.5turn)';
+  const rotate = 'rotate(1turn)';
   return {
     ...style,
     transform: `${translate} ${rotate}`,

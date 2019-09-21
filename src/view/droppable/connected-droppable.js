@@ -1,4 +1,5 @@
 // @flow
+import invariant from 'tiny-invariant';
 // eslint-disable-next-line no-unused-vars
 import { Component } from 'react';
 import { connect } from 'react-redux';
@@ -20,6 +21,8 @@ import type {
   Selector,
   DispatchProps,
   StateSnapshot,
+  UseClone,
+  DraggableChildrenFn,
 } from './droppable-types';
 import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
@@ -39,7 +42,7 @@ const getDraggable = (
 // Returning a function to ensure each
 // Droppable gets its own selector
 export const makeMapStateToProps = (): Selector => {
-  const idle: MapProps = {
+  const idleWithAnimation: MapProps = {
     placeholder: null,
     shouldAnimatePlaceholder: true,
     snapshot: {
@@ -47,33 +50,49 @@ export const makeMapStateToProps = (): Selector => {
       draggingOverWith: null,
       draggingFromThisWith: null,
     },
+    useClone: null,
   };
 
   const idleWithoutAnimation = {
-    ...idle,
+    ...idleWithAnimation,
     shouldAnimatePlaceholder: false,
   };
 
   const getMapProps = memoizeOne(
     (
       id: DroppableId,
+      isEnabled: boolean,
       isDraggingOver: boolean,
       dragging: DraggableDimension,
       snapshot: StateSnapshot,
+      renderClone: ?DraggableChildrenFn,
     ): MapProps => {
       const isHome: boolean = dragging.descriptor.droppableId === id;
 
       if (isHome) {
+        const useClone: ?UseClone = renderClone
+          ? {
+              render: renderClone,
+              dragging: dragging.descriptor,
+            }
+          : null;
+
         return {
           placeholder: dragging.placeholder,
           shouldAnimatePlaceholder: false,
           snapshot,
+          useClone,
         };
+      }
+
+      if (!isEnabled) {
+        return idleWithoutAnimation;
       }
 
       // not over foreign list - return idle
       if (!isDraggingOver) {
-        return idle;
+        // TODO: needs to be with animation
+        return idleWithAnimation;
       }
 
       return {
@@ -81,6 +100,7 @@ export const makeMapStateToProps = (): Selector => {
         // Animating placeholder in foreign list
         shouldAnimatePlaceholder: true,
         snapshot,
+        useClone: null,
       };
     },
   );
@@ -111,11 +131,13 @@ export const makeMapStateToProps = (): Selector => {
 
     const id: DroppableId = ownProps.droppableId;
     const type: TypeId = ownProps.type;
+    const isEnabled: boolean = !ownProps.isDropDisabled;
+    const renderClone: ?DraggableChildrenFn = ownProps.renderClone;
 
     if (state.isDragging) {
       const critical: Critical = state.critical;
       if (!isMatchingType(type, critical)) {
-        return idle;
+        return idleWithoutAnimation;
       }
 
       const dragging: DraggableDimension = getDraggable(
@@ -126,13 +148,20 @@ export const makeMapStateToProps = (): Selector => {
 
       // Snapshot based on current impact
       const snapshot: StateSnapshot = getSnapshot(id, isDraggingOver, dragging);
-      return getMapProps(id, isDraggingOver, dragging, snapshot);
+      return getMapProps(
+        id,
+        isEnabled,
+        isDraggingOver,
+        dragging,
+        snapshot,
+        renderClone,
+      );
     }
 
     if (state.phase === 'DROP_ANIMATING') {
       const completed: CompletedDrag = state.completed;
       if (!isMatchingType(type, completed.critical)) {
-        return idle;
+        return idleWithoutAnimation;
       }
 
       const dragging: DraggableDimension = getDraggable(
@@ -151,46 +180,44 @@ export const makeMapStateToProps = (): Selector => {
 
       return getMapProps(
         id,
+        isEnabled,
         whatIsDraggedOver(completed.impact) === id,
         dragging,
         snapshot,
+        renderClone,
       );
     }
 
-    // An error occurred and we need to clear everything
-    // TODO: validate and add test
-    if (state.phase === 'IDLE' && !state.completed && state.shouldFlush) {
-      return idleWithoutAnimation;
-    }
-
-    if (state.phase === 'IDLE' && state.completed) {
+    if (state.phase === 'IDLE' && state.completed && !state.shouldFlush) {
       const completed: CompletedDrag = state.completed;
       if (!isMatchingType(type, completed.critical)) {
-        return idle;
+        return idleWithoutAnimation;
       }
 
       // Looking at impact as this controls the placeholder
       const wasOver: boolean = whatIsDraggedOver(completed.impact) === id;
-      const wasCombining: boolean = Boolean(completed.impact.merge);
-
-      // need to cut any animations: sadly a memoization fail
-      // we need to do this for all lists as there might be
-      // lists that are still animating a placeholder closed
-      if (state.shouldFlush) {
-        return idleWithoutAnimation;
-      }
+      const wasCombining: boolean = Boolean(
+        completed.impact.at && completed.impact.at.type === 'COMBINE',
+      );
+      const isHome: boolean = completed.critical.droppable.id === id;
 
       if (wasOver) {
         // if reordering we need to cut an animation immediately
         // if merging: animate placeholder closed after drop
-        return wasCombining ? idle : idleWithoutAnimation;
+        return wasCombining ? idleWithAnimation : idleWithoutAnimation;
       }
 
-      // keep default value
-      return idle;
+      // we need to animate the home placeholder closed if it is not
+      // being dropped into
+      if (isHome) {
+        return idleWithAnimation;
+      }
+
+      return idleWithoutAnimation;
     }
 
-    return idle;
+    // default: including when flushed
+    return idleWithoutAnimation;
   };
 
   return selector;
@@ -200,12 +227,20 @@ const mapDispatchToProps: DispatchProps = {
   updateViewportMaxScroll: updateViewportMaxScrollAction,
 };
 
+function getBody(): HTMLElement {
+  invariant(document.body, 'document.body is not ready');
+  return document.body;
+}
+
 const defaultProps = ({
+  mode: 'standard',
   type: 'DEFAULT',
   direction: 'vertical',
   isDropDisabled: false,
   isCombineEnabled: false,
   ignoreContainerClipping: false,
+  renderClone: null,
+  getContainerForClone: getBody,
 }: DefaultProps);
 
 // Abstract class allows to specify props and defaults to component.
@@ -220,7 +255,7 @@ class DroppableType extends Component<OwnProps> {
 // Leaning heavily on the default shallow equality checking
 // that `connect` provides.
 // It avoids needing to do it own within `Droppable`
-const ConnectedDroppable: typeof DroppableType = (connect(
+const ConnectedDroppable: typeof DroppableType = connect(
   // returning a function so each component can do its own memoization
   makeMapStateToProps,
   // no dispatch props for droppable
@@ -237,7 +272,7 @@ const ConnectedDroppable: typeof DroppableType = (connect(
     // Switching to a strictEqual as we return a memoized object on changes
     areStatePropsEqual: isStrictEqual,
   },
-): any)(Droppable);
+)(Droppable);
 
 ConnectedDroppable.defaultProps = defaultProps;
 

@@ -1,99 +1,52 @@
 // @flow
 import type {
   DroppableDimension,
-  DragImpact,
-  CombineImpact,
+  Combine,
   DraggableDimension,
   DraggableDimensionMap,
+  DisplacementGroups,
   DraggableId,
-  DragMovement,
-  OnLift,
+  LiftEffect,
 } from '../../../../types';
-import type { Instruction } from './move-to-next-index-types';
-import didStartDisplaced from '../../../starting-displaced/did-start-displaced';
+import didStartAfterCritical from '../../../did-start-after-critical';
 
 type Args = {|
   isMovingForward: boolean,
   destination: DroppableDimension,
-  previousImpact: DragImpact,
+  displaced: DisplacementGroups,
   draggables: DraggableDimensionMap,
-  merge: CombineImpact,
-  onLift: OnLift,
+  combine: Combine,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
   isMovingForward,
   destination,
-  previousImpact,
   draggables,
-  merge,
-  onLift,
-}: Args): ?Instruction => {
+  combine,
+  afterCritical,
+}: Args): ?number => {
   if (!destination.isCombineEnabled) {
     return null;
   }
+  const combineId: DraggableId = combine.draggableId;
+  const combineWith: DraggableDimension = draggables[combineId];
+  const combineWithIndex: number = combineWith.descriptor.index;
+  const didCombineWithStartAfterCritical: boolean = didStartAfterCritical(
+    combineId,
+    afterCritical,
+  );
 
-  const movement: DragMovement = previousImpact.movement;
-  const combineId: DraggableId = merge.combine.draggableId;
-  const combine: DraggableDimension = draggables[combineId];
-  const combineIndex: number = combine.descriptor.index;
-  const wasDisplacedAtStart: boolean = didStartDisplaced(combineId, onLift);
-
-  if (wasDisplacedAtStart) {
-    const hasDisplacedFromStart: boolean = !movement.map[combineId];
-
-    if (hasDisplacedFromStart) {
-      if (isMovingForward) {
-        return {
-          proposedIndex: combineIndex,
-          modifyDisplacement: false,
-        };
-      }
-
-      return {
-        proposedIndex: combineIndex - 1,
-        modifyDisplacement: true,
-      };
-    }
-
-    // move into position of combine
+  if (didCombineWithStartAfterCritical) {
     if (isMovingForward) {
-      return {
-        proposedIndex: combineIndex,
-        modifyDisplacement: true,
-      };
+      return combineWithIndex;
     }
-
-    return {
-      proposedIndex: combineIndex - 1,
-      modifyDisplacement: false,
-    };
-  }
-
-  const isDisplaced: boolean = Boolean(movement.map[combineId]);
-
-  if (isDisplaced) {
-    if (isMovingForward) {
-      return {
-        proposedIndex: combineIndex + 1,
-        modifyDisplacement: true,
-      };
-    }
-    return {
-      proposedIndex: combineIndex,
-      modifyDisplacement: false,
-    };
+    return combineWithIndex - 1;
   }
 
   if (isMovingForward) {
-    return {
-      proposedIndex: combineIndex + 1,
-      modifyDisplacement: false,
-    };
+    return combineWithIndex + 1;
   }
 
-  return {
-    proposedIndex: combineIndex,
-    modifyDisplacement: true,
-  };
+  return combineWithIndex;
 };

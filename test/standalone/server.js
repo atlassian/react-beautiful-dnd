@@ -3,7 +3,7 @@ import express from 'express';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { resolve } from 'path';
-import Sample from './app';
+import App from './app';
 import { resetServerContext } from '../../src';
 
 let count = 0;
@@ -11,7 +11,7 @@ function getNonce(): string {
   return `ThisShouldBeACryptographicallySecurePseudoRandomNumber-${count++}`;
 }
 
-function getSample(policy?: string, nonce?: string) {
+function renderHtml(policy?: string, nonce?: string) {
   resetServerContext();
   let meta = '';
   if (nonce) {
@@ -21,7 +21,7 @@ function getSample(policy?: string, nonce?: string) {
     meta += `<meta http-equiv="Content-Security-Policy" content="${policy}"></meta>`;
   }
   return `<!doctype html><head>${meta}<head><html><body><div id="root">${renderToString(
-    <Sample nonce={nonce} />,
+    <App nonce={nonce} />,
   )}</div><script src="/client.js"></script></body></html>`;
 }
 
@@ -38,7 +38,7 @@ export default (port: string, outputPath: string, fs: any) => {
       res.header('Content-Security-Policy', policy);
     }
     res.header('content-type', 'text/html');
-    res.end(getSample(policy, nonce));
+    res.end(renderHtml(policy, nonce));
   }
 
   server.get('/', (req, res) => {

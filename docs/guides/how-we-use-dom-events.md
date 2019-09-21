@@ -17,11 +17,7 @@ Without needing going into all the details below, here are the safest event hand
 > These can be added on the _drag handle_, anywhere else higher on the tree or to the window directly.
 
 - `onClick`: the `event.defaultPrevented` property will be set to `true` if occurred as a part of the drag interaction. This is true even if the drag was not finished with a pre-click action such as `mouseup` or `touchend`. See [sloppy clicks and click prevention](/docs/sensors/mouse.md#sloppy-clicks-and-click-prevention-).
-- `onKeyDown`: the `event.defaultPrevented` property will be set to `true` if it was used as a part of a drag. If you add `onKeyDown` to the _drag handle_ you will need to monkey patch the [`DragHandleProps`](/docs/api/draggable.md) `onKeyDown` event handler.
-
-You may need to enchance the logic of your event handlers with information from [`onDragStart`](/docs/guides/responders.md) and [`onDragEnd`](/docs/guides/responders.md) to know about whether a drag is occuring while those events fire.
-
-You are welcome to add other event handlers but you may be more reliant on `onDragStart` and `onDragEnd` information.
+- `onKeyDown`: the `event.defaultPrevented` property will be set to `true` if it was used as a part of a drag.
 
 ## General rules
 
@@ -32,7 +28,7 @@ When we use an input event as part of a drag and drop interaction we generally c
 - we use: `event.preventDefault()`
 - we do not use: `event.stopPropagation()`
 
-Some event handlers we add on the _drag handle_ itself (see [`DragHandleProps`](https://github.com/atlassian/react-beautiful-dnd#draghandleprops-type-information)) and others we add to the `window` in the [capture phase](https://javascript.info/bubbling-and-capturing#capturing). What this means is as long as you are applying your events handlers in the [bubbling phase](https://javascript.info/bubbling-and-capturing#bubbling) (which is the default for event handlers) then behaviour of events will be as described on this page.
+We add all event handlers to the `window` in the [capture phase](https://javascript.info/bubbling-and-capturing#capturing). What this means is as long as you are applying your events handlers in the [bubbling phase](https://javascript.info/bubbling-and-capturing#bubbling) (which is the default for event handlers) then behaviour of events will be as described on this page.
 
 In order to know if we have already used the event for the purpose of drag and drop you need to check the [`event.defaultPrevented`](https://developer.mozilla.org/en-US/docs/Web/API/Event/defaultPrevented) property.
 
@@ -51,7 +47,7 @@ window.addEventListener('click', (event: MouseEvent) => {
 
 ### Direct and indirect actions
 
-Some user events have a direct impact on a drag: such as a `mousemove` when dragging with a mouse or the **up arrow** <kbd>↑</kbd> `keydown` event while dragging with a keyboard. These direct events will have `event.preventDefault()` called on them to prevent their default browser behaviours. Some events indirectly impact a drag such as a `resize` event which cancels a drag. For events that indirectly impact a drag we do not call `event.preventDefault()` on them. Generally indirect events that impact drag are events that cancel a drag such as `resize` or `orientationchange` events.
+Some user events have a direct impact on a drag: such as a `mousemove` when dragging with a mouse or the **up arrow** <kbd>↑</kbd> `keydown` event while dragging with a keyboard. These direct events will have `event.preventDefault()` called on them to prevent their default browser behaviours. Some events indirectly impact a drag such as a `resize` event which cancels a drag. For events that indirectly impact a drag we do not call `event.preventDefault()` on them. Generally indirect events that impact drag are events that cancel a drag such as `resize` and `orientationchange` events.
 
 ## Mouse dragging 🐭
 

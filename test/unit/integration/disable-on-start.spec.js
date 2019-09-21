@@ -1,9 +1,7 @@
 // @flow
 import React from 'react';
 import { getRect } from 'css-box-model';
-import { mount, type ReactWrapper } from 'enzyme';
-import { withKeyboard } from '../../utils/user-input-util';
-import * as keyCodes from '../../../src/view/key-codes';
+import { render } from '@testing-library/react';
 import type {
   DraggableProvided,
   DroppableProvided,
@@ -13,9 +11,8 @@ import type {
 } from '../../../src';
 import type { Responders } from '../../../src/types';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
-import { getComputedSpacing } from '../../utils/dimension';
-
-const pressSpacebar = withKeyboard(keyCodes.space);
+import { getComputedSpacing } from '../../util/dimension';
+import { simpleLift, keyboard } from './util/controls';
 
 // Both list and item will have the same dimensions
 jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() =>
@@ -77,7 +74,7 @@ class App extends React.Component<*, State> {
                 {(draggableProvided: DraggableProvided) => (
                   <div
                     ref={draggableProvided.innerRef}
-                    className="drag-handle"
+                    data-testid="drag-handle"
                     {...draggableProvided.draggableProps}
                     {...draggableProvided.dragHandleProps}
                   >
@@ -102,9 +99,10 @@ it('should allow the disabling of a droppable in onDragStart', () => {
     onDragUpdate: jest.fn(),
     onDragEnd: jest.fn(),
   };
-  const wrapper: ReactWrapper<*> = mount(<App {...responders} />);
+  const { getByTestId } = render(<App {...responders} />);
+  const handle: HTMLElement = getByTestId('drag-handle');
 
-  pressSpacebar(wrapper.find('.drag-handle'));
+  simpleLift(keyboard, handle);
   // flush responder
   jest.runOnlyPendingTimers();
 

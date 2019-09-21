@@ -44,7 +44,6 @@ Args): StateWhenUpdatesAllowed => {
     viewport,
     destination,
     draggables,
-    onLift: state.onLift,
   });
 
   const clientSelection: Position = getClientBorderBoxCenter({
@@ -53,7 +52,7 @@ Args): StateWhenUpdatesAllowed => {
     droppable: destination,
     draggables,
     viewport,
-    onLift: state.onLift,
+    afterCritical: state.afterCritical,
   });
 
   return update({

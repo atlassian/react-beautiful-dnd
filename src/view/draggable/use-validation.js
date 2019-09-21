@@ -1,42 +1,61 @@
 // @flow
-import { useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import invariant from 'tiny-invariant';
+import type { DraggableId, ContextId } from '../../types';
 import type { Props } from './draggable-types';
 import checkIsValidInnerRef from '../check-is-valid-inner-ref';
 import { warning } from '../../dev-warning';
+import findDragHandle from '../get-elements/find-drag-handle';
 
-function checkOwnProps(props: Props) {
-  // Number.isInteger will be provided by @babel/runtime-corejs2
-  invariant(
-    Number.isInteger(props.index),
-    'Draggable requires an integer index prop',
-  );
-  invariant(props.draggableId, 'Draggable requires a draggableId');
-  invariant(
-    typeof props.isDragDisabled === 'boolean',
-    'isDragDisabled must be a boolean',
-  );
+function prefix(id: DraggableId): string {
+  return `Draggable[id: ${id}]: `;
 }
 
-function checkForOutdatedProps(props: Props) {
-  if (Object.prototype.hasOwnProperty.call(props, 'shouldRespectForceTouch')) {
-    warning(
-      'shouldRespectForceTouch has been renamed to shouldRespectForcePress',
-    );
-  }
-}
-
-export default function useValidation(
+export function useValidation(
   props: Props,
+  contextId: ContextId,
   getRef: () => ?HTMLElement,
 ) {
   // running after every update in development
   useEffect(() => {
     // wrapping entire block for better minification
     if (process.env.NODE_ENV !== 'production') {
-      checkOwnProps(props);
-      checkForOutdatedProps(props);
+      const id: ?DraggableId = props.draggableId;
+      // Number.isInteger will be provided by @babel/runtime-corejs2
+      invariant(id, 'Draggable requires a draggableId');
+
+      invariant(
+        Number.isInteger(props.index),
+        `${prefix(id)} requires an integer index prop`,
+      );
+
+      if (props.mapped.type === 'DRAGGING') {
+        return;
+      }
+
+      // Checking provided ref (only when not dragging as it might be removed)
       checkIsValidInnerRef(getRef());
+
+      // Checking that drag handle is provided
+      // Only running check when enabled.
+      // When not enabled there is no drag handle props
+      if (props.isEnabled) {
+        invariant(
+          findDragHandle(contextId, id),
+          `${prefix(id)} Unable to find drag handle`,
+        );
+      }
     }
   });
+}
+
+// we expect isClone not to change for entire component's life
+export function useClonePropValidation(isClone: boolean) {
+  const initialRef = useRef<boolean>(isClone);
+
+  useEffect(() => {
+    if (isClone !== initialRef.current) {
+      warning('Draggable isClone prop value changed during component life');
+    }
+  }, [isClone]);
 }

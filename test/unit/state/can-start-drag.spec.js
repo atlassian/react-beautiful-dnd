@@ -1,7 +1,7 @@
 // @flow
 import canStartDrag from '../../../src/state/can-start-drag';
-import getStatePreset from '../../utils/get-simple-state-preset';
-import { getPreset } from '../../utils/dimension';
+import getStatePreset from '../../util/get-simple-state-preset';
+import { getPreset } from '../../util/dimension';
 
 const preset = getPreset();
 const state = getStatePreset();

@@ -8,11 +8,9 @@ We require that a `<Draggable />` and its drag handle be a `HTMLElement`. Almost
 
 ![HTMLElement](https://user-images.githubusercontent.com/2182637/42302315-9150d4e0-805d-11e8-8345-71bc32135203.png)
 
-## Using focus
+## Focus management
 
-We use and manipulate focus on a drag handle during a drag if it is needed. This is especially true for keyboard dragging that relies on focus management.
-
-An element loses focus when it moves into a [`React Portal`](https://reactjs.org/docs/portals.html). We can detect when a `<Draggable />` is moving into a portal and we give the new element in the portal focus with `.focus()`. Additionally, we also will maintain focus when you move a `<Draggable />` from one list to another using `.focus()` if it had focus when dragging. An element will always have focus when keyboard dragging.
+We use and manipulate focus on a drag handle during a drag if it is needed. This is especially true for keyboard dragging that relies on focus management. See our [focus guide](/docs/guides/focus.md).
 
 ## Enter [`SVGElement`](https://developer.mozilla.org/en-US/docs/Web/API/SVGElement) 🖼
 

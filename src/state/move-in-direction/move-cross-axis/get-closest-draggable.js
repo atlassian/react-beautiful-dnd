@@ -4,7 +4,7 @@ import type {
   Viewport,
   DraggableDimension,
   DroppableDimension,
-  OnLift,
+  LiftEffect,
 } from '../../../types';
 import { distance } from '../../position';
 import { isTotallyVisible } from '../../visibility/is-visible';
@@ -21,7 +21,7 @@ type Args = {|
   destination: DroppableDimension,
   // the droppables inside the destination
   insideDestination: DraggableDimension[],
-  onLift: OnLift,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
@@ -29,7 +29,7 @@ export default ({
   viewport,
   destination,
   insideDestination,
-  onLift,
+  afterCritical,
 }: Args): ?DraggableDimension => {
   const sorted: DraggableDimension[] = insideDestination
     .filter((draggable: DraggableDimension): boolean =>
@@ -37,7 +37,7 @@ export default ({
       // but must be visible in the droppable
       // We can improve this, but this limitation is easier for now
       isTotallyVisible({
-        target: getCurrentPageBorderBox(draggable, onLift),
+        target: getCurrentPageBorderBox(draggable, afterCritical),
         destination,
         viewport: viewport.frame,
         withDroppableDisplacement: true,
@@ -49,14 +49,14 @@ export default ({
         pageBorderBoxCenter,
         withDroppableDisplacement(
           destination,
-          getCurrentPageBorderBoxCenter(a, onLift),
+          getCurrentPageBorderBoxCenter(a, afterCritical),
         ),
       );
       const distanceToB = distance(
         pageBorderBoxCenter,
         withDroppableDisplacement(
           destination,
-          getCurrentPageBorderBoxCenter(b, onLift),
+          getCurrentPageBorderBoxCenter(b, afterCritical),
         ),
       );
 

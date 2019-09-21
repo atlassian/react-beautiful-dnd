@@ -1,29 +1,23 @@
 // @flow
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
-import type {
-  Axis,
-  DragImpact,
-  DisplacedBy,
-  Displacement,
-} from '../../../../src/types';
+import type { Axis, DragImpact, DisplacedBy } from '../../../../src/types';
 import type {
   Selector,
   OwnProps,
   MapProps,
 } from '../../../../src/view/draggable/draggable-types';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import {
   move,
   draggingStates,
   withImpact,
   type IsDraggingState,
-} from '../../../utils/dragging-state';
+} from '../../../util/dragging-state';
 import getOwnProps from './util/get-own-props';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../../src/state/get-displacement-map';
-import getNotAnimatedDisplacement from '../../../utils/get-displacement/get-not-animated-displacement';
 import { getDraggingSnapshot } from './util/get-snapshot';
+import { getForcedDisplacement } from '../../../util/impact';
 
 const preset = getPreset();
 const ownProps: OwnProps = getOwnProps(preset.inHome1);
@@ -32,19 +26,17 @@ const displacedBy: DisplacedBy = getDisplacedBy(
   axis,
   preset.inHome1.displaceBy,
 );
-const displaced: Displacement[] = [
-  getNotAnimatedDisplacement(preset.inHome2),
-  getNotAnimatedDisplacement(preset.inHome3),
-  getNotAnimatedDisplacement(preset.inHome4),
-];
 const impact: DragImpact = {
-  movement: {
-    displaced,
-    map: getDisplacementMap(displaced),
-    displacedBy,
-  },
-  destination: null,
-  merge: {
+  displaced: getForcedDisplacement({
+    visible: [
+      { dimension: preset.inHome2, shouldAnimate: false },
+      { dimension: preset.inHome3, shouldAnimate: false },
+      { dimension: preset.inHome4, shouldAnimate: false },
+    ],
+  }),
+  displacedBy,
+  at: {
+    type: 'COMBINE',
     whenEntered: forward,
     combine: {
       draggableId: preset.inHome2.descriptor.id,

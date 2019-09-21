@@ -5,7 +5,6 @@ import getMocks from './util/get-args-mock';
 import { scrollableViewport, unscrollableViewport } from './util/viewport';
 import dragTo from './util/drag-to';
 import getScroller, {
-  type PublicArgs,
   type FluidScroller,
 } from '../../../../../src/state/auto-scroller/fluid-scroller';
 import { patch } from '../../../../../src/state/position';
@@ -20,7 +19,7 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
     );
 
     {
-      const mocks: PublicArgs = getMocks();
+      const mocks = getMocks();
       const scroller: FluidScroller = getScroller(mocks);
 
       scroller.start(
@@ -42,7 +41,7 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
 
     // validation (no cancel)
     {
-      const mocks: PublicArgs = getMocks();
+      const mocks = getMocks();
       const scroller: FluidScroller = getScroller(mocks);
 
       scroller.start(
@@ -67,7 +66,7 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
     );
 
     {
-      const mocks: PublicArgs = getMocks();
+      const mocks = getMocks();
       const scroller: FluidScroller = getScroller(mocks);
 
       scroller.start(
@@ -90,7 +89,7 @@ forEach(({ axis, state, preset }: BlockFnArgs) => {
 
     // validation (no cancel)
     {
-      const mocks: PublicArgs = getMocks();
+      const mocks = getMocks();
       const scroller: FluidScroller = getScroller(mocks);
 
       scroller.start(

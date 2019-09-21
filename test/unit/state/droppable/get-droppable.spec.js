@@ -10,7 +10,7 @@ import {
 import getDroppableDimension from '../../../../src/state/droppable/get-droppable';
 import { noSpacing } from '../../../../src/state/spacing';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
-import { expandBySpacing } from '../../../utils/spacing';
+import { expandBySpacing } from '../../../util/spacing';
 import type {
   DroppableDescriptor,
   DroppableDimension,
@@ -21,6 +21,7 @@ import type {
 const descriptor: DroppableDescriptor = {
   id: 'drop-1',
   type: 'TYPE',
+  mode: 'standard',
 };
 
 const margin: Spacing = {

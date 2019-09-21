@@ -5,6 +5,7 @@ import type { Spacing } from 'css-box-model';
 import type {
   Placeholder as PlaceholderType,
   InOutAnimationMode,
+  ContextId,
 } from '../../types';
 import { transitions } from '../../animation';
 import { noSpacing } from '../../state/spacing';
@@ -23,7 +24,7 @@ export type PlaceholderStyle = {|
   flexShrink: '0',
   flexGrow: '0',
   pointerEvents: 'none',
-  transition: string,
+  transition: ?string,
 |};
 export type Props = {|
   placeholder: PlaceholderType,
@@ -31,7 +32,7 @@ export type Props = {|
   onClose: () => void,
   innerRef?: () => ?HTMLElement,
   onTransitionEnd: () => void,
-  styleContext: string,
+  contextId: ContextId,
 |};
 
 type Size = {|
@@ -109,7 +110,7 @@ const getStyle = ({
     pointerEvents: 'none',
 
     // Animate the placeholder size and margin
-    transition: transitions.placeholder,
+    transition: animate !== 'none' ? transitions.placeholder : null,
   };
 };
 
@@ -124,7 +125,7 @@ function Placeholder(props: Props): Node {
     animateOpenTimerRef.current = null;
   }, []);
 
-  const { animate, onTransitionEnd, onClose, styleContext } = props;
+  const { animate, onTransitionEnd, onClose, contextId } = props;
   const [isAnimatingOpenOnMount, setIsAnimatingOpenOnMount] = useState<boolean>(
     props.animate === 'open',
   );
@@ -186,7 +187,7 @@ function Placeholder(props: Props): Node {
 
   return React.createElement(props.placeholder.tagName, {
     style,
-    'data-react-beautiful-dnd-placeholder': styleContext,
+    'data-rbd-placeholder-context-id': contextId,
     onTransitionEnd: onSizeChangeEnd,
     ref: props.innerRef,
   });

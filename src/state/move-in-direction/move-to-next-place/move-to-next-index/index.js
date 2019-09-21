@@ -5,17 +5,13 @@ import type {
   DroppableDimension,
   DraggableDimensionMap,
   DragImpact,
-  DisplacedBy,
-  Displacement,
-  OnLift,
+  LiftEffect,
+  Viewport,
+  ImpactLocation,
 } from '../../../../types';
-import type { Instruction } from './move-to-next-index-types';
-import getDisplacementMap from '../../../get-displacement-map';
-import { addClosest, removeClosest } from '../update-displacement';
-import getDisplacedBy from '../../../get-displaced-by';
-import fromReorder from './from-reorder';
+import calculateReorderImpact from '../../../calculate-drag-impact/calculate-reorder-impact';
 import fromCombine from './from-combine';
-import removeDraggableFromList from '../../../remove-draggable-from-list';
+import fromReorder from './from-reorder';
 
 export type Args = {|
   isMovingForward: boolean,
@@ -25,7 +21,8 @@ export type Args = {|
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
   previousImpact: DragImpact,
-  onLift: OnLift,
+  viewport: Viewport,
+  afterCritical: LiftEffect,
 |};
 
 export default ({
@@ -36,78 +33,54 @@ export default ({
   destination,
   insideDestination,
   previousImpact,
-  onLift,
+  viewport,
+  afterCritical,
 }: Args): ?DragImpact => {
-  const instruction: ?Instruction = (() => {
-    // moving from reorder
-    if (previousImpact.destination) {
-      return fromReorder({
-        isMovingForward,
-        isInHomeList,
-        draggable,
-        location: previousImpact.destination,
-        insideDestination,
-      });
+  const wasAt: ?ImpactLocation = previousImpact.at;
+  invariant(wasAt, 'Cannot move in direction without previous impact location');
+
+  if (wasAt.type === 'REORDER') {
+    const newIndex: ?number = fromReorder({
+      isMovingForward,
+      isInHomeList,
+      location: wasAt.destination,
+      insideDestination,
+    });
+    // TODO: can we just pass new index on?
+    if (newIndex == null) {
+      return null;
     }
+    return calculateReorderImpact({
+      draggable,
+      insideDestination,
+      destination,
+      viewport,
+      last: previousImpact.displaced,
+      displacedBy: previousImpact.displacedBy,
+      index: newIndex,
+    });
+  }
 
-    // moving from merge
-    if (previousImpact.merge) {
-      return fromCombine({
-        isMovingForward,
-        destination,
-        previousImpact,
-        draggables,
-        merge: previousImpact.merge,
-        onLift,
-      });
-    }
-
-    invariant('Cannot move to next spot without a destination or merge');
-    return null;
-  })();
-
-  if (instruction == null) {
+  // COMBINE
+  const newIndex: ?number = fromCombine({
+    isMovingForward,
+    destination,
+    displaced: previousImpact.displaced,
+    draggables,
+    combine: wasAt.combine,
+    afterCritical,
+  });
+  if (newIndex == null) {
     return null;
   }
 
-  const { proposedIndex, modifyDisplacement } = instruction;
-  const displacedBy: DisplacedBy = getDisplacedBy(
-    destination.axis,
-    draggable.displaceBy,
-  );
-
-  const displaced: Displacement[] = (() => {
-    const lastDisplaced: Displacement[] = previousImpact.movement.displaced;
-
-    if (!modifyDisplacement) {
-      return lastDisplaced;
-    }
-
-    if (isMovingForward) {
-      return removeClosest(lastDisplaced);
-    }
-
-    // moving backwards - will increase the amount of displaced items
-
-    const withoutDraggable: DraggableDimension[] = removeDraggableFromList(
-      draggable,
-      insideDestination,
-    );
-
-    const atProposedIndex: DraggableDimension = withoutDraggable[proposedIndex];
-    return addClosest(atProposedIndex, lastDisplaced);
-  })();
-
-  return {
-    movement: {
-      displacedBy,
-      displaced,
-      map: getDisplacementMap(displaced),
-    },
-    destination: {
-      droppableId: destination.descriptor.id,
-      index: proposedIndex,
-    },
-    merge: null,
-  };
+  return calculateReorderImpact({
+    draggable,
+    insideDestination,
+    destination,
+    viewport,
+    last: previousImpact.displaced,
+    displacedBy: previousImpact.displacedBy,
+    index: newIndex,
+  });
 };

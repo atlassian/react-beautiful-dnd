@@ -1,7 +1,19 @@
 // @flow
-import { type PublicArgs } from '../../../../../../src/state/auto-scroller/fluid-scroller';
+import type { Position } from 'css-box-model';
+import type { DroppableId } from '../../../../../../src/types';
 
-export default (): PublicArgs => ({
-  scrollWindow: jest.fn(),
-  scrollDroppable: jest.fn(),
-});
+// Similiar to PublicArgs
+type Result = {|
+  scrollWindow: JestMockFn<[Position], void>,
+  scrollDroppable: JestMockFn<[DroppableId, Position], void>,
+|};
+
+export default (): Result => {
+  const scrollWindow: JestMockFn<[Position], void> = jest.fn();
+  const scrollDroppable: JestMockFn<[DroppableId, Position], void> = jest.fn();
+
+  return {
+    scrollWindow,
+    scrollDroppable,
+  };
+};

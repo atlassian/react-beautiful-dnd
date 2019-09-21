@@ -6,7 +6,7 @@ import {
 } from '../../../../src/state/visibility/is-visible';
 import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 import { offsetByPosition } from '../../../../src/state/spacing';
-import { getDroppableDimension, getFrame } from '../../../utils/dimension';
+import { getDroppableDimension, getFrame } from '../../../util/dimension';
 import type { DroppableDimension } from '../../../../src/types';
 
 const viewport: Rect = getRect({
@@ -20,6 +20,7 @@ const asBigAsViewport: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'same-as-viewport',
     type: 'TYPE',
+    mode: 'standard',
   },
   borderBox: viewport,
 });
@@ -49,6 +50,7 @@ const asBigAsInViewport1: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'subset',
     type: 'TYPE',
+    mode: 'standard',
   },
   borderBox: inViewport1,
 });
@@ -129,6 +131,7 @@ describe('is totally visible', () => {
         descriptor: {
           id: 'clipped',
           type: 'TYPE',
+          mode: 'standard',
         },
         borderBox: {
           top: viewport.top,
@@ -230,6 +233,7 @@ describe('is totally visible', () => {
       descriptor: {
         id: 'clipped',
         type: 'TYPE',
+        mode: 'standard',
       },
       borderBox,
       closest: {
@@ -341,6 +345,7 @@ describe('is totally visible', () => {
           descriptor: {
             id: 'clipped',
             type: 'TYPE',
+            mode: 'standard',
           },
           borderBox: {
             ...ourFrame,
@@ -489,6 +494,7 @@ describe('is totally visible', () => {
           descriptor: {
             id: 'droppable',
             type: 'TYPE',
+            mode: 'standard',
           },
           borderBox: {
             top: 0,
@@ -577,6 +583,7 @@ describe('is totally visible', () => {
         descriptor: {
           id: 'not-visible',
           type: 'TYPE',
+          mode: 'standard',
         },
         borderBox: notInViewport,
       });

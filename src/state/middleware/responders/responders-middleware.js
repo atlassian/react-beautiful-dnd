@@ -51,7 +51,7 @@ export default (
 
     // Drag state resetting - need to check if
     // we should fire a onDragEnd responder
-    if (action.type === 'CLEAN') {
+    if (action.type === 'FLUSH') {
       publisher.abort();
       return;
     }

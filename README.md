@@ -48,7 +48,8 @@ We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/
 - Compatible with semantic `<table>` reordering - [table pattern](/docs/patterns/tables.md)
 - [Auto scrolling](/docs/guides/auto-scrolling.md) - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
 - Custom drag handles - you can drag a whole item by just a part of it
-- Compatible with [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html) - [portal pattern](/docs/patterns/using-a-portal.md)
+- Able to move the dragging item to another element while dragging (clone, portal) - [Reparenting your `<Draggable />`](/docs/patterns/reparenting.md)
+- Full [programmatic api 🎮](/docs/sensors/programmatic.md)
 - 🌲 Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) package
 - A `<Droppable />` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
@@ -85,6 +86,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [Mouse dragging 🐭](/docs/sensors/mouse.md)
 - [Touch dragging 👉📱](/docs/sensors/touch.md)
 - [Keyboard dragging 🎹♿️](/docs/sensors/keyboard.md)
+- [Programmatic dragging 🎮](/docs/sensors/programmatic.md)
 
 ### API 🏋️‍
 
@@ -103,6 +105,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [Using `innerRef`](/docs/guides/using-inner-ref.md)
 - [Developer warnings and how to disable them](/docs/guides/developer-warnings.md)
 - [Rules for `draggableId` and `droppableId`s](/docs/guides/identifiers.md)
+- [Focus management](/docs/guides/focus.md)
 - [Customising or skipping the drop animation](/docs/guides/drop-animation.md)
 - [Auto scrolling](/docs/guides/auto-scrolling.md)
 - [Controlling the screen reader](/docs/guides/screen-reader.md)
@@ -118,7 +121,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 
 - [Multi drag](/docs/patterns/multi-drag.md)
 - [Tables](/docs/patterns/tables.md)
-- [Using a portal (`ReactDOM.createPortal`)](/docs/patterns/using-a-portal.md)
+- [Reparenting a `<Draggable />`](/docs/patterns/reparenting.md)
 
 ### Support 👩‍⚕️
 

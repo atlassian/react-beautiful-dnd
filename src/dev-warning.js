@@ -7,13 +7,13 @@ const spacesAndTabs: RegExp = /[ \t]{2,}/g;
 const lineStartWithSpaces: RegExp = /^[ \t]*/gm;
 
 // using .trim() to clear the any newlines before the first text and after last text
-const clean = (value: string) =>
+const clean = (value: string): string =>
   value
     .replace(spacesAndTabs, ' ')
     .replace(lineStartWithSpaces, '')
     .trim();
 
-const getDevMessage = (message: string) =>
+const getDevMessage = (message: string): string =>
   clean(`
   %creact-beautiful-dnd
 

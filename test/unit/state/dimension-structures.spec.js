@@ -5,7 +5,7 @@ import {
   toDroppableMap,
   toDroppableList,
 } from '../../../src/state/dimension-structures';
-import { getPreset } from '../../utils/dimension';
+import { getPreset } from '../../util/dimension';
 import type {
   DraggableDimension,
   DroppableDimension,
