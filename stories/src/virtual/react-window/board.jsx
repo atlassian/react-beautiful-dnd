@@ -36,7 +36,7 @@ type RowProps = {
 const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
   const quote: ?Quote = quotes[index];
 
-  // placeholder :D
+  // We are rendering an extra item for the placeholder
   if (!quote) {
     return null;
   }
@@ -104,6 +104,9 @@ const Column = React.memo(function Column(props: ColumnProps) {
           droppableProvided: DroppableProvided,
           snapshot: DroppableStateSnapshot,
         ) => {
+          // Add an extra item to our list to make space for a dragging item
+          // Usually the DroppableProvided.placeholder does this, but that won't
+          // work in a virtual list
           const itemCount: number = droppableProvided.placeholderInfo
             ? quotes.length + 1
             : quotes.length;

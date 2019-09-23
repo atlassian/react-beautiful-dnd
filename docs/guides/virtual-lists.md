@@ -4,7 +4,7 @@
 
 ## Background: what are virtual lists?
 
-A "virtual list" is the name given to a *windowing* performance optimisation technique where only the **visible** list items are rendered.
+A "virtual list" is the name given to a _windowing_ performance optimisation technique where only the **visible** list items are rendered.
 
 [TODO: GIF]
 
@@ -18,15 +18,15 @@ Keep in mind that there are drawbacks with using virtual lists. The biggest are 
 
 ## Usage
 
-In order to use `react-beautiful-dnd` with a virtual list solution there are a number of things you will need to do. `rbd` does not provide it's own virtual list library, so there is a bit of wiring that you will need to do in order to get going.
+`react-beautiful-dnd` does not provide it's own virtual list library so there is a bit of wiring that you will need to do in order to get going with virtual lists 🛠
 
 ### Enable overscanning
 
-> Most virtualisation libraries have overscanning enabled by default so you shouldn't need to change anything
+> Virtualisation libraries often have overscanning enabled by default
 
-Most virtual list libraries support the concept of **overscanning**. Overscanning is where the library will render a small about of items (usually one) that are technically not visible themselves, but near the boundary of the window. So when a scroll occurs the item is already visible. Overscanning generally leads to a more fluid experience.
+Most virtual list libraries support the concept of **overscanning**. Overscanning is where a small about of non-visible items are rendered near the boundary of the window. When a scroll occurs the overscanned item can be immediately moved into view and does not need to be created. Overscanning generally leads to a more fluid experience.
 
-It is required that overscanning be enabled for `react-beautiful-dnd` to work correctly. If overscanning is not enabled, we cannot tell if there are more items in the list when we are in the last visual position.
+It is required that overscanning be enabled for `react-beautiful-dnd` to work correctly. If overscanning is not enabled, `rbd` cannot tell if there are more items in the list when an item is in the last visual position. We require an overscanning value of one or more.
 
 ### Set `<Droppable /> | mode` to `virtual`
 
@@ -43,13 +43,21 @@ Virtual lists behave differently to regular lists. You will need to tell `rbd` t
 When using a virtual list the original dragging item can be unmounted during a drag if it becomes invisible. To get around this we require that you drag a clone of the dragging item. See our [reparenting guide](/docs/guides/reparenting.md) for more details.
 
 ```js
-function renderItem(provided, snapshot, descriptor) {
-  //...
-}
-
-<Droppable renderClone={renderItem}>
+<Droppable
+  droppableId="droppable"
+  mode="virtual"
+  renderClone={(provided, snapshot, descriptor) => (
+    <div
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      ref={provided.innerRef}
+    >
+      Item id: {items[descriptor.id].id}
+    </div>
+  )}
+>
   {/*...*/}
-</Droppable>;
+</Droppable>
 ```
 
 ### Stand in for the placeholder
@@ -57,7 +65,7 @@ function renderItem(provided, snapshot, descriptor) {
 Usually we require consumers to put a `placeholder` (`<Droppable /> | DroppableProvided | placeholder`) into the list so that we can insert space into a list as needing during a drag.
 
 ```js
-<Droppable droppableId="droppable-1">
+<Droppable droppableId="droppable">
   {(provided, snapshot) => (
     <div ref={provided.innerRef} {...provided.droppableProps}>
       {/* Usually needed. But not for virtual lists! */}
@@ -67,10 +75,52 @@ Usually we require consumers to put a `placeholder` (`<Droppable /> | DroppableP
 </Droppable>
 ```
 
-However, a `placeholder` does not make sense in the context of a virtual list as the dimensions of the list is not based on collective size of the visual items, but rather is calculated based on things like `itemCount` and `itemSize`. (eg `height` = `itemSize` * `itemCount`). For virtual lists, inserting our own node into it would not increase the size of the list. **So we need you do insert the space for us!**
+However, a `placeholder` does not make sense in the context of a virtual list as the dimensions of the list is not based on collective size of the visual items, but rather is calculated based on things like `itemCount` and `itemSize`. (eg `height` = `itemSize` \* `itemCount`). For virtual lists, inserting our own node into it would not increase the size of the list. **So we need you do insert the space for us!**
 
+A simple way add extra space to a virtual list add a non-visible item to your list. It is important that this extra item is not a `<Draggable />`.
 
+```js
+// This example uses the `react-window` API
 
+const Row = ({ data, index, style }: RowProps) => {
+  const item = data[index];
+
+   // We are rendering an extra item for the placeholder
+  if (!quote) {
+    return null;
+  }
+
+  return (
+    <Draggable draggableId={item.id} index={index} key={item.id}>
+      {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+        {/*...*/}
+      )}
+    </Draggable>
+  );
+});
+
+function render(provided: DroppableProvided, snapshot: DroppableStateSnapshot) {
+  // Add an extra item to our list to make space for a dragging item
+  // Usually the DroppableProvided.placeholder does this, but that won't
+  // work in a virtual list
+  const itemCount: number = provided.placeholderInfo
+    ? quotes.length + 1
+    : quotes.length;
+
+  return (
+    <List
+      height={500}
+      itemCount={itemCount}
+      itemSize={110}
+      width={300}
+      outerRef={provided.innerRef}
+      itemData={quotes}
+    >
+      {Row}
+    </List>
+  );
+}
+```
 
 ### Premade: `react-window
 
@@ -83,6 +133,5 @@ However, a `placeholder` does not make sense in the context of a virtual list as
 - [Board example](TODO) [source](TODO)
 
 > Please raise a pull request ff you would like to add examples for other virtualization libraries! ❤
-
 
 [← Back to documentation](/README.md#documentation-)

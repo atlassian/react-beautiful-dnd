@@ -13,19 +13,79 @@ To get around this issue you need to move the dragging item to another location 
 
 ## Cloning API
 
-Our cloning API is a first class way of reparenting a `<Draggable />`s into another DOM location while a drag is occurring. When using our cloning API the original `<Draggable />` is removed while the drag is being performed; a new *clone* is rendered (using `renderClone`) into the container element (controllable using `getContainerForClone`)
+Our cloning API is a first class way of reparenting a `<Draggable />`s into another DOM location while a drag is occurring. When using our cloning API the original `<Draggable />` is removed while the drag is being performed; a new _clone_ is rendered (using `renderClone`) into the container element (controllable using `getContainerForClone`)
 
-Using our cloning API is required for compatibility with [virtual lists](TODO).
+Using our cloning API is required for compatibility with [virtual lists](/docs/guides/virtual-lists.md).
 
 ```js
-function renderItem(provided, snapshot, descriptor) {
-  //...
-}
+function List(props) {
+  const items = props.items;
 
-<Droppable renderClone={renderItem} getContainerForClone={() => document.body}>
-  {renderItem}
-</Droppable>;
+  return (
+    <Droppable
+      droppableId="droppable"
+      renderClone={(provided, snapshot, descriptor) => (
+        <div
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          ref={provided.innerRef}
+        >
+          Item id: {items[descriptor.id].id}
+        </div>
+      )}
+    >
+      <div ref={provided.innerRef} {...provided.droppableProps}>
+        {items.map(item) => (
+          <Draggable draggableId={item.id} index={item.index}>
+            {(provided, snapshot) => (
+              <div
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                ref={provided.innerRef}
+              >
+                Item id: {item.id}
+              </div>
+            )}
+          </Draggable>
+        )}
+      </div>
+    </Droppable>
+  );
+}
 ```
+
+You can also reuse the `<Draggable /> | DraggableChildrenFn` if you want too!
+
+````js
+const getRenderItem = (items) => (provided, snapshot, descriptor) => (
+  <div
+    {...provided.draggableProps}
+    {...provided.dragHandleProps}
+    ref={provided.innerRef}
+  >
+    Item id: {items[descriptor.id].id}
+  </div>
+);
+
+function List(props) {
+  const items = props.items;
+  const renderItem = getRenderItem(items);
+
+  return (
+    <Droppable
+      droppableId="droppable"
+      renderClone={renderItem}
+    >
+      <div ref={provided.innerRef} {...provided.droppableProps}>
+        {items.map(item) => (
+          <Draggable draggableId={item.id} index={item.index}>
+            {renderItem}
+          </Draggable>
+        )}
+      </div>
+    </Droppable>
+  );
+}
 
 ### `<Droppable />` | `renderClone`
 
@@ -66,3 +126,4 @@ If you are doing drag and drop reordering within a `<table>` we have created a p
 Keep in mind that anything that is reparented will be rendered from scratch. So you do not want to be moving large component trees into a `portal`: otherwise you will experience large UI jank. We do not using reparenting out of the box because of this performance drawback.
 
 [← Back to documentation](/README.md#documentation-)
+````
