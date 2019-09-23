@@ -77,10 +77,12 @@ The function is provided with two arguments:
 ### 1. provided: (DroppableProvided)
 
 ```js
+import type { Node } from 'react';
+
 type DroppableProvided = {|
   innerRef: (?HTMLElement) => void,
   droppableProps: DroppableProps,
-  placeholder: ?ReactElement,
+  placeholder: ?Node,
 |};
 
 type DroppableProps = {|

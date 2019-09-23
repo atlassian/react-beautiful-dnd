@@ -26,6 +26,7 @@ export type DroppableProps = {|
 export type Provided = {|
   innerRef: (?HTMLElement) => void,
   placeholder: ?Node,
+  placeholderInfo: ?Placeholder,
   droppableProps: DroppableProps,
 |};
 
