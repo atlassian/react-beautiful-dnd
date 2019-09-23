@@ -5,6 +5,7 @@ import { colors } from '@atlaskit/theme';
 import { grid, borderRadius } from '../constants';
 
 type Props = {|
+  library: string,
   count: number,
   onCountChange: (count: number) => void,
 |};
@@ -29,42 +30,35 @@ export default function QuoteCountChooser(props: Props) {
   return (
     <div
       css={css`
+        background-color: ${colors.N0};
+        padding: ${grid}px;
+        border-radius: ${borderRadius}px;
+        width: 200px;
         display: flex;
         flex-direction: column;
+        margin-left: ${grid}px;
       `}
     >
-      <div
+      <h4
         css={css`
-          align-self: center;
-          background-color: ${colors.N0};
-          padding: ${grid}px;
-          border-radius: ${borderRadius}px;
+          margin-bottom: ${grid}px;
         `}
       >
-        <h4
-          css={css`
-            margin-bottom: ${grid}px;
-          `}
-        >
-          <a href="https://github.com/bvaughn/react-window">
-            <code>react-window</code>
-          </a>
-        </h4>
-        <select
-          onChange={onChange}
-          value={props.count}
-          css={css`
-            width: 200px;
-            font-size: 16px;
-          `}
-        >
-          {options.map((option: Option) => (
-            <option key={option.name} value={option.value}>
-              {option.name} ({option.value})
-            </option>
-          ))}
-        </select>
-      </div>
+        <code>{props.library}</code>
+      </h4>
+      <select
+        onChange={onChange}
+        value={props.count}
+        css={css`
+          font-size: 16px;
+        `}
+      >
+        {options.map((option: Option) => (
+          <option key={option.name} value={option.value}>
+            {option.name} ({option.value})
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

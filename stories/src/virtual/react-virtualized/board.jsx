@@ -1,6 +1,8 @@
 // @flow
 import React, { useReducer } from 'react';
-import { FixedSizeList as List, areEqual } from 'react-window';
+import ReactDOM from 'react-dom';
+import 'react-virtualized/styles.css';
+import { List } from 'react-virtualized';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
 import { colors } from '@atlaskit/theme';
@@ -28,12 +30,11 @@ const Container = styled.div`
 `;
 
 type RowProps = {
-  data: Quote[],
   index: number,
   style: Object,
 };
 
-const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
+const getRow = (quotes: Quote[]) => ({ index, style }: RowProps) => {
   const quote: ?Quote = quotes[index];
 
   // placeholder :D
@@ -61,7 +62,7 @@ const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
       )}
     </Draggable>
   );
-}, areEqual);
+};
 
 type ColumnProps = {|
   columnId: string,
@@ -115,22 +116,28 @@ const Column = React.memo(function Column(props: ColumnProps) {
           return (
             <List
               height={500}
-              itemCount={itemCount}
-              itemSize={110}
+              rowCount={itemCount}
+              rowHeight={110}
               width={300}
-              outerRef={droppableProvided.innerRef}
+              ref={ref => {
+                if (ref) {
+                  // eslint-disable-next-line react/no-find-dom-node
+                  const whatHasMyLifeComeTo = ReactDOM.findDOMNode(ref);
+                  // $ExpectError - not checking if HTMLElement
+                  droppableProvided.innerRef(whatHasMyLifeComeTo);
+                }
+                // droppableProvided.innerRef
+              }}
               style={{
                 backgroundColor: getBackgroundColor(
                   snapshot.isDraggingOver,
                   Boolean(snapshot.draggingFromThisWith),
                 ),
                 transition: 'background-color 0.2s ease',
-                padding: grid,
+                // padding: grid,
               }}
-              itemData={quotes}
-            >
-              {Row}
-            </List>
+              rowRenderer={getRow(quotes)}
+            />
           );
         }}
       </Droppable>
@@ -230,7 +237,7 @@ function Board(props: Empty) {
           })}
         </Container>
         <QuoteCountSlider
-          library="react-window"
+          library="react-virtualized"
           count={state.itemCount}
           onCountChange={(count: number) =>
             dispatch({ type: 'CHANGE_COUNT', payload: count })
