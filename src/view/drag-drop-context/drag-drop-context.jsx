@@ -28,7 +28,8 @@ export default function DragDropContext(props: Props) {
   const contextId: ContextId = useMemo(() => `${instanceCount++}`, []);
   const liftInstruction: string =
     props.liftInstruction || preset.liftInstruction;
-  const errorMode: ErrorMode = props.errorMode || 'RECOVER';
+  // TODO: no caps
+  const errorMode: ErrorMode = props.errorMode || 'recover';
 
   // We need the error boundary to be on the outside of App
   // so that it can catch any errors caused by App

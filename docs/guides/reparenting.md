@@ -15,7 +15,7 @@ To get around this issue you need to move the dragging item to another location 
 
 Our cloning API is a first class way of reparenting a `<Draggable />`s into another DOM location while a drag is occurring. When using our cloning API the original `<Draggable />` is removed while the drag is being performed; a new _clone_ is rendered (using `renderClone`) into the container element (controllable using `getContainerForClone`)
 
-Using our cloning API is required for compatibility with [virtual lists](/docs/guides/virtual-lists.md).
+Using our cloning API is required for compatibility with [virtual lists](/docs/patterns/virtual-lists.md).
 
 ```js
 function List(props) {

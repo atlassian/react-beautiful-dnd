@@ -44,6 +44,9 @@ describe('reorder: virtual', () => {
       force: true,
     });
 
+    // This is setting up a chain of commands and this test will not wait
+    // for a 'promise' to resolve. Linting is getting confused by .then
+    // eslint-disable-next-line jest/valid-expect-in-promise
     cy.get('@item-id').then(id => {
       cy.get(getHandleSelector(id))
         .invoke('attr', 'data-index')
