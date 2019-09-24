@@ -122,6 +122,10 @@ type DroppableStateSnapshot = {|
   // What is the id of the draggable that is dragging from this list?
   // Useful for styling the home list when not being dragged over
   draggingFromThisWith: ?DraggableId,
+  // Whether or not the placeholder is actively being used.
+  // This is useful information when working with virtual lists
+  // (See our virtual list guide)
+  isUsingPlaceholder: boolean,
 |};
 ```
 

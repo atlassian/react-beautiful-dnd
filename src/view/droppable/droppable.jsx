@@ -111,13 +111,12 @@ export default function Droppable(props: Props) {
     (): Provided => ({
       innerRef: setDroppableRef,
       placeholder,
-      placeholderInfo: props.placeholder,
       droppableProps: {
         'data-rbd-droppable-id': droppableId,
         'data-rbd-droppable-context-id': contextId,
       },
     }),
-    [contextId, droppableId, placeholder, props.placeholder, setDroppableRef],
+    [contextId, droppableId, placeholder, setDroppableRef],
   );
 
   const isUsingCloneFor: ?DraggableId = useClone ? useClone.dragging.id : null;

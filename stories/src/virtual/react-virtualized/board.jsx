@@ -105,13 +105,9 @@ const Column = React.memo(function Column(props: ColumnProps) {
           droppableProvided: DroppableProvided,
           snapshot: DroppableStateSnapshot,
         ) => {
-          // TODO: should snapshot include `placeholder` data?
-          const itemCount: number = (() => {
-            if (snapshot.isDraggingOver && !snapshot.draggingFromThisWith) {
-              return quotes.length + 1;
-            }
-            return quotes.length;
-          })();
+          const itemCount: number = snapshot.isUsingPlaceholder
+            ? quotes.length + 1
+            : quotes.length;
 
           return (
             <List

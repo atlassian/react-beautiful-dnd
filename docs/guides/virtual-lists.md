@@ -6,9 +6,9 @@
 
 A "virtual list" is the name given to a _windowing_ performance optimisation technique where only the **visible** list items are rendered.
 
-[TODO: GIF]
+![windowing](https://user-images.githubusercontent.com/2182637/65490523-a7307980-def0-11e9-9991-a7e0c2a6e30a.gif)
 
-> See [Rendering large lists with react-window](https://addyosmani.com/blog/react-window/) By Addy Osmani
+> Diagram from [Creating more efficient React views with windowing](https://bvaughn.github.io/forward-js-2017/#/0/0) by Brain Vaugh. See [Rendering large lists with react-window](https://addyosmani.com/blog/react-window/) By Addy Osmani for more background on virtual lists
 
 Keep in mind that there are drawbacks with using virtual lists. The biggest are poor accessiblity and findability. When using windowing non visible items are not rendered in the DOM. This means that inbuilt browser behaviours like
 
@@ -103,7 +103,7 @@ function render(provided: DroppableProvided, snapshot: DroppableStateSnapshot) {
   // Add an extra item to our list to make space for a dragging item
   // Usually the DroppableProvided.placeholder does this, but that won't
   // work in a virtual list
-  const itemCount: number = provided.placeholderInfo
+  const itemCount: number = snapshot.isUsingPlaceholder
     ? quotes.length + 1
     : quotes.length;
 

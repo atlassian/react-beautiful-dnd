@@ -107,7 +107,7 @@ const Column = React.memo(function Column(props: ColumnProps) {
           // Add an extra item to our list to make space for a dragging item
           // Usually the DroppableProvided.placeholder does this, but that won't
           // work in a virtual list
-          const itemCount: number = droppableProvided.placeholderInfo
+          const itemCount: number = snapshot.isUsingPlaceholder
             ? quotes.length + 1
             : quotes.length;
 

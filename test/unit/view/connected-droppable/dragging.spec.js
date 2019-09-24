@@ -36,6 +36,7 @@ describe('home list', () => {
       isDraggingOver: true,
       draggingOverWith: preset.inHome1.descriptor.id,
       draggingFromThisWith: preset.inHome1.descriptor.id,
+      isUsingPlaceholder: true,
     },
     useClone: null,
   };
@@ -110,6 +111,7 @@ describe('home list', () => {
         isDraggingOver: false,
         draggingOverWith: null,
         draggingFromThisWith: preset.inHome1.descriptor.id,
+        isUsingPlaceholder: true,
       },
       useClone: null,
     };
@@ -176,6 +178,7 @@ describe('foreign list', () => {
         isDraggingOver: true,
         draggingFromThisWith: null,
         draggingOverWith: preset.inHome1.descriptor.id,
+        isUsingPlaceholder: true,
       },
       useClone: null,
     };

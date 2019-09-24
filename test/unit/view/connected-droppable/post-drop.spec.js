@@ -26,6 +26,7 @@ const isOverHomeMapProps: MapProps = {
     isDraggingOver: true,
     draggingOverWith: preset.inHome1.descriptor.id,
     draggingFromThisWith: preset.inHome1.descriptor.id,
+    isUsingPlaceholder: true,
   },
   useClone: null,
 };
