@@ -1,6 +1,6 @@
 # Virtual lists
 
-`react-beautiful-dnd` supports drag and drop with virtual lists and connected virtual lists. This lets you have fantastic performance with very large data sets. As a general rule, you will want to start using a virtual list when your list size is more than 500 items.
+`react-beautiful-dnd` supports drag and drop within and between virtual lists. This lets you have fantastic performance with very large data sets. As a general rule, you will want to start using a virtual list when your list size is more than 500 items.
 
 ## Background: what are virtual lists?
 
@@ -8,9 +8,14 @@ A "virtual list" is the name given to a _windowing_ performance optimisation tec
 
 ![windowing](https://user-images.githubusercontent.com/2182637/65490523-a7307980-def0-11e9-9991-a7e0c2a6e30a.gif)
 
-> Diagram from [Creating more efficient React views with windowing](https://bvaughn.github.io/forward-js-2017/#/0/0) by Brain Vaugh. See [Rendering large lists with react-window](https://addyosmani.com/blog/react-window/) By Addy Osmani for more background on virtual lists
+> Diagram from [Creating more efficient React views with windowing](https://bvaughn.github.io/forward-js-2017/#/0/0) by Brain Vaugh. See [Rendering large lists with react-window](https://addyosmani.com/blog/react-window/) by Addy Osmani for more background on virtual lists
 
-Keep in mind that there are drawbacks with using virtual lists. The biggest are poor accessiblity and findability. When using windowing non visible items are not rendered in the DOM. This means that inbuilt browser behaviours like
+Keep in mind that there are drawbacks with using virtual lists. The biggest are poor accessiblity and findability.
+
+- Accessibility: is not great as a screenreader cannot read out all of the content of a page
+- Findability:
+
+TODO!!
 
 ## Support
 
