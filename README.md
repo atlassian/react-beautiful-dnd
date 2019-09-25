@@ -49,7 +49,8 @@ We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/
 - [Auto scrolling](/docs/guides/auto-scrolling.md) - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
 - Custom drag handles - you can drag a whole item by just a part of it
 - Able to move the dragging item to another element while dragging (clone, portal) - [Reparenting your `<Draggable />`](/docs/guides/reparenting.md)
-- Full [programmatic api 🎮](/docs/sensors/programmatic.md)
+- [Create scripted drag and drop experiences 🎮](/docs/sensors/sensor-api.md)
+- Allows extensions to support for [any input type you like 🕹](/docs/sensors/sensor-api.md)
 - 🌲 Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) package
 - A `<Droppable />` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
@@ -86,7 +87,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [Mouse dragging 🐭](/docs/sensors/mouse.md)
 - [Touch dragging 👉📱](/docs/sensors/touch.md)
 - [Keyboard dragging 🎹♿️](/docs/sensors/keyboard.md)
-- [Programmatic dragging 🎮](/docs/sensors/programmatic.md)
+- [Create your own sensor](/docs/sensors/sensor-api.md) (allows for any input type as well as scripted experiences)
 
 ### API 🏋️‍
 
