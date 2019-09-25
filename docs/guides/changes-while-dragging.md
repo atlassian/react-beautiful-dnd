@@ -2,7 +2,7 @@
 
 > For virtual list support see our [virtual list pattern](/docs/patterns/virtual-lists.md)
 
-> ❌ **This behaviour is only supported in `11.x`**. We do plan on supporting this behaviour again in a future release `minor` release. We needed to cut this existing behaviour order to get `12.x` across the line. Going forward, tree behaviour will be supported on the latest version. We know this sucks, but we thought it better to move things forward.
+> ❌ **This behaviour is only supported in `11.x`**. We do plan on supporting this type of behaviour again in a future `minor` release. We needed to cut this existing behaviour order to get `12.x` across the line. Going forward, tree behaviour will be supported on the latest version. We know this sucks, but we thought it better to move things forward.
 
 `react-beautiful-dnd` supports the addition and removal of `<Draggable />`s during a drag.
 

@@ -4,18 +4,16 @@
 
 ## Background: what are virtual lists?
 
-A "virtual list" is the name given to a _windowing_ performance optimisation technique where only the **visible** list items are rendered.
+A "virtual list" is the name given to a _windowing_ performance optimisation technique where only the **visible** list items are rendered. See [Rendering large lists with react-window](https://addyosmani.com/blog/react-window/) by Addy Osmani for more background on virtual lists
 
 ![windowing](https://user-images.githubusercontent.com/2182637/65490523-a7307980-def0-11e9-9991-a7e0c2a6e30a.gif)
 
-> Diagram from [Creating more efficient React views with windowing](https://bvaughn.github.io/forward-js-2017/#/0/0) by Brain Vaugh. See [Rendering large lists with react-window](https://addyosmani.com/blog/react-window/) by Addy Osmani for more background on virtual lists
+> Diagram from [Creating more efficient React views with windowing](https://bvaughn.github.io/forward-js-2017/#/0/0) by Brain Vaughn
 
-Keep in mind that there are drawbacks with using virtual lists. The biggest are poor accessiblity and findability.
+There are drawbacks with using virtual lists. They stem from the fact that with a virtual list not all of the page content is rendered into the DOM.
 
-- Accessibility: is not great as a screenreader cannot read out all of the content of a page
-- Findability:
-
-TODO!!
+- Accessibility: screenreaders cannot read out all of the content of a page
+- Findability: native find (<kbd>meta</kbd> + <kbd>f</kbd>) will not find things that are not rendered in the DOM.
 
 ## Support
 
@@ -23,7 +21,7 @@ TODO!!
 
 ## Usage
 
-`react-beautiful-dnd` does not provide it's own virtual list library so there is a bit of wiring that you will need to do in order to get going with virtual lists 🛠
+`react-beautiful-dnd` does not provide it's own virtual list abstraction so there is a bit of wiring that you will need to do in order to get going with existing virtual list solutions 🛠
 
 ### Enable overscanning
 
@@ -66,6 +64,8 @@ When using a virtual list the original dragging item can be unmounted during a d
 ```
 
 ### Stand in for the placeholder
+
+> 👋 This is only required when you have multiple connected lists. This is not required when using a single list
 
 Usually we require consumers to put a `placeholder` (`<Droppable /> | DroppableProvided | placeholder`) into the list so that we can insert space into a list as needing during a drag.
 

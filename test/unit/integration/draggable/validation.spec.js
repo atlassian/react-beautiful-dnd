@@ -18,75 +18,57 @@ afterEach(() => {
   warn.mockClear();
 });
 
-it('should log an error if no draggableId is provided', () => {
-  function App() {
-    return (
-      <DragDropContext onDragEnd={() => {}} errorMode="abort">
-        <Droppable droppableId="droppable">
-          {(droppableProvided: DroppableProvided) => (
-            <div
-              ref={droppableProvided.innerRef}
-              {...droppableProvided.droppableProps}
-            >
-              {/* $ExpectError no draggable id */}
-              <Draggable index={0}>
-                {(provided: DraggableProvided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                  >
-                    Drag me!
-                  </div>
-                )}
-              </Draggable>
-              {droppableProvided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+type Props = {|
+  draggableId: any,
+  index: any,
+|};
+
+function WithCustomProps(props: Props) {
+  return (
+    <DragDropContext onDragEnd={() => {}} errorMode="abort">
+      <Droppable droppableId="droppable">
+        {(droppableProvided: DroppableProvided) => (
+          <div
+            ref={droppableProvided.innerRef}
+            {...droppableProvided.droppableProps}
+          >
+            <Draggable draggableId={props.draggableId} index={props.index}>
+              {(provided: DraggableProvided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                >
+                  Drag me!
+                </div>
+              )}
+            </Draggable>
+            {droppableProvided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+}
+
+it('should log an error if draggableId is not a string', () => {
+  [1, undefined, false, {}].forEach((value: mixed) => {
+    const { unmount } = render(
+      <WithCustomProps draggableId={value} index={0} />,
     );
-  }
 
-  render(<App />);
+    expect(error).toHaveBeenCalled();
 
-  expect(error).toHaveBeenCalled();
+    unmount();
+    error.mockClear();
+  });
 });
 
 it('should log an error if index is not an integer', () => {
-  function App(props: { index: mixed }) {
-    return (
-      <DragDropContext onDragEnd={() => {}} errorMode="abort">
-        <Droppable droppableId="droppable">
-          {(droppableProvided: DroppableProvided) => (
-            <div
-              ref={droppableProvided.innerRef}
-              {...droppableProvided.droppableProps}
-            >
-              <Draggable
-                draggableId="draggable"
-                index={((props.index: any): number)}
-              >
-                {(provided: DraggableProvided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                  >
-                    Drag me!
-                  </div>
-                )}
-              </Draggable>
-              {droppableProvided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-    );
-  }
-
   ['1', 1.33, undefined, false, {}].forEach((value: mixed) => {
-    const { unmount } = render(<App index={value} />);
+    const { unmount } = render(
+      <WithCustomProps draggableId="draggable" index={value} />,
+    );
 
     expect(error).toHaveBeenCalled();
 

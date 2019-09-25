@@ -33,6 +33,7 @@ type RowProps = {
   style: Object,
 };
 
+// Using memo
 const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
   const quote: ?Quote = quotes[index];
 

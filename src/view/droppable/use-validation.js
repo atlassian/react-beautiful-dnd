@@ -24,6 +24,10 @@ function runChecks(args: Args, checks: CheckFn[]) {
 const shared: CheckFn[] = [
   function required({ props }: Args) {
     invariant(props.droppableId, 'A Droppable requires a droppableId prop');
+    invariant(
+      typeof props.droppableId === 'string',
+      `A Droppable requires a [string] droppableId. Provided: [${typeof props.droppableId}]`,
+    );
   },
   function boolean({ props }: Args) {
     invariant(

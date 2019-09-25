@@ -40,7 +40,7 @@ export default (store: MiddlewareStore) => {
       eventName: 'scroll',
       // capture: true will catch all scroll events, event from scroll containers
       // once: just in case, we only want to ever fire one
-      options: { capture: true, passive: false },
+      options: { capture: true, passive: false, once: true },
       fn: function flushDropAnimation() {
         const state: State = store.getState();
         if (state.phase === 'DROP_ANIMATING') {
@@ -56,6 +56,7 @@ export default (store: MiddlewareStore) => {
     // TODO: why is a second window scroll being fired?
     // It leads to funny drop positions :(
     frameId = requestAnimationFrame(() => {
+      frameId = null;
       unbind = bindEvents(window, [binding]);
     });
   };
