@@ -1,4 +1,4 @@
-# Focus
+# Browser focus
 
 > "You got to focus on what's real, man" - [Jake from Adventure time](https://www.youtube.com/watch?v=TFGz6Qvg1CE)
 

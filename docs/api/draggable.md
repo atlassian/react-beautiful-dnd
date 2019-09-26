@@ -226,7 +226,7 @@ Any force press action will cancel an existing or pending drag
 
 #### Focus retention
 
-See [our focus guide](/docs/guides/focus.md)
+See [our focus guide](/docs/guides/browser-focus.md)
 
 #### Extending `DraggableProps.style`
 

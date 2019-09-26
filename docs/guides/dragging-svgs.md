@@ -10,7 +10,7 @@ We require that a `<Draggable />` and its drag handle be a `HTMLElement`. Almost
 
 ## Focus management
 
-We use and manipulate focus on a drag handle during a drag if it is needed. This is especially true for keyboard dragging that relies on focus management. See our [focus guide](/docs/guides/focus.md).
+We use and manipulate focus on a drag handle during a drag if it is needed. This is especially true for keyboard dragging that relies on focus management. See our [focus guide](/docs/guides/browser-focus.md).
 
 ## Enter [`SVGElement`](https://developer.mozilla.org/en-US/docs/Web/API/SVGElement) 🖼
 

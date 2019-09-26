@@ -32,7 +32,7 @@ Please raise a pull request if you would like to add examples for other virtuali
 
 - [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--list) [source](/stories/src/virtual/react-virtualized/list.jsx)
 - [Board](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--board) [source](/stories/src/virtual/react-virtualized/board.jsx)
-- [With window scrolling](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--window-list) [source](/stories/src/virtual/react-virtualized/window-list.jsx) ([`WindowScroller`](https://github.com/bvaughn/react-virtualized/blob/master/docs/WindowScroller.md))
+- [List with `WindowScroller`](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--window-list) [source](/stories/src/virtual/react-virtualized/window-list.jsx) ([`WindowScroller`](https://github.com/bvaughn/react-virtualized/blob/master/docs/WindowScroller.md))
 
 ## Usage
 
