@@ -119,7 +119,7 @@ export default (registry: Registry, callbacks: Callbacks) => {
       `Cannot update the scroll on Droppable ${id} as it is not registered`,
     );
 
-    callbacks.updateDroppableScroll({ id, offset: newScroll });
+    callbacks.updateDroppableScroll({ id, newScroll });
   };
 
   const scrollDroppable = (id: DroppableId, change: Position) => {

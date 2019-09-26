@@ -225,7 +225,7 @@ export default (state: State = idle, action: Action): State => {
       `${action.type} not permitted in phase ${state.phase}`,
     );
 
-    const { id, offset } = action.payload;
+    const { id, newScroll } = action.payload;
     const target: ?DroppableDimension = state.dimensions.droppables[id];
 
     // This is possible if a droppable has been asked to watch scroll but
@@ -234,7 +234,7 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    const scrolled: DroppableDimension = scrollDroppable(target, offset);
+    const scrolled: DroppableDimension = scrollDroppable(target, newScroll);
     return postDroppableChange(state, scrolled, false);
   }
 

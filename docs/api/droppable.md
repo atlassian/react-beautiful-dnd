@@ -58,7 +58,7 @@ type Direction = 'horizontal' | 'vertical';
 - `ignoreContainerClipping`: When a `<Droppable />` is inside a scrollable container its area is constrained so that you can only drop on the part of the `<Droppable />` that you can see. Setting this prop opts out of this behavior, allowing you to drop anywhere on a `<Droppable />` even if it's visually hidden by a scrollable parent. The default behavior is suitable for most cases so odds are you'll never need to use this prop, but it can be useful if you've got very long `<Draggable />`s inside a short scroll container. Keep in mind that it might cause some unexpected behavior if you have multiple `<Droppable />`s inside scroll containers on the same page.
 - `mode`: `standard` (default) or `virtual`. Used to designate a list as a virtual list. See our [virtual lists pattern](/docs/patterns/virtual-lists.md)
 - `renderClone`: used to render a clone (replacement) of the dragging `<Draggable />` while a drag is occurring. See our [reparenting guide](/docs/guides/reparenting.md) for usage details. **A clone must be used for [virtual lists](/docs/patterns/virtual-lists.md).** You can use a clone without using virtual lists
-- `getContainerForClone`: a function that returns the containing element (parent element) for a clone during a drag. See our [reparenting guide](/docs/guides/reparenting).
+- `getContainerForClone`: a function that returns the containing element (parent element) for a clone during a drag. See our [reparenting guide](/docs/guides/reparenting.md).
 
 ## Children function
 

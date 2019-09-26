@@ -84,7 +84,7 @@ describe('responding to scroll changes', () => {
     marshal.updateDroppableScroll(critical.droppable.id, { x: 10, y: 20 });
     expect(callbacks.updateDroppableScroll).toHaveBeenCalledWith({
       id: critical.droppable.id,
-      offset: { x: 10, y: 20 },
+      newScroll: { x: 10, y: 20 },
     });
   });
 

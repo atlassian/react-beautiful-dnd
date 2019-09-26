@@ -106,7 +106,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [Using `innerRef`](/docs/guides/using-inner-ref.md)
 - [Developer warnings and how to disable them](/docs/guides/developer-warnings.md)
 - [Rules for `draggableId` and `droppableId`s](/docs/guides/identifiers.md)
-- [Focus management](/docs/guides/focus.md)
+- [Browser focus retention](/docs/guides/focus.md)
 - [Customising or skipping the drop animation](/docs/guides/drop-animation.md)
 - [Auto scrolling](/docs/guides/auto-scrolling.md)
 - [Controlling the screen reader](/docs/guides/screen-reader.md)

@@ -74,7 +74,7 @@ export const collectionStarting = (): CollectionStartingAction => ({
 
 export type UpdateDroppableScrollArgs = {
   id: DroppableId,
-  offset: Position,
+  newScroll: Position,
 };
 
 export type UpdateDroppableScrollAction = {|

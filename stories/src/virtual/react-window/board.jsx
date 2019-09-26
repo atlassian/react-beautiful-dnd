@@ -38,10 +38,12 @@ const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
   const quote: ?Quote = quotes[index];
 
   // We are rendering an extra item for the placeholder
+  // Do do this we increased our data set size to include one 'fake' item
   if (!quote) {
     return null;
   }
 
+  // Faking some nice spacing around the items
   const patchedStyle = {
     ...style,
     left: style.left + grid,
@@ -125,6 +127,7 @@ const Column = React.memo(function Column(props: ColumnProps) {
                   Boolean(snapshot.draggingFromThisWith),
                 ),
                 transition: 'background-color 0.2s ease',
+                // We add this spacing so that when we drop into an empty list we will animate to the correct visual position.
                 padding: grid,
               }}
               itemData={quotes}

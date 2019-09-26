@@ -56,7 +56,7 @@ function List(props) {
 
 You can also reuse the `<Draggable /> | DraggableChildrenFn` if you want too!
 
-````js
+```js
 const getRenderItem = (items) => (provided, snapshot, descriptor) => (
   <div
     {...provided.draggableProps}
@@ -86,8 +86,9 @@ function List(props) {
     </Droppable>
   );
 }
+```
 
-### `<Droppable />` | `renderClone`
+### `<Droppable /> | \renderClone`
 
 This function is called to get a clone to be rendered while dragging.
 
@@ -105,7 +106,7 @@ type DraggableChildrenFn = (
 
 > This is the same `type` as the child function for a `<Draggable />`. [See `<Draggable />` for more details](/docs/api/draggable.md).
 
-### `<Droppable />` | `getContainerForClone`
+### `<Droppable /> | getContainerForClone`
 
 A function that is called to get the DOM element you would like to put the clone into. If function is not defined, then `document.body` is used
 
@@ -126,4 +127,3 @@ If you are doing drag and drop reordering within a `<table>` we have created a p
 Keep in mind that anything that is reparented will be rendered from scratch. So you do not want to be moving large component trees into a `portal`: otherwise you will experience large UI jank. We do not using reparenting out of the box because of this performance drawback.
 
 [← Back to documentation](/README.md#documentation-)
-````
