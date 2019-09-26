@@ -113,6 +113,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [Use the html5 `doctype`](/docs/guides/doctype.md)
 - [`TypeScript` and `flow`](/docs/guides/types.md)
 - [Dragging `<svg>`s](/docs/guides/dragging-svgs.md)
+- [Avoiding image flickering](/docs/guides/avoiding-image-flickering.md)
 - [Non-visible preset styles](/docs/guides/preset-styles.md)
 - [How we detect scroll containers](/docs/guides/how-we-detect-scroll-containers.md)
 - [How we use dom events](/docs/guides/how-we-use-dom-events.md) - _Useful if you need to build on top of `react-beautiful-dnd`_
