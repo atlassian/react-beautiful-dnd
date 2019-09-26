@@ -3,14 +3,10 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 import { colors } from '@atlaskit/theme';
 import type { Author, Quote, QuoteMap } from './types';
-// $ExpectError - flow cannot resolve the import
-import finnImg from '!!url-loader!../static/media/finn-min.png';
-// $ExpectError - flow cannot resolve the import
-import bmoImg from '!!url-loader!../static/media/bmo-min.png';
-// $ExpectError - flow cannot resolve the import
-import princessImg from '!!url-loader!../static/media/princess-min.png';
-// $ExpectError - flow cannot resolve the import
-import jakeImg from '!!url-loader!../static/media/jake-min.png';
+import finnImg from '../static/media/finn-min.png';
+import bmoImg from '../static/media/bmo-min.png';
+import princessImg from '../static/media/princess-min.png';
+import jakeImg from '../static/media/jake-min.png';
 
 const jake: Author = {
   id: '1',
