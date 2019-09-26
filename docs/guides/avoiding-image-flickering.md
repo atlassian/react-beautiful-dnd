@@ -15,7 +15,9 @@ The big idea is you want to allow the browser to load the image **instantly** wh
 
 Here are some ways you can do that:
 
-### Cache control
+### HTTP cache headers
+
+> Heroku has a nice [HTTP cache headers guide](https://devcenter.heroku.com/articles/increasing-application-performance-with-http-cache-headers)
 
 [TODO](TODO)
 
