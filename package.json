@@ -136,8 +136,6 @@
     "stylelint-config-standard": "^19.0.0",
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.8.0",
-    "testcafe-reporter-xunit": "^2.1.0",
-    "url-loader": "^2.1.0",
     "wait-port": "^0.2.2",
     "webpack": "^4.41.0"
   },

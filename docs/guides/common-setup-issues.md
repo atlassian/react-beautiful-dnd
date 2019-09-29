@@ -8,11 +8,11 @@ For detectable setup issues we try to log information in the `console` for `deve
 
 ## React version
 
-Please ensure that you meet our peer dependency version of `React`. Your React version needs to be greater than or equal to `16.3.1`.
+Please ensure that you meet our peer dependency version of `React`. Your React version needs to be greater than or equal to `16.8.5`.
 
 If you want to know what React version you are on take a look at your [`package.json`](https://docs.npmjs.com/files/package.json) or use `console.log(React.version)`.
 
-If you are not sure if your `package.json` version satisfies `16.3.1` have a read of [npm: about semantic versioning](https://docs.npmjs.com/about-semantic-versioning) and try out the [npm sermver calculator](https://semver.npmjs.com/)
+If you are not sure if your `package.json` version satisfies `16.8.5` have a read of [npm: about semantic versioning](https://docs.npmjs.com/about-semantic-versioning) and try out the [npm sermver calculator](https://semver.npmjs.com/)
 
 ## No duplicate ids
 

@@ -26,7 +26,7 @@ Keep in mind that internally `react-beautiful-dnd` is not aware of multi drag. T
 
 ## Selection
 
-Before a drag starts we need to allow the user to _optionally_ select a number of `<Draggable />`s to drag. We an item is selected you should apply a style update to the `<Draggable />` such as a background color change to indicate that the item is selected.
+Before a drag starts we need to allow the user to _optionally_ select a number of `<Draggable />`s to drag. When an item is selected you should apply a style update to the `<Draggable />` such as a background color change to indicate that the item is selected.
 
 ### Selection interaction recommendations
 
