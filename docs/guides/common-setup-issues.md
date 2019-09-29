@@ -69,4 +69,8 @@ We recommend you set a `min-height` or `min-width` on a `<Droppable />` to ensur
 
 We go over this in our [Get started with `react-beautiful-dnd` course](https://egghead.io/lessons/react-move-items-between-columns-with-react-beautiful-dnd-using-ondragend)
 
+## Image flickering in a `<Draggable />`
+
+See our [avoiding image flickering guide](/docs/guides/avoiding-image-flickering.md)
+
 [← Back to documentation](/README.md#documentation-)

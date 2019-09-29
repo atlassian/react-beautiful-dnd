@@ -73,7 +73,7 @@ export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
     [tryGiveFocus],
   );
 
-  function tryRecordFocus(id: DraggableId) {
+  const tryRecordFocus = useCallback(function tryRecordFocus(id: DraggableId) {
     // clear any existing record
     recordRef.current = null;
 
@@ -90,7 +90,7 @@ export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
     }
 
     recordRef.current = id;
-  }
+  }, []);
 
   useLayoutEffect(() => {
     return function clearFrameOnUnmount() {
@@ -108,7 +108,7 @@ export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
       tryRestoreFocusRecorded,
       tryShiftRecord,
     }),
-    [register, tryRestoreFocusRecorded, tryShiftRecord],
+    [register, tryRecordFocus, tryRestoreFocusRecorded, tryShiftRecord],
   );
 
   return marshal;
