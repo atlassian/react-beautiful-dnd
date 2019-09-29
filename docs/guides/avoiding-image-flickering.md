@@ -47,3 +47,5 @@ You will want to keep your image sizes fairly small.
 ### Really anything else!
 
 The big idea is that you don't want to be calling the server to refetch an image that has already been fetched. So anything you can use to do client side caching of images is fine. You could even use [service workers](https://developers.google.com/web/ilt/pwa/caching-files-with-service-worker) if you want!
+
+[← Back to documentation](/README.md#documentation-)

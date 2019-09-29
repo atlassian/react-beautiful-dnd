@@ -5,7 +5,7 @@ import { getHandleSelector } from './util';
 
 describe('reorder: virtual', () => {
   beforeEach(() => {
-    cy.visit('/iframe.html?id=virtual--list-with-react-window');
+    cy.visit('/iframe.html?id=virtual-react-window--list');
   });
 
   it('should reorder within a list', () => {
@@ -35,7 +35,8 @@ describe('reorder: virtual', () => {
       cy.get('@item')
         .trigger('keydown', { keyCode: keyCodes.arrowDown, force: true })
         // finishing before the movement time is fine - but this looks nice
-        .wait(timings.outOfTheWay * 1000);
+        // waiting longer than we should (timings.outOfTheWay * 1000) as electron is being strange
+        .wait(timings.outOfTheWay * 1000 * 1.5);
     });
 
     // drop
