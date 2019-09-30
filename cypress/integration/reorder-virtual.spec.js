@@ -36,7 +36,7 @@ describe('reorder: virtual', () => {
         .trigger('keydown', { keyCode: keyCodes.arrowDown, force: true })
         // finishing before the movement time is fine - but this looks nice
         // waiting longer than we should (timings.outOfTheWay * 1000) as electron is being strange
-        .wait(timings.outOfTheWay * 1000 * 1.5);
+        .wait(timings.outOfTheWay * 1000 * 2);
     });
 
     // drop
