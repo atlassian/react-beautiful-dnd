@@ -42,7 +42,15 @@ type Props = {|
 > `react-beautiful-dnd` will throw an error if a required prop is not provided
 
 - `draggableId`: A _required_ `DraggableId(string)`. See our [identifiers guide](/docs/guides/identifiers.md) for more information.
-- `index`: A _required_ `number` that matches the order of the `<Draggable />` in the `<Droppable />`. It is simply the index of the `<Draggable />` in the list. The `index` needs to be unique within a `<Droppable />` but does not need to be unique between `Droppables`. The `index`s in a list must start from `0` and be consecutive. `[0, 1, 2]` and not `[1, 2, 8]`. Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
+- `index`: A _required_ `number` that matches the order of the `<Draggable />` in the `<Droppable />`. It is simply the index of the `<Draggable />` in the list.
+
+`index` rules:
+
+- Must be unique with a `<Droppable />` (no duplicates)
+- Must be consecutive. `[0, 1, 2]` and not `[1, 2, 8]`
+- Does not need to start from `0` (this is often the case in virtual lists)
+
+Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
 
 ```js
 {
@@ -200,7 +208,7 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 `react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `<Draggable />` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue.
 
-To get around this you can [reparent your <Draggable />](/docs/patterns/reparenting.md). We do not enable this functionality by default as it has performance problems.
+To get around this you can [reparent your <Draggable />](/docs/guides/reparenting.md). We do not enable this functionality by default as it has performance problems.
 
 #### Force press
 
@@ -226,7 +234,7 @@ Any force press action will cancel an existing or pending drag
 
 #### Focus retention
 
-See [our focus guide](/docs/guides/focus.md)
+See [our focus guide](/docs/guides/browser-focus.md)
 
 #### Extending `DraggableProps.style`
 

@@ -22,6 +22,10 @@ A id must uniquely identify a `<Draggable />` or `<Droppable />` within a `<Drag
 
 The id must also be unique even if the `type` argument on the `<Droppable />` is different.
 
+## Ids must be a string
+
+Right now it is important that all `Id`'s be strings. `rbd` will throw an error if an `Id` is not a string.
+
 ## Avoid reusing ids
 
 For simplicity, it is best to avoid changing a `draggableId` or `droppableId` when a reorder occurs. The safest option is to associate an id with an piece of data and do not update the id between reorders.

@@ -41,7 +41,7 @@ import {
 } from '../../state/action-creators';
 import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
-import useDragHandleDescription from '../use-lift-instruction';
+import useLiftInstruction from '../use-lift-instruction';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
 import usePrevious from '../use-previous-ref';
@@ -93,7 +93,7 @@ export default function App(props: Props) {
 
   const announce: Announce = useAnnouncer(contextId);
 
-  const liftInstructionId: ElementId = useDragHandleDescription(
+  const liftInstructionId: ElementId = useLiftInstruction(
     contextId,
     liftInstruction,
   );

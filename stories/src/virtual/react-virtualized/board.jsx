@@ -34,14 +34,18 @@ type RowProps = {
   style: Object,
 };
 
-const getRow = (quotes: Quote[]) => ({ index, style }: RowProps) => {
+// Using a higher order function so that we can look up the quotes data to retrieve
+// our quote from within the rowRender function
+const getRowRender = (quotes: Quote[]) => ({ index, style }: RowProps) => {
   const quote: ?Quote = quotes[index];
 
-  // placeholder :D
+  // We are rendering an extra item for the placeholder
+  // Do do this we increased our data set size to include one 'fake' item
   if (!quote) {
     return null;
   }
 
+  // Faking some nice spacing around the items
   const patchedStyle = {
     ...style,
     left: style.left + grid,
@@ -105,13 +109,9 @@ const Column = React.memo(function Column(props: ColumnProps) {
           droppableProvided: DroppableProvided,
           snapshot: DroppableStateSnapshot,
         ) => {
-          // TODO: should snapshot include `placeholder` data?
-          const itemCount: number = (() => {
-            if (snapshot.isDraggingOver && !snapshot.draggingFromThisWith) {
-              return quotes.length + 1;
-            }
-            return quotes.length;
-          })();
+          const itemCount: number = snapshot.isUsingPlaceholder
+            ? quotes.length + 1
+            : quotes.length;
 
           return (
             <List
@@ -120,13 +120,15 @@ const Column = React.memo(function Column(props: ColumnProps) {
               rowHeight={110}
               width={300}
               ref={ref => {
+                // react-virtualized has no way to get the list's ref that I can so
+                // So we use the `ReactDOM.findDOMNode(ref)` escape hatch to get the ref
                 if (ref) {
                   // eslint-disable-next-line react/no-find-dom-node
                   const whatHasMyLifeComeTo = ReactDOM.findDOMNode(ref);
-                  // $ExpectError - not checking if HTMLElement
-                  droppableProvided.innerRef(whatHasMyLifeComeTo);
+                  if (whatHasMyLifeComeTo instanceof HTMLElement) {
+                    droppableProvided.innerRef(whatHasMyLifeComeTo);
+                  }
                 }
-                // droppableProvided.innerRef
               }}
               style={{
                 backgroundColor: getBackgroundColor(
@@ -134,9 +136,8 @@ const Column = React.memo(function Column(props: ColumnProps) {
                   Boolean(snapshot.draggingFromThisWith),
                 ),
                 transition: 'background-color 0.2s ease',
-                // padding: grid,
               }}
-              rowRenderer={getRow(quotes)}
+              rowRenderer={getRowRender(quotes)}
             />
           );
         }}

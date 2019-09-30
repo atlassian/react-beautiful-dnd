@@ -1,6 +1,5 @@
 // @flow
-import { useRef, useEffect } from 'react';
-import invariant from 'tiny-invariant';
+import { useEffect } from 'react';
 import { useMemo } from 'use-memo-one';
 import type { ContextId, ElementId } from '../../types';
 import getBodyElement from '../get-body-element';
@@ -14,14 +13,10 @@ export default function useLiftInstruction(
   liftInstruction: string,
 ): ElementId {
   const id: string = useMemo(() => getId(contextId), [contextId]);
-  const ref = useRef<?HTMLElement>(null);
 
   useEffect(
     function mount() {
-      invariant(!ref.current, 'Description node already mounted');
-
       const el: HTMLElement = document.createElement('div');
-      ref.current = el;
 
       // identifier
       el.id = id;
@@ -36,12 +31,8 @@ export default function useLiftInstruction(
       getBodyElement().appendChild(el);
 
       return function unmount() {
-        const toBeRemoved: ?HTMLElement = ref.current;
-        invariant(toBeRemoved, 'Cannot unmount description node');
-
         // Remove from body
-        getBodyElement().removeChild(toBeRemoved);
-        ref.current = null;
+        getBodyElement().removeChild(el);
       };
     },
     [id, liftInstruction],

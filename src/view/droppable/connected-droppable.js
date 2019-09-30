@@ -49,6 +49,7 @@ export const makeMapStateToProps = (): Selector => {
       isDraggingOver: false,
       draggingOverWith: null,
       draggingFromThisWith: null,
+      isUsingPlaceholder: false,
     },
     useClone: null,
   };
@@ -58,73 +59,65 @@ export const makeMapStateToProps = (): Selector => {
     shouldAnimatePlaceholder: false,
   };
 
-  const getMapProps = memoizeOne(
-    (
-      id: DroppableId,
-      isEnabled: boolean,
-      isDraggingOver: boolean,
-      dragging: DraggableDimension,
-      snapshot: StateSnapshot,
-      renderClone: ?DraggableChildrenFn,
-    ): MapProps => {
-      const isHome: boolean = dragging.descriptor.droppableId === id;
+  const getMapProps = memoizeOne((
+    id: DroppableId,
+    isEnabled: boolean,
+    isDraggingOverForConsumer: boolean,
+    isDraggingOverForImpact: boolean,
+    dragging: DraggableDimension,
+    // snapshot: StateSnapshot,
+    renderClone: ?DraggableChildrenFn,
+  ): MapProps => {
+    const draggableId: DraggableId = dragging.descriptor.id;
+    const isHome: boolean = dragging.descriptor.droppableId === id;
 
-      if (isHome) {
-        const useClone: ?UseClone = renderClone
-          ? {
-              render: renderClone,
-              dragging: dragging.descriptor,
-            }
-          : null;
+    if (isHome) {
+      const useClone: ?UseClone = renderClone
+        ? {
+            render: renderClone,
+            dragging: dragging.descriptor,
+          }
+        : null;
 
-        return {
-          placeholder: dragging.placeholder,
-          shouldAnimatePlaceholder: false,
-          snapshot,
-          useClone,
-        };
-      }
-
-      if (!isEnabled) {
-        return idleWithoutAnimation;
-      }
-
-      // not over foreign list - return idle
-      if (!isDraggingOver) {
-        // TODO: needs to be with animation
-        return idleWithAnimation;
-      }
+      const snapshot: StateSnapshot = {
+        isDraggingOver: isDraggingOverForConsumer,
+        draggingOverWith: isDraggingOverForConsumer ? draggableId : null,
+        draggingFromThisWith: draggableId,
+        isUsingPlaceholder: true,
+      };
 
       return {
         placeholder: dragging.placeholder,
-        // Animating placeholder in foreign list
-        shouldAnimatePlaceholder: true,
+        shouldAnimatePlaceholder: false,
         snapshot,
-        useClone: null,
+        useClone,
       };
-    },
-  );
+    }
 
-  const getSnapshot = memoizeOne(
-    (
-      id: DroppableId,
-      isDraggingOver: boolean,
-      dragging: DraggableDimension,
-    ): StateSnapshot => {
-      const draggableId: DraggableId = dragging.descriptor.id;
-      const isHome: boolean = dragging.descriptor.droppableId === id;
-      const draggingOverWith: ?DraggableId = isDraggingOver
-        ? draggableId
-        : null;
-      const draggingFromThisWith: ?DraggableId = isHome ? draggableId : null;
+    if (!isEnabled) {
+      return idleWithoutAnimation;
+    }
 
-      return {
-        isDraggingOver,
-        draggingOverWith,
-        draggingFromThisWith,
-      };
-    },
-  );
+    // not over foreign list - return idle
+    if (!isDraggingOverForImpact) {
+      return idleWithAnimation;
+    }
+
+    const snapshot: StateSnapshot = {
+      isDraggingOver: isDraggingOverForConsumer,
+      draggingOverWith: draggableId,
+      draggingFromThisWith: null,
+      isUsingPlaceholder: true,
+    };
+
+    return {
+      placeholder: dragging.placeholder,
+      // Animating placeholder in foreign list
+      shouldAnimatePlaceholder: true,
+      snapshot,
+      useClone: null,
+    };
+  });
 
   const selector = (state: State, ownProps: OwnProps): MapProps => {
     // not checking if item is disabled as we need the home list to display a placeholder
@@ -146,14 +139,12 @@ export const makeMapStateToProps = (): Selector => {
       );
       const isDraggingOver: boolean = whatIsDraggedOver(state.impact) === id;
 
-      // Snapshot based on current impact
-      const snapshot: StateSnapshot = getSnapshot(id, isDraggingOver, dragging);
       return getMapProps(
         id,
         isEnabled,
         isDraggingOver,
+        isDraggingOver,
         dragging,
-        snapshot,
         renderClone,
       );
     }
@@ -172,18 +163,12 @@ export const makeMapStateToProps = (): Selector => {
       // Snapshot based on result and not impact
       // The result might be null (cancel) but the impact is populated
       // to move everything back
-      const snapshot: StateSnapshot = getSnapshot(
-        id,
-        whatIsDraggedOverFromResult(completed.result) === id,
-        dragging,
-      );
-
       return getMapProps(
         id,
         isEnabled,
+        whatIsDraggedOverFromResult(completed.result) === id,
         whatIsDraggedOver(completed.impact) === id,
         dragging,
-        snapshot,
         renderClone,
       );
     }

@@ -23,6 +23,10 @@ export function useValidation(
       const id: ?DraggableId = props.draggableId;
       // Number.isInteger will be provided by @babel/runtime-corejs2
       invariant(id, 'Draggable requires a draggableId');
+      invariant(
+        typeof id === 'string',
+        `Draggable requires a [string] draggableId. Provided: $[{typeof id}]`,
+      );
 
       invariant(
         Number.isInteger(props.index),

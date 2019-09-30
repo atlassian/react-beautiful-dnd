@@ -43,7 +43,7 @@ All of our built in screen reader messages use `id`'s to identify `<Draggable />
 
 ### Step 1: Introduce draggable item
 
-When a user `tabs` to a _drag handle_, we need to tell them how to start a drag. We do this by using the `liftInstruction` property on a `<DragDropContext />`. All _drag handles_ share the same lift announcement message.
+When a user `tabs` to a _drag handle_, we need to tell them how to start a drag. We do this by using the `liftInstruction` prop on a `<DragDropContext />`. All _drag handles_ share the same lift announcement message.
 
 **Default message**: "Draggable item. Ensure your screen reader is not in browse mode and then press spacebar to lift."
 

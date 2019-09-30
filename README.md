@@ -28,9 +28,9 @@
 
 ## Get started 👩‍🏫
 
-We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help you get started with `react-beautiful-dnd` as quickly as possible.
+We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd?af=2jc3e4) to help you get started with `react-beautiful-dnd` as quickly as possible.
 
-[![course-logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
+[![course-logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd?af=2jc3e4)
 
 ## Currently supported feature set ✅
 
@@ -48,8 +48,9 @@ We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/
 - Compatible with semantic `<table>` reordering - [table pattern](/docs/patterns/tables.md)
 - [Auto scrolling](/docs/guides/auto-scrolling.md) - automatically scroll containers and the window as required during a drag (even with keyboard 🔥)
 - Custom drag handles - you can drag a whole item by just a part of it
-- Able to move the dragging item to another element while dragging (clone, portal) - [Reparenting your `<Draggable />`](/docs/patterns/reparenting.md)
-- Full [programmatic api 🎮](/docs/sensors/programmatic.md)
+- Able to move the dragging item to another element while dragging (clone, portal) - [Reparenting your `<Draggable />`](/docs/guides/reparenting.md)
+- [Create scripted drag and drop experiences 🎮](/docs/sensors/sensor-api.md)
+- Allows extensions to support for [any input type you like 🕹](/docs/sensors/sensor-api.md)
 - 🌲 Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) package
 - A `<Droppable />` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
@@ -73,7 +74,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 
 - [Installation](/docs/about/installation.md)
 - [Examples and samples](/docs/about/examples.md)
-- [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
+- [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd?af=2jc3e4)
 - [Design principles](/docs/about/design-principles.md)
 - [Animations](/docs/about/animations.md)
 - [Accessibility](/docs/about/accessibility.md)
@@ -86,7 +87,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [Mouse dragging 🐭](/docs/sensors/mouse.md)
 - [Touch dragging 👉📱](/docs/sensors/touch.md)
 - [Keyboard dragging 🎹♿️](/docs/sensors/keyboard.md)
-- [Programmatic dragging 🎮](/docs/sensors/programmatic.md)
+- [Create your own sensor](/docs/sensors/sensor-api.md) (allows for any input type as well as scripted experiences)
 
 ### API 🏋️‍
 
@@ -105,23 +106,25 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [Using `innerRef`](/docs/guides/using-inner-ref.md)
 - [Developer warnings and how to disable them](/docs/guides/developer-warnings.md)
 - [Rules for `draggableId` and `droppableId`s](/docs/guides/identifiers.md)
-- [Focus management](/docs/guides/focus.md)
+- [Browser focus retention](/docs/guides/browser-focus.md)
 - [Customising or skipping the drop animation](/docs/guides/drop-animation.md)
 - [Auto scrolling](/docs/guides/auto-scrolling.md)
 - [Controlling the screen reader](/docs/guides/screen-reader.md)
 - [Use the html5 `doctype`](/docs/guides/doctype.md)
 - [`TypeScript` and `flow`](/docs/guides/types.md)
 - [Dragging `<svg>`s](/docs/guides/dragging-svgs.md)
+- [Avoiding image flickering](/docs/guides/avoiding-image-flickering.md)
 - [Non-visible preset styles](/docs/guides/preset-styles.md)
 - [How we detect scroll containers](/docs/guides/how-we-detect-scroll-containers.md)
 - [How we use dom events](/docs/guides/how-we-use-dom-events.md) - _Useful if you need to build on top of `react-beautiful-dnd`_
-- [Adding `<Draggable />`s during a drag](/docs/guides/changes-while-dragging.md) - _⚠️ Advanced_
+- [Adding `<Draggable />`s during a drag (11.x behaviour)](/docs/guides/changes-while-dragging.md) - _⚠️ Advanced_
+- [Setting up Content Security Policy](/docs/guides/content-security-policy.md)
 
 ### Patterns 👷‍
 
 - [Multi drag](/docs/patterns/multi-drag.md)
 - [Tables](/docs/patterns/tables.md)
-- [Reparenting a `<Draggable />`](/docs/patterns/reparenting.md)
+- [Reparenting a `<Draggable />`](/docs/guides/reparenting.md) - _Using our cloning API or your own portal_
 
 ### Support 👩‍⚕️
 

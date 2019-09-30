@@ -44,6 +44,7 @@ describe('home list', () => {
         isDraggingOver: false,
         draggingOverWith: null,
         draggingFromThisWith: preset.inHome1.descriptor.id,
+        isUsingPlaceholder: true,
       },
       useClone: null,
     };

@@ -1,15 +1,13 @@
-# Programmatic dragging 🎮
+# Sensor API 🎮
 
 ![programmatic api logo](https://user-images.githubusercontent.com/2182637/60233733-ec8ade00-98e4-11e9-88b2-6fe407cf6bcb.jpg)
 
-It is possible to drive an entire drag and drop experience programmatically 😱
-
-You can use the programmatic API to:
+With our sensor API it is possible to:
 
 - Create drag and drop interactions from **any input** type you can think of
 - Create beautiful scripted **experiences**
 
-The programmatic API is the same API that our [mouse](/docs/sensors/mouse.md), [keyboard](/docs/sensors/keyboard.md), and [touch](/docs/sensors/touch.md) sensors use. So it is powerful enough to drive any experience we ship out of the box.
+The public sensor API is the same API that our [mouse](/docs/sensors/mouse.md), [keyboard](/docs/sensors/keyboard.md), and [touch](/docs/sensors/touch.md) sensors use. So it is powerful enough to drive any experience we ship out of the box.
 
 ## Overview
 

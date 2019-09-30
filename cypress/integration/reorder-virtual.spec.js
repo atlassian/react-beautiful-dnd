@@ -5,7 +5,7 @@ import { getHandleSelector } from './util';
 
 describe('reorder: virtual', () => {
   beforeEach(() => {
-    cy.visit('/iframe.html?id=virtual--list-with-react-window');
+    cy.visit('/iframe.html?id=virtual-react-window--list');
   });
 
   it('should reorder within a list', () => {
@@ -35,7 +35,8 @@ describe('reorder: virtual', () => {
       cy.get('@item')
         .trigger('keydown', { keyCode: keyCodes.arrowDown, force: true })
         // finishing before the movement time is fine - but this looks nice
-        .wait(timings.outOfTheWay * 1000);
+        // waiting longer than we should (timings.outOfTheWay * 1000) as electron is being strange
+        .wait(timings.outOfTheWay * 1000 * 2);
     });
 
     // drop
@@ -44,7 +45,10 @@ describe('reorder: virtual', () => {
       force: true,
     });
 
-    return cy.get('@item-id').then(id => {
+    // This is setting up a chain of commands and this test will not wait
+    // for a 'promise' to resolve. Linting is getting confused by .then
+    // eslint-disable-next-line jest/valid-expect-in-promise
+    cy.get('@item-id').then(id => {
       cy.get(getHandleSelector(id))
         .invoke('attr', 'data-index')
         .should('equal', `${movements}`);

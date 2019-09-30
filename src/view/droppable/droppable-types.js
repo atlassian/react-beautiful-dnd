@@ -42,6 +42,9 @@ export type StateSnapshot = {|
   // What is the id of the draggable that is dragging from this list?
   // Useful for styling the home list when not being dragged over
   draggingFromThisWith: ?DraggableId,
+  // Whether or not the placeholder is actively being used.
+  // This is useful information when working with virtual lists
+  isUsingPlaceholder: boolean,
 |};
 
 export type MapProps = {|

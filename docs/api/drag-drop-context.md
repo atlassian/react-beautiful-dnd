@@ -20,6 +20,7 @@ type Props = {|
   ...Responders,
   nonce?: string,
   children: ?Node,
+  liftInstruction: ?string,
 |};
 ```
 
@@ -104,5 +105,9 @@ function App() {
 Responders are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
 
 [Please see our Responders guide](/docs/guides/responders.md) for detailed information about responders ❤️
+
+## `liftInstruction`
+
+This is text used as the screen reader lift instruction for *drag-handle*s. We will use our default english message if no liftInstruction is provided. See our [screen reader guide](/docs/guides/screen-reader.md)
 
 [← Back to documentation](/README.md#documentation-)

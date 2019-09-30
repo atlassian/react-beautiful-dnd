@@ -33,14 +33,17 @@ type RowProps = {
   style: Object,
 };
 
+// Memoizing row items for even better performance!
 const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
   const quote: ?Quote = quotes[index];
 
-  // placeholder :D
+  // We are rendering an extra item for the placeholder
+  // Do do this we increased our data set size to include one 'fake' item
   if (!quote) {
     return null;
   }
 
+  // Faking some nice spacing around the items
   const patchedStyle = {
     ...style,
     left: style.left + grid,
@@ -104,13 +107,12 @@ const Column = React.memo(function Column(props: ColumnProps) {
           droppableProvided: DroppableProvided,
           snapshot: DroppableStateSnapshot,
         ) => {
-          // TODO: should snapshot include `placeholder` data?
-          const itemCount: number = (() => {
-            if (snapshot.isDraggingOver && !snapshot.draggingFromThisWith) {
-              return quotes.length + 1;
-            }
-            return quotes.length;
-          })();
+          // Add an extra item to our list to make space for a dragging item
+          // Usually the DroppableProvided.placeholder does this, but that won't
+          // work in a virtual list
+          const itemCount: number = snapshot.isUsingPlaceholder
+            ? quotes.length + 1
+            : quotes.length;
 
           return (
             <List
@@ -125,6 +127,7 @@ const Column = React.memo(function Column(props: ColumnProps) {
                   Boolean(snapshot.draggingFromThisWith),
                 ),
                 transition: 'background-color 0.2s ease',
+                // We add this spacing so that when we drop into an empty list we will animate to the correct visual position.
                 padding: grid,
               }}
               itemData={quotes}

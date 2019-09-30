@@ -8,6 +8,7 @@ const restingProps: MapProps = {
     isDraggingOver: false,
     draggingOverWith: null,
     draggingFromThisWith: null,
+    isUsingPlaceholder: false,
   },
   useClone: null,
 };

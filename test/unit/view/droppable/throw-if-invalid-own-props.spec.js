@@ -17,16 +17,16 @@ it('should throw if no droppableId is provided', () => {
     ...defaultOwnProps,
   };
 
-  // $ExpectError
+  // $ExpectError - not provided
   ownProps.droppableId = undefined;
   expect(() => mount({ ownProps })).toThrow();
 
-  // $ExpectError
+  // $ExpectError - not a string
   ownProps.droppableId = null;
   expect(() => mount({ ownProps })).toThrow();
 
-  // $ExpectError
-  ownProps.droppableId = 0;
+  // $ExpectError - using number
+  ownProps.droppableId = 3;
   expect(() => mount({ ownProps })).toThrow();
 });
 

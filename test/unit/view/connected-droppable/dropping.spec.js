@@ -30,6 +30,7 @@ describe('home list', () => {
         isDraggingOver: true,
         draggingOverWith: preset.inHome1.descriptor.id,
         draggingFromThisWith: preset.inHome1.descriptor.id,
+        isUsingPlaceholder: true,
       },
       useClone: null,
     };
@@ -98,6 +99,8 @@ describe('home list', () => {
         placeholder: preset.inHome1.placeholder,
         shouldAnimatePlaceholder: false,
         snapshot: {
+          // is using a placeholder
+          isUsingPlaceholder: true,
           // still the home list so this is populated
           draggingFromThisWith: preset.inHome1.descriptor.id,
           // cleared from result and cleared version is given to consumer
@@ -121,6 +124,7 @@ describe('home list', () => {
           isDraggingOver: false,
           draggingOverWith: null,
           draggingFromThisWith: preset.inHome1.descriptor.id,
+          isUsingPlaceholder: true,
         },
         useClone: null,
       };

@@ -478,4 +478,4 @@ export type SensorAPI = {|
 
 export type Sensor = (api: SensorAPI) => void;
 
-export type ErrorMode = 'RECOVER' | 'ONLY_ABORT';
+export type ErrorMode = 'recover' | 'abort';

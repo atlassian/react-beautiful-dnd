@@ -64,7 +64,7 @@ export default class ErrorBoundary extends React.Component<Props> {
     }
 
     // If the failure was due to an invariant failure - then we handle the error
-    if (this.props.mode === 'RECOVER' && isInvariant(error)) {
+    if (this.props.mode === 'recover' && isInvariant(error)) {
       this.setState({});
     }
   };
