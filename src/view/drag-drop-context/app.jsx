@@ -29,6 +29,7 @@ import type {
   ElementId,
 } from '../../types';
 import type { Store, Action } from '../../state/store-types';
+import type { SetAppCallbacks, AppCallbacks } from './drag-drop-context-types';
 import StoreContext from '../context/store-context';
 import {
   move,
@@ -51,13 +52,15 @@ import useSensorMarshal from '../use-sensor-marshal/use-sensor-marshal';
 export type Props = {|
   ...Responders,
   contextId: string,
-  setOnError: (onError: Function) => void,
+  setCallbacks: SetAppCallbacks,
   // we do not technically need any children for this component
   children: Node | null,
 
   // sensors
   sensors?: Sensor[],
   enableDefaultSensors?: ?boolean,
+
+  // screen reader
   liftInstruction: string,
 |};
 
@@ -78,7 +81,7 @@ function getStore(lazyRef: LazyStoreRef): Store {
 }
 
 export default function App(props: Props) {
-  const { contextId, setOnError, sensors, liftInstruction } = props;
+  const { contextId, setCallbacks, sensors, liftInstruction } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
@@ -102,7 +105,7 @@ export default function App(props: Props) {
     getStore(lazyStoreRef).dispatch(action);
   }, []);
 
-  const callbacks: DimensionMarshalCallbacks = useMemo(
+  const marshalCallbacks: DimensionMarshalCallbacks = useMemo(
     () =>
       bindActionCreators(
         {
@@ -121,8 +124,8 @@ export default function App(props: Props) {
   const registry: Registry = useRegistry();
 
   const dimensionMarshal: DimensionMarshal = useMemo<DimensionMarshal>(() => {
-    return createDimensionMarshal(registry, callbacks);
-  }, [registry, callbacks]);
+    return createDimensionMarshal(registry, marshalCallbacks);
+  }, [registry, marshalCallbacks]);
 
   const autoScroller: AutoScroller = useMemo<AutoScroller>(
     () =>
@@ -180,9 +183,22 @@ export default function App(props: Props) {
     }
   }, []);
 
+  const isDragging = useCallback((): boolean => {
+    const state: State = getStore(lazyStoreRef).getState();
+    return state.isDragging || state.phase === 'DROP_ANIMATING';
+  }, []);
+
+  const appCallbacks: AppCallbacks = useMemo(
+    () => ({
+      isDragging,
+      tryAbort: tryResetStore,
+    }),
+    [isDragging, tryResetStore],
+  );
+
   // doing this in render rather than a side effect so any errors on the
   // initial mount are caught
-  setOnError(tryResetStore);
+  setCallbacks(appCallbacks);
 
   const getCanLift = useCallback(
     (id: DraggableId) => canStartDrag(getStore(lazyStoreRef).getState(), id),

@@ -1,8 +1,9 @@
 // @flow
 import React, { type Node } from 'react';
 import { useMemo } from 'use-memo-one';
-import type { Responders, ContextId, Sensor, ErrorMode } from '../../types';
-import ErrorBoundary from '../error-boundary';
+import type { Responders, ContextId, Sensor } from '../../types';
+import type { ErrorMode } from './drag-drop-context-types';
+import ErrorBoundary from './error-boundary';
 import preset from '../../screen-reader-message-preset';
 import App from './app';
 
@@ -28,20 +29,23 @@ export default function DragDropContext(props: Props) {
   const contextId: ContextId = useMemo(() => `${instanceCount++}`, []);
   const liftInstruction: string =
     props.liftInstruction || preset.liftInstruction;
-  // TODO: no caps
   const errorMode: ErrorMode = props.errorMode || 'recover';
 
   // We need the error boundary to be on the outside of App
   // so that it can catch any errors caused by App
   return (
     <ErrorBoundary mode={errorMode}>
-      {setOnError => (
-        // $FlowFixMe: errorMode prop
+      {setCallbacks => (
         <App
-          setOnError={setOnError}
           contextId={contextId}
+          setCallbacks={setCallbacks}
           liftInstruction={liftInstruction}
-          {...props}
+          enableDefaultSensors={props.enableDefaultSensors}
+          sensors={props.sensors}
+          onBeforeDragStart={props.onBeforeDragStart}
+          onDragStart={props.onDragStart}
+          onDragUpdate={props.onDragUpdate}
+          onDragEnd={props.onDragEnd}
         >
           {props.children}
         </App>
