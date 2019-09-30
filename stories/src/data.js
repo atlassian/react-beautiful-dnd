@@ -1,6 +1,4 @@
 // @flow
-/* eslint-disable import/no-unresolved */
-/* eslint-disable import/no-webpack-loader-syntax */
 import { colors } from '@atlaskit/theme';
 import type { Author, Quote, QuoteMap } from './types';
 import finnImg from '../static/media/finn-min.png';
