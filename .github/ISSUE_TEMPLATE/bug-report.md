@@ -16,7 +16,7 @@ https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/common-
 In development builds we log warnings to the console for common setup issues. Please have a look to see if it can give you information in overcoming your issue
 
 ## Are you new to rbd?
-If you are new to `react-beautiful-dnd` we recommend taking at look at our getting started course: https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd
+If you are new to `react-beautiful-dnd` we recommend taking at look at our getting started course: https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd?af=2jc3e4
 
 It will give you a good base understanding of how everything fits together. This can often be the best help in overcoming your issue.
 
