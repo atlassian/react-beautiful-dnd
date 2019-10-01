@@ -25,7 +25,7 @@ export function useValidation(
       invariant(id, 'Draggable requires a draggableId');
       invariant(
         typeof id === 'string',
-        `Draggable requires a [string] draggableId. Provided: $[{typeof id}]`,
+        `Draggable requires a [string] draggableId. Provided: [${typeof id}]`,
       );
 
       invariant(

@@ -44,7 +44,9 @@ export default class ErrorBoundary extends React.Component<Props> {
         // eslint-disable-next-line no-console
         console.error('rbd error', error);
       }
+
       this.setState({});
+      return;
     }
 
     // 1. mode === 'recover' and not an RbdInvariant
@@ -53,7 +55,7 @@ export default class ErrorBoundary extends React.Component<Props> {
     throw error;
   }
 
-  onWindowError = () => {
+  onWindowError = (error: Error) => {
     const callbacks: AppCallbacks = this.getCallbacks();
 
     if (callbacks.isDragging()) {
@@ -62,6 +64,13 @@ export default class ErrorBoundary extends React.Component<Props> {
         The active drag has been aborted.
       `);
       callbacks.tryAbort();
+    }
+
+    if (error instanceof RbdInvariant) {
+      if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.error('rbd error', error);
+      }
     }
   };
 

@@ -14,10 +14,10 @@ export function invariant(condition: mixed, message?: string) {
 
   if (isProduction) {
     // In production we strip the message but still throw
-    throw new Error(prefix);
+    throw new RbdInvariant(prefix);
   } else {
     // When not in production we allow the message to pass through
     // *This block will be removed in production builds*
-    throw new Error(`${prefix}: ${message || ''}`);
+    throw new RbdInvariant(`${prefix}: ${message || ''}`);
   }
 }
