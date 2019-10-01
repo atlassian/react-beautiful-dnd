@@ -1,7 +1,7 @@
 // @flow
-import invariant from 'tiny-invariant';
 import React from 'react';
 import { render } from '@testing-library/react';
+import { invariant } from '../../../../../src/invariant';
 import { isDragging } from '../../util/helpers';
 import App from '../../util/app';
 import type { SensorAPI } from '../../../../../src/types';

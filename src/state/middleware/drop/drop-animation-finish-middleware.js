@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../invariant';
 import { completeDrop } from '../../action-creators';
 import type { State } from '../../../types';
 import type { MiddlewareStore, Action, Dispatch } from '../../store-types';

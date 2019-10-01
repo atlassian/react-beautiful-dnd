@@ -1,11 +1,11 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   DraggableLocation,
   Responders,
   State,
   DropResult,
 } from '../../../../../src/types';
+import { invariant } from '../../../../../src/invariant';
 import type { Store } from '../../../../../src/state/store-types';
 import {
   flush,

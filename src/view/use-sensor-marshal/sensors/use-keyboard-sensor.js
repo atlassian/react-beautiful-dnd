@@ -1,7 +1,7 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { useRef } from 'react';
 import { useMemo, useCallback } from 'use-memo-one';
+import { invariant } from '../../../invariant';
 import type {
   SensorAPI,
   PreDragActions,

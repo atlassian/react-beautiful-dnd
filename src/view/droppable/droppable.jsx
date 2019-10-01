@@ -1,8 +1,8 @@
 // @flow
-import invariant from 'tiny-invariant';
 import ReactDOM from 'react-dom';
 import { useMemo, useCallback } from 'use-memo-one';
 import React, { useRef, useContext, type Node } from 'react';
+import { invariant } from '../../invariant';
 import type { DraggableId } from '../../types';
 import type { Props, Provided } from './droppable-types';
 import useDroppablePublisher from '../use-droppable-publisher';

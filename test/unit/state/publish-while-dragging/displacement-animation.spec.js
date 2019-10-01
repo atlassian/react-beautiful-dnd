@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../../src/invariant';
 import { getPreset, addDroppable } from '../../../util/dimension';
 import type {
   DraggableDimension,

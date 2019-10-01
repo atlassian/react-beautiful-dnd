@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import type {
   Viewport,
@@ -7,6 +6,7 @@ import type {
   DragImpact,
   DisplacedBy,
 } from '../../../../../../src/types';
+import { invariant } from '../../../../../../src/invariant';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';

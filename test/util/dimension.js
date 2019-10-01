@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import {
   createBox,
   getRect,
@@ -9,6 +8,7 @@ import {
   type Spacing,
   type Position,
 } from 'css-box-model';
+import { invariant } from '../../src/invariant';
 import { vertical } from '../../src/state/axis';
 import { noSpacing, offsetByPosition } from '../../src/state/spacing';
 import getViewport from '../../src/view/window/get-viewport';

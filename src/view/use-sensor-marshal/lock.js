@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../invariant';
 
 export type Lock = {|
   abandon: () => void,

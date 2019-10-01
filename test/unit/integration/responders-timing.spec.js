@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
 import { getRect } from 'css-box-model';
-import invariant from 'tiny-invariant';
 import { render } from '@testing-library/react';
+import { invariant } from '../../../src/invariant';
 import { DragDropContext, Draggable, Droppable } from '../../../src';
 import { getComputedSpacing } from '../../util/dimension';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';

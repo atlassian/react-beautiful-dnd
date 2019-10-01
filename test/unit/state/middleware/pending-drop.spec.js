@@ -1,7 +1,7 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { State } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
+import { invariant } from '../../../../src/invariant';
 import {
   collectionStarting,
   completeDrop,

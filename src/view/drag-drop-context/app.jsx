@@ -1,9 +1,9 @@
 // @flow
 import React, { useEffect, useRef, type Node } from 'react';
-import invariant from 'tiny-invariant';
 import { bindActionCreators } from 'redux';
 import { Provider } from 'react-redux';
 import { useMemo, useCallback } from 'use-memo-one';
+import { invariant } from '../../invariant';
 import createStore from '../../state/create-store';
 import createDimensionMarshal from '../../state/dimension-marshal/dimension-marshal';
 import canStartDrag from '../../state/can-start-drag';

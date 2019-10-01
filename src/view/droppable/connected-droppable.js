@@ -1,9 +1,9 @@
 // @flow
-import invariant from 'tiny-invariant';
 // eslint-disable-next-line no-unused-vars
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
+import { invariant } from '../../invariant';
 import type {
   State,
   DroppableId,

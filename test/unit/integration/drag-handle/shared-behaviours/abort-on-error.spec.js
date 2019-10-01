@@ -1,7 +1,7 @@
 // @flow
-import invariant from 'tiny-invariant';
 import React, { useState, useRef } from 'react';
 import { render, act } from '@testing-library/react';
+import { invariant } from '../../../../../src/invariant';
 import { isDragging, getOffset } from '../../util/helpers';
 import App from '../../util/app';
 import { noop } from '../../../../../src/empty';

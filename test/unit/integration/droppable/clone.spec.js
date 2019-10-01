@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
-import invariant from 'tiny-invariant';
 import { render } from '@testing-library/react';
+import { invariant } from '../../../../src/invariant';
 import { type DraggableStateSnapshot } from '../../../../src';
 import { simpleLift, keyboard } from '../util/controls';
 import expandedMouse from '../util/expanded-mouse';

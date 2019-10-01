@@ -1,6 +1,5 @@
 // @flow
 import { offset, type Position } from 'css-box-model';
-import invariant from 'tiny-invariant';
 import type {
   Published,
   DraggableDimension,
@@ -10,6 +9,7 @@ import type {
   Viewport,
   DroppableDimension,
 } from '../../../../src/types';
+import { invariant } from '../../../../src/invariant';
 import publish from '../../../../src/state/publish-while-dragging-in-virtual';
 import {
   getPreset,

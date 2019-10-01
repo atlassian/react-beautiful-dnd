@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../../../src/invariant';
 import { initialPublish } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/responders';
 import {

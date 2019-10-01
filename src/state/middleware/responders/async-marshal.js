@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../invariant';
 import { findIndex } from '../../../native-with-fallback';
 
 type Entry = {|

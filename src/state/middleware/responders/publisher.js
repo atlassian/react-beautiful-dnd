@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../invariant';
 import messagePreset from '../../../screen-reader-message-preset';
 import * as timings from '../../../debug/timings';
 import getExpiringAnnounce, {

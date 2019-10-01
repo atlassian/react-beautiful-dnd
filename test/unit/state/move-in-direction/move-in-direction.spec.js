@@ -1,11 +1,11 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   DraggableLocation,
   DraggingState,
   DroppableDimension,
   Axis,
 } from '../../../../src/types';
+import { invariant } from '../../../../src/invariant';
 import type { PublicResult } from '../../../../src/state/move-in-direction/move-in-direction-types';
 import moveInDirection from '../../../../src/state/move-in-direction';
 import { vertical, horizontal } from '../../../../src/state/axis';

@@ -1,6 +1,6 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { useEffect } from 'react';
+import { invariant } from '../../invariant';
 import type { Sensor } from '../../types';
 import usePreviousRef from '../use-previous-ref';
 

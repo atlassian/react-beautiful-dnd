@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import {
   getRect,
   type Position,
@@ -16,6 +15,7 @@ import type {
   DisplacedBy,
   Viewport,
 } from '../../../../../../src/types';
+import { invariant } from '../../../../../../src/invariant';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import {
   getDraggableDimension,

@@ -1,6 +1,6 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { Position, BoxModel } from 'css-box-model';
+import { invariant } from '../../../../src/invariant';
 import type { DropReason } from '../../../../src/types';
 import * as attributes from '../../../../src/view/data-attributes';
 import { defaultItemRender, type RenderItem, type Item } from './app';

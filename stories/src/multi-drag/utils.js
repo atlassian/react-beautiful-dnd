@@ -1,7 +1,7 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { Column, ColumnMap, Entities } from './types';
 import type { Id } from '../types';
+import { invariant } from '../../../src/invariant';
 import type { DraggableLocation } from '../../../src/types';
 import reorder from '../reorder';
 

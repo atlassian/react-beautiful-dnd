@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import {
   type AnimateDropArgs,
   drop,
@@ -7,6 +6,7 @@ import {
   move,
   moveDown,
 } from '../../../../../src/state/action-creators';
+import { invariant } from '../../../../../src/invariant';
 import middleware from '../../../../../src/state/middleware/drop';
 import { enableCombining } from '../../../../util/dimension';
 import { initialPublishArgs } from '../../../../util/preset-action-args';

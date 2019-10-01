@@ -1,8 +1,8 @@
 // @flow
 import { mount } from 'enzyme';
-import invariant from 'tiny-invariant';
 import React from 'react';
 import { type Position } from 'css-box-model';
+import { invariant } from '../../../../src/invariant';
 import type { DimensionMarshal } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import { getMarshalStub } from '../../../util/dimension-marshal';
 import { setViewport } from '../../../util/viewport';

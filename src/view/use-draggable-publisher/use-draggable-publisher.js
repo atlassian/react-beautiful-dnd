@@ -1,8 +1,8 @@
 // @flow
 import { type Position } from 'css-box-model';
-import invariant from 'tiny-invariant';
 import { useMemo, useCallback } from 'use-memo-one';
 import { useRef } from 'react';
+import { invariant } from '../../invariant';
 import type {
   DraggableDescriptor,
   DraggableDimension,

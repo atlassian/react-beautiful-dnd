@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
-import invariant from 'tiny-invariant';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
+import { invariant } from '../../../../src/invariant';
 import { resetServerContext } from '../../../../src';
 import App from '../util/app';
 import { noop } from '../../../../src/empty';

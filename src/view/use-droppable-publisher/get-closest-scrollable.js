@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../invariant';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';
 

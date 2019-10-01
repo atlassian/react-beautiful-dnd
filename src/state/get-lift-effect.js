@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../invariant';
 import getHomeLocation from './get-home-location';
 import type {
   DraggableDimension,

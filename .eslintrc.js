@@ -92,6 +92,18 @@ module.exports = {
         message:
           'Not allowing using of Array.from to save kbs. Please use native-with-fallback/from',
       },
+
+      // No usage of `tiny-invariant`. Must use our own invariant for error flow
+      {
+        selector: 'ImportDeclaration[source.value="tiny-invariant"]',
+        message: 'Please use our own invariant function (src/invariant.js) to ensure correct error flow'
+      },
+
+      // Must use invariant to throw
+      {
+        selector: 'ThrowStatement',
+        message: 'Please use invariant (src/invariant.js) for throwing. This is to ensure correct error flows'
+      }
     ],
 
     // Allowing Math.pow rather than forcing `**`

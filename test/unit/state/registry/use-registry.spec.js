@@ -1,12 +1,12 @@
 // @flow
 import React from 'react';
-import invariant from 'tiny-invariant';
 import { render } from '@testing-library/react';
 import type {
   Registry,
   DraggableEntry,
 } from '../../../../src/state/registry/registry-types';
 import type { DraggableId } from '../../../../src/types';
+import { invariant } from '../../../../src/invariant';
 import { getPreset } from '../../../util/dimension';
 import { getDraggableEntry } from '../../../util/registry';
 import useRegistry from '../../../../src/state/registry/use-registry';

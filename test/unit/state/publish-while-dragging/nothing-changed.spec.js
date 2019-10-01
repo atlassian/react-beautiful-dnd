@@ -1,11 +1,10 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   DropPendingState,
   DraggingState,
   CollectingState,
 } from '../../../../src/types';
-
+import { invariant } from '../../../../src/invariant';
 import publish from '../../../../src/state/publish-while-dragging-in-virtual';
 import getStatePreset from '../../../util/get-simple-state-preset';
 import { empty, withVirtuals } from './util';

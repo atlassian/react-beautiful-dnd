@@ -1,6 +1,6 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
+import { invariant } from '../../invariant';
 import { add, subtract } from '../position';
 import {
   canScrollWindow,

@@ -1,10 +1,10 @@
 // @flow
 import { useRef } from 'react';
-import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import rafSchedule from 'raf-schd';
 import { useMemo, useCallback } from 'use-memo-one';
 import memoizeOne from 'memoize-one';
+import { invariant } from '../../invariant';
 import checkForNestedScrollContainers from './check-for-nested-scroll-container';
 import * as dataAttr from '../data-attributes';
 import { origin } from '../../state/position';

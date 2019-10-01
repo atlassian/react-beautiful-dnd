@@ -1,8 +1,8 @@
 // @flow
-import invariant from 'tiny-invariant';
 import React from 'react';
 import type { Position } from 'css-box-model';
 import { render, fireEvent, createEvent } from '@testing-library/react';
+import { invariant } from '../../../../../src/invariant';
 import {
   sloppyClickThreshold,
   primaryButton,

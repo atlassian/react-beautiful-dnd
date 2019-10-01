@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
-import invariant from 'tiny-invariant';
 import { render, fireEvent } from '@testing-library/react';
+import { invariant } from '../../../../src/invariant';
 import * as attributes from '../../../../src/view/data-attributes';
 import type { DroppableId } from '../../../../src/types';
 import { isOver, isDragging } from '../util/helpers';

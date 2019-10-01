@@ -1,10 +1,10 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   Axis,
   DragImpact,
   DisplacedBy,
 } from '../../../../../../../src/types';
+import { invariant } from '../../../../../../../src/invariant';
 import { vertical, horizontal } from '../../../../../../../src/state/axis';
 import { getPreset } from '../../../../../../util/dimension';
 import moveToNextIndex from '../../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-index';

@@ -1,9 +1,9 @@
 // @flow
 import rafSchd from 'raf-schd';
-import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import type { DraggingState, DroppableId } from '../../../types';
 import scroll from './scroll';
+import { invariant } from '../../../invariant';
 import * as timings from '../../../debug/timings';
 
 export type PublicArgs = {|

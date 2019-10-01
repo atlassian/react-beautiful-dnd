@@ -1,7 +1,7 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
 import rafSchd from 'raf-schd';
+import { invariant } from '../invariant';
 import bindEvents from './event-bindings/bind-events';
 import type { EventBinding } from './event-bindings/event-types';
 import getWindowScroll from './window/get-window-scroll';

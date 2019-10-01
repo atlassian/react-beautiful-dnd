@@ -1,11 +1,11 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   Axis,
   DragImpact,
   DisplacedBy,
   DroppableDimension,
 } from '../../../../../../src/types';
+import { invariant } from '../../../../../../src/invariant';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import {
   forward,

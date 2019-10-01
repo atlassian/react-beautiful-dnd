@@ -1,6 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../../src/invariant';
 import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 import publish from '../../../../src/state/publish-while-dragging-in-virtual';
 import {

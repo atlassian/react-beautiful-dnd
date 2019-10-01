@@ -1,8 +1,8 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { useRef } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
+import { invariant } from '../../../invariant';
 import type {
   PreDragActions,
   FluidDragActions,

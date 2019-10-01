@@ -1,7 +1,7 @@
 // @flow
 import { useRef, useEffect } from 'react';
-import invariant from 'tiny-invariant';
 import { useMemo, useCallback } from 'use-memo-one';
+import { invariant } from '../../invariant';
 import type { Announce, ContextId } from '../../types';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';

@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../invariant';
 
 import type { DroppableDimension, Scrollable } from '../types';
 

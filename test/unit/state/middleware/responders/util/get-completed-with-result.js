@@ -1,10 +1,10 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   DropResult,
   State,
   CompletedDrag,
 } from '../../../../../../src/types';
+import { invariant } from '../../../../../../src/invariant';
 
 export default (result: DropResult, state: State): CompletedDrag => {
   invariant(

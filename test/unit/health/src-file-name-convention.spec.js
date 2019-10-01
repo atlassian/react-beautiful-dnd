@@ -1,6 +1,6 @@
 // @flow
 import globby from 'globby';
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../src/invariant';
 import pkg from '../../../package.json';
 
 // Regex playground: https://regexr.com/40fin

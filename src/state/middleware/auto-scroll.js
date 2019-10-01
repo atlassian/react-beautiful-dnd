@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../invariant';
 import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
 import type { Action, Dispatch, MiddlewareStore } from '../store-types';
 import type { State } from '../../types';

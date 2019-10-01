@@ -1,9 +1,9 @@
 // @flow
 import rafSchd from 'raf-schd';
-import invariant from 'tiny-invariant';
 import { useState } from 'react';
 import { useCallback, useMemo } from 'use-memo-one';
 import type { Position } from 'css-box-model';
+import { invariant } from '../../invariant';
 import type {
   ContextId,
   State,

@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable no-restricted-syntax */
 const isProduction: boolean = process.env.NODE_ENV === 'production';
 const prefix: string = 'Invariant failed';
 

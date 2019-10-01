@@ -1,8 +1,8 @@
 // @flow
 import { type Position } from 'css-box-model';
 import { mount, type ReactWrapper } from 'enzyme';
-import invariant from 'tiny-invariant';
 import React from 'react';
+import { invariant } from '../../../../src/invariant';
 import type { DroppableDimension, ScrollSize } from '../../../../src/types';
 import { negate } from '../../../../src/state/position';
 import { offsetByPosition } from '../../../../src/state/spacing';

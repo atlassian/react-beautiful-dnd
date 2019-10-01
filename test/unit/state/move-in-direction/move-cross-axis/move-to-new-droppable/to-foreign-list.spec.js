@@ -1,6 +1,5 @@
 // @flow
 import type { BoxModel, Position, Spacing } from 'css-box-model';
-import invariant from 'tiny-invariant';
 import type {
   Viewport,
   Axis,
@@ -8,6 +7,7 @@ import type {
   DroppableDimension,
   DisplacedBy,
 } from '../../../../../../src/types';
+import { invariant } from '../../../../../../src/invariant';
 import { horizontal, vertical } from '../../../../../../src/state/axis';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
 import { goIntoStart } from '../../../../../../src/state/get-center-from-impact/move-relative-to';

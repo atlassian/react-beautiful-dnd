@@ -1,6 +1,6 @@
 // @flow
 import { useEffect } from 'react';
-import invariant from 'tiny-invariant';
+import { invariant } from '../../invariant';
 import type { Props } from './droppable-types';
 import { warning } from '../../dev-warning';
 import checkIsValidInnerRef from '../check-is-valid-inner-ref';

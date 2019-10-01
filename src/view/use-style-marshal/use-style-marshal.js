@@ -2,7 +2,7 @@
 import { useRef } from 'react';
 import memoizeOne from 'memoize-one';
 import { useMemo, useCallback } from 'use-memo-one';
-import invariant from 'tiny-invariant';
+import { invariant } from '../../invariant';
 import type { StyleMarshal } from './style-marshal-types';
 import type { ContextId, DropReason } from '../../types';
 import getStyles, { type Styles } from './get-styles';

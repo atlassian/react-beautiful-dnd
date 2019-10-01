@@ -1,6 +1,6 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
+import { invariant } from '../../../../../src/invariant';
 import {
   animateDrop,
   flush,

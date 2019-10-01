@@ -1,8 +1,8 @@
 // @flow
-import invariant from 'tiny-invariant';
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { getRect, type Rect } from 'css-box-model';
+import { invariant } from '../../../src/invariant';
 import { DragDropContext, Draggable, Droppable } from '../../../src';
 import { sloppyClickThreshold } from '../../../src/view/use-sensor-marshal/sensors/use-mouse-sensor';
 import type {

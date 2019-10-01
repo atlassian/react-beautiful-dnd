@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   Responders,
   DropResult,
@@ -7,6 +6,7 @@ import type {
   State,
   DraggableLocation,
 } from '../../../../../src/types';
+import { invariant } from '../../../../../src/invariant';
 import type { Store } from '../../../../../src/state/store-types';
 import middleware from '../../../../../src/state/middleware/responders';
 import createStore from '../util/create-store';

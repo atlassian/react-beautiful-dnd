@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../../src/invariant';
 import getStatePreset from '../../../util/get-simple-state-preset';
 import type {
   Published,

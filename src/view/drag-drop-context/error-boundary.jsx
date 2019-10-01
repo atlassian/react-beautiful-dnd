@@ -49,6 +49,7 @@ export default class ErrorBoundary extends React.Component<Props> {
 
     // 1. mode === 'recover' and not an RbdInvariant
     // 2. mode === 'abort'
+    // eslint-disable-next-line no-restricted-syntax
     throw error;
   }
 
@@ -66,6 +67,7 @@ export default class ErrorBoundary extends React.Component<Props> {
 
   getCallbacks = (): AppCallbacks => {
     if (!this.callbacks) {
+      // eslint-disable-next-line no-restricted-syntax
       throw new Error('Unable to find AppCallbacks in ErrorBoundary');
     }
     return this.callbacks;
