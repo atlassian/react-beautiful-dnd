@@ -25,13 +25,13 @@ Please raise a pull request if you would like to add examples for other virtuali
 
 ### [`react-window`](https://github.com/bvaughn/react-window)
 
-- [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-window--list) [source](/stories/src/virtual/react-window/list.jsx)
-- [Board](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-window--board) [source](/stories/src/virtual/react-window/board.jsx)
+- [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-window--list) - [source](/stories/src/virtual/react-window/list.jsx)
+- [Board](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-window--board) - [source](/stories/src/virtual/react-window/board.jsx)
 
 ### [`react-virtualized`](https://github.com/bvaughn/react-virtualized)
 
-- [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--list) [source](/stories/src/virtual/react-virtualized/list.jsx)
-- [Board](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--board) [source](/stories/src/virtual/react-virtualized/board.jsx)
+- [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--list) - [source](/stories/src/virtual/react-virtualized/list.jsx)
+- [Board](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--board) - [source](/stories/src/virtual/react-virtualized/board.jsx)
 - [List with `WindowScroller`](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--window-list) [source](/stories/src/virtual/react-virtualized/window-list.jsx) ([`WindowScroller`](https://github.com/bvaughn/react-virtualized/blob/master/docs/WindowScroller.md))
 
 ## Usage
