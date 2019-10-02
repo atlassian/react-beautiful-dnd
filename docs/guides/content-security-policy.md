@@ -3,7 +3,13 @@
 > This page is to help you get around the CSP error: "Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self'"."
 > A huge thankyou to [@Zweder](https://github.com/Zweder) for driving this effort
 
-[Content Security Policy (CSP)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) is a way of controlling where a browser can download assets from, as well as what those assets are allowed to do. [Here is a good explanation of CSP](https://helmetjs.github.io/docs/csp/).
+Content Security Policy (CSP) is a way of controlling where a browser can download assets from, as well as what those assets are allowed to do.
+
+Background reading on CSP
+
+- [Google guide](https://developer.chrome.com/extensions/contentSecurityPolicy)
+- [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
+- [Helmetjs guide](https://helmetjs.github.io/docs/csp/)
 
 `react-beautiful-dnd` creates a `<style>` element in the `<head>` and dynamically updates it's value (see [/docs/guides/preset-styles.md] and [Dragging React performance forward](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33)). This is considered a *unsafe inline* and will violate the strict CSP policy: `Content-Security-Policy: style-src 'self'`
 
