@@ -14,4 +14,6 @@ if (cspEl) {
   nonce = cspEl.getAttribute('content');
 }
 
-if (root) hydrate(<Sample nonce={nonce} />, root);
+if (root) {
+  hydrate(<Sample nonce={nonce} />, root);
+}
