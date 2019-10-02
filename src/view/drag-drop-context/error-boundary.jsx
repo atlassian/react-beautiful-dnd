@@ -28,10 +28,12 @@ export default class ErrorBoundary extends React.Component<Props> {
   }
 
   componentDidCatch(error: Error) {
+    console.log('DID CATCH');
     const callbacks: AppCallbacks = this.getCallbacks();
     const mode: ErrorMode = this.props.mode;
-
+    console.log('is dragging?', callbacks.isDragging());
     if (callbacks.isDragging()) {
+      console.log('TRY ABORT: componentDidCatch');
       warning(`
         An error was thrown in the React tree while a drag was occurring.
         The active drag has been aborted.
@@ -45,6 +47,7 @@ export default class ErrorBoundary extends React.Component<Props> {
         console.error('rbd error', error);
       }
 
+      console.log('RECOVERING');
       this.setState({});
       return;
     }
@@ -59,6 +62,7 @@ export default class ErrorBoundary extends React.Component<Props> {
     const callbacks: AppCallbacks = this.getCallbacks();
 
     if (callbacks.isDragging()) {
+      console.log('TRY ABORT: onWindowError');
       warning(`
         An error was caught by our window 'error' event listener while a drag was occurring.
         The active drag has been aborted.
