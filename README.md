@@ -118,6 +118,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [How we detect scroll containers](/docs/guides/how-we-detect-scroll-containers.md)
 - [How we use dom events](/docs/guides/how-we-use-dom-events.md) - _Useful if you need to build on top of `react-beautiful-dnd`_
 - [Adding `<Draggable />`s during a drag (11.x behaviour)](/docs/guides/changes-while-dragging.md) - _⚠️ Advanced_
+- [Setting up Content Security Policy](/docs/guides/content-security-policy.md)
 
 ### Patterns 👷‍
 

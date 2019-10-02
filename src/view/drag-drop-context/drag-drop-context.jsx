@@ -8,6 +8,7 @@ import App from './app';
 
 type Props = {|
   ...Responders,
+  nonce?: string,
   // we do not technically need any children for this component
   children: Node | null,
 
