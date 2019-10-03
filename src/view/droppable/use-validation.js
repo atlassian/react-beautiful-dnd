@@ -1,9 +1,9 @@
 // @flow
-import { useEffect } from 'react';
 import { invariant } from '../../invariant';
 import type { Props } from './droppable-types';
 import { warning } from '../../dev-warning';
 import checkIsValidInnerRef from '../check-is-valid-inner-ref';
+import useDevSetupWarning from '../use-dev-setup-warning';
 
 type Args = {|
   props: Props,
@@ -86,19 +86,16 @@ const virtual: CheckFn[] = [
 ];
 
 export default function useValidation(args: Args) {
-  // Running on every update
-  useEffect(() => {
+  useDevSetupWarning(() => {
     // wrapping entire block for better minification
-    if (process.env.NODE_ENV !== 'production') {
-      runChecks(args, shared);
+    runChecks(args, shared);
 
-      if (args.props.mode === 'standard') {
-        runChecks(args, standard);
-      }
+    if (args.props.mode === 'standard') {
+      runChecks(args, standard);
+    }
 
-      if (args.props.mode === 'virtual') {
-        runChecks(args, virtual);
-      }
+    if (args.props.mode === 'virtual') {
+      runChecks(args, virtual);
     }
   });
 }

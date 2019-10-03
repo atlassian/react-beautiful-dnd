@@ -83,7 +83,7 @@ export default [
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
       commonjs(commonjsArgs),
-      strip({ debugger: true }),
+      strip(),
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot(snapshotArgs),
       terser(),

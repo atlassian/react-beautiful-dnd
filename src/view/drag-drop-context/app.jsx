@@ -193,7 +193,6 @@ export default function App(props: Props) {
   }, []);
 
   const isDragging = useCallback((): boolean => {
-    console.log('is dragging check');
     const state: State = getStore(lazyStoreRef).getState();
     return state.isDragging || state.phase === 'DROP_ANIMATING';
   }, []);

@@ -1,15 +1,11 @@
 // @flow
-import { useRef, useEffect } from 'react';
-import { validationInvariant as invariant } from '../../validation-invariant';
+import { useRef } from 'react';
+import { invariant } from '../../invariant';
 import type { DraggableId, ContextId } from '../../types';
 import type { Props } from './draggable-types';
 import checkIsValidInnerRef from '../check-is-valid-inner-ref';
-import { warning } from '../../dev-warning';
 import findDragHandle from '../get-elements/find-drag-handle';
-
-function prefix(id: DraggableId): string {
-  return `Draggable[id: ${id}]: `;
-}
+import useDevSetupWarning from '../use-dev-setup-warning';
 
 export function useValidation(
   props: Props,
@@ -17,38 +13,40 @@ export function useValidation(
   getRef: () => ?HTMLElement,
 ) {
   // running after every update in development
-  useEffect(() => {
+  useDevSetupWarning(() => {
+    function prefix(id: DraggableId): string {
+      return `Draggable[id: ${id}]: `;
+    }
+
     // wrapping entire block for better minification
-    if (process.env.NODE_ENV !== 'production') {
-      const id: ?DraggableId = props.draggableId;
-      // Number.isInteger will be provided by @babel/runtime-corejs2
-      invariant(id, 'Draggable requires a draggableId');
+    const id: ?DraggableId = props.draggableId;
+    // Number.isInteger will be provided by @babel/runtime-corejs2
+    invariant(id, 'Draggable requires a draggableId');
+    invariant(
+      typeof id === 'string',
+      `Draggable requires a [string] draggableId. Provided: [${typeof id}]`,
+    );
+
+    invariant(
+      Number.isInteger(props.index),
+      `${prefix(id)} requires an integer index prop`,
+    );
+
+    if (props.mapped.type === 'DRAGGING') {
+      return;
+    }
+
+    // Checking provided ref (only when not dragging as it might be removed)
+    checkIsValidInnerRef(getRef());
+
+    // Checking that drag handle is provided
+    // Only running check when enabled.
+    // When not enabled there is no drag handle props
+    if (props.isEnabled) {
       invariant(
-        typeof id === 'string',
-        `Draggable requires a [string] draggableId. Provided: [${typeof id}]`,
+        findDragHandle(contextId, id),
+        `${prefix(id)} Unable to find drag handle`,
       );
-
-      invariant(
-        Number.isInteger(props.index),
-        `${prefix(id)} requires an integer index prop`,
-      );
-
-      if (props.mapped.type === 'DRAGGING') {
-        return;
-      }
-
-      // Checking provided ref (only when not dragging as it might be removed)
-      checkIsValidInnerRef(getRef());
-
-      // Checking that drag handle is provided
-      // Only running check when enabled.
-      // When not enabled there is no drag handle props
-      if (props.isEnabled) {
-        invariant(
-          findDragHandle(contextId, id),
-          `${prefix(id)} Unable to find drag handle`,
-        );
-      }
     }
   });
 }
@@ -57,9 +55,10 @@ export function useValidation(
 export function useClonePropValidation(isClone: boolean) {
   const initialRef = useRef<boolean>(isClone);
 
-  useEffect(() => {
-    if (isClone !== initialRef.current) {
-      warning('Draggable isClone prop value changed during component life');
-    }
+  useDevSetupWarning(() => {
+    invariant(
+      isClone === initialRef.current,
+      'Draggable isClone prop value changed during component life',
+    );
   }, [isClone]);
 }
