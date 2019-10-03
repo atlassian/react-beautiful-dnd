@@ -9,15 +9,28 @@ const storybook = childProcess.spawn(process.execPath, [
   '9002',
 ]);
 
+const standalone = childProcess.spawn(process.execPath, [
+  path.join('test', 'standalone', 'start.sh'),
+  '9003',
+]);
+
 process.on('exit', () => {
   storybook.kill();
+  standalone.kill();
 });
 
-waitPort({
-  host: 'localhost',
-  port: 9002,
-  timeout: 60000,
-})
+Promise.all([
+  waitPort({
+    host: 'localhost',
+    port: 9003,
+    timeout: 60000,
+  }),
+  waitPort({
+    host: 'localhost',
+    port: 9002,
+    timeout: 60000,
+  }),
+])
   .then(() => {
     const child = childProcess.spawn(process.argv[2], process.argv.slice(3), {
       stdio: 'inherit',
@@ -31,7 +44,8 @@ waitPort({
   })
   .catch(() => {
     // eslint-disable-next-line no-console
-    console.error('Storybook did not start in time');
+    console.error('Storybook or our stand alone server did not start in time');
     storybook.kill();
+    standalone.kill();
     process.exit(1);
   });

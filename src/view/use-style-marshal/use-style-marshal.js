@@ -15,13 +15,16 @@ const getHead = (): HTMLHeadElement => {
   return head;
 };
 
-const createStyleEl = (): HTMLStyleElement => {
+const createStyleEl = (nonce?: string): HTMLStyleElement => {
   const el: HTMLStyleElement = document.createElement('style');
+  if (nonce) {
+    el.setAttribute('nonce', nonce);
+  }
   el.type = 'text/css';
   return el;
 };
 
-export default function useStyleMarshal(contextId: ContextId) {
+export default function useStyleMarshal(contextId: ContextId, nonce?: string) {
   const styles: Styles = useMemo(() => getStyles(contextId), [contextId]);
   const alwaysRef = useRef<?HTMLStyleElement>(null);
   const dynamicRef = useRef<?HTMLStyleElement>(null);
@@ -49,8 +52,8 @@ export default function useStyleMarshal(contextId: ContextId) {
       'style elements already mounted',
     );
 
-    const always: HTMLStyleElement = createStyleEl();
-    const dynamic: HTMLStyleElement = createStyleEl();
+    const always: HTMLStyleElement = createStyleEl(nonce);
+    const dynamic: HTMLStyleElement = createStyleEl(nonce);
 
     // store their refs
     alwaysRef.current = always;
@@ -80,6 +83,7 @@ export default function useStyleMarshal(contextId: ContextId) {
       remove(dynamicRef);
     };
   }, [
+    nonce,
     setAlwaysStyle,
     setDynamicStyle,
     styles.always,

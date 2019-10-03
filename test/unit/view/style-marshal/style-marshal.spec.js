@@ -14,11 +14,12 @@ const getMock = () => jest.fn().mockImplementation(() => null);
 
 type Props = {|
   contextId: ContextId,
+  nonce?: string,
   children: (marshal: StyleMarshal) => Node,
 |};
 
 function WithMarshal(props: Props) {
-  const marshal: StyleMarshal = useStyleMarshal(props.contextId);
+  const marshal: StyleMarshal = useStyleMarshal(props.contextId, props.nonce);
   return props.children(marshal);
 }
 
@@ -28,16 +29,24 @@ const getDynamicStyleTagSelector = (contextId: ContextId) =>
 const getAlwaysStyleTagSelector = (contextId: ContextId) =>
   `style[${prefix}-always="${contextId}"]`;
 
-const getDynamicStyleFromTag = (contextId: ContextId): string => {
+const getDynamicStyleTag = (contextId: ContextId): HTMLStyleElement => {
   const selector: string = getDynamicStyleTagSelector(contextId);
   const el: HTMLStyleElement = (document.querySelector(selector): any);
-  return el.innerHTML;
+  return el;
+};
+
+const getAlwaysStyleTag = (contextId: ContextId): HTMLStyleElement => {
+  const selector: string = getAlwaysStyleTagSelector(contextId);
+  const el: HTMLStyleElement = (document.querySelector(selector): any);
+  return el;
+};
+
+const getDynamicStyleFromTag = (contextId: ContextId): string => {
+  return getDynamicStyleTag(contextId).innerHTML;
 };
 
 const getAlwaysStyleFromTag = (contextId: ContextId): string => {
-  const selector: string = getAlwaysStyleTagSelector(contextId);
-  const el: HTMLStyleElement = (document.querySelector(selector): any);
-  return el.innerHTML;
+  return getAlwaysStyleTag(contextId).innerHTML;
 };
 
 it('should not mount style tags until mounted', () => {
@@ -174,5 +183,31 @@ it('should allow subsequent updates', () => {
     expect(getDynamicStyleFromTag(contextId)).toEqual(styles.dropAnimating);
   });
 
+  wrapper.unmount();
+});
+
+it('should insert nonce into tag attribute', () => {
+  const contextId: ContextId = '2';
+  const nonce = 'ThisShouldBeACryptographicallySecurePseudoRandomNumber';
+  const mock = getMock();
+  const wrapper: ReactWrapper<*> = mount(
+    <WithMarshal contextId={contextId} nonce={nonce}>
+      {mock}
+    </WithMarshal>,
+  );
+  const dynamicStyleTag = getDynamicStyleTag(contextId);
+  const dynamicStyleTagNonce = dynamicStyleTag
+    ? dynamicStyleTag.getAttribute('nonce')
+    : '';
+  const alwaysStyleTag = getAlwaysStyleTag(contextId);
+  const alwaysStyleTagNonce = alwaysStyleTag
+    ? alwaysStyleTag.getAttribute('nonce')
+    : '';
+
+  // the style tag exists
+  expect(dynamicStyleTagNonce).toEqual(nonce);
+  expect(alwaysStyleTagNonce).toEqual(nonce);
+
+  // now unmounted
   wrapper.unmount();
 });

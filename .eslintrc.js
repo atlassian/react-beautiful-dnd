@@ -58,6 +58,9 @@ module.exports = {
     // Allowing ++ on numbers
     'no-plusplus': 'off',
 
+    // Always enforcing the use of curly braces for if statements
+    'curly': ['error', 'all'],
+
     'no-restricted-syntax': [
       // Nicer booleans #1
       // Disabling the use of !! to cast to boolean

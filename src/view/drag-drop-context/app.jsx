@@ -53,6 +53,7 @@ export type Props = {|
   ...Responders,
   contextId: string,
   setCallbacks: SetAppCallbacks,
+  nonce?: string,
   // we do not technically need any children for this component
   children: Node | null,
 
@@ -81,7 +82,7 @@ function getStore(lazyRef: LazyStoreRef): Store {
 }
 
 export default function App(props: Props) {
-  const { contextId, setCallbacks, sensors, liftInstruction } = props;
+  const { contextId, setCallbacks, sensors, nonce, liftInstruction } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
@@ -99,7 +100,7 @@ export default function App(props: Props) {
     contextId,
     liftInstruction,
   );
-  const styleMarshal: StyleMarshal = useStyleMarshal(contextId);
+  const styleMarshal: StyleMarshal = useStyleMarshal(contextId, nonce);
 
   const lazyDispatch: Action => void = useCallback((action: Action): void => {
     getStore(lazyStoreRef).dispatch(action);
