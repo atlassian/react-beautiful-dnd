@@ -177,19 +177,11 @@ export default function App(props: Props) {
   lazyStoreRef.current = store;
 
   const tryResetStore = useCallback(() => {
-    console.log('trying to reset store');
     const current: Store = getStore(lazyStoreRef);
     const state: State = current.getState();
     if (state.phase !== 'IDLE') {
       current.dispatch(flush());
     }
-  }, []);
-
-  useEffect(() => {
-    console.log('App: mounting');
-    return () => {
-      console.log('App: unmounting');
-    };
   }, []);
 
   const isDragging = useCallback((): boolean => {
