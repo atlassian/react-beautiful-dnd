@@ -52,6 +52,9 @@ module.exports = {
     // Cannot reassign function parameters but allowing modification
     'no-param-reassign': ['error', { props: false }],
 
+    // Named exports are kewl
+    'import/prefer-default-export': 'off',
+
     // Don't tell me what to do!
     'max-classes-per-file': 'off',
 

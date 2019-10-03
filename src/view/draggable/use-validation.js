@@ -1,6 +1,6 @@
 // @flow
 import { useRef, useEffect } from 'react';
-import { invariant } from '../../invariant';
+import { validationInvariant as invariant } from '../../validation-invariant';
 import type { DraggableId, ContextId } from '../../types';
 import type { Props } from './draggable-types';
 import checkIsValidInnerRef from '../check-is-valid-inner-ref';

@@ -31,13 +31,17 @@ export default class ErrorBoundary extends React.Component<Props> {
     // At this point the React tree below the error boundary has been unmounted
     const mode: ErrorMode = this.props.mode;
 
-    if (process.env.NODE_ENV !== 'production') {
-      fatal(error);
-    }
+    console.log('COMPONENT DID CATCH');
+    if (error instanceof RbdInvariant) {
+      if (process.env.NODE_ENV !== 'production') {
+        fatal(error);
+      }
 
-    if (mode === 'recover' && error instanceof RbdInvariant) {
-      this.setState({});
-      return;
+      if (mode === 'recover') {
+        console.warn('RECOVERING');
+        this.setState({});
+        return;
+      }
     }
 
     // throwing error for other error boundaries
@@ -66,7 +70,7 @@ export default class ErrorBoundary extends React.Component<Props> {
   getCallbacks = (): AppCallbacks => {
     if (!this.callbacks) {
       // eslint-disable-next-line no-restricted-syntax
-      throw new Error('Unable to find AppCallbacks in ErrorBoundary');
+      throw new Error('Unable to find AppCallbacks in <ErrorBoundary/>');
     }
     return this.callbacks;
   };
