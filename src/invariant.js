@@ -3,7 +3,12 @@
 const isProduction: boolean = process.env.NODE_ENV === 'production';
 const prefix: string = 'Invariant failed';
 
-export class RbdInvariant extends Error {}
+export function RbdInvariant(message: string) {
+  Error.call(message);
+}
+RbdInvariant.prototype = Object.create(Error.prototype);
+
+// export class RbdInvariant extends Error { }
 
 // A copy-paste of tiny-invariant but with a custom error type
 // Throw an error if the condition fails
