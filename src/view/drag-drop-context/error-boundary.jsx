@@ -1,6 +1,6 @@
 // @flow
 import React, { type Node } from 'react';
-import { warning } from '../../dev-warning';
+import { warning, fatal } from '../../dev-warning';
 import { noop } from '../../empty';
 import bindEvents from '../event-bindings/bind-events';
 import { RbdInvariant } from '../../invariant';
@@ -28,32 +28,19 @@ export default class ErrorBoundary extends React.Component<Props> {
   }
 
   componentDidCatch(error: Error) {
-    console.log('DID CATCH');
-    const callbacks: AppCallbacks = this.getCallbacks();
+    // At this point the React tree below the error boundary has been unmounted
     const mode: ErrorMode = this.props.mode;
-    console.log('is dragging?', callbacks.isDragging());
-    if (callbacks.isDragging()) {
-      console.log('TRY ABORT: componentDidCatch');
-      warning(`
-        An error was thrown in the React tree while a drag was occurring.
-        The active drag has been aborted.
-      `);
-      callbacks.tryAbort();
+
+    if (process.env.NODE_ENV !== 'production') {
+      fatal(error);
     }
 
     if (mode === 'recover' && error instanceof RbdInvariant) {
-      if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
-        console.error('rbd error', error);
-      }
-
-      console.log('RECOVERING');
       this.setState({});
       return;
     }
 
-    // 1. mode === 'recover' and not an RbdInvariant
-    // 2. mode === 'abort'
+    // throwing error for other error boundaries
     // eslint-disable-next-line no-restricted-syntax
     throw error;
   }
@@ -62,18 +49,16 @@ export default class ErrorBoundary extends React.Component<Props> {
     const callbacks: AppCallbacks = this.getCallbacks();
 
     if (callbacks.isDragging()) {
-      console.log('TRY ABORT: onWindowError');
+      callbacks.tryAbort();
       warning(`
         An error was caught by our window 'error' event listener while a drag was occurring.
         The active drag has been aborted.
       `);
-      callbacks.tryAbort();
     }
 
     if (error instanceof RbdInvariant) {
       if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
-        console.error('rbd error', error);
+        fatal(error);
       }
     }
   };

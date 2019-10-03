@@ -34,7 +34,7 @@ export const getFormattedMessage = (message: string): string[] => [
 
 const isDisabledFlag: string = '__react-beautiful-dnd-disable-dev-warnings';
 
-export const warning = (message: string) => {
+function log(type: 'error' | 'warn', message: string) {
   // no warnings in production
   if (isProduction) {
     return;
@@ -46,5 +46,12 @@ export const warning = (message: string) => {
   }
 
   // eslint-disable-next-line no-console
-  console.warn(...getFormattedMessage(message));
-};
+  console[type](...getFormattedMessage(message));
+}
+
+export const warning = log.bind(null, 'warn');
+export function fatal(error: Error) {
+  log('error', error.message ? error.message : 'UNKNOWN ERROR');
+  // eslint-disable-next-line no-console
+  console.error('raw error', error);
+}
