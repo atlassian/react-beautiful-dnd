@@ -2,28 +2,28 @@
 # yarn lockfile v1
 
 
-"@atlaskit/css-reset@^4.0.0":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-4.0.1.tgz#8c1dacba80f26b0913a5d04106df670d02b639a9"
-  integrity sha512-8QA8F12VyrqdmNaPy29fKicYExs7pIrM6vxEAy8Egw70XGGYuKefAZpRYuoijJd6T7HhwjZWAPhJxSegdv+ovQ==
+"@atlaskit/css-reset@^5.0.9":
+  version "5.0.9"
+  resolved "https://registry.yarnpkg.com/@atlaskit/css-reset/-/css-reset-5.0.9.tgz#5e7d7e5ee775aa87a4d470fab15a20daa4d86df1"
+  integrity sha512-7HqIVo5wZYKmuHcC8YFf4H15zbUGYHJxltBB2RnYlComNnihonJYknI2YLTuz70SYEznELIEo7NJX1VP0Liisw==
   dependencies:
-    "@atlaskit/theme" "^9.0.0"
+    "@atlaskit/theme" "^9.2.4"
     fbjs "^1.0.0"
     mkdirp "^0.5.1"
-
-"@atlaskit/theme@^9.0.0":
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-9.0.0.tgz#09eee5433a6084dfd506d8f303fd1913bdf6e5c5"
-  integrity sha512-FxPubfXMBidzyG3YrzH4T1MstpxJXg6CsW09aBvW25tmafrAlrj+gSnd5/ky9Oa4zKgXk4itZNSCdefxgwqs7w==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-    exenv "^1.2.2"
-    prop-types "^15.5.10"
 
 "@atlaskit/theme@^9.1.0":
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-9.1.0.tgz#a58f01240f090efa4b230991664b2b8d4e5c6c8e"
   integrity sha512-7uF8YksrQp7l6rIWoBBTtqPXxkJTt6j30aLykxv6WlIq2aO8rT6BxVbBOEQZ4xT1v5CGTuXBnLjKGBuXZJ/kFw==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    exenv "^1.2.2"
+    prop-types "^15.5.10"
+
+"@atlaskit/theme@^9.2.4":
+  version "9.2.4"
+  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-9.2.4.tgz#f4951dc49e480221e7c58214cca8bcc00430956e"
+  integrity sha512-C9QCEiB9raUyb5jiZVwvCmwEQIKnHear0iY3uKd6SwYCsS7faw+71/9TylXBlgVBkwUAZ+UC3XzAv2uIXg5qlA==
   dependencies:
     "@babel/runtime" "^7.0.0"
     exenv "^1.2.2"
