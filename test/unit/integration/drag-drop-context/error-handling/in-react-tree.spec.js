@@ -1,17 +1,17 @@
 // @flow
-import React, { useRef } from 'react';
+import React from 'react';
 import { render } from '@testing-library/react';
 import { invariant } from '../../../../../src/invariant';
 import App from '../../util/app';
 import { simpleLift, keyboard } from '../../util/controls';
 import { isDragging } from '../../util/helpers';
+import { withError } from '../../../../util/console';
 
-it.only('should abort any active drag (rbd error)', () => {
+it('should recover from rbd invariants', () => {
   let hasThrown: boolean = false;
   function CanThrow(props: { shouldThrow: boolean }) {
     if (!hasThrown && props.shouldThrow) {
       hasThrown = true;
-      console.log('THROWING');
       invariant(false, 'throwing');
     }
     return null;
@@ -20,23 +20,37 @@ it.only('should abort any active drag (rbd error)', () => {
   const { rerender, getByTestId } = render(
     <App anotherChild={<CanThrow shouldThrow={false} />} />,
   );
-  const handle: HTMLElement = getByTestId('0');
 
-  simpleLift(keyboard, handle);
-  expect(isDragging(handle)).toBe(true);
+  simpleLift(keyboard, getByTestId('0'));
+  expect(isDragging(getByTestId('0'))).toBe(true);
 
-  rerender(<App anotherChild={<CanThrow shouldThrow />} />);
+  withError(() => {
+    rerender(<App anotherChild={<CanThrow shouldThrow />} />);
+  });
 
-  expect(isDragging(handle)).toBe(false);
-});
-it('should abort any active drag (non-rbd error)', () => {});
-
-describe('recovery mode', () => {
-  it('should recover from rbd errors', () => {});
-  it('should not recover from non-rbd errors and rethrow them', () => {});
+  expect(isDragging(getByTestId('0'))).toBe(false);
 });
 
-describe('abort mode', () => {
-  it('should not recover from rbd errors', () => {});
-  it('should not recover from non-rbd errors', () => {});
+it('should not recover from non-rbd errors', () => {
+  let hasThrown: boolean = false;
+  function CanThrow(props: { shouldThrow: boolean }) {
+    if (!hasThrown && props.shouldThrow) {
+      hasThrown = true;
+      throw new Error('Boom');
+    }
+    return null;
+  }
+
+  const { rerender, getByTestId } = render(
+    <App anotherChild={<CanThrow shouldThrow={false} />} />,
+  );
+
+  simpleLift(keyboard, getByTestId('0'));
+  expect(isDragging(getByTestId('0'))).toBe(true);
+
+  withError(() => {
+    expect(() => {
+      rerender(<App anotherChild={<CanThrow shouldThrow />} />);
+    }).toThrow();
+  });
 });

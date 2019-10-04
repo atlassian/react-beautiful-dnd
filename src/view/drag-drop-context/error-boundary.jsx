@@ -1,6 +1,6 @@
 // @flow
 import React, { type Node } from 'react';
-import { warning, fatal } from '../../dev-warning';
+import { warning, error } from '../../dev-warning';
 import { noop } from '../../empty';
 import bindEvents from '../event-bindings/bind-events';
 import { RbdInvariant } from '../../invariant';
@@ -9,6 +9,11 @@ import type { AppCallbacks } from './drag-drop-context-types';
 type Props = {|
   children: (setCallbacks: (callbacks: AppCallbacks) => void) => Node,
 |};
+
+// Lame that this is not in flow
+type ErrorEvent = Event & {
+  error: ?Error,
+};
 
 export default class ErrorBoundary extends React.Component<Props> {
   callbacks: ?AppCallbacks = null;
@@ -26,10 +31,10 @@ export default class ErrorBoundary extends React.Component<Props> {
     this.unbind();
   }
 
-  componentDidCatch(error: Error) {
-    if (error instanceof RbdInvariant) {
+  componentDidCatch(err: Error) {
+    if (err instanceof RbdInvariant) {
       if (process.env.NODE_ENV !== 'production') {
-        fatal(error);
+        error(err.message);
       }
 
       this.setState({});
@@ -38,10 +43,10 @@ export default class ErrorBoundary extends React.Component<Props> {
 
     // throwing error for other error boundaries
     // eslint-disable-next-line no-restricted-syntax
-    throw error;
+    throw err;
   }
 
-  onWindowError = (error: Error) => {
+  onWindowError = (event: ErrorEvent) => {
     const callbacks: AppCallbacks = this.getCallbacks();
 
     if (callbacks.isDragging()) {
@@ -52,9 +57,11 @@ export default class ErrorBoundary extends React.Component<Props> {
       `);
     }
 
-    if (error instanceof RbdInvariant) {
+    const err: ?Error = event.error;
+
+    if (err instanceof RbdInvariant) {
       if (process.env.NODE_ENV !== 'production') {
-        fatal(error);
+        error(err.message);
       }
     }
   };

@@ -1,7 +1,7 @@
 // @flow
 /* eslint-disable no-restricted-syntax */
 const isProduction: boolean = process.env.NODE_ENV === 'production';
-const prefix: string = 'Invariant failed';
+const prefix: string = 'rbd invariant failed';
 
 // Want to use this:
 // export class RbdInvariant extends Error { }
@@ -10,6 +10,10 @@ const prefix: string = 'Invariant failed';
 export function RbdInvariant(message: string) {
   this.message = message;
 }
+// $FlowFixMe
+RbdInvariant.prototype.toString = function toString() {
+  return this.message;
+};
 
 // A copy-paste of tiny-invariant but with a custom error type
 // Throw an error if the condition fails

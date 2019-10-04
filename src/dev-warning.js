@@ -51,8 +51,3 @@ export function log(type: 'error' | 'warn', message: string) {
 
 export const warning = log.bind(null, 'warn');
 export const error = log.bind(null, 'error');
-export function fatal(e: Error) {
-  log('error', e.message ? e.message : 'UNKNOWN ERROR');
-  // eslint-disable-next-line no-console
-  console.error('raw error', e);
-}
