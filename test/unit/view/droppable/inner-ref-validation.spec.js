@@ -2,8 +2,7 @@
 import React from 'react';
 import type { Provided } from '../../../../src/view/droppable/droppable-types';
 import mount from './util/mount';
-
-jest.spyOn(console, 'error').mockImplementation(() => {});
+import { withError } from '../../../util/console';
 
 it('should warn a consumer if they have not provided a ref', () => {
   class NoRef extends React.Component<{ provided: Provided }> {
@@ -19,7 +18,9 @@ it('should warn a consumer if they have not provided a ref', () => {
     }
   }
 
-  expect(() => mount({ WrappedComponent: NoRef })).toThrow();
+  withError(() => {
+    mount({ WrappedComponent: NoRef });
+  });
 });
 
 it('should throw a consumer if they have provided an SVGElement', () => {
@@ -37,5 +38,7 @@ it('should throw a consumer if they have provided an SVGElement', () => {
     }
   }
 
-  expect(() => mount({ WrappedComponent: WithSVG })).toThrow();
+  withError(() => {
+    mount({ WrappedComponent: WithSVG });
+  });
 });

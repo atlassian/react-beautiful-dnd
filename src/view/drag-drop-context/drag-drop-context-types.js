@@ -5,5 +5,3 @@ export type AppCallbacks = {|
 |};
 
 export type SetAppCallbacks = (callbacks: AppCallbacks) => void;
-
-export type ErrorMode = 'recover' | 'abort';

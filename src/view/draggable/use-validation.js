@@ -24,7 +24,8 @@ export function useValidation(
     invariant(id, 'Draggable requires a draggableId');
     invariant(
       typeof id === 'string',
-      `Draggable requires a [string] draggableId. Provided: [${typeof id}]`,
+      `Draggable requires a [string] draggableId.
+      Provided: [type: ${typeof id}] (value: ${id})`,
     );
 
     invariant(
@@ -53,12 +54,17 @@ export function useValidation(
 
 // we expect isClone not to change for entire component's life
 export function useClonePropValidation(isClone: boolean) {
-  const initialRef = useRef<boolean>(isClone);
+  // Wrapping whole thing in guard so ref is not created in production
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const initialRef = useRef<boolean>(isClone);
 
-  useDevSetupWarning(() => {
-    invariant(
-      isClone === initialRef.current,
-      'Draggable isClone prop value changed during component life',
-    );
-  }, [isClone]);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useDevSetupWarning(() => {
+      invariant(
+        isClone === initialRef.current,
+        'Draggable isClone prop value changed during component life',
+      );
+    }, [isClone]);
+  }
 }

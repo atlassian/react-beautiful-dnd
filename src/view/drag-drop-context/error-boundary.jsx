@@ -4,10 +4,9 @@ import { warning, fatal } from '../../dev-warning';
 import { noop } from '../../empty';
 import bindEvents from '../event-bindings/bind-events';
 import { RbdInvariant } from '../../invariant';
-import type { AppCallbacks, ErrorMode } from './drag-drop-context-types';
+import type { AppCallbacks } from './drag-drop-context-types';
 
 type Props = {|
-  mode: ErrorMode,
   children: (setCallbacks: (callbacks: AppCallbacks) => void) => Node,
 |};
 
@@ -28,20 +27,13 @@ export default class ErrorBoundary extends React.Component<Props> {
   }
 
   componentDidCatch(error: Error) {
-    // At this point the React tree below the error boundary has been unmounted
-    const mode: ErrorMode = this.props.mode;
-
-    console.log('COMPONENT DID CATCH');
     if (error instanceof RbdInvariant) {
       if (process.env.NODE_ENV !== 'production') {
         fatal(error);
       }
 
-      if (mode === 'recover') {
-        console.warn('RECOVERING');
-        this.setState({});
-        return;
-      }
+      this.setState({});
+      return;
     }
 
     // throwing error for other error boundaries

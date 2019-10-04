@@ -3,12 +3,13 @@
 const isProduction: boolean = process.env.NODE_ENV === 'production';
 const prefix: string = 'Invariant failed';
 
-export function RbdInvariant(message: string) {
-  Error.call(message);
-}
-RbdInvariant.prototype = Object.create(Error.prototype);
-
+// Want to use this:
 // export class RbdInvariant extends Error { }
+// But it causes babel to bring in a lot of code
+
+export function RbdInvariant(message: string) {
+  this.message = message;
+}
 
 // A copy-paste of tiny-invariant but with a custom error type
 // Throw an error if the condition fails

@@ -25,7 +25,7 @@ type Props = {|
 
 function WithCustomProps(props: Props) {
   return (
-    <DragDropContext onDragEnd={() => {}} errorMode="abort">
+    <DragDropContext onDragEnd={() => {}}>
       <Droppable droppableId="droppable">
         {(droppableProvided: DroppableProvided) => (
           <div
@@ -80,7 +80,7 @@ it('should log an error if index is not an integer', () => {
 it('should log an error if innerRef is not provided', () => {
   function App() {
     return (
-      <DragDropContext onDragEnd={() => {}} errorMode="abort">
+      <DragDropContext onDragEnd={() => {}}>
         <Droppable droppableId="droppable">
           {(droppableProvided: DroppableProvided) => (
             <div
@@ -115,7 +115,7 @@ it('should log an error if innerRef is not provided', () => {
 it('should log an error if innerRef is an SVG', () => {
   function App() {
     return (
-      <DragDropContext onDragEnd={() => {}} errorMode="abort">
+      <DragDropContext onDragEnd={() => {}}>
         <Droppable droppableId="droppable">
           {(droppableProvided: DroppableProvided) => (
             <div
@@ -150,7 +150,7 @@ it('should log an error if innerRef is an SVG', () => {
 it('should log an error if no drag handle props are applied', () => {
   function App() {
     return (
-      <DragDropContext onDragEnd={() => {}} errorMode="abort">
+      <DragDropContext onDragEnd={() => {}}>
         <Droppable droppableId="droppable">
           {(droppableProvided: DroppableProvided) => (
             <div
@@ -185,7 +185,7 @@ it('should log an error if no drag handle props are applied', () => {
 it('should log an error if the draggable is disabled as there will be no drag handle', () => {
   function App() {
     return (
-      <DragDropContext onDragEnd={() => {}} errorMode="abort">
+      <DragDropContext onDragEnd={() => {}}>
         <Droppable droppableId="droppable">
           {(droppableProvided: DroppableProvided) => (
             <div
