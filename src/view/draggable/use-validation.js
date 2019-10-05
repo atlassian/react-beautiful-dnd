@@ -6,6 +6,7 @@ import type { Props } from './draggable-types';
 import checkIsValidInnerRef from '../check-is-valid-inner-ref';
 import findDragHandle from '../get-elements/find-drag-handle';
 import useDevSetupWarning from '../use-dev-setup-warning';
+import useDev from '../use-dev';
 
 export function useValidation(
   props: Props,
@@ -54,8 +55,7 @@ export function useValidation(
 
 // we expect isClone not to change for entire component's life
 export function useClonePropValidation(isClone: boolean) {
-  // Wrapping whole thing in guard so ref is not created in production
-  if (process.env.NODE_ENV !== 'production') {
+  useDev(() => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const initialRef = useRef<boolean>(isClone);
 
@@ -66,5 +66,5 @@ export function useClonePropValidation(isClone: boolean) {
         'Draggable isClone prop value changed during component life',
       );
     }, [isClone]);
-  }
+  });
 }

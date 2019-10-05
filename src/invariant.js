@@ -1,7 +1,7 @@
 // @flow
 /* eslint-disable no-restricted-syntax */
 const isProduction: boolean = process.env.NODE_ENV === 'production';
-const prefix: string = 'rbd invariant failed';
+const prefix: string = 'Invariant failed';
 
 // Want to use this:
 // export class RbdInvariant extends Error { }
