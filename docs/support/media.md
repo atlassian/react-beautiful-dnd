@@ -66,6 +66,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 
 ## Articles, tutorials and blogs
 
+- [How to add Drag and Drop features to your React app](https://medium.com/javascript-in-plain-english/how-to-add-drag-and-drop-feature-to-your-react-app-20cb22fb180)
 - [`awesome-react-components`](https://github.com/brillout/awesome-react-components)
 - CSS-Tricks [tweet](https://twitter.com/css/status/1138866065965010945)
 - dev.to 7 most popular DEV posts [May 27th, 2019](https://dev.to/devteam/the-7-most-popular-dev-posts-from-the-past-week-2ice)
