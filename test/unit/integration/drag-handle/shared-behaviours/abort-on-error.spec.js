@@ -4,10 +4,9 @@ import { render, act } from '@testing-library/react';
 import { invariant } from '../../../../../src/invariant';
 import { isDragging, getOffset } from '../../util/helpers';
 import App from '../../util/app';
-import { noop } from '../../../../../src/empty';
+import { withError, withWarn } from '../../../../util/console';
 import { forEachSensor, simpleLift, type Control } from '../../util/controls';
-
-jest.spyOn(console, 'error').mockImplementation(noop);
+import causeRuntimeError from '../../../../util/cause-runtime-error';
 
 type Props = {
   throw: () => void,
@@ -45,9 +44,11 @@ function getThrower(): Thrower {
   }
 
   function execute() {
-    act(() => {
-      invariant(current, 'Expected throw callback to be set');
-      current();
+    withError(() => {
+      act(() => {
+        invariant(current, 'Expected throw callback to be set');
+        current();
+      });
     });
   }
 
@@ -121,5 +122,31 @@ forEachSensor((control: Control) => {
       control.move(handle);
       expect(getOffset(handle)).toEqual({ x: 0, y: 0 });
     }).not.toThrow();
+  });
+
+  it('should abort a drag if a runtime error occurs', () => {
+    const thrower: Thrower = getThrower();
+    const { getByText, queryByText } = render(
+      <App
+        anotherChild={
+          <Vomit
+            throw={() => {
+              causeRuntimeError();
+            }}
+            setForceThrow={thrower.setForceThrow}
+          />
+        }
+      />,
+    );
+    const handle: HTMLElement = getByText('item: 0');
+
+    simpleLift(control, handle);
+    expect(isDragging(handle)).toBe(true);
+
+    withWarn(() => {
+      thrower.execute();
+    });
+
+    expect(isDragging(queryByText('item: 0'))).toBe(false);
   });
 });

@@ -7,7 +7,7 @@ import { simpleLift, keyboard } from '../../util/controls';
 import { isDragging } from '../../util/helpers';
 import { withError } from '../../../../util/console';
 
-it('should recover from rbd invariants', () => {
+it('should recover from rbd errors', () => {
   let hasThrown: boolean = false;
   function CanThrow(props: { shouldThrow: boolean }) {
     if (!hasThrown && props.shouldThrow) {
@@ -37,6 +37,31 @@ it('should not recover from non-rbd errors', () => {
     if (!hasThrown && props.shouldThrow) {
       hasThrown = true;
       throw new Error('Boom');
+    }
+    return null;
+  }
+
+  const { rerender, getByTestId } = render(
+    <App anotherChild={<CanThrow shouldThrow={false} />} />,
+  );
+
+  simpleLift(keyboard, getByTestId('0'));
+  expect(isDragging(getByTestId('0'))).toBe(true);
+
+  withError(() => {
+    expect(() => {
+      rerender(<App anotherChild={<CanThrow shouldThrow />} />);
+    }).toThrow();
+  });
+});
+
+it('should not recover from runtime errors', () => {
+  let hasThrown: boolean = false;
+  function CanThrow(props: { shouldThrow: boolean }) {
+    if (!hasThrown && props.shouldThrow) {
+      hasThrown = true;
+      // Boom: TypeError
+      window.foo();
     }
     return null;
   }
