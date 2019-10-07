@@ -9,7 +9,7 @@ import expandedMouse from '../util/expanded-mouse';
 import Board, { withPoorBoardDimensions } from '../util/board';
 import { toDroppableList } from '../../../../src/state/dimension-structures';
 import { getTransitionEnd } from '../util/controls';
-import { withError } from '../../../util/console';
+import { withWarn } from '../../../util/console';
 
 function findPlaceholder(
   droppableId: DroppableId,
@@ -78,7 +78,7 @@ it('should remove all placeholders if an error occurs while dragging', () => {
       expect(isOver(handle)).toBe(droppable.descriptor.id);
       expect(hasPlaceholder(droppable.descriptor.id, container)).toBe(true);
 
-      withError(() => {
+      withWarn(() => {
         const event: Event = new Event('error');
         fireEvent(window, event);
       });
