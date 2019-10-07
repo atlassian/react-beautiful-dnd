@@ -91,7 +91,8 @@ export const quotes: Quote[] = [
   },
   {
     id: '8',
-    content: 'People make mistakes. It’s a part of growing up',
+    content:
+      "People make mistakes. It's all a part of growing up and you never really stop growing",
     author: finn,
   },
   {
