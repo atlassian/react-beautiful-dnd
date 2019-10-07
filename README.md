@@ -104,7 +104,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [Combining `<Draggable />`s](/docs/guides/combining.md)
 - [Common setup issues](/docs/guides/common-setup-issues.md)
 - [Using `innerRef`](/docs/guides/using-inner-ref.md)
-- [Developer warnings and how to disable them](/docs/guides/developer-warnings.md)
+- [Setup problem detection and error recovery](/docs/guides/setup-problem-detection-and-error-recovery.md)
 - [Rules for `draggableId` and `droppableId`s](/docs/guides/identifiers.md)
 - [Browser focus retention](/docs/guides/browser-focus.md)
 - [Customising or skipping the drop animation](/docs/guides/drop-animation.md)

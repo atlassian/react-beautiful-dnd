@@ -2,16 +2,31 @@
 
 > "People make mistakes. It's all a part of growing up and you never really stop growing" - [Duke of nuts (Adventure time)](https://adventuretime.fandom.com/wiki/Duke_of_Nuts)
 
-Contents
-
-- [Setup problems](#setup-problems)
+- [Setup problem detection](#setup-problem-detection)
 - [Error recovery](#error-recovery)
 
-## Setup problems
+## Setup problem detection
 
-For detectable setup issues and errors `react-beautiful-dnd` will log some information `console` for development builds (`process.env.NODE_ENV !== 'production'`). These logs are stripped from productions builds to save kbs and to keep the `console` clean. Keep in mind, that any setup errors that are logged will cause things to **break** in fun and interesting ways - so it is worth ensuring that there are none.
+For detectable setup problems `react-beautiful-dnd` will log some information `console` for development builds (`process.env.NODE_ENV !== 'production'`). These logs are stripped from productions builds to save kbs and to keep the `console` clean. Keep in mind, that any setup errors that are logged will cause things to **break** in fun and interesting ways - so it is worth ensuring that there are none.
 
 ![dev only warnings](https://user-images.githubusercontent.com/2182637/46385261-98a8eb00-c6fe-11e8-9b46-0699bf3e6043.png)
+
+### Log rather than throw setup errors
+
+Some setup problems will cause errors. These are logged with `console.error`. We do not `throw` these errors. This is because an infinite loop can be created.
+
+<details>
+  <summary>More details if you are interested</summary>
+
+  If we threw setup errors, here is the infinite loop:
+
+  1. Mount application
+  2. Error detected (we usually do it in a `useEffect`) and thrown
+  3. Error caught in `componentDidCatch`
+  4. React tree recovered (remounted). Goto step 2.
+
+  We could work around this loop condition, but it would lead to conditionally throwing, and otherwise logging. It is also tricky to avoid double logging of errors. Given that we are trying to recover the React tree, there is not a lot of value in throwing any setup problem in the first place. So we just log the problem in the `console`.
+</details>
 
 ### Production builds
 
@@ -68,11 +83,4 @@ React [error boundaries](https://reactjs.org/docs/error-boundaries.html) do not 
 - Cancel any active drag.
 - Log a warning stating that the drag has been cancelled (non-production builds; will respect disabled logging)
 
-
-
-
-
-
-
-## Background
-
+[← Back to documentation](/README.md#documentation-)
