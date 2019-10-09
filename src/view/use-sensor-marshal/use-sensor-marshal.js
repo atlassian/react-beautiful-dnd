@@ -46,6 +46,7 @@ import useLayoutEffect from '../use-isomorphic-layout-effect';
 import { noop } from '../../empty';
 import findClosestDraggableIdFromEvent from './try-get-closest-draggable-id-from-event';
 import findDraggable from '../get-elements/find-draggable';
+import bindEvents from '../event-bindings/bind-events';
 
 function preventDefault(event: Event) {
   event.preventDefault();
@@ -237,12 +238,22 @@ function tryStart({
 
       // block next click if requested
       if (options.shouldBlockNextClick) {
-        window.addEventListener('click', preventDefault, {
-          // only blocking a single click
-          once: true,
-          passive: false,
-          capture: true,
-        });
+        const unbind = bindEvents(window, [
+          {
+            eventName: 'click',
+            fn: preventDefault,
+            options: {
+              // only blocking a single click
+              once: true,
+              passive: false,
+              capture: true,
+            },
+          },
+        ]);
+        // Sometimes the click is swallowed, such as when there is reparenting
+        // The click event (in the message queue) will occur before the next setTimeout expiry
+        // https://codesandbox.io/s/click-behaviour-pkfk2
+        setTimeout(unbind);
       }
 
       // releasing
