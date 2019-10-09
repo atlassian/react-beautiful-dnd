@@ -2,7 +2,7 @@
 const path = require('path');
 
 const common = {
-  context: path.resolve(__dirname, '..', '..'),
+  context: path.resolve(__dirname, '..'),
   mode: 'development',
   entry: path.resolve(__dirname, 'main.js'),
   target: 'web',

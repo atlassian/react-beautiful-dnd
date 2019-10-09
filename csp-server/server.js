@@ -60,5 +60,8 @@ export default (port: string, outputPath: string, fs: any) => {
     render(res, `style-src 'nonce-${nonce}'`, wrongNonce);
   });
 
-  server.listen(port);
+  server.listen(port, () => {
+    // eslint-disable-next-line no-console
+    console.log('csp server listening on port', port);
+  });
 };

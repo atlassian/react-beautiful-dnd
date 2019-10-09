@@ -37,6 +37,12 @@ Promise.all([
   }),
 ])
   .then(() => {
+    if (!process.argv[2]) {
+      // eslint-disable-next-line no-console
+      console.warn('Started servers but no command supplied to run after');
+      process.exit();
+    }
+
     const child = childProcess.spawn(process.argv[2], process.argv.slice(3), {
       stdio: 'inherit',
     });
@@ -47,9 +53,11 @@ Promise.all([
       process.exit(code);
     });
   })
-  .catch(() => {
+  .catch(error => {
     // eslint-disable-next-line no-console
-    console.error('Storybook or our stand alone server did not start in time');
+    console.error('Unable to spin up standalone servers');
+    // eslint-disable-next-line no-console
+    console.error(error);
     storybook.kill();
     cspServer.kill();
     process.exit(1);
