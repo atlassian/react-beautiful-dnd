@@ -6,7 +6,7 @@
 
 A "virtual list" is the name given to a _windowing_ performance optimisation technique where only the **visible** list items are rendered. See [Rendering large lists with react-window](https://addyosmani.com/blog/react-window/) by Addy Osmani for more background on virtual lists
 
-![windowing](https://user-images.githubusercontent.com/2182637/65490523-a7307980-def0-11e9-9991-a7e0c2a6e30a.gif)
+<img src="https://user-images.githubusercontent.com/2182637/65490523-a7307980-def0-11e9-9991-a7e0c2a6e30a.gif" alt="windowing" width="200px"/>
 
 > Diagram from [Creating more efficient React views with windowing](https://bvaughn.github.io/forward-js-2017/#/0/0) by Brain Vaughn
 
@@ -25,14 +25,14 @@ Please raise a pull request if you would like to add examples for other virtuali
 
 ### [`react-window`](https://github.com/bvaughn/react-window)
 
-- [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-window--list) - [source](/stories/src/virtual/react-window/list.jsx)
-- [Board](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-window--board) - [source](/stories/src/virtual/react-window/board.jsx)
+- [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-window--list) ([source](/stories/src/virtual/react-window/list.jsx))
+- [Board](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-window--board) ([source](/stories/src/virtual/react-window/board.jsx))
 
 ### [`react-virtualized`](https://github.com/bvaughn/react-virtualized)
 
-- [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--list) - [source](/stories/src/virtual/react-virtualized/list.jsx)
-- [Board](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--board) - [source](/stories/src/virtual/react-virtualized/board.jsx)
-- [List with `WindowScroller`](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--window-list) [source](/stories/src/virtual/react-virtualized/window-list.jsx) ([`WindowScroller`](https://github.com/bvaughn/react-virtualized/blob/master/docs/WindowScroller.md))
+- [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--list) ([source](/stories/src/virtual/react-virtualized/list.jsx))
+- [Board](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--board) ([source](/stories/src/virtual/react-virtualized/board.jsx))
+- [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--window-list) with [`WindowScroller`](https://github.com/bvaughn/react-virtualized/blob/master/docs/WindowScroller.md) ([source](/stories/src/virtual/react-virtualized/window-list.jsx))
 
 ## Usage
 
