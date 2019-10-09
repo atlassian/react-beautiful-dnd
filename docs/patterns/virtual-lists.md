@@ -2,6 +2,8 @@
 
 `react-beautiful-dnd` supports drag and drop within and between virtual lists. This lets you have fantastic performance with very large data sets. As a general rule, you will want to start using a virtual list when your list size is more than 500 items.
 
+![virtual-board](https://user-images.githubusercontent.com/2182637/66453948-e0044d00-eab1-11e9-88db-3e5165dde69b.gif)
+
 ## Background: what are virtual lists?
 
 A "virtual list" is the name given to a _windowing_ performance optimisation technique where only the **visible** list items are rendered. See [Rendering large lists with react-window](https://addyosmani.com/blog/react-window/) by Addy Osmani for more background on virtual lists
