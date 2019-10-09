@@ -18,6 +18,7 @@ import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getCombinedItemDisplacement from '../get-combined-item-displacement';
 import removeDraggableFromList from '../remove-draggable-from-list';
 import calculateCombineImpact from '../calculate-drag-impact/calculate-combine-impact';
+import getDisplacedBy from '../get-displaced-by';
 
 function getWhenEntered(
   id: DraggableId,
@@ -104,7 +105,10 @@ export default ({
 
   const axis: Axis = destination.axis;
   const displaced: DisplacementGroups = previousImpact.displaced;
-  const canBeDisplacedBy: DisplacedBy = previousImpact.displacedBy;
+  const canBeDisplacedBy: DisplacedBy = getDisplacedBy(
+    destination.axis,
+    draggable.displaceBy,
+  );
   const lastCombineImpact: ?CombineImpact = tryGetCombineImpact(previousImpact);
 
   const combineWith: ?DraggableDimension = find(

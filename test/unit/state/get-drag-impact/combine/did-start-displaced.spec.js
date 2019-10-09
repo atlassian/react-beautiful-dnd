@@ -19,6 +19,7 @@ import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import afterPoint from '../../../../util/after-point';
 import beforePoint from '../../../../util/before-point';
 import { getForcedDisplacement } from '../../../../util/impact';
+import noImpact, { emptyGroups } from '../../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -394,6 +395,41 @@ import { getForcedDisplacement } from '../../../../util/impact';
         });
         expect(impact).toEqual(combineWithDisplacedInHome3Impact);
       }
+    });
+
+    // - dragging inHome3 out of home
+    // - inHome4 will have shifted backwards
+    // - re-enter home list
+    it('should understand that when re-entering a list, items that started displaced no longer are', () => {
+      const impact: DragImpact = getDragImpact({
+        // right over the center of inHome4
+        pageBorderBoxCenter: preset.inHome4.page.borderBox.center,
+        draggable: preset.inHome3,
+        draggables: preset.draggables,
+        droppables: withCombineEnabled,
+        // nowhere
+        previousImpact: noImpact,
+        viewport: preset.viewport,
+        userDirection: backward,
+        afterCritical,
+      });
+      const displacedByForInHome3: DisplacedBy = getDisplacedBy(
+        axis,
+        preset.inHome3.displaceBy,
+      );
+      const expected: DragImpact = {
+        displaced: emptyGroups,
+        displacedBy: displacedByForInHome3,
+        // below inHome4
+        at: {
+          type: 'REORDER',
+          destination: {
+            droppableId: preset.inHome3.descriptor.droppableId,
+            index: preset.inHome4.descriptor.index,
+          },
+        },
+      };
+      expect(impact).toEqual(expected);
     });
   });
 });
