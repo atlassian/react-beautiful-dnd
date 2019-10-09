@@ -15,6 +15,10 @@ To get around this issue you need to move the dragging item to another location 
 
 Our cloning API is a first class way of reparenting a `<Draggable />`s into another DOM location while a drag is occurring. When using our cloning API the original `<Draggable />` is removed while the drag is being performed; a new _clone_ is rendered (using `renderClone`) into the container element (controllable using `getContainerForClone`)
 
+<img src="https://user-images.githubusercontent.com/2182637/66469796-439f7200-ead4-11e9-834e-c11d13dafab0.gif" width="300px" />
+
+Generally you will want to render the same visual item as the one that is dragging, but you can render anything you want. The displacement will be based on the dimensions of the original item so we strongly recommend using an element that is exactly the same size.
+
 Using our cloning API is required for compatibility with [virtual lists](/docs/patterns/virtual-lists.md).
 
 ```js
