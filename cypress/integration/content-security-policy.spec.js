@@ -2,6 +2,7 @@
 import * as keyCodes from '../../src/view/key-codes';
 import { timings } from '../../src/animation';
 import { getHandleSelector } from './util';
+import ports from '../../server-ports';
 
 function commonTest(url: string, cspTest: string) {
   cy.visit(url);
@@ -43,14 +44,17 @@ function commonTest(url: string, cspTest: string) {
 
 describe('content security policy', () => {
   it('should reorder a list without a nonce', () => {
-    commonTest('http://localhost:9003', 'contain');
+    commonTest(`http://localhost:${ports.cspServer}`, 'contain');
   });
 
   it('should reorder a list with a nonce', () => {
-    commonTest('http://localhost:9003/nonce', 'contain');
+    commonTest(`http://localhost:${ports.cspServer}/nonce`, 'contain');
   });
 
   it('should reorder a list with a wrong nonce', () => {
-    commonTest('http://localhost:9003/wrong-nonce', 'not.contain');
+    commonTest(
+      `http://localhost:${ports.cspServer}/wrong-nonce`,
+      'not.contain',
+    );
   });
 });

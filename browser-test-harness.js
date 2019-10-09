@@ -2,11 +2,7 @@
 const childProcess = require('child_process');
 const path = require('path');
 const waitPort = require('wait-port');
-
-const ports = {
-  storybook: 9002,
-  cspServer: 9003,
-};
+const ports = require('./server-ports');
 
 const storybook = childProcess.spawn(process.execPath, [
   path.join('node_modules', '.bin', 'start-storybook'),
