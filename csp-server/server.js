@@ -4,7 +4,7 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { resolve } from 'path';
 import App from './app';
-import { resetServerContext } from '../../src';
+import { resetServerContext } from '../src';
 
 let count = 0;
 function getNonce(): string {

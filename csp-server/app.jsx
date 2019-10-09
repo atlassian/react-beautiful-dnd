@@ -4,7 +4,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DragDropContext, Droppable, Draggable } from '../../src';
+import { DragDropContext, Droppable, Draggable } from '../src';
 
 // fake data generator
 const getItems = count =>

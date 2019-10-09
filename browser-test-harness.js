@@ -3,31 +3,36 @@ const childProcess = require('child_process');
 const path = require('path');
 const waitPort = require('wait-port');
 
+const ports = {
+  storybook: 9002,
+  cspServer: 9003,
+};
+
 const storybook = childProcess.spawn(process.execPath, [
   path.join('node_modules', '.bin', 'start-storybook'),
   '-p',
-  '9002',
+  `${ports.storybook}`,
 ]);
 
-const standalone = childProcess.spawn(process.execPath, [
-  path.join('test', 'standalone', 'start.sh'),
-  '9003',
+const cspServer = childProcess.spawn(process.execPath, [
+  path.join('csp-server', 'start.sh'),
+  `${ports.cspServer}`,
 ]);
 
 process.on('exit', () => {
   storybook.kill();
-  standalone.kill();
+  cspServer.kill();
 });
 
 Promise.all([
   waitPort({
     host: 'localhost',
-    port: 9003,
+    port: ports.storybook,
     timeout: 60000,
   }),
   waitPort({
     host: 'localhost',
-    port: 9002,
+    port: ports.cspServer,
     timeout: 60000,
   }),
 ])
@@ -46,6 +51,6 @@ Promise.all([
     // eslint-disable-next-line no-console
     console.error('Storybook or our stand alone server did not start in time');
     storybook.kill();
-    standalone.kill();
+    cspServer.kill();
     process.exit(1);
   });
