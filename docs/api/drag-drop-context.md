@@ -18,11 +18,23 @@ import type { Node } from 'react';
 
 type Props = {|
   ...Responders,
+  // We do not technically need any children for this component
+  children: Node | null,
+  // Read out by screen readers when focusing on a drag handle
+  liftInstruction?: string,
+  // Used for strict content security policies
   nonce?: string,
-  children: ?Node,
-  liftInstruction: ?string,
+  // Used for custom sensors
+  sensors?: Sensor[],
+  enableDefaultSensors?: ?boolean,
 |};
 ```
+
+- `liftInstruction`: What is read out to screen reader users when a *drag handle* is given browser focus. See our [screen reader guide](/docs/guides/screen-reader.md)
+- `nonce`: Used for strict content security policy setups. See our [content security policy guide](/docs/guides/content-security-policy.md)
+- `sensors`: Used to pass in your own `sensor`s for a `<DragDropContext>`. See our [sensor api documentation](/docs/sensors/sensor-api.md)
+- `enableDefaultSensors`: Whether or not the default sensors ([mouse](/docs/sensors/mouse.md), [keyboard](/docs/sensors/keyboard.md), and [touch](/docs/sensors/touch.md)) are enabled. See our [sensor api documentation](/docs/sensors/sensor-api.md)
+
 
 > See our [type guide](/docs/guides/types.md) for more details
 

@@ -11,17 +11,19 @@ The public sensor API is the same API that our [mouse](/docs/sensors/mouse.md), 
 
 ## Examples
 
-These are some **illustrative** examples to show off what is possible with the Sensor API. They are currently not built to be of production quality. Although they could be leveled up to that point. Feel free to reach out if you would like to help improve them.
+These are some examples to show off what is possible with the Sensor API. They are currently not built to be production ready. Feel free to reach out if you would like to help improve them or add your own!
+
+(Please be sure to use prefix `rbd-`)
 
 | Voice 🗣 | Webcam 📷 | Thought 🧠 |
 | :-------: | :---------: | :----------: |
-| ![voice sensor](https://user-images.githubusercontent.com/2182637/66467095-87dc4380-eacf-11e9-9e2e-7ae1a59bfddf.gif) | ![webcam-sensor](https://user-images.githubusercontent.com/2182637/66466837-1603fa00-eacf-11e9-8c15-5ed324c8916f.gif) | ![thought sensor](https://raw.githubusercontent.com/charliegerard/rbd-thought-sensor/master/demo.gif) |
+| ![voice sensor](https://user-images.githubusercontent.com/2182637/66467095-87dc4380-eacf-11e9-9e2e-7ae1a59bfddf.gif) | ![webcam sensor](https://user-images.githubusercontent.com/2182637/66466837-1603fa00-eacf-11e9-8c15-5ed324c8916f.gif) | ![thought sensor](https://raw.githubusercontent.com/charliegerard/rbd-thought-sensor/master/demo.gif) |
 | [`rbd-voice-sensor`](https://github.com/danieldelcore/rbd-voice-sensor)<br>created by [@danieldelcore](https://github.com/danieldelcore) | [`rbd-webcam-sensor`](https://github.com/kangweichan/rbd-webcam-sensor)<br>created by [@kangweichan](https://github.com/kangweichan) | [`rbd-thought-sensor`](https://github.com/charliegerard/rbd-thought-sensor)<br>created by [@charliegerard](https://github.com/charliegerard) |
 
-| Controls | Run sheet | Run sheet isolation | Onboarding   |
-| -------- | --------- | ------------------- | ------------ |
-| ![programatic-dragging](https://user-images.githubusercontent.com/2182637/66469550-c07e1c00-ead3-11e9-8e45-3cb114cf3c97.gif) |           |                     | ![onboarding](https://user-images.githubusercontent.com/2182637/66466850-1bf9db00-eacf-11e9-958f-82f970f4111b.gif) |
-|          |           |                     | An scripted onboarding experience for a trip planning application |
+| With controls | Run sheet | Onboarding   |
+| :--------: | :---------: | :------------: |
+| ![controls](https://user-images.githubusercontent.com/2182637/66469550-c07e1c00-ead3-11e9-8e45-3cb114cf3c97.gif) | ![multiple-drag-drop-context](https://user-images.githubusercontent.com/2182637/66472177-6c296b00-ead8-11e9-8966-bd194d3f8070.gif) | ![onboarding](https://user-images.githubusercontent.com/2182637/66466850-1bf9db00-eacf-11e9-958f-82f970f4111b.gif) |
+| Mapping controls to movements | Running scripted experiences along side a user controlled drag | A scripted onboarding experience for a trip planning application |
 
 ## Overview
 
@@ -101,6 +103,8 @@ function App() {
 }
 ```
 
+**The `sensors` array should not change dynamically**. If you do this you run the risk of violating the [rules of React hooks](https://reactjs.org/docs/hooks-rules.html).
+
 You can also disable all of the prebuilt sensors ([mouse](/docs/sensors/mouse.md), [keyboard](/docs/sensors/keyboard.md), and [touch](/docs/sensors/touch.md)) by setting `enableDefaultSensors={false}` on a `<DragDropContext />`. This is useful if you _only_ want a `<DragDropContext />` to be controlled programmatically.
 
 ### Controlling a drag: try to get a lock
@@ -108,7 +112,9 @@ You can also disable all of the prebuilt sensors ([mouse](/docs/sensors/mouse.md
 A `sensor` is provided with a an object (`SensorAPI`) which is used to try to get a **lock**
 
 ```js
-export type SensorAPI = {|
+type Sensor = (api: SensorAPI) => void;
+
+type SensorAPI = {|
   tryGetLock: TryGetLock,
   canGetLock: (id: DraggableId) => boolean,
   isLockClaimed: () => boolean,
@@ -117,7 +123,7 @@ export type SensorAPI = {|
   findOptionsForDraggable: (id: DraggableId) => ?DraggableOptions,
 |};
 
-export type DraggableOptions = {|
+type DraggableOptions = {|
   canDragInteractiveElements: boolean,
   shouldRespectForcePress: boolean,
   isEnabled: boolean,

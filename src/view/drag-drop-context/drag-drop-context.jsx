@@ -8,13 +8,16 @@ import App from './app';
 
 type Props = {|
   ...Responders,
-  nonce?: string,
-  // we do not technically need any children for this component
+  // We do not technically need any children for this component
   children: Node | null,
-
+  // Read out by screen readers when focusing on a drag handle
+  liftInstruction?: string,
+  // Used for strict content security policies
+  // See our [content security policy guide](/docs/guides/content-security-policy.md)
+  nonce?: string,
+  // See our [sensor api](/docs/sensors/sensor-api.md)
   sensors?: Sensor[],
   enableDefaultSensors?: ?boolean,
-  liftInstruction?: string,
 |};
 
 let instanceCount: number = 0;

@@ -32,6 +32,8 @@ export type {
   OnDragEndResponder,
   SensorAPI,
   Sensor,
+  TryGetLock,
+  TryGetLockOptions,
 } from './types';
 
 // Droppable types
