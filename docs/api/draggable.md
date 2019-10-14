@@ -44,11 +44,12 @@ type Props = {|
 - `draggableId`: A _required_ `DraggableId(string)`. See our [identifiers guide](/docs/guides/identifiers.md) for more information.
 - `index`: A _required_ `number` that matches the order of the `<Draggable />` in the `<Droppable />`. It is simply the index of the `<Draggable />` in the list.
 
-`index` rules:
+`index` rule:
 
-- Must be unique with a `<Droppable />` (no duplicates)
+- Must be unique within a `<Droppable />` (no duplicates)
 - Must be consecutive. `[0, 1, 2]` and not `[1, 2, 8]`
-- Does not need to start from `0` (this is often the case in virtual lists)
+
+Indexes do not need to start from `0` (this is often the case in virtual lists). In development mode we will log warnings to the `console` if any of these rules are violated. See [Setup problem detection and error recovery](/docs/guides/setup-problem-detection-and-error-recovery.md)
 
 Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
 

@@ -24,9 +24,10 @@ More information: [identifiers guide](/docs/guides/identifiers.md)
 
 Rules:
 
-- Must be unique with a `<Droppable />` (no duplicates)
+- Must be unique within a `<Droppable />` (no duplicates)
 - Must be consecutive. `[0, 1, 2]` and not `[1, 2, 8]`
-- Does not need to start from `0` (this is often the case in virtual lists)
+
+Indexes do not need to start from `0` (this is often the case in virtual lists)
 
 [More information](/docs/api/draggable.md#draggable-props)
 
