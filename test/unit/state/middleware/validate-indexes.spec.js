@@ -40,7 +40,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-it.only('should log a warning if items are added that do not have consecutive indexes', () => {
+it('should log a warning if items are added that do not have consecutive indexes', () => {
   const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
   const mock = jest.fn();
@@ -51,11 +51,11 @@ it.only('should log a warning if items are added that do not have consecutive in
       index: preset.inHome2.descriptor.index + 5,
     },
   };
-  const dimensions: DimensionMap = copy(preset.dimensions);
-  dimensions.draggables[preset.inHome2.descriptor.id] = customInHome2;
+  const copied: DimensionMap = copy(preset.dimensions);
+  copied.draggables[preset.inHome2.descriptor.id] = customInHome2;
 
   const marshal: DimensionMarshal = createMarshal(
-    getPopulatedRegistry(dimensions),
+    getPopulatedRegistry(copied),
     // lazy use of store.dispatch
     action =>
       // eslint-disable-next-line no-use-before-define
@@ -64,7 +64,7 @@ it.only('should log a warning if items are added that do not have consecutive in
   const store: Store = createStore(passThrough(mock), middleware(marshal));
   const initial: InitialPublishArgs = {
     ...initialPublishArgs,
-    dimensions,
+    dimensions: copied,
   };
 
   // first lift is preparing
@@ -93,16 +93,16 @@ it('should log a warning if items are added have duplicate indexes', () => {
   const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
   const mock = jest.fn();
-  const customInHome2: DraggableDimension = {
-    ...preset.inHome2,
+  const customInHome4: DraggableDimension = {
+    ...preset.inHome4,
     descriptor: {
-      ...preset.inHome2.descriptor,
+      ...preset.inHome4.descriptor,
       // duplicate index
-      index: preset.inHome1.descriptor.index,
+      index: preset.inHome3.descriptor.index,
     },
   };
   const dimensions: DimensionMap = copy(preset.dimensions);
-  dimensions.draggables[preset.inHome2.descriptor.id] = customInHome2;
+  dimensions.draggables[preset.inHome4.descriptor.id] = customInHome4;
 
   const marshal: DimensionMarshal = createMarshal(
     getPopulatedRegistry(dimensions),
@@ -128,7 +128,7 @@ it('should log a warning if items are added have duplicate indexes', () => {
   // a warning is logged
   expect(warn).toHaveBeenCalled();
   expect(warn.mock.calls[0][0]).toEqual(
-    expect.stringContaining('0, [🔥2], [🔥2], 3'),
+    expect.stringContaining('0, 1, [🔥2], [🔥2]'),
   );
 
   warn.mockRestore();

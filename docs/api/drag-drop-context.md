@@ -32,7 +32,7 @@ type Props = {|
 
 - `liftInstruction`: What is read out to screen reader users when a *drag handle* is given browser focus. See our [screen reader guide](/docs/guides/screen-reader.md)
 - `nonce`: Used for strict content security policy setups. See our [content security policy guide](/docs/guides/content-security-policy.md)
-- `sensors`: Used to pass in your own `sensor`s for a `<DragDropContext>`. See our [sensor api documentation](/docs/sensors/sensor-api.md)
+- `sensors`: Used to pass in your own `sensor`s for a `<DragDropContext />`. See our [sensor api documentation](/docs/sensors/sensor-api.md)
 - `enableDefaultSensors`: Whether or not the default sensors ([mouse](/docs/sensors/mouse.md), [keyboard](/docs/sensors/keyboard.md), and [touch](/docs/sensors/touch.md)) are enabled. See our [sensor api documentation](/docs/sensors/sensor-api.md)
 
 
