@@ -1,8 +1,11 @@
 // @flow
+export function getRuntimeError(): Event {
+  return new window.ErrorEvent('error', {
+    error: new Error('non-rbd'),
+    cancelable: true,
+  });
+}
 
 export default function causeRuntimeError() {
-  const event: Event = new window.ErrorEvent('error', {
-    error: new Error('non-rbd'),
-  });
-  window.dispatchEvent(event);
+  window.dispatchEvent(getRuntimeError());
 }

@@ -77,6 +77,7 @@ React [error boundaries](https://reactjs.org/docs/error-boundaries.html) do not 
 - Cancel any active drag.
 - Log a warning stating that the drag has been cancelled (non-production builds; will respect disabled logging)
 - Log the error
+- Call `event.preventDefault()` on the event. This marks the event as consumed. See [how we use DOM events](/docs/guides/how-we-use-dom-events.md). It will also prevent any 'uncaught error' warnings in your `console`.
 
 #### non-rbd error or runtime error
 

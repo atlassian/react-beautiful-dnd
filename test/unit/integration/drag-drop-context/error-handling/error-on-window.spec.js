@@ -6,61 +6,50 @@ import App from '../../util/app';
 import { simpleLift, keyboard } from '../../util/controls';
 import { isDragging } from '../../util/helpers';
 import { withError, withWarn, withoutError } from '../../../../util/console';
-import causeRuntimeError from '../../../../util/cause-runtime-error';
+import { getRuntimeError } from '../../../../util/cause-runtime-error';
 
-// Lame that this is not in flow
+function getRbdErrorEvent(): Event {
+  return new window.ErrorEvent('error', {
+    error: new RbdInvariant('my invariant'),
+    cancelable: true,
+  });
+}
 
-it('should abort any active drag (rbd error) and log the error', () => {
+it('should abort any active drag (rbd error)', () => {
   const { getByTestId } = render(<App />);
 
   simpleLift(keyboard, getByTestId('0'));
   expect(isDragging(getByTestId('0'))).toBe(true);
+  const event: Event = getRbdErrorEvent();
 
   withWarn(() => {
     withError(() => {
-      window.dispatchEvent(
-        new window.ErrorEvent('error', {
-          error: new RbdInvariant('my invariant'),
-        }),
-      );
+      window.dispatchEvent(event);
     });
   });
 
+  // drag aborted
   expect(isDragging(getByTestId('0'))).toBe(false);
+  // error event prevented
+  expect(event.defaultPrevented).toBe(true);
 });
 
-it('should abort any active drag (non-rbd error) and not log the error', () => {
+it('should abort any active drag (non-rbd error)', () => {
   const { getByTestId } = render(<App />);
   simpleLift(keyboard, getByTestId('0'));
   expect(isDragging(getByTestId('0'))).toBe(true);
+  const event: Event = getRuntimeError();
 
   // not logging the raw error
   withoutError(() => {
     // logging that the drag was aborted
     withWarn(() => {
-      window.dispatchEvent(
-        new window.ErrorEvent('error', {
-          error: new Error('non-rbd'),
-        }),
-      );
+      window.dispatchEvent(event);
     });
   });
 
+  // drag aborted
   expect(isDragging(getByTestId('0'))).toBe(false);
-});
-
-it('should abort any active drag (runtime error) and not log the error', () => {
-  const { getByTestId } = render(<App />);
-  simpleLift(keyboard, getByTestId('0'));
-  expect(isDragging(getByTestId('0'))).toBe(true);
-
-  // not logging the raw error
-  withoutError(() => {
-    // logging that the drag was aborted
-    withWarn(() => {
-      causeRuntimeError();
-    });
-  });
-
-  expect(isDragging(getByTestId('0'))).toBe(false);
+  // error event not prevented
+  expect(event.defaultPrevented).toBe(false);
 });

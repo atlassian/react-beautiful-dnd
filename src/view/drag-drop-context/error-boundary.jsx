@@ -60,6 +60,9 @@ export default class ErrorBoundary extends React.Component<Props> {
     const err: ?Error = event.error;
 
     if (err instanceof RbdInvariant) {
+      // Marking the event as dealt with.
+      // This will prevent any 'uncaught' error warnings in the console
+      event.preventDefault();
       if (process.env.NODE_ENV !== 'production') {
         error(err.message);
       }
