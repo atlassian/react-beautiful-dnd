@@ -317,7 +317,7 @@ export default (state: State = idle, action: Action): State => {
 
     invariant(
       state.isWindowScrollAllowed,
-      'Window scrolling is currently not supported for fixed lists. Aborting drag',
+      'Window scrolling is currently not supported for fixed lists',
     );
 
     const newScroll: Position = action.payload.newScroll;

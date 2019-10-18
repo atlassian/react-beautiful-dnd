@@ -5,6 +5,7 @@ import { invariant } from '../invariant';
 import bindEvents from './event-bindings/bind-events';
 import type { EventBinding } from './event-bindings/event-types';
 import getWindowScroll from './window/get-window-scroll';
+import { noop } from '../empty';
 
 type OnWindowScroll = (newScroll: Position) => void;
 
@@ -18,8 +19,6 @@ type Result = {|
   isActive: () => boolean,
 |};
 
-function noop() {}
-
 function getWindowScrollBinding(update: () => void): EventBinding {
   return {
     eventName: 'scroll',
@@ -31,10 +30,11 @@ function getWindowScrollBinding(update: () => void): EventBinding {
     // Using capture: false here as we want to avoid intercepting droppable scroll requests
     options: { passive: true, capture: false },
     fn: (event: UIEvent) => {
-      // IE11 fix:
-      // Scrollable events still bubble up and are caught by this handler in ie11.
-      // We can ignore this event
-      if (event.currentTarget !== window) {
+      // IE11 fix
+      // All scrollable events still bubble up and are caught by this handler in ie11.
+      // On a window scroll the event.target should be the window or the document.
+      // If this is not the case then it is not a 'window' scroll event and can be ignored
+      if (event.target !== window && event.target !== window.document) {
         return;
       }
 
