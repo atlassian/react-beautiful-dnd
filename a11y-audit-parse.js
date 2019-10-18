@@ -1,9 +1,12 @@
-// @flow
+/* eslint-disable flowtype/require-valid-file-annotation */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable global-require */
 /* eslint-disable no-console */
 try {
-  // $ExpectError - file not be created
+  // I disabled flow for this file because of this line.
+  // Sometimes the file exists, sometimes it doesn't.
+  // It depends on if you have run the accessibility test or not.
+  // Given this conditional I thought it best to simply disable flow for the file
   const a11yReport = require('./test-reports/lighthouse/a11y.report.json');
   const a11yScore = a11yReport.categories.accessibility.score;
   const a11yScoreFormatted = `${a11yScore ? a11yScore * 100 : 0}%`;
