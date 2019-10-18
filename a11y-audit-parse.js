@@ -9,7 +9,7 @@ try {
   const a11yScoreFormatted = `${a11yScore ? a11yScore * 100 : 0}%`;
 
   console.log('*************************');
-  console.log('a11y score: ', a11yScoreFormatted);
+  console.log('Lighthouse accessibility score: ', a11yScoreFormatted);
   console.log('*************************');
 
   if (a11yScore === 1) {
