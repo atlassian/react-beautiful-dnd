@@ -87,6 +87,13 @@ export default [
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot(snapshotArgs),
       terser(),
+      // Useful for debugging: you can see what code is dropped
+      // terser({
+      //   mangle: false,
+      //   compress: false,
+      //   keep_fnames: true,
+      //   output: { beautify: true },
+      // }),
     ],
   },
 
