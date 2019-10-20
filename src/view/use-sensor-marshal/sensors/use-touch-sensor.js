@@ -18,7 +18,6 @@ import * as keyCodes from '../../key-codes';
 import supportedPageVisibilityEventName from './util/supported-page-visibility-event-name';
 import { noop } from '../../../empty';
 import useLayoutEffect from '../../use-isomorphic-layout-effect';
-import isHtmlElement from '../../is-type-of-element/is-html-element';
 
 type TouchWithForce = Touch & {
   force: number,
