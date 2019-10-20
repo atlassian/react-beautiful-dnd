@@ -42,9 +42,9 @@ function closestPonyfill(el: ?Element, selector: string) {
 
 export default function closest(el: Element, selector: string): ?Element {
   // Using native closest for maximum speed where we can
-  // if (el.closest) {
-  //   return el.closest(selector);
-  // }
+  if (el.closest) {
+    return el.closest(selector);
+  }
   // ie11: damn you!
   return closestPonyfill(el, selector);
 }

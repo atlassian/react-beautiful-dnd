@@ -288,17 +288,14 @@ export default function useMouseSensor(api: SensorAPI) {
           x: clientX,
           y: clientY,
         };
-        const target: EventTarget = event.target;
-        invariant(
-          isHtmlElement(target),
-          'Expected touch target to be an element',
-        );
+        const handle: ?HTMLElement = api.findClosestDragHandle(event);
+        invariant(handle, 'Touch sensor unable to find drag handle');
 
         // unbind this event handler
         unbindEventsRef.current();
 
         // eslint-disable-next-line no-use-before-define
-        startPendingDrag(actions, point, target);
+        startPendingDrag(actions, point, handle);
       },
     }),
     // not including stop or startPendingDrag as it is not defined initially

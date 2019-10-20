@@ -44,7 +44,8 @@ import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 import { noop } from '../../empty';
-import findClosestDraggableIdFromEvent from './try-get-closest-draggable-id-from-event';
+import findClosestDragHandleFromEvent from './find-closest-drag-handle-from-event';
+import findClosestDraggableIdFromEvent from './find-closest-draggable-id-from-event';
 import findDraggable from '../get-elements/find-draggable';
 import bindEvents from '../event-bindings/bind-events';
 
@@ -442,6 +443,12 @@ export default function useSensorMarshal({
     [contextId],
   );
 
+  const findClosestDragHandle = useCallback(
+    (event: Event): ?HTMLElement =>
+      findClosestDragHandleFromEvent(contextId, event),
+    [contextId],
+  );
+
   const findOptionsForDraggable = useCallback(
     (id: DraggableId): ?DraggableOptions => {
       const entry: ?DraggableEntry = registry.draggable.findById(id);
@@ -458,6 +465,7 @@ export default function useSensorMarshal({
       canGetLock,
       tryGetLock,
       findClosestDraggableId,
+      findClosestDragHandle,
       findOptionsForDraggable,
       tryReleaseLock,
       isLockClaimed,
@@ -466,6 +474,7 @@ export default function useSensorMarshal({
       canGetLock,
       tryGetLock,
       findClosestDraggableId,
+      findClosestDragHandle,
       findOptionsForDraggable,
       tryReleaseLock,
       isLockClaimed,

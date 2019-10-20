@@ -134,7 +134,8 @@ type DraggableOptions = {|
 - `canGetLock(id)`: returns whether a lock _could_ be claimed for a given `DraggableId`
 - `isLockClaimed()`: returns `true` if any sensor currently has a lock
 - `tryReleaseLock()`: will release any active lock. This can be useful for programmatically cancelling a drag.
-- `findClosestDraggableId(event)`: a function that will try to find the closest `draggableId` based on an event. It will look upwards from the `event.target` to try and find a _drag handle_
+- `findClosestDraggableId(event)`: a function that will try to find the closest `draggableId` based on an event. It has the same behaviour as `findClosestDragHandle(event)`, except it just returns the `draggableId`, rather than the element.
+- `findClosestDragHandle(event)`: a function that will try to find the closest *drag handle* based on an event. It will look upwards from the `event.target` to try and find a _drag handle_
 - `findOptionsForDraggable(id)`: tries to lookup `DraggableOptions` associated with a `<Draggable />`
 
 ```js
