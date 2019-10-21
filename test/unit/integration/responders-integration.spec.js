@@ -320,6 +320,16 @@ describe('responders integration', () => {
     });
   });
 
+  describe('unmounted mid drag', () => {
+    it('should cancel a drag if unmounted mid drag', () => {
+      drag.start();
+
+      wrapper.unmount();
+
+      wasDragCancelled();
+    });
+  });
+
   describe('subsequent drags', () => {
     it('should publish subsequent drags', () => {
       drag.perform();
