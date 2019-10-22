@@ -66,6 +66,8 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 
 ## Articles, tutorials and blogs
 
+- [Scripted natural motion with react-beautiful-dnd](TODO)
+- [Drag n’Drop with react-beautiful-dnd](https://medium.com/@reireynoso/drag-ndrop-with-react-beautiful-dnd-73014e5937f2)
 - [How to add Drag and Drop features to your React app](https://medium.com/javascript-in-plain-english/how-to-add-drag-and-drop-feature-to-your-react-app-20cb22fb180)
 - [`awesome-react-components`](https://github.com/brillout/awesome-react-components)
 - CSS-Tricks [tweet](https://twitter.com/css/status/1138866065965010945)

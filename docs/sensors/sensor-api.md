@@ -198,6 +198,8 @@ type StopDragOptions = {|
 
 #### Fluid dragging
 
+> ✍️ [Raathi Kugarajan](https://twitter.com/Raathigesh) has written a blog : ["Scripted natural motion with react-beautiful-dnd"](TODO) which outlines how you can create scripted user behaviour with the Sensor API 👏
+
 `<Draggable />`s move around naturally in response a moving point. The _impact_ of the drag is controlled by a _collision engine_. (This is what our [mouse sensor](/docs/sensors/mouse.md) and [touch sensor](/docs/sensors/touch.md) use)
 
 ```js
