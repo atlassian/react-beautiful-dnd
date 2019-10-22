@@ -1,10 +1,14 @@
-// flow-typed signature: 68ee88c520cb9bb70866d8812664bc7b
-// flow-typed version: 00c3a083ad/@storybook/react_v5.x.x/flow_>=v0.72.x
+// flow-typed signature: e484579841f3cb1e8f57a768abc4642d
+// flow-typed version: c6154227d1/@storybook/react_v5.x.x/flow_>=v0.104.x
 
 type NodeModule = typeof module;
 
 declare module '@storybook/react' {
-  declare type Context = { kind: string, story: string };
+  declare type Context = {
+    kind: string,
+    story: string,
+    ...
+  };
   declare type Renderable =
     | string
     | number
@@ -20,9 +24,7 @@ declare module '@storybook/react' {
     context: Context
   ) => Renderable;
 
-  declare type DecoratorParameters = {
-    [key: string]: any,
-  };
+  declare type DecoratorParameters = { [key: string]: any, ... };
 
   declare interface Story {
     +kind: string;
