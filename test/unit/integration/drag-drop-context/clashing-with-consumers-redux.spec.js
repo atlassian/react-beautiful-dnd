@@ -6,16 +6,18 @@ import { Provider, connect } from 'react-redux';
 import { createStore } from 'redux';
 import { Droppable, Draggable, DragDropContext } from '../../../../src';
 import type { DraggableProvided, DroppableProvided } from '../../../../src';
-// Imported as wildcard so we can mock `resetStyleContext` using spyOn
 
 type AppState = {|
   foo: string,
+  // Needed to appease react-redux connect type
+  // eslint-disable-next-line react/no-unused-prop-types
+  dispatch?: () => void,
 |};
 const original: AppState = {
   foo: 'bar',
 };
 // super boring reducer that always returns the same thing
-const reducer = (state: AppState = original) => state;
+const reducer = (state?: AppState = original) => state;
 const store = createStore(reducer);
 
 class Unconnected extends Component<AppState> {

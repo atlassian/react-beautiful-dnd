@@ -247,6 +247,7 @@ const ConnectedDroppable: typeof DroppableType = connect(
   mapDispatchToProps,
   // mergeProps - using default
   null,
+  // $FlowFixMe: current react-redux type does not know about context property
   {
     // Ensuring our context does not clash with consumers
     context: StoreContext,
