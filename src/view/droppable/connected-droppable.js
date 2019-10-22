@@ -13,6 +13,8 @@ import type {
   DimensionMap,
   TypeId,
   Critical,
+  DraggableRubric,
+  DraggableDescriptor,
 } from '../../types';
 import type {
   MapProps,
@@ -59,6 +61,17 @@ export const makeMapStateToProps = (): Selector => {
     shouldAnimatePlaceholder: false,
   };
 
+  const getDraggableRubric = memoizeOne(
+    (descriptor: DraggableDescriptor): DraggableRubric => ({
+      draggableId: descriptor.id,
+      type: descriptor.type,
+      source: {
+        index: descriptor.index,
+        droppableId: descriptor.droppableId,
+      },
+    }),
+  );
+
   const getMapProps = memoizeOne((
     id: DroppableId,
     isEnabled: boolean,
@@ -75,7 +88,7 @@ export const makeMapStateToProps = (): Selector => {
       const useClone: ?UseClone = renderClone
         ? {
             render: renderClone,
-            dragging: dragging.descriptor,
+            dragging: getDraggableRubric(dragging.descriptor),
           }
         : null;
 

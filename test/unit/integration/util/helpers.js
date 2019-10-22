@@ -7,7 +7,7 @@ import { defaultItemRender, type RenderItem, type Item } from './app';
 import {
   type DraggableProvided,
   type DraggableStateSnapshot,
-  type DraggableDescriptor,
+  type DraggableRubric,
   type DraggableId,
 } from '../../../../src';
 import { getComputedSpacing, getPreset } from '../../../util/dimension';
@@ -72,18 +72,14 @@ export const renderItemAndSpy = (mock: JestMockFn<*, *>): RenderItem => (
   return (
     provided: DraggableProvided,
     snapshot: DraggableStateSnapshot,
-    descriptor: DraggableDescriptor,
+    rubric: DraggableRubric,
   ) => {
-    mock(provided, snapshot, descriptor);
-    return render(provided, snapshot, descriptor);
+    mock(provided, snapshot, rubric);
+    return render(provided, snapshot, rubric);
   };
 };
 
-export type Call = [
-  DraggableProvided,
-  DraggableStateSnapshot,
-  DraggableDescriptor,
-];
+export type Call = [DraggableProvided, DraggableStateSnapshot, DraggableRubric];
 
 export const getCallsFor = (
   id: DraggableId,
@@ -113,10 +109,10 @@ export const getSnapshotsFor = (
   });
 };
 
-export const getDescriptorsFor = (
+export const getRubricsFor = (
   id: DraggableId,
   mock: JestMockFn<*, *>,
-): DraggableDescriptor[] => {
+): DraggableRubric[] => {
   return getCallsFor(id, mock).map(call => {
     return call[2];
   });

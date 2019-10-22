@@ -7,11 +7,11 @@ import {
   DragDropContext,
   Droppable,
   Draggable,
-  type DraggableDescriptor,
   type DropResult,
   type DroppableProvided,
   type DraggableProvided,
   type DraggableStateSnapshot,
+  type DraggableRubric,
 } from '../../../src';
 import reorder from '../reorder';
 import { grid } from '../constants';
@@ -366,12 +366,12 @@ export default class TableApp extends Component<AppProps, AppState> {
                 renderClone={(
                   provided: DraggableProvided,
                   snapshot: DraggableStateSnapshot,
-                  descriptor: DraggableDescriptor,
+                  rubric: DraggableRubric,
                 ) => (
                   <TableRow
                     provided={provided}
                     snapshot={snapshot}
-                    quote={this.state.quotes[descriptor.index]}
+                    quote={this.state.quotes[rubric.source.index]}
                   />
                 )}
                 getContainerForClone={() => tbody}

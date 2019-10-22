@@ -245,11 +245,15 @@ export type DragPositions = {|
   page: PagePositions,
 |};
 
-// published when a drag starts
-export type DragStart = {|
+export type DraggableRubric = {|
   draggableId: DraggableId,
   type: TypeId,
   source: DraggableLocation,
+|};
+
+// published when a drag starts
+export type DragStart = {|
+  ...DraggableRubric,
   mode: MovementMode,
 |};
 

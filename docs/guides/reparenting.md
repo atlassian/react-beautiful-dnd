@@ -28,13 +28,13 @@ function List(props) {
   return (
     <Droppable
       droppableId="droppable"
-      renderClone={(provided, snapshot, descriptor) => (
+      renderClone={(provided, snapshot, rubric) => (
         <div
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
         >
-          Item id: {items[descriptor.id].id}
+          Item id: {items[rubric.source.index].id}
         </div>
       )}
     >
@@ -61,13 +61,13 @@ function List(props) {
 You can also reuse the `<Draggable /> | DraggableChildrenFn` if you want too!
 
 ```js
-const getRenderItem = (items) => (provided, snapshot, descriptor) => (
+const getRenderItem = (items) => (provided, snapshot, rubric) => (
   <div
     {...provided.draggableProps}
     {...provided.dragHandleProps}
     ref={provided.innerRef}
   >
-    Item id: {items[descriptor.id].id}
+    Item id: {items[rubric.source.index].id}
   </div>
 );
 
@@ -104,7 +104,7 @@ renderClone: ?DraggableChildrenFn
 type DraggableChildrenFn = (
   Provided,
   StateSnapshot,
-  DraggableDescriptor,
+  DraggableRubric,
 ) => Node | null;
 ```
 

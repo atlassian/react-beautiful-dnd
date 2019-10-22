@@ -2,12 +2,12 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import App, { type RenderItem, type Item } from '../util/app';
-import type { DraggableDescriptor } from '../../../../src';
+import type { DraggableRubric } from '../../../../src';
 import {
   renderItemAndSpy,
   atRest,
   getSnapshotsFor,
-  getDescriptorsFor,
+  getRubricsFor,
 } from '../util/helpers';
 
 it('should have no movement when at rest', () => {
@@ -30,7 +30,7 @@ it('should have a resting snapshot', () => {
   expect(snapshots[0]).toEqual(atRest);
 });
 
-it('should be provided with its descriptor', () => {
+it('should be provided with its rubric', () => {
   const watcher = jest.fn();
   const items = Array.from({ length: 3 }, (v, k): Item => ({
     id: `${k}`,
@@ -40,18 +40,17 @@ it('should be provided with its descriptor', () => {
   render(<App renderItem={renderItem} items={items} />);
 
   items.forEach((item: Item, index: number) => {
-    const expected: DraggableDescriptor = {
-      id: item.id,
-      index,
+    const expected: DraggableRubric = {
+      draggableId: item.id,
       type: 'DEFAULT',
-      droppableId: 'droppable',
+      source: {
+        droppableId: 'droppable',
+        index,
+      },
     };
-    const descriptors: DraggableDescriptor[] = getDescriptorsFor(
-      item.id,
-      watcher,
-    );
+    const rubrics: DraggableRubric[] = getRubricsFor(item.id, watcher);
 
-    expect(descriptors).toHaveLength(1);
-    expect(descriptors[0]).toEqual(expected);
+    expect(rubrics).toHaveLength(1);
+    expect(rubrics[0]).toEqual(expected);
   });
 });

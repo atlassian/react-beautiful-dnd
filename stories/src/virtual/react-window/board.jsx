@@ -10,7 +10,7 @@ import type {
   DraggableProvided,
   DraggableStateSnapshot,
   DroppableProvided,
-  DraggableDescriptor,
+  DraggableRubric,
   DroppableStateSnapshot,
 } from '../../../../src';
 import type { QuoteMap, Quote } from '../../types';
@@ -93,12 +93,12 @@ const Column = React.memo(function Column(props: ColumnProps) {
         renderClone={(
           provided: DraggableProvided,
           snapshot: DraggableStateSnapshot,
-          descriptor: DraggableDescriptor,
+          rubric: DraggableRubric,
         ) => (
           <QuoteItem
             provided={provided}
             isDragging={snapshot.isDragging}
-            quote={quotes[descriptor.index]}
+            quote={quotes[rubric.source.index]}
             style={{ margin: 0 }}
           />
         )}

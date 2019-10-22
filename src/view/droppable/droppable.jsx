@@ -119,7 +119,9 @@ export default function Droppable(props: Props) {
     [contextId, droppableId, placeholder, setDroppableRef],
   );
 
-  const isUsingCloneFor: ?DraggableId = useClone ? useClone.dragging.id : null;
+  const isUsingCloneFor: ?DraggableId = useClone
+    ? useClone.dragging.draggableId
+    : null;
 
   const droppableContext: ?DroppableContextValue = useMemo(
     () => ({
@@ -138,8 +140,8 @@ export default function Droppable(props: Props) {
 
     const node: Node = (
       <PrivateDraggable
-        draggableId={dragging.id}
-        index={dragging.index}
+        draggableId={dragging.draggableId}
+        index={dragging.source.index}
         isClone
         isEnabled
         // not important as drag has already started

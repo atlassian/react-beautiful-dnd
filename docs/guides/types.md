@@ -39,10 +39,14 @@ type OnDragEndResponder = (
   provided: ResponderProvided,
 ) => mixed;
 
-type DragStart = {|
+type DraggableRubric = {|
   draggableId: DraggableId,
   type: TypeId,
   source: DraggableLocation,
+|}
+
+type DragStart = {|
+  ...DraggableRubric,
   mode: MovementMode,
 |};
 
@@ -152,17 +156,8 @@ type DraggableProps = {|
 type DraggableChildrenFn = (
   DraggableProvided,
   DraggableStateSnapshot,
-  DraggableDescriptor,
+  DraggableRubric,
 ) => Node | null;
-type DraggableDescriptor = {|
-  id: DraggableId,
-  index: number,
-  // Inherited from Droppable
-  droppableId: DroppableId,
-  // This is technically redundant but it avoids
-  // needing to look up a parent droppable just to get its type
-  type: TypeId,
-|};
 |};
 type DraggableStyle = DraggingStyle | NotDraggingStyle;
 type DraggingStyle = {|

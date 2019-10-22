@@ -9,7 +9,7 @@ import {
   type DroppableProvided,
   type DraggableProvided,
   type DraggableStateSnapshot,
-  type DraggableDescriptor,
+  type DraggableRubric,
   type DropResult,
 } from '../../../../src';
 import QuoteItem from '../../primatives/quote-item';
@@ -70,14 +70,14 @@ function App(props: Props) {
         renderClone={(
           provided: DraggableProvided,
           snapshot: DraggableStateSnapshot,
-          descriptor: DraggableDescriptor,
+          rubric: DraggableRubric,
         ) => (
           <QuoteItem
             provided={provided}
             isDragging={snapshot.isDragging}
-            quote={quotes[descriptor.index]}
+            quote={quotes[rubric.source.index]}
             style={{ margin: 0 }}
-            index={descriptor.index}
+            index={rubric.source.index}
           />
         )}
       >

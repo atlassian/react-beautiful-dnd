@@ -96,7 +96,7 @@ The `React` children of a `<Draggable />` must be a function that returns a `Rea
 ```
 
 ```js
-type DraggableChildrenFn = (DraggableProvided, DraggableStateSnapshot, DraggableDescriptor) => Node
+type DraggableChildrenFn = (DraggableProvided, DraggableStateSnapshot, DraggableRubric) => Node
 ```
 
 The function is provided with three arguments:
@@ -424,9 +424,17 @@ The `children` function is also provided with a small amount of state relating t
 </Draggable>
 ```
 
-### 3. descriptor: (DraggableDescriptor)
+### 3. rubric: (DraggableRubric)
 
+```js
+type DraggableRubric = {|
+  draggableId: DraggableId,
+  type: TypeId,
+  source: DraggableLocation,
+|};
+```
 
+`rubric` represents all of the information associated with a `<Draggable />`. `rubric` is helpful for looking up the data associated with your `<Draggable />` when it is not available in the current scope. This is useful when using the `<Droppable /> | renderClone` API. The `rubric` is the same lookup information that is provided to the [`Responder`s](/docs/guides/responders.md).
 
 ## Adding an `onClick` handler to a `<Draggable />` or a _drag handle_
 

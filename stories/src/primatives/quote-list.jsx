@@ -152,7 +152,7 @@ export default function QuoteList(props: Props) {
         useClone
           ? (provided, snapshot, descriptor) => (
               <QuoteItem
-                quote={quotes[descriptor.index]}
+                quote={quotes[descriptor.source.index]}
                 provided={provided}
                 isDragging={snapshot.isDragging}
                 isClone

@@ -9,7 +9,7 @@ import {
   type DraggableStateSnapshot,
   type Sensor,
   type Direction,
-  type DraggableDescriptor,
+  type DraggableRubric,
   type DropResult,
 } from '../../../../src';
 import reorder from '../../../util/reorder';
@@ -29,7 +29,7 @@ export type RenderItem = (
 ) => (
   provided: DraggableProvided,
   snapshot: DraggableStateSnapshot,
-  descriptor: DraggableDescriptor,
+  rubric: DraggableRubric,
 ) => Node;
 
 export const defaultItemRender: RenderItem = (item: Item) => (
@@ -122,10 +122,10 @@ export default function App(props: Props) {
     return function result(
       provided: DraggableProvided,
       snapshot: DraggableStateSnapshot,
-      descriptor: DraggableDescriptor,
+      rubric: DraggableRubric,
     ): Node {
-      const item: Item = items[descriptor.index];
-      return render(item)(provided, snapshot, descriptor);
+      const item: Item = items[rubric.source.index];
+      return render(item)(provided, snapshot, rubric);
     };
   })();
 

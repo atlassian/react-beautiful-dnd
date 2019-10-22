@@ -9,7 +9,7 @@ import type {
   MovementMode,
   ContextId,
   ElementId,
-  DraggableDescriptor,
+  DraggableRubric,
 } from '../../types';
 import { dropAnimationFinished } from '../../state/action-creators';
 
@@ -144,7 +144,7 @@ export type MapProps = {|
 export type ChildrenFn = (
   Provided,
   StateSnapshot,
-  DraggableDescriptor,
+  DraggableRubric,
 ) => Node | null;
 
 export type PublicOwnProps = {|

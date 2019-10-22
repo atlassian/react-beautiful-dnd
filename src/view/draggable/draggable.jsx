@@ -1,7 +1,7 @@
 // @flow
 import { useRef } from 'react';
 import { useMemo, useCallback } from 'use-memo-one';
-import type { DraggableDescriptor } from '../../types';
+import type { DraggableRubric, DraggableDescriptor } from '../../types';
 import getStyle from './get-style';
 import useDraggablePublisher, {
   type Args as PublisherArgs,
@@ -152,5 +152,17 @@ export default function Draggable(props: Props) {
     return result;
   }, [contextId, dragHandleProps, draggableId, mapped, onMoveEnd, setRef]);
 
-  return children(provided, mapped.snapshot, descriptor);
+  const rubric: DraggableRubric = useMemo(
+    () => ({
+      draggableId: descriptor.id,
+      type: descriptor.type,
+      source: {
+        index: descriptor.index,
+        droppableId: descriptor.droppableId,
+      },
+    }),
+    [descriptor.droppableId, descriptor.id, descriptor.index, descriptor.type],
+  );
+
+  return children(provided, mapped.snapshot, rubric);
 }

@@ -66,13 +66,13 @@ When using a virtual list the original dragging item can be unmounted during a d
 <Droppable
   droppableId="droppable"
   mode="virtual"
-  renderClone={(provided, snapshot, descriptor) => (
+  renderClone={(provided, snapshot, rubric) => (
     <div
       {...provided.draggableProps}
       {...provided.dragHandleProps}
       ref={provided.innerRef}
     >
-      Item id: {items[descriptor.id].id}
+      Item id: {items[rubric.source.index].id}
     </div>
   )}
 >

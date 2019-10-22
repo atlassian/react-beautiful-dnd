@@ -8,7 +8,7 @@ import type {
   Placeholder,
   State,
   ContextId,
-  DraggableDescriptor,
+  DraggableRubric,
   DroppableMode,
 } from '../../types';
 import type { ChildrenFn } from '../draggable/draggable-types';
@@ -30,7 +30,7 @@ export type Provided = {|
 |};
 
 export type UseClone = {|
-  dragging: DraggableDescriptor,
+  dragging: DraggableRubric,
   render: DraggableChildrenFn,
 |};
 
