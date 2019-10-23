@@ -29,6 +29,7 @@ Please raise a pull request if you would like to add examples for other virtuali
 
 - [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-window--list) ([source](/stories/src/virtual/react-window/list.jsx))
 - [Board](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-window--board) ([source](/stories/src/virtual/react-window/board.jsx))
+- [Basic list on `codesandbox.io`](https://codesandbox.io/s/simple-virtual-list-feeyu)
 
 ### [`react-virtualized`](https://github.com/bvaughn/react-virtualized)
 
