@@ -104,12 +104,12 @@ export default ({
     const previousImpact: DragImpact = (() => {
       const wasOver: ?DroppableId = whatIsDraggedOver(state.impact);
       if (!wasOver) {
-        return noImpact;
+        return onLiftImpact;
       }
       const droppable: DroppableDimension = dimensions.droppables[wasOver];
 
       if (!droppable.isCombineEnabled) {
-        return noImpact;
+        return onLiftImpact;
       }
 
       // Cheating here
@@ -122,7 +122,6 @@ export default ({
       draggable: dimensions.draggables[state.critical.draggable.id],
       draggables: dimensions.draggables,
       droppables: dimensions.droppables,
-      // starting from a fresh slate?
       previousImpact,
       viewport: state.viewport,
       userDirection: state.userDirection,
