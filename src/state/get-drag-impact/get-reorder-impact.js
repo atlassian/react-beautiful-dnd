@@ -29,7 +29,6 @@ type Args = {|
   viewport: Viewport,
   userDirection: UserDirection,
   afterCritical: LiftEffect,
-  forceShouldAnimate?: boolean,
 |};
 
 type AtIndexArgs = {|
