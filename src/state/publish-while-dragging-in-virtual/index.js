@@ -12,6 +12,7 @@ import type {
   DroppableDimension,
   DragImpact,
   DroppablePublish,
+  DroppableId,
 } from '../../types';
 import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
@@ -19,6 +20,8 @@ import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-chang
 import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
 import scrollDroppable from '../droppable/scroll-droppable';
+import noImpact from '../no-impact';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -93,16 +96,33 @@ export default ({
     viewport: state.viewport,
   });
 
+  // const
+
+  const previousImpact: DragImpact = (() => {
+    const wasOver: ?DroppableId = whatIsDraggedOver(state.impact);
+    if (!wasOver) {
+      return noImpact;
+    }
+    const droppable: DroppableDimension = dimensions.droppables[wasOver];
+
+    if (!droppable.isCombineEnabled) {
+      return noImpact;
+    }
+
+    return state.impact;
+  })();
+
   const impact: DragImpact = getDragImpact({
     pageBorderBoxCenter: state.current.page.borderBoxCenter,
     draggable: dimensions.draggables[state.critical.draggable.id],
     draggables: dimensions.draggables,
     droppables: dimensions.droppables,
-    // starting from a fresh slate
-    previousImpact: state.impact,
+    // starting from a fresh slate?
+    previousImpact,
     viewport: state.viewport,
     userDirection: state.userDirection,
     afterCritical,
+    forceShouldAnimate: false,
   });
 
   timings.finish(timingsKey);

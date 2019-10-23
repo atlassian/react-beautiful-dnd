@@ -35,6 +35,7 @@ const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
           provided={provided}
           quote={quote}
           isDragging={snapshot.isDragging}
+          isGroupedOver={Boolean(snapshot.combineTargetFor)}
           style={{ margin: 0, ...style }}
           index={index}
         />

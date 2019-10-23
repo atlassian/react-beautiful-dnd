@@ -12,6 +12,7 @@ type Args = {|
   destinationId: DroppableId,
   previousImpact: DragImpact,
   userDirection: UserDirection,
+  forceShouldAnimate?: boolean,
 |};
 
 function getWhenEntered(
