@@ -23,6 +23,7 @@ import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
 import scrollDroppable from '../droppable/scroll-droppable';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
+import { values } from '../../native-with-fallback';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -128,10 +129,8 @@ export default ({
     });
 
     // strip animation of anything added
-    const visible: DisplacementMap = Object.keys(base.displaced.visible)
-      .map((id: DraggableId) => {
-        const displacement: Displacement = base.displaced.visible[id];
-
+    const visible: DisplacementMap = values(base.displaced.visible)
+      .map((displacement: Displacement) => {
         if (!updatedAdditions[displacement.draggableId]) {
           return displacement;
         }
