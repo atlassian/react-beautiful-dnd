@@ -45,7 +45,7 @@ Please raise a pull request if you would like to add examples for other virtuali
 
 > Virtualisation libraries often have overscanning enabled by default
 
-Most virtual list libraries support the concept of **overscanning**. Overscanning is where a small about of non-visible items are rendered near the boundary of the window. When a scropll occurs the overscanned item can be immediately moved into view and does not need to be created. Overscanning generally leads to a more fluid experience.
+Most virtual list libraries support the concept of **overscanning**. Overscanning is where a small about of non-visible items are rendered near the boundary of the window. When a scroll occurs the overscanned item can be immediately moved into view and does not need to be created. Overscanning generally leads to a more fluid experience.
 
 It is required that overscanning be enabled for `react-beautiful-dnd` to work correctly. If overscanning is not enabled, `rbd` cannot tell if there are more items in the list when an item is in the last visual position. We require an overscanning value of one or more.
 
