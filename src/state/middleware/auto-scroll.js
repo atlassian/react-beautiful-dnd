@@ -9,20 +9,11 @@ const shouldStop = (action: Action): boolean =>
   action.type === 'DROP_ANIMATE' ||
   action.type === 'FLUSH';
 
-const shouldCancelPending = (action: Action): boolean =>
-  action.type === 'COLLECTION_STARTING';
-
 export default (autoScroller: AutoScroller) => (store: MiddlewareStore) => (
   next: Dispatch,
 ) => (action: Action): any => {
   if (shouldStop(action)) {
     autoScroller.stop();
-    next(action);
-    return;
-  }
-
-  if (shouldCancelPending(action)) {
-    autoScroller.cancelPending();
     next(action);
     return;
   }

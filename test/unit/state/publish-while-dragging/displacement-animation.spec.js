@@ -103,8 +103,8 @@ it('should not animate any displacement', () => {
       { dimension: preset.inForeign2, shouldAnimate: true },
       { dimension: preset.inForeign3, shouldAnimate: true },
       { dimension: preset.inForeign4, shouldAnimate: true },
-      // addition can still animate
-      { dimension: added, shouldAnimate: true },
+      // addition forced to not animate
+      { dimension: added, shouldAnimate: false },
     ],
   });
   const expected: DragImpact = {

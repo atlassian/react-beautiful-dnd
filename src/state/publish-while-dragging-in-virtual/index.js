@@ -12,6 +12,9 @@ import type {
   DroppableDimension,
   DragImpact,
   DroppablePublish,
+  DisplacementMap,
+  Displacement,
+  DroppableId,
 } from '../../types';
 import * as timings from '../../debug/timings';
 import getDragImpact from '../get-drag-impact';
@@ -19,6 +22,8 @@ import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-chang
 import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
 import scrollDroppable from '../droppable/scroll-droppable';
+import whatIsDraggedOver from '../droppable/what-is-dragged-over';
+import { values } from '../../native-with-fallback';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -58,15 +63,17 @@ export default ({
     ...toDroppableMap(withScrollChange),
   };
 
-  const updated: DraggableDimension[] = adjustAdditionsForScrollChanges({
-    additions: published.additions,
-    updatedDroppables: droppables,
-    viewport: state.viewport,
-  });
+  const updatedAdditions: DraggableDimensionMap = toDraggableMap(
+    adjustAdditionsForScrollChanges({
+      additions: published.additions,
+      updatedDroppables: droppables,
+      viewport: state.viewport,
+    }),
+  );
 
   const draggables: DraggableDimensionMap = {
     ...state.dimensions.draggables,
-    ...toDraggableMap(updated),
+    ...updatedAdditions,
   };
 
   // remove all the old ones (except for the critical)
@@ -93,17 +100,59 @@ export default ({
     viewport: state.viewport,
   });
 
-  const impact: DragImpact = getDragImpact({
-    pageBorderBoxCenter: state.current.page.borderBoxCenter,
-    draggable: dimensions.draggables[state.critical.draggable.id],
-    draggables: dimensions.draggables,
-    droppables: dimensions.droppables,
-    // starting from a fresh slate
-    previousImpact: state.impact,
-    viewport: state.viewport,
-    userDirection: state.userDirection,
-    afterCritical,
-  });
+  const impact: DragImpact = (() => {
+    const previousImpact: DragImpact = (() => {
+      const wasOver: ?DroppableId = whatIsDraggedOver(state.impact);
+      if (!wasOver) {
+        return onLiftImpact;
+      }
+      const droppable: DroppableDimension = dimensions.droppables[wasOver];
+
+      if (!droppable.isCombineEnabled) {
+        return onLiftImpact;
+      }
+
+      // Cheating here
+      // TODO: pursue a more robust approach
+      return state.impact;
+    })();
+
+    const base: DragImpact = getDragImpact({
+      pageBorderBoxCenter: state.current.page.borderBoxCenter,
+      draggable: dimensions.draggables[state.critical.draggable.id],
+      draggables: dimensions.draggables,
+      droppables: dimensions.droppables,
+      previousImpact,
+      viewport: state.viewport,
+      userDirection: state.userDirection,
+      afterCritical,
+    });
+
+    // strip animation of anything added
+    const visible: DisplacementMap = values(base.displaced.visible)
+      .map((displacement: Displacement) => {
+        if (!updatedAdditions[displacement.draggableId]) {
+          return displacement;
+        }
+        return {
+          ...displacement,
+          shouldAnimate: false,
+        };
+      })
+      .reduce((acc: DisplacementMap, current: Displacement) => {
+        acc[current.draggableId] = current;
+        return acc;
+      }, {});
+
+    const patched: DragImpact = {
+      ...base,
+      displaced: {
+        ...base.displaced,
+        visible,
+      },
+    };
+    return patched;
+  })();
 
   timings.finish(timingsKey);
 
