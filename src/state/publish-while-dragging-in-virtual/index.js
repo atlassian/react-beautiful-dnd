@@ -100,22 +100,23 @@ export default ({
     viewport: state.viewport,
   });
 
-  const previousImpact: DragImpact = (() => {
-    const wasOver: ?DroppableId = whatIsDraggedOver(state.impact);
-    if (!wasOver) {
-      return noImpact;
-    }
-    const droppable: DroppableDimension = dimensions.droppables[wasOver];
-
-    if (!droppable.isCombineEnabled) {
-      return noImpact;
-    }
-
-    // Cheating here
-    return state.impact;
-  })();
-
   const impact: DragImpact = (() => {
+    const previousImpact: DragImpact = (() => {
+      const wasOver: ?DroppableId = whatIsDraggedOver(state.impact);
+      if (!wasOver) {
+        return noImpact;
+      }
+      const droppable: DroppableDimension = dimensions.droppables[wasOver];
+
+      if (!droppable.isCombineEnabled) {
+        return noImpact;
+      }
+
+      // Cheating here
+      // TODO: pursue a more robust approach
+      return state.impact;
+    })();
+
     const base: DragImpact = getDragImpact({
       pageBorderBoxCenter: state.current.page.borderBoxCenter,
       draggable: dimensions.draggables[state.critical.draggable.id],
