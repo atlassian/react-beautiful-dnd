@@ -22,7 +22,6 @@ import adjustAdditionsForScrollChanges from './adjust-additions-for-scroll-chang
 import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
 import scrollDroppable from '../droppable/scroll-droppable';
-import noImpact from '../no-impact';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
 
 type Args = {|
