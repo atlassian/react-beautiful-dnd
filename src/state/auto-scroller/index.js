@@ -48,7 +48,6 @@ export default ({
 
   const scroller: AutoScroller = {
     scroll,
-    cancelPending: fluidScroller.cancelPending,
     start: fluidScroller.start,
     stop: fluidScroller.stop,
   };

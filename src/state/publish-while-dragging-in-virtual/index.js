@@ -12,6 +12,8 @@ import type {
   DroppableDimension,
   DragImpact,
   DroppablePublish,
+  DisplacementMap,
+  Displacement,
   DroppableId,
 } from '../../types';
 import * as timings from '../../debug/timings';
@@ -61,15 +63,17 @@ export default ({
     ...toDroppableMap(withScrollChange),
   };
 
-  const updated: DraggableDimension[] = adjustAdditionsForScrollChanges({
-    additions: published.additions,
-    updatedDroppables: droppables,
-    viewport: state.viewport,
-  });
+  const updatedAdditions: DraggableDimensionMap = toDraggableMap(
+    adjustAdditionsForScrollChanges({
+      additions: published.additions,
+      updatedDroppables: droppables,
+      viewport: state.viewport,
+    }),
+  );
 
   const draggables: DraggableDimensionMap = {
     ...state.dimensions.draggables,
-    ...toDraggableMap(updated),
+    ...updatedAdditions,
   };
 
   // remove all the old ones (except for the critical)
@@ -96,8 +100,6 @@ export default ({
     viewport: state.viewport,
   });
 
-  // const
-
   const previousImpact: DragImpact = (() => {
     const wasOver: ?DroppableId = whatIsDraggedOver(state.impact);
     if (!wasOver) {
@@ -109,21 +111,50 @@ export default ({
       return noImpact;
     }
 
+    // Cheating here
     return state.impact;
   })();
 
-  const impact: DragImpact = getDragImpact({
-    pageBorderBoxCenter: state.current.page.borderBoxCenter,
-    draggable: dimensions.draggables[state.critical.draggable.id],
-    draggables: dimensions.draggables,
-    droppables: dimensions.droppables,
-    // starting from a fresh slate?
-    previousImpact,
-    viewport: state.viewport,
-    userDirection: state.userDirection,
-    afterCritical,
-    forceShouldAnimate: false,
-  });
+  const impact: DragImpact = (() => {
+    const base: DragImpact = getDragImpact({
+      pageBorderBoxCenter: state.current.page.borderBoxCenter,
+      draggable: dimensions.draggables[state.critical.draggable.id],
+      draggables: dimensions.draggables,
+      droppables: dimensions.droppables,
+      // starting from a fresh slate?
+      previousImpact,
+      viewport: state.viewport,
+      userDirection: state.userDirection,
+      afterCritical,
+    });
+
+    // strip animation of anything added
+    const visible: DisplacementMap = Object.keys(base.displaced.visible)
+      .map((id: DraggableId) => {
+        const displacement: Displacement = base.displaced.visible[id];
+
+        if (!updatedAdditions[displacement.draggableId]) {
+          return displacement;
+        }
+        return {
+          ...displacement,
+          shouldAnimate: false,
+        };
+      })
+      .reduce((acc: DisplacementMap, current: Displacement) => {
+        acc[current.draggableId] = current;
+        return acc;
+      }, {});
+
+    const patched: DragImpact = {
+      ...base,
+      displaced: {
+        ...base.displaced,
+        visible,
+      },
+    };
+    return patched;
+  })();
 
   timings.finish(timingsKey);
 

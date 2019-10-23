@@ -15,7 +15,6 @@ export type FluidScroller = {|
   scroll: (state: DraggingState) => void,
   start: (state: DraggingState) => void,
   stop: () => void,
-  cancelPending: () => void,
 |};
 
 type WhileDragging = {|
@@ -42,12 +41,6 @@ export default ({
       dragStartTime,
       shouldUseTimeDampening,
     });
-  };
-
-  const cancelPending = () => {
-    invariant(dragging, 'Cannot cancel pending fluid scroll when not started');
-    scheduleWindowScroll.cancel();
-    scheduleDroppableScroll.cancel();
   };
 
   const start = (state: DraggingState) => {
@@ -84,14 +77,14 @@ export default ({
     if (!dragging) {
       return;
     }
-    cancelPending();
+    scheduleWindowScroll.cancel();
+    scheduleDroppableScroll.cancel();
     dragging = null;
   };
 
   return {
     start,
     stop,
-    cancelPending,
     scroll: tryScroll,
   };
 };

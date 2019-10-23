@@ -28,7 +28,6 @@ type Args = {|
   viewport: Viewport,
   userDirection: UserDirection,
   afterCritical: LiftEffect,
-  forceShouldAnimate?: boolean,
 |};
 
 export default ({
@@ -40,7 +39,6 @@ export default ({
   viewport,
   userDirection,
   afterCritical,
-  forceShouldAnimate,
 }: Args): DragImpact => {
   const destinationId: ?DroppableId = getDroppableOver({
     target: pageBorderBoxCenter,
@@ -88,7 +86,6 @@ export default ({
       viewport,
       userDirection,
       afterCritical,
-      forceShouldAnimate,
     })
   );
 };

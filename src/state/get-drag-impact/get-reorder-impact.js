@@ -63,7 +63,6 @@ export default ({
   viewport,
   userDirection,
   afterCritical,
-  forceShouldAnimate,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const isMovingForward: boolean = isUserMovingForward(
@@ -138,6 +137,5 @@ export default ({
     last,
     displacedBy,
     index: newIndex,
-    forceShouldAnimate,
   });
 };
