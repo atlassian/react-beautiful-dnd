@@ -265,7 +265,18 @@ function getSecondarySelector(): TrySelect {
     }
 
     if (isAfterCriticalInVirtualList) {
-      return getFallback(combineTargetFor);
+      const fallback: ?MapProps = getFallback(combineTargetFor);
+      if (fallback) {
+        return fallback;
+      }
+
+      return getMemoizedProps(
+        // moving back to original position
+        origin,
+        // we know this is null, but meh
+        combineTargetFor,
+        displacement.shouldAnimate,
+      );
     }
     const displaceBy: Position = impact.displacedBy.point;
     const offset: Position = memoizedOffset(displaceBy.x, displaceBy.y);

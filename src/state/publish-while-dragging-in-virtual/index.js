@@ -12,8 +12,6 @@ import type {
   DroppableDimension,
   DragImpact,
   DroppablePublish,
-  DisplacementMap,
-  Displacement,
   DroppableId,
 } from '../../types';
 import * as timings from '../../debug/timings';
@@ -23,8 +21,6 @@ import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
 import scrollDroppable from '../droppable/scroll-droppable';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
-import { values } from '../../native-with-fallback';
-import trySpeculativelyIncrease from './try-speculatively-increase';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -99,80 +95,30 @@ export default ({
   const home: DroppableDimension =
     dimensions.droppables[state.critical.droppable.id];
 
-  const { impact: onLiftImpact, afterCritical } = (() => {
-    const base = getLiftEffect({
-      draggable,
-      home,
-      draggables,
-      viewport: state.viewport,
-    });
+  const { impact: onLiftImpact, afterCritical } = getLiftEffect({
+    draggable,
+    home,
+    draggables,
+    viewport: state.viewport,
+  });
 
-    const increased: DragImpact = trySpeculativelyIncrease({
-      impact: base.impact,
-      destination: home,
-      viewport: state.viewport,
-      draggables,
-      draggable,
-    });
+  const previousImpact: DragImpact =
+    wasOver && wasOver.isCombineEnabled
+      ? // Cheating here
+        // TODO: pursue a more robust approach
+        state.impact
+      : onLiftImpact;
 
-    return {
-      afterCritical: base.afterCritical,
-      impact: increased,
-    };
-  })();
-
-  const impact: DragImpact = (() => {
-    const previousImpact: DragImpact =
-      wasOver && wasOver.isCombineEnabled
-        ? // Cheating here
-          // TODO: pursue a more robust approach
-          state.impact
-        : onLiftImpact;
-
-    const base: DragImpact = getDragImpact({
-      pageBorderBoxCenter: state.current.page.borderBoxCenter,
-      draggable: dimensions.draggables[state.critical.draggable.id],
-      draggables: dimensions.draggables,
-      droppables: dimensions.droppables,
-      previousImpact,
-      viewport: state.viewport,
-      userDirection: state.userDirection,
-      afterCritical,
-    });
-
-    const increased: DragImpact = trySpeculativelyIncrease({
-      impact: base,
-      destination: wasOver,
-      viewport: state.viewport,
-      draggables,
-      draggable,
-    });
-
-    // strip animation of anything added
-    const visible: DisplacementMap = values(increased.displaced.visible)
-      .map((displacement: Displacement) => {
-        if (!updatedAdditions[displacement.draggableId]) {
-          return displacement;
-        }
-        return {
-          ...displacement,
-          shouldAnimate: false,
-        };
-      })
-      .reduce((acc: DisplacementMap, current: Displacement) => {
-        acc[current.draggableId] = current;
-        return acc;
-      }, {});
-
-    const patched: DragImpact = {
-      ...increased,
-      displaced: {
-        ...increased.displaced,
-        visible,
-      },
-    };
-    return patched;
-  })();
+  const impact: DragImpact = getDragImpact({
+    pageBorderBoxCenter: state.current.page.borderBoxCenter,
+    draggable: dimensions.draggables[state.critical.draggable.id],
+    draggables: dimensions.draggables,
+    droppables: dimensions.droppables,
+    previousImpact,
+    viewport: state.viewport,
+    userDirection: state.userDirection,
+    afterCritical,
+  });
 
   timings.finish(timingsKey);
 
