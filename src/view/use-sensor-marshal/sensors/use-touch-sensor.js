@@ -107,9 +107,9 @@ function getWindowBindings({
   ];
 }
 
-// All of the touch events get applied to the initial target of the touch interaction
-// This plays well with the target being unmounted during a drag
-function getTargetBindings({
+// All of the touch events get applied to the drag handle of the touch interaction
+// This plays well with the event.target being unmounted during a drag
+function getHandleBindings({
   cancel,
   completed,
   getPhase,
@@ -192,7 +192,12 @@ function getTargetBindings({
         // Calling event.preventDefault() will currently opt out of scrolling and clicking
         // https://github.com/atlassian/react-beautiful-dnd/issues/1401
 
-        const touch: TouchWithForce = (event.touches[0]: any);
+        const touch: ?TouchWithForce = (event.touches[0]: any);
+
+        if (!touch) {
+          return;
+        }
+
         const isForcePress: boolean = touch.force >= forcePressThreshold;
 
         if (!isForcePress) {
@@ -287,14 +292,12 @@ export default function useMouseSensor(api: SensorAPI) {
           x: clientX,
           y: clientY,
         };
-        const handle: ?HTMLElement = api.findClosestDragHandle(event);
-        invariant(handle, 'Touch sensor unable to find drag handle');
 
         // unbind this event handler
         unbindEventsRef.current();
 
         // eslint-disable-next-line no-use-before-define
-        startPendingDrag(actions, point, handle);
+        startPendingDrag(actions, point);
       },
     }),
     // not including stop or startPendingDrag as it is not defined initially
@@ -347,7 +350,7 @@ export default function useMouseSensor(api: SensorAPI) {
   }, [stop]);
 
   const bindCapturingEvents = useCallback(
-    function bindCapturingEvents(target: HTMLElement) {
+    function bindCapturingEvents() {
       const options: EventOptions = { capture: true, passive: false };
       const args: GetBindingArgs = {
         cancel,
@@ -355,13 +358,15 @@ export default function useMouseSensor(api: SensorAPI) {
         getPhase,
       };
 
-      // When removing a drag handle, such as moving into a portal or clone,
-      // touch events stop being published to the window.
-      // Even though the handle is removed, if you attach events to it they will
-      // continue to fire for the interaction. Strange, but hey - that's the web
+      // In prior versions of iOS it was required that touch listeners be added
+      // to the handle to work correctly (even if the handle got removed in a portal / clone)
+      // In the latest version it appears to be the opposite: for reparenting to work
+      // the events need to be attached to the window.
+      // For now i'll keep these two functions seperate in case we need to swap it back again
+      // Old behaviour:
       // https://gist.github.com/parris/dda613e3ae78f14eb2dc9fa0f4bfce3d
       // https://stackoverflow.com/questions/33298828/touch-move-event-dont-fire-after-touch-start-target-is-removed
-      const unbindTarget = bindEvents(target, getTargetBindings(args), options);
+      const unbindTarget = bindEvents(window, getHandleBindings(args), options);
       const unbindWindow = bindEvents(window, getWindowBindings(args), options);
 
       unbindEventsRef.current = function unbindAll() {
@@ -392,11 +397,7 @@ export default function useMouseSensor(api: SensorAPI) {
   );
 
   const startPendingDrag = useCallback(
-    function startPendingDrag(
-      actions: PreDragActions,
-      point: Position,
-      target: HTMLElement,
-    ) {
+    function startPendingDrag(actions: PreDragActions, point: Position) {
       invariant(
         getPhase().type === 'IDLE',
         'Expected to move from IDLE to PENDING drag',
@@ -414,7 +415,7 @@ export default function useMouseSensor(api: SensorAPI) {
         longPressTimerId,
       });
 
-      bindCapturingEvents(target);
+      bindCapturingEvents();
     },
     [bindCapturingEvents, getPhase, setPhase, startDragging],
   );
