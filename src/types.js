@@ -476,7 +476,6 @@ export type SensorAPI = {|
   canGetLock: (id: DraggableId) => boolean,
   isLockClaimed: () => boolean,
   tryReleaseLock: () => void,
-  findClosestDragHandle: (event: Event) => ?HTMLElement,
   findClosestDraggableId: (event: Event) => ?DraggableId,
   findOptionsForDraggable: (id: DraggableId) => ?DraggableOptions,
 |};
