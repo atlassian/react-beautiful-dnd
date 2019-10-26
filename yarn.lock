@@ -5415,10 +5415,10 @@ eslint-config-airbnb@^17.1.0:
     object.assign "^4.1.0"
     object.entries "^1.0.4"
 
-eslint-config-prettier@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-5.1.0.tgz#bf29442e7c818236a77acfe2241ec991299f9bf1"
-  integrity sha512-+tpiaLm3wl6fPW5nq0dDyVowQM0FT61lAdWZ+sDWgk6kKzgbOnCDwlcbwI38cyCBhq+Z3ret5Iofp6/gZpO0zw==
+eslint-config-prettier@^6.5.0:
+  version "6.5.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-6.5.0.tgz#aaf9a495e2a816865e541bfdbb73a65cc162b3eb"
+  integrity sha512-cjXp8SbO9VFGW/Z7mbTydqS9to8Z58E5aYhj3e1+Hx7lS9s6gL5ILKNpCqZAFOVYRcSkWPFYljHrEh8QFEK5EQ==
   dependencies:
     get-stdin "^6.0.0"
 
