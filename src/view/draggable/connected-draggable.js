@@ -243,7 +243,7 @@ function getSecondarySelector(): TrySelect {
     impact: DragImpact,
     afterCritical: LiftEffect,
   ): ?MapProps => {
-    const displacement: ?Displacement = impact.displaced.visible[ownId];
+    const visualDisplacement: ?Displacement = impact.displaced.visible[ownId];
     const isAfterCriticalInVirtualList: boolean = Boolean(
       afterCritical.inVirtualList && afterCritical.effected[ownId],
     );
@@ -252,13 +252,16 @@ function getSecondarySelector(): TrySelect {
     const combineTargetFor: ?DraggableId =
       combine && combine.draggableId === ownId ? draggingId : null;
 
-    if (!displacement) {
+    if (!visualDisplacement) {
       if (!isAfterCriticalInVirtualList) {
         return getFallback(combineTargetFor);
       }
 
-      // when not over a list we close the gap
+      if (impact.displaced.invisible[ownId]) {
+        return null;
+      }
 
+      // when not over a list we close the gap
       const change: Position = negate(afterCritical.displacedBy.point);
       const offset: Position = memoizedOffset(change.x, change.y);
       return getMemoizedProps(offset, combineTargetFor, true);
@@ -275,7 +278,7 @@ function getSecondarySelector(): TrySelect {
         origin,
         // we know this is null, but meh
         combineTargetFor,
-        displacement.shouldAnimate,
+        visualDisplacement.shouldAnimate,
       );
     }
     const displaceBy: Position = impact.displacedBy.point;
@@ -284,7 +287,7 @@ function getSecondarySelector(): TrySelect {
     return getMemoizedProps(
       offset,
       combineTargetFor,
-      displacement.shouldAnimate,
+      visualDisplacement.shouldAnimate,
     );
   };
 
