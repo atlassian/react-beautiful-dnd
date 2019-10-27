@@ -28,3 +28,4 @@ function withoutConsole(type: string, fn: () => void) {
 }
 
 export const withoutError = withoutConsole.bind(null, 'error');
+export const withoutWarn = withoutConsole.bind(null, 'warn');

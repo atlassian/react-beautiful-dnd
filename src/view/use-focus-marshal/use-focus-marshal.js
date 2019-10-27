@@ -20,6 +20,7 @@ export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
   const entriesRef = useRef<EntryMap>({});
   const recordRef = useRef<?DraggableId>(null);
   const restoreFocusFrameRef = useRef<?AnimationFrameID>(null);
+  const isMountedRef = useRef<boolean>(false);
 
   const register = useCallback(function register(
     id: DraggableId,
@@ -62,6 +63,17 @@ export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
 
   const tryRestoreFocusRecorded = useCallback(
     function tryRestoreFocusRecorded() {
+      // frame already queued
+      if (restoreFocusFrameRef.current) {
+        return;
+      }
+
+      // cannot give focus if unmounted
+      // this code path is generally not hit expect for some hot-reloading flows
+      if (!isMountedRef.current) {
+        return;
+      }
+
       restoreFocusFrameRef.current = requestAnimationFrame(() => {
         restoreFocusFrameRef.current = null;
         const record: ?DraggableId = recordRef.current;
@@ -93,7 +105,9 @@ export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
   }, []);
 
   useLayoutEffect(() => {
+    isMountedRef.current = true;
     return function clearFrameOnUnmount() {
+      isMountedRef.current = false;
       const frameId: ?AnimationFrameID = restoreFocusFrameRef.current;
       if (frameId) {
         cancelAnimationFrame(frameId);
