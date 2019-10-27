@@ -21,7 +21,6 @@ import { toDraggableMap, toDroppableMap } from '../dimension-structures';
 import getLiftEffect from '../get-lift-effect';
 import scrollDroppable from '../droppable/scroll-droppable';
 import whatIsDraggedOver from '../droppable/what-is-dragged-over';
-import animateAfterCritical from './animate-after-critical';
 
 type Args = {|
   state: CollectingState | DropPendingState,
@@ -110,17 +109,14 @@ export default ({
         state.impact
       : onLiftImpact;
 
-  const impact: DragImpact = animateAfterCritical({
-    impact: getDragImpact({
-      pageBorderBoxCenter: state.current.page.borderBoxCenter,
-      draggable: dimensions.draggables[state.critical.draggable.id],
-      draggables: dimensions.draggables,
-      droppables: dimensions.droppables,
-      previousImpact,
-      viewport: state.viewport,
-      userDirection: state.userDirection,
-      afterCritical,
-    }),
+  const impact: DragImpact = getDragImpact({
+    pageBorderBoxCenter: state.current.page.borderBoxCenter,
+    draggable: dimensions.draggables[state.critical.draggable.id],
+    draggables: dimensions.draggables,
+    droppables: dimensions.droppables,
+    previousImpact,
+    viewport: state.viewport,
+    userDirection: state.userDirection,
     afterCritical,
   });
 

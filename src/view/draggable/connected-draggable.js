@@ -257,29 +257,28 @@ function getSecondarySelector(): TrySelect {
         return getFallback(combineTargetFor);
       }
 
+      // After critical but not visibly displaced in a virtual list
+      // This can occur if:
+      // 1. the item is not visible (displaced.invisible)
+      // 2. We have moved out of the home list.
+
+      // Don't need to do anything - item is invisible
       if (impact.displaced.invisible[ownId]) {
         return null;
       }
 
-      // when not over a list we close the gap
+      // We are no longer over the home list.
+      // We need to move backwards to close the gap that the dragging item has left
       const change: Position = negate(afterCritical.displacedBy.point);
       const offset: Position = memoizedOffset(change.x, change.y);
       return getMemoizedProps(offset, combineTargetFor, true);
     }
 
     if (isAfterCriticalInVirtualList) {
-      const fallback: ?MapProps = getFallback(combineTargetFor);
-      if (fallback) {
-        return fallback;
-      }
-
-      return getMemoizedProps(
-        // moving back to original position
-        origin,
-        // we know this is null, but meh
-        combineTargetFor,
-        visualDisplacement.shouldAnimate,
-      );
+      // In a virtual list the removal of a dragging item does
+      // not cause the list to collapse. So when something is 'displaced'
+      // we can just leave it in the original spot.
+      return getFallback(combineTargetFor);
     }
     const displaceBy: Position = impact.displacedBy.point;
     const offset: Position = memoizedOffset(displaceBy.x, displaceBy.y);
