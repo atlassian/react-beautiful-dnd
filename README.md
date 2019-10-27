@@ -37,6 +37,7 @@ We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/
 - Vertical lists ↕
 - Horizontal lists ↔
 - Movement between lists (▤ ↔ ▤)
+- [Virtual list support 👾](/docs/patterns/virtual-lists.md) - unlocking 10,000 items @ 60fps
 - [Combining items](/docs/guides/combining.md)
 - Mouse 🐭, keyboard 🎹♿️ and touch 👉📱 (mobile, tablet and so on) support
 - [Multi drag support](/docs/patterns/multi-drag.md)
@@ -122,6 +123,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 
 ### Patterns 👷‍
 
+- [Virtual lists 👾](/docs/patterns/virtual-lists.md)
 - [Multi drag](/docs/patterns/multi-drag.md)
 - [Tables](/docs/patterns/tables.md)
 - [Reparenting a `<Draggable />`](/docs/guides/reparenting.md) - _Using our cloning API or your own portal_

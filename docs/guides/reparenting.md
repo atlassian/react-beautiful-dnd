@@ -2,7 +2,7 @@
 
 There are situations were you want to change the parent element of the dragging item while a drag is occurring. There are two approaches you can use to do this:
 
-1. Using our 1st class cloning API (required for virtual lists)
+1. Using our 1st class cloning API (required for [virtual lists](/docs/patterns/virtual-lists.md))
 2. Using your own `portal` with [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html)
 
 ## Background

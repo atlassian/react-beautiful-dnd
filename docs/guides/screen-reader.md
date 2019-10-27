@@ -73,7 +73,7 @@ We tell the user the following:
 - What position the item is in
 - How to move the item around
 
-Notice that we don't tell them that they are in position `1 of x`. This is because we don't have access to the size of the list in the current api. It is like this for now to keep the api light and future proof as we move towards virtual lists. Feel free to add the the `1 of x` in your own messaging, and what list the item is in.
+Notice that we don't tell them that they are in position `1 of x`. This is because we don't have access to the size of the list in the current api. This is especially true for [virtual lists](/docs/patterns/virtual-lists.md) where only a portion of the list is rendered at any one time. Feel free to add the the `1 of x` in your own messaging, and what list the item is in.
 
 **Message with more info**: "You have lifted an item in position `${startPosition}` of `${listLength}` in the `${listName}` list. Use the arrow keys to move, space bar to drop, and escape to cancel."
 
