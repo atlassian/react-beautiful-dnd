@@ -11,17 +11,25 @@ import type {
   DimensionMap,
   Published,
   Viewport,
+  Critical,
 } from '../../../../src/types';
-import { critical, preset } from '../../../utils/preset-action-args';
+import { preset } from '../../../util/preset-action-args';
+import { getCallbacksStub } from '../../../util/dimension-marshal';
+import { defaultRequest } from './util';
+import { makeScrollable } from '../../../util/dimension';
+import { setViewport } from '../../../util/viewport';
+import getFrame from '../../../../src/state/get-frame';
+import type { Registry } from '../../../../src/state/registry/registry-types';
+import createRegistry from '../../../../src/state/registry/create-registry';
 import {
-  getDroppableCallbacks,
-  populateMarshal,
+  getDraggableEntry,
+  getDroppableEntry,
+  populate,
   type DimensionWatcher,
-  getCallbacksStub,
-} from '../../../utils/dimension-marshal';
-import { defaultRequest, withExpectedAdvancedUsageWarning } from './util';
-import { makeScrollable } from '../../../utils/dimension';
-import { setViewport } from '../../../utils/viewport';
+} from '../../../util/registry';
+import { origin } from '../../../../src/state/position';
+import patchDimensionMap from '../../../../src/state/patch-dimension-map';
+import { withWarn } from '../../../util/console';
 
 const viewport: Viewport = preset.viewport;
 setViewport(viewport);
@@ -32,8 +40,22 @@ const empty: Published = {
   modified: [],
 };
 
-const scrollableHome: DroppableDimension = makeScrollable(preset.home);
-const scrollableForeign: DroppableDimension = makeScrollable(preset.foreign);
+function makeVirtual(droppable: DroppableDimension): DroppableDimension {
+  return {
+    ...droppable,
+    descriptor: {
+      ...droppable.descriptor,
+      mode: 'virtual',
+    },
+  };
+}
+
+const scrollableHome: DroppableDimension = makeScrollable(
+  makeVirtual(preset.home),
+);
+const scrollableForeign: DroppableDimension = makeScrollable(
+  makeVirtual(preset.foreign),
+);
 const withScrollables: DimensionMap = {
   draggables: preset.dimensions.draggables,
   droppables: {
@@ -48,6 +70,7 @@ const ofAnotherType: DroppableDimension = {
   descriptor: {
     type: 'some rogue type',
     id: 'another droppable',
+    mode: 'virtual',
   },
 };
 const inAnotherType: DraggableDimension = {
@@ -67,7 +90,11 @@ const anotherDroppable: DroppableDimension = {
   },
 };
 
-// TODO: remove
+const critical: Critical = {
+  draggable: preset.inHome1.descriptor,
+  droppable: scrollableHome.descriptor,
+};
+
 const justCritical: DimensionMap = {
   draggables: {
     [preset.inHome1.descriptor.id]: preset.inHome1,
@@ -81,7 +108,7 @@ afterEach(() => {
   requestAnimationFrame.reset();
 });
 
-describe('additions', () => {
+describe('draggable additions', () => {
   it('should collect and publish the draggables', () => {
     const beforeInHome1: DraggableDimension = {
       ...preset.inHome1,
@@ -99,19 +126,25 @@ describe('additions', () => {
         index: 1,
       },
     };
+    const registry: Registry = createRegistry();
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
-    // Registering a new draggable (inserted before inHome1)
-    withExpectedAdvancedUsageWarning(() => {
-      marshal.registerDraggable(beforeInHome1.descriptor, () => beforeInHome1);
-    });
-    marshal.registerDraggable(beforeInHome2.descriptor, () => beforeInHome2);
+    registry.draggable.register(
+      getDraggableEntry({ dimension: beforeInHome1 }),
+    );
+    registry.draggable.register(
+      getDraggableEntry({ dimension: beforeInHome2 }),
+    );
+    expect(callbacks.collectionStarting).toHaveBeenCalled();
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
@@ -119,45 +152,30 @@ describe('additions', () => {
     const expected: Published = {
       ...empty,
       additions: [beforeInHome1, beforeInHome2],
-      modified: [scrollableHome],
+      modified: [{ droppableId: scrollableHome.descriptor.id, scroll: origin }],
     };
     expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
   });
 
-  it('should throw if trying to add a droppable', () => {
+  it('should not do anything if trying to add a draggable that does not have the same type as the dragging item', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
-    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
-
-    const register = () =>
-      marshal.registerDroppable(
-        anotherDroppable.descriptor,
-        getDroppableCallbacks(anotherDroppable),
-      );
-
-    expect(register).toThrow();
-  });
-
-  it('should throw if trying to add a draggable that does not have the same type as the dragging item', () => {
-    const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
-
-    // A publish has started
-    marshal.startPublishing(defaultRequest);
-    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
 
     // Registering a new draggable (inserted before inHome1)
-    const execute = () =>
-      marshal.registerDraggable(inAnotherType.descriptor, () => inAnotherType);
 
-    expect(execute).toThrow(
-      'This is not of the same type as the dragging item',
+    registry.draggable.register(
+      getDraggableEntry({ dimension: inAnotherType }),
     );
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
   });
 
   it('should order published draggables by their index', () => {
@@ -179,19 +197,25 @@ describe('additions', () => {
       },
     };
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // publishing the higher index value first
-    withExpectedAdvancedUsageWarning(() => {
-      marshal.registerDraggable(beforeInHome2.descriptor, () => beforeInHome2);
-    });
+    registry.draggable.register(
+      getDraggableEntry({ dimension: beforeInHome2 }),
+    );
     // publishing the lower index value second
-    marshal.registerDraggable(beforeInHome1.descriptor, () => beforeInHome1);
+    registry.draggable.register(
+      getDraggableEntry({ dimension: beforeInHome1 }),
+    );
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
@@ -200,93 +224,81 @@ describe('additions', () => {
       ...empty,
       // we expect this to be ordered by index
       additions: [beforeInHome1, beforeInHome2],
-      modified: [scrollableHome],
+      modified: [{ droppableId: scrollableHome.descriptor.id, scroll: origin }],
     };
     expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
   });
-});
 
-describe('droppables', () => {
-  it('should recollect droppables that had internal changes (home)', () => {
+  it('should log a warning if trying to add or remove a draggable from a non-virtual list', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    const watcher: DimensionWatcher = populateMarshal(marshal, withScrollables);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    const notVirtual: DroppableDimension = {
+      ...scrollableHome,
+      descriptor: {
+        ...scrollableHome.descriptor,
+        mode: 'standard',
+      },
+    };
+    const map: DimensionMap = patchDimensionMap(withScrollables, notVirtual);
+    populate(registry, map);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
-    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
 
-    withExpectedAdvancedUsageWarning(() => {
-      marshal.unregisterDraggable(preset.inHome2.descriptor);
+    // additions log a warning
+    withWarn(() => {
+      const beforeInHome1: DraggableDimension = {
+        ...preset.inHome1,
+        descriptor: {
+          ...preset.inHome1.descriptor,
+          id: 'b',
+          index: 0,
+        },
+      };
+      registry.draggable.register(
+        getDraggableEntry({ dimension: beforeInHome1 }),
+      );
     });
-    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
-    expect(watcher.droppable.recollect).not.toHaveBeenCalled();
-
-    // Fire the collection / publish step
-    requestAnimationFrame.flush();
-
-    // not hiding placeholder in home list
-    expect(watcher.droppable.recollect).toHaveBeenCalledWith(
-      scrollableHome.descriptor.id,
-      { withoutPlaceholder: false },
-    );
-
-    const expected: Published = {
-      additions: [],
-      removals: [preset.inHome2.descriptor.id],
-      modified: [scrollableHome],
-    };
-    expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
-  });
-
-  it('should recollect droppables that had internal changes (foreign)', () => {
-    const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    const watcher: DimensionWatcher = populateMarshal(marshal, withScrollables);
-
-    // A publish has started
-    marshal.startPublishing(defaultRequest);
-    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
-
-    withExpectedAdvancedUsageWarning(() => {
-      marshal.unregisterDraggable(preset.inForeign1.descriptor);
+    // removals log a warning
+    withWarn(() => {
+      registry.draggable.unregister(
+        registry.draggable.getById(preset.inHome2.descriptor.id),
+      );
     });
-    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
-    expect(watcher.droppable.recollect).not.toHaveBeenCalled();
 
-    // Fire the collection / publish step
-    requestAnimationFrame.flush();
-
-    // hiding placeholder in foreign list
-    expect(watcher.droppable.recollect).toHaveBeenCalledWith(
-      scrollableForeign.descriptor.id,
-      { withoutPlaceholder: true },
-    );
-
-    const expected: Published = {
-      additions: [],
-      removals: [preset.inForeign1.descriptor.id],
-      modified: [scrollableForeign],
-    };
-    expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
+    // neither cause a collection to start
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
   });
 });
 
-describe('removals', () => {
+describe('draggable removals', () => {
   it('should publish a removal', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
-    withExpectedAdvancedUsageWarning(() => {
-      marshal.unregisterDraggable(preset.inHome2.descriptor);
-    });
-    marshal.unregisterDraggable(preset.inHome3.descriptor);
-    marshal.unregisterDraggable(preset.inForeign1.descriptor);
+    registry.draggable.unregister(
+      registry.draggable.getById(preset.inHome2.descriptor.id),
+    );
+    registry.draggable.unregister(
+      registry.draggable.getById(preset.inHome3.descriptor.id),
+    );
+    registry.draggable.unregister(
+      registry.draggable.getById(preset.inForeign1.descriptor.id),
+    );
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
     // Fire the collection / publish step
@@ -298,14 +310,21 @@ describe('removals', () => {
         preset.inHome3.descriptor.id,
         preset.inForeign1.descriptor.id,
       ],
-      modified: [scrollableHome, scrollableForeign],
+      modified: [
+        { droppableId: scrollableHome.descriptor.id, scroll: origin },
+        { droppableId: scrollableForeign.descriptor.id, scroll: origin },
+      ],
     };
     expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
   });
 
-  it('should throw if tying to remove a draggable of a different type', () => {
+  it('should do nothing if tying to remove a draggable of a different type', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
     const dimensions: DimensionMap = {
       draggables: {
         ...withScrollables.draggables,
@@ -316,57 +335,188 @@ describe('removals', () => {
         [ofAnotherType.descriptor.id]: ofAnotherType,
       },
     };
-    populateMarshal(marshal, dimensions);
+    populate(registry, dimensions);
 
     // A publish has started
     marshal.startPublishing(defaultRequest);
 
-    const unregister = () =>
-      marshal.unregisterDraggable(inAnotherType.descriptor);
-
-    expect(unregister).toThrow(
-      'This is not of the same type as the dragging item',
+    registry.draggable.unregister(
+      registry.draggable.getById(inAnotherType.descriptor.id),
     );
+
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
   });
 
-  it('should throw an error if trying to remove a critical dimension', () => {
+  it('should do nothing if removing the critical draggable', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, withScrollables);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
 
     marshal.startPublishing(defaultRequest);
 
-    expect(() => marshal.unregisterDraggable(critical.draggable)).toThrow(
-      'Cannot remove the dragging item during a drag',
+    registry.draggable.unregister(
+      registry.draggable.getById(critical.draggable.id),
     );
-    expect(() => marshal.unregisterDroppable(critical.droppable)).toThrow(
-      'Cannot add a Droppable during a drag',
+
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
+  });
+});
+
+describe('droppables', () => {
+  it('should not do anything if a droppable is added', () => {
+    const registry: Registry = createRegistry();
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
     );
+    populate(registry, withScrollables);
+
+    // A publish has started
+    marshal.startPublishing(defaultRequest);
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+
+    registry.droppable.register(
+      getDroppableEntry({ dimension: anotherDroppable }),
+    );
+
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
+  });
+
+  it('should not do anything if a droppable is removed', () => {
+    const registry: Registry = createRegistry();
+    const callbacks: Callbacks = getCallbacksStub();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, withScrollables);
+
+    // A publish has started
+    marshal.startPublishing(defaultRequest);
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+
+    registry.droppable.unregister(
+      registry.droppable.getById(scrollableForeign.descriptor.id),
+    );
+
+    expect(callbacks.collectionStarting).not.toHaveBeenCalled();
+  });
+
+  it('should recollect the scroll from droppables that had draggable additions', () => {
+    const beforeInHome2: DraggableDimension = {
+      ...preset.inHome2,
+      descriptor: {
+        ...preset.inHome2.descriptor,
+        id: 'addition2',
+        index: 1,
+      },
+    };
+    const callbacks: Callbacks = getCallbacksStub();
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    const watcher: DimensionWatcher = populate(registry, withScrollables);
+
+    // A publish has started
+    marshal.startPublishing(defaultRequest);
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+
+    registry.draggable.register(
+      getDraggableEntry({ dimension: beforeInHome2 }),
+    );
+    expect(callbacks.collectionStarting).toHaveBeenCalled();
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+    expect(watcher.droppable.getScrollWhileDragging).not.toHaveBeenCalled();
+
+    // Fire the collection / publish step
+    requestAnimationFrame.flush();
+
+    // not hiding placeholder in home list
+
+    expect(watcher.droppable.getScrollWhileDragging).toHaveBeenCalledWith(
+      scrollableHome.descriptor.id,
+      getFrame(scrollableHome).scroll.current,
+    );
+
+    const expected: Published = {
+      additions: [beforeInHome2],
+      removals: [],
+      modified: [{ droppableId: scrollableHome.descriptor.id, scroll: origin }],
+    };
+    expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
+  });
+
+  it('should recollect the scroll from droppables that had draggable removals', () => {
+    const callbacks: Callbacks = getCallbacksStub();
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    const watcher: DimensionWatcher = populate(registry, withScrollables);
+
+    // A publish has started
+    marshal.startPublishing(defaultRequest);
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+
+    registry.draggable.unregister(
+      registry.draggable.getById(preset.inHome2.descriptor.id),
+    );
+    expect(callbacks.collectionStarting).toHaveBeenCalled();
+    expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
+    expect(watcher.droppable.getScrollWhileDragging).not.toHaveBeenCalled();
+
+    // Fire the collection / publish step
+    requestAnimationFrame.flush();
+
+    // not hiding placeholder in home list
+
+    expect(watcher.droppable.getScrollWhileDragging).toHaveBeenCalledWith(
+      scrollableHome.descriptor.id,
+      getFrame(scrollableHome).scroll.current,
+    );
+
+    const expected: Published = {
+      additions: [],
+      removals: [preset.inHome2.descriptor.id],
+      modified: [{ droppableId: scrollableHome.descriptor.id, scroll: origin }],
+    };
+    expect(callbacks.publishWhileDragging).toHaveBeenCalledWith(expected);
   });
 });
 
 describe('cancelling mid publish', () => {
   it('should cancel any pending collections', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
 
-    populateMarshal(marshal, justCritical);
+    populate(registry, justCritical);
 
     const result: StartPublishingResult = marshal.startPublishing(
       defaultRequest,
     );
-    expect(result).toEqual({
+    const expected: StartPublishingResult = {
       critical,
       dimensions: justCritical,
       viewport,
-    });
+    };
+    expect(result).toEqual(expected);
 
-    withExpectedAdvancedUsageWarning(() => {
-      marshal.registerDraggable(
-        preset.inHome2.descriptor,
-        () => preset.inHome2,
-      );
-    });
+    registry.draggable.register(
+      getDraggableEntry({ dimension: preset.inHome2 }),
+    );
+    expect(callbacks.collectionStarting).toHaveBeenCalled();
     // no request animation fired yet
     expect(callbacks.publishWhileDragging).not.toHaveBeenCalled();
 
@@ -382,41 +532,47 @@ describe('cancelling mid publish', () => {
 describe('subsequent', () => {
   it('should allow subsequent publishes in the same drag', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, justCritical);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, justCritical);
 
     marshal.startPublishing(defaultRequest);
 
-    withExpectedAdvancedUsageWarning(() => {
-      marshal.registerDraggable(
-        preset.inHome2.descriptor,
-        () => preset.inHome1,
-      );
-    });
+    registry.draggable.register(
+      getDraggableEntry({ dimension: preset.inHome2 }),
+    );
     requestAnimationFrame.step();
     expect(callbacks.publishWhileDragging).toHaveBeenCalledTimes(1);
+    // $FlowFixMe
     callbacks.publishWhileDragging.mockReset();
 
-    marshal.registerDraggable(preset.inHome3.descriptor, () => preset.inHome3);
+    registry.draggable.register(
+      getDraggableEntry({ dimension: preset.inHome3 }),
+    );
     requestAnimationFrame.step();
     expect(callbacks.publishWhileDragging).toHaveBeenCalledTimes(1);
   });
 
   it('should allow subsequent publishes between drags', () => {
     const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, justCritical);
+    const registry: Registry = createRegistry();
+    const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
+      callbacks,
+    );
+    populate(registry, justCritical);
 
     marshal.startPublishing(defaultRequest);
 
-    withExpectedAdvancedUsageWarning(() => {
-      marshal.registerDraggable(
-        preset.inHome2.descriptor,
-        () => preset.inHome1,
-      );
-    });
+    registry.draggable.register(
+      getDraggableEntry({ dimension: preset.inHome2 }),
+    );
     requestAnimationFrame.step();
     expect(callbacks.publishWhileDragging).toHaveBeenCalledTimes(1);
+    // $FlowFixMe
     callbacks.publishWhileDragging.mockReset();
 
     marshal.stopPublishing();
@@ -424,30 +580,10 @@ describe('subsequent', () => {
     // second drag
     marshal.startPublishing(defaultRequest);
 
-    marshal.registerDraggable(preset.inHome3.descriptor, () => preset.inHome3);
+    registry.draggable.register(
+      getDraggableEntry({ dimension: preset.inHome3 }),
+    );
     requestAnimationFrame.step();
     expect(callbacks.publishWhileDragging).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe('advanced usage warning', () => {
-  it('should print an advanced usage warning on the first dynamic change', () => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
-
-    const callbacks: Callbacks = getCallbacksStub();
-    const marshal: DimensionMarshal = createDimensionMarshal(callbacks);
-    populateMarshal(marshal, justCritical);
-
-    marshal.startPublishing(defaultRequest);
-    expect(console.warn).not.toHaveBeenCalled();
-
-    marshal.registerDraggable(preset.inHome1.descriptor, () => preset.inHome1);
-    expect(console.warn).toHaveBeenCalledTimes(1);
-    console.warn.mockReset();
-
-    marshal.registerDraggable(preset.inHome2.descriptor, () => preset.inHome2);
-    expect(console.warn).not.toHaveBeenCalled();
-
-    console.warn.mockRestore();
   });
 });

@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../invariant';
 
 export default (): HTMLBodyElement => {
   const body: ?HTMLBodyElement = document.body;

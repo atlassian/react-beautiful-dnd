@@ -9,7 +9,7 @@ export default (marshal: DimensionMarshal) => () => (next: Dispatch) => (
   if (
     // drag is finished
     action.type === 'DROP_COMPLETE' ||
-    action.type === 'CLEAN' ||
+    action.type === 'FLUSH' ||
     // no longer accepting changes once the drop has started
     action.type === 'DROP_ANIMATE'
   ) {

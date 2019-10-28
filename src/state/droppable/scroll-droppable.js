@@ -1,6 +1,6 @@
 // @flow
 import { type Position } from 'css-box-model';
-import invariant from 'tiny-invariant';
+import { invariant } from '../../invariant';
 import type {
   DroppableDimension,
   Scrollable,

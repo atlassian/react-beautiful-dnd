@@ -39,10 +39,14 @@ type OnDragEndResponder = (
   provided: ResponderProvided,
 ) => mixed;
 
-type DragStart = {|
+type DraggableRubric = {|
   draggableId: DraggableId,
   type: TypeId,
   source: DraggableLocation,
+|}
+
+type DragStart = {|
+  ...DraggableRubric,
   mode: MovementMode,
 |};
 
@@ -76,7 +80,29 @@ type DraggableLocation = {|
 // There are two modes that a drag can be in
 // FLUID: everything is done in response to highly granular input (eg mouse)
 // SNAP: items snap between positions (eg keyboard);
-export type MovementMode = 'FLUID' | 'SNAP';
+type MovementMode = 'FLUID' | 'SNAP';
+```
+
+### Sensors
+
+```js
+type Sensor = (api: SensorAPI) => void;
+type SensorAPI = {|
+  tryGetLock: TryGetLock,
+  canGetLock: (id: DraggableId) => boolean,
+  isLockClaimed: () => boolean,
+  tryReleaseLock: () => void,
+  findClosestDraggableId: (event: Event) => ?DraggableId,
+  findOptionsForDraggable: (id: DraggableId) => ?DraggableOptions,
+|};
+type TryGetLock = (
+  draggableId: DraggableId,
+  forceStop?: () => void,
+  options?: TryGetLockOptions,
+) => ?PreDragActions;
+type TryGetLockOptions = {
+  sourceEvent?: Event,
+};
 ```
 
 ### Droppable
@@ -85,12 +111,19 @@ export type MovementMode = 'FLUID' | 'SNAP';
 type DroppableProvided = {|
   innerRef: (?HTMLElement) => void,
   placeholder: ?ReactElement,
+  droppableProps: DroppableProps,
 |};
-
+type DroppableProps = {|
+  // used for shared global styles
+  'data-rbd-droppable-context-id': ContextId,
+  // Used to lookup. Currently not used for drag and drop lifecycle
+  'data-rbd-droppable-id': DroppableId,
+|};
 type DroppableStateSnapshot = {|
   isDraggingOver: boolean,
   draggingOverWith: ?DraggableId,
   draggingFromThisWith: ?DraggableId,
+  isUsingPlaceholder: boolean,
 |};
 ```
 
@@ -113,10 +146,17 @@ type DraggableStateSnapshot = {|
   mode: ?MovementMode,
 |};
 
-export type DraggableProps = {|
+type DraggableProps = {|
   style: ?DraggableStyle,
-  'data-react-beautiful-dnd-draggable': string,
+  'data-rbd-draggable-context-id': string,
+  'data-rbd-draggable-id': string,
   onTransitionEnd: ?(event: TransitionEvent) => void,
+|};
+type DraggableChildrenFn = (
+  DraggableProvided,
+  DraggableStateSnapshot,
+  DraggableRubric,
+) => Node | null;
 |};
 type DraggableStyle = DraggingStyle | NotDraggingStyle;
 type DraggingStyle = {|

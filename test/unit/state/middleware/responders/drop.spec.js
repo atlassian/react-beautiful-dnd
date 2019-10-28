@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   Responders,
   DropResult,
@@ -7,13 +6,14 @@ import type {
   State,
   DraggableLocation,
 } from '../../../../../src/types';
+import { invariant } from '../../../../../src/invariant';
 import type { Store } from '../../../../../src/state/store-types';
 import middleware from '../../../../../src/state/middleware/responders';
 import createStore from '../util/create-store';
 import {
   initialPublishArgs,
   getDragStart,
-} from '../../../../utils/preset-action-args';
+} from '../../../../util/preset-action-args';
 import {
   initialPublish,
   completeDrop,
@@ -21,7 +21,8 @@ import {
 import getResponders from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
 import getCompletedWithResult from './util/get-completed-with-result';
-import getSimpleStatePreset from '../../../../utils/get-simple-state-preset';
+import getSimpleStatePreset from '../../../../util/get-simple-state-preset';
+import { tryGetDestination } from '../../../../../src/state/get-impact-location';
 
 const result: DropResult = {
   ...getDragStart(),
@@ -46,7 +47,6 @@ it('should call the onDragEnd responder when a DROP_COMPLETE action occurs', () 
   store.dispatch(
     completeDrop({
       completed: getCompletedWithResult(result, store.getState()),
-      shouldFlush: false,
     }),
   );
   expect(responders.onDragEnd).toHaveBeenCalledWith(result, expect.any(Object));
@@ -64,7 +64,6 @@ it('should throw an exception if there was no drag start published', () => {
     store.dispatch(
       completeDrop({
         completed: borrowed,
-        shouldFlush: false,
       }),
     ),
   ).toThrow('Can only flush responders while dragging');
@@ -80,7 +79,7 @@ it('should use the drop result and not the final impact', () => {
 
   const state: State = store.getState();
   invariant(state.phase === 'DRAGGING');
-  const destination: ?DraggableLocation = state.impact.destination;
+  const destination: ?DraggableLocation = tryGetDestination(state.impact);
   invariant(destination);
   const fakeResult: DropResult = {
     ...getDragStart(),
@@ -97,7 +96,6 @@ it('should use the drop result and not the final impact', () => {
   store.dispatch(
     completeDrop({
       completed: getCompletedWithResult(fakeResult, store.getState()),
-      shouldFlush: false,
     }),
   );
   expect(responders.onDragEnd).toHaveBeenCalledWith(

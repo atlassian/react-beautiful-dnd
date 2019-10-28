@@ -29,6 +29,7 @@ beforeEach(() => {
   jest.spyOn(console, 'warn').mockImplementation(() => {});
 });
 afterEach(() => {
+  // $FlowFixMe
   console.warn.mockRestore();
 });
 

@@ -10,7 +10,7 @@ import getPlaceholderStyle from './util/get-placeholder-style';
 import * as attributes from '../../../../src/view/data-attributes';
 
 jest.useFakeTimers();
-const styleContext: string = 'hello-there';
+const contextId: string = 'hello-there';
 
 let spy;
 
@@ -24,18 +24,18 @@ afterEach(() => {
 
 const getCreatePlaceholderCalls = () => {
   return spy.mock.calls.filter(call => {
-    return call[1] && call[1][attributes.placeholder] === styleContext;
+    return call[1] && call[1][attributes.placeholder.contextId] === contextId;
   });
 };
 
 it('should animate a mount', () => {
   const wrapper: ReactWrapper<*> = mount(
     <Placeholder
+      contextId={contextId}
       animate="open"
       placeholder={placeholder}
       onClose={jest.fn()}
       onTransitionEnd={jest.fn()}
-      styleContext={styleContext}
     />,
   );
 
@@ -61,10 +61,10 @@ it('should not animate a mount if interrupted', () => {
   const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="open"
+      contextId={contextId}
       placeholder={placeholder}
       onClose={jest.fn()}
       onTransitionEnd={jest.fn()}
-      styleContext={styleContext}
     />,
   );
   const onMount: PlaceholderStyle = getPlaceholderStyle(wrapper);
@@ -76,6 +76,7 @@ it('should not animate a mount if interrupted', () => {
   wrapper.setProps({
     animate: 'none',
   });
+
   // render 1: normal
   // render 2: useEffect calling setState
   // render 3: result of setState
@@ -97,15 +98,15 @@ it('should not animate a mount if interrupted', () => {
 });
 
 it('should not animate in if unmounted', () => {
-  jest.spyOn(console, 'error');
+  const error = jest.spyOn(console, 'error');
 
   const wrapper: ReactWrapper<*> = mount(
     <Placeholder
       animate="open"
+      contextId={contextId}
       placeholder={placeholder}
       onClose={jest.fn()}
       onTransitionEnd={jest.fn()}
-      styleContext={styleContext}
     />,
   );
   expectIsEmpty(getPlaceholderStyle(wrapper));
@@ -115,6 +116,6 @@ it('should not animate in if unmounted', () => {
 
   // an internal setState would be triggered the timer was
   // not cleared when unmounting
-  expect(console.error).not.toHaveBeenCalled();
-  console.error.mockRestore();
+  expect(error).not.toHaveBeenCalled();
+  error.mockRestore();
 });

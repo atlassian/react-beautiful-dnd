@@ -41,11 +41,11 @@ For tables with less than 50 rows this should approach be fine!
 
 [See example code here](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20dimension%20locking&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
 
-## Advanced: using [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html)
+## Advanced: reparenting
 
-If you want to use `ReactDOM.createPortal` in combination with table row reordering then there are few extra steps you need to go through.
+If you want to use reparenting (cloning or your own portal) in combination with table row reordering then there are few extra steps you need to go through.
 
-First up, have a read of our [using a portal pattern](/docs/patterns/using-a-portal.md) to get familiar with the approach.
+First up, have a read of our [reparenting pattern](/docs/guides/reparenting.md) to get familiar with the approach.
 
 It is important to know things timings of mount / unmount actions in React. We have created a [codesandbox.io example](https://codesandbox.io/s/nkl52y1wn0) to show how the mount timings work when moving in and out of a `ReactDOM.createPortal`.
 
@@ -63,6 +63,11 @@ It seems like the only way to get things working is to:
 1.  In `componentWillUnmount` of the `tr` read the current widths of the cells from the DOM. You then store this value outside of the component so that it can be read by new components that are mounting.
 2.  If a component is mounting and `DraggableStateSnapshot > isDragging` is true then you can see if there is a previously recorded width. If there is then you can apply that width.
 
-This gets a little complicated - so we [created another example](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20portal&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel) for you showing you how this technique works! You're welcome!
+This gets a little complicated - so we created some examples to show you how this technique works
+
+- [With our cloning API](https://react-beautiful-dnd.netlify.com/?path=/story/tables--with-clone)
+- [With your own portal](https://react-beautiful-dnd.netlify.com/?path=/story/tables--with-portal)
+
+You're welcome!
 
 [← Back to documentation](/README.md#documentation-)

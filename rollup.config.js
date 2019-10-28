@@ -5,7 +5,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import strip from 'rollup-plugin-strip';
-import { uglify } from 'rollup-plugin-uglify';
+import { terser } from 'rollup-plugin-terser';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
 import json from 'rollup-plugin-json';
 import pkg from './package.json';
@@ -36,7 +36,7 @@ const commonjsArgs = {
   // needed for react-is via react-redux
   // https://stackoverflow.com/questions/50080893/rollup-error-isvalidelementtype-is-not-exported-by-node-modules-react-is-inde/50098540
   namedExports: {
-    'node_modules/react-redux/node_modules/react-is/index.js': [
+    'node_modules/react-is/index.js': [
       'isValidElementType',
       'isContextConsumer',
     ],
@@ -83,10 +83,17 @@ export default [
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
       commonjs(commonjsArgs),
-      strip({ debugger: true }),
+      strip(),
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot(snapshotArgs),
-      uglify(),
+      terser(),
+      // Useful for debugging: you can see what code is dropped
+      // terser({
+      //   mangle: false,
+      //   compress: false,
+      //   keep_fnames: true,
+      //   output: { beautify: true },
+      // }),
     ],
   },
 

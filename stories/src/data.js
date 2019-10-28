@@ -1,10 +1,10 @@
 // @flow
 import { colors } from '@atlaskit/theme';
 import type { Author, Quote, QuoteMap } from './types';
-import jakeImg from '../assets/jake.png';
-import finnImg from '../assets/finn.png';
-import bmoImg from '../assets/bmo.png';
-import princessImg from '../assets/princess.png';
+import finnImg from '../static/media/finn-min.png';
+import bmoImg from '../static/media/bmo-min.png';
+import princessImg from '../static/media/princess-min.png';
+import jakeImg from '../static/media/jake-min.png';
 
 const jake: Author = {
   id: '1',
@@ -13,7 +13,7 @@ const jake: Author = {
   avatarUrl: jakeImg,
   colors: {
     soft: colors.Y50,
-    hard: colors.Y200,
+    hard: colors.N400A,
   },
 };
 
@@ -24,7 +24,7 @@ const BMO: Author = {
   avatarUrl: bmoImg,
   colors: {
     soft: colors.G50,
-    hard: colors.G200,
+    hard: colors.N400A,
   },
 };
 
@@ -35,7 +35,7 @@ const finn: Author = {
   avatarUrl: finnImg,
   colors: {
     soft: colors.B50,
-    hard: colors.B200,
+    hard: colors.N400A,
   },
 };
 
@@ -46,7 +46,7 @@ const princess: Author = {
   avatarUrl: princessImg,
   colors: {
     soft: colors.P50,
-    hard: colors.P200,
+    hard: colors.N400A,
   },
 };
 
@@ -91,7 +91,8 @@ export const quotes: Quote[] = [
   },
   {
     id: '8',
-    content: 'People make mistakes. It’s a part of growing up',
+    content:
+      "People make mistakes. It's all a part of growing up and you never really stop growing",
     author: finn,
   },
   {

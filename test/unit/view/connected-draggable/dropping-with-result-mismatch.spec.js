@@ -1,7 +1,7 @@
 // @flow
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
-import { getPreset } from '../../../utils/dimension';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import { getPreset } from '../../../util/dimension';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import getOwnProps from './util/get-own-props';
 import type {
   Selector,
@@ -12,6 +12,7 @@ import type {
 import type { DropAnimatingState } from '../../../../src/types';
 import { curves } from '../../../../src/animation';
 import { getDraggingSnapshot } from './util/get-snapshot';
+import { tryGetDestination } from '../../../../src/state/get-impact-location';
 
 const preset = getPreset();
 const state = getStatePreset();
@@ -22,7 +23,7 @@ it('should use result for providing data and not the impact', () => {
 
   // little validation: the result is null, but the impact has a destination
   expect(current.completed.result.destination).toBe(null);
-  expect(current.completed.impact.destination).toBeTruthy();
+  expect(tryGetDestination(current.completed.impact)).toBeTruthy();
 
   const selector: Selector = makeMapStateToProps();
 

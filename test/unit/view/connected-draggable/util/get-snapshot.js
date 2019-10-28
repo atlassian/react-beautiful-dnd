@@ -14,6 +14,7 @@ type GetDraggingSnapshotArgs = {|
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
   dropping: ?DropAnimation,
+  isClone?: ?boolean,
 |};
 
 export const getDraggingSnapshot = ({
@@ -21,6 +22,7 @@ export const getDraggingSnapshot = ({
   draggingOver,
   combineWith,
   dropping,
+  isClone,
 }: GetDraggingSnapshotArgs): StateSnapshot => ({
   isDragging: true,
   isDropAnimating: Boolean(dropping),
@@ -29,6 +31,7 @@ export const getDraggingSnapshot = ({
   draggingOver,
   combineWith,
   combineTargetFor: null,
+  isClone: Boolean(isClone),
 });
 
 type GetSecondarySnapshotArgs = {|
@@ -39,6 +42,7 @@ export const getSecondarySnapshot = ({
   combineTargetFor,
 }: GetSecondarySnapshotArgs): StateSnapshot => ({
   isDragging: false,
+  isClone: false,
   isDropAnimating: false,
   dropAnimation: null,
   mode: null,

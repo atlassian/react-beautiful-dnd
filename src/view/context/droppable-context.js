@@ -1,8 +1,9 @@
 // @flow
 import React from 'react';
-import type { DroppableId, TypeId } from '../../types';
+import type { DraggableId, DroppableId, TypeId } from '../../types';
 
 export type DroppableContextValue = {|
+  isUsingCloneFor: ?DraggableId,
   droppableId: DroppableId,
   type: TypeId,
 |};

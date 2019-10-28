@@ -20,8 +20,9 @@ coverage/
 # test reports
 test-reports/
 
-# test videos
+# test outputs
 cypress/videos/
+cypress/screenshots/
 
 # storybook
 .storybook.out

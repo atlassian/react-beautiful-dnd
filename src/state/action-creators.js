@@ -74,7 +74,7 @@ export const collectionStarting = (): CollectionStartingAction => ({
 
 export type UpdateDroppableScrollArgs = {
   id: DroppableId,
-  offset: Position,
+  newScroll: Position,
 };
 
 export type UpdateDroppableScrollAction = {|
@@ -169,26 +169,6 @@ export const updateViewportMaxScroll = (
   payload: args,
 });
 
-// type PostJumpScrollAction = {|
-//   type: 'POST_JUMP_SCROLL',
-//   payload: null,
-// |};
-
-// export const postJumpScroll = (): PostJumpScrollAction => ({
-//   type: 'POST_JUMP_SCROLL',
-//   payload: null,
-// });
-
-// type PostSnapDestinationChangeAction = {|
-//   type: 'POST_SNAP_DESTINATION_CHANGE',
-//   payload: null,
-// |};
-
-// export const postSnapDestinationChange = (): PostSnapDestinationChangeAction => ({
-//   type: 'POST_SNAP_DESTINATION_CHANGE',
-//   payload: null,
-// });
-
 export type MoveUpAction = {|
   type: 'MOVE_UP',
   payload: null,
@@ -229,20 +209,14 @@ export const moveLeft = (): MoveLeftAction => ({
   payload: null,
 });
 
-type CleanActionArgs = {|
-  shouldFlush: boolean,
+type FlushAction = {|
+  type: 'FLUSH',
+  payload: null,
 |};
 
-type CleanAction = {|
-  type: 'CLEAN',
-  payload: CleanActionArgs,
-|};
-
-export const clean = (
-  args?: CleanActionArgs = { shouldFlush: false },
-): CleanAction => ({
-  type: 'CLEAN',
-  payload: args,
+export const flush = (): FlushAction => ({
+  type: 'FLUSH',
+  payload: null,
 });
 
 export type AnimateDropArgs = {|
@@ -263,7 +237,6 @@ export const animateDrop = (args: AnimateDropArgs): DropAnimateAction => ({
 
 export type DropCompleteArgs = {|
   completed: CompletedDrag,
-  shouldFlush: boolean,
 |};
 
 export type DropCompleteAction = {
@@ -334,4 +307,4 @@ export type Action =
   | DropAnimateAction
   | DropAnimationFinishedAction
   | DropCompleteAction
-  | CleanAction;
+  | FlushAction;

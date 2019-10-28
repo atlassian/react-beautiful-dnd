@@ -1,11 +1,11 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../../../src/invariant';
 import { initialPublish } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/responders';
 import {
   getDragStart,
   initialPublishArgs,
-} from '../../../../utils/preset-action-args';
+} from '../../../../util/preset-action-args';
 import createStore from '../util/create-store';
 import passThrough from '../util/pass-through-middleware';
 import type { Responders } from '../../../../../src/types';

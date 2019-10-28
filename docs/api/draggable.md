@@ -29,7 +29,7 @@ type Props = {|
   // required
   draggableId: DraggableId,
   index: number,
-  children: (DraggableProvided, DraggableStateSnapshot) => Node,
+  children: DraggableChildrenFn,
   // optional
   isDragDisabled: ?boolean,
   disableInteractiveElementBlocking: ?boolean,
@@ -42,7 +42,16 @@ type Props = {|
 > `react-beautiful-dnd` will throw an error if a required prop is not provided
 
 - `draggableId`: A _required_ `DraggableId(string)`. See our [identifiers guide](/docs/guides/identifiers.md) for more information.
-- `index`: A _required_ `number` that matches the order of the `<Draggable />` in the `<Droppable />`. It is simply the index of the `<Draggable />` in the list. The `index` needs to be unique within a `<Droppable />` but does not need to be unique between `Droppables`. The `index`s in a list must start from `0` and be consecutive. `[0, 1, 2]` and not `[1, 2, 8]`. Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
+- `index`: A _required_ `number` that matches the order of the `<Draggable />` in the `<Droppable />`. It is simply the index of the `<Draggable />` in the list.
+
+`index` rule:
+
+- Must be unique within a `<Droppable />` (no duplicates)
+- Must be consecutive. `[0, 1, 2]` and not `[1, 2, 8]`
+
+Indexes do not need to start from `0` (this is often the case in [virtual lists](/docs/patterns/virtual-lists.md)). In development mode we will log warnings to the `console` if any of these rules are violated. See [Setup problem detection and error recovery](/docs/guides/setup-problem-detection-and-error-recovery.md)
+
+Typically the `index` value will simply be the `index` provided by a `Array.prototype.map` function:
 
 ```js
 {
@@ -86,7 +95,11 @@ The `React` children of a `<Draggable />` must be a function that returns a `Rea
 </Draggable>
 ```
 
-The function is provided with two arguments:
+```js
+type DraggableChildrenFn = (DraggableProvided, DraggableStateSnapshot, DraggableRubric) => Node
+```
+
+The function is provided with three arguments:
 
 ### 1. provided: (DraggableProvided)
 
@@ -127,7 +140,10 @@ export type DraggableProps = {|
   // inline style
   style: ?DraggableStyle,
   // used for shared global styles
-  'data-react-beautiful-dnd-draggable': string,
+  'data-rbd-draggable-context-id': string,
+  'data-rbd-draggable-id': string,
+  // used to know when a transition ends
+  onTransitionEnd: ?(event: TransitionEvent) => void,
 |};
 ```
 
@@ -193,7 +209,7 @@ It is a contract of this library that it owns the positioning logic of the dragg
 
 `react-beautiful-dnd` uses `position: fixed` to position the dragging element. This is quite robust and allows for you to have `position: relative | absolute | fixed` parents. However, unfortunately `position:fixed` is [impacted by `transform`](http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/) (such as `transform: rotate(10deg);`). This means that if you have a `transform: *` on one of the parents of a `<Draggable />` then the positioning logic will be incorrect while dragging. Lame! For most consumers this will not be an issue.
 
-To get around this you can use [`ReactDOM.createPortal`](https://reactjs.org/docs/portals.html). We do not enable this functionality by default as it has performance problems. We have a [using a portal guide](/docs/patterns/using-a-portal.md) explaining the performance problem in more detail and how you can set up your own `ReactDOM.createPortal` if you want to.
+To get around this you can [reparent your <Draggable />](/docs/guides/reparenting.md). We do not enable this functionality by default as it has performance problems.
 
 #### Force press
 
@@ -217,14 +233,9 @@ If the user force presses on the element before they have moved the element (eve
 
 Any force press action will cancel an existing or pending drag
 
-#### Focus retention when moving between lists
+#### Focus retention
 
-When moving a `<Draggable />` from one list to another the default browser behaviour is for the _drag handle_ element to lose focus. This is because the old element is being destroyed and a new one is being created. The loss of focus is not good when dragging with a keyboard as the user is then unable to continue to interact with the element. To improve this user experience we automatically give a _drag handle_ focus when:
-
-- It was unmounted at the end of a drag
-- It had focus
-- It is enabled when mounted
-- No other elements have gained browser focus before the drag handle has mounted
+See [our focus guide](/docs/guides/browser-focus.md)
 
 #### Extending `DraggableProps.style`
 
@@ -311,14 +322,19 @@ It is an assumption that `<Draggable />`s are _visible siblings_ of one another.
 
 ```js
 type DragHandleProps = {|
-  onFocus: () => void,
-  onBlur: () => void,
-  onMouseDown: (event: MouseEvent) => void,
-  onKeyDown: (event: KeyboardEvent) => void,
-  onTouchStart: (event: TouchEvent) => void,
-  'data-react-beautiful-dnd-drag-handle': string,
-  'aria-roledescription': string,
+  // what draggable the handle belongs to
+  'data-rbd-drag-handle-draggable-id': DraggableId,
+
+  // What DragDropContext the drag handle is in
+  'data-rbd-drag-handle-context-id': ContextId,
+
+  // Id of hidden element that contains the lift instruction (nicer screen reader text)
+  'aria-labelledby': ElementId,
+
+  // Allow tabbing to this element
   tabIndex: number,
+
+  // Stop html5 drag and drop
   draggable: boolean,
   onDragStart: (event: DragEvent) => void,
 |};
@@ -353,42 +369,6 @@ Controlling a whole draggable by just a part of it
     </div>
   )}
 </Draggable>
-```
-
-#### `dragHandleProps` monkey patching
-
-You can override some of the `dragHandleProps` props with your own behavior if you need to.
-
-```js
-const myOnMouseDown = event => console.log('mouse down on', event.target);
-
-<Draggable draggableId="draggable-1" index={0}>
-  {(provided, snapshot) => {
-    const onMouseDown = (() => {
-      // dragHandleProps might be null
-      if (!provided.dragHandleProps) {
-        return onMouseDown;
-      }
-
-      // creating a new onMouseDown function that calls myOnMouseDown as well as the drag handle one.
-      return event => {
-        provided.dragHandleProps.onMouseDown(event);
-        myOnMouseDown(event);
-      };
-    })();
-
-    return (
-      <div
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-        onMouseDown={onMouseDown}
-      >
-        Drag me!
-      </div>
-    );
-  }}
-</Draggable>;
 ```
 
 ### 2. Snapshot: (DraggableStateSnapshot)
@@ -443,6 +423,18 @@ The `children` function is also provided with a small amount of state relating t
   }}
 </Draggable>
 ```
+
+### 3. rubric: (DraggableRubric)
+
+```js
+type DraggableRubric = {|
+  draggableId: DraggableId,
+  type: TypeId,
+  source: DraggableLocation,
+|};
+```
+
+`rubric` represents all of the information associated with a `<Draggable />`. `rubric` is helpful for looking up the data associated with your `<Draggable />` when it is not available in the current scope. This is useful when using the `<Droppable /> | renderClone` API. The `rubric` is the same lookup information that is provided to the [`Responder`s](/docs/guides/responders.md).
 
 ## Adding an `onClick` handler to a `<Draggable />` or a _drag handle_
 

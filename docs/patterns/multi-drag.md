@@ -4,7 +4,7 @@
 
 Dragging multiple `<Draggable />`s at once (multi drag) is currently a pattern that needs to be built on top of `react-beautiful-dnd`. We have not included the interaction into the library itself. This is done because a multi drag experience introduces a lot of concepts, decisions and opinions. We have done a lot of work to ensure there is a standard base of [dom event management](/docs/guides/how-we-use-dom-events.md) to build on.
 
-We have created a [reference application](https://react-beautiful-dnd.netlify.com/iframe.html?selectedKind=Multi%20drag&selectedStory=pattern&full=0&down=1&left=1&panelRight=0&downPanel=storybook%2Factions%2Factions-panel) ([source](/stories/src/multi-drag)) which implements this multi drag pattern. The application is fairly basic and does not handle performance in large lists well. As such, there is are [a few performance recommendations](#performance) that we suggest you also add on to our reference application if you want to support lists greater than 50 in size.
+We have created a [reference application](https://react-beautiful-dnd.netlify.com/?path=/story/multi-drag--pattern) ([source](/stories/src/multi-drag)) which implements this multi drag pattern. The application is fairly basic and does not handle performance in large lists well. As such, there is are [a few performance recommendations](#performance) that we suggest you also add on to our reference application if you want to support lists greater than 50 in size.
 
 ![multi drag demo](https://user-images.githubusercontent.com/2182637/37322724-7843a218-26d3-11e8-9ebb-8d5853387bb3.gif)
 
@@ -16,9 +16,9 @@ We have decided on a simple, but very flexible and scalable multi drag pattern t
 
 We can break the user experience down in three phases.
 
-1.  [**Selection**](#selection): The user selects one or more items.
-2.  [**Dragging**](#dragging): The user drags one item as a representation of the whole group.
-3.  [**Dropping**](#dropping): The user drops an item into a new location. We move all of the selected items into the new location
+1. [**Selection**](#selection): The user selects one or more items.
+2. [**Dragging**](#dragging): The user drags one item as a representation of the whole group.
+3. [**Dropping**](#dropping): The user drops an item into a new location. We move all of the selected items into the new location
 
 ## Announcements
 
@@ -47,9 +47,9 @@ If a user clicks on an item the selected state of the item should be toggled. Ad
 #### Keyboard event handler
 
 - When the user presses **enter** <kbd>⏎</kbd> toggle the selection of the item
-- **Option 1**: Attach an `onKeyDown` handler to your _drag handle_ or `<Draggable />`. You will need to monkey patch the `DragHandleProvided > onKeyDown` keyboard handler.
-- **Option 2**: Attach an `onKeyUp` handler to your _drag handle_. Then you will not need to monkey patch the `onKeyDown` handler. However, `keyup` events will not have their default action prevented so you will not be able to check `event.defaultPrevented` to see if the keypress was used for a drag. If you are only using the **enter** <kbd>⏎</kbd> key in your event handler then you should be fine as that is not used as a part of dragging.
-- Prevent the default action on the `keydown` / `keyup` event if you are toggling selection as you are using it for selection as you want to opt out of the standard browser behaviour and also provide a clue that this event has been used.
+- **Option 1**: Attach an `onKeyDown` handler to your _drag handle_ or `<Draggable />`
+- **Option 2**: Attach an `onKeyUp` handler to your _drag handle_. `keyup` events will not have their default action prevented so you will not be able to check `event.defaultPrevented` to see if the keypress was used for a drag. If you are only using the **enter** <kbd>⏎</kbd> key in your event handler then you should be fine as that is not used as a part of dragging.
+- Prevent the default action on the `keydown` / `keyup` event if you are toggling selection as you are using it for selection and you want to opt out of the standard browser behaviour - and also provide a clue that this event has been used.
 
 #### Toggle selection behaviour
 
@@ -110,16 +110,8 @@ Here is an example of composing the above event handling logic in a component
 
 ```js
 class Task extends Component<Props> {
-  onKeyDown = (
-    event: KeyboardEvent,
-    // we will be monkey patching this
-    provided: DraggableProvided,
-    snapshot: DraggableStateSnapshot,
-  ) => {
-    if (provided.dragHandleProps) {
-      provided.dragHandleProps.onKeyDown(event);
-    }
-
+  onKeyDown = (event: KeyboardEvent, snapshot: DraggableStateSnapshot) => {
+    // already used
     if (event.defaultPrevented) {
       return;
     }
@@ -195,7 +187,7 @@ class Task extends Component<Props> {
             {...provided.dragHandleProps}
             onClick={this.onClick}
             onKeyDown={(event: KeyboardEvent) =>
-              this.onKeyDown(event, provided, snapshot)
+              this.onKeyDown(event, snapshot)
             }
           >
             {task.content}

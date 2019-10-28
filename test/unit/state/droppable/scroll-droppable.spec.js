@@ -1,11 +1,11 @@
 // @flow
-import invariant from 'tiny-invariant';
 import {
   type BoxModel,
   type Position,
   createBox,
   getRect,
 } from 'css-box-model';
+import { invariant } from '../../../../src/invariant';
 import type {
   ScrollSize,
   DroppableDimension,
@@ -21,6 +21,7 @@ import getMaxScroll from '../../../../src/state/get-max-scroll';
 const descriptor: DroppableDescriptor = {
   id: 'drop-1',
   type: 'TYPE',
+  mode: 'standard',
 };
 
 it('should update the frame scroll and the subject', () => {

@@ -1,7 +1,7 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../../../src/invariant';
 import {
-  clean,
+  flush,
   collectionStarting,
   drop,
   dropPending,
@@ -10,7 +10,7 @@ import {
 } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/drop';
 import { add } from '../../../../../src/state/position';
-import { initialPublishArgs } from '../../../../utils/preset-action-args';
+import { initialPublishArgs } from '../../../../util/preset-action-args';
 import createStore from '../util/create-store';
 import passThrough from '../util/pass-through-middleware';
 import type { State } from '../../../../../src/types';
@@ -26,7 +26,7 @@ it('should throw an error if a drop action occurs while not in a phase where you
   }).not.toThrow();
 
   // drop animating
-  store.dispatch(clean());
+  store.dispatch(flush());
   store.dispatch(initialPublish(initialPublishArgs));
   expect(store.getState().phase).toBe('DRAGGING');
 

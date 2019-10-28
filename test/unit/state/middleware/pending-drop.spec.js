@@ -1,7 +1,7 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { State } from '../../../../src/types';
 import type { Store } from '../../../../src/state/store-types';
+import { invariant } from '../../../../src/invariant';
 import {
   collectionStarting,
   completeDrop,
@@ -14,7 +14,7 @@ import middleware from '../../../../src/state/middleware/pending-drop';
 import {
   initialPublishWithScrollables,
   publishAdditionArgs,
-} from '../../../utils/preset-action-args';
+} from '../../../util/preset-action-args';
 import createStore from './util/create-store';
 import passThrough from './util/pass-through-middleware';
 
@@ -45,10 +45,9 @@ it('should trigger a drop on a dynamic publish if a drop pending is waiting', ()
   expect(mock).toHaveBeenCalledWith(drop({ reason: 'DROP' }));
 
   expect(mock).toHaveBeenCalledWith(
+    // $ExpectError - this calculation is not completed by this module and it is non trival
     completeDrop({
-      // $ExpectError - this calculation is not completed by this module and it is non trival
       completed: expect.any(Object),
-      shouldFlush: false,
     }),
   );
   expect(mock).toHaveBeenCalledTimes(3);

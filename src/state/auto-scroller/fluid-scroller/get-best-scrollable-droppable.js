@@ -1,12 +1,12 @@
 // @flow
 import memoizeOne from 'memoize-one';
-import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
 import type {
   DroppableDimension,
   DroppableDimensionMap,
   DroppableId,
 } from '../../../types';
+import { invariant } from '../../../invariant';
 import isPositionInFrame from '../../visibility/is-position-in-frame';
 import { toDroppableList } from '../../dimension-structures';
 import { find } from '../../../native-with-fallback';

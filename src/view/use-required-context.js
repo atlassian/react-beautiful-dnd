@@ -1,6 +1,6 @@
 // @flow
 import { useContext, type Context as ContextType } from 'react';
-import invariant from 'tiny-invariant';
+import { invariant } from '../invariant';
 
 export default function useRequiredContext<T>(Context: ContextType<?T>): T {
   const result: ?T = useContext(Context);

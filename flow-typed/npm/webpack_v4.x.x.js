@@ -1,20 +1,23 @@
-// flow-typed signature: 72cb54db24df27a7bac24b0b302df296
-// flow-typed version: 6cb74e5628/webpack_v4.x.x/flow_>=v0.71.x
+// flow-typed signature: fab19979b6b943bd172a4ace0f3a0550
+// flow-typed version: b942841feb/webpack_v4.x.x/flow_>=v0.104.x
 
 import * as http from 'http';
 import fs from 'fs';
 
 declare module 'webpack' {
-  declare class WebpackError extends Error {
+  declare class $WebpackError extends Error {
     constructor(message: string): WebpackError;
     inspect(): string;
+    details: string;
   }
+
+  declare type WebpackError = $WebpackError;
 
   declare interface Stats {
     hasErrors(): boolean;
     hasWarnings(): boolean;
     toJson(options?: StatsOptions): any;
-    toString(options?: StatsOptions & { colors?: boolean }): string;
+    toString(options?: StatsOptions & { colors?: boolean, ... }): string;
   }
 
   declare type Callback = (error: WebpackError, stats: Stats) => void;
@@ -23,16 +26,19 @@ declare module 'webpack' {
   declare type Watching = {
     close(): void,
     invalidate(): void,
+    ...
   };
 
   declare type WebpackCompiler = {
     run(callback: Callback): void,
     watch(options: WatchOptions, handler: WatchHandler): Watching,
+    ...
   };
 
   declare type WebpackMultiCompiler = {
     run(callback: Callback): void,
     watch(options: WatchOptions, handler: WatchHandler): Watching,
+    ...
   };
 
   declare class WebpackCompilation {
@@ -47,9 +53,7 @@ declare module 'webpack' {
 
   declare type NonEmptyArrayOfUniqueStringValues = Array<string>;
 
-  declare type EntryObject = {
-    [k: string]: string | NonEmptyArrayOfUniqueStringValues,
-  };
+  declare type EntryObject = { [k: string]: string | NonEmptyArrayOfUniqueStringValues, ... };
 
   declare type EntryItem = string | NonEmptyArrayOfUniqueStringValues;
 
@@ -63,15 +67,11 @@ declare module 'webpack' {
 
   declare type ExternalItem =
     | string
-    | {
-        [k: string]:
-          | string
-          | {
-              [k: string]: any,
-            }
-          | ArrayOfStringValues
-          | boolean,
-      }
+    | { [k: string]:
+    | string
+    | { [k: string]: any, ... }
+    | ArrayOfStringValues
+    | boolean, ... }
     | RegExp;
 
   declare type Externals =
@@ -96,13 +96,14 @@ declare module 'webpack' {
     | ((value: string) => boolean)
     | RuleSetConditions
     | {
-        and?: RuleSetConditions,
-        exclude?: RuleSetConditionOrConditions,
-        include?: RuleSetConditionOrConditions,
-        not?: RuleSetConditions,
-        or?: RuleSetConditions,
-        test?: RuleSetConditionOrConditions,
-      };
+    and?: RuleSetConditions,
+    exclude?: RuleSetConditionOrConditions,
+    include?: RuleSetConditionOrConditions,
+    not?: RuleSetConditions,
+    or?: RuleSetConditions,
+    test?: RuleSetConditionOrConditions,
+    ...
+  };
 
   declare type RuleSetConditions = Array<RuleSetCondition>;
 
@@ -112,17 +113,18 @@ declare module 'webpack' {
 
   declare type RuleSetLoader = string;
 
-  declare type RuleSetQuery = { [k: string]: any } | string;
+  declare type RuleSetQuery = { [k: string]: any, ... } | string;
 
   declare type RuleSetUseItem =
     | RuleSetLoader
     | Function
     | {
-        ident?: string,
-        loader?: RuleSetLoader,
-        options?: RuleSetQuery,
-        query?: RuleSetQuery,
-      };
+    ident?: string,
+    loader?: RuleSetLoader,
+    options?: RuleSetQuery,
+    query?: RuleSetQuery,
+    ...
+  };
 
   declare type RuleSetUse = RuleSetUseItem | Function | Array<RuleSetUseItem>;
 
@@ -136,9 +138,7 @@ declare module 'webpack' {
     loaders?: RuleSetUse,
     oneOf?: RuleSetRules,
     options?: RuleSetQuery,
-    parser?: {
-      [k: string]: any,
-    },
+    parser?: { [k: string]: any, ... },
     query?: RuleSetQuery,
     resolve?: ResolveOptions,
     resource?: RuleSetConditionOrConditions,
@@ -153,6 +153,7 @@ declare module 'webpack' {
       | 'json'
       | 'webassembly/experimental',
     use?: RuleSetUse,
+    ...
   };
 
   declare type RuleSetRules = Array<RuleSetRule>;
@@ -175,55 +176,58 @@ declare module 'webpack' {
     wrappedContextCritical?: boolean,
     wrappedContextRecursive?: boolean,
     wrappedContextRegExp?: RegExp,
+    ...
   };
 
   declare type NodeOptions = {
+    [k: string]: false | true | 'mock' | 'empty',
     Buffer?: false | true | 'mock',
     __dirname?: false | true | 'mock',
     __filename?: false | true | 'mock',
     console?: false | true | 'mock',
     global?: boolean,
     process?: false | true | 'mock',
-    [k: string]: false | true | 'mock' | 'empty',
+    ...
   };
 
   declare type WebpackPluginFunction = (compiler: WebpackCompiler) => void;
 
   declare type WebpackPluginInstance = {
-    apply: WebpackPluginFunction,
     [k: string]: any,
+    apply: WebpackPluginFunction,
+    ...
   };
 
   declare type OptimizationSplitChunksOptions = {
     automaticNameDelimiter?: string,
-    cacheGroups?: {
-      [k: string]:
-        | false
-        | Function
-        | string
-        | RegExp
-        | {
-            automaticNameDelimiter?: string,
-            automaticNamePrefix?: string,
-            chunks?: ('initial' | 'async' | 'all') | Function,
-            enforce?: boolean,
-            filename?: string,
-            maxAsyncRequests?: number,
-            maxInitialRequests?: number,
-            maxSize?: number,
-            minChunks?: number,
-            minSize?: number,
-            name?: boolean | Function | string,
-            priority?: number,
-            reuseExistingChunk?: boolean,
-            test?: Function | string | RegExp,
-          },
-    },
+    cacheGroups?: { [k: string]:
+      | false
+      | Function
+      | string
+      | RegExp
+      | {
+      automaticNameDelimiter?: string,
+      automaticNamePrefix?: string,
+      chunks?: ('initial' | 'async' | 'all') | Function,
+      enforce?: boolean,
+      filename?: string,
+      maxAsyncRequests?: number,
+      maxInitialRequests?: number,
+      maxSize?: number,
+      minChunks?: number,
+      minSize?: number,
+      name?: boolean | Function | string,
+      priority?: number,
+      reuseExistingChunk?: boolean,
+      test?: Function | string | RegExp,
+      ...
+    }, ... },
     chunks?: ('initial' | 'async' | 'all') | Function,
     fallbackCacheGroup?: {
       automaticNameDelimiter?: string,
       maxSize?: number,
       minSize?: number,
+      ...
     },
     filename?: string,
     hidePathInfo?: boolean,
@@ -233,6 +237,7 @@ declare module 'webpack' {
     minChunks?: number,
     minSize?: number,
     name?: boolean | Function | string,
+    ...
   };
 
   declare type OptimizationOptions = {
@@ -258,35 +263,36 @@ declare module 'webpack' {
     runtimeChunk?:
       | boolean
       | ('single' | 'multiple')
-      | {
-          name?: string | Function,
-        },
+      | { name?: string | Function, ... },
     sideEffects?: boolean,
     splitChunks?: false | OptimizationSplitChunksOptions,
     usedExports?: boolean,
+    ...
   };
 
   declare type LibraryCustomUmdObject = {
     amd?: string,
     commonjs?: string,
     root?: string | ArrayOfStringValues,
+    ...
   };
 
   declare type OutputOptions = {
     auxiliaryComment?:
       | string
       | {
-          amd?: string,
-          commonjs?: string,
-          commonjs2?: string,
-          root?: string,
-        },
+      amd?: string,
+      commonjs?: string,
+      commonjs2?: string,
+      root?: string,
+      ...
+    },
     chunkCallbackName?: string,
     chunkFilename?: string,
     chunkLoadTimeout?: number,
     crossOriginLoading?: false | 'anonymous' | 'use-credentials',
     devtoolFallbackModuleFilenameTemplate?: string | Function,
-    devtoolLineToLine?: boolean | { [k: string]: any },
+    devtoolLineToLine?: boolean | { [k: string]: any, ... },
     devtoolModuleFilenameTemplate?: string | Function,
     devtoolNamespace?: string,
     filename?: string | Function,
@@ -325,6 +331,7 @@ declare module 'webpack' {
     strictModuleExceptionHandling?: boolean,
     umdNamedDefine?: boolean,
     webassemblyModuleFilename?: string,
+    ...
   };
 
   declare type PerformanceOptions = {
@@ -332,18 +339,20 @@ declare module 'webpack' {
     hints?: false | 'warning' | 'error',
     maxAssetSize?: number,
     maxEntrypointSize?: number,
+    ...
   };
 
   declare type ArrayOfStringOrStringArrayValues = Array<string | Array<string>>;
 
   declare type ResolveOptions = {
     alias?:
-      | { [k: string]: string }
+      | { [k: string]: string, ... }
       | Array<{
-          alias?: string,
-          name?: string,
-          onlyModule?: boolean,
-        }>,
+      alias?: string,
+      name?: string,
+      onlyModule?: boolean,
+      ...
+    }>,
     aliasFields?: ArrayOfStringOrStringArrayValues,
     cachePredicate?: Function,
     cacheWithContext?: boolean,
@@ -352,16 +361,17 @@ declare module 'webpack' {
     enforceExtension?: boolean,
     enforceModuleExtension?: boolean,
     extensions?: ArrayOfStringValues,
-    fileSystem?: { [k: string]: any },
+    fileSystem?: { [k: string]: any, ... },
     mainFields?: ArrayOfStringOrStringArrayValues,
     mainFiles?: ArrayOfStringValues,
     moduleExtensions?: ArrayOfStringValues,
     modules?: ArrayOfStringValues,
     plugins?: Array<WebpackPluginInstance | WebpackPluginFunction>,
-    resolver?: { [k: string]: any },
+    resolver?: { [k: string]: any, ... },
     symlinks?: boolean,
-    unsafeCache?: boolean | { [k: string]: any },
+    unsafeCache?: boolean | { [k: string]: any, ... },
     useSyncFileSystemCalls?: boolean,
+    ...
   };
 
   declare type FilterItemTypes = RegExp | string | Function;
@@ -372,69 +382,72 @@ declare module 'webpack' {
     | boolean
     | ('none' | 'errors-only' | 'minimal' | 'normal' | 'detailed' | 'verbose')
     | {
-        all?: boolean,
-        assets?: boolean,
-        assetsSort?: string,
-        builtAt?: boolean,
-        cached?: boolean,
-        cachedAssets?: boolean,
-        children?: boolean,
-        chunkGroups?: boolean,
-        chunkModules?: boolean,
-        chunkOrigins?: boolean,
-        chunks?: boolean,
-        chunksSort?: string,
-        colors?:
-          | boolean
-          | {
-              bold?: string,
-              cyan?: string,
-              green?: string,
-              magenta?: string,
-              red?: string,
-              yellow?: string,
-            },
-        context?: string,
-        depth?: boolean,
-        entrypoints?: boolean,
-        env?: boolean,
-        errorDetails?: boolean,
-        errors?: boolean,
-        exclude?: FilterTypes | boolean,
-        excludeAssets?: FilterTypes,
-        excludeModules?: FilterTypes | boolean,
-        hash?: boolean,
-        maxModules?: number,
-        moduleAssets?: boolean,
-        moduleTrace?: boolean,
-        modules?: boolean,
-        modulesSort?: string,
-        nestedModules?: boolean,
-        optimizationBailout?: boolean,
-        outputPath?: boolean,
-        performance?: boolean,
-        providedExports?: boolean,
-        publicPath?: boolean,
-        reasons?: boolean,
-        source?: boolean,
-        timings?: boolean,
-        usedExports?: boolean,
-        version?: boolean,
-        warnings?: boolean,
-        warningsFilter?: FilterTypes,
-      };
+    all?: boolean,
+    assets?: boolean,
+    assetsSort?: string,
+    builtAt?: boolean,
+    cached?: boolean,
+    cachedAssets?: boolean,
+    children?: boolean,
+    chunkGroups?: boolean,
+    chunkModules?: boolean,
+    chunkOrigins?: boolean,
+    chunks?: boolean,
+    chunksSort?: string,
+    colors?:
+      | boolean
+      | {
+      bold?: string,
+      cyan?: string,
+      green?: string,
+      magenta?: string,
+      red?: string,
+      yellow?: string,
+      ...
+    },
+    context?: string,
+    depth?: boolean,
+    entrypoints?: boolean,
+    env?: boolean,
+    errorDetails?: boolean,
+    errors?: boolean,
+    exclude?: FilterTypes | boolean,
+    excludeAssets?: FilterTypes,
+    excludeModules?: FilterTypes | boolean,
+    hash?: boolean,
+    maxModules?: number,
+    moduleAssets?: boolean,
+    moduleTrace?: boolean,
+    modules?: boolean,
+    modulesSort?: string,
+    nestedModules?: boolean,
+    optimizationBailout?: boolean,
+    outputPath?: boolean,
+    performance?: boolean,
+    providedExports?: boolean,
+    publicPath?: boolean,
+    reasons?: boolean,
+    source?: boolean,
+    timings?: boolean,
+    usedExports?: boolean,
+    version?: boolean,
+    warnings?: boolean,
+    warningsFilter?: FilterTypes,
+    ...
+  };
 
   declare type WatchOptions = {
     aggregateTimeout?: number,
-    ignored?: { [k: string]: any },
+    ignored?: { [k: string]: any, ... },
     poll?: boolean | number,
     stdin?: boolean,
+    ...
   };
 
   declare type WebpackOptions = {
-    amd?: { [k: string]: any },
+    amd?: { [k: string]: any, ... },
     bail?: boolean,
-    cache?: boolean | { [k: string]: any },
+    cache?: boolean | { [k: string]: any, ... },
     context?: string,
     dependencies?: Array<string>,
     devServer?: {
@@ -447,23 +460,29 @@ declare module 'webpack' {
       contentBase?: false | string | string[] | number,
       disableHostCheck?: boolean,
       filename?: string,
-      headers?: { [key: string]: string },
+      headers?: { [key: string]: string, ... },
       historyApiFallback?:
         | boolean
         | {
-            rewrites?: Array<{ from: string, to: string }>,
-            disableDotRule?: boolean,
-          },
+        rewrites?: Array<{
+          from: string,
+          to: string,
+          ...
+        }>,
+        disableDotRule?: boolean,
+        ...
+      },
       host?: string,
       hot?: boolean,
       hotOnly?: boolean,
       https?:
         | boolean
         | {
-            key: string,
-            cert: string,
-            ca?: string,
-          },
+        key: string,
+        cert: string,
+        ca?: string,
+        ...
+      },
       index?: string,
       inline?: boolean,
       lazy?: boolean,
@@ -473,9 +492,10 @@ declare module 'webpack' {
       overlay?:
         | boolean
         | {
-            errors?: boolean,
-            warnings?: boolean,
-          },
+        errors?: boolean,
+        warnings?: boolean,
+        ...
+      },
       pfx?: string,
       pfxPassphrase?: string,
       port?: number,
@@ -499,12 +519,14 @@ declare module 'webpack' {
           path: string,
           stat: fs.Stat
         ) => void,
+        ...
       },
       stats?: StatsOptions,
       useLocalIp?: boolean,
       watchContentBase?: boolean,
       watchOptions?: WatchOptions,
       publicPath?: string,
+      ...
     },
     devtool?:
       | '@cheap-eval-source-map'
@@ -550,7 +572,7 @@ declare module 'webpack' {
       | false,
     entry?: Entry,
     externals?: Externals,
-    loader?: { [k: string]: any },
+    loader?: { [k: string]: any, ... },
     mode?: 'development' | 'production' | 'none',
     module?: ModuleOptions,
     name?: string,
@@ -566,7 +588,7 @@ declare module 'webpack' {
     recordsPath?: string,
     resolve?: ResolveOptions,
     resolveLoader?: ResolveOptions,
-    serve?: { [k: string]: any },
+    serve?: { [k: string]: any, ... },
     stats?: StatsOptions,
     target?:
       | 'web'
@@ -579,7 +601,75 @@ declare module 'webpack' {
       | ((compiler: WebpackCompiler) => void),
     watch?: boolean,
     watchOptions?: WatchOptions,
+    ...
   };
+
+  declare class EnvironmentPlugin {
+    constructor(env: { [string]: mixed, ... } | string[]): $ElementType<
+      $NonMaybeType<$PropertyType<ResolveOptions, 'plugins'>>,
+      number
+    >;
+  }
+
+  declare class DefinePlugin {
+    constructor({ [string]: string, ... }): $ElementType<
+      $NonMaybeType<$PropertyType<ResolveOptions, 'plugins'>>,
+      number
+    >;
+  }
+
+  declare class IgnorePlugin {
+    constructor(RegExp | {|
+      resourceRegExp: RegExp,
+      contextRegExp?: RegExp,
+    |}, void | RegExp): $ElementType<
+      $NonMaybeType<$PropertyType<ResolveOptions, 'plugins'>>,
+      number
+    >;
+  }
+
+  declare class SourceMapDevToolPlugin {
+    constructor({|
+      test?: ?(string | RegExp | Array<string | RegExp>),
+      include?: ?(string | RegExp | Array<string | RegExp>),
+      exclude?: ?(string | RegExp | Array<string | RegExp>),
+      filename?: ?string,
+      append?: ?(string | false),
+      moduleFilenameTemplate?: ?string,
+      fallbackModuleFilenameTemplate?: ?string,
+      namespace?: ?string,
+      module?: ?boolean,
+      columns?: ?boolean,
+      lineToLine?: ?(boolean | {|
+        test?: ?(string | RegExp | Array<string | RegExp>),
+        include?: ?(string | RegExp | Array<string | RegExp>),
+        exclude?: ?(string | RegExp | Array<string | RegExp>),
+      |}),
+      noSources?: ?boolean,
+      publicPath?: ?string,
+      fileContext?: ?string,
+    |}): $ElementType<
+      $NonMaybeType<$PropertyType<ResolveOptions, 'plugins'>>,
+      number
+    >;
+  }
+
+  declare class HotModuleReplacementPlugin {
+    constructor(): $ElementType<
+      $NonMaybeType<$PropertyType<ResolveOptions, 'plugins'>>,
+      number
+    >;
+  }
+
+  declare class ContextReplacementPlugin {
+    constructor(
+      resourceRegExp: RegExp,
+      newContentRegExp?: RegExp
+    ): $ElementType<
+      $NonMaybeType<$PropertyType<ResolveOptions, 'plugins'>>,
+      number
+    >;
+  }
 
   declare function builder(
     options: WebpackOptions,
@@ -590,5 +680,13 @@ declare module 'webpack' {
     callback?: Callback
   ): WebpackMultiCompiler;
 
-  declare module.exports: typeof builder;
+  declare module.exports: typeof builder & {
+    EnvironmentPlugin: typeof EnvironmentPlugin,
+    DefinePlugin: typeof DefinePlugin,
+    IgnorePlugin: typeof IgnorePlugin,
+    SourceMapDevToolPlugin: typeof SourceMapDevToolPlugin,
+    HotModuleReplacementPlugin: typeof HotModuleReplacementPlugin,
+    ContextReplacementPlugin: typeof ContextReplacementPlugin,
+    ...
+  };
 }

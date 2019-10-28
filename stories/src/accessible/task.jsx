@@ -2,9 +2,9 @@
 import React, { Component, type Node } from 'react';
 import ReactDOM from 'react-dom';
 import memoizeOne from 'memoize-one';
-import invariant from 'tiny-invariant';
 import styled from '@emotion/styled';
 import { colors } from '@atlaskit/theme';
+import { invariant } from '../../../src/invariant';
 import { Draggable } from '../../../src';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Task as TaskType } from '../types';
@@ -57,7 +57,6 @@ export default class Task extends Component<Props> {
                   isDragging={snapshot.isDragging}
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
-                  aria-roledescription="Draggable task. Press space bar to lift"
                   blur={blur}
                 >
                   {this.props.task.content}

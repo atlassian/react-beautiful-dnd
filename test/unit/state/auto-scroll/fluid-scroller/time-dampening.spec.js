@@ -4,7 +4,6 @@ import forEach, { type BlockFnArgs } from './util/for-each';
 import { scrollableViewport } from './util/viewport';
 import dragTo from './util/drag-to';
 import getScroller, {
-  type PublicArgs,
   type FluidScroller,
 } from '../../../../../src/state/auto-scroller/fluid-scroller';
 import getDistanceThresholds, {
@@ -52,7 +51,7 @@ forEach(({ state, axis }: BlockFnArgs) => {
   });
 
   it('should not dampen scrolling if not starting in scrollable area', () => {
-    const mocks: PublicArgs = getArgsMock();
+    const mocks = getArgsMock();
     const scroller: FluidScroller = getScroller(mocks);
 
     // no scroll on initial lift
@@ -84,7 +83,7 @@ forEach(({ state, axis }: BlockFnArgs) => {
   it('should dampen if lifted in a scrollable area', () => {
     // on start of boundary: would have been a min scroll anyway
     {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
 
       // lifting in scrollable area
@@ -103,7 +102,7 @@ forEach(({ state, axis }: BlockFnArgs) => {
     }
     // would normally be max scroll speed
     {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
 
       // lifting in scrollable area
@@ -123,7 +122,7 @@ forEach(({ state, axis }: BlockFnArgs) => {
   });
 
   it('should have the minimum scroll up to a small time threshold and then accelerate to the max speed as time continues', () => {
-    const mocks: PublicArgs = getArgsMock();
+    const mocks = getArgsMock();
     const scroller: FluidScroller = getScroller(mocks);
 
     // starting on the max boundary which normally

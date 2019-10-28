@@ -1,6 +1,6 @@
 // @flow
-import invariant from 'tiny-invariant';
 import { type Position } from 'css-box-model';
+import { invariant } from '../../invariant';
 import type {
   Axis,
   DroppableDimension,
@@ -22,6 +22,13 @@ const getRequiredGrowthForPlaceholder = (
   draggables: DraggableDimensionMap,
 ): ?Position => {
   const axis: Axis = droppable.axis;
+
+  // A virtual list will most likely not contain all of the Draggables
+  // so counting them does not help.
+  if (droppable.descriptor.mode === 'virtual') {
+    return patch(axis.line, placeholderSize[axis.line]);
+  }
+
   // TODO: consider margin collapsing?
   // Using contentBox as that is where the Draggables will sit
   const availableSpace: number = droppable.subject.page.contentBox[axis.size];

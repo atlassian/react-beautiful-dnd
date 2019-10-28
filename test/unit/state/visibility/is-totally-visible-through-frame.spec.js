@@ -2,7 +2,7 @@
 import { type Spacing } from 'css-box-model';
 import isTotallyVisibleThroughFrame from '../../../../src/state/visibility/is-totally-visible-through-frame';
 import { offsetByPosition } from '../../../../src/state/spacing';
-import { expandBySpacing } from '../../../utils/spacing';
+import { expandBySpacing } from '../../../util/spacing';
 
 const frame: Spacing = {
   top: 0,

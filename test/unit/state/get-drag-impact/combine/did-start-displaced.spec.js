@@ -5,10 +5,9 @@ import type {
   DragImpact,
   DisplacedBy,
   DroppableDimensionMap,
-  Displacement,
 } from '../../../../../src/types';
 import { vertical, horizontal } from '../../../../../src/state/axis';
-import { getPreset, enableCombining } from '../../../../utils/dimension';
+import { getPreset, enableCombining } from '../../../../util/dimension';
 import {
   forward,
   backward,
@@ -16,17 +15,17 @@ import {
 import getDragImpact from '../../../../../src/state/get-drag-impact';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { patch, subtract, add } from '../../../../../src/state/position';
-import getDisplacementMap from '../../../../../src/state/get-displacement-map';
-import getHomeOnLift from '../../../../../src/state/get-home-on-lift';
-import getNotAnimatedDisplacement from '../../../../utils/get-displacement/get-not-animated-displacement';
-import afterPoint from '../../../../utils/after-point';
-import beforePoint from '../../../../utils/before-point';
+import getLiftEffect from '../../../../../src/state/get-lift-effect';
+import afterPoint from '../../../../util/after-point';
+import beforePoint from '../../../../util/before-point';
+import { getForcedDisplacement } from '../../../../util/impact';
+import noImpact, { emptyGroups } from '../../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
 
-    const { onLift, impact: homeImpact } = getHomeOnLift({
+    const { afterCritical, impact: homeImpact } = getLiftEffect({
       draggable: preset.inHome2,
       home: preset.home,
       draggables: preset.draggables,
@@ -47,30 +46,25 @@ import beforePoint from '../../../../utils/before-point';
       preset.inHome3.page.borderBox[axis.start],
       crossAxisCenter,
     );
-    const combineWithInHome3Impact: DragImpact = (() => {
-      // ordered by closest to current location
-      const displaced: Displacement[] = [
+    const combineWithInHome3Impact: DragImpact = {
+      displaced: getForcedDisplacement({
+        // ordered by closest to current location
         // displaced is not animated as it was the starting displacement
-        getNotAnimatedDisplacement(preset.inHome3),
-        getNotAnimatedDisplacement(preset.inHome4),
-      ];
-      const impact: DragImpact = {
-        movement: {
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
+        visible: [
+          { dimension: preset.inHome3, shouldAnimate: false },
+          { dimension: preset.inHome4, shouldAnimate: false },
+        ],
+      }),
+      displacedBy,
+      at: {
+        type: 'COMBINE',
+        whenEntered: forward,
+        combine: {
+          draggableId: preset.inHome3.descriptor.id,
+          droppableId: preset.inHome3.descriptor.droppableId,
         },
-        destination: null,
-        merge: {
-          whenEntered: forward,
-          combine: {
-            draggableId: preset.inHome3.descriptor.id,
-            droppableId: preset.inHome3.descriptor.droppableId,
-          },
-        },
-      };
-      return impact;
-    })();
+      },
+    };
 
     // moving onto inHome2
     it('should move forward onto an item that started displaced', () => {
@@ -84,7 +78,7 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: homeImpact,
           viewport: preset.viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
 
         expect(impact).toEqual(homeImpact);
@@ -99,7 +93,7 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: homeImpact,
           viewport: preset.viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
 
         expect(impact).toEqual(combineWithInHome3Impact);
@@ -122,7 +116,7 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: homeImpact,
           viewport: preset.viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
 
         expect(impact).toEqual(combineWithInHome3Impact);
@@ -137,7 +131,7 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: homeImpact,
           viewport: preset.viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
 
         expect(impact).toEqual(combineWithInHome3Impact);
@@ -152,26 +146,22 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: homeImpact,
           viewport: preset.viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
 
-        // ordered by closest to current location
-        const displaced: Displacement[] = [
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
+          displaced: getForcedDisplacement({
+            visible: [{ dimension: preset.inHome4, shouldAnimate: false }],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            // now in position of inHome3
+            destination: {
+              index: preset.inHome3.descriptor.index,
+              droppableId: preset.inHome3.descriptor.droppableId,
+            },
           },
-          // now in position of inHome3
-          destination: {
-            index: preset.inHome3.descriptor.index,
-            droppableId: preset.inHome3.descriptor.droppableId,
-          },
-          // no merge yet
-          merge: null,
         };
         expect(impact).toEqual(expected);
       }
@@ -188,7 +178,7 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: combineWithInHome3Impact,
           viewport: preset.viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
 
         expect(impact).toEqual(combineWithInHome3Impact);
@@ -203,7 +193,7 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: combineWithInHome3Impact,
           viewport: preset.viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
 
         expect(impact).toEqual(combineWithInHome3Impact);
@@ -224,7 +214,7 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: combineWithInHome3Impact,
           viewport: preset.viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
 
         // ordered by closest to current location
@@ -233,23 +223,22 @@ import beforePoint from '../../../../utils/before-point';
         // because the center position is bigger
         // than the displaced bottom edge of inHome3
 
-        const displaced: Displacement[] = [
-          // keeping original not animated displacement
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
+          displaced: getForcedDisplacement({
+            visible: [
+              // keeping original not animated displacement
+              { dimension: preset.inHome4, shouldAnimate: false },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              // in the visual spot of inHome3
+              index: preset.inHome3.descriptor.index,
+              droppableId: preset.inHome3.descriptor.droppableId,
+            },
           },
-          destination: {
-            // in the visual spot of inHome3
-            index: preset.inHome3.descriptor.index,
-            droppableId: preset.inHome3.descriptor.droppableId,
-          },
-          // no merge yet
-          merge: null,
         };
         expect(impact).toEqual(expected);
       }
@@ -260,29 +249,23 @@ import beforePoint from '../../../../utils/before-point';
       preset.inHome3.page.borderBox[axis.end] - displacedBy.value,
       crossAxisCenter,
     );
-    const combineWithDisplacedInHome3Impact: DragImpact = (() => {
-      const displaced: Displacement[] = [
-        // inHome3 is not displaced. It is visibly displaced as the initial displacement has been removed
-        getNotAnimatedDisplacement(preset.inHome4),
-      ];
-      const impact: DragImpact = {
-        movement: {
-          displaced,
-          map: getDisplacementMap(displaced),
-          displacedBy,
+    const combineWithDisplacedInHome3Impact: DragImpact = {
+      displaced: getForcedDisplacement({
+        visible: [
+          // inHome3 is not displaced. It is visibly displaced as the initial displacement has been removed
+          { dimension: preset.inHome4, shouldAnimate: false },
+        ],
+      }),
+      displacedBy,
+      at: {
+        type: 'COMBINE',
+        whenEntered: backward,
+        combine: {
+          draggableId: preset.inHome3.descriptor.id,
+          droppableId: preset.inHome3.descriptor.droppableId,
         },
-        destination: null,
-        // merging with visibly displaced inHome3
-        merge: {
-          whenEntered: backward,
-          combine: {
-            draggableId: preset.inHome3.descriptor.id,
-            droppableId: preset.inHome3.descriptor.droppableId,
-          },
-        },
-      };
-      return impact;
-    })();
+      },
+    };
 
     // dragging inHome2 forward past inHome3 and then back onto inhome3
     it('should move backwards onto an item that was displaced but no longer is', () => {
@@ -294,27 +277,24 @@ import beforePoint from '../../../../utils/before-point';
         previousImpact: homeImpact,
         viewport: preset.viewport,
         userDirection: forward,
-        onLift,
+        afterCritical,
       });
       // have moved past merging with inHome3
       {
         // ordered by closest to current location
-        const displaced: Displacement[] = [
-          getNotAnimatedDisplacement(preset.inHome4),
-        ];
         const expected: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
+          displaced: getForcedDisplacement({
+            visible: [{ dimension: preset.inHome4, shouldAnimate: false }],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            // now in position of inHome3
+            destination: {
+              index: preset.inHome3.descriptor.index,
+              droppableId: preset.inHome3.descriptor.droppableId,
+            },
           },
-          // now in position of inHome3
-          destination: {
-            index: preset.inHome3.descriptor.index,
-            droppableId: preset.inHome3.descriptor.droppableId,
-          },
-          // no merge yet
-          merge: null,
         };
         expect(first).toEqual(expected);
       }
@@ -329,9 +309,9 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: first,
           viewport: preset.viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
-        expect(impact.merge).toBe(null);
+        expect(impact.at).toHaveProperty('type', 'REORDER');
       }
       // moved back enough to combine with visibly displaced inHome3
       {
@@ -343,7 +323,7 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: first,
           viewport: preset.viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
 
         expect(impact).toEqual(combineWithDisplacedInHome3Impact);
@@ -366,7 +346,7 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: combineWithDisplacedInHome3Impact,
           viewport: preset.viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
         expect(impact).toEqual(combineWithDisplacedInHome3Impact);
       }
@@ -380,9 +360,9 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: combineWithDisplacedInHome3Impact,
           viewport: preset.viewport,
           userDirection: backward,
-          onLift,
+          afterCritical,
         });
-        expect(impact.merge).toBe(null);
+        expect(impact.at).not.toHaveProperty('COMBINE');
       }
     });
 
@@ -397,7 +377,7 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: combineWithDisplacedInHome3Impact,
           viewport: preset.viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
         expect(impact).toEqual(combineWithDisplacedInHome3Impact);
       }
@@ -411,10 +391,45 @@ import beforePoint from '../../../../utils/before-point';
           previousImpact: combineWithDisplacedInHome3Impact,
           viewport: preset.viewport,
           userDirection: forward,
-          onLift,
+          afterCritical,
         });
         expect(impact).toEqual(combineWithDisplacedInHome3Impact);
       }
+    });
+
+    // - dragging inHome3 out of home
+    // - inHome4 will have shifted backwards
+    // - re-enter home list
+    it('should understand that when re-entering a list, items that started displaced no longer are', () => {
+      const impact: DragImpact = getDragImpact({
+        // right over the center of inHome4
+        pageBorderBoxCenter: preset.inHome4.page.borderBox.center,
+        draggable: preset.inHome3,
+        draggables: preset.draggables,
+        droppables: withCombineEnabled,
+        // nowhere
+        previousImpact: noImpact,
+        viewport: preset.viewport,
+        userDirection: backward,
+        afterCritical,
+      });
+      const displacedByForInHome3: DisplacedBy = getDisplacedBy(
+        axis,
+        preset.inHome3.displaceBy,
+      );
+      const expected: DragImpact = {
+        displaced: emptyGroups,
+        displacedBy: displacedByForInHome3,
+        // below inHome4
+        at: {
+          type: 'REORDER',
+          destination: {
+            droppableId: preset.inHome3.descriptor.droppableId,
+            index: preset.inHome4.descriptor.index,
+          },
+        },
+      };
+      expect(impact).toEqual(expected);
     });
   });
 });

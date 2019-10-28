@@ -2,9 +2,11 @@
   "presets": [
     "@babel/react",
     "@babel/flow",
-    ["@babel/env", { "modules": false, "loose": true }]
+    ["@babel/env", { "modules": false, "loose": true }],
+    "@emotion/babel-preset-css-prop"
   ],
   "plugins": [
+    "emotion",
     ["@babel/proposal-class-properties", { "loose": true }],
     ["@babel/proposal-object-rest-spread", { "loose": true }]
   ],

@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import {
   getRect,
   type Position,
@@ -10,22 +9,21 @@ import {
 import type {
   Axis,
   DragImpact,
-  Displacement,
   DroppableDimension,
   DraggableDimension,
   DraggableDimensionMap,
   DisplacedBy,
   Viewport,
 } from '../../../../../../src/types';
+import { invariant } from '../../../../../../src/invariant';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import {
   getDraggableDimension,
   getDroppableDimension,
   getFrame,
-} from '../../../../../utils/dimension';
+} from '../../../../../util/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
-import getDisplacementMap from '../../../../../../src/state/get-displacement-map';
-import { createViewport } from '../../../../../utils/viewport';
+import { createViewport } from '../../../../../util/viewport';
 import moveToNextPlace from '../../../../../../src/state/move-in-direction/move-to-next-place';
 import { type PublicResult } from '../../../../../../src/state/move-in-direction/move-in-direction-types';
 import { origin, subtract, patch } from '../../../../../../src/state/position';
@@ -35,10 +33,11 @@ import {
   isPartiallyVisible,
 } from '../../../../../../src/state/visibility/is-visible';
 import { toDraggableMap } from '../../../../../../src/state/dimension-structures';
-import getHomeOnLift from '../../../../../../src/state/get-home-on-lift';
-import getVisibleDisplacement from '../../../../../utils/get-displacement/get-visible-displacement';
+import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import getClientFromPageBorderBoxCenter from '../../../../../../src/state/get-center-from-impact/get-client-border-box-center/get-client-from-page-border-box-center';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
+import { getForcedDisplacement } from '../../../../../util/impact';
+import { emptyGroups } from '../../../../../../src/state/no-impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   const viewport: Viewport = createViewport({
@@ -57,6 +56,7 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
     descriptor: {
       id: 'home',
       type: 'droppable',
+      mode: 'standard',
     },
     direction: axis.direction,
     borderBox: {
@@ -70,6 +70,7 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
     descriptor: {
       id: 'scrollable foriegn',
       type: 'droppable',
+      mode: 'standard',
     },
     direction: axis.direction,
     // huge subject that will be cut by frame
@@ -117,7 +118,7 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
   // in home list moving forward
   const displacedBy: DisplacedBy = getDisplacedBy(axis, inHome.displaceBy);
   const draggables: DraggableDimensionMap = toDraggableMap([inHome, inForeign]);
-  const { onLift } = getHomeOnLift({
+  const { afterCritical } = getLiftEffect({
     draggable: inHome,
     draggables,
     home,
@@ -166,17 +167,17 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
           inHome.page.borderBox.center;
         const previousClientSelection: Position =
           inHome.client.borderBox.center;
-        const displaced: Displacement[] = [getVisibleDisplacement(inForeign)];
         const previousImpact: DragImpact = {
-          movement: {
-            displaced,
-            map: getDisplacementMap(displaced),
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: foreign.descriptor.id,
-            index: inForeign.descriptor.index,
+          displaced: getForcedDisplacement({
+            visible: [{ dimension: inForeign }],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: foreign.descriptor.id,
+              index: inForeign.descriptor.index,
+            },
           },
         };
 
@@ -189,20 +190,19 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
           viewport,
           previousPageBorderBoxCenter,
           previousClientSelection,
-          onLift,
+          afterCritical,
         });
         invariant(result);
 
         const expectedImpact: DragImpact = {
-          movement: {
-            displaced: [],
-            map: {},
-            displacedBy,
-          },
-          merge: null,
-          destination: {
-            droppableId: foreign.descriptor.id,
-            index: inForeign.descriptor.index + 1,
+          displaced: emptyGroups,
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: foreign.descriptor.id,
+              index: inForeign.descriptor.index + 1,
+            },
           },
         };
         // if the item would have been visible - where would the center have been?
@@ -211,7 +211,7 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
           draggable: inHome,
           droppable: foreign,
           draggables,
-          onLift,
+          afterCritical,
         });
         const expectedScrollJump: Position = subtract(
           nonVisibleCenter,
@@ -273,20 +273,19 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
       it('should request a jump scroll for movement that is outside of the viewport', () => {
         // after non-displaced inForeign
         const previousImpact: DragImpact = {
-          movement: {
-            displaced: [],
-            map: {},
-            displacedBy: getDisplacedBy(axis, inHome.displaceBy),
+          displaced: emptyGroups,
+          displacedBy: getDisplacedBy(axis, inHome.displaceBy),
+          at: {
+            type: 'REORDER',
+            destination: {
+              droppableId: foreign.descriptor.id,
+              index: inForeign.descriptor.index + 1,
+            },
           },
-          destination: {
-            droppableId: foreign.descriptor.id,
-            index: inForeign.descriptor.index + 1,
-          },
-          merge: null,
         };
         const previousPageBorderBoxCenter: Position = getPageBorderBoxCenter({
           impact: previousImpact,
-          onLift,
+          afterCritical,
           draggable: inHome,
           droppable: scrolled,
           draggables,
@@ -298,10 +297,6 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
             viewport,
           },
         );
-        // const previousPageBorderBoxCenter: Position =
-        //   initiallyOutsideViewport.page.borderBox.center;
-        // const previousClientSelection: Position =
-        //   initiallyOutsideViewport.client.borderBox.center;
 
         // figure out where we would have been if it was visible
 
@@ -314,26 +309,24 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
           viewport,
           previousPageBorderBoxCenter,
           previousClientSelection,
-          onLift,
+          afterCritical,
         });
         invariant(result);
 
-        const expectedDisplaced: Displacement[] = [
-          // Even though the item started in an invisible place we force
-          // the displacement to be visible.
-          getVisibleDisplacement(inForeign),
-        ];
         const expectedImpact: DragImpact = {
-          movement: {
-            displaced: expectedDisplaced,
-            map: getDisplacementMap(expectedDisplaced),
-            displacedBy,
-          },
-          merge: null,
-          // moving into place of inForeign
-          destination: {
-            droppableId: foreign.descriptor.id,
-            index: inForeign.descriptor.index,
+          displaced: getForcedDisplacement({
+            // Even though the item started in an invisible place we force
+            // the displacement to be visible.
+            visible: [{ dimension: inForeign, shouldAnimate: false }],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            // moving into place of inForeign
+            destination: {
+              droppableId: foreign.descriptor.id,
+              index: inForeign.descriptor.index,
+            },
           },
         };
         // if the item would have been visible - where would the center have been?
@@ -342,7 +335,7 @@ import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppa
           draggable: inHome,
           droppable: scrolled,
           draggables,
-          onLift,
+          afterCritical,
         });
         const expectedScrollJump: Position = subtract(
           nonVisibleCenter,

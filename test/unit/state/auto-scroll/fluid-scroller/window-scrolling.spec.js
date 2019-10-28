@@ -6,7 +6,6 @@ import { scrollableViewport } from './util/viewport';
 import scrollViewport from '../../../../../src/state/scroll-viewport';
 import dragTo from './util/drag-to';
 import getScroller, {
-  type PublicArgs,
   type FluidScroller,
 } from '../../../../../src/state/auto-scroller/fluid-scroller';
 import getDistanceThresholds, {
@@ -55,7 +54,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
       requestAnimationFrame.step();
     };
     it('should not scroll if before the start threshold', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
       const target: Position = subtract(onStartBoundary, patch(axis.line, 1));
 
@@ -72,7 +71,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should scroll if on the start threshold', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
 
       scroller.start(
@@ -89,7 +88,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should scroll if moving beyond the start threshold', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
       const target: Position = add(onStartBoundary, patch(axis.line, 1));
 
@@ -112,7 +111,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should get faster the closer to the max speed point', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
       const atStartOfRange: Position = onStartBoundary;
       const atEndOfRange: Position = subtract(
@@ -155,7 +154,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should have the top speed at the max speed point', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
 
       startWithNoScroll(scroller);
@@ -173,7 +172,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should have the top speed when moving beyond the max speed point', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
       const target: Position = add(onMaxBoundary, patch(axis.line, 1));
 
@@ -192,7 +191,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should throttle multiple scrolls into a single animation frame', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
       const target1: Position = add(onStartBoundary, patch(axis.line, 1));
       const target2: Position = subtract(onMaxBoundary, patch(axis.line, 1));
@@ -253,7 +252,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     };
 
     it('should not scroll if before the start threshold', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
       const target: Position = add(onStartBoundary, patch(axis.line, 1));
 
@@ -270,7 +269,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should scroll if on the start threshold', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
 
       scroller.start(
@@ -287,7 +286,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should scroll if moving beyond the start threshold', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
       const target: Position = subtract(onStartBoundary, patch(axis.line, 1));
 
@@ -310,7 +309,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should get faster the closer to the max speed point', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
       const atStartOfRange: Position = onStartBoundary;
       const atEndOfRange: Position = add(onMaxBoundary, patch(axis.line, 1));
@@ -350,7 +349,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should have the top speed at the max speed point', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
 
       startWithNoScroll(scroller);
@@ -368,7 +367,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should have the top speed when moving beyond the max speed point', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
       const target: Position = subtract(onMaxBoundary, patch(axis.line, 1));
 
@@ -387,7 +386,7 @@ forEach(({ axis, state }: BlockFnArgs) => {
     });
 
     it('should throttle multiple scrolls into a single animation frame', () => {
-      const mocks: PublicArgs = getArgsMock();
+      const mocks = getArgsMock();
       const scroller: FluidScroller = getScroller(mocks);
       const target1: Position = subtract(onStartBoundary, patch(axis.line, 1));
       const target2: Position = add(onMaxBoundary, patch(axis.line, 1));

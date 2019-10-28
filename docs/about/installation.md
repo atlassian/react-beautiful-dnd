@@ -27,7 +27,7 @@ import { DragDropContext } from 'react-beautiful-dnd';
 In order to use `react-beautiful-dnd` you will probably want to have a `React` environment set up.
 
 - [Add react to a website](https://reactjs.org/docs/add-react-to-a-website.html) - official `React` docs
-- [Setup a react environment with `create-react-app`](https://egghead.io/lessons/react-set-up-a-react-environment-with-create-react-app) - from our [free getting started course](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
+- [Setup a react environment with `create-react-app`](https://egghead.io/lessons/react-set-up-a-react-environment-with-create-react-app?af=2jc3e4) - from our [free getting started course](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd?af=2jc3e4)
 
 ## Distribution bundle
 
