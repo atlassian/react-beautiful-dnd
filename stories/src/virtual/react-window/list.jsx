@@ -88,7 +88,8 @@ function App(props: Props) {
             itemCount={quotes.length}
             itemSize={100}
             width={300}
-            innerRef={droppableProvided.innerRef}
+            // you will want to use List.outerRef rather than List.innerRef as it has the correct height when the list is unpopulated
+            outerRef={droppableProvided.innerRef}
             itemData={quotes}
           >
             {Row}
