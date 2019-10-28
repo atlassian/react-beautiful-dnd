@@ -7,12 +7,12 @@ import type {
 } from '../../../../src/view/draggable/draggable-types';
 import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import {
   draggingStates,
   withImpact,
   type IsDraggingState,
-} from '../../../utils/dragging-state';
+} from '../../../util/dragging-state';
 import getOwnProps from './util/get-own-props';
 import { getSecondarySnapshot } from './util/get-snapshot';
 
@@ -23,8 +23,8 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
   describe(`in phase: ${withoutMerge.phase}`, () => {
     const impact: DragImpact = {
       ...withoutMerge.impact,
-      destination: null,
-      merge: {
+      at: {
+        type: 'COMBINE',
         whenEntered: forward,
         combine: {
           draggableId: preset.inHome2.descriptor.id,
@@ -42,7 +42,7 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
       const expected: MapProps = {
         mapped: {
           type: 'SECONDARY',
-          offset: impact.movement.displacedBy.point,
+          offset: impact.displacedBy.point,
           shouldAnimateDisplacement: false,
           combineTargetFor: preset.inHome1.descriptor.id,
           snapshot: getSecondarySnapshot({
@@ -53,12 +53,21 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
       expect(result).toEqual(expected);
     });
 
+    it('should give resting props if not the combine target', () => {
+      const selector: Selector = makeMapStateToProps();
+      const unrelatedOwnProps: OwnProps = getOwnProps(preset.inForeign1);
+      const atRest: MapProps = selector(withoutMerge, unrelatedOwnProps);
+      const result: MapProps = selector(withMerge, unrelatedOwnProps);
+
+      expect(result).toBe(atRest);
+    });
+
     it('should not break memoization on multiple calls with the same impact', () => {
       const selector: Selector = makeMapStateToProps();
       const expected: MapProps = {
         mapped: {
           type: 'SECONDARY',
-          offset: impact.movement.displacedBy.point,
+          offset: impact.displacedBy.point,
           shouldAnimateDisplacement: false,
           combineTargetFor: preset.inHome1.descriptor.id,
           snapshot: getSecondarySnapshot({

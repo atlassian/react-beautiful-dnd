@@ -1,8 +1,8 @@
 // @flow
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import noImpact from '../../../../src/state/no-impact';
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import type {
   Selector,
   OwnProps,
@@ -14,10 +14,10 @@ import {
   draggingStates,
   withImpact,
   type IsDraggingState,
-} from '../../../utils/dragging-state';
+} from '../../../util/dragging-state';
 import getOwnProps from './util/get-own-props';
 import getDraggingMapProps from './util/get-dragging-map-props';
-import getHomeOnLift from '../../../../src/state/get-home-on-lift';
+import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { getDraggingSnapshot } from './util/get-snapshot';
 
 const preset = getPreset();
@@ -85,7 +85,7 @@ draggingStates.forEach((current: IsDraggingState) => {
 
     it('should indicate when over a droppable', () => {
       const selector: Selector = makeMapStateToProps();
-      const { impact: homeImpact } = getHomeOnLift({
+      const { impact: homeImpact } = getLiftEffect({
         draggable: preset.inHome1,
         draggables: preset.draggables,
         viewport: preset.viewport,

@@ -2,9 +2,9 @@
 import { useRef } from 'react';
 import memoizeOne from 'memoize-one';
 import { useMemo, useCallback } from 'use-memo-one';
-import invariant from 'tiny-invariant';
+import { invariant } from '../../invariant';
 import type { StyleMarshal } from './style-marshal-types';
-import type { DropReason } from '../../types';
+import type { ContextId, DropReason } from '../../types';
 import getStyles, { type Styles } from './get-styles';
 import { prefix } from '../data-attributes';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
@@ -15,17 +15,17 @@ const getHead = (): HTMLHeadElement => {
   return head;
 };
 
-const createStyleEl = (): HTMLStyleElement => {
+const createStyleEl = (nonce?: string): HTMLStyleElement => {
   const el: HTMLStyleElement = document.createElement('style');
+  if (nonce) {
+    el.setAttribute('nonce', nonce);
+  }
   el.type = 'text/css';
   return el;
 };
 
-export default function useStyleMarshal(uniqueId: number) {
-  const uniqueContext: string = useMemo(() => `${uniqueId}`, [uniqueId]);
-  const styles: Styles = useMemo(() => getStyles(uniqueContext), [
-    uniqueContext,
-  ]);
+export default function useStyleMarshal(contextId: ContextId, nonce?: string) {
+  const styles: Styles = useMemo(() => getStyles(contextId), [contextId]);
   const alwaysRef = useRef<?HTMLStyleElement>(null);
   const dynamicRef = useRef<?HTMLStyleElement>(null);
 
@@ -52,16 +52,16 @@ export default function useStyleMarshal(uniqueId: number) {
       'style elements already mounted',
     );
 
-    const always: HTMLStyleElement = createStyleEl();
-    const dynamic: HTMLStyleElement = createStyleEl();
+    const always: HTMLStyleElement = createStyleEl(nonce);
+    const dynamic: HTMLStyleElement = createStyleEl(nonce);
 
     // store their refs
     alwaysRef.current = always;
     dynamicRef.current = dynamic;
 
     // for easy identification
-    always.setAttribute(`${prefix}-always`, uniqueContext);
-    dynamic.setAttribute(`${prefix}-dynamic`, uniqueContext);
+    always.setAttribute(`${prefix}-always`, contextId);
+    dynamic.setAttribute(`${prefix}-dynamic`, contextId);
 
     // add style tags to head
     getHead().appendChild(always);
@@ -83,11 +83,12 @@ export default function useStyleMarshal(uniqueId: number) {
       remove(dynamicRef);
     };
   }, [
+    nonce,
     setAlwaysStyle,
     setDynamicStyle,
     styles.always,
     styles.resting,
-    uniqueContext,
+    contextId,
   ]);
 
   const dragging = useCallback(() => setDynamicStyle(styles.dragging), [
@@ -117,9 +118,8 @@ export default function useStyleMarshal(uniqueId: number) {
       dragging,
       dropping,
       resting,
-      styleContext: uniqueContext,
     }),
-    [dragging, dropping, resting, uniqueContext],
+    [dragging, dropping, resting],
   );
 
   return marshal;

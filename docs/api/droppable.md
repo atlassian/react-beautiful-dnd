@@ -29,12 +29,18 @@ type Props = {|
   droppableId: DroppableId,
   // optional
   type?: TypeId,
+  mode?: DroppableMode,
   isDropDisabled?: boolean,
   isCombineEnabled?: boolean,
   direction?: Direction,
   ignoreContainerClipping?: boolean,
-  children: (Provided, StateSnapshot) => Node,
+  renderClone?: DraggableChildrenFn,
+  getContainerForClone?: () => HTMLElement,
+  children: (DroppableProvided, DroppableStateSnapshot) => Node,
 |};
+
+type DroppableMode = 'standard' | 'virtual';
+type Direction = 'horizontal' | 'vertical';
 ```
 
 ### Required props
@@ -50,6 +56,9 @@ type Props = {|
 - `isCombineEnabled`: A flag to control whether or not _all_ the `Draggables` in the list will be able to be **combined** with. It will default to `false`.
 - `direction`: The direction in which items flow in this droppable. Options are `vertical` (default) and `horizontal`.
 - `ignoreContainerClipping`: When a `<Droppable />` is inside a scrollable container its area is constrained so that you can only drop on the part of the `<Droppable />` that you can see. Setting this prop opts out of this behavior, allowing you to drop anywhere on a `<Droppable />` even if it's visually hidden by a scrollable parent. The default behavior is suitable for most cases so odds are you'll never need to use this prop, but it can be useful if you've got very long `<Draggable />`s inside a short scroll container. Keep in mind that it might cause some unexpected behavior if you have multiple `<Droppable />`s inside scroll containers on the same page.
+- `mode`: `standard` (default) or `virtual`. Used to designate a list as a virtual list. See our [virtual lists pattern](/docs/patterns/virtual-lists.md)
+- `renderClone`: used to render a clone (replacement) of the dragging `<Draggable />` while a drag is occurring. See our [reparenting guide](/docs/guides/reparenting.md) for usage details. **A clone must be used for [virtual lists](/docs/patterns/virtual-lists.md).** You can use a clone without using virtual lists
+- `getContainerForClone`: a function that returns the containing element (parent element) for a clone during a drag. See our [reparenting guide](/docs/guides/reparenting.md).
 
 ## Children function
 
@@ -68,15 +77,19 @@ The function is provided with two arguments:
 ### 1. provided: (DroppableProvided)
 
 ```js
+import type { Node } from 'react';
+
 type DroppableProvided = {|
   innerRef: (?HTMLElement) => void,
   droppableProps: DroppableProps,
-  placeholder: ?ReactElement,
+  placeholder: ?Node,
 |};
 
 type DroppableProps = {|
   // used for shared global styles
-  'data-react-beautiful-dnd-droppable': string,
+  'data-rbd-droppable-context-id': ContextId,
+  // Used to lookup. Currently not used for drag and drop lifecycle
+  'data-rbd-droppable-id': DroppableId,
 |};
 ```
 
@@ -85,7 +98,7 @@ type DroppableProps = {|
 > For more information on using `innerRef` see our [using `innerRef` guide](/docs/guides/using-inner-ref.md)
 
 - `provided.placeholder`: This is used to create space in the `<Droppable />` as needed during a drag. This space is needed when a user is dragging over a list that is not the home list. Please be sure to put the placeholder inside of the component for which you have provided the ref. We need to increase the size of the `<Droppable />` itself.
-- `provided.droppableProps (DroppableProps)`: This is an Object that contains properties that need to be applied to a Droppable element. It needs to be applied to the same element that you apply `provided.innerRef` to. It currently contains a `data` attribute that we use to control some non-visible css.
+- `provided.droppableProps (DroppableProps)`: This is an Object that contains properties that need to be applied to a Droppable element. It needs to be applied to the same element that you apply `provided.innerRef` to. It currently contains `data` attributes that we use for styling and lookups.
 
 ```js
 <Droppable droppableId="droppable-1">
@@ -109,6 +122,10 @@ type DroppableStateSnapshot = {|
   // What is the id of the draggable that is dragging from this list?
   // Useful for styling the home list when not being dragged over
   draggingFromThisWith: ?DraggableId,
+  // Whether or not the placeholder is actively being used.
+  // This is useful information when working with virtual lists
+  // (See our virtual list pattern)
+  isUsingPlaceholder: boolean,
 |};
 ```
 
@@ -196,7 +213,7 @@ const getBackgroundColor = (snapshot: DroppableStateSnapshot): string => {
 
 ## Recommended `<Droppable />` performance optimisation
 
-> 📺 This optimisation is covered in a [free lesson of our getting started course](https://egghead.io/lessons/react-optimize-performance-in-react-beautiful-dnd-with-shouldcomponentupdate-and-purecomponent)
+> 📺 This optimisation is covered in a [free lesson of our getting started course](https://egghead.io/lessons/react-optimize-performance-in-react-beautiful-dnd-with-shouldcomponentupdate-and-purecomponent?af=2jc3e4)
 
 When a user drags over, or stops dragging over, a `<Droppable />` we re-render the `<Droppable />` with an updated `DroppableStateSnapshot > isDraggingOver` value. This is useful for styling the `<Droppable />`. However, by default this will cause a render of all of the children of the `<Droppable />` - which might be 100's of `<Draggable />`s! This can result in a noticeable frame rate drop. To avoid this problem we recommend that you create a component that is the child of a `<Droppable />` whose responsibility it is to avoid rendering children if it is not required.
 

@@ -1,5 +1,5 @@
-// flow-typed signature: b6bb53397d83d2d821e258cc73818d1b
-// flow-typed version: 9c71eca8ef/react-test-renderer_v16.x.x/flow_>=v0.47.x
+// flow-typed signature: 1e72e585885f0d635f1583960545de71
+// flow-typed version: c6154227d1/react-test-renderer_v16.x.x/flow_>=v0.104.x
 
 // Type definitions for react-test-renderer 16.x.x
 // Ported from: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-test-renderer
@@ -8,44 +8,43 @@ type ReactComponentInstance = React$Component<any>;
 
 type ReactTestRendererJSON = {
   type: string,
-  props: { [propName: string]: any },
-  children: null | ReactTestRendererJSON[]
+  props: { [propName: string]: any, ... },
+  children: null | ReactTestRendererJSON[],
+  ...
 };
 
 type ReactTestRendererTree = ReactTestRendererJSON & {
   nodeType: "component" | "host",
   instance: ?ReactComponentInstance,
-  rendered: null | ReactTestRendererTree
+  rendered: null | ReactTestRendererTree,
+  ...
 };
 
 type ReactTestInstance = {
   instance: ?ReactComponentInstance,
   type: string,
-  props: { [propName: string]: any },
+  props: { [propName: string]: any, ... },
   parent: null | ReactTestInstance,
   children: Array<ReactTestInstance | string>,
-
   find(predicate: (node: ReactTestInstance) => boolean): ReactTestInstance,
   findByType(type: React$ElementType): ReactTestInstance,
-  findByProps(props: { [propName: string]: any }): ReactTestInstance,
-
+  findByProps(props: { [propName: string]: any, ... }): ReactTestInstance,
   findAll(
     predicate: (node: ReactTestInstance) => boolean,
-    options?: { deep: boolean }
+    options?: { deep: boolean, ... }
   ): ReactTestInstance[],
   findAllByType(
     type: React$ElementType,
-    options?: { deep: boolean }
+    options?: { deep: boolean, ... }
   ): ReactTestInstance[],
   findAllByProps(
-    props: { [propName: string]: any },
-    options?: { deep: boolean }
-  ): ReactTestInstance[]
+    props: { [propName: string]: any, ... },
+    options?: { deep: boolean, ... }
+  ): ReactTestInstance[],
+  ...
 };
 
-type TestRendererOptions = {
-  createNodeMock(element: React$Element<any>): any
-};
+type TestRendererOptions = { createNodeMock(element: React$Element<any>): any, ... };
 
 declare module "react-test-renderer" {
   declare export type ReactTestRenderer = {
@@ -54,12 +53,11 @@ declare module "react-test-renderer" {
     unmount(nextElement?: React$Element<any>): void,
     update(nextElement: React$Element<any>): void,
     getInstance(): ?ReactComponentInstance,
-    root: ReactTestInstance
+    root: ReactTestInstance,
+    ...
   };
 
-  declare type Thenable = {
-    then(resolve: () => mixed, reject?: () => mixed): mixed,
-  };
+  declare type Thenable = { then(resolve: () => mixed, reject?: () => mixed): mixed, ... };
 
   declare function create(
     nextElement: React$Element<any>,

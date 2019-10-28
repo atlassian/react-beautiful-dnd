@@ -1,28 +1,19 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../invariant';
 import type { AutoScroller } from '../auto-scroller/auto-scroller-types';
 import type { Action, Dispatch, MiddlewareStore } from '../store-types';
 import type { State } from '../../types';
 
-const shouldEnd = (action: Action): boolean =>
+const shouldStop = (action: Action): boolean =>
   action.type === 'DROP_COMPLETE' ||
   action.type === 'DROP_ANIMATE' ||
-  action.type === 'CLEAN';
-
-const shouldCancelPending = (action: Action): boolean =>
-  action.type === 'COLLECTION_STARTING';
+  action.type === 'FLUSH';
 
 export default (autoScroller: AutoScroller) => (store: MiddlewareStore) => (
   next: Dispatch,
 ) => (action: Action): any => {
-  if (shouldEnd(action)) {
+  if (shouldStop(action)) {
     autoScroller.stop();
-    next(action);
-    return;
-  }
-
-  if (shouldCancelPending(action)) {
-    autoScroller.cancelPending();
     next(action);
     return;
   }
@@ -42,5 +33,6 @@ export default (autoScroller: AutoScroller) => (store: MiddlewareStore) => (
   // auto scroll happens in response to state changes
   // releasing all actions to the reducer first
   next(action);
+
   autoScroller.scroll(store.getState());
 };

@@ -1,43 +1,54 @@
 // @flow
 import type {
+  DraggableDimension,
   DroppableDimension,
   DraggableDimensionMap,
   DragImpact,
-  Displacement,
   Viewport,
-  OnLift,
+  DraggableId,
+  DisplacementGroups,
 } from '../../types';
-import getDisplacement from '../get-displacement';
-import withNewDisplacement from './with-new-displacement';
+import getDisplacementGroups from '../get-displacement-groups';
 
 type RecomputeArgs = {|
   impact: DragImpact,
+  draggables: DraggableDimensionMap,
   destination: DroppableDimension,
   viewport: Viewport,
-  onLift: OnLift,
-  draggables: DraggableDimensionMap,
   forceShouldAnimate?: boolean,
 |};
+
+function getDraggables(
+  ids: DraggableId[],
+  draggables: DraggableDimensionMap,
+): DraggableDimension[] {
+  return ids.map((id: DraggableId): DraggableDimension => draggables[id]);
+}
 
 export default ({
   impact,
   viewport,
-  destination,
   draggables,
-  onLift,
+  destination,
   forceShouldAnimate,
 }: RecomputeArgs): DragImpact => {
-  const updated: Displacement[] = impact.movement.displaced.map(
-    (entry: Displacement) =>
-      getDisplacement({
-        draggable: draggables[entry.draggableId],
-        destination,
-        previousImpact: impact,
-        viewport: viewport.frame,
-        onLift,
-        forceShouldAnimate,
-      }),
+  const last: DisplacementGroups = impact.displaced;
+  const afterDragging: DraggableDimension[] = getDraggables(
+    last.all,
+    draggables,
   );
 
-  return withNewDisplacement(impact, updated);
+  const displaced: DisplacementGroups = getDisplacementGroups({
+    afterDragging,
+    destination,
+    displacedBy: impact.displacedBy,
+    viewport: viewport.frame,
+    forceShouldAnimate,
+    last,
+  });
+
+  return {
+    ...impact,
+    displaced,
+  };
 };

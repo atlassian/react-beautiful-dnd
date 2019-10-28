@@ -1,14 +1,9 @@
 // @flow
 import createDimensionMarshal from '../../../../src/state/dimension-marshal/dimension-marshal';
-import {
-  getCallbacksStub,
-  getDroppableCallbacks,
-  populateMarshal,
-} from '../../../utils/dimension-marshal';
-import { copy, critical, preset } from '../../../utils/preset-action-args';
+import { getCallbacksStub } from '../../../util/dimension-marshal';
+import { copy, critical, preset } from '../../../util/preset-action-args';
 import type {
   DimensionMarshal,
-  DroppableCallbacks,
   StartPublishingResult,
 } from '../../../../src/state/dimension-marshal/dimension-marshal-types';
 import type {
@@ -18,7 +13,17 @@ import type {
   DimensionMap,
   Viewport,
 } from '../../../../src/types';
-import { setViewport } from '../../../utils/viewport';
+import { setViewport } from '../../../util/viewport';
+import type {
+  Registry,
+  DraggableEntry,
+} from '../../../../src/state/registry/registry-types';
+import createRegistry from '../../../../src/state/registry/create-registry';
+import {
+  getDraggableEntry,
+  getDroppableEntry,
+  populate,
+} from '../../../util/registry';
 
 const viewport: Viewport = preset.viewport;
 setViewport(viewport);
@@ -60,15 +65,15 @@ const withNewType: DimensionMap = {
 };
 
 it('should publish the registered dimensions (simple)', () => {
-  const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
-
-  marshal.registerDraggable(preset.inHome1.descriptor, () => preset.inHome1);
-  marshal.registerDraggable(preset.inHome2.descriptor, () => preset.inHome2);
-
-  const droppableCallbacks: DroppableCallbacks = getDroppableCallbacks(
-    preset.home,
+  const registry: Registry = createRegistry();
+  const marshal: DimensionMarshal = createDimensionMarshal(
+    registry,
+    getCallbacksStub(),
   );
-  marshal.registerDroppable(preset.home.descriptor, droppableCallbacks);
+
+  registry.draggable.register(getDraggableEntry({ dimension: preset.inHome1 }));
+  registry.draggable.register(getDraggableEntry({ dimension: preset.inHome2 }));
+  registry.droppable.register(getDroppableEntry({ dimension: preset.home }));
 
   const result: StartPublishingResult = marshal.startPublishing(defaultRequest);
   const expected: StartPublishingResult = {
@@ -89,46 +94,69 @@ it('should publish the registered dimensions (simple)', () => {
 
 // Just checking our preset behaves how we expect
 it('should publish the registered dimensions (preset)', () => {
-  const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
-  populateMarshal(marshal);
+  const registry: Registry = createRegistry();
+  const marshal: DimensionMarshal = createDimensionMarshal(
+    registry,
+    getCallbacksStub(),
+  );
+  populate(registry);
 
   const result: StartPublishingResult = marshal.startPublishing(defaultRequest);
-
-  expect(result).toEqual({
+  const expected: StartPublishingResult = {
     critical,
     dimensions: preset.dimensions,
     viewport,
-  });
+  };
+
+  expect(result).toEqual(expected);
 });
 
 it('should not publish dimensions that do not have the same type as the critical droppable', () => {
-  const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
-  populateMarshal(marshal, withNewType);
+  const registry: Registry = createRegistry();
+  const marshal: DimensionMarshal = createDimensionMarshal(
+    registry,
+    getCallbacksStub(),
+  );
+  populate(registry, withNewType);
 
   const result: StartPublishingResult = marshal.startPublishing(defaultRequest);
 
-  expect(result).toEqual({
+  const expected: StartPublishingResult = {
     critical,
     // dimensions with new type not gathered
     dimensions: preset.dimensions,
     viewport,
-  });
+  };
+
+  expect(result).toEqual(expected);
 });
 
 it('should not publish dimensions that have been unregistered', () => {
-  const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
-  populateMarshal(marshal, preset.dimensions);
+  const registry: Registry = createRegistry();
+  const marshal: DimensionMarshal = createDimensionMarshal(
+    registry,
+    getCallbacksStub(),
+  );
+  populate(registry, preset.dimensions);
   const expectedMap: DimensionMap = copy(preset.dimensions);
 
-  marshal.unregisterDraggable(preset.inHome2.descriptor);
+  // removing inHome2
+  registry.draggable.unregister(
+    registry.draggable.getById(preset.inHome2.descriptor.id),
+  );
   delete expectedMap.draggables[preset.inHome2.descriptor.id];
 
-  marshal.unregisterDroppable(preset.foreign.descriptor);
+  // removing foreign
+  registry.droppable.unregister(
+    registry.droppable.getById(preset.foreign.descriptor.id),
+  );
   delete expectedMap.droppables[preset.foreign.descriptor.id];
 
   // Being a good citizen and also unregistering all of the foreign draggables
   preset.inForeignList.forEach((draggable: DraggableDimension) => {
-    marshal.unregisterDraggable(draggable.descriptor);
+    registry.draggable.unregister(
+      registry.draggable.getById(draggable.descriptor.id),
+    );
     delete expectedMap.draggables[draggable.descriptor.id];
   });
 
@@ -147,8 +175,12 @@ it('should not publish dimensions that have been unregistered', () => {
 });
 
 it('should publish draggables that have been updated (index change)', () => {
-  const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
-  populateMarshal(marshal, preset.dimensions);
+  const registry: Registry = createRegistry();
+  const marshal: DimensionMarshal = createDimensionMarshal(
+    registry,
+    getCallbacksStub(),
+  );
+  populate(registry, preset.dimensions);
 
   const updatedInHome2: DraggableDimension = {
     ...preset.inHome2,
@@ -157,11 +189,14 @@ it('should publish draggables that have been updated (index change)', () => {
       index: 10000,
     },
   };
-  marshal.updateDraggable(
-    preset.inHome2.descriptor,
-    updatedInHome2.descriptor,
-    () => updatedInHome2,
+  const last: DraggableEntry = registry.draggable.getById(
+    preset.inHome2.descriptor.id,
   );
+  const updated: DraggableEntry = getDraggableEntry({
+    uniqueId: last.uniqueId,
+    dimension: updatedInHome2,
+  });
+  registry.draggable.update(updated, last);
 
   const result: StartPublishingResult = marshal.startPublishing(defaultRequest);
   const expected: DimensionMap = copy(preset.dimensions);
@@ -174,8 +209,12 @@ it('should publish draggables that have been updated (index change)', () => {
 });
 
 it('should publish droppables that have been updated (id change)', () => {
-  const marshal: DimensionMarshal = createDimensionMarshal(getCallbacksStub());
-  populateMarshal(marshal, preset.dimensions);
+  const registry: Registry = createRegistry();
+  const marshal: DimensionMarshal = createDimensionMarshal(
+    registry,
+    getCallbacksStub(),
+  );
+  populate(registry, preset.dimensions);
   const expected: DimensionMap = copy(preset.dimensions);
 
   // changing the id of home
@@ -186,11 +225,10 @@ it('should publish droppables that have been updated (id change)', () => {
       id: 'some new id',
     },
   };
-  marshal.unregisterDroppable(preset.home.descriptor);
-  marshal.registerDroppable(
-    updatedHome.descriptor,
-    getDroppableCallbacks(updatedHome),
+  registry.droppable.unregister(
+    registry.droppable.getById(preset.home.descriptor.id),
   );
+  registry.droppable.register(getDroppableEntry({ dimension: updatedHome }));
   delete expected.droppables[preset.home.descriptor.id];
   expected.droppables[updatedHome.descriptor.id] = updatedHome;
 
@@ -203,17 +241,20 @@ it('should publish droppables that have been updated (id change)', () => {
         droppableId: updatedHome.descriptor.id,
       },
     };
-    marshal.updateDraggable(
-      draggable.descriptor,
-      updated.descriptor,
-      () => updated,
+    const last: DraggableEntry = registry.draggable.getById(
+      draggable.descriptor.id,
     );
+    const fresh: DraggableEntry = getDraggableEntry({
+      uniqueId: last.uniqueId,
+      dimension: updated,
+    });
+    registry.draggable.update(fresh, last);
     expected.draggables[draggable.descriptor.id] = updated;
   });
 
   const result: StartPublishingResult = marshal.startPublishing(defaultRequest);
 
-  expect(result).toEqual({
+  const wanted: StartPublishingResult = {
     viewport,
     critical: {
       draggable: {
@@ -223,7 +264,8 @@ it('should publish droppables that have been updated (id change)', () => {
       droppable: updatedHome.descriptor,
     },
     dimensions: expected,
-  });
+  };
+  expect(result).toEqual(wanted);
 });
 
 describe('subsequent calls', () => {
@@ -232,10 +274,12 @@ describe('subsequent calls', () => {
   const stop = (marshal: DimensionMarshal) => marshal.stopPublishing();
 
   it('should return dimensions a subsequent call', () => {
+    const registry: Registry = createRegistry();
     const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
       getCallbacksStub(),
     );
-    populateMarshal(marshal, preset.dimensions);
+    populate(registry, preset.dimensions);
     const expected: StartPublishingResult = {
       critical,
       dimensions: preset.dimensions,
@@ -251,20 +295,24 @@ describe('subsequent calls', () => {
   });
 
   it('should throw if starting asked to start before stopping', () => {
+    const registry: Registry = createRegistry();
     const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
       getCallbacksStub(),
     );
-    populateMarshal(marshal, preset.dimensions);
+    populate(registry, preset.dimensions);
 
     start(marshal);
     expect(() => start(marshal)).toThrow();
   });
 
   it('should account for changes after the last call', () => {
+    const registry: Registry = createRegistry();
     const marshal: DimensionMarshal = createDimensionMarshal(
+      registry,
       getCallbacksStub(),
     );
-    populateMarshal(marshal, preset.dimensions);
+    populate(registry, preset.dimensions);
 
     // Start first publish
     const result1: StartPublishingResult = start(marshal);
@@ -283,11 +331,14 @@ describe('subsequent calls', () => {
         index: 10000,
       },
     };
-    marshal.updateDraggable(
-      preset.inHome2.descriptor,
-      updatedInHome2.descriptor,
-      () => updatedInHome2,
+    const last: DraggableEntry = registry.draggable.getById(
+      preset.inHome2.descriptor.id,
     );
+    const fresh: DraggableEntry = getDraggableEntry({
+      uniqueId: last.uniqueId,
+      dimension: updatedInHome2,
+    });
+    registry.draggable.update(fresh, last);
     const expected: DimensionMap = copy(preset.dimensions);
     expected.draggables[updatedInHome2.descriptor.id] = updatedInHome2;
 

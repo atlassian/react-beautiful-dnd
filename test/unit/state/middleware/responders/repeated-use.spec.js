@@ -1,6 +1,6 @@
 // @flow
 import {
-  clean,
+  flush,
   completeDrop,
   initialPublish,
   moveDown,
@@ -9,7 +9,7 @@ import middleware from '../../../../../src/state/middleware/responders';
 import {
   getDragStart,
   initialPublishArgs,
-} from '../../../../utils/preset-action-args';
+} from '../../../../util/preset-action-args';
 import createStore from '../util/create-store';
 import type {
   Responders,
@@ -61,7 +61,6 @@ it('should behave correctly across multiple drags', () => {
     store.dispatch(
       completeDrop({
         completed: getCompletedWithResult(result, store.getState()),
-        shouldFlush: false,
       }),
     );
     expect(responders.onDragEnd).toHaveBeenCalledWith(
@@ -71,11 +70,12 @@ it('should behave correctly across multiple drags', () => {
     expect(responders.onDragEnd).toHaveBeenCalledTimes(1);
 
     // cleanup
-    store.dispatch(clean());
+    store.dispatch(flush());
     // $ExpectError - unknown mock reset property
     responders.onDragStart.mockReset();
     // $ExpectError - unknown mock reset property
     responders.onDragUpdate.mockReset();
+    // $ExpectError - unknown mock reset property
     responders.onDragEnd.mockReset();
   });
 });

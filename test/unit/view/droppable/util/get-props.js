@@ -1,21 +1,25 @@
 // @flow
-import { getPreset } from '../../../../utils/dimension';
+import { getPreset } from '../../../../util/dimension';
 import type {
   MapProps,
   OwnProps,
   DispatchProps,
 } from '../../../../../src/view/droppable/droppable-types';
+import getBodyElement from '../../../../../src/view/get-body-element';
 
 export const preset = getPreset();
 
 export const homeOwnProps: OwnProps = {
   droppableId: preset.home.descriptor.id,
   type: preset.home.descriptor.type,
+  mode: preset.home.descriptor.mode,
   isDropDisabled: false,
   isCombineEnabled: false,
   direction: preset.home.axis.direction,
   ignoreContainerClipping: false,
   children: () => null,
+  getContainerForClone: getBodyElement,
+  renderClone: null,
 };
 
 export const foreignOwnProps: OwnProps = {
@@ -32,7 +36,9 @@ export const homeAtRest: MapProps = {
     isDraggingOver: false,
     draggingOverWith: null,
     draggingFromThisWith: null,
+    isUsingPlaceholder: false,
   },
+  useClone: null,
 };
 
 export const isOverHome: MapProps = {
@@ -40,10 +46,12 @@ export const isOverHome: MapProps = {
   // this can change during a drag
   shouldAnimatePlaceholder: false,
   snapshot: {
+    isUsingPlaceholder: true,
     isDraggingOver: true,
     draggingOverWith: preset.inHome1.descriptor.id,
     draggingFromThisWith: preset.inHome1.descriptor.id,
   },
+  useClone: null,
 };
 
 export const isNotOverHome: MapProps = {
@@ -51,40 +59,48 @@ export const isNotOverHome: MapProps = {
   // this can change during a drag
   shouldAnimatePlaceholder: false,
   snapshot: {
+    isUsingPlaceholder: true,
     isDraggingOver: false,
     draggingOverWith: null,
     draggingFromThisWith: preset.inHome1.descriptor.id,
   },
+  useClone: null,
 };
 
 export const homePostDropAnimation: MapProps = {
   placeholder: null,
   shouldAnimatePlaceholder: true,
   snapshot: {
+    isUsingPlaceholder: false,
     isDraggingOver: false,
     draggingOverWith: null,
     draggingFromThisWith: null,
   },
+  useClone: null,
 };
 
 export const isOverForeign: MapProps = {
   placeholder: preset.inHome1.placeholder,
   shouldAnimatePlaceholder: true,
   snapshot: {
+    isUsingPlaceholder: true,
     isDraggingOver: true,
     draggingOverWith: preset.inHome1.descriptor.id,
     draggingFromThisWith: null,
   },
+  useClone: null,
 };
 
 export const isNotOverForeign: MapProps = {
   placeholder: null,
   shouldAnimatePlaceholder: false,
   snapshot: {
+    isUsingPlaceholder: false,
     isDraggingOver: false,
     draggingOverWith: null,
     draggingFromThisWith: null,
   },
+  useClone: null,
 };
 
 export const dispatchProps: DispatchProps = {

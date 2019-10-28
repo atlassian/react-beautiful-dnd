@@ -1,6 +1,6 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type { Position } from 'css-box-model';
+import { invariant } from '../invariant';
 import type {
   DimensionMap,
   State,
@@ -20,7 +20,6 @@ import type {
 import type { Action } from './store-types';
 import type { PublicResult as MoveInDirectionResult } from './move-in-direction/move-in-direction-types';
 import scrollDroppable from './droppable/scroll-droppable';
-import publishWhileDragging from './publish-while-dragging';
 import moveInDirection from './move-in-direction';
 import { add, isEqual, origin } from './position';
 import scrollViewport from './scroll-viewport';
@@ -29,8 +28,9 @@ import { toDroppableList } from './dimension-structures';
 import { forward } from './user-direction/user-direction-preset';
 import update from './post-reducer/when-moving/update';
 import refreshSnap from './post-reducer/when-moving/refresh-snap';
-import getHomeOnLift from './get-home-on-lift';
+import getLiftEffect from './get-lift-effect';
 import patchDimensionMap from './patch-dimension-map';
+import publishWhileDraggingInVirtual from './publish-while-dragging-in-virtual';
 
 const isSnapping = (state: StateWhenUpdatesAllowed): boolean =>
   state.movementMode === 'SNAP';
@@ -56,13 +56,26 @@ const postDroppableChange = (
   });
 };
 
+function removeScrollJumpRequest(state: State): State {
+  if (state.isDragging && state.movementMode === 'SNAP') {
+    return {
+      // will be overwritten by spread
+      // needed for flow
+      phase: 'DRAGGING',
+      ...state,
+      scrollJumpRequest: null,
+    };
+  }
+  return state;
+}
+
 const idle: IdleState = { phase: 'IDLE', completed: null, shouldFlush: false };
 
 export default (state: State = idle, action: Action): State => {
-  if (action.type === 'CLEAN') {
+  if (action.type === 'FLUSH') {
     return {
       ...idle,
-      shouldFlush: action.payload.shouldFlush,
+      shouldFlush: true,
     };
   }
 
@@ -103,7 +116,7 @@ export default (state: State = idle, action: Action): State => {
       dimensions.droppables,
     ).every((item: DroppableDimension) => !item.isFixedOnPage);
 
-    const { impact, onLift } = getHomeOnLift({
+    const { impact, afterCritical } = getLiftEffect({
       draggable,
       home,
       draggables: dimensions.draggables,
@@ -120,7 +133,7 @@ export default (state: State = idle, action: Action): State => {
       current: initial,
       isWindowScrollAllowed,
       impact,
-      onLift,
+      afterCritical,
       onLiftImpact: impact,
       viewport,
       userDirection: forward,
@@ -161,7 +174,7 @@ export default (state: State = idle, action: Action): State => {
       `Unexpected ${action.type} received in phase ${state.phase}`,
     );
 
-    return publishWhileDragging({
+    return publishWhileDraggingInVirtual({
       state,
       published: action.payload,
     });
@@ -198,13 +211,13 @@ export default (state: State = idle, action: Action): State => {
     // Cannot get this during a DROP_ANIMATING as the dimension
     // marshal will cancel any pending scroll updates
     if (state.phase === 'DROP_PENDING') {
-      return state;
+      return removeScrollJumpRequest(state);
     }
 
     // We will be updating the scroll in response to dynamic changes
     // manually on the droppable so we can ignore this change
     if (state.phase === 'COLLECTING') {
-      return state;
+      return removeScrollJumpRequest(state);
     }
 
     invariant(
@@ -212,7 +225,7 @@ export default (state: State = idle, action: Action): State => {
       `${action.type} not permitted in phase ${state.phase}`,
     );
 
-    const { id, offset } = action.payload;
+    const { id, newScroll } = action.payload;
     const target: ?DroppableDimension = state.dimensions.droppables[id];
 
     // This is possible if a droppable has been asked to watch scroll but
@@ -221,7 +234,7 @@ export default (state: State = idle, action: Action): State => {
       return state;
     }
 
-    const scrolled: DroppableDimension = scrollDroppable(target, offset);
+    const scrolled: DroppableDimension = scrollDroppable(target, newScroll);
     return postDroppableChange(state, scrolled, false);
   }
 
@@ -304,14 +317,14 @@ export default (state: State = idle, action: Action): State => {
 
     invariant(
       state.isWindowScrollAllowed,
-      'Window scrolling is currently not supported for fixed lists. Aborting drag',
+      'Window scrolling is currently not supported for fixed lists',
     );
 
     const newScroll: Position = action.payload.newScroll;
 
     // nothing needs to be done
     if (isEqual(state.viewport.scroll.current, newScroll)) {
-      return state;
+      return removeScrollJumpRequest(state);
     }
 
     const viewport: Viewport = scrollViewport(state.viewport, newScroll);
@@ -420,10 +433,10 @@ export default (state: State = idle, action: Action): State => {
     // Moving into a new phase
     const result: DropAnimatingState = {
       phase: 'DROP_ANIMATING',
-      dimensions: state.dimensions,
       completed,
       dropDuration,
       newHomeClientOffset,
+      dimensions: state.dimensions,
     };
 
     return result;
@@ -432,12 +445,12 @@ export default (state: State = idle, action: Action): State => {
   // Action will be used by responders to call consumers
   // We can simply return to the idle state
   if (action.type === 'DROP_COMPLETE') {
-    const { completed, shouldFlush } = action.payload;
+    const { completed } = action.payload;
 
     return {
       phase: 'IDLE',
       completed,
-      shouldFlush,
+      shouldFlush: false,
     };
   }
 

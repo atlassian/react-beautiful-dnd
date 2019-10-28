@@ -19,8 +19,10 @@ import { DragDropContext, Droppable, Draggable } from '../src';
 {
   <React.Fragment>
     <Droppable droppableId="">{() => null}</Droppable>
-    {/* $ExpectError doppableId is required */}
+    {/* $ExpectError droppableId is required */}
     <Droppable>{() => null}</Droppable>
+    {/* $ExpectError droppableId must be a string */}
+    <Droppable droppableId={3}>{() => null}</Droppable>
     {/* $ExpectError children as function is required*/}
     <Droppable droppableId="" />
   </React.Fragment>;
@@ -34,6 +36,8 @@ import { DragDropContext, Droppable, Draggable } from '../src';
     </Draggable>
     {/* $ExpectError draggableId is required */}
     <Draggable index={0}>{() => null}</Draggable>
+    {/* $ExpectError draggableId must be a string */}
+    <Draggable draggableId={2} index={0}>{() => null}</Draggable>
     {/* $ExpectError index is required */}
     <Draggable draggableId="">{() => null}</Draggable>
     {/* $ExpectError children as function is required*/}

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { mount } from 'enzyme';
 import type { Provided } from '../../../../src/view/droppable/droppable-types';
 import Droppable from '../../../../src/view/droppable/connected-droppable';
-import forceUpdate from '../../../utils/force-update';
+import forceUpdate from '../../../util/force-update';
 import { DragDropContext } from '../../../../src';
 
 class Person extends Component<{ name: string, provided: Provided }> {

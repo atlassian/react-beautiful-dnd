@@ -1,5 +1,5 @@
-// flow-typed signature: 55b84d40e54f80cef7b74a34aa052ad5
-// flow-typed version: 2c899a110b/redux_v4.x.x/flow_>=v0.89.x
+// flow-typed signature: f62df6dbce399d55b0f2954c5ac1bd4e
+// flow-typed version: c6154227d1/redux_v4.x.x/flow_>=v0.104.x
 
 declare module 'redux' {
   /*
@@ -10,13 +10,16 @@ declare module 'redux' {
 
   */
 
+  declare export type Action<T> = { type: T, ... }
+
   declare export type DispatchAPI<A> = (action: A) => A;
 
-  declare export type Dispatch<A: { type: * }> = DispatchAPI<A>;
+  declare export type Dispatch<A: { type: *, ... }> = DispatchAPI<A>;
 
   declare export type MiddlewareAPI<S, A, D = Dispatch<A>> = {
     dispatch: D,
     getState(): S,
+    ...
   };
 
   declare export type Store<S, A, D = Dispatch<A>> = {
@@ -25,12 +28,13 @@ declare module 'redux' {
     getState(): S,
     subscribe(listener: () => void): () => void,
     replaceReducer(nextReducer: Reducer<S, A>): void,
+    ...
   };
 
   declare export type Reducer<S, A> = (state: S | void, action: A) => S;
 
   declare export type CombinedReducer<S, A> = (
-    state: ($Shape<S> & {}) | void,
+    state: ($Shape<S> & {...}) | void,
     action: A
   ) => S;
 
@@ -45,6 +49,7 @@ declare module 'redux' {
       preloadedState: S,
       enhancer?: StoreEnhancer<S, A, D>
     ): Store<S, A, D>,
+    ...
   };
 
   declare export type StoreEnhancer<S, A, D = Dispatch<A>> = (
@@ -66,9 +71,7 @@ declare module 'redux' {
   ): StoreEnhancer<S, A, D>;
 
   declare export type ActionCreator<A, B> = (...args: Array<B>) => A;
-  declare export type ActionCreators<K, A> = {
-    [key: K]: ActionCreator<A, any>,
-  };
+  declare export type ActionCreators<K, A> = { [key: K]: ActionCreator<A, any>, ... };
 
   declare export function bindActionCreators<
     A,
@@ -88,7 +91,7 @@ declare module 'redux' {
     dispatch: D
   ): C;
 
-  declare export function combineReducers<O: {}, A>(
+  declare export function combineReducers<O: {...}, A>(
     reducers: O
   ): CombinedReducer<$ObjMap<O, <S>(r: Reducer<S, any>) => S>, A>;
 

@@ -2,7 +2,11 @@
 import type { Announce } from '../../../types';
 import { warning } from '../../../dev-warning';
 
-export default (announce: Announce) => {
+export type ExpiringAnnounce = Announce & {
+  wasCalled: () => boolean,
+};
+
+export default (announce: Announce): ExpiringAnnounce => {
   let wasCalled: boolean = false;
   let isExpired: boolean = false;
 

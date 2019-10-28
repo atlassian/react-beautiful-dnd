@@ -7,19 +7,11 @@ import type {
   DraggableDimension,
   State,
   MovementMode,
+  ContextId,
+  ElementId,
+  DraggableRubric,
 } from '../../types';
-import {
-  lift,
-  move,
-  moveByWindowScroll,
-  moveUp,
-  moveDown,
-  moveRight,
-  moveLeft,
-  drop,
-  dropAnimationFinished,
-} from '../../state/action-creators';
-import type { DragHandleProps } from '../use-drag-handle/drag-handle-types';
+import { dropAnimationFinished } from '../../state/action-creators';
 
 export type DraggingStyle = {|
   position: 'fixed',
@@ -62,9 +54,29 @@ export type DraggableProps = {|
   // inline style
   style: ?DraggableStyle,
   // used for shared global styles
-  'data-react-beautiful-dnd-draggable': string,
+  'data-rbd-draggable-context-id': ContextId,
+  // used for lookups
+  'data-rbd-draggable-id': DraggableId,
   // used to know when a transition ends
   onTransitionEnd: ?(event: TransitionEvent) => void,
+|};
+
+export type DragHandleProps = {|
+  // what draggable the handle belongs to
+  'data-rbd-drag-handle-draggable-id': DraggableId,
+
+  // What DragDropContext the drag handle is in
+  'data-rbd-drag-handle-context-id': ContextId,
+
+  // id of drag handle aria description for screen readers
+  'aria-labelledby': ElementId,
+
+  // Allow tabbing to this element
+  tabIndex: number,
+
+  // Stop html5 drag and drop
+  draggable: boolean,
+  onDragStart: (event: DragEvent) => void,
 |};
 
 export type Provided = {|
@@ -87,6 +99,7 @@ export type DropAnimation = {|
 export type StateSnapshot = {|
   isDragging: boolean,
   isDropAnimating: boolean,
+  isClone: boolean,
   dropAnimation: ?DropAnimation,
   draggingOver: ?DroppableId,
   combineWith: ?DraggableId,
@@ -95,14 +108,6 @@ export type StateSnapshot = {|
 |};
 
 export type DispatchProps = {|
-  lift: typeof lift,
-  move: typeof move,
-  moveByWindowScroll: typeof moveByWindowScroll,
-  moveUp: typeof moveUp,
-  moveDown: typeof moveDown,
-  moveRight: typeof moveRight,
-  moveLeft: typeof moveLeft,
-  drop: typeof drop,
   dropAnimationFinished: typeof dropAnimationFinished,
 |};
 
@@ -136,19 +141,34 @@ export type MapProps = {|
   // secondary: ?SecondaryMapProps,
 |};
 
-export type ChildrenFn = (Provided, StateSnapshot) => Node | null;
+export type ChildrenFn = (
+  Provided,
+  StateSnapshot,
+  DraggableRubric,
+) => Node | null;
 
-export type DefaultProps = {|
-  isDragDisabled: boolean,
-  disableInteractiveElementBlocking: boolean,
+export type PublicOwnProps = {|
+  draggableId: DraggableId,
+  index: number,
+  children: ChildrenFn,
+
+  // optional own props
+  isDragDisabled?: boolean,
+  disableInteractiveElementBlocking?: boolean,
+  shouldRespectForcePress?: boolean,
+|};
+
+export type PrivateOwnProps = {|
+  ...PublicOwnProps,
+  isClone: boolean,
+  // no longer optional
+  isEnabled: boolean,
+  canDragInteractiveElements: boolean,
   shouldRespectForcePress: boolean,
 |};
 
 export type OwnProps = {|
-  ...DefaultProps,
-  draggableId: DraggableId,
-  index: number,
-  children: ChildrenFn,
+  ...PrivateOwnProps,
 |};
 
 export type Props = {|

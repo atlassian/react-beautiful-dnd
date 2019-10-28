@@ -1,5 +1,4 @@
 // @flow
-import invariant from 'tiny-invariant';
 import {
   createBox,
   withScroll,
@@ -7,10 +6,11 @@ import {
   type Spacing,
   type Position,
 } from 'css-box-model';
+import { invariant } from '../../../../src/invariant';
 import getDroppableDimension from '../../../../src/state/droppable/get-droppable';
 import { noSpacing } from '../../../../src/state/spacing';
 import getMaxScroll from '../../../../src/state/get-max-scroll';
-import { expandBySpacing } from '../../../utils/spacing';
+import { expandBySpacing } from '../../../util/spacing';
 import type {
   DroppableDescriptor,
   DroppableDimension,
@@ -21,6 +21,7 @@ import type {
 const descriptor: DroppableDescriptor = {
   id: 'drop-1',
   type: 'TYPE',
+  mode: 'standard',
 };
 
 const margin: Spacing = {

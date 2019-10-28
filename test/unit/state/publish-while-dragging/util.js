@@ -1,17 +1,14 @@
 // @flow
 import { createBox, type BoxModel, type Position } from 'css-box-model';
-import {
-  getPreset,
-  makeScrollable,
-  addDroppable,
-} from '../../../utils/dimension';
+import { getPreset, addDroppable, makeVirtual } from '../../../util/dimension';
 import type {
   Published,
   DraggableDimension,
   DroppableDimension,
   CollectingState,
+  LiftEffect,
 } from '../../../../src/types';
-import offsetDraggable from '../../../../src/state/publish-while-dragging/update-draggables/offset-draggable';
+import offsetDraggable from '../../../../src/state/publish-while-dragging-in-virtual/offset-draggable';
 
 const preset = getPreset();
 
@@ -49,14 +46,25 @@ export const shift = ({
   return result;
 };
 
-export const scrollableHome: DroppableDimension = makeScrollable(preset.home);
-export const scrollableForeign: DroppableDimension = makeScrollable(
-  preset.foreign,
-);
+export const virtualHome: DroppableDimension = makeVirtual(preset.home);
+export const virtualForeign: DroppableDimension = makeVirtual(preset.foreign);
 
-export const withScrollables = (state: CollectingState): CollectingState =>
-  // $FlowFixMe - wrong types for these functions
-  addDroppable(addDroppable(state, scrollableHome), scrollableForeign);
+export const withVirtuals = (state: CollectingState): CollectingState => {
+  // $ExpectError
+  const base: CollectingState = addDroppable(
+    // $ExpectError
+    addDroppable(state, virtualHome),
+    virtualForeign,
+  );
+  const afterCritical: LiftEffect = {
+    ...base.afterCritical,
+    inVirtualList: true,
+  };
+  return {
+    ...base,
+    afterCritical,
+  };
+};
 
 export const adjustBox = (box: BoxModel, point: Position): BoxModel =>
   createBox({

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 // @flow
 import React from 'react';
 import styled from '@emotion/styled';

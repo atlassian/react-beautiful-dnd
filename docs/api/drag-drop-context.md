@@ -1,6 +1,6 @@
 # `<DragDropContext />`
 
-In order to use drag and drop, you need to have the part of your `React` tree that you want to be able to use drag and drop in wrapped in a `<DragDropContext />`. It is advised to just wrap your entire application in a `<DragDropContext />`. Having nested `<DragDropContext />`'s is _not_ supported. You will be able to achieve your desired conditional dragging and dropping using the props of `<Droppable />` and `<Draggable />`. You can think of `<DragDropContext />` as having a similar purpose to the [react-redux Provider component](https://react-redux.js.org/api/provider)
+In order to use drag and drop, you need to have the part of your `React` tree that you want to be able to use drag and drop in wrapped in a `<DragDropContext />`. It is advised to just wrap your entire application in a `<DragDropContext />`. Having nested `<DragDropContext />`'s is _not_ supported. You will be able to achieve your desired conditional dragging and dropping using the props of `<Droppable />` and `<Draggable />`. You can think of `<DragDropContext />` as having a similar purpose to the [react-redux Provider component](https://react-redux.js.org/api/provider). A content-security-protection nonce attribute is added to the injected style tags if provided.
 
 ## Props
 
@@ -18,9 +18,23 @@ import type { Node } from 'react';
 
 type Props = {|
   ...Responders,
-  children: ?Node,
+  // We do not technically need any children for this component
+  children: Node | null,
+  // Read out by screen readers when focusing on a drag handle
+  liftInstruction?: string,
+  // Used for strict content security policies
+  nonce?: string,
+  // Used for custom sensors
+  sensors?: Sensor[],
+  enableDefaultSensors?: ?boolean,
 |};
 ```
+
+- `liftInstruction`: What is read out to screen reader users when a *drag handle* is given browser focus. See our [screen reader guide](/docs/guides/screen-reader.md)
+- `nonce`: Used for strict content security policy setups. See our [content security policy guide](/docs/guides/content-security-policy.md)
+- `sensors`: Used to pass in your own `sensor`s for a `<DragDropContext />`. See our [sensor api documentation](/docs/sensors/sensor-api.md)
+- `enableDefaultSensors`: Whether or not the default sensors ([mouse](/docs/sensors/mouse.md), [keyboard](/docs/sensors/keyboard.md), and [touch](/docs/sensors/touch.md)) are enabled. See our [sensor api documentation](/docs/sensors/sensor-api.md)
+
 
 > See our [type guide](/docs/guides/types.md) for more details
 
@@ -103,5 +117,9 @@ function App() {
 Responders are top level application events that you can use to perform your own state updates, style updates, as well as to make screen reader announcements.
 
 [Please see our Responders guide](/docs/guides/responders.md) for detailed information about responders ❤️
+
+## `liftInstruction`
+
+This is text used as the screen reader lift instruction for *drag-handle*s. We will use our default english message if no liftInstruction is provided. See our [screen reader guide](/docs/guides/screen-reader.md)
 
 [← Back to documentation](/README.md#documentation-)

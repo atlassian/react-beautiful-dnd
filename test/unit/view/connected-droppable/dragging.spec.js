@@ -1,5 +1,5 @@
 // @flow
-import getStatePreset from '../../../utils/get-simple-state-preset';
+import getStatePreset from '../../../util/get-simple-state-preset';
 import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
 import type {
   DraggingState,
@@ -13,13 +13,13 @@ import type {
   MapProps,
 } from '../../../../src/view/droppable/droppable-types';
 import getOwnProps from './util/get-own-props';
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import {
   move,
   type IsDraggingState,
   withImpact,
-} from '../../../utils/dragging-state';
-import noImpact from '../../../../src/state/no-impact';
+} from '../../../util/dragging-state';
+import noImpact, { emptyGroups } from '../../../../src/state/no-impact';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import withCombineImpact from './util/with-combine-impact';
 import restingProps from './util/resting-props';
@@ -36,7 +36,9 @@ describe('home list', () => {
       isDraggingOver: true,
       draggingOverWith: preset.inHome1.descriptor.id,
       draggingFromThisWith: preset.inHome1.descriptor.id,
+      isUsingPlaceholder: true,
     },
+    useClone: null,
   };
 
   describe('is dragging over', () => {
@@ -109,7 +111,9 @@ describe('home list', () => {
         isDraggingOver: false,
         draggingOverWith: null,
         draggingFromThisWith: preset.inHome1.descriptor.id,
+        isUsingPlaceholder: true,
       },
+      useClone: null,
     };
 
     it('should indicate that it is not being dragged over', () => {
@@ -156,16 +160,15 @@ describe('foreign list', () => {
       preset.inHome1.displaceBy,
     );
     const overForeign: DragImpact = {
-      movement: {
-        displaced: [],
-        map: {},
-        displacedBy,
+      displaced: emptyGroups,
+      displacedBy,
+      at: {
+        type: 'REORDER',
+        destination: {
+          index: 0,
+          droppableId: preset.foreign.descriptor.id,
+        },
       },
-      destination: {
-        index: 0,
-        droppableId: preset.foreign.descriptor.id,
-      },
-      merge: null,
     };
 
     const isOverForeignMapProps: MapProps = {
@@ -175,7 +178,9 @@ describe('foreign list', () => {
         isDraggingOver: true,
         draggingFromThisWith: null,
         draggingOverWith: preset.inHome1.descriptor.id,
+        isUsingPlaceholder: true,
       },
+      useClone: null,
     };
 
     it('should indicate that it is being dragged over', () => {
@@ -231,18 +236,23 @@ describe('foreign list', () => {
       impact: { ...noImpact },
     });
 
+    const isNotOver: MapProps = {
+      ...restingProps,
+      shouldAnimatePlaceholder: true,
+    };
+
     it('should indicate that it is not being dragged over', () => {
       const selector: Selector = makeMapStateToProps();
 
       const first: MapProps = selector(getNoWhere(), ownProps);
-      expect(first).toEqual(restingProps);
+      expect(first).toEqual(isNotOver);
     });
 
     it('should not break memoization between moves', () => {
       const selector: Selector = makeMapStateToProps();
 
       const first: MapProps = selector(getNoWhere(), ownProps);
-      expect(first).toEqual(restingProps);
+      expect(first).toEqual(isNotOver);
 
       expect(selector(move(getNoWhere(), { x: 1, y: 1 }), ownProps)).toBe(
         first,

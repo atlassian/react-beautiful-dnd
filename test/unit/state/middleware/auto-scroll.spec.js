@@ -8,46 +8,27 @@ import {
   userCancelArgs,
   initialPublishArgs,
   getCompletedArgs,
-} from '../../../utils/preset-action-args';
+} from '../../../util/preset-action-args';
 import {
   animateDrop,
   completeDrop,
-  collectionStarting,
   initialPublish,
   moveDown,
-  clean,
+  flush,
 } from '../../../../src/state/action-creators';
-
-const shouldCancelPending: Action[] = [collectionStarting()];
 
 const shouldStop: Action[] = [
   animateDrop(animateDropArgs),
   animateDrop(userCancelArgs),
   completeDrop(getCompletedArgs('CANCEL')),
   completeDrop(getCompletedArgs('DROP')),
-  clean(),
+  flush(),
 ];
 
 const getScrollerStub = (): AutoScroller => ({
   start: jest.fn(),
-  cancelPending: jest.fn(),
   stop: jest.fn(),
   scroll: jest.fn(),
-});
-
-shouldCancelPending.forEach((action: Action) => {
-  it(`should cancel a pending scroll when a ${action.type} is fired`, () => {
-    const scroller: AutoScroller = getScrollerStub();
-    const store: Store = createStore(middleware(scroller));
-
-    store.dispatch(initialPublish(initialPublishArgs));
-    expect(store.getState().phase).toBe('DRAGGING');
-    expect(scroller.start).toHaveBeenCalled();
-
-    expect(scroller.cancelPending).not.toHaveBeenCalled();
-    store.dispatch(action);
-    expect(scroller.cancelPending).toHaveBeenCalled();
-  });
 });
 
 shouldStop.forEach((action: Action) => {

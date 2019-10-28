@@ -10,6 +10,7 @@ module.exports = {
   setupFilesAfterEnv: ['./test/test-setup.js'],
   // node_modules is default.
   testPathIgnorePatterns: ['/node_modules/', '/cypress/'],
+  modulePathIgnorePatterns: ['/dist/'],
   watchPlugins: [
     'jest-watch-typeahead/filename',
     'jest-watch-typeahead/testname',

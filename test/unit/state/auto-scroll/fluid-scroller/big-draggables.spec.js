@@ -22,7 +22,7 @@ import { expandByPosition } from '../../../../../src/state/spacing';
 import {
   getDraggableDimension,
   addDraggable,
-} from '../../../../utils/dimension';
+} from '../../../../util/dimension';
 
 forEach(({ axis, state, preset }: BlockFnArgs) => {
   describe('window', () => {

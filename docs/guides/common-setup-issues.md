@@ -24,9 +24,10 @@ More information: [identifiers guide](/docs/guides/identifiers.md)
 
 Rules:
 
-- Must start from `0`
+- Must be unique within a `<Droppable />` (no duplicates)
 - Must be consecutive. `[0, 1, 2]` and not `[1, 2, 8]`
-- Must be unique with a `<Droppable />` (no duplicates)
+
+Indexes do not need to start from `0` (this is often the case in [virtual lists](/docs/patterns/virtual-lists.md))
 
 [More information](/docs/api/draggable.md#draggable-props)
 
@@ -67,6 +68,10 @@ return items.map((item, index) => (
 
 We recommend you set a `min-height` or `min-width` on a `<Droppable />` to ensure that there is a visible drop target when a list is empty
 
-We go over this in our [Get started with `react-beautiful-dnd` course](https://egghead.io/lessons/react-move-items-between-columns-with-react-beautiful-dnd-using-ondragend)
+We go over this in our [Get started with `react-beautiful-dnd` course](https://egghead.io/lessons/react-move-items-between-columns-with-react-beautiful-dnd-using-ondragend?af=2jc3e4)
+
+## Image flickering in a `<Draggable />`
+
+See our [avoiding image flickering guide](/docs/guides/avoiding-image-flickering.md)
 
 [← Back to documentation](/README.md#documentation-)

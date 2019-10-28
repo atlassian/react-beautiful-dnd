@@ -1,5 +1,5 @@
 // @flow
-import { getPreset } from '../../../utils/dimension';
+import { getPreset } from '../../../util/dimension';
 import type {
   DimensionMap,
   LiftRequest,
@@ -7,13 +7,6 @@ import type {
 } from '../../../../src/types';
 
 const preset = getPreset();
-
-export const withExpectedAdvancedUsageWarning = (fn: Function) => {
-  jest.spyOn(console, 'warn').mockImplementation(() => {});
-  fn();
-  expect(console.warn).toHaveBeenCalled();
-  console.warn.mockRestore();
-};
 
 export const defaultRequest: LiftRequest = {
   draggableId: preset.inHome1.descriptor.id,

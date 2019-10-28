@@ -8,19 +8,18 @@ import {
   initialPublish,
   animateDrop,
   completeDrop,
-  clean,
+  flush,
 } from '../../../../src/state/action-creators';
 import {
   initialPublishArgs,
   animateDropArgs,
   getCompletedArgs,
-} from '../../../utils/preset-action-args';
+} from '../../../util/preset-action-args';
 
 const getMarshalStub = (): StyleMarshal => ({
   dragging: jest.fn(),
   dropping: jest.fn(),
   resting: jest.fn(),
-  styleContext: 'why hello there',
 });
 
 it('should use the dragging styles on an initial publish', () => {
@@ -65,7 +64,7 @@ it('should use the resting styles when aborting', () => {
   store.dispatch(initialPublish(initialPublishArgs));
 
   expect(marshal.resting).not.toHaveBeenCalled();
-  store.dispatch(clean());
+  store.dispatch(flush());
 
   expect(marshal.resting).toHaveBeenCalled();
 });

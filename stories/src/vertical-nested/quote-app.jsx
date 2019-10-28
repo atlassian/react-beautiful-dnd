@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import styled from '@emotion/styled';
-import invariant from 'tiny-invariant';
 import { colors } from '@atlaskit/theme';
+import { invariant } from '../../../src/invariant';
 import { DragDropContext } from '../../../src';
 import { grid } from '../constants';
 import QuoteList from './quote-list';

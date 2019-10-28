@@ -19,7 +19,7 @@ it('should only fire a single transitionend event a single time when transitioni
       placeholder={placeholder}
       onClose={onClose}
       onTransitionEnd={onTransitionEnd}
-      styleContext="hey"
+      contextId="hey"
     />,
   );
   // finish the animate open timer

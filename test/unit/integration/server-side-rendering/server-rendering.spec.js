@@ -4,9 +4,9 @@
 // @flow
 import React from 'react';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../../src/invariant';
 import { resetServerContext } from '../../../../src';
-import App from './app';
+import App from '../util/app';
 
 const consoleFunctions: string[] = ['warn', 'error', 'log'];
 

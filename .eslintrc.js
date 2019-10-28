@@ -52,8 +52,17 @@ module.exports = {
     // Cannot reassign function parameters but allowing modification
     'no-param-reassign': ['error', { props: false }],
 
+    // Named exports are kewl
+    'import/prefer-default-export': 'off',
+
+    // Don't tell me what to do!
+    'max-classes-per-file': 'off',
+
     // Allowing ++ on numbers
     'no-plusplus': 'off',
+
+    // Always enforcing the use of curly braces for if statements
+    'curly': ['error', 'all'],
 
     'no-restricted-syntax': [
       // Nicer booleans #1
@@ -82,6 +91,25 @@ module.exports = {
         message:
           'Must use `useLayoutEffect` as the name of the import from `*use-isomorphic-layout-effect` to leverage `eslint-plugin-react-hooks`',
       },
+
+      // No Array.from as it pulls in a large amount of babel helpers
+      {
+        selector: 'MemberExpression[object.name="Array"][property.name="from"]',
+        message:
+          'Not allowing using of Array.from to save kbs. Please use native-with-fallback/from',
+      },
+
+      // No usage of `tiny-invariant`. Must use our own invariant for error flow
+      {
+        selector: 'ImportDeclaration[source.value="tiny-invariant"]',
+        message: 'Please use our own invariant function (src/invariant.js) to ensure correct error flow'
+      },
+
+      // Must use invariant to throw
+      {
+        selector: 'ThrowStatement',
+        message: 'Please use invariant (src/invariant.js) for throwing. This is to ensure correct error flows'
+      }
     ],
 
     // Allowing Math.pow rather than forcing `**`
@@ -162,6 +190,17 @@ module.exports = {
     // Enforce rules of hooks
     'react-hooks/rules-of-hooks': 'error',
     // Second argument to hook functions
-    'react-hooks/exhaustive-deps': 'warn',
+    'react-hooks/exhaustive-deps': 'error',
+
+    'react/jsx-props-no-spreading': 'off',
+
+    // using <React.Fragment> is fine
+    'react/jsx-fragments': 'off',
+
+    // all good to declare static class members in the class
+    'react/static-property-placement': 'off',
+
+    // don't need to initialize state in a constructor
+    'react/state-in-constructor': 'off',
   },
 };

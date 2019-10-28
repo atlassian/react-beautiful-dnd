@@ -7,13 +7,13 @@ const spacesAndTabs: RegExp = /[ \t]{2,}/g;
 const lineStartWithSpaces: RegExp = /^[ \t]*/gm;
 
 // using .trim() to clear the any newlines before the first text and after last text
-const clean = (value: string) =>
+const clean = (value: string): string =>
   value
     .replace(spacesAndTabs, ' ')
     .replace(lineStartWithSpaces, '')
     .trim();
 
-const getDevMessage = (message: string) =>
+const getDevMessage = (message: string): string =>
   clean(`
   %creact-beautiful-dnd
 
@@ -34,7 +34,7 @@ export const getFormattedMessage = (message: string): string[] => [
 
 const isDisabledFlag: string = '__react-beautiful-dnd-disable-dev-warnings';
 
-export const warning = (message: string) => {
+export function log(type: 'error' | 'warn', message: string) {
   // no warnings in production
   if (isProduction) {
     return;
@@ -46,5 +46,8 @@ export const warning = (message: string) => {
   }
 
   // eslint-disable-next-line no-console
-  console.warn(...getFormattedMessage(message));
-};
+  console[type](...getFormattedMessage(message));
+}
+
+export const warning = log.bind(null, 'warn');
+export const error = log.bind(null, 'error');

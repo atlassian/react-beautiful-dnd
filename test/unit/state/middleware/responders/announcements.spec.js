@@ -1,5 +1,5 @@
 // @flow
-import invariant from 'tiny-invariant';
+import { invariant } from '../../../../../src/invariant';
 import {
   completeDrop,
   initialPublish,
@@ -7,16 +7,15 @@ import {
   updateDroppableIsCombineEnabled,
 } from '../../../../../src/state/action-creators';
 import middleware from '../../../../../src/state/middleware/responders';
-import messagePreset from '../../../../../src/state/middleware/util/screen-reader-message-preset';
+import messagePreset from '../../../../../src/screen-reader-message-preset';
 import {
   preset,
   getDragStart,
   initialPublishArgs,
-} from '../../../../utils/preset-action-args';
+} from '../../../../util/preset-action-args';
 import createStore from '../util/create-store';
 import type {
   Responders,
-  Announce,
   DragUpdate,
   DropResult,
   ResponderProvided,
@@ -73,7 +72,6 @@ const end = (store: Store) => {
   store.dispatch(
     completeDrop({
       completed: getCompletedWithResult(result, store.getState()),
-      shouldFlush: false,
     }),
   );
 };
@@ -131,7 +129,7 @@ cases.forEach((current: Case) => {
     current.description ? `: ${current.description}` : ''
   }`, () => {
     let responders: Responders;
-    let announce: Announce;
+    let announce: JestMockFn<string[], void>;
     let store: Store;
 
     beforeEach(() => {
@@ -172,7 +170,7 @@ cases.forEach((current: Case) => {
     });
 
     it('should prevent async announcements', () => {
-      jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       let provided: ResponderProvided;
       responders[current.responder] = jest.fn(
@@ -187,7 +185,7 @@ cases.forEach((current: Case) => {
       // We did not announce so it would have been called with the default message
       expect(announce).toHaveBeenCalledWith(current.defaultMessage);
       expect(announce).toHaveBeenCalledTimes(1);
-      expect(console.warn).not.toHaveBeenCalled();
+      expect(warn).not.toHaveBeenCalled();
       announce.mockReset();
 
       // perform an async message
@@ -195,14 +193,14 @@ cases.forEach((current: Case) => {
       jest.runOnlyPendingTimers();
 
       expect(announce).not.toHaveBeenCalled();
-      expect(console.warn).toHaveBeenCalled();
+      expect(warn).toHaveBeenCalled();
 
       // cleanup
-      console.warn.mockRestore();
+      warn.mockRestore();
     });
 
     it('should prevent multiple announcement calls from a consumer', () => {
-      jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       let provided: ResponderProvided;
       responders[current.responder] = jest.fn(
@@ -217,7 +215,7 @@ cases.forEach((current: Case) => {
 
       expect(announce).toHaveBeenCalledWith('hello');
       expect(announce).toHaveBeenCalledTimes(1);
-      expect(console.warn).not.toHaveBeenCalled();
+      expect(warn).not.toHaveBeenCalled();
       announce.mockReset();
 
       // perform another announcement
@@ -225,9 +223,9 @@ cases.forEach((current: Case) => {
       provided.announce('another one');
 
       expect(announce).not.toHaveBeenCalled();
-      expect(console.warn).toHaveBeenCalled();
+      expect(warn).toHaveBeenCalled();
 
-      console.warn.mockRestore();
+      warn.mockRestore();
     });
   });
 });

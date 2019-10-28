@@ -1,10 +1,10 @@
 // @flow
-import invariant from 'tiny-invariant';
 import type {
   MappedProps,
   MapProps,
   DraggingMapProps,
 } from '../../../../../src/view/draggable/draggable-types';
+import { invariant } from '../../../../../src/invariant';
 
 export default (mapProps: MapProps): DraggingMapProps => {
   const mapped: MappedProps = mapProps.mapped;

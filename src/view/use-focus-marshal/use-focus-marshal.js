@@ -1,0 +1,129 @@
+// @flow
+import { useRef } from 'react';
+import { useMemo, useCallback } from 'use-memo-one';
+import type { DraggableId, ContextId } from '../../types';
+import type { FocusMarshal, Unregister } from './focus-marshal-types';
+import { dragHandle as dragHandleAttr } from '../data-attributes';
+import useLayoutEffect from '../use-isomorphic-layout-effect';
+import findDragHandle from '../get-elements/find-drag-handle';
+
+type Entry = {|
+  id: DraggableId,
+  focus: () => void,
+|};
+
+type EntryMap = {
+  [id: DraggableId]: Entry,
+};
+
+export default function useFocusMarshal(contextId: ContextId): FocusMarshal {
+  const entriesRef = useRef<EntryMap>({});
+  const recordRef = useRef<?DraggableId>(null);
+  const restoreFocusFrameRef = useRef<?AnimationFrameID>(null);
+  const isMountedRef = useRef<boolean>(false);
+
+  const register = useCallback(function register(
+    id: DraggableId,
+    focus: () => void,
+  ): Unregister {
+    const entry: Entry = { id, focus };
+    entriesRef.current[id] = entry;
+
+    return function unregister() {
+      const entries: EntryMap = entriesRef.current;
+      const current: Entry = entries[id];
+      // entry might have been overrided by another registration
+      if (current !== entry) {
+        delete entries[id];
+      }
+    };
+  },
+  []);
+
+  const tryGiveFocus = useCallback(
+    function tryGiveFocus(tryGiveFocusTo: DraggableId) {
+      const handle: ?HTMLElement = findDragHandle(contextId, tryGiveFocusTo);
+
+      if (handle && handle !== document.activeElement) {
+        handle.focus();
+      }
+    },
+    [contextId],
+  );
+
+  const tryShiftRecord = useCallback(function tryShiftRecord(
+    previous: DraggableId,
+    redirectTo: DraggableId,
+  ) {
+    if (recordRef.current === previous) {
+      recordRef.current = redirectTo;
+    }
+  },
+  []);
+
+  const tryRestoreFocusRecorded = useCallback(
+    function tryRestoreFocusRecorded() {
+      // frame already queued
+      if (restoreFocusFrameRef.current) {
+        return;
+      }
+
+      // cannot give focus if unmounted
+      // this code path is generally not hit expect for some hot-reloading flows
+      if (!isMountedRef.current) {
+        return;
+      }
+
+      restoreFocusFrameRef.current = requestAnimationFrame(() => {
+        restoreFocusFrameRef.current = null;
+        const record: ?DraggableId = recordRef.current;
+        if (record) {
+          tryGiveFocus(record);
+        }
+      });
+    },
+    [tryGiveFocus],
+  );
+
+  const tryRecordFocus = useCallback(function tryRecordFocus(id: DraggableId) {
+    // clear any existing record
+    recordRef.current = null;
+
+    const focused: ?Element = document.activeElement;
+
+    // no item focused so it cannot be our item
+    if (!focused) {
+      return;
+    }
+
+    // focused element is not a drag handle or does not have the right id
+    if (focused.getAttribute(dragHandleAttr.draggableId) !== id) {
+      return;
+    }
+
+    recordRef.current = id;
+  }, []);
+
+  useLayoutEffect(() => {
+    isMountedRef.current = true;
+    return function clearFrameOnUnmount() {
+      isMountedRef.current = false;
+      const frameId: ?AnimationFrameID = restoreFocusFrameRef.current;
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+      }
+    };
+  }, []);
+
+  const marshal: FocusMarshal = useMemo(
+    () => ({
+      register,
+      tryRecordFocus,
+      tryRestoreFocusRecorded,
+      tryShiftRecord,
+    }),
+    [register, tryRecordFocus, tryRestoreFocusRecorded, tryShiftRecord],
+  );
+
+  return marshal;
+}

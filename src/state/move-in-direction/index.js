@@ -69,7 +69,7 @@ export default ({ state, type }: Args): ?PublicResult => {
         viewport: state.viewport,
         previousClientSelection: state.current.client.selection,
         previousImpact: state.impact,
-        onLift: state.onLift,
+        afterCritical: state.afterCritical,
       })
     : moveCrossAxis({
         isMovingForward,
@@ -78,8 +78,7 @@ export default ({ state, type }: Args): ?PublicResult => {
         isOver,
         draggables,
         droppables,
-        previousImpact: state.impact,
         viewport: state.viewport,
-        onLift: state.onLift,
+        afterCritical: state.afterCritical,
       });
 };
