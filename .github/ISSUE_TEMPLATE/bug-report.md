@@ -1,7 +1,7 @@
 ---
 name: 🐛 Bug Report
 about: Bugs, missing documentation, or unexpected behavior 🤔.
-labels: "unconfirmed-bug, untriaged \U0001F469‍⚖️"
+labels: "unconfirmed-bug, untriaged"
 ---
 
 <!--
