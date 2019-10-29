@@ -1,7 +1,7 @@
 ---
 name: 💡Feature request
 about: Ideas and suggestions
-labels: "idea \U0001F914, untriaged \U0001F469‍⚖️"
+labels: "idea \U0001F914, untriaged"
 ---
 
 <!--
