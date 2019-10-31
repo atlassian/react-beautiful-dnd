@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { useMemo } from 'use-memo-one';
 import type { ContextId, ElementId } from '../../types';
 import getBodyElement from '../get-body-element';
-import visuallyHidden from '../visually-hidden-style';
 
 export const getId = (contextId: ContextId): string =>
   `rbd-lift-instruction-${contextId}`;
@@ -24,8 +23,8 @@ export default function useLiftInstruction(
       // add the description text
       el.textContent = liftInstruction;
 
-      // hide the element visually
-      Object.assign(el.style, visuallyHidden);
+      // prevent AT from idly reading it. Fixes #1568
+      Object.assign(el.style, { display: 'none' });
 
       // Add to body
       getBodyElement().appendChild(el);
