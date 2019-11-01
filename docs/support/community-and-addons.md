@@ -3,7 +3,7 @@
 ## Community ❤️👋
 
 - [kanban-dnd](https://kanban-dnd.glitch.me) - A Kanban style to-do list, with the ability to create custom lanes and reorder them on the fly.
-- [react-beautiful-dnd-test-utils](https://github.com/colinrcummings/react-beautiful-dnd-test-utils) - Test utils for `react-beautiful-dnd` buit with `react-testing-library`.
+- [react-beautiful-dnd-test-utils](https://github.com/colinrcummings/react-beautiful-dnd-test-utils) - 🧤 Test utils for `react-beautiful-dnd` built with `react-testing-library`.
 - Simple Trello - A simple cloning version of Trello, using React ecosystem.
   - [Demo](https://simple-trello.netlify.com/)
   - [Source](https://github.com/ng-hai/simple-trello)
