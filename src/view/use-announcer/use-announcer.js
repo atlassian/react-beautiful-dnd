@@ -1,7 +1,6 @@
 // @flow
 import { useRef, useEffect } from 'react';
 import { useMemo, useCallback } from 'use-memo-one';
-import { invariant } from '../../invariant';
 import type { Announce, ContextId } from '../../types';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';
@@ -16,9 +15,8 @@ export default function useAnnouncer(contextId: ContextId): Announce {
 
   useEffect(
     function setup() {
-      invariant(!ref.current, 'Announcement node already mounted');
-
       const el: HTMLElement = document.createElement('div');
+      // storing reference for usage in announce
       ref.current = el;
 
       // identifier
@@ -39,16 +37,13 @@ export default function useAnnouncer(contextId: ContextId): Announce {
       getBodyElement().appendChild(el);
 
       return function cleanup() {
-        // grabbing and clearing ref incase effect is about to run again
-        const toBeRemoved: ?HTMLElement = ref.current;
-        invariant(toBeRemoved, 'Cannot unmount announcement node');
-        ref.current = null;
+        // Not clearing the ref as it might be used by announce before the timeout expires
 
-        // unmounting after a timeout to let any annoucements
+        // unmounting after a timeout to let any announcements
         // during a mount be published
         setTimeout(function remove() {
-          // Remove from body
-          getBodyElement().removeChild(toBeRemoved);
+          // not clearing the ref as it might have been set by a new effect
+          getBodyElement().removeChild(el);
         });
       };
     },
