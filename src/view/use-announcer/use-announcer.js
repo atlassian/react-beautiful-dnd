@@ -44,6 +44,12 @@ export default function useAnnouncer(contextId: ContextId): Announce {
         setTimeout(function remove() {
           // not clearing the ref as it might have been set by a new effect
           getBodyElement().removeChild(el);
+
+          // if el was the current ref - clear it so that
+          // we can get a warning if announce is called
+          if (el === ref.current) {
+            ref.current = null;
+          }
         });
       };
     },
