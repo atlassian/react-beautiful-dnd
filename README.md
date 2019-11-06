@@ -28,9 +28,9 @@
 
 ## Get started 👩‍🏫
 
-We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd?af=2jc3e4) to help you get started with `react-beautiful-dnd` as quickly as possible.
+We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help you get started with `react-beautiful-dnd` as quickly as possible.
 
-[![course-logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd?af=2jc3e4)
+[![course-logo](https://user-images.githubusercontent.com/2182637/43372837-8c72d3f8-93e8-11e8-9d92-a82adde7718f.png)](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
 
 ## Currently supported feature set ✅
 
@@ -75,7 +75,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 
 - [Installation](/docs/about/installation.md)
 - [Examples and samples](/docs/about/examples.md)
-- [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd?af=2jc3e4)
+- [Get started](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd)
 - [Design principles](/docs/about/design-principles.md)
 - [Animations](/docs/about/animations.md)
 - [Accessibility](/docs/about/accessibility.md)
