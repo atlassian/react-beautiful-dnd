@@ -30,6 +30,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 
 ## Newsletters
 
+- Tiny letter [November 04, 2019](https://tinyletter.com/cassidoo/letters/the-world-is-changed-by-your-example-not-by-your-opinion-paulo-coelho)
 - Ponyfoo [issue 78](https://ponyfoo.com/weekly/78/javascript-and-css-engines-pwa-drag-and-drop-web-components-and-http-2)
 - PonyFoo [issue 99](https://ponyfoo.com/weekly/99/react-across-the-universe-typography-load-balancing-and-javascript-frameworks)
 - PonyFoo [issue 141](https://ponyfoo.com/weekly/141/http-3-bgp-leaks-react-as-native-dom-typescript-tensorflow-and-all-things-performance)

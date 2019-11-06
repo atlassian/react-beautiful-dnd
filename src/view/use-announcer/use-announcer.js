@@ -14,42 +14,46 @@ export default function useAnnouncer(contextId: ContextId): Announce {
   const id: string = useMemo(() => getId(contextId), [contextId]);
   const ref = useRef<?HTMLElement>(null);
 
-  useEffect(() => {
-    invariant(!ref.current, 'Announcement node already mounted');
+  useEffect(
+    function setup() {
+      invariant(!ref.current, 'Announcement node already mounted');
 
-    const el: HTMLElement = document.createElement('div');
-    ref.current = el;
+      const el: HTMLElement = document.createElement('div');
+      ref.current = el;
 
-    // identifier
-    el.id = id;
+      // identifier
+      el.id = id;
 
-    // Aria live region
+      // Aria live region
 
-    // will force itself to be read
-    el.setAttribute('aria-live', 'assertive');
-    el.setAttribute('role', 'log');
-    // must read the whole thing every time
-    el.setAttribute('aria-atomic', 'true');
+      // will force itself to be read
+      el.setAttribute('aria-live', 'assertive');
+      el.setAttribute('role', 'log');
+      // must read the whole thing every time
+      el.setAttribute('aria-atomic', 'true');
 
-    // hide the element visually
-    Object.assign(el.style, visuallyHidden);
+      // hide the element visually
+      Object.assign(el.style, visuallyHidden);
 
-    // Add to body
-    getBodyElement().appendChild(el);
+      // Add to body
+      getBodyElement().appendChild(el);
 
-    return () => {
-      // unmounting after a timeout to let any annoucements
-      // during a mount be published
-      setTimeout(function remove() {
+      return function cleanup() {
+        // grabbing and clearing ref incase effect is about to run again
         const toBeRemoved: ?HTMLElement = ref.current;
         invariant(toBeRemoved, 'Cannot unmount announcement node');
-
-        // Remove from body
-        getBodyElement().removeChild(toBeRemoved);
         ref.current = null;
-      });
-    };
-  }, [id]);
+
+        // unmounting after a timeout to let any annoucements
+        // during a mount be published
+        setTimeout(function remove() {
+          // Remove from body
+          getBodyElement().removeChild(toBeRemoved);
+        });
+      };
+    },
+    [id],
+  );
 
   const announce: Announce = useCallback((message: string): void => {
     const el: ?HTMLElement = ref.current;
