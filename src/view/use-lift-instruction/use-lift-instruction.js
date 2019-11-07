@@ -23,7 +23,8 @@ export default function useLiftInstruction(
       // add the description text
       el.textContent = liftInstruction;
 
-      // prevent AT from idly reading it. Fixes #1568
+// Visually hide the element and prevent screen readers from reading this element in the document flow
+// This element is used as a `aria-labelledby` reference for *other elements* and will be read out for those
       Object.assign(el.style, { display: 'none' });
 
       // Add to body
