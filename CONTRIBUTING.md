@@ -40,7 +40,7 @@ The online courses listed are no free - feel free to seek out alternatives if yo
 This is a `React` project so getting familiar with `React` is a must!
 
 - [`react`](https://facebook.github.io/react/)
-- [An intro to using React](https://egghead.io/courses/start-using-react-to-build-web-applications?af=2jc3e4)
+- [An intro to using React](https://egghead.io/courses/start-using-react-to-build-web-applications)
 
 #### `Redux`
 
@@ -57,8 +57,8 @@ This project uses `redux` for its state management. If you have not used `redux`
 We test our application very thoroughly. Changes will not be accepted without tests
 
 - [`jest`](https://facebook.github.io/jest/): We use the jest test runner. It is worth getting familiar with it
-- [Test JavaScript with Jest](https://egghead.io/lessons/javascript-test-javascript-with-jest?af=2jc3e4)
-- [React Testing Cookbook](https://egghead.io/courses/react-testing-cookbook?af=2jc3e4)
+- [Test JavaScript with Jest](https://egghead.io/lessons/javascript-test-javascript-with-jest)
+- [React Testing Cookbook](https://egghead.io/courses/react-testing-cookbook)
 
 #### Performance
 
@@ -75,7 +75,7 @@ Performance is **critical** to this project. Please get familiar with React perf
 This codebase is typed with [`flow`](https://flow.org/). Changes will not be merged without correct flow typing. If you are not sure about a particular use case let flow break the build and it can be discussed in the pull request.
 
 - [`flow`](https://flow.org/en/docs/getting-started/): the `flow` docs are great
-- [Up and Running with Facebook Flow for Typed JavaScript](https://egghead.io/lessons/javascript-up-and-running-with-facebook-flow-for-typed-javascript?af=2jc3e4): a small primer for running flow
+- [Up and Running with Facebook Flow for Typed JavaScript](https://egghead.io/lessons/javascript-up-and-running-with-facebook-flow-for-typed-javascript): a small primer for running flow
 
 ### Drag and drop problem space
 
