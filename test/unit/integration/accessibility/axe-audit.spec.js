@@ -14,6 +14,7 @@ it('should not fail an aXe audit', async () => {
 
   const results = await axe(document.body);
 
+// $FlowFixMe - flow doesn't know about hte custom validator
   expect(results).toHaveNoViolations();
 
   cleanup();
