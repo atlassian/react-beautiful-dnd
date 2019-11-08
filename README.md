@@ -112,7 +112,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 - [Auto scrolling](/docs/guides/auto-scrolling.md)
 - [Controlling the screen reader](/docs/guides/screen-reader.md)
 - [Use the html5 `doctype`](/docs/guides/doctype.md)
-- [`TypeScript` and `flow`](/docs/guides/types.md)
+- [`TypeScript` and `flow`: type information](/docs/guides/types.md)
 - [Dragging `<svg>`s](/docs/guides/dragging-svgs.md)
 - [Avoiding image flickering](/docs/guides/avoiding-image-flickering.md)
 - [Non-visible preset styles](/docs/guides/preset-styles.md)
