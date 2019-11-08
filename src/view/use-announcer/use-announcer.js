@@ -1,7 +1,6 @@
 // @flow
 import { useRef, useEffect } from 'react';
 import { useMemo, useCallback } from 'use-memo-one';
-import { invariant } from '../../invariant';
 import type { Announce, ContextId } from '../../types';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';
@@ -14,42 +13,48 @@ export default function useAnnouncer(contextId: ContextId): Announce {
   const id: string = useMemo(() => getId(contextId), [contextId]);
   const ref = useRef<?HTMLElement>(null);
 
-  useEffect(() => {
-    invariant(!ref.current, 'Announcement node already mounted');
+  useEffect(
+    function setup() {
+      const el: HTMLElement = document.createElement('div');
+      // storing reference for usage in announce
+      ref.current = el;
 
-    const el: HTMLElement = document.createElement('div');
-    ref.current = el;
+      // identifier
+      el.id = id;
 
-    // identifier
-    el.id = id;
+      // Aria live region
 
-    // Aria live region
+      // will force itself to be read
+      el.setAttribute('aria-live', 'assertive');
+      el.setAttribute('role', 'log');
+      // must read the whole thing every time
+      el.setAttribute('aria-atomic', 'true');
 
-    // will force itself to be read
-    el.setAttribute('aria-live', 'assertive');
-    el.setAttribute('role', 'log');
-    // must read the whole thing every time
-    el.setAttribute('aria-atomic', 'true');
+      // hide the element visually
+      Object.assign(el.style, visuallyHidden);
 
-    // hide the element visually
-    Object.assign(el.style, visuallyHidden);
+      // Add to body
+      getBodyElement().appendChild(el);
 
-    // Add to body
-    getBodyElement().appendChild(el);
+      return function cleanup() {
+        // Not clearing the ref as it might be used by announce before the timeout expires
 
-    return () => {
-      // unmounting after a timeout to let any annoucements
-      // during a mount be published
-      setTimeout(function remove() {
-        const toBeRemoved: ?HTMLElement = ref.current;
-        invariant(toBeRemoved, 'Cannot unmount announcement node');
+        // unmounting after a timeout to let any announcements
+        // during a mount be published
+        setTimeout(function remove() {
+          // not clearing the ref as it might have been set by a new effect
+          getBodyElement().removeChild(el);
 
-        // Remove from body
-        getBodyElement().removeChild(toBeRemoved);
-        ref.current = null;
-      });
-    };
-  }, [id]);
+          // if el was the current ref - clear it so that
+          // we can get a warning if announce is called
+          if (el === ref.current) {
+            ref.current = null;
+          }
+        });
+      };
+    },
+    [id],
+  );
 
   const announce: Announce = useCallback((message: string): void => {
     const el: ?HTMLElement = ref.current;
