@@ -36,6 +36,8 @@ export default (marshal: DimensionMarshal) => ({
   dispatch(flush());
 
   // Let consumers know we are just about to publish
+  // We are only publishing a small amount of information as
+  // things might change as a result of the onBeforeCapture callback
   dispatch(beforeInitialCapture({ draggableId: id, movementMode }));
 
   // will communicate with the marshal to start requesting dimensions
