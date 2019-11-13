@@ -147,7 +147,6 @@ export default function AddingThings() {
             )}
           </Droppable>
         </Tasks>
-
         {isShowingBin ? (
           <Bin>
             <ListTitle>
