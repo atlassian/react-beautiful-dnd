@@ -82,7 +82,7 @@ export default ({
       draggable,
       destination,
       insideDestination,
-      previousImpact,
+      last: previousImpact.displaced,
       viewport,
       userDirection,
       afterCritical,

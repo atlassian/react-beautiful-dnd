@@ -1,6 +1,7 @@
 // @flow
 import { type Position, type Rect } from 'css-box-model';
 import type {
+  DraggableId,
   DraggableDimension,
   DroppableDimension,
   DragImpact,
@@ -11,8 +12,11 @@ import type {
   DisplacedBy,
   LiftEffect,
 } from '../../types';
+import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import removeDraggableFromList from '../remove-draggable-from-list';
+import isHomeOf from '../droppable/is-home-of';
+import { find } from '../../native-with-fallback';
 import getDidStartAfterCritical from '../did-start-after-critical';
 import calculateReorderImpact from '../calculate-drag-impact/calculate-reorder-impact';
 
@@ -21,10 +25,10 @@ type Args = {|
   draggable: DraggableDimension,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
+  last: DisplacementGroups,
   viewport: Viewport,
   userDirection: UserDirection,
   afterCritical: LiftEffect,
-  previousImpact: DragImpact,
 |};
 
 type AtIndexArgs = {|
@@ -33,16 +37,37 @@ type AtIndexArgs = {|
   inHomeList: boolean,
 |};
 
+function atIndex({ draggable, closest, inHomeList }: AtIndexArgs): ?number {
+  if (!closest) {
+    return null;
+  }
+
+  if (!inHomeList) {
+    return closest.descriptor.index;
+  }
+
+  if (closest.descriptor.index > draggable.descriptor.index) {
+    return closest.descriptor.index - 1;
+  }
+
+  return closest.descriptor.index;
+}
+
 export default ({
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
   draggable,
   destination,
   insideDestination,
+  last,
   viewport,
+  userDirection,
   afterCritical,
-  previousImpact,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
+  const isMovingForward: boolean = isUserMovingForward(
+    destination.axis,
+    userDirection,
+  );
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
@@ -55,63 +80,61 @@ export default ({
     insideDestination,
   );
 
-  // Determine the current index of the target within the list.
-  // This will either be the index of the previous impact destination or if
-  // there hasn't been a previous impact yet fallback to the initial index
-  // of the draggable.
-  const prevDest =
-    previousImpact && previousImpact.at && previousImpact.at.destination;
-  const initialIndex = draggable.descriptor.index;
-  const targetIndex = prevDest ? prevDest.index : initialIndex;
-
   // Calculate the current start and end positions of the target item.
   const offset = displacement / 2;
   const targetStart = targetCenter - offset;
   const targetEnd = targetCenter + offset;
 
-  // Initialize the newIndex to the current index of the target.
-  // If no updated index is found in the loop below then the `newIndex` will
-  // remain unchanged i.e. maintaining the current index of the target item.
-  let newIndex = targetIndex;
+  const closest: ?DraggableDimension = find(
+    withoutDragging,
+    (child: DraggableDimension): boolean => {
+      const id: DraggableId = child.descriptor.id;
+      const borderBox: Rect = child.page.borderBox;
+      const childCenter: number = borderBox.center[axis.line];
 
-  // Loop through all items in the list excluding the current target item
-  for (let i = 0; i < withoutDragging.length; i++) {
-    const child = withoutDragging[i];
+      // Adding a threshold amount before and after the center to create a buffer area
+      // where combining can occur without triggering a reorder
+      const centerThreshold: number = borderBox[axis.size] * 0.1;
+      const childCenterStart: number = childCenter - centerThreshold;
+      const childCenterEnd: number = childCenter + centerThreshold;
 
-    // The `withoutDragging` list does not include the target item, so for all
-    // elements after the target in the list shift the index forward by 1
-    const listIndex = i >= targetIndex ? i + 1 : i;
+      const didStartAfterCritical: boolean = getDidStartAfterCritical(
+        id,
+        afterCritical,
+      );
 
-    // Determine whether the child has been reordered, i.e. whether the child
-    // is currently ordered before the target in the list but was initially after,
-    // or is currently ordered after the target and started before.
-    const startedAfter = getDidStartAfterCritical(
-      child.descriptor.id,
-      afterCritical,
-    );
-    const isAfter = listIndex > targetIndex;
-    const hasReordered = startedAfter !== isAfter;
+      // Moving forward will decrease the amount of things needed to be displaced
+      if (isMovingForward) {
+        if (didStartAfterCritical) {
+          // if started displaced then its displaced position is its resting position
+          // continue to keep the item at rest until we cross beyond the end point of the
+          // center area of the item
+          return targetEnd < childCenterEnd;
+        }
+        // if the item did not start displaced then we displace the item
+        // while we have still not crossed into the center area of the item
+        return targetEnd < childCenterEnd + displacement;
+      }
 
-    // If the child has been reordered then the center position will have been
-    // shifted back/forward by the displacement size of the target item.
-    // To get the current center position of the child item adding or subtract
-    // the displacement size from the center position based on whether the target
-    // was initially before or after the item.
-    const childDisplacement = startedAfter ? -displacement : displacement;
-    const boxCenter = child.page.borderBox.center[axis.line];
-    const center = boxCenter + (hasReordered ? childDisplacement : 0);
+      // Moving backwards will increase the amount of things needed to be displaced
+      // The logic for this works by looking at assuming everything has been displaced
+      // backwards and then looking at how you would undo that
 
-    // Check if the target item belongs at the child items index based on whether:
-    // A: The target start position is less than the center of the child and the
-    // child is before the target in the list.
-    // or
-    // B: The target end position is greater than the center of the child and the
-    // child is after the target in the list.
-    if ((targetStart < center && !isAfter) || (targetEnd > center && isAfter)) {
-      newIndex = listIndex;
-      break;
-    }
-  }
+      if (didStartAfterCritical) {
+        // we continue to displace the item until we move back over the center of the item without displacement
+        return targetStart <= childCenterStart - displacement;
+      }
+
+      // a non-displaced item is at rest. when we hit the item from the bottom we move it out of the way
+      return targetStart <= childCenterStart;
+    },
+  );
+
+  const newIndex: ?number = atIndex({
+    draggable,
+    closest,
+    inHomeList: isHomeOf(draggable, destination),
+  });
 
   // TODO: index cannot be null?
   // otherwise return null from there and return empty impact
@@ -121,7 +144,7 @@ export default ({
     insideDestination,
     destination,
     viewport,
-    last: previousImpact.displaced,
+    last,
     displacedBy,
     index: newIndex,
   });
