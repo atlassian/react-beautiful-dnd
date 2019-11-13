@@ -402,6 +402,7 @@ export type ResponderProvided = {|
   announce: Announce,
 |};
 
+export type OnBeforeCaptureResponder = ({ draggableId: DraggableId }) => mixed;
 export type OnBeforeDragStartResponder = (start: DragStart) => mixed;
 export type OnDragStartResponder = (
   start: DragStart,
@@ -417,6 +418,7 @@ export type OnDragEndResponder = (
 ) => mixed;
 
 export type Responders = {|
+  onBeforeCapture?: OnBeforeCaptureResponder,
   onBeforeDragStart?: OnBeforeDragStartResponder,
   onDragStart?: OnDragStartResponder,
   onDragUpdate?: OnDragUpdateResponder,

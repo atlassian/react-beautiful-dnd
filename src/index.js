@@ -26,6 +26,7 @@ export type {
   ResponderProvided,
   Announce,
   DraggableLocation,
+  OnBeforeCaptureResponder,
   OnBeforeDragStartResponder,
   OnDragStartResponder,
   OnDragUpdateResponder,

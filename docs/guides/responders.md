@@ -6,19 +6,19 @@ Responders are top level application events that you can use to perform your own
 
 > For more information about controlling the screen reader see our [screen reader guide](/docs/guides/screen-reader.md)
 
-## What responders are available?
+## Life cycle
 
-### Primary
-
-- `onDragStart`: A drag has started
-- `onDragUpdate`: Something has changed during a drag
-- `onDragEnd` **(required)**: A drag has ended. It is the responsibility of this responder to synchronously apply changes that has resulted from the drag
+1. `onBeforeCapture`: a drag is about to start but dimensions have not been collected from the DOM
+2. `onBeforeDragStart`: a drag is about to start and dimensions have already been captured from the DOM
+3. `onDragStart`: A drag has started
+4. `onDragUpdate`: Something has changed during a drag
+5. `onDragEnd` **(required)**: A drag has ended. It is the responsibility of this responder to synchronously apply changes that has resulted from the drag
 
 ### Secondary
 
 > Generally you will not need to use `onBeforeDragStart`, and it has a slightly different function signature to the rest of the responders
 
-- `onBeforeDragStart`: Called just before `onDragStart`. It is called immediately before any `snapshot` values are updated. It can be useful to do dimension locking for [table reordering](/docs/patterns/tables.md).
+- `onBeforeDragStart`: Called just before `onDragStart`. It is called immediately before any `snapshot` values are updated. .
 
 ## The second argument to responders: `provided: ResponderProvided`
 
@@ -182,6 +182,10 @@ type OnBeforeDragStartResponder = (start: DragStart) => mixed;
 
 - User initiates a drag
 - We prepare and collect information required for the drag (async). If the drag ends before this phase is completed then no responders will be fired.
+
+### Phase 2: collection
+
+[TODO](TODO)
 
 ### Phase 2: publish
 
