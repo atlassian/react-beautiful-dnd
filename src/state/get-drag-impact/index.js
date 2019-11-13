@@ -84,7 +84,6 @@ export default ({
       insideDestination,
       last: previousImpact.displaced,
       viewport,
-      userDirection,
       afterCritical,
     })
   );

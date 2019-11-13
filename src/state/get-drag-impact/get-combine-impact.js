@@ -38,6 +38,7 @@ type IsCombiningWithArgs = {|
   id: DraggableId,
   currentCenter: Position,
   axis: Axis,
+  draggableBox: Rect,
   borderBox: Rect,
   displaceBy: Position,
   currentUserDirection: UserDirection,
@@ -48,15 +49,21 @@ const isCombiningWith = ({
   id,
   currentCenter,
   axis,
+  draggableBox,
   borderBox,
   displaceBy,
   currentUserDirection,
   lastCombineImpact,
 }: IsCombiningWithArgs): boolean => {
-  const start: number = borderBox[axis.start] + displaceBy[axis.line];
-  const end: number = borderBox[axis.end] + displaceBy[axis.line];
-  const size: number = borderBox[axis.size];
-  const twoThirdsOfSize: number = size * 0.666;
+  const boxCenter: number = borderBox.center[axis.line] + displaceBy[axis.line];
+  const centerThreshold: number = borderBox[axis.size] * 0.45;
+  const boxCenterStart: number = boxCenter - centerThreshold;
+  const boxCenterEnd: number = boxCenter + centerThreshold;
+
+  const targetCenter: number = currentCenter[axis.line];
+  const offset: number = draggableBox[axis.size] / 2;
+  const targetStart: number = targetCenter - offset;
+  const targetEnd: number = targetCenter + offset;
 
   const whenEntered: UserDirection = getWhenEntered(
     id,
@@ -64,14 +71,14 @@ const isCombiningWith = ({
     lastCombineImpact,
   );
   const isMovingForward: boolean = isUserMovingForward(axis, whenEntered);
-  const targetCenter: number = currentCenter[axis.line];
 
-  if (isMovingForward) {
-    // combine when moving in the front 2/3 of the item
-    return isWithin(start, start + twoThirdsOfSize)(targetCenter);
-  }
-  // combine when moving in the back 2/3 of the item
-  return isWithin(end - twoThirdsOfSize, end)(targetCenter);
+  // combine when the target is moving forward and the end of the target is within the front
+  // threshold area of the item, or when the target is moving backward and the start of the
+  // target is within the back threshold area of the item
+  return (
+    (isMovingForward && isWithin(boxCenterStart, boxCenter)(targetEnd)) ||
+    (!isMovingForward && isWithin(boxCenter, boxCenterEnd)(targetStart))
+  );
 };
 
 function tryGetCombineImpact(impact: DragImpact): ?CombineImpact {
@@ -127,6 +134,7 @@ export default ({
         id,
         currentCenter,
         axis,
+        draggableBox: draggable.page.borderBox,
         borderBox: child.page.borderBox,
         displaceBy,
         currentUserDirection: userDirection,

@@ -8,11 +8,9 @@ import type {
   Axis,
   DisplacementGroups,
   Viewport,
-  UserDirection,
   DisplacedBy,
   LiftEffect,
 } from '../../types';
-import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import removeDraggableFromList from '../remove-draggable-from-list';
 import isHomeOf from '../droppable/is-home-of';
@@ -27,7 +25,6 @@ type Args = {|
   insideDestination: DraggableDimension[],
   last: DisplacementGroups,
   viewport: Viewport,
-  userDirection: UserDirection,
   afterCritical: LiftEffect,
 |};
 
@@ -60,14 +57,9 @@ export default ({
   insideDestination,
   last,
   viewport,
-  userDirection,
   afterCritical,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
-  const isMovingForward: boolean = isUserMovingForward(
-    destination.axis,
-    userDirection,
-  );
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
@@ -81,7 +73,7 @@ export default ({
   );
 
   // Calculate the current start and end positions of the target item.
-  const offset = displacement / 2;
+  const offset = draggable.page.borderBox[axis.size] / 2;
   const targetStart = targetCenter - offset;
   const targetEnd = targetCenter + offset;
 
@@ -92,41 +84,16 @@ export default ({
       const borderBox: Rect = child.page.borderBox;
       const childCenter: number = borderBox.center[axis.line];
 
-      // Adding a threshold amount before and after the center to create a buffer area
-      // where combining can occur without triggering a reorder
-      const centerThreshold: number = borderBox[axis.size] * 0.1;
-      const childCenterStart: number = childCenter - centerThreshold;
-      const childCenterEnd: number = childCenter + centerThreshold;
-
       const didStartAfterCritical: boolean = getDidStartAfterCritical(
         id,
         afterCritical,
       );
 
-      // Moving forward will decrease the amount of things needed to be displaced
-      if (isMovingForward) {
-        if (didStartAfterCritical) {
-          // if started displaced then its displaced position is its resting position
-          // continue to keep the item at rest until we cross beyond the end point of the
-          // center area of the item
-          return targetEnd < childCenterEnd;
-        }
-        // if the item did not start displaced then we displace the item
-        // while we have still not crossed into the center area of the item
-        return targetEnd < childCenterEnd + displacement;
-      }
-
-      // Moving backwards will increase the amount of things needed to be displaced
-      // The logic for this works by looking at assuming everything has been displaced
-      // backwards and then looking at how you would undo that
-
       if (didStartAfterCritical) {
-        // we continue to displace the item until we move back over the center of the item without displacement
-        return targetStart <= childCenterStart - displacement;
+        return (targetStart <= childCenter - displacement) || (targetEnd < childCenter);
       }
 
-      // a non-displaced item is at rest. when we hit the item from the bottom we move it out of the way
-      return targetStart <= childCenterStart;
+      return (targetEnd < childCenter + displacement) || (targetStart <= childCenter);
     },
   );
 
