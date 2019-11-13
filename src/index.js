@@ -19,6 +19,7 @@ export type {
   DroppableId,
   DraggableRubric,
   MovementMode,
+  BeforeCapture,
   DragStart,
   DragUpdate,
   DropResult,

@@ -36,7 +36,7 @@ export default (marshal: DimensionMarshal) => ({
   dispatch(flush());
 
   // Let consumers know we are just about to publish
-  dispatch(beforeInitialCapture(id));
+  dispatch(beforeInitialCapture({ draggableId: id, movementMode }));
 
   // will communicate with the marshal to start requesting dimensions
   const scrollOptions: ScrollOptions = {

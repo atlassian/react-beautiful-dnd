@@ -12,18 +12,21 @@ import type {
   Published,
 } from '../types';
 
+type BeforeInitialCaptureArgs = {|
+  draggableId: DraggableId,
+  movementMode: MovementMode,
+|};
+
 export type BeforeInitialCaptureAction = {|
   type: 'BEFORE_INITIAL_CAPTURE',
-  payload: {|
-    draggableId: DraggableId,
-  |},
+  payload: BeforeInitialCaptureArgs,
 |};
 
 export const beforeInitialCapture = (
-  draggableId: DraggableId,
+  args: BeforeInitialCaptureArgs,
 ): BeforeInitialCaptureAction => ({
   type: 'BEFORE_INITIAL_CAPTURE',
-  payload: { draggableId },
+  payload: args,
 });
 
 export type LiftArgs = {|

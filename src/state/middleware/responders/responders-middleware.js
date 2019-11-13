@@ -27,7 +27,10 @@ export default (
     action: Action,
   ): any => {
     if (action.type === 'BEFORE_INITIAL_CAPTURE') {
-      publisher.beforeCapture(action.payload.draggableId);
+      publisher.beforeCapture(
+        action.payload.draggableId,
+        action.payload.movementMode,
+      );
       return;
     }
 

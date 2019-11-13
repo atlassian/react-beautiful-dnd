@@ -11,6 +11,7 @@ import type {
   Responders,
   ResponderProvided,
   Critical,
+  BeforeCapture,
   DragImpact,
   DraggableLocation,
   Combine,
@@ -85,7 +86,7 @@ export default (getResponders: () => Responders, announce: Announce) => {
   const asyncMarshal: AsyncMarshal = getAsyncMarshal();
   let dragging: ?WhileDragging = null;
 
-  const beforeCapture = (draggableId: DraggableId) => {
+  const beforeCapture = (draggableId: DraggableId, mode: MovementMode) => {
     invariant(
       !dragging,
       'Cannot fire onBeforeCapture as a drag start has already been published',
@@ -94,7 +95,11 @@ export default (getResponders: () => Responders, announce: Announce) => {
       // No use of screen reader for this responder
       const fn: ?OnBeforeCaptureResponder = getResponders().onBeforeCapture;
       if (fn) {
-        fn({ draggableId });
+        const before: BeforeCapture = {
+          draggableId,
+          mode,
+        };
+        fn(before);
       }
     });
   };
