@@ -14,6 +14,7 @@ const expandedMouse = {
       clientY: point.y + sloppyClickThreshold,
     });
   },
+  // no batching of events with .act by testing libray
   rawPowerLift: (handle: HTMLElement, point: Position) => {
     const mousedown: MouseEvent = new MouseEvent('mousedown', {
       bubbles: true,
