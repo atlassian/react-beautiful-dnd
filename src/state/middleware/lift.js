@@ -3,7 +3,12 @@ import { invariant } from '../../invariant';
 import type { DimensionMarshal } from '../dimension-marshal/dimension-marshal-types';
 import type { State, ScrollOptions, LiftRequest } from '../../types';
 import type { MiddlewareStore, Action, Dispatch } from '../store-types';
-import { completeDrop, initialPublish, flush } from '../action-creators';
+import {
+  completeDrop,
+  initialPublish,
+  flush,
+  beforeInitialCapture,
+} from '../action-creators';
 import validateDimensions from './util/validate-dimensions';
 
 export default (marshal: DimensionMarshal) => ({
@@ -29,6 +34,11 @@ export default (marshal: DimensionMarshal) => ({
 
   // Removing any placeholders before we capture any starting dimensions
   dispatch(flush());
+
+  // Let consumers know we are just about to publish
+  // We are only publishing a small amount of information as
+  // things might change as a result of the onBeforeCapture callback
+  dispatch(beforeInitialCapture({ draggableId: id, movementMode }));
 
   // will communicate with the marshal to start requesting dimensions
   const scrollOptions: ScrollOptions = {

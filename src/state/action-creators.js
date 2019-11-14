@@ -12,6 +12,23 @@ import type {
   Published,
 } from '../types';
 
+export type BeforeInitialCaptureArgs = {|
+  draggableId: DraggableId,
+  movementMode: MovementMode,
+|};
+
+export type BeforeInitialCaptureAction = {|
+  type: 'BEFORE_INITIAL_CAPTURE',
+  payload: BeforeInitialCaptureArgs,
+|};
+
+export const beforeInitialCapture = (
+  args: BeforeInitialCaptureArgs,
+): BeforeInitialCaptureAction => ({
+  type: 'BEFORE_INITIAL_CAPTURE',
+  payload: args,
+});
+
 export type LiftArgs = {|
   // lifting with DraggableId rather than descriptor
   // as the descriptor might change after a drop is flushed
@@ -286,6 +303,7 @@ export const dropAnimationFinished = (): DropAnimationFinishedAction => ({
 });
 
 export type Action =
+  | BeforeInitialCaptureAction
   | LiftAction
   | InitialPublishAction
   | WhileDraggingPublishAction

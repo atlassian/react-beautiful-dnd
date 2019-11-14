@@ -16,6 +16,7 @@ import type {
 import type {
   DropCompleteArgs,
   InitialPublishArgs,
+  BeforeInitialCaptureArgs,
   LiftArgs,
   AnimateDropArgs,
 } from '../../src/state/action-creators';
@@ -48,6 +49,11 @@ const clientSelection: Position = preset.inHome1.client.borderBox.center;
 export const liftArgs: LiftArgs = {
   id: critical.draggable.id,
   clientSelection,
+  movementMode: 'FLUID',
+};
+
+export const beforeCaptureArgs: BeforeInitialCaptureArgs = {
+  draggableId: critical.draggable.id,
   movementMode: 'FLUID',
 };
 

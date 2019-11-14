@@ -12,6 +12,7 @@ import type {
   DroppableId,
   DragStart,
   DropResult,
+  BeforeCapture,
 } from '../../../src/types';
 import type { Provided as DraggableProvided } from '../../../src/view/draggable/draggable-types';
 import type { Provided as DroppableProvided } from '../../../src/view/droppable/droppable-types';
@@ -49,6 +50,7 @@ type Props = {|
 function App({ responders }: Props) {
   return (
     <DragDropContext
+      onBeforeCapture={responders.onBeforeCapture}
       onBeforeDragStart={responders.onBeforeDragStart}
       onDragStart={responders.onDragStart}
       onDragUpdate={responders.onDragUpdate}
@@ -93,6 +95,7 @@ describe('responders integration', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     responders = {
+      onBeforeCapture: jest.fn(),
       onBeforeDragStart: jest.fn(),
       onDragStart: jest.fn(),
       onDragUpdate: jest.fn(),
@@ -189,8 +192,25 @@ describe('responders integration', () => {
       reason: 'CANCEL',
     };
 
-    return { start, completed, cancelled };
+    const beforeCapture: BeforeCapture = {
+      draggableId: start.draggableId,
+      mode: 'FLUID',
+    };
+
+    return { beforeCapture, start, completed, cancelled };
   })();
+
+  const wasOnBeforeCaptureCalled = (
+    amountOfDrags?: number = 1,
+    provided?: Responders = responders,
+  ) => {
+    invariant(provided.onBeforeCapture);
+    expect(provided.onBeforeCapture).toHaveBeenCalledTimes(amountOfDrags);
+    // $ExpectError - mock property
+    expect(provided.onBeforeCapture.mock.calls[amountOfDrags - 1][0]).toEqual(
+      expected.beforeCapture,
+    );
+  };
 
   const wasOnBeforeDragCalled = (
     amountOfDrags?: number = 1,
@@ -237,6 +257,17 @@ describe('responders integration', () => {
       expected.cancelled,
     );
   };
+
+  describe('before capture', () => {
+    it('should call the onBeforeDragCapture responder just before the drag starts', () => {
+      drag.start();
+
+      wasOnBeforeCaptureCalled();
+
+      // cleanup
+      drag.stop();
+    });
+  });
 
   describe('before drag start', () => {
     it('should call the onBeforeDragStart responder just before the drag starts', () => {

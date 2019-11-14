@@ -44,6 +44,7 @@ export default function DragDropContext(props: Props) {
           liftInstruction={liftInstruction}
           enableDefaultSensors={props.enableDefaultSensors}
           sensors={props.sensors}
+          onBeforeCapture={props.onBeforeCapture}
           onBeforeDragStart={props.onBeforeDragStart}
           onDragStart={props.onDragStart}
           onDragUpdate={props.onDragUpdate}

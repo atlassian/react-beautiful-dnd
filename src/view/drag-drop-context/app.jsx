@@ -66,6 +66,7 @@ export type Props = {|
 |};
 
 const createResponders = (props: Props): Responders => ({
+  onBeforeCapture: props.onBeforeCapture,
   onBeforeDragStart: props.onBeforeDragStart,
   onDragStart: props.onDragStart,
   onDragEnd: props.onDragEnd,
