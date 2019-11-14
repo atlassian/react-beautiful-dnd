@@ -57,7 +57,7 @@ This responder is called after we know a drag will start, but before any dimensi
 > ⚠️ Misuse of this responder can lead to some terrible user interactions. You should not change the visible position of the dragging item to change as a result of your changes here. Keep in mind that if you remove the dragging item or it's
 
 ```js
-// We cannot give more information then this because things might change
+// We cannot give more information than this because things might change
 type BeforeCapture = {|
   draggableId: DraggableId,
   mode: MovementMode,
