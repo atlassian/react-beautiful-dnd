@@ -8,7 +8,6 @@ import {
   Droppable,
   Draggable,
   type DropResult,
-  type DraggableId,
 } from '../../../src';
 import { grid } from '../constants';
 import reorder from '../reorder';
