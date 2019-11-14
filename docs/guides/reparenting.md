@@ -38,21 +38,23 @@ function List(props) {
         </div>
       )}
     >
-      <div ref={provided.innerRef} {...provided.droppableProps}>
-        {items.map(item) => (
-          <Draggable draggableId={item.id} index={item.index}>
-            {(provided, snapshot) => (
-              <div
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-                ref={provided.innerRef}
-              >
-                Item id: {item.id}
-              </div>
-            )}
-          </Draggable>
-        )}
-      </div>
+      {provided => (
+        <div ref={provided.innerRef} {...provided.droppableProps}>
+          {items.map(item) => (
+            <Draggable draggableId={item.id} index={item.index}>
+              {(provided, snapshot) => (
+                <div
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  ref={provided.innerRef}
+                >
+                  Item id: {item.id}
+                </div>
+              )}
+            </Draggable>
+          )}
+        </div>
+      )}
     </Droppable>
   );
 }

@@ -27,7 +27,7 @@ function getTasks(count: number): Task[] {
 const Item = styled.div`
   padding: ${grid}px;
   border: 1px solid ${colors.N30};
-  background-color: ${colors.N30};
+  background-color: ${props => (props.isDragging ? colors.G100 : colors.N30)};
   margin-top: ${grid}px;
   margin-left: ${grid}px;
   margin-right: ${grid}px;
@@ -45,10 +45,11 @@ function renderTasks(
         key={task.id}
         isDragDisabled={!options.isDragEnabled}
       >
-        {provided => (
+        {(provided, snapshot) => (
           <Item
             {...provided.draggableProps}
             {...provided.dragHandleProps}
+            isDragging={snapshot.isDragging}
             ref={provided.innerRef}
           >
             Task id: {task.id}
