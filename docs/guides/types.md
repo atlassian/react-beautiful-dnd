@@ -18,6 +18,7 @@ type DraggableId = Id;
 ```js
 type Responders = {|
   // optional
+  onBeforeCapture?: OnBeforeCaptureResponder,
   onBeforeDragStart?: OnBeforeDragStartResponder,
   onDragStart?: OnDragStartResponder,
   onDragUpdate?: OnDragUpdateResponder,
@@ -25,6 +26,7 @@ type Responders = {|
   onDragEnd: OnDragEndResponder,
 |};
 
+type OnBeforeCaptureResponder = (before: BeforeCapture) => mixed;
 type OnBeforeDragStartResponder = (start: DragStart) => mixed;
 type OnDragStartResponder = (
   start: DragStart,
@@ -39,11 +41,16 @@ type OnDragEndResponder = (
   provided: ResponderProvided,
 ) => mixed;
 
+type BeforeCapture = {|
+  draggableId: DraggableId,
+  mode: MovementMode,
+|};
+
 type DraggableRubric = {|
   draggableId: DraggableId,
   type: TypeId,
   source: DraggableLocation,
-|}
+|};
 
 type DragStart = {|
   ...DraggableRubric,

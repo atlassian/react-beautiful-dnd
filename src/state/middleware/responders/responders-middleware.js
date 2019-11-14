@@ -26,6 +26,14 @@ export default (
   return (store: MiddlewareStore) => (next: Dispatch) => (
     action: Action,
   ): any => {
+    if (action.type === 'BEFORE_INITIAL_CAPTURE') {
+      publisher.beforeCapture(
+        action.payload.draggableId,
+        action.payload.movementMode,
+      );
+      return;
+    }
+
     if (action.type === 'INITIAL_PUBLISH') {
       const critical: Critical = action.payload.critical;
       publisher.beforeStart(critical, action.payload.movementMode);

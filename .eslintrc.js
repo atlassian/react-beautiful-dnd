@@ -177,6 +177,9 @@ module.exports = {
     // Having issues with this rule not working correctly
     'react/default-props-match-prop-types': 'off',
 
+    // Allowing functions to be passed as props
+    'react/jsx-no-bind': 'off',
+
     // Require // @flow at the top of files
     'flowtype/require-valid-file-annotation': [
       'error',
