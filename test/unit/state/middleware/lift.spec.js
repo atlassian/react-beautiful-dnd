@@ -13,12 +13,14 @@ import {
   completeDrop,
   type AnimateDropArgs,
   flush,
+  beforeInitialCapture,
 } from '../../../../src/state/action-creators';
 import { createMarshal } from '../../../util/dimension-marshal';
 import {
   preset,
   liftArgs,
   initialPublishArgs,
+  beforeCaptureArgs,
   getCompletedArgs,
 } from '../../../util/preset-action-args';
 import { populate } from '../../../util/registry';
@@ -100,8 +102,10 @@ it('should flush any animating drops', () => {
   expect(mock).toHaveBeenCalledWith(completeDrop({ completed }));
   // any animations are flushed
   expect(mock).toHaveBeenCalledWith(flush());
+  // a before capture is fired
+  expect(mock).toHaveBeenCalledWith(beforeInitialCapture(beforeCaptureArgs));
   // the new lift continues
-  expect(mock).toHaveBeenCalledTimes(4);
+  expect(mock).toHaveBeenCalledTimes(5);
 });
 
 it('should publish the initial dimensions when lifting', () => {
@@ -121,6 +125,7 @@ it('should publish the initial dimensions when lifting', () => {
   // last drag flushed
   expect(mock).toHaveBeenCalledWith(flush());
   expect(mock).toHaveBeenCalledWith(initialPublish(initialPublishArgs));
-  expect(mock).toHaveBeenCalledTimes(3);
+  expect(mock).toHaveBeenCalledWith(beforeInitialCapture(beforeCaptureArgs));
+  expect(mock).toHaveBeenCalledTimes(4);
   expect(store.getState().phase).toBe('DRAGGING');
 });

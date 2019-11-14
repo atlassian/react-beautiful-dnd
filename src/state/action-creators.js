@@ -12,7 +12,7 @@ import type {
   Published,
 } from '../types';
 
-type BeforeInitialCaptureArgs = {|
+export type BeforeInitialCaptureArgs = {|
   draggableId: DraggableId,
   movementMode: MovementMode,
 |};
