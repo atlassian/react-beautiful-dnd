@@ -7,6 +7,7 @@ In order to use drag and drop, you need to have the part of your `React` tree th
 ```js
 type Responders = {|
   // optional
+  onBeforeCapture?: OnBeforeCaptureResponder
   onBeforeDragStart?: OnBeforeDragStartResponder,
   onDragStart?: OnDragStartResponder,
   onDragUpdate?: OnDragUpdateResponder,
@@ -30,11 +31,10 @@ type Props = {|
 |};
 ```
 
-- `liftInstruction`: What is read out to screen reader users when a *drag handle* is given browser focus. See our [screen reader guide](/docs/guides/screen-reader.md)
+- `liftInstruction`: What is read out to screen reader users when a _drag handle_ is given browser focus. See our [screen reader guide](/docs/guides/screen-reader.md)
 - `nonce`: Used for strict content security policy setups. See our [content security policy guide](/docs/guides/content-security-policy.md)
 - `sensors`: Used to pass in your own `sensor`s for a `<DragDropContext />`. See our [sensor api documentation](/docs/sensors/sensor-api.md)
 - `enableDefaultSensors`: Whether or not the default sensors ([mouse](/docs/sensors/mouse.md), [keyboard](/docs/sensors/keyboard.md), and [touch](/docs/sensors/touch.md)) are enabled. See our [sensor api documentation](/docs/sensors/sensor-api.md)
-
 
 > See our [type guide](/docs/guides/types.md) for more details
 
@@ -47,6 +47,10 @@ import React from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 
 class App extends React.Component {
+  onBeforeCapture = () => {
+    /*...*/
+  };
+
   onBeforeDragStart = () => {
     /*...*/
   };
@@ -64,6 +68,7 @@ class App extends React.Component {
   render() {
     return (
       <DragDropContext
+        onBeforeCapture={this.onBeforeCapture}
         onBeforeDragStart={this.onBeforeDragStart}
         onDragStart={this.onDragStart}
         onDragUpdate={this.onDragUpdate}
@@ -83,10 +88,13 @@ import React from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 
 function App() {
+  // using useCallback is optional
+  const onBeforeCapture = useCallback(() => {
+    /*...*/
+  }, []);
   const onBeforeDragStart = useCallback(() => {
     /*...*/
   }, []);
-
   const onDragStart = useCallback(() => {
     /*...*/
   }, []);
@@ -99,6 +107,7 @@ function App() {
 
   return (
     <DragDropContext
+      onBeforeCapture={onBeforeCapture}
       onBeforeDragStart={onBeforeDragStart}
       onDragStart={onDragStart}
       onDragUpdate={onDragUpdate}
