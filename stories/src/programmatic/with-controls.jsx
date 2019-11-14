@@ -111,7 +111,7 @@ function Controls(props: ControlProps) {
         }}
       >
         Lift{' '}
-        <span role="img" aria-label="drop">
+        <span role="img" aria-label="lift">
           🏋️‍♀️
         </span>
       </ActionButton>
