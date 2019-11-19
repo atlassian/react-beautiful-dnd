@@ -7,6 +7,7 @@ import {
   initialPublish,
   type InitialPublishArgs,
   lift,
+  beforeInitialCapture,
 } from '../../../../src/state/action-creators';
 import middleware from '../../../../src/state/middleware/lift';
 import createRegistry from '../../../../src/state/registry/create-registry';
@@ -14,6 +15,7 @@ import { createMarshal } from '../../../util/dimension-marshal';
 import {
   copy,
   initialPublishArgs,
+  beforeCaptureArgs,
   liftArgs,
   preset,
 } from '../../../util/preset-action-args';
@@ -71,8 +73,9 @@ it('should log a warning if items are added that do not have consecutive indexes
   store.dispatch(lift(liftArgs));
   expect(mock).toHaveBeenCalledWith(lift(liftArgs));
   expect(mock).toHaveBeenCalledWith(flush());
+  expect(mock).toHaveBeenCalledWith(beforeInitialCapture(beforeCaptureArgs));
   expect(mock).toHaveBeenCalledWith(initialPublish(initial));
-  expect(mock).toHaveBeenCalledTimes(3);
+  expect(mock).toHaveBeenCalledTimes(4);
   expect(store.getState().phase).toBe('DRAGGING');
 
   // a warning is logged
@@ -121,8 +124,9 @@ it('should log a warning if items are added have duplicate indexes', () => {
   store.dispatch(lift(liftArgs));
   expect(mock).toHaveBeenCalledWith(lift(liftArgs));
   expect(mock).toHaveBeenCalledWith(flush());
+  expect(mock).toHaveBeenCalledWith(beforeInitialCapture(beforeCaptureArgs));
   expect(mock).toHaveBeenCalledWith(initialPublish(initial));
-  expect(mock).toHaveBeenCalledTimes(3);
+  expect(mock).toHaveBeenCalledTimes(4);
   expect(store.getState().phase).toBe('DRAGGING');
 
   // a warning is logged

@@ -11,6 +11,7 @@ import type {
   Responders,
   ResponderProvided,
   Critical,
+  BeforeCapture,
   DragImpact,
   DraggableLocation,
   Combine,
@@ -18,6 +19,8 @@ import type {
   Announce,
   DragUpdate,
   MovementMode,
+  DraggableId,
+  OnBeforeCaptureResponder,
   OnBeforeDragStartResponder,
   OnDragStartResponder,
   OnDragUpdateResponder,
@@ -82,6 +85,24 @@ type WhileDragging = {|
 export default (getResponders: () => Responders, announce: Announce) => {
   const asyncMarshal: AsyncMarshal = getAsyncMarshal();
   let dragging: ?WhileDragging = null;
+
+  const beforeCapture = (draggableId: DraggableId, mode: MovementMode) => {
+    invariant(
+      !dragging,
+      'Cannot fire onBeforeCapture as a drag start has already been published',
+    );
+    withTimings('onBeforeCapture', () => {
+      // No use of screen reader for this responder
+      const fn: ?OnBeforeCaptureResponder = getResponders().onBeforeCapture;
+      if (fn) {
+        const before: BeforeCapture = {
+          draggableId,
+          mode,
+        };
+        fn(before);
+      }
+    });
+  };
 
   const beforeStart = (critical: Critical, mode: MovementMode) => {
     invariant(
@@ -221,6 +242,7 @@ export default (getResponders: () => Responders, announce: Announce) => {
   };
 
   return {
+    beforeCapture,
     beforeStart,
     start,
     update,

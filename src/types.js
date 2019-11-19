@@ -251,6 +251,14 @@ export type DraggableRubric = {|
   source: DraggableLocation,
 |};
 
+// Published in onBeforeCapture
+// We cannot give more information as things might change in the
+// onBeforeCapture responder!
+export type BeforeCapture = {|
+  draggableId: DraggableId,
+  mode: MovementMode,
+|};
+
 // published when a drag starts
 export type DragStart = {|
   ...DraggableRubric,
@@ -402,6 +410,7 @@ export type ResponderProvided = {|
   announce: Announce,
 |};
 
+export type OnBeforeCaptureResponder = (before: BeforeCapture) => mixed;
 export type OnBeforeDragStartResponder = (start: DragStart) => mixed;
 export type OnDragStartResponder = (
   start: DragStart,
@@ -417,6 +426,7 @@ export type OnDragEndResponder = (
 ) => mixed;
 
 export type Responders = {|
+  onBeforeCapture?: OnBeforeCaptureResponder,
   onBeforeDragStart?: OnBeforeDragStartResponder,
   onDragStart?: OnDragStartResponder,
   onDragUpdate?: OnDragUpdateResponder,
