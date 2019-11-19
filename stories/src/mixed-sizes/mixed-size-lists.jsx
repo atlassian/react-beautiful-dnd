@@ -22,7 +22,7 @@ const Parent = styled.div`
 type ItemWidth = 'small' | 'large';
 const itemWidths = {
   small: 250,
-  large: 500,
+  large: 600,
 };
 
 type ItemProps = {|
@@ -38,6 +38,7 @@ const StyledItem = styled.div`
   margin-bottom: ${grid}px;
   width: ${props =>
     props.width === 'small' ? itemWidths.small : itemWidths.large}px;
+  user-select: none;
 `;
 
 function Item(props: ItemProps) {
