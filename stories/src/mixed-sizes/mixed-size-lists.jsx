@@ -49,12 +49,7 @@ function Item(props: ItemProps) {
     const unsubscribe = bindEvents(window, [
       {
         eventName: 'onBeforeCapture',
-        fn: (
-          event: CustomEvent<{
-            before: BeforeCapture,
-            clientSelection: Position,
-          }>,
-        ) => {
+        fn: (event: CustomEvent) => {
           if (props.width === 'small') {
             return;
           }
