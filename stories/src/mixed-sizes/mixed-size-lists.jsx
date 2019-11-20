@@ -12,7 +12,6 @@ import {
   Droppable,
   Draggable,
 } from '../../../src';
-import { noop } from '../../../src/empty';
 import bindEvents from '../../../src/view/event-bindings/bind-events';
 import { grid } from '../constants';
 import reorder, { moveBetween } from '../reorder';
