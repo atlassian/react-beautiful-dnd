@@ -10,7 +10,7 @@ import {
   type DropResult,
 } from '../../../src';
 import { grid } from '../constants';
-import reorder from '../reorder';
+import reorder, { moveBetween } from '../reorder';
 
 let uniqueId = 0;
 function getTasks(count: number): Task[] {
@@ -110,22 +110,21 @@ export default function AddingThings() {
       return;
     }
 
-    // removing from one list to another
+    const { list1, list2 } = moveBetween({
+      list1: {
+        id: 'tasks',
+        values: tasks,
+      },
+      list2: {
+        id: 'trash',
+        values: trash,
+      },
+      source,
+      destination,
+    });
 
-    // this won't be possible with our UI
-    if (destination.droppableId === 'tasks') {
-      return;
-    }
-
-    // moving something to trash
-    const newTasks = Array.from(tasks);
-    const [moved] = newTasks.splice(source.index, 1);
-
-    const newTrash = Array.from(trash);
-    newTrash.splice(destination.index, 0, moved);
-
-    setTasks(newTasks);
-    setTrash(newTrash);
+    setTasks(list1.values);
+    setTrash(list2.values);
   }
 
   return (

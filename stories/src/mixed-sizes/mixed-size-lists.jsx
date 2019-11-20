@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { getBox, type Position, type BoxModel } from 'css-box-model';
 import styled from '@emotion/styled';
 import { colors } from '@atlaskit/theme';
@@ -8,12 +8,16 @@ import { type Quote } from '../types';
 import {
   DragDropContext,
   type BeforeCapture,
+  type DropResult,
   Droppable,
   Draggable,
 } from '../../../src';
 import { noop } from '../../../src/empty';
 import bindEvents from '../../../src/view/event-bindings/bind-events';
 import { grid } from '../constants';
+import reorder, { moveBetween } from '../reorder';
+
+const UseTrimmingContext = React.createContext<boolean>(false);
 
 const Parent = styled.div`
   display: flex;
@@ -44,12 +48,16 @@ const StyledItem = styled.div`
 function Item(props: ItemProps) {
   const { quote, index } = props;
   const ref = useRef<?HTMLElement>(null);
+  const useTrimming: boolean = useContext(UseTrimmingContext);
 
   useEffect(() => {
     const unsubscribe = bindEvents(window, [
       {
         eventName: 'onBeforeCapture',
         fn: (event: CustomEvent) => {
+          if (!useTrimming) {
+            return;
+          }
           if (props.width === 'small') {
             return;
           }
@@ -112,7 +120,7 @@ function Item(props: ItemProps) {
     ]);
 
     return unsubscribe;
-  }, [props.width, quote.id]);
+  }, [props.width, quote.id, useTrimming]);
 
   return (
     <Draggable draggableId={quote.id} index={index}>
@@ -167,9 +175,40 @@ function List(props: ListProps) {
 }
 
 export default function App() {
-  const [first] = useState(() => getQuotes(3));
-  const [second] = useState(() => getQuotes(3));
+  const [first, setFirst] = useState(() => getQuotes(3));
+  const [second, setSecond] = useState(() => getQuotes(3));
+  const [useTrimming, setUseTrimming] = useState(false);
   const clientSelectionRef = useRef<Position>({ x: 0, y: 0 });
+
+  function onDragEnd(result: DropResult) {
+    const { source, destination } = result;
+    if (!destination) {
+      return;
+    }
+    if (source.droppableId === destination.droppableId) {
+      if (source.droppableId === 'first') {
+        setFirst(reorder(first, source.index, destination.index));
+        return;
+      }
+      setSecond(reorder(second, source.index, destination.index));
+    }
+
+    const { list1, list2 } = moveBetween({
+      list1: {
+        id: 'first',
+        values: first,
+      },
+      list2: {
+        id: 'second',
+        values: second,
+      },
+      source,
+      destination,
+    });
+
+    setFirst(list1.values);
+    setSecond(list2.values);
+  }
 
   useEffect(() => {
     const unsubscribe = bindEvents(window, [
@@ -196,12 +235,20 @@ export default function App() {
     );
   }
   return (
-    <DragDropContext onBeforeCapture={onBeforeCapture} onDragEnd={noop}>
-      <p>This is a bit lame right now</p>
-      <Parent>
-        <List listId="first" quotes={first} itemWidth="small" />
-        <List listId="second" quotes={second} itemWidth="large" />
-      </Parent>
-    </DragDropContext>
+    <UseTrimmingContext.Provider value={useTrimming}>
+      <DragDropContext onBeforeCapture={onBeforeCapture} onDragEnd={onDragEnd}>
+        <Parent>
+          <List listId="first" quotes={first} itemWidth="small" />
+          <List listId="second" quotes={second} itemWidth="large" />
+        </Parent>
+        Item trimming: <strong>{useTrimming ? 'enabled' : 'disabled'}</strong>
+        <button
+          type="button"
+          onClick={() => setUseTrimming((value: boolean) => !value)}
+        >
+          {useTrimming ? 'disable' : 'enable'}
+        </button>
+      </DragDropContext>
+    </UseTrimmingContext.Provider>
   );
 }
