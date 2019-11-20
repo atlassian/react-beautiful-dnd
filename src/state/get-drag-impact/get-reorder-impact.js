@@ -93,6 +93,8 @@ export default ({
         last.visible[id] || last.invisible[id],
       );
 
+      // TODO: <= or <
+
       if (didStartAfterCritical) {
         // Continue to displace while targetEnd < center
         if (isDisplaced) {
