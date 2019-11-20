@@ -81,8 +81,6 @@ export default ({
     (child: DraggableDimension): boolean => {
       const id: DraggableId = child.descriptor.id;
       const childCenter: number = child.page.borderBox.center[axis.line];
-      // const start: number = borderBox[axis.start];
-      // const end: number = borderBox[axis.end];
 
       const didStartAfterCritical: boolean = getDidStartAfterCritical(
         id,
@@ -93,7 +91,7 @@ export default ({
         last.visible[id] || last.invisible[id],
       );
 
-      // TODO: <= or <
+      // TODO: <= or < ?
 
       if (didStartAfterCritical) {
         // Continue to displace while targetEnd < center
