@@ -1,5 +1,5 @@
 // @flow
-import { type Position, type Rect } from 'css-box-model';
+import { type Position } from 'css-box-model';
 import type {
   DraggableId,
   DraggableDimension,
@@ -8,11 +8,9 @@ import type {
   Axis,
   DisplacementGroups,
   Viewport,
-  UserDirection,
   DisplacedBy,
   LiftEffect,
 } from '../../types';
-import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import removeDraggableFromList from '../remove-draggable-from-list';
 import isHomeOf from '../droppable/is-home-of';
@@ -27,7 +25,6 @@ type Args = {|
   insideDestination: DraggableDimension[],
   last: DisplacementGroups,
   viewport: Viewport,
-  userDirection: UserDirection,
   afterCritical: LiftEffect,
 |};
 
@@ -60,20 +57,19 @@ export default ({
   insideDestination,
   last,
   viewport,
-  userDirection,
   afterCritical,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
-  const isMovingForward: boolean = isUserMovingForward(
-    destination.axis,
-    userDirection,
-  );
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
   );
 
   const targetCenter: number = currentCenter[axis.line];
+  const targetSize: number = draggable.client.borderBox[axis.size];
+  const targetStart: number = targetCenter - targetSize / 2;
+  const targetEnd: number = targetCenter + targetSize / 2;
+
   const displacement: number = displacedBy.value;
   const withoutDragging: DraggableDimension[] = removeDraggableFromList(
     draggable,
@@ -84,38 +80,39 @@ export default ({
     withoutDragging,
     (child: DraggableDimension): boolean => {
       const id: DraggableId = child.descriptor.id;
-      const borderBox: Rect = child.page.borderBox;
-      const start: number = borderBox[axis.start];
-      const end: number = borderBox[axis.end];
+      const childCenter: number = child.page.borderBox.center[axis.line];
+      // const start: number = borderBox[axis.start];
+      // const end: number = borderBox[axis.end];
 
       const didStartAfterCritical: boolean = getDidStartAfterCritical(
         id,
         afterCritical,
       );
 
-      // Moving forward will decrease the amount of things needed to be displaced
-      if (isMovingForward) {
-        if (didStartAfterCritical) {
-          // if started displaced then its displaced position is its resting position
-          // continue to keep the item at rest until we go onto the start of the item
-          return targetCenter < start;
-        }
-        // if the item did not start displaced then we displace the item
-        // while we are still before the start edge
-        return targetCenter < start + displacement;
-      }
-
-      // Moving backwards will increase the amount of things needed to be displaced
-      // The logic for this works by looking at assuming everything has been displaced
-      // backwards and then looking at how you would undo that
+      const isDisplaced: boolean = Boolean(
+        last.visible[id] || last.invisible[id],
+      );
 
       if (didStartAfterCritical) {
-        // we continue to displace the item until we move back over the end of the item without displacement
-        return targetCenter <= end - displacement;
+        // Continue to displace while targetEnd < center
+        if (isDisplaced) {
+          return targetEnd < childCenter;
+        }
+
+        // has been moved backwards from where it started
+        // displace once targetStart is less than the new center
+        return targetStart < childCenter - displacement;
       }
 
-      // a non-displaced item is at rest. when we hit the item from the bottom we move it out of the way
-      return targetCenter <= end;
+      // Item has been shifted forward.
+      // Continue to displace forward while targetEnd < new center
+      if (isDisplaced) {
+        return targetEnd < childCenter + displacement;
+      }
+
+      // Item is behind the dragging item
+      // We want to displace it if the targetStart < center
+      return targetStart < childCenter;
     },
   );
 
