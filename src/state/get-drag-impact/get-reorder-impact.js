@@ -17,6 +17,7 @@ import isHomeOf from '../droppable/is-home-of';
 import { find } from '../../native-with-fallback';
 import getDidStartAfterCritical from '../did-start-after-critical';
 import calculateReorderImpact from '../calculate-drag-impact/calculate-reorder-impact';
+import getIsDisplaced from '../get-is-displaced';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
@@ -64,13 +65,13 @@ export default ({
     destination.axis,
     draggable.displaceBy,
   );
+  const displacement: number = displacedBy.value;
 
   const targetCenter: number = currentCenter[axis.line];
   const targetSize: number = draggable.client.borderBox[axis.size];
   const targetStart: number = targetCenter - targetSize / 2;
   const targetEnd: number = targetCenter + targetSize / 2;
 
-  const displacement: number = displacedBy.value;
   const withoutDragging: DraggableDimension[] = removeDraggableFromList(
     draggable,
     insideDestination,
@@ -87,9 +88,7 @@ export default ({
         afterCritical,
       );
 
-      const isDisplaced: boolean = Boolean(
-        last.visible[id] || last.invisible[id],
-      );
+      const isDisplaced: boolean = getIsDisplaced({ displaced: last, id });
 
       // TODO: <= or < ?
 
