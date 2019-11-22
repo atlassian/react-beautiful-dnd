@@ -6,7 +6,6 @@ import type {
   DroppableDimension,
   DraggableDimensionMap,
   DroppableDimensionMap,
-  UserDirection,
   DragImpact,
   Viewport,
   LiftEffect,
@@ -26,7 +25,6 @@ type Args = {|
   droppables: DroppableDimensionMap,
   previousImpact: DragImpact,
   viewport: Viewport,
-  userDirection: UserDirection,
   afterCritical: LiftEffect,
 |};
 
@@ -37,7 +35,6 @@ export default ({
   droppables,
   previousImpact,
   viewport,
-  userDirection,
   afterCritical,
 }: Args): DragImpact => {
   const destinationId: ?DroppableId = getDroppableOver({
@@ -74,7 +71,6 @@ export default ({
       previousImpact,
       destination,
       insideDestination,
-      userDirection,
       afterCritical,
     }) ||
     getReorderImpact({
