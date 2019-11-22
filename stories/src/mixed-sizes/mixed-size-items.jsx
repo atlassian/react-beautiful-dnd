@@ -29,7 +29,7 @@ export default function App() {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <p>This is a bit lame right now</p>
-      <QuoteList quotes={quotes} />
+      <QuoteList quotes={quotes} isCombineEnabled />
     </DragDropContext>
   );
 }

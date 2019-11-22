@@ -19,6 +19,8 @@ import getCombinedItemDisplacement from '../get-combined-item-displacement';
 import removeDraggableFromList from '../remove-draggable-from-list';
 import calculateCombineImpact from '../calculate-drag-impact/calculate-combine-impact';
 import getDisplacedBy from '../get-displaced-by';
+import getDidStartAfterCritical from '../did-start-after-critical';
+import getIsDisplaced from '../get-is-displaced';
 
 function getWhenEntered(
   id: DraggableId,
@@ -104,34 +106,71 @@ export default ({
   }
 
   const axis: Axis = destination.axis;
-  const displaced: DisplacementGroups = previousImpact.displaced;
-  const canBeDisplacedBy: DisplacedBy = getDisplacedBy(
+  const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
   );
-  const lastCombineImpact: ?CombineImpact = tryGetCombineImpact(previousImpact);
+  const displacement: number = displacedBy.value;
+
+  const targetCenter: number = currentCenter[axis.line];
+  const targetSize: number = draggable.client.borderBox[axis.size];
+  const targetStart: number = targetCenter - targetSize / 2;
+  const targetEnd: number = targetCenter + targetSize / 2;
+
+  const withoutDragging: DraggableDimension[] = removeDraggableFromList(
+    draggable,
+    insideDestination,
+  );
 
   const combineWith: ?DraggableDimension = find(
-    removeDraggableFromList(draggable, insideDestination),
+    withoutDragging,
     (child: DraggableDimension): boolean => {
       const id: DraggableId = child.descriptor.id;
+      const childRect: Rect = child.page.borderBox;
+      const childSize: number = childRect[axis.size];
+      const threshold: number = childSize * (1 / 6);
 
-      const displaceBy: Position = getCombinedItemDisplacement({
-        displaced,
-        afterCritical,
-        combineWith: id,
-        displacedBy: canBeDisplacedBy,
-      });
-
-      return isCombiningWith({
+      const didStartAfterCritical: boolean = getDidStartAfterCritical(
         id,
-        currentCenter,
-        axis,
-        borderBox: child.page.borderBox,
-        displaceBy,
-        currentUserDirection: userDirection,
-        lastCombineImpact,
+        afterCritical,
+      );
+
+      const isDisplaced: boolean = getIsDisplaced({
+        displaced: previousImpact.displaced,
+        id,
       });
+
+      if (didStartAfterCritical) {
+        // In original position
+        // Will combine with item when between 1/3 and 2/3 of item
+        if (isDisplaced) {
+          return (
+            targetEnd >= childRect[axis.start] + threshold &&
+            targetEnd <= childRect[axis.end] - threshold
+          );
+        }
+
+        // child is now 'displaced' backwards from where it started
+        // want to combine when we move backwards onto it
+        return (
+          targetStart <= childRect[axis.end] - displacement - threshold &&
+          targetStart >= childRect[axis.start] - displacement + threshold
+        );
+      }
+
+      // has moved forwards
+      if (isDisplaced) {
+        return (
+          targetStart <= childRect[axis.end] - threshold &&
+          targetStart >= childRect[axis.start] + threshold
+        );
+      }
+
+      // is in resting position - being moved backwards on to
+      return (
+        targetEnd >= childRect[axis.start] + displacement + threshold &&
+        targetEnd <= childRect[axis.end] + displacement - threshold
+      );
     },
   );
 
