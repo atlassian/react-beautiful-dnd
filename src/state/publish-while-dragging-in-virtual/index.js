@@ -116,7 +116,6 @@ export default ({
     droppables: dimensions.droppables,
     previousImpact,
     viewport: state.viewport,
-    userDirection: state.userDirection,
     afterCritical,
   });
 
