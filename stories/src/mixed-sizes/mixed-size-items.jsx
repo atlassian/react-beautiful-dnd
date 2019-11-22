@@ -20,6 +20,7 @@ function getQuotes() {
 
 export default function App() {
   const [quotes, setQuotes] = useState(() => getQuotes());
+  const [isCombineEnabled, setIsCombineEnabled] = useState(false);
   function onDragEnd(result: DropResult) {
     if (!result.destination) {
       return;
@@ -28,8 +29,13 @@ export default function App() {
   }
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <p>This is a bit lame right now</p>
-      <QuoteList quotes={quotes} isCombineEnabled />
+      <button
+        type="button"
+        onClick={() => setIsCombineEnabled(value => !value)}
+      >
+        Combining <strong>{isCombineEnabled ? 'enabled' : 'disabled'}</strong>
+      </button>
+      <QuoteList quotes={quotes} isCombineEnabled={isCombineEnabled} />
     </DragDropContext>
   );
 }
