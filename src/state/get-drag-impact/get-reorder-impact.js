@@ -90,17 +90,16 @@ export default ({
 
       const isDisplaced: boolean = getIsDisplaced({ displaced: last, id });
 
-      // TODO: <= or < ?
-
       if (didStartAfterCritical) {
-        // Continue to displace while targetEnd < center
+        // Continue to displace while targetEnd before the childCenter
+        // Move once we hit the childCenter
         if (isDisplaced) {
           return targetEnd < childCenter;
         }
 
-        // has been moved backwards from where it started
-        // displace once targetStart is less than the new center
-        return targetStart < childCenter - displacement;
+        // Has been moved backwards from where it started
+        // Displace forwards when targetStart hits the displaced childCenter
+        return targetStart <= childCenter - displacement;
       }
 
       // Item has been shifted forward.
