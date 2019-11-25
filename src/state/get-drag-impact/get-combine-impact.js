@@ -34,7 +34,6 @@ export default ({
   if (!destination.isCombineEnabled) {
     return null;
   }
-
   const axis: Axis = destination.axis;
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
