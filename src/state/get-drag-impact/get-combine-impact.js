@@ -58,7 +58,7 @@ export default ({
       const id: DraggableId = child.descriptor.id;
       const childRect: Rect = child.page.borderBox;
       const childSize: number = childRect[axis.size];
-      const threshold: number = childSize * (1 / 6);
+      const threshold: number = childSize * (1 / 5);
 
       const didStartAfterCritical: boolean = getDidStartAfterCritical(
         id,
