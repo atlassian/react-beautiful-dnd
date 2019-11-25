@@ -12,11 +12,7 @@ import { horizontal, vertical } from '../../../../../../src/state/axis';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
-import { patch, subtract } from '../../../../../../src/state/position';
-import {
-  backward,
-  forward,
-} from '../../../../../../src/state/user-direction/user-direction-preset';
+import { patch } from '../../../../../../src/state/position';
 import getViewport from '../../../../../../src/view/window/get-viewport';
 import { getPreset, makeScrollable } from '../../../../../util/dimension';
 
@@ -45,16 +41,13 @@ const viewport: Viewport = getViewport();
       });
 
       it('should move past other draggables', () => {
-        // the middle of the target edge
-        const startOfInHome2: Position = patch(
+        const centerOfInHome2: number =
+          preset.inHome2.page.borderBox.center[axis.line];
+        const distanceNeeded: Position = patch(
           axis.line,
-          preset.inHome2.page.borderBox[axis.start],
-          preset.inHome2.page.borderBox.center[axis.crossAxisLine],
+          centerOfInHome2 - preset.inHome1.page.borderBox[axis.end],
         );
-        const distanceNeeded: Position = subtract(
-          startOfInHome2,
-          preset.inHome1.page.borderBox.center,
-        );
+
         const scrolledHome: DroppableDimension = scrollDroppable(
           scrollableHome,
           distanceNeeded,
@@ -78,7 +71,6 @@ const viewport: Viewport = getViewport();
           droppables: updatedDroppables,
           previousImpact: homeImpact,
           viewport,
-          userDirection: forward,
           afterCritical,
         });
 
@@ -113,17 +105,19 @@ const viewport: Viewport = getViewport();
         draggables: preset.draggables,
         viewport,
       });
+      const displacedBy: DisplacedBy = getDisplacedBy(
+        axis,
+        preset.inHome4.displaceBy,
+      );
 
       it('should move back past inHome2', () => {
-        // the middle of the target edge
-        const endOfInHome2: Position = patch(
+        const centerOfInHome2: number =
+          preset.inHome2.page.borderBox.center[axis.line];
+
+        // Displacement will end when start hits the displaced center of inHome2
+        const distanceNeeded: Position = patch(
           axis.line,
-          preset.inHome2.page.borderBox[axis.end],
-          preset.inHome2.page.borderBox.center[axis.crossAxisLine],
-        );
-        const distanceNeeded: Position = subtract(
-          endOfInHome2,
-          preset.inHome4.page.borderBox.center,
+          centerOfInHome2 - preset.inHome4.page.borderBox[axis.start],
         );
         const scrolledHome: DroppableDimension = scrollDroppable(
           scrollableHome,
@@ -136,11 +130,7 @@ const viewport: Viewport = getViewport();
         // no changes in current page center from original
         const pageBorderBoxCenter: Position =
           preset.inHome4.page.borderBox.center;
-        // moving inHome4 backwards
-        const displacedBy: DisplacedBy = getDisplacedBy(
-          axis,
-          preset.inHome4.displaceBy,
-        );
+
         const impact: DragImpact = getDragImpact({
           pageBorderBoxCenter,
           draggable: preset.inHome4,
@@ -148,7 +138,6 @@ const viewport: Viewport = getViewport();
           droppables: updatedDroppables,
           previousImpact: homeImpact,
           viewport,
-          userDirection: backward,
           afterCritical,
         });
 
