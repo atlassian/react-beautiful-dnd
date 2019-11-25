@@ -10,7 +10,6 @@ import type {
   Selector,
   MapProps,
 } from '../../../../src/view/droppable/droppable-types';
-import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import { makeMapStateToProps } from '../../../../src/view/droppable/connected-droppable';
 import { getPreset } from '../../../util/dimension';
 import getStatePreset from '../../../util/get-simple-state-preset';
@@ -73,7 +72,6 @@ describe('was over - merging', () => {
       ...base.completed.impact,
       at: {
         type: 'COMBINE',
-        whenEntered: forward,
         combine,
       },
     };
@@ -150,7 +148,6 @@ describe('flushed', () => {
       ...base.completed.impact,
       at: {
         type: 'COMBINE',
-        whenEntered: forward,
         combine,
       },
     };

@@ -15,7 +15,6 @@ import type {
   Combine,
 } from '../../../../src/types';
 import { curves, combine as combineStyle } from '../../../../src/animation';
-import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
 import { getDraggingSnapshot } from './util/get-snapshot';
 
@@ -72,7 +71,6 @@ it('should maintain combine information', () => {
     ...homeImpact,
     at: {
       type: 'COMBINE',
-      whenEntered: forward,
       combine,
     },
   };
