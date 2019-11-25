@@ -14,7 +14,6 @@ import {
   type IsDraggingState,
 } from '../../../util/dragging-state';
 import getOwnProps from './util/get-own-props';
-import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
 import { getDraggingSnapshot } from './util/get-snapshot';
 import { getForcedDisplacement } from '../../../util/impact';
@@ -37,7 +36,6 @@ const impact: DragImpact = {
   displacedBy,
   at: {
     type: 'COMBINE',
-    whenEntered: forward,
     combine: {
       draggableId: preset.inHome2.descriptor.id,
       droppableId: preset.inHome2.descriptor.droppableId,
