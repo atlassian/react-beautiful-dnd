@@ -5,7 +5,6 @@ import getDragImpact from '../../../../src/state/get-drag-impact';
 import noImpact from '../../../../src/state/no-impact';
 import { getPreset } from '../../../util/dimension';
 import type { Axis, DragImpact } from '../../../../src/types';
-import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
 
 [vertical, horizontal].forEach((axis: Axis) => {
@@ -32,7 +31,6 @@ import getLiftEffect from '../../../../src/state/get-lift-effect';
         droppables: preset.droppables,
         previousImpact: homeImpact,
         viewport: preset.viewport,
-        userDirection: forward,
         afterCritical,
       });
 
