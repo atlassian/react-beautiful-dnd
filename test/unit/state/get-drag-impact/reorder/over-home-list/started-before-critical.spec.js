@@ -1,7 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
-import { patch } from '../../../../../../src/state/position';
+import { add } from '../../../../../../src/state/position';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import { getPreset } from '../../../../../util/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
@@ -11,22 +11,19 @@ import type {
   Viewport,
   DisplacedBy,
 } from '../../../../../../src/types';
-import {
-  backward,
-  forward,
-} from '../../../../../../src/state/user-direction/user-direction-preset';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import beforePoint from '../../../../../util/before-point';
 import afterPoint from '../../../../../util/after-point';
 import { getForcedDisplacement } from '../../../../../util/impact';
+import {
+  getCenterForStartEdge,
+  getCenterForEndEdge,
+} from '../../util/get-edge-from-center';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
     const viewport: Viewport = preset.viewport;
-
-    const crossAxisCenter: number =
-      preset.inHome3.page.borderBox.center[axis.crossAxisLine];
 
     const displacedBy: DisplacedBy = getDisplacedBy(
       axis,
@@ -39,34 +36,32 @@ import { getForcedDisplacement } from '../../../../../util/impact';
       viewport: preset.viewport,
     });
 
-    const onEndOfInHome1: Position = patch(
-      axis.line,
-      preset.inHome1.page.borderBox[axis.end],
-      crossAxisCenter,
-    );
+    const centerForStartOnInHome1Center: Position = getCenterForStartEdge({
+      startEdgeOn: preset.inHome1.page.borderBox.center,
+      dragging: preset.inHome3.page.borderBox,
+      axis,
+    });
 
-    const goingBackwards: DragImpact = getDragImpact({
-      pageBorderBoxCenter: onEndOfInHome1,
+    const startOnInHome1Center: DragImpact = getDragImpact({
+      pageBorderBoxCenter: centerForStartOnInHome1Center,
       draggable: preset.inHome3,
       draggables: preset.draggables,
       droppables: preset.droppables,
       previousImpact: homeImpact,
       viewport,
-      userDirection: backward,
       afterCritical,
     });
 
-    it('should displace items when moving backwards onto their bottom edge', () => {
-      // after end of inHome1
+    it('should displace items forward when the start edge of the dragging item hits the items center', () => {
+      // after center of inHome1
       {
-        const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterPoint(onEndOfInHome1, axis),
+        const startAfterInHome1Center: DragImpact = getDragImpact({
+          pageBorderBoxCenter: afterPoint(centerForStartOnInHome1Center, axis),
           draggable: preset.inHome3,
           draggables: preset.draggables,
           droppables: preset.droppables,
           previousImpact: homeImpact,
           viewport,
-          userDirection: backward,
           afterCritical,
         });
 
@@ -90,71 +85,74 @@ import { getForcedDisplacement } from '../../../../../util/impact';
             },
           },
         };
-        expect(impact).toEqual(expected);
+        expect(startAfterInHome1Center).toEqual(expected);
       }
-
-      const expected: DragImpact = {
-        displaced: getForcedDisplacement({
-          // ordered by closest to current location
-          visible: [
-            { dimension: preset.inHome1 },
-            { dimension: preset.inHome2 },
-            // inHome3 is not displaced as it is the dragging item
-            // inHome4 would have been displaced on lift so it won't be animated
-            { dimension: preset.inHome4, shouldAnimate: false },
-          ],
-        }),
-        displacedBy,
-        at: {
-          type: 'REORDER',
-          destination: {
-            // is now in position of inHome1
-            droppableId: preset.home.descriptor.id,
-            index: preset.inHome1.descriptor.index,
+      // on center of inHome1
+      {
+        const expected: DragImpact = {
+          displaced: getForcedDisplacement({
+            // ordered by closest to current location
+            visible: [
+              { dimension: preset.inHome1 },
+              { dimension: preset.inHome2 },
+              // inHome3 is not displaced as it is the dragging item
+              // inHome4 would have been displaced on lift so it won't be animated
+              { dimension: preset.inHome4, shouldAnimate: false },
+            ],
+          }),
+          displacedBy,
+          at: {
+            type: 'REORDER',
+            destination: {
+              // is now in position of inHome1
+              droppableId: preset.home.descriptor.id,
+              index: preset.inHome1.descriptor.index,
+            },
           },
-        },
-      };
-      expect(goingBackwards).toEqual(expected);
+        };
+        expect(startOnInHome1Center).toEqual(expected);
+      }
     });
 
-    it('should end displacement if moving forward over the displaced top edge', () => {
-      const topEdgeOfInHome1: number =
-        preset.inHome1.page.borderBox[axis.start];
-      const displacedTopEdgeOfInHome1: number =
-        topEdgeOfInHome1 + displacedBy.value;
+    it('should end displacement if the dragging item bottom edge hits the displaced center', () => {
+      const displacedInHome1Center: Position = add(
+        preset.inHome1.page.borderBox.center,
+        displacedBy.point,
+      );
 
-      const displacedTopEdge: Position = patch(
-        axis.line,
-        // onto top edge with without displacement
-        displacedTopEdgeOfInHome1,
-        // no change
-        crossAxisCenter,
+      const centerForEndOnDisplacedInHome1Center: Position = getCenterForEndEdge(
+        {
+          endEdgeOn: displacedInHome1Center,
+          dragging: preset.inHome3.page.borderBox,
+          axis,
+        },
       );
 
       // still not far enough
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforePoint(displacedTopEdge, axis),
+          pageBorderBoxCenter: beforePoint(
+            centerForEndOnDisplacedInHome1Center,
+            axis,
+          ),
           draggable: preset.inHome3,
           draggables: preset.draggables,
           droppables: preset.droppables,
-          previousImpact: goingBackwards,
+          previousImpact: startOnInHome1Center,
           viewport,
-          userDirection: forward,
           afterCritical,
         });
-        expect(impact).toEqual(goingBackwards);
+        expect(impact).toEqual(startOnInHome1Center);
       }
       // no longer displace as we have moved onto the displaced top edge
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: displacedTopEdge,
+          pageBorderBoxCenter: centerForEndOnDisplacedInHome1Center,
           draggable: preset.inHome3,
           draggables: preset.draggables,
           droppables: preset.droppables,
-          previousImpact: goingBackwards,
+          previousImpact: startOnInHome1Center,
           viewport,
-          userDirection: forward,
           afterCritical,
         });
 

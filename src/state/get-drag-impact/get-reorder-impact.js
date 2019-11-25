@@ -109,8 +109,8 @@ export default ({
       }
 
       // Item is behind the dragging item
-      // We want to displace it if the targetStart < center
-      return targetStart < childCenter;
+      // We want to displace it if the targetStart hits the childCenter from behind
+      return targetStart <= childCenter;
     },
   );
 
