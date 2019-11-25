@@ -75,31 +75,31 @@ export default ({
         // Will combine with item when between 1/3 and 2/3 of item
         if (isDisplaced) {
           return (
-            targetEnd >= childRect[axis.start] + threshold &&
-            targetEnd <= childRect[axis.end] - threshold
+            targetEnd > childRect[axis.start] + threshold &&
+            targetEnd < childRect[axis.end] - threshold
           );
         }
 
         // child is now 'displaced' backwards from where it started
         // want to combine when we move backwards onto it
         return (
-          targetStart <= childRect[axis.end] - displacement - threshold &&
-          targetStart >= childRect[axis.start] - displacement + threshold
+          targetStart < childRect[axis.end] - displacement - threshold &&
+          targetStart > childRect[axis.start] - displacement + threshold
         );
       }
 
       // has moved forwards
       if (isDisplaced) {
         return (
-          targetStart <= childRect[axis.end] - threshold &&
-          targetStart >= childRect[axis.start] + threshold
+          targetStart < childRect[axis.end] - threshold &&
+          targetStart > childRect[axis.start] + threshold
         );
       }
 
       // is in resting position - being moved backwards on to
       return (
-        targetEnd >= childRect[axis.start] + displacement + threshold &&
-        targetEnd <= childRect[axis.end] + displacement - threshold
+        targetEnd > childRect[axis.start] + displacement + threshold &&
+        targetEnd < childRect[axis.end] + displacement - threshold
       );
     },
   );
