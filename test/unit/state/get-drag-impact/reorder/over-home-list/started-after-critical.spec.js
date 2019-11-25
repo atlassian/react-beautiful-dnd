@@ -1,7 +1,7 @@
 // @flow
 import { type Position } from 'css-box-model';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
-import { patch, subtract } from '../../../../../../src/state/position';
+import { subtract } from '../../../../../../src/state/position';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
 import { getPreset } from '../../../../../util/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
@@ -21,7 +21,7 @@ import {
   getCenterForStartEdge,
 } from '../../util/get-edge-from-center';
 
-[vertical /* , horizontal */].forEach((axis: Axis) => {
+[vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
     const viewport: Viewport = preset.viewport;
@@ -55,7 +55,7 @@ import {
 
     // Do not need to move forward to a displaced edge.
     // The original edge is the displaced edge
-    it('should displace items backwards when end of dragging item is greater than the target center', () => {
+    it('should displace items backwards when end of dragging item hits the target center', () => {
       {
         const endBeforeInHome3Center: DragImpact = getDragImpact({
           // not currently on
@@ -124,19 +124,10 @@ import {
         displacedBy.point,
       );
 
-      // const bottomEdgeOfInHome3: number =
-      //   preset.inHome3.page.borderBox[axis.end];
-
-      // const onDisplacedBottomOfInHome3: Position = patch(
-      //   axis.line,
-      //   bottomEdgeOfInHome3 - displacedBy.value,
-      //   crossAxisCenter,
-      // );
-
       const centerForStartOnDisplacedInHome2Center: Position = getCenterForStartEdge(
         {
-          startEdge: displacedInHome3Center,
-          rect: preset.inHome2.page.borderBox,
+          startEdgeOn: displacedInHome3Center,
+          dragging: preset.inHome2.page.borderBox,
           axis,
         },
       );
