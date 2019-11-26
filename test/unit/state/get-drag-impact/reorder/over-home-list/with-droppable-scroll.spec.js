@@ -45,7 +45,7 @@ const viewport: Viewport = getViewport();
           preset.inHome2.page.borderBox.center[axis.line];
         const distanceNeeded: Position = patch(
           axis.line,
-          centerOfInHome2 - preset.inHome1.page.borderBox[axis.end],
+          centerOfInHome2 - preset.inHome1.page.borderBox[axis.end] + 1,
         );
 
         const scrolledHome: DroppableDimension = scrollDroppable(
@@ -114,10 +114,10 @@ const viewport: Viewport = getViewport();
         const centerOfInHome2: number =
           preset.inHome2.page.borderBox.center[axis.line];
 
-        // Displacement will end when start hits the displaced center of inHome2
+        // Displacement will end when start goes past the displaced center of inHome2
         const distanceNeeded: Position = patch(
           axis.line,
-          centerOfInHome2 - preset.inHome4.page.borderBox[axis.start],
+          centerOfInHome2 - preset.inHome4.page.borderBox[axis.start] - 1,
         );
         const scrolledHome: DroppableDimension = scrollDroppable(
           scrollableHome,

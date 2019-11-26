@@ -92,25 +92,25 @@ export default ({
 
       if (didStartAfterCritical) {
         // Continue to displace while targetEnd before the childCenter
-        // Move once we hit the childCenter
+        // Move once we *move forward past* the childCenter
         if (isDisplaced) {
-          return targetEnd < childCenter;
+          return targetEnd <= childCenter;
         }
 
         // Has been moved backwards from where it started
-        // Displace forwards when targetStart hits the displaced childCenter
-        return targetStart <= childCenter - displacement;
+        // Displace forwards when targetStart *moves backwards past* the displaced childCenter
+        return targetStart < childCenter - displacement;
       }
 
       // Item has been shifted forward.
-      // Continue to displace forward while targetEnd < new center
+      // Remove displacement when targetEnd moves forward past the displaced center
       if (isDisplaced) {
-        return targetEnd < childCenter + displacement;
+        return targetEnd <= childCenter + displacement;
       }
 
       // Item is behind the dragging item
-      // We want to displace it if the targetStart hits the childCenter from behind
-      return targetStart <= childCenter;
+      // We want to displace it if the targetStart goes *backwards past* the childCenter
+      return targetStart < childCenter;
     },
   );
 
