@@ -57,7 +57,7 @@ export default ({
       const id: DraggableId = child.descriptor.id;
       const childRect: Rect = child.page.borderBox;
       const childSize: number = childRect[axis.size];
-      const threshold: number = childSize * (1 / 5);
+      const threshold: number = childSize / 5;
 
       const didStartAfterCritical: boolean = getDidStartAfterCritical(
         id,
@@ -69,21 +69,26 @@ export default ({
         id,
       });
 
+      /*
+      Note: need to move past the barriers not onto them to
+      */
+
       if (didStartAfterCritical) {
         // In original position
-        // Will combine with item when between 1/3 and 2/3 of item
+        // Will combine with item when inside a band
         if (isDisplaced) {
+          // must move past the line, not onto it
           return (
             targetEnd > childRect[axis.start] + threshold &&
-            targetEnd < childRect[axis.end] - threshold
+            targetEnd <= childRect[axis.end] - threshold
           );
         }
 
         // child is now 'displaced' backwards from where it started
         // want to combine when we move backwards onto it
         return (
-          targetStart < childRect[axis.end] - displacement - threshold &&
-          targetStart > childRect[axis.start] - displacement + threshold
+          targetStart >= childRect[axis.start] - displacement + threshold &&
+          targetStart < childRect[axis.end] - displacement - threshold
         );
       }
 
