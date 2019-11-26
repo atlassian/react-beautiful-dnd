@@ -5,7 +5,6 @@ import type {
   DragImpact,
   DisplacedBy,
   DroppableDimensionMap,
-  DraggableDimension,
 } from '../../../../../src/types';
 import { vertical, horizontal } from '../../../../../src/state/axis';
 import { getPreset, enableCombining } from '../../../../util/dimension';
@@ -21,10 +20,7 @@ import {
   getCenterForStartEdge,
   getCenterForEndEdge,
 } from '../util/get-edge-from-center';
-
-function getThreshold(axis: Axis, draggable: DraggableDimension): Position {
-  return patch(axis.line, draggable.page.borderBox[axis.size] / 5);
-}
+import { getThreshold } from './util';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
