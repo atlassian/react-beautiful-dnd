@@ -98,7 +98,7 @@ import { getThreshold } from './util';
         // gone past combine point
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: afterPoint(center, axis),
+            pageBorderBoxCenter: afterPoint(axis, center),
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -132,7 +132,7 @@ import { getThreshold } from './util';
         }
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: afterPoint(center, axis),
+            pageBorderBoxCenter: afterPoint(axis, center),
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -234,7 +234,7 @@ import { getThreshold } from './util';
         // moved back enough
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: beforePoint(center, axis),
+            pageBorderBoxCenter: beforePoint(axis, center),
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -270,7 +270,7 @@ import { getThreshold } from './util';
         // moved back enough
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: beforePoint(center, axis),
+            pageBorderBoxCenter: beforePoint(axis, center),
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -310,7 +310,7 @@ import { getThreshold } from './util';
       });
 
       const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter: beforePoint(center, axis),
+        pageBorderBoxCenter: beforePoint(axis, center),
         draggable: preset.inHome3,
         draggables: preset.draggables,
         droppables: withCombineEnabled,

@@ -28,7 +28,7 @@ import afterPoint from '../../../../../util/after-point';
       });
 
       const goingForwards: DragImpact = getDragImpact({
-        pageBorderBoxCenter: afterPoint(centerForEndOnInHome4Center, axis),
+        pageBorderBoxCenter: afterPoint(axis, centerForEndOnInHome4Center),
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: preset.droppables,

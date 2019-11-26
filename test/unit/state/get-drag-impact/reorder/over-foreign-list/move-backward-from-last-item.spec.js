@@ -52,7 +52,7 @@ import beforePoint from '../../../../../util/before-point';
       });
 
       const goingBackwards: DragImpact = getDragImpact({
-        pageBorderBoxCenter: beforePoint(centerForEndOnInForeign4Center, axis),
+        pageBorderBoxCenter: beforePoint(axis, centerForEndOnInForeign4Center),
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: preset.droppables,

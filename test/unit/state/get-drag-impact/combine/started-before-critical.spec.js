@@ -130,7 +130,7 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
           // it should merge with the item when it goes onto the displaced start
           {
             const impact: DragImpact = getDragImpact({
-              pageBorderBoxCenter: afterPoint(endOnCombineStart, axis),
+              pageBorderBoxCenter: afterPoint(axis, endOnCombineStart),
               draggable: preset.inHome1,
               draggables: preset.draggables,
               droppables: withCombineEnabled,
@@ -159,8 +159,8 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
           {
             const impact: DragImpact = getDragImpact({
               pageBorderBoxCenter: afterPoint(
-                onDisplacedTwoThirdsOfInForeign3,
                 axis,
+                onDisplacedTwoThirdsOfInForeign3,
               ),
               draggable: preset.inHome1,
               draggables: preset.draggables,
@@ -223,7 +223,7 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
         // before is not far enough
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: afterPoint(endOfInForeign2, axis),
+            pageBorderBoxCenter: afterPoint(axis, endOfInForeign2),
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -335,7 +335,7 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
         // forward in the grouping range
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: afterPoint(onOneThirdOfInForeign2, axis),
+            pageBorderBoxCenter: afterPoint(axis, onOneThirdOfInForeign2),
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
