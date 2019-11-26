@@ -90,6 +90,16 @@ export default ({
 
       const isDisplaced: boolean = getIsDisplaced({ displaced: last, id });
 
+      /*
+      Note: we change things when moving *past* the child center - not when it hits the center
+      If we make it when we *hit* the child center then there can be
+      a hit on the next update causing a flicker.
+
+      - Update 1: targetBottom hits center => displace backwards
+      - Update 2: targetStart is now hitting the displaced center => displace forwards
+      - Update 3: goto 1 (boom)
+    */
+
       if (didStartAfterCritical) {
         // Continue to displace while targetEnd before the childCenter
         // Move once we *move forward past* the childCenter
