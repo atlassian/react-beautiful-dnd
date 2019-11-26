@@ -136,7 +136,7 @@ import {
       // no longer displace as we have moved forwards past the displaced center
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterPoint(displaced, axis),
+          pageBorderBoxCenter: afterPoint(axis, displaced),
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: preset.droppables,

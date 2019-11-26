@@ -40,7 +40,7 @@ import { getForcedDisplacement } from '../../../../util/impact';
       // does not combine when combine is disabled
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforePoint(startOfInHome3, axis),
+          pageBorderBoxCenter: beforePoint(axis, startOfInHome3),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: preset.droppables,

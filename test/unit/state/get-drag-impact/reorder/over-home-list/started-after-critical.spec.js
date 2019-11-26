@@ -44,7 +44,7 @@ import {
     });
 
     const endPastInHome3Center: DragImpact = getDragImpact({
-      pageBorderBoxCenter: afterPoint(centerForEndOnInHome3Center, axis),
+      pageBorderBoxCenter: afterPoint(axis, centerForEndOnInHome3Center),
       draggable: preset.inHome2,
       draggables: preset.draggables,
       droppables: preset.droppables,
@@ -146,8 +146,8 @@ import {
       {
         const impact: DragImpact = getDragImpact({
           pageBorderBoxCenter: beforePoint(
-            centerForStartOnDisplacedInHome2Center,
             axis,
+            centerForStartOnDisplacedInHome2Center,
           ),
           draggable: preset.inHome2,
           draggables: preset.draggables,
