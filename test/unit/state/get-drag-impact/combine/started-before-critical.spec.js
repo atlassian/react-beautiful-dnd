@@ -15,8 +15,10 @@ import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import afterPoint from '../../../../util/after-point';
 import beforePoint from '../../../../util/before-point';
 import { getForcedDisplacement } from '../../../../util/impact';
+import { getThreshold } from './util';
+import { getCenterForEndEdge } from '../util/get-edge-from-center';
 
-[vertical, horizontal].forEach((axis: Axis) => {
+[vertical /* , horizontal */].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
     const { afterCritical } = getLiftEffect({
@@ -57,20 +59,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
 
     // moving onto a displaced inForeign3
     describe('combining with displaced item', () => {
-      const startOfInForeign3: Position = patch(
-        axis.line,
-        preset.inForeign3.page.borderBox[axis.start],
-        crossAxisCenter,
-      );
-      const onDisplacedStartOfInForeign3: Position = add(
-        startOfInForeign3,
-        displacedBy.point,
-      );
-      const onDisplacedTwoThirdsOfInForeign3: Position = add(
-        onDisplacedStartOfInForeign3,
-        patch(axis.line, preset.inForeign3.page.borderBox[axis.size] * 0.666),
-      );
-
       const combineWithDisplacedInForeign3: DragImpact = {
         displaced: getForcedDisplacement({
           // inForeign3 is still displaced - we are just merging with it
@@ -90,137 +78,115 @@ import { getForcedDisplacement } from '../../../../util/impact';
         },
       };
 
-      it.only('should combine when moving forward onto a displaced start edge', () => {
-        // it should not merge when before the item
-        {
-          const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: beforePoint(
-              onDisplacedStartOfInForeign3,
-              axis,
-            ),
-            draggable: preset.inHome1,
-            draggables: preset.draggables,
-            droppables: withCombineEnabled,
-            previousImpact: whenEnteredForeign,
-            viewport: preset.viewport,
-            afterCritical,
-          });
-          expect(impact).toEqual(whenEnteredForeign);
-        }
-        // it should merge with the item when it goes onto the displaced start
-        {
-          const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: onDisplacedStartOfInForeign3,
-            draggable: preset.inHome1,
-            draggables: preset.draggables,
-            droppables: withCombineEnabled,
-            previousImpact: whenEnteredForeign,
-            viewport: preset.viewport,
-            afterCritical,
-          });
-          expect(impact).toEqual(combineWithDisplacedInForeign3);
-        }
-      });
+      describe('item is displaced forward', () => {
+        const threshold: Position = getThreshold(axis, preset.inHome3);
+        const startOfInForeign3: Position = patch(
+          axis.line,
+          preset.inForeign3.page.borderBox[axis.start],
+          crossAxisCenter,
+        );
+        const endOfInForeign3: Position = patch(
+          axis.line,
+          preset.inForeign3.page.borderBox[axis.end],
+          crossAxisCenter,
+        );
+        const displacedStartOfInForeign3: Position = add(
+          startOfInForeign3,
+          displacedBy.point,
+        );
+        const displacedEndOfInForeign3: Position = add(
+          endOfInForeign3,
+          displacedBy.point,
+        );
+        const combineStart: Position = add(
+          displacedStartOfInForeign3,
+          threshold,
+        );
+        const combineEnd: Position = subtract(
+          displacedEndOfInForeign3,
+          threshold,
+        );
 
-      it('should no longer merge when moving out of the first 2/3 of the target', () => {
-        // merge when still in on two thirds
-        {
-          const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: onDisplacedTwoThirdsOfInForeign3,
-            draggable: preset.inHome1,
-            draggables: preset.draggables,
-            droppables: withCombineEnabled,
-            previousImpact: whenEnteredForeign,
-            viewport: preset.viewport,
-            afterCritical,
-          });
-          expect(impact).toEqual(combineWithDisplacedInForeign3);
-        }
-        {
-          const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: afterPoint(
-              onDisplacedTwoThirdsOfInForeign3,
-              axis,
-            ),
-            draggable: preset.inHome1,
-            draggables: preset.draggables,
-            droppables: withCombineEnabled,
-            previousImpact: whenEnteredForeign,
-            viewport: preset.viewport,
-            afterCritical,
-          });
-
-          const expected: DragImpact = {
-            displaced: getForcedDisplacement({
-              visible: [{ dimension: preset.inForeign4 }],
-            }),
-            displacedBy,
-            at: {
-              type: 'REORDER',
-              // now in spot of inForeign4
-              destination: {
-                index: preset.inForeign4.descriptor.index,
-                droppableId: preset.inForeign4.descriptor.droppableId,
-              },
-            },
-          };
-          expect(impact).toEqual(expected);
-        }
-      });
-
-      it('should allow movement in any direction when in the first 2/3 and still combine', () => {
-        const initial: DragImpact = getDragImpact({
-          pageBorderBoxCenter: onDisplacedStartOfInForeign3,
-          draggable: preset.inHome1,
-          draggables: preset.draggables,
-          droppables: withCombineEnabled,
-          previousImpact: whenEnteredForeign,
-          viewport: preset.viewport,
-          afterCritical,
+        const endOnCombineStart: Position = getCenterForEndEdge({
+          endEdgeOn: combineStart,
+          dragging: preset.inHome1.page.borderBox,
+          axis,
         });
-        expect(initial).toEqual(combineWithDisplacedInForeign3);
-        // on start edge, but in backward direction
-        {
-          const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: onDisplacedStartOfInForeign3,
-            draggable: preset.inHome1,
-            draggables: preset.draggables,
-            droppables: withCombineEnabled,
-            previousImpact: initial,
-            viewport: preset.viewport,
-            afterCritical,
-          });
-          expect(impact).toEqual(combineWithDisplacedInForeign3);
-        }
-        // on displaced edge, but in backward direction
-        {
-          const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: onDisplacedTwoThirdsOfInForeign3,
-            draggable: preset.inHome1,
-            draggables: preset.draggables,
-            droppables: withCombineEnabled,
-            previousImpact: initial,
-            viewport: preset.viewport,
-            afterCritical,
-          });
-          expect(impact).toEqual(combineWithDisplacedInForeign3);
-        }
-        // on displaced edge, but in backward direction
-        {
-          const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: beforePoint(
-              onDisplacedTwoThirdsOfInForeign3,
-              axis,
-            ),
-            draggable: preset.inHome1,
-            draggables: preset.draggables,
-            droppables: withCombineEnabled,
-            previousImpact: initial,
-            viewport: preset.viewport,
-            afterCritical,
-          });
-          expect(impact).toEqual(combineWithDisplacedInForeign3);
-        }
+
+        it.only('should combine when moving forward past the displaced start threshold', () => {
+          // it should not merge on the threshold
+          {
+            const impact: DragImpact = getDragImpact({
+              pageBorderBoxCenter: endOnCombineStart,
+              draggable: preset.inHome1,
+              draggables: preset.draggables,
+              droppables: withCombineEnabled,
+              previousImpact: whenEnteredForeign,
+              viewport: preset.viewport,
+              afterCritical,
+            });
+            expect(impact).toEqual(whenEnteredForeign);
+          }
+          // it should merge with the item when it goes onto the displaced start
+          {
+            const impact: DragImpact = getDragImpact({
+              pageBorderBoxCenter: afterPoint(endOnCombineStart, axis),
+              draggable: preset.inHome1,
+              draggables: preset.draggables,
+              droppables: withCombineEnabled,
+              previousImpact: whenEnteredForeign,
+              viewport: preset.viewport,
+              afterCritical,
+            });
+            expect(impact).toEqual(combineWithDisplacedInForeign3);
+          }
+        });
+
+        it('should no longer merge when moving out of the first 2/3 of the target', () => {
+          // merge when still in on two thirds
+          {
+            const impact: DragImpact = getDragImpact({
+              pageBorderBoxCenter: onDisplacedTwoThirdsOfInForeign3,
+              draggable: preset.inHome1,
+              draggables: preset.draggables,
+              droppables: withCombineEnabled,
+              previousImpact: whenEnteredForeign,
+              viewport: preset.viewport,
+              afterCritical,
+            });
+            expect(impact).toEqual(combineWithDisplacedInForeign3);
+          }
+          {
+            const impact: DragImpact = getDragImpact({
+              pageBorderBoxCenter: afterPoint(
+                onDisplacedTwoThirdsOfInForeign3,
+                axis,
+              ),
+              draggable: preset.inHome1,
+              draggables: preset.draggables,
+              droppables: withCombineEnabled,
+              previousImpact: whenEnteredForeign,
+              viewport: preset.viewport,
+              afterCritical,
+            });
+
+            const expected: DragImpact = {
+              displaced: getForcedDisplacement({
+                visible: [{ dimension: preset.inForeign4 }],
+              }),
+              displacedBy,
+              at: {
+                type: 'REORDER',
+                // now in spot of inForeign4
+                destination: {
+                  index: preset.inForeign4.descriptor.index,
+                  droppableId: preset.inForeign4.descriptor.droppableId,
+                },
+              },
+            };
+            expect(impact).toEqual(expected);
+          }
+        });
       });
     });
 
