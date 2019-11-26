@@ -8,6 +8,7 @@ import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../../util/dimension';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
 import { getCenterForEndEdge } from '../../util/get-edge-from-center';
+import afterPoint from '../../../../../util/after-point';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -27,7 +28,7 @@ import { getCenterForEndEdge } from '../../util/get-edge-from-center';
       });
 
       const goingForwards: DragImpact = getDragImpact({
-        pageBorderBoxCenter: centerForEndOnInHome4Center,
+        pageBorderBoxCenter: afterPoint(centerForEndOnInHome4Center, axis),
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: preset.droppables,
