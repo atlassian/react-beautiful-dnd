@@ -10,11 +10,11 @@ import { horizontal, vertical } from '../../../../../../src/state/axis';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import { patch } from '../../../../../../src/state/position';
-import { backward } from '../../../../../../src/state/user-direction/user-direction-preset';
 import { getPreset } from '../../../../../util/dimension';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
 import { getForcedDisplacement } from '../../../../../util/impact';
+import { getCenterForStartEdge } from '../../util/get-edge-from-center';
+import beforePoint from '../../../../../util/before-point';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -31,11 +31,7 @@ import { getForcedDisplacement } from '../../../../../util/impact';
         axis,
         preset.inHome1.displaceBy,
       );
-      const endOfInForeign4: Position = patch(
-        axis.line,
-        preset.inForeign4.page.borderBox[axis.end],
-        preset.foreign.page.borderBox.center[axis.crossAxisLine],
-      );
+
       const inLastSpot: DragImpact = {
         displaced: emptyGroups,
         displacedBy,
@@ -49,14 +45,19 @@ import { getForcedDisplacement } from '../../../../../util/impact';
         },
       };
 
+      const centerForEndOnInForeign4Center: Position = getCenterForStartEdge({
+        startEdgeOn: preset.inForeign4.page.borderBox.center,
+        dragging: preset.inHome1.page.borderBox,
+        axis,
+      });
+
       const goingBackwards: DragImpact = getDragImpact({
-        pageBorderBoxCenter: endOfInForeign4,
+        pageBorderBoxCenter: beforePoint(centerForEndOnInForeign4Center, axis),
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: preset.droppables,
         previousImpact: inLastSpot,
         viewport,
-        userDirection: backward,
         afterCritical,
       });
 
