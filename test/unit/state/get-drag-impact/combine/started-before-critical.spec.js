@@ -8,10 +8,6 @@ import type {
 } from '../../../../../src/types';
 import { vertical, horizontal } from '../../../../../src/state/axis';
 import { getPreset, enableCombining } from '../../../../util/dimension';
-import {
-  forward,
-  backward,
-} from '../../../../../src/state/user-direction/user-direction-preset';
 import getDragImpact from '../../../../../src/state/get-drag-impact';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { patch, subtract, add } from '../../../../../src/state/position';
@@ -86,7 +82,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
         displacedBy,
         at: {
           type: 'COMBINE',
-          whenEntered: forward,
           // now merging with inForeign3
           combine: {
             draggableId: preset.inForeign3.descriptor.id,
@@ -95,7 +90,7 @@ import { getForcedDisplacement } from '../../../../util/impact';
         },
       };
 
-      it('should combine when moving forward onto a displaced start edge', () => {
+      it.only('should combine when moving forward onto a displaced start edge', () => {
         // it should not merge when before the item
         {
           const impact: DragImpact = getDragImpact({
@@ -108,7 +103,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
-            userDirection: forward,
             afterCritical,
           });
           expect(impact).toEqual(whenEnteredForeign);
@@ -122,7 +116,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
-            userDirection: forward,
             afterCritical,
           });
           expect(impact).toEqual(combineWithDisplacedInForeign3);
@@ -139,7 +132,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
-            userDirection: forward,
             afterCritical,
           });
           expect(impact).toEqual(combineWithDisplacedInForeign3);
@@ -155,7 +147,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
-            userDirection: forward,
             afterCritical,
           });
 
@@ -185,7 +176,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
           droppables: withCombineEnabled,
           previousImpact: whenEnteredForeign,
           viewport: preset.viewport,
-          userDirection: forward,
           afterCritical,
         });
         expect(initial).toEqual(combineWithDisplacedInForeign3);
@@ -198,7 +188,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: initial,
             viewport: preset.viewport,
-            userDirection: backward,
             afterCritical,
           });
           expect(impact).toEqual(combineWithDisplacedInForeign3);
@@ -212,7 +201,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: initial,
             viewport: preset.viewport,
-            userDirection: backward,
             afterCritical,
           });
           expect(impact).toEqual(combineWithDisplacedInForeign3);
@@ -229,7 +217,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: initial,
             viewport: preset.viewport,
-            userDirection: backward,
             afterCritical,
           });
           expect(impact).toEqual(combineWithDisplacedInForeign3);
@@ -259,7 +246,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
         // now merging with inForeign2
         at: {
           type: 'COMBINE',
-          whenEntered: backward,
           combine: {
             draggableId: preset.inForeign2.descriptor.id,
             droppableId: preset.inForeign2.descriptor.droppableId,
@@ -277,7 +263,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
-            userDirection: backward,
             afterCritical,
           });
           expect(impact).toEqual(whenEnteredForeign);
@@ -291,7 +276,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
-            userDirection: backward,
             afterCritical,
           });
           expect(impact).toEqual(combineWithInForeign2);
@@ -308,7 +292,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
-            userDirection: backward,
             afterCritical,
           });
           expect(impact).toEqual(combineWithInForeign2);
@@ -322,7 +305,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
-            userDirection: backward,
             afterCritical,
           });
 
@@ -355,7 +337,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
           droppables: withCombineEnabled,
           previousImpact: whenEnteredForeign,
           viewport: preset.viewport,
-          userDirection: backward,
           afterCritical,
         });
         expect(initial).toEqual(combineWithInForeign2);
@@ -368,7 +349,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: initial,
             viewport: preset.viewport,
-            userDirection: forward,
             afterCritical,
           });
           expect(impact).toEqual(combineWithInForeign2);
@@ -382,7 +362,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: initial,
             viewport: preset.viewport,
-            userDirection: forward,
             afterCritical,
           });
           expect(impact).toEqual(combineWithInForeign2);
@@ -396,7 +375,6 @@ import { getForcedDisplacement } from '../../../../util/impact';
             droppables: withCombineEnabled,
             previousImpact: initial,
             viewport: preset.viewport,
-            userDirection: forward,
             afterCritical,
           });
           expect(impact).toEqual(combineWithInForeign2);
