@@ -19,7 +19,7 @@ import { getForcedDisplacement } from '../../../../../util/impact';
 import {
   getCenterForEndEdge,
   getCenterForStartEdge,
-} from '../../util/get-edge-from-center';
+} from '../../util/get-center-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

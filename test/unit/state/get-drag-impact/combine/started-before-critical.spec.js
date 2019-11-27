@@ -15,11 +15,11 @@ import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import afterPoint from '../../../../util/after-point';
 import beforePoint from '../../../../util/before-point';
 import { getForcedDisplacement } from '../../../../util/impact';
-import { getThreshold } from './util';
+import { getThreshold } from '../util/get-combine-threshold';
 import {
   getCenterForEndEdge,
   getCenterForStartEdge,
-} from '../util/get-edge-from-center';
+} from '../util/get-center-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

@@ -12,7 +12,7 @@ import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../../util/dimension';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
-import { getCenterForStartEdge } from '../../util/get-edge-from-center';
+import { getCenterForStartEdge } from '../../util/get-center-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

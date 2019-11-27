@@ -19,8 +19,8 @@ import noImpact, { emptyGroups } from '../../../../../src/state/no-impact';
 import {
   getCenterForStartEdge,
   getCenterForEndEdge,
-} from '../util/get-edge-from-center';
-import { getThreshold } from './util';
+} from '../util/get-center-for-edge';
+import { getThreshold } from '../util/get-combine-threshold';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
