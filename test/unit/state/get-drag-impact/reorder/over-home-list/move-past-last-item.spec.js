@@ -7,7 +7,7 @@ import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../../util/dimension';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
-import { getCenterForEndEdge } from '../../util/get-edge-from-center';
+import { getCenterForEndEdge } from '../../util/get-center-for-edge';
 import afterPoint from '../../../../../util/after-point';
 
 [vertical, horizontal].forEach((axis: Axis) => {

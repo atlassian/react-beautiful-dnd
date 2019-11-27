@@ -13,7 +13,7 @@ import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../../util/dimension';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
 import { getForcedDisplacement } from '../../../../../util/impact';
-import { getCenterForStartEdge } from '../../util/get-edge-from-center';
+import { getCenterForStartEdge } from '../../util/get-center-for-edge';
 import beforePoint from '../../../../../util/before-point';
 
 [vertical, horizontal].forEach((axis: Axis) => {

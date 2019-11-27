@@ -13,8 +13,8 @@ import { patch, add } from '../../../../../src/state/position';
 import afterPoint from '../../../../util/after-point';
 import { enableCombining, getPreset } from '../../../../util/dimension';
 import { getForcedDisplacement } from '../../../../util/impact';
-import { getThreshold } from './util';
-import { getCenterForEndEdge } from '../util/get-edge-from-center';
+import { getThreshold } from '../util/get-combine-threshold';
+import { getCenterForEndEdge } from '../util/get-center-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
