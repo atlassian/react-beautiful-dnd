@@ -68,7 +68,7 @@ const Container = styled.a`
   box-sizing: border-box;
   padding: ${grid}px;
   min-height: ${imageSize}px;
-  xmargin-bottom: ${grid}px;
+  margin-bottom: ${grid}px;
   user-select: none;
 
   /* anchor overrides */

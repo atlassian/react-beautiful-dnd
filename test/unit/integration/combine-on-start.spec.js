@@ -1,6 +1,5 @@
 // @flow
 import React from 'react';
-import { getRect } from 'css-box-model';
 import { render, fireEvent } from '@testing-library/react';
 import * as keyCodes from '../../../src/view/key-codes';
 import type {
@@ -89,7 +88,7 @@ class App extends React.Component<*, State> {
 }
 
 jest.useFakeTimers();
-it.only('should allow the changing of combining in onDragStart', () => {
+it('should allow the changing of combining in onDragStart', () => {
   withPoorDimensionMocks(() => {
     const responders: Responders = {
       onDragStart: jest.fn(),
