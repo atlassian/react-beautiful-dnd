@@ -111,7 +111,7 @@ import { getThreshold } from './util';
         }
       });
 
-      it('should remain displaced until the bottom of the dragging item goes past the (4/5) mark', () => {
+      it('should remain displaced until the bottom of the dragging item goes onto the (4/5) mark', () => {
         const center: Position = getCenterForEndEdge({
           endEdgeOn: combineEnd,
           dragging: preset.inHome2.page.borderBox,
@@ -119,7 +119,7 @@ import { getThreshold } from './util';
         });
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: center,
+            pageBorderBoxCenter: beforePoint(axis, center),
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -132,7 +132,7 @@ import { getThreshold } from './util';
         }
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: afterPoint(axis, center),
+            pageBorderBoxCenter: center,
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -247,7 +247,7 @@ import { getThreshold } from './util';
         }
       });
 
-      it('should no longer combine with an item once it goes past the top threshold', () => {
+      it('should no longer combine with an item once it hits the top threshold', () => {
         const center: Position = getCenterForStartEdge({
           startEdgeOn: combineStart,
           dragging: preset.inHome2.page.borderBox,
@@ -257,7 +257,7 @@ import { getThreshold } from './util';
         // have not moved far enough backwards yet
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: center,
+            pageBorderBoxCenter: afterPoint(axis, center),
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -270,7 +270,7 @@ import { getThreshold } from './util';
         // moved back enough
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: beforePoint(axis, center),
+            pageBorderBoxCenter: center,
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
