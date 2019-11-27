@@ -22,16 +22,12 @@ const Parent = styled.div`
   display: flex;
 `;
 
-type ItemWidth = 'small' | 'large';
-const itemWidths = {
-  small: 250,
-  large: 600,
-};
+type Width = 'small' | 'large';
 
 type ItemProps = {|
   quote: Quote,
   index: number,
-  width: ItemWidth,
+  shouldAllowTrimming: boolean,
 |};
 
 const StyledItem = styled.div`
@@ -39,8 +35,6 @@ const StyledItem = styled.div`
   background: ${colors.G50};
   padding: ${grid}px;
   margin-bottom: ${grid}px;
-  width: ${props =>
-    props.width === 'small' ? itemWidths.small : itemWidths.large}px;
   user-select: none;
 `;
 
@@ -57,7 +51,7 @@ function Item(props: ItemProps) {
           if (!useTrimming) {
             return;
           }
-          if (props.width === 'small') {
+          if (!props.shouldAllowTrimming) {
             return;
           }
 
@@ -119,7 +113,7 @@ function Item(props: ItemProps) {
     ]);
 
     return unsubscribe;
-  }, [props.width, quote.id, useTrimming]);
+  }, [props.shouldAllowTrimming, quote.id, useTrimming]);
 
   return (
     <Draggable draggableId={quote.id} index={index}>
@@ -131,7 +125,7 @@ function Item(props: ItemProps) {
             provided.innerRef(node);
             ref.current = node;
           }}
-          width={props.width}
+          shouldAllowTrimming={props.shouldAllowTrimming}
         >
           {quote.content}
         </StyledItem>
@@ -143,7 +137,7 @@ function Item(props: ItemProps) {
 type ListProps = {|
   listId: string,
   quotes: Quote[],
-  itemWidth: ItemWidth,
+  width: Width,
 |};
 
 const StyledList = styled.div`
@@ -151,19 +145,27 @@ const StyledList = styled.div`
   margin: ${grid}px;
   padding: ${grid}px;
   box-sizing: border-box;
+  background-color: ${props =>
+    props.isDraggingOver ? colors.B100 : 'inherit'};
+  width: ${props => (props.width === 'large' ? 800 : 200)}px;
 `;
 
 function List(props: ListProps) {
   return (
     <Droppable droppableId={props.listId}>
-      {provided => (
-        <StyledList {...provided.droppableProps} ref={provided.innerRef}>
+      {(provided, snapshot) => (
+        <StyledList
+          {...provided.droppableProps}
+          ref={provided.innerRef}
+          isDraggingOver={snapshot.isDraggingOver}
+          width={props.width}
+        >
           {props.quotes.map((quote: Quote, index: number) => (
             <Item
               key={quote.id}
               quote={quote}
               index={index}
-              width={props.itemWidth}
+              shouldAllowTrimming={props.width === 'large'}
             />
           ))}
           {provided.placeholder}
@@ -187,9 +189,10 @@ export default function App() {
     if (source.droppableId === destination.droppableId) {
       if (source.droppableId === 'first') {
         setFirst(reorder(first, source.index, destination.index));
-        return;
+      } else {
+        setSecond(reorder(second, source.index, destination.index));
       }
-      setSecond(reorder(second, source.index, destination.index));
+      return;
     }
 
     const { list1, list2 } = moveBetween({
@@ -237,10 +240,11 @@ export default function App() {
     <UseTrimmingContext.Provider value={useTrimming}>
       <DragDropContext onBeforeCapture={onBeforeCapture} onDragEnd={onDragEnd}>
         <Parent>
-          <List listId="first" quotes={first} itemWidth="small" />
-          <List listId="second" quotes={second} itemWidth="large" />
+          <List listId="first" quotes={first} width="small" />
+          <List listId="second" quotes={second} width="large" />
         </Parent>
-        Item trimming: <strong>{useTrimming ? 'enabled' : 'disabled'}</strong>
+        Item trimming experiment:{' '}
+        <strong>{useTrimming ? 'enabled' : 'disabled'}</strong>
         <button
           type="button"
           onClick={() => setUseTrimming((value: boolean) => !value)}
