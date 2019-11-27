@@ -70,10 +70,8 @@ export default ({
       });
 
       /*
-      Note: need to move past the barriers not onto them to
-
-          Only combining when in the combine region
-          As soon as a boundary is hit then no longer combining
+        Only combining when in the combine region
+        As soon as a boundary is hit then no longer combining
       */
 
       if (didStartAfterCritical) {

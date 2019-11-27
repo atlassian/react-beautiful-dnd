@@ -43,7 +43,7 @@ import {
     });
 
     const goingBackwards: DragImpact = getDragImpact({
-      pageBorderBoxCenter: beforePoint(centerForStartOnInForeign2Center, axis),
+      pageBorderBoxCenter: beforePoint(axis, centerForStartOnInForeign2Center),
       draggable: preset.inHome1,
       draggables: preset.draggables,
       droppables: preset.droppables,
