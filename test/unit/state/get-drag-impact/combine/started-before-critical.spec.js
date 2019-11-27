@@ -16,9 +16,12 @@ import afterPoint from '../../../../util/after-point';
 import beforePoint from '../../../../util/before-point';
 import { getForcedDisplacement } from '../../../../util/impact';
 import { getThreshold } from './util';
-import { getCenterForEndEdge } from '../util/get-edge-from-center';
+import {
+  getCenterForEndEdge,
+  getCenterForStartEdge,
+} from '../util/get-edge-from-center';
 
-[vertical /* , horizontal */].forEach((axis: Axis) => {
+[vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
     const preset = getPreset(axis);
     const { afterCritical } = getLiftEffect({
@@ -107,13 +110,13 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
           threshold,
         );
 
-        const endOnCombineStart: Position = getCenterForEndEdge({
-          endEdgeOn: combineStart,
-          dragging: preset.inHome1.page.borderBox,
-          axis,
-        });
+        it('should combine when moving forward past the displaced start threshold', () => {
+          const endOnCombineStart: Position = getCenterForEndEdge({
+            endEdgeOn: combineStart,
+            dragging: preset.inHome1.page.borderBox,
+            axis,
+          });
 
-        it.only('should combine when moving forward past the displaced start threshold', () => {
           // it should not merge on the threshold
           {
             const impact: DragImpact = getDragImpact({
@@ -142,11 +145,17 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
           }
         });
 
-        it('should no longer merge when moving out of the first 2/3 of the target', () => {
+        it('should no longer merge when moving onto 4/5 of the target', () => {
+          const endOnCombineEnd: Position = getCenterForEndEdge({
+            endEdgeOn: combineEnd,
+            dragging: preset.inHome1.page.borderBox,
+            axis,
+          });
+
           // merge when still in on two thirds
           {
             const impact: DragImpact = getDragImpact({
-              pageBorderBoxCenter: onDisplacedTwoThirdsOfInForeign3,
+              pageBorderBoxCenter: beforePoint(axis, endOnCombineEnd),
               draggable: preset.inHome1,
               draggables: preset.draggables,
               droppables: withCombineEnabled,
@@ -158,10 +167,7 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
           }
           {
             const impact: DragImpact = getDragImpact({
-              pageBorderBoxCenter: afterPoint(
-                axis,
-                onDisplacedTwoThirdsOfInForeign3,
-              ),
+              pageBorderBoxCenter: endOnCombineEnd,
               draggable: preset.inHome1,
               draggables: preset.draggables,
               droppables: withCombineEnabled,
@@ -192,15 +198,19 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
 
     // moving onto a non-displaced inForeign2
     describe('combining with non-displaced item', () => {
+      const threshold: Position = getThreshold(axis, preset.inForeign2);
+      const startOfInForeign2: Position = patch(
+        axis.line,
+        preset.inForeign2.page.borderBox[axis.start],
+        crossAxisCenter,
+      );
       const endOfInForeign2: Position = patch(
         axis.line,
         preset.inForeign2.page.borderBox[axis.end],
         crossAxisCenter,
       );
-      const onOneThirdOfInForeign2: Position = subtract(
-        endOfInForeign2,
-        patch(axis.line, preset.inForeign2.page.borderBox[axis.size] * 0.666),
-      );
+      const combineStart: Position = add(startOfInForeign2, threshold);
+      const combineEnd: Position = subtract(endOfInForeign2, threshold);
       const combineWithInForeign2: DragImpact = {
         displaced: getForcedDisplacement({
           visible: [
@@ -219,11 +229,16 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
         },
       };
 
-      it('should combine with an item when moving backwards onto the end edge', () => {
-        // before is not far enough
+      it('should combine with an item when moving backwards past 1 / 5 of the items size', () => {
+        const startOnCombineEnd: Position = getCenterForStartEdge({
+          startEdgeOn: combineEnd,
+          dragging: preset.inHome1.page.borderBox,
+          axis,
+        });
+        // on edge is not far enough
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: afterPoint(axis, endOfInForeign2),
+            pageBorderBoxCenter: startOnCombineEnd,
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -233,10 +248,10 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
           });
           expect(impact).toEqual(whenEnteredForeign);
         }
-        // on edge is enough
+        // over edge is enough
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: endOfInForeign2,
+            pageBorderBoxCenter: beforePoint(axis, startOnCombineEnd),
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -248,11 +263,16 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
         }
       });
 
-      it('should stop combining when going back 2/3 of the size', () => {
-        // on top 1/3 line is good
+      it('should stop combining when going back onto 2/3 of the size', () => {
+        const startOnCombineStart: Position = getCenterForStartEdge({
+          startEdgeOn: combineStart,
+          dragging: preset.inHome1.page.borderBox,
+          axis,
+        });
+        // after start is all good
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: onOneThirdOfInForeign2,
+            pageBorderBoxCenter: afterPoint(axis, startOnCombineStart),
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -262,10 +282,10 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
           });
           expect(impact).toEqual(combineWithInForeign2);
         }
-        // past 1/3 top line is too far
+        // on combine start = stop combining
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: beforePoint(onOneThirdOfInForeign2, axis),
+            pageBorderBoxCenter: startOnCombineStart,
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -292,58 +312,6 @@ import { getCenterForEndEdge } from '../util/get-edge-from-center';
             },
           };
           expect(impact).toEqual(expected);
-        }
-      });
-
-      it('should continue to combine when forward movements are made after entering the bottom 2/3', () => {
-        const initial: DragImpact = getDragImpact({
-          pageBorderBoxCenter: endOfInForeign2,
-          draggable: preset.inHome1,
-          draggables: preset.draggables,
-          droppables: withCombineEnabled,
-          previousImpact: whenEnteredForeign,
-          viewport: preset.viewport,
-          afterCritical,
-        });
-        expect(initial).toEqual(combineWithInForeign2);
-        // forward movement on bottom edge
-        {
-          const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: endOfInForeign2,
-            draggable: preset.inHome1,
-            draggables: preset.draggables,
-            droppables: withCombineEnabled,
-            previousImpact: initial,
-            viewport: preset.viewport,
-            afterCritical,
-          });
-          expect(impact).toEqual(combineWithInForeign2);
-        }
-        // forward on 1/3 edge
-        {
-          const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: onOneThirdOfInForeign2,
-            draggable: preset.inHome1,
-            draggables: preset.draggables,
-            droppables: withCombineEnabled,
-            previousImpact: initial,
-            viewport: preset.viewport,
-            afterCritical,
-          });
-          expect(impact).toEqual(combineWithInForeign2);
-        }
-        // forward in the grouping range
-        {
-          const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: afterPoint(axis, onOneThirdOfInForeign2),
-            draggable: preset.inHome1,
-            draggables: preset.draggables,
-            droppables: withCombineEnabled,
-            previousImpact: initial,
-            viewport: preset.viewport,
-            afterCritical,
-          });
-          expect(impact).toEqual(combineWithInForeign2);
         }
       });
     });
