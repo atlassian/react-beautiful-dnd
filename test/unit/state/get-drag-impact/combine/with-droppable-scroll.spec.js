@@ -10,9 +10,10 @@ import { vertical, horizontal } from '../../../../../src/state/axis';
 import scrollDroppable from '../../../../../src/state/droppable/scroll-droppable';
 import getDragImpact from '../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../src/state/get-lift-effect';
-import { patch } from '../../../../../src/state/position';
-import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
+import { patch, add } from '../../../../../src/state/position';
 import { getPreset, makeScrollable } from '../../../../util/dimension';
+import { getThreshold } from '../util/get-combine-threshold';
+import { getCenterForEndEdge } from '../util/get-center-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -44,23 +45,29 @@ import { getPreset, makeScrollable } from '../../../../util/dimension';
       ...preset.droppables,
       [preset.home.descriptor.id]: scrolled,
     };
-    const beforeStart: Position = patch(
+    const startOfInHome2: Position = patch(
       axis.line,
-      preset.inHome2.page.borderBox[axis.start] - 1,
+      preset.inHome2.page.borderBox[axis.start],
       preset.inHome2.page.borderBox.center[axis.crossAxisLine],
     );
+    const threshold: Position = getThreshold(axis, preset.inHome2);
+    const combineStart: Position = add(startOfInHome2, threshold);
+    const onCombineStart: Position = getCenterForEndEdge({
+      endEdgeOn: combineStart,
+      dragging: preset.inHome1.page.borderBox,
+      axis,
+    });
 
     it('should take into account droppable scroll', () => {
       // no combine without droppable scroll
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforeStart,
+          pageBorderBoxCenter: onCombineStart,
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: withoutScrolled,
           previousImpact: homeImpact,
           viewport: preset.viewport,
-          userDirection: forward,
           afterCritical,
         });
 
@@ -69,13 +76,12 @@ import { getPreset, makeScrollable } from '../../../../util/dimension';
       // combine now due to do droppable scroll
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforeStart,
+          pageBorderBoxCenter: onCombineStart,
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: withScrolled,
           previousImpact: homeImpact,
           viewport: preset.viewport,
-          userDirection: forward,
           afterCritical,
         });
 
@@ -84,7 +90,6 @@ import { getPreset, makeScrollable } from '../../../../util/dimension';
           displacedBy: homeImpact.displacedBy,
           at: {
             type: 'COMBINE',
-            whenEntered: forward,
             combine: {
               draggableId: preset.inHome2.descriptor.id,
               droppableId: preset.home.descriptor.id,
