@@ -7,8 +7,5 @@ export default (frame: Spacing) => {
   const isWithinHorizontal = isWithin(frame.left, frame.right);
 
   return (point: Position) =>
-    isWithinVertical(point.y) &&
-    isWithinVertical(point.y) &&
-    isWithinHorizontal(point.x) &&
-    isWithinHorizontal(point.x);
+    isWithinVertical(point.y) && isWithinHorizontal(point.x);
 };
