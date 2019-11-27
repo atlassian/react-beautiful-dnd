@@ -71,23 +71,25 @@ export default ({
 
       /*
       Note: need to move past the barriers not onto them to
+
+          Only combining when in the combine region
+          As soon as a boundary is hit then no longer combining
       */
 
       if (didStartAfterCritical) {
         // In original position
         // Will combine with item when inside a band
         if (isDisplaced) {
-          // must move past the line, not onto it
           return (
             targetEnd > childRect[axis.start] + threshold &&
-            targetEnd <= childRect[axis.end] - threshold
+            targetEnd < childRect[axis.end] - threshold
           );
         }
 
         // child is now 'displaced' backwards from where it started
         // want to combine when we move backwards onto it
         return (
-          targetStart >= childRect[axis.start] - displacement + threshold &&
+          targetStart > childRect[axis.start] - displacement + threshold &&
           targetStart < childRect[axis.end] - displacement - threshold
         );
       }
