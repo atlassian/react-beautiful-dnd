@@ -92,18 +92,18 @@ export default ({
         );
       }
 
-      // has moved forwards
+      // item has moved forwards
       if (isDisplaced) {
         return (
-          targetStart < childRect[axis.end] - threshold &&
-          targetStart > childRect[axis.start] + threshold
+          targetEnd > childRect[axis.start] + displacement + threshold &&
+          targetEnd < childRect[axis.end] + displacement - threshold
         );
       }
 
       // is in resting position - being moved backwards on to
       return (
-        targetEnd > childRect[axis.start] + displacement + threshold &&
-        targetEnd < childRect[axis.end] + displacement - threshold
+        targetStart > childRect[axis.start] + threshold &&
+        targetStart < childRect[axis.end] - threshold
       );
     },
   );
