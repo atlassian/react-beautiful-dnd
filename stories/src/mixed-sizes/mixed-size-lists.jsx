@@ -23,7 +23,6 @@ type Width = 'small' | 'large';
 type ItemProps = {|
   quote: Quote,
   index: number,
-  shouldAllowTrimming: boolean,
 |};
 
 const StyledItem = styled.div`
@@ -55,8 +54,15 @@ function Item(props: ItemProps) {
 type ListProps = {|
   listId: string,
   quotes: Quote[],
-  width: Width,
 |};
+
+const ListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Controls = styled.div``;
 
 const StyledList = styled.div`
   border: 1px solid ${colors.N100};
@@ -69,40 +75,39 @@ const StyledList = styled.div`
 `;
 
 function List(props: ListProps) {
+  const [width, setWidth] = useState<Width>('small');
   return (
-    <Droppable droppableId={props.listId}>
-      {(provided, snapshot) => (
-        <StyledList
-          {...provided.droppableProps}
-          ref={provided.innerRef}
-          isDraggingOver={snapshot.isDraggingOver}
-          width={props.width}
-        >
-          {props.quotes.map((quote: Quote, index: number) => (
-            <Item
-              key={quote.id}
-              quote={quote}
-              index={index}
-              shouldAllowTrimming={props.width === 'large'}
-            />
-          ))}
-          {provided.placeholder}
-        </StyledList>
-      )}
-    </Droppable>
+    <ListContainer>
+      <Controls>
+        <button type="button" onClick={() => setWidth('small')}>
+          Small
+        </button>
+        <button type="button" onClick={() => setWidth('large')}>
+          Large
+        </button>
+      </Controls>
+      <Droppable droppableId={props.listId}>
+        {(provided, snapshot) => (
+          <StyledList
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            isDraggingOver={snapshot.isDraggingOver}
+            width={width}
+          >
+            {props.quotes.map((quote: Quote, index: number) => (
+              <Item key={quote.id} quote={quote} index={index} />
+            ))}
+            {provided.placeholder}
+          </StyledList>
+        )}
+      </Droppable>
+    </ListContainer>
   );
 }
 
 export default function App() {
   const [columns, setColumns] = useState(authorQuoteMap);
   const ordered = useMemo(() => Object.keys(columns), [columns]);
-  const widths: Width[] = useMemo(
-    () =>
-      ordered.map((key: string, index: number, array: string[]): Width => {
-        return index === array.length - 1 ? 'large' : 'small';
-      }),
-    [ordered],
-  );
 
   function onDragEnd(result: DropResult) {
     const { source, destination } = result;
@@ -140,13 +145,8 @@ export default function App() {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Parent>
-        {ordered.map((key: string, index: number) => (
-          <List
-            listId={key}
-            quotes={columns[key]}
-            width={widths[index]}
-            key={key}
-          />
+        {ordered.map((key: string) => (
+          <List listId={key} quotes={columns[key]} key={key} />
         ))}
       </Parent>
     </DragDropContext>
