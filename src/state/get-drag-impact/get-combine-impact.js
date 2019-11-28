@@ -23,6 +23,10 @@ type Args = {|
   insideDestination: DraggableDimension[],
   afterCritical: LiftEffect,
 |};
+
+// exported for testing
+export const combineThresholdDivisor: number = 4;
+
 export default ({
   draggable,
   pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
@@ -57,7 +61,7 @@ export default ({
       const id: DraggableId = child.descriptor.id;
       const childRect: Rect = child.page.borderBox;
       const childSize: number = childRect[axis.size];
-      const threshold: number = childSize / 5;
+      const threshold: number = childSize / combineThresholdDivisor;
 
       const didStartAfterCritical: boolean = getDidStartAfterCritical(
         id,
