@@ -37,10 +37,21 @@ export default ({
   viewport,
   afterCritical,
 }: Args): DragImpact => {
-  const destinationId: ?DroppableId = getDroppableOver({
+  const droppablesOver: DroppableDimension[] = getDroppableOver({
     target: pageBorderBoxCenter,
+    draggable,
     droppables,
   });
+
+  console.log(
+    droppablesOver.reduce((accum, element) => {
+      accum.push(element.descriptor.id);
+      return accum;
+    }, []),
+  );
+
+  const destinationId =
+    droppablesOver.length > 0 ? droppablesOver[0].descriptor.id : undefined;
 
   // not dragging over anything
 
@@ -51,6 +62,7 @@ export default ({
   }
 
   const destination: DroppableDimension = droppables[destinationId];
+
   const insideDestination: DraggableDimension[] = getDraggablesInsideDroppable(
     destination.descriptor.id,
     draggables,
