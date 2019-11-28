@@ -1,52 +1,49 @@
 // @flow
 import type { Position, Rect, BoxModel } from 'css-box-model';
 import { toDroppableList } from './dimension-structures';
+import { distance } from './position';
+import isWithin from './is-within';
 
 import type {
+  DroppableId,
   DroppableDimension,
   DraggableDimension,
   DroppableDimensionMap,
 } from '../types';
 
-const isWithin = (
-  lowerBound: number,
-  upperBound: number,
-): (number => boolean) => (value: number): boolean =>
-  lowerBound <= value && value <= upperBound;
+type isCandidateArgs = {|
+  active: Rect,
+  target: Position,
+  client: BoxModel,
+|};
 
-const isPositionIntersecting = (frame: Rect) => {
-  const isWithinVertical = isWithin(frame.top, frame.bottom);
-  const isWithinHorizontal = isWithin(frame.left, frame.right);
-  const frameCenter = frame.center.x;
+const isCandidate = ({ active, target, client }: isCandidateArgs) => {
+  const isWithinVertical = isWithin(active.top, active.bottom)(target.y);
+  const isWithinHorizontal = isWithin(active.left, active.right)(target.x);
+  const { width: draggableWidth } = client.borderBox;
+  const activeCenterHorizontal = active.center.x;
+  const isCollidingLeft =
+    activeCenterHorizontal > target.x - draggableWidth / 2;
+  const isCollidingRight =
+    activeCenterHorizontal < target.x + draggableWidth / 2;
 
-  return (point: Position, draggableDimensions: BoxModel) => {
-    const { width: draggableWidth } = draggableDimensions.contentBox;
-    const isWithinBounds =
-      isWithinVertical(point.y) && isWithinHorizontal(point.x);
-    const isCollidingLeft = frameCenter > point.x - draggableWidth / 2;
-    const isCollidingRight = frameCenter < point.x + draggableWidth / 2;
+  // TODO: shrink active
 
-    console.log('RESULT', isWithinBounds, isCollidingLeft, isCollidingRight);
+  // TODO: current draggable rect have any overlap with smaller active
 
-    if (isCollidingLeft && point.x > frameCenter) {
-      return true;
-    }
+  // Has one of the edges passed a center point
 
-    if (isCollidingRight && point.x <= frameCenter) {
-      return true;
-    }
+  // TODO: check vertical cases
+  if (isCollidingLeft && target.x > activeCenterHorizontal) {
+    return true;
+  }
 
-    if (isWithinBounds) {
-      return true;
-    }
+  if (isCollidingRight && target.x <= activeCenterHorizontal) {
+    return true;
+  }
 
-    // TODO we might be able to use this instead of isWithinBounds
-    // if (isCollidingLeft && isCollidingRight) {
-    //   return true;
-    // }
-
-    return false;
-  };
+  // Is it within the frame
+  return isWithinVertical && isWithinHorizontal;
 };
 
 type Args = {|
@@ -55,13 +52,9 @@ type Args = {|
   droppables: DroppableDimensionMap,
 |};
 
-export default ({
-  target,
-  draggable,
-  droppables,
-}: Args): DroppableDimension[] => {
-  return toDroppableList(droppables).filter(
-    (droppable: DroppableDimension): boolean => {
+export default ({ target, draggable, droppables }: Args): ?DroppableId => {
+  const active = toDroppableList(droppables).filter(
+    (droppable: DroppableDimension) => {
       // only want enabled droppables
       if (!droppable.isEnabled) {
         return false;
@@ -73,11 +66,17 @@ export default ({
         return false;
       }
 
-      // Not checking to see if visible in viewport
-      // as the target might be off screen if dragging a large draggable
-      // Not adjusting target for droppable scroll as we are just checking
-      // if it is over the droppable - not its internal impact
-      return isPositionIntersecting(active)(target, draggable.client);
+      return isCandidate({ active, target, client: draggable.client });
     },
   );
+
+  const origin = droppables[draggable.descriptor.droppableId];
+
+  const preferences = active.sort(
+    (prev, next) =>
+      distance(origin.client.borderBox.center, next.client.borderBox.center) -
+      distance(origin.client.borderBox.center, prev.client.borderBox.center),
+  );
+
+  return preferences.length ? preferences[0].descriptor.id : undefined;
 };
