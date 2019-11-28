@@ -25,7 +25,6 @@ import { add, isEqual, origin } from './position';
 import scrollViewport from './scroll-viewport';
 import isMovementAllowed from './is-movement-allowed';
 import { toDroppableList } from './dimension-structures';
-import { forward } from './user-direction/user-direction-preset';
 import update from './post-reducer/when-moving/update';
 import refreshSnap from './post-reducer/when-moving/refresh-snap';
 import getLiftEffect from './get-lift-effect';
@@ -136,7 +135,6 @@ export default (state: State = idle, action: Action): State => {
       afterCritical,
       onLiftImpact: impact,
       viewport,
-      userDirection: forward,
       scrollJumpRequest: null,
       forceShouldAnimate: null,
     };

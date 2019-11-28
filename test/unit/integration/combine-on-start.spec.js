@@ -1,6 +1,5 @@
 // @flow
 import React from 'react';
-import { getRect } from 'css-box-model';
 import { render, fireEvent } from '@testing-library/react';
 import * as keyCodes from '../../../src/view/key-codes';
 import type {
@@ -12,23 +11,8 @@ import type {
 } from '../../../src';
 import type { Responders } from '../../../src/types';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
-import { getComputedSpacing } from '../../util/dimension';
 import { simpleLift, keyboard } from './util/controls';
-
-// Both list and item will have the same dimensions
-jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() =>
-  getRect({
-    top: 0,
-    left: 0,
-    right: 100,
-    bottom: 100,
-  }),
-);
-
-// Stubbing out totally - not including margins in this
-jest
-  .spyOn(window, 'getComputedStyle')
-  .mockImplementation(() => getComputedSpacing({}));
+import { withPoorDimensionMocks } from './util/helpers';
 
 type State = {|
   isCombineEnabled: boolean,
@@ -63,7 +47,6 @@ class App extends React.Component<*, State> {
       >
         <Droppable
           droppableId="droppable"
-          direction="horizontal"
           isCombineEnabled={this.state.isCombineEnabled}
         >
           {(droppableProvided: DroppableProvided) => (
@@ -71,11 +54,11 @@ class App extends React.Component<*, State> {
               ref={droppableProvided.innerRef}
               {...droppableProvided.droppableProps}
             >
-              <Draggable draggableId="first" index={0}>
+              <Draggable draggableId="0" index={0}>
                 {(draggableProvided: DraggableProvided) => (
                   <div
                     ref={draggableProvided.innerRef}
-                    data-testid="drag-handle-1"
+                    data-testid="0"
                     {...draggableProvided.draggableProps}
                     {...draggableProvided.dragHandleProps}
                   >
@@ -83,11 +66,11 @@ class App extends React.Component<*, State> {
                   </div>
                 )}
               </Draggable>
-              <Draggable draggableId="second" index={1}>
+              <Draggable draggableId="1" index={1}>
                 {(draggableProvided: DraggableProvided) => (
                   <div
                     ref={draggableProvided.innerRef}
-                    data-testid="drag-handle-2"
+                    data-testid="1"
                     {...draggableProvided.draggableProps}
                     {...draggableProvided.dragHandleProps}
                   >
@@ -106,39 +89,41 @@ class App extends React.Component<*, State> {
 
 jest.useFakeTimers();
 it('should allow the changing of combining in onDragStart', () => {
-  const responders: Responders = {
-    onDragStart: jest.fn(),
-    onDragUpdate: jest.fn(),
-    onDragEnd: jest.fn(),
-  };
-  const { getByTestId } = render(<App {...responders} />);
+  withPoorDimensionMocks(() => {
+    const responders: Responders = {
+      onDragStart: jest.fn(),
+      onDragUpdate: jest.fn(),
+      onDragEnd: jest.fn(),
+    };
+    const { getByTestId } = render(<App {...responders} />);
 
-  const handle: HTMLElement = getByTestId('drag-handle-1');
-  simpleLift(keyboard, handle);
-  // flush onDragStart  responder
-  jest.runOnlyPendingTimers();
+    const handle: HTMLElement = getByTestId('0');
+    simpleLift(keyboard, handle);
+    // flush onDragStart  responder
+    jest.runOnlyPendingTimers();
 
-  const start: DragStart = {
-    draggableId: 'first',
-    source: {
-      droppableId: 'droppable',
-      index: 0,
-    },
-    type: 'DEFAULT',
-    mode: 'SNAP',
-  };
-  expect(responders.onDragStart).toHaveBeenCalledWith(start);
+    const start: DragStart = {
+      draggableId: '0',
+      source: {
+        droppableId: 'droppable',
+        index: 0,
+      },
+      type: 'DEFAULT',
+      mode: 'SNAP',
+    };
+    expect(responders.onDragStart).toHaveBeenCalledWith(start);
 
-  // now moving down will cause a combine impact!
-  fireEvent.keyDown(handle, { keyCode: keyCodes.arrowDown });
-  jest.runOnlyPendingTimers();
-  const update: DragUpdate = {
-    ...start,
-    destination: null,
-    combine: {
-      draggableId: 'second',
-      droppableId: 'droppable',
-    },
-  };
-  expect(responders.onDragUpdate).toHaveBeenCalledWith(update);
+    // now moving down will cause a combine impact!
+    fireEvent.keyDown(handle, { keyCode: keyCodes.arrowDown });
+    jest.runOnlyPendingTimers();
+    const update: DragUpdate = {
+      ...start,
+      destination: null,
+      combine: {
+        draggableId: '1',
+        droppableId: 'droppable',
+      },
+    };
+    expect(responders.onDragUpdate).toHaveBeenCalledWith(update);
+  });
 });

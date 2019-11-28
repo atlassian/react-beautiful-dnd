@@ -1,5 +1,5 @@
 // @flow
-import { type Position, type Rect } from 'css-box-model';
+import { type Position } from 'css-box-model';
 import type {
   DraggableId,
   DraggableDimension,
@@ -8,17 +8,16 @@ import type {
   Axis,
   DisplacementGroups,
   Viewport,
-  UserDirection,
   DisplacedBy,
   LiftEffect,
 } from '../../types';
-import isUserMovingForward from '../user-direction/is-user-moving-forward';
 import getDisplacedBy from '../get-displaced-by';
 import removeDraggableFromList from '../remove-draggable-from-list';
 import isHomeOf from '../droppable/is-home-of';
 import { find } from '../../native-with-fallback';
 import getDidStartAfterCritical from '../did-start-after-critical';
 import calculateReorderImpact from '../calculate-drag-impact/calculate-reorder-impact';
+import getIsDisplaced from '../get-is-displaced';
 
 type Args = {|
   pageBorderBoxCenterWithDroppableScrollChange: Position,
@@ -27,7 +26,6 @@ type Args = {|
   insideDestination: DraggableDimension[],
   last: DisplacementGroups,
   viewport: Viewport,
-  userDirection: UserDirection,
   afterCritical: LiftEffect,
 |};
 
@@ -60,21 +58,20 @@ export default ({
   insideDestination,
   last,
   viewport,
-  userDirection,
   afterCritical,
 }: Args): DragImpact => {
   const axis: Axis = destination.axis;
-  const isMovingForward: boolean = isUserMovingForward(
-    destination.axis,
-    userDirection,
-  );
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
     draggable.displaceBy,
   );
+  const displacement: number = displacedBy.value;
 
   const targetCenter: number = currentCenter[axis.line];
-  const displacement: number = displacedBy.value;
+  const targetSize: number = draggable.client.borderBox[axis.size];
+  const targetStart: number = targetCenter - targetSize / 2;
+  const targetEnd: number = targetCenter + targetSize / 2;
+
   const withoutDragging: DraggableDimension[] = removeDraggableFromList(
     draggable,
     insideDestination,
@@ -84,38 +81,46 @@ export default ({
     withoutDragging,
     (child: DraggableDimension): boolean => {
       const id: DraggableId = child.descriptor.id;
-      const borderBox: Rect = child.page.borderBox;
-      const start: number = borderBox[axis.start];
-      const end: number = borderBox[axis.end];
+      const childCenter: number = child.page.borderBox.center[axis.line];
 
       const didStartAfterCritical: boolean = getDidStartAfterCritical(
         id,
         afterCritical,
       );
 
-      // Moving forward will decrease the amount of things needed to be displaced
-      if (isMovingForward) {
-        if (didStartAfterCritical) {
-          // if started displaced then its displaced position is its resting position
-          // continue to keep the item at rest until we go onto the start of the item
-          return targetCenter < start;
-        }
-        // if the item did not start displaced then we displace the item
-        // while we are still before the start edge
-        return targetCenter < start + displacement;
-      }
+      const isDisplaced: boolean = getIsDisplaced({ displaced: last, id });
 
-      // Moving backwards will increase the amount of things needed to be displaced
-      // The logic for this works by looking at assuming everything has been displaced
-      // backwards and then looking at how you would undo that
+      /*
+      Note: we change things when moving *past* the child center - not when it hits the center
+      If we make it when we *hit* the child center then there can be
+      a hit on the next update causing a flicker.
+
+      - Update 1: targetBottom hits center => displace backwards
+      - Update 2: targetStart is now hitting the displaced center => displace forwards
+      - Update 3: goto 1 (boom)
+    */
 
       if (didStartAfterCritical) {
-        // we continue to displace the item until we move back over the end of the item without displacement
-        return targetCenter <= end - displacement;
+        // Continue to displace while targetEnd before the childCenter
+        // Move once we *move forward past* the childCenter
+        if (isDisplaced) {
+          return targetEnd <= childCenter;
+        }
+
+        // Has been moved backwards from where it started
+        // Displace forwards when targetStart *moves backwards past* the displaced childCenter
+        return targetStart < childCenter - displacement;
       }
 
-      // a non-displaced item is at rest. when we hit the item from the bottom we move it out of the way
-      return targetCenter <= end;
+      // Item has been shifted forward.
+      // Remove displacement when targetEnd moves forward past the displaced center
+      if (isDisplaced) {
+        return targetEnd <= childCenter + displacement;
+      }
+
+      // Item is behind the dragging item
+      // We want to displace it if the targetStart goes *backwards past* the childCenter
+      return targetStart < childCenter;
     },
   );
 
