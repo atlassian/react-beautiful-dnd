@@ -5,18 +5,12 @@ import type {
   DroppableDimension,
   DroppableDimensionMap,
   DragImpact,
-  UserDirection,
 } from '../../../../src/types';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getDragImpact from '../../../../src/state/get-drag-impact';
 import noImpact from '../../../../src/state/no-impact';
 import { disableDroppable, getPreset } from '../../../util/dimension';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
-
-const dontCareAboutDirection: UserDirection = {
-  vertical: 'down',
-  horizontal: 'right',
-};
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -47,7 +41,6 @@ const dontCareAboutDirection: UserDirection = {
         droppables: withDisabled,
         previousImpact: homeImpact,
         viewport: preset.viewport,
-        userDirection: dontCareAboutDirection,
         afterCritical,
       });
 
@@ -71,7 +64,6 @@ const dontCareAboutDirection: UserDirection = {
         droppables: withDisabled,
         previousImpact: homeImpact,
         viewport: preset.viewport,
-        userDirection: dontCareAboutDirection,
         afterCritical,
       });
 

@@ -9,13 +9,11 @@ import type {
   DragImpact,
   Viewport,
   DimensionMap,
-  UserDirection,
   StateWhenUpdatesAllowed,
   DroppableDimensionMap,
 } from '../../../types';
 import getDragImpact from '../../get-drag-impact';
 import { add, subtract } from '../../position';
-import getUserDirection from '../../user-direction/get-user-direction';
 import recomputePlaceholders from '../../recompute-placeholders';
 
 type Args = {|
@@ -67,12 +65,6 @@ export default ({
     page,
   };
 
-  const userDirection: UserDirection = getUserDirection(
-    state.userDirection,
-    state.current.page.borderBoxCenter,
-    current.page.borderBoxCenter,
-  );
-
   // Not updating impact while bulk collecting
   if (state.phase === 'COLLECTING') {
     return {
@@ -82,7 +74,6 @@ export default ({
       dimensions,
       viewport,
       current,
-      userDirection,
     };
   }
 
@@ -98,7 +89,6 @@ export default ({
       droppables: dimensions.droppables,
       previousImpact: state.impact,
       viewport,
-      userDirection,
       afterCritical: state.afterCritical,
     });
 
@@ -113,7 +103,6 @@ export default ({
   const result: DraggingState = {
     ...state,
     current,
-    userDirection,
     dimensions: {
       draggables: dimensions.draggables,
       droppables: withUpdatedPlaceholders,

@@ -10,10 +10,9 @@ import { horizontal, vertical } from '../../../../../../src/state/axis';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import { patch, add } from '../../../../../../src/state/position';
-import { forward } from '../../../../../../src/state/user-direction/user-direction-preset';
 import { getPreset } from '../../../../../util/dimension';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
+import { getCenterForStartEdge } from '../../util/get-center-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -30,24 +29,22 @@ import { emptyGroups } from '../../../../../../src/state/no-impact';
         axis,
         preset.inHome1.displaceBy,
       );
-      const startOfInForeign4: Position = patch(
-        axis.line,
-        preset.inForeign4.page.borderBox[axis.start],
-        preset.foreign.page.borderBox.center[axis.crossAxisLine],
-      );
-      const displacedStartOfInForeign4: Position = add(
-        startOfInForeign4,
-        displacedBy.point,
-      );
+
+      const centerForStartOnInForeign4Center: Position = getCenterForStartEdge({
+        startEdgeOn: preset.inForeign4.page.borderBox.center,
+        dragging: preset.inHome1.page.borderBox,
+        axis,
+      });
 
       const goingForwards: DragImpact = getDragImpact({
-        pageBorderBoxCenter: displacedStartOfInForeign4,
+        // because this is a new impact - nothing is previously displaced
+        // targetStart < childCenter;
+        pageBorderBoxCenter: centerForStartOnInForeign4Center,
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: preset.droppables,
         previousImpact: homeImpact,
         viewport,
-        userDirection: forward,
         afterCritical,
       });
 

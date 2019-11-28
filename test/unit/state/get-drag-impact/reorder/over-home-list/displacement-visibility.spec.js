@@ -13,7 +13,6 @@ import type {
   Viewport,
   DisplacedBy,
 } from '../../../../../../src/types';
-import { backward } from '../../../../../../src/state/user-direction/user-direction-preset';
 import {
   getDroppableDimension,
   getDraggableDimension,
@@ -174,7 +173,6 @@ const viewport: Viewport = getViewport();
         droppables: customDroppables,
         previousImpact: homeImpact,
         viewport,
-        userDirection: backward,
         afterCritical,
       });
 
@@ -302,7 +300,6 @@ const viewport: Viewport = getViewport();
         droppables: customDroppables,
         previousImpact: noImpact,
         viewport,
-        userDirection: backward,
         afterCritical: noAfterCritical,
       });
 
