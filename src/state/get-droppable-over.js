@@ -1,12 +1,5 @@
 // @flow
-import {
-  shrink,
-  type Position,
-  type Rect,
-  type Spacing,
-  getRect,
-} from 'css-box-model';
-import { number } from 'prop-types';
+import { type Position, type Rect, getRect } from 'css-box-model';
 import type {
   DroppableDimension,
   DroppableDimensionMap,
@@ -61,6 +54,7 @@ function getFurthestAway(
         distance: distance(center, item.page.borderBox.center),
       };
     })
+    // largest value will be first
     .sort((a: WithDistance, b: WithDistance) => b.distance - a.distance);
 
   // just being safe
@@ -93,33 +87,25 @@ export default ({ pageOffset, draggable, droppables }: Args): ?DroppableId => {
   const candidates: DroppableDimension[] = potentials.filter(
     (item: DroppableDimension): boolean => {
       const axis: Axis = item.axis;
-      const childRect: Rect = item.page.borderBox;
-      const childCenter: number = childRect.center[axis.crossAxisLine];
+      const active: Rect = getActive(item);
+      const childCenter: number = active.center[axis.crossAxisLine];
       const crossAxisStart: number = dragging[axis.crossAxisStart];
       const crossAxisEnd: number = dragging[axis.crossAxisEnd];
 
-      const isTotallyCovering: boolean =
-        crossAxisStart <= childRect[axis.crossAxisStart] &&
-        crossAxisEnd >= childRect[axis.crossAxisEnd];
-
-      if (isTotallyCovering) {
-        return true;
-      }
-
       const isContained = isWithin(
-        childRect[axis.crossAxisStart],
-        childRect[axis.crossAxisEnd],
+        active[axis.crossAxisStart],
+        active[axis.crossAxisEnd],
       );
 
       const isStartContained: boolean = isContained(crossAxisStart);
       const isEndContained: boolean = isContained(crossAxisEnd);
 
-      // Nothing within bounds
+      // Dragging item is totally covering the active area
       if (!isStartContained && !isEndContained) {
-        return false;
+        return true;
       }
 
-      // Both within: going to cover this in a later check
+      // Both within edges: going to cover this in a later check (center check)
       if (isStartContained && isEndContained) {
         return false;
       }
