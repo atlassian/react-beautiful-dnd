@@ -1,11 +1,11 @@
 // @flow
 import { type Position } from 'css-box-model';
-import getDroppableOver from '../../../src/state/get-droppable-over';
+import getDroppableOver from '../../../../src/state/get-droppable-over';
 import {
   disableDroppable,
   getDroppableDimension,
   getPreset,
-} from '../../util/dimension';
+} from '../../../util/dimension';
 import type {
   DraggableId,
   DraggableDimension,
