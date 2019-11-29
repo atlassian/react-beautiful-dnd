@@ -16,11 +16,11 @@ import afterPoint from '../../../../util/after-point';
 import beforePoint from '../../../../util/before-point';
 import { getForcedDisplacement } from '../../../../util/impact';
 import noImpact, { emptyGroups } from '../../../../../src/state/no-impact';
-import {
-  getCenterForStartEdge,
-  getCenterForEndEdge,
-} from '../util/get-center-for-edge';
 import { getThreshold } from '../util/get-combine-threshold';
+import {
+  getOffsetForEndEdge,
+  getOffsetForStartEdge,
+} from '../util/get-offset-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -75,7 +75,7 @@ import { getThreshold } from '../util/get-combine-threshold';
       const combineEnd: Position = subtract(endOfInHome3, inHome3Threshold);
 
       it('should move onto a target once it hits (1/5) of the targets size ', () => {
-        const center: Position = getCenterForEndEdge({
+        const offset: Position = getOffsetForEndEdge({
           endEdgeOn: combineStart,
           dragging: preset.inHome2.page.borderBox,
           axis,
@@ -84,7 +84,7 @@ import { getThreshold } from '../util/get-combine-threshold';
         // sitting on combine point
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: center,
+            pageOffset: offset,
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -98,7 +98,7 @@ import { getThreshold } from '../util/get-combine-threshold';
         // gone past combine point
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: afterPoint(axis, center),
+            pageOffset: afterPoint(axis, offset),
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -112,14 +112,14 @@ import { getThreshold } from '../util/get-combine-threshold';
       });
 
       it('should remain displaced until the bottom of the dragging item goes onto the (4/5) mark', () => {
-        const center: Position = getCenterForEndEdge({
+        const offset: Position = getOffsetForEndEdge({
           endEdgeOn: combineEnd,
           dragging: preset.inHome2.page.borderBox,
           axis,
         });
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: beforePoint(axis, center),
+            pageOffset: beforePoint(axis, offset),
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -132,7 +132,7 @@ import { getThreshold } from '../util/get-combine-threshold';
         }
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: center,
+            pageOffset: offset,
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -212,7 +212,7 @@ import { getThreshold } from '../util/get-combine-threshold';
       };
 
       it('should move backwards onto an item that has shifted backwards', () => {
-        const center: Position = getCenterForStartEdge({
+        const offset: Position = getOffsetForStartEdge({
           startEdgeOn: combineEnd,
           dragging: preset.inHome2.page.borderBox,
           axis,
@@ -221,7 +221,7 @@ import { getThreshold } from '../util/get-combine-threshold';
         // have not moved far enough backwards yet
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: center,
+            pageOffset: offset,
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -234,7 +234,7 @@ import { getThreshold } from '../util/get-combine-threshold';
         // moved back enough
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: beforePoint(axis, center),
+            pageOffset: beforePoint(axis, offset),
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -248,7 +248,7 @@ import { getThreshold } from '../util/get-combine-threshold';
       });
 
       it('should no longer combine with an item once it hits the top threshold', () => {
-        const center: Position = getCenterForStartEdge({
+        const offset: Position = getOffsetForStartEdge({
           startEdgeOn: combineStart,
           dragging: preset.inHome2.page.borderBox,
           axis,
@@ -257,7 +257,7 @@ import { getThreshold } from '../util/get-combine-threshold';
         // have not moved far enough backwards yet
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: afterPoint(axis, center),
+            pageOffset: afterPoint(axis, offset),
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -270,7 +270,7 @@ import { getThreshold } from '../util/get-combine-threshold';
         // moved back enough
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: center,
+            pageOffset: offset,
             draggable: preset.inHome2,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -303,18 +303,20 @@ import { getThreshold } from '../util/get-combine-threshold';
         inHome4Threshold,
       );
 
-      const center: Position = getCenterForStartEdge({
+      const offset: Position = getOffsetForStartEdge({
         startEdgeOn: combineEnd,
         dragging: preset.inHome4.page.borderBox,
         axis,
       });
 
+      console.log('offset', offset);
+
       const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter: beforePoint(axis, center),
+        pageOffset: beforePoint(axis, offset),
         draggable: preset.inHome3,
         draggables: preset.draggables,
         droppables: withCombineEnabled,
-        // nowhere
+        // out of the list
         previousImpact: noImpact,
         viewport: preset.viewport,
         afterCritical,

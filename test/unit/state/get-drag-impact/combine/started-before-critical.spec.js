@@ -17,9 +17,9 @@ import beforePoint from '../../../../util/before-point';
 import { getForcedDisplacement } from '../../../../util/impact';
 import { getThreshold } from '../util/get-combine-threshold';
 import {
-  getCenterForEndEdge,
-  getCenterForStartEdge,
-} from '../util/get-center-for-edge';
+  getOffsetForEndEdge,
+  getOffsetForStartEdge,
+} from '../util/get-offset-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -111,7 +111,7 @@ import {
         );
 
         it('should combine when moving forward past the displaced start threshold', () => {
-          const endOnCombineStart: Position = getCenterForEndEdge({
+          const endOnCombineStart: Position = getOffsetForEndEdge({
             endEdgeOn: combineStart,
             dragging: preset.inHome1.page.borderBox,
             axis,
@@ -120,7 +120,7 @@ import {
           // it should not merge on the threshold
           {
             const impact: DragImpact = getDragImpact({
-              pageBorderBoxCenter: endOnCombineStart,
+              pageOffset: endOnCombineStart,
               draggable: preset.inHome1,
               draggables: preset.draggables,
               droppables: withCombineEnabled,
@@ -133,7 +133,7 @@ import {
           // it should merge with the item when it goes onto the displaced start
           {
             const impact: DragImpact = getDragImpact({
-              pageBorderBoxCenter: afterPoint(axis, endOnCombineStart),
+              pageOffset: afterPoint(axis, endOnCombineStart),
               draggable: preset.inHome1,
               draggables: preset.draggables,
               droppables: withCombineEnabled,
@@ -146,7 +146,7 @@ import {
         });
 
         it('should no longer merge when moving onto 4/5 of the target', () => {
-          const endOnCombineEnd: Position = getCenterForEndEdge({
+          const endOnCombineEnd: Position = getOffsetForEndEdge({
             endEdgeOn: combineEnd,
             dragging: preset.inHome1.page.borderBox,
             axis,
@@ -155,7 +155,7 @@ import {
           // merge when still in on two thirds
           {
             const impact: DragImpact = getDragImpact({
-              pageBorderBoxCenter: beforePoint(axis, endOnCombineEnd),
+              pageOffset: beforePoint(axis, endOnCombineEnd),
               draggable: preset.inHome1,
               draggables: preset.draggables,
               droppables: withCombineEnabled,
@@ -167,7 +167,7 @@ import {
           }
           {
             const impact: DragImpact = getDragImpact({
-              pageBorderBoxCenter: endOnCombineEnd,
+              pageOffset: endOnCombineEnd,
               draggable: preset.inHome1,
               draggables: preset.draggables,
               droppables: withCombineEnabled,
@@ -230,7 +230,7 @@ import {
       };
 
       it('should combine with an item when moving backwards past 1 / 5 of the items size', () => {
-        const startOnCombineEnd: Position = getCenterForStartEdge({
+        const startOnCombineEnd: Position = getOffsetForStartEdge({
           startEdgeOn: combineEnd,
           dragging: preset.inHome1.page.borderBox,
           axis,
@@ -238,7 +238,7 @@ import {
         // on edge is not far enough
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: startOnCombineEnd,
+            pageOffset: startOnCombineEnd,
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -251,7 +251,7 @@ import {
         // over edge is enough
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: beforePoint(axis, startOnCombineEnd),
+            pageOffset: beforePoint(axis, startOnCombineEnd),
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -264,7 +264,7 @@ import {
       });
 
       it('should stop combining when going back onto 2/3 of the size', () => {
-        const startOnCombineStart: Position = getCenterForStartEdge({
+        const startOnCombineStart: Position = getOffsetForStartEdge({
           startEdgeOn: combineStart,
           dragging: preset.inHome1.page.borderBox,
           axis,
@@ -272,7 +272,7 @@ import {
         // after start is all good
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: afterPoint(axis, startOnCombineStart),
+            pageOffset: afterPoint(axis, startOnCombineStart),
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,
@@ -285,7 +285,7 @@ import {
         // on combine start = stop combining
         {
           const impact: DragImpact = getDragImpact({
-            pageBorderBoxCenter: startOnCombineStart,
+            pageOffset: startOnCombineStart,
             draggable: preset.inHome1,
             draggables: preset.draggables,
             droppables: withCombineEnabled,

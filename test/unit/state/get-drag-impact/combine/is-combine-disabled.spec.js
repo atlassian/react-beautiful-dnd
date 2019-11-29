@@ -14,7 +14,7 @@ import afterPoint from '../../../../util/after-point';
 import { enableCombining, getPreset } from '../../../../util/dimension';
 import { getForcedDisplacement } from '../../../../util/impact';
 import { getThreshold } from '../util/get-combine-threshold';
-import { getCenterForEndEdge } from '../util/get-center-for-edge';
+import { getOffsetForEndEdge } from '../util/get-offset-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -35,7 +35,7 @@ import { getCenterForEndEdge } from '../util/get-center-for-edge';
       preset.inHome3.page.borderBox.center[axis.crossAxisLine],
     );
     const threshold: Position = getThreshold(axis, preset.inHome3);
-    const combineStart: Position = getCenterForEndEdge({
+    const combineStart: Position = getOffsetForEndEdge({
       endEdgeOn: add(startOfInHome3, threshold),
       dragging: preset.inHome2.page.borderBox,
       axis,
@@ -45,7 +45,7 @@ import { getCenterForEndEdge } from '../util/get-center-for-edge';
       // does not combine when combine is disabled
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterPoint(axis, combineStart),
+          pageOffset: afterPoint(axis, combineStart),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: preset.droppables,
@@ -59,7 +59,7 @@ import { getCenterForEndEdge } from '../util/get-center-for-edge';
       // would have combined if was enabled (validation)
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterPoint(axis, combineStart),
+          pageOffset: afterPoint(axis, combineStart),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: withCombineEnabled,
