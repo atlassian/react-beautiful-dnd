@@ -9,6 +9,7 @@ import type {
   DragImpact,
   Viewport,
   LiftEffect,
+  PagePositions,
 } from '../../types';
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
@@ -18,7 +19,7 @@ import getCombineImpact from './get-combine-impact';
 import noImpact from '../no-impact';
 
 type Args = {|
-  pageBorderBoxCenter: Position,
+  page: PagePositions,
   draggable: DraggableDimension,
   // all dimensions in system
   draggables: DraggableDimensionMap,
@@ -29,7 +30,7 @@ type Args = {|
 |};
 
 export default ({
-  pageBorderBoxCenter,
+  page,
   draggable,
   draggables,
   droppables,
@@ -38,7 +39,8 @@ export default ({
   afterCritical,
 }: Args): DragImpact => {
   const destinationId: ?DroppableId = getDroppableOver({
-    target: pageBorderBoxCenter,
+    pageOffset: page.offset,
+    draggable,
     droppables,
   });
 
@@ -60,7 +62,7 @@ export default ({
   // Need to take into account the change of scroll in the droppable
   const pageBorderBoxCenterWithDroppableScrollChange: Position = withDroppableScroll(
     destination,
-    pageBorderBoxCenter,
+    page.borderBoxCenter,
   );
 
   // checking combine first so we combine before any reordering

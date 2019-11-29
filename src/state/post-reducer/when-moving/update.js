@@ -39,7 +39,6 @@ export default ({
   // COLLECTING: can update position but cannot update impact
 
   const viewport: Viewport = forcedViewport || state.viewport;
-  const currentWindowScroll: Position = viewport.scroll.current;
   const dimensions: DimensionMap = forcedDimensions || state.dimensions;
   const clientSelection: Position =
     forcedClientSelection || state.current.client.selection;
@@ -56,8 +55,9 @@ export default ({
   };
 
   const page: PagePositions = {
-    selection: add(client.selection, currentWindowScroll),
-    borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),
+    selection: add(client.selection, viewport.scroll.current),
+    borderBoxCenter: add(client.borderBoxCenter, viewport.scroll.current),
+    offset: add(client.offset, viewport.scroll.diff.value),
   };
 
   const current: DragPositions = {
@@ -83,7 +83,7 @@ export default ({
   const newImpact: DragImpact =
     forcedImpact ||
     getDragImpact({
-      pageBorderBoxCenter: page.borderBoxCenter,
+      page,
       draggable,
       draggables: dimensions.draggables,
       droppables: dimensions.droppables,
