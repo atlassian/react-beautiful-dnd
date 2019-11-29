@@ -107,6 +107,7 @@ export default (state: State = idle, action: Action): State => {
       page: {
         selection: add(client.selection, viewport.scroll.initial),
         borderBoxCenter: add(client.selection, viewport.scroll.initial),
+        offset: add(client.selection, viewport.scroll.diff.value),
       },
     };
 
