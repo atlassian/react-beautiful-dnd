@@ -288,6 +288,7 @@ import {
     // - inHome4 will have shifted backwards
     // - re-enter home list
     it('should understand that when re-entering a list, items that started displaced no longer are', () => {
+      const inHome4Threshold: Position = getThreshold(axis, preset.inHome4);
       const endOfInHome4: Position = patch(
         axis.line,
         preset.inHome4.page.borderBox[axis.end],
@@ -297,7 +298,6 @@ import {
         endOfInHome4,
         displacedBy.point,
       );
-      const inHome4Threshold: Position = getThreshold(axis, preset.inHome4);
       const combineEnd: Position = subtract(
         displacedEndOfInHome4,
         inHome4Threshold,
@@ -305,11 +305,9 @@ import {
 
       const offset: Position = getOffsetForStartEdge({
         startEdgeOn: combineEnd,
-        dragging: preset.inHome4.page.borderBox,
+        dragging: preset.inHome3.page.borderBox,
         axis,
       });
-
-      console.log('offset', offset);
 
       const impact: DragImpact = getDragImpact({
         pageOffset: beforePoint(axis, offset),
