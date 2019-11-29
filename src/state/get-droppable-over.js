@@ -121,7 +121,6 @@ export default ({ pageOffset, draggable, droppables }: Args): ?DroppableId => {
 
   // Yay
   if (candidates.length === 1) {
-    console.log('one candidate (edge detection)', candidates[0].descriptor.id);
     return candidates[0].descriptor.id;
   }
 
@@ -131,10 +130,6 @@ export default ({ pageOffset, draggable, droppables }: Args): ?DroppableId => {
   // Should only occur with really large items
   // Going to use *crap* fallback: distance from start
   if (candidates.length > 1) {
-    console.log(
-      'returning furthest candidate (edge detection)',
-      getFurthestAway(home, candidates),
-    );
     return getFurthestAway(home, candidates);
   }
 
@@ -145,10 +140,5 @@ export default ({ pageOffset, draggable, droppables }: Args): ?DroppableId => {
     },
   );
 
-  if (centerOver) {
-    console.log('over center', centerOver.descriptor.id);
-  } else {
-    console.log('center over nothing');
-  }
   return centerOver ? centerOver.descriptor.id : null;
 };
