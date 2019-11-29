@@ -1,4 +1,5 @@
 // @flow
+import type { Position } from 'css-box-model';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import noImpact from '../../../../../../src/state/no-impact';
 import { vertical, horizontal } from '../../../../../../src/state/axis';
@@ -21,6 +22,7 @@ import getViewport from '../../../../../../src/view/window/get-viewport';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getForcedDisplacement } from '../../../../../util/impact';
 import noAfterCritical from '../../../../../util/no-after-critical';
+import { origin, subtract } from '../../../../../../src/state/position';
 
 const viewport: Viewport = getViewport();
 
@@ -165,9 +167,14 @@ const viewport: Viewport = getViewport();
         draggables: customDraggables,
         viewport,
       });
+      // moving backwards to near the start of the droppable
+      const destination: Position = { x: 1, y: 1 };
+      const offset: Position = subtract(
+        destination,
+        notVisible2.page.borderBox.center,
+      );
       const impact: DragImpact = getDragImpact({
-        // moving backwards to near the start of the droppable
-        pageBorderBoxCenter: { x: 1, y: 1 },
+        pageOffset: offset,
         draggable: notVisible2,
         draggables: customDraggables,
         droppables: customDroppables,
@@ -294,7 +301,7 @@ const viewport: Viewport = getViewport();
       };
 
       const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter: visible.page.borderBox.center,
+        pageOffset: origin,
         draggable: visible,
         draggables: customDraggables,
         droppables: customDroppables,

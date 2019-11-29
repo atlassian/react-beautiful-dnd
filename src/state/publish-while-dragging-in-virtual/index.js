@@ -110,7 +110,7 @@ export default ({
       : onLiftImpact;
 
   const impact: DragImpact = getDragImpact({
-    page: state.current.page,
+    pageOffset: state.current.page.offset,
     draggable: dimensions.draggables[state.critical.draggable.id],
     draggables: dimensions.draggables,
     droppables: dimensions.droppables,

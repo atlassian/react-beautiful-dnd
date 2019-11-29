@@ -12,10 +12,9 @@ import { horizontal, vertical } from '../../../../../../src/state/axis';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
-import { patch } from '../../../../../../src/state/position';
+import { patch, origin } from '../../../../../../src/state/position';
 import getViewport from '../../../../../../src/view/window/get-viewport';
 import { getPreset, makeScrollable } from '../../../../../util/dimension';
-
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getForcedDisplacement } from '../../../../../util/impact';
 
@@ -56,16 +55,13 @@ const viewport: Viewport = getViewport();
           ...withScrollableHome,
           [preset.home.descriptor.id]: scrolledHome,
         };
-        // no changes in current page center from original
-        const pageBorderBoxCenter: Position =
-          preset.inHome1.page.borderBox.center;
         // moving forward over inHome2
         const displacedBy: DisplacedBy = getDisplacedBy(
           axis,
           preset.inHome1.displaceBy,
         );
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter,
+          pageOffset: origin,
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: updatedDroppables,
@@ -127,12 +123,10 @@ const viewport: Viewport = getViewport();
           ...withScrollableHome,
           [preset.home.descriptor.id]: scrolledHome,
         };
-        // no changes in current page center from original
-        const pageBorderBoxCenter: Position =
-          preset.inHome4.page.borderBox.center;
 
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter,
+          // no changes in current page center from original
+          pageOffset: origin,
           draggable: preset.inHome4,
           draggables: preset.draggables,
           droppables: updatedDroppables,

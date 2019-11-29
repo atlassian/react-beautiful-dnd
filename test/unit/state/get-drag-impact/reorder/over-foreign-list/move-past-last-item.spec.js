@@ -12,7 +12,7 @@ import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../../util/dimension';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
-import { getCenterForStartEdge } from '../../util/get-center-for-edge';
+import { getOffsetForStartEdge } from '../../util/get-offset-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -30,7 +30,7 @@ import { getCenterForStartEdge } from '../../util/get-center-for-edge';
         preset.inHome1.displaceBy,
       );
 
-      const centerForStartOnInForeign4Center: Position = getCenterForStartEdge({
+      const offsetForStartOnInForeign4Center: Position = getOffsetForStartEdge({
         startEdgeOn: preset.inForeign4.page.borderBox.center,
         dragging: preset.inHome1.page.borderBox,
         axis,
@@ -39,7 +39,7 @@ import { getCenterForStartEdge } from '../../util/get-center-for-edge';
       const goingForwards: DragImpact = getDragImpact({
         // because this is a new impact - nothing is previously displaced
         // targetStart < childCenter;
-        pageBorderBoxCenter: centerForStartOnInForeign4Center,
+        pageOffset: offsetForStartOnInForeign4Center,
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: preset.droppables,

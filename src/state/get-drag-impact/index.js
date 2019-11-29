@@ -1,5 +1,5 @@
 // @flow
-import { type Position } from 'css-box-model';
+import { type Position, type Rect, getRect } from 'css-box-model';
 import type {
   DroppableId,
   DraggableDimension,
@@ -9,7 +9,6 @@ import type {
   DragImpact,
   Viewport,
   LiftEffect,
-  PagePositions,
 } from '../../types';
 import getDroppableOver from '../get-droppable-over';
 import getDraggablesInsideDroppable from '../get-draggables-inside-droppable';
@@ -17,9 +16,11 @@ import withDroppableScroll from '../with-scroll-change/with-droppable-scroll';
 import getReorderImpact from './get-reorder-impact';
 import getCombineImpact from './get-combine-impact';
 import noImpact from '../no-impact';
+import { offsetByPosition } from '../spacing';
+import { offsetRectByPosition } from '../rect';
 
 type Args = {|
-  page: PagePositions,
+  pageOffset: Position,
   draggable: DraggableDimension,
   // all dimensions in system
   draggables: DraggableDimensionMap,
@@ -30,7 +31,7 @@ type Args = {|
 |};
 
 export default ({
-  page,
+  pageOffset,
   draggable,
   draggables,
   droppables,
@@ -38,8 +39,13 @@ export default ({
   viewport,
   afterCritical,
 }: Args): DragImpact => {
+  const pageBorderBox: Rect = offsetRectByPosition(
+    draggable.page.borderBox,
+    pageOffset,
+  );
+
   const destinationId: ?DroppableId = getDroppableOver({
-    pageOffset: page.offset,
+    pageBorderBox,
     draggable,
     droppables,
   });
@@ -60,15 +66,15 @@ export default ({
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
-  const pageBorderBoxCenterWithDroppableScrollChange: Position = withDroppableScroll(
+  const pageBorderBoxWithDroppableScroll: Rect = withDroppableScroll(
     destination,
-    page.borderBoxCenter,
+    pageBorderBox,
   );
 
   // checking combine first so we combine before any reordering
   return (
     getCombineImpact({
-      pageBorderBoxCenterWithDroppableScrollChange,
+      pageBorderBoxWithDroppableScroll,
       draggable,
       previousImpact,
       destination,
@@ -76,7 +82,7 @@ export default ({
       afterCritical,
     }) ||
     getReorderImpact({
-      pageBorderBoxCenterWithDroppableScrollChange,
+      pageBorderBoxWithDroppableScroll,
       draggable,
       destination,
       insideDestination,

@@ -11,6 +11,7 @@ import { getCorners, expandByPosition } from '../../../../src/state/spacing';
 import getDroppableOver from '../../../../src/state/get-droppable-over';
 import { invariant } from '../../../../src/invariant';
 import { subtract, patch } from '../../../../src/state/position';
+import { offsetRectByPosition } from '../../../../src/state/rect';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -27,8 +28,12 @@ import { subtract, patch } from '../../../../src/state/position';
           corner,
           draggable.page.borderBox.center,
         );
-        const result: ?DroppableId = getDroppableOver({
+        const pageBorderBox: Rect = offsetRectByPosition(
+          draggable.page.borderBox,
           pageOffset,
+        );
+        const result: ?DroppableId = getDroppableOver({
+          pageBorderBox,
           draggable,
           droppables: preset.droppables,
         });
@@ -45,8 +50,12 @@ import { subtract, patch } from '../../../../src/state/position';
           corner,
           draggable.page.borderBox.center,
         );
-        const result: ?DroppableId = getDroppableOver({
+        const pageBorderBox: Rect = offsetRectByPosition(
+          draggable.page.borderBox,
           pageOffset,
+        );
+        const result: ?DroppableId = getDroppableOver({
+          pageBorderBox,
           draggable,
           droppables: preset.droppables,
         });

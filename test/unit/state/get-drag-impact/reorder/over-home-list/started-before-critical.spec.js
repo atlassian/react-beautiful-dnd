@@ -16,9 +16,9 @@ import beforePoint from '../../../../../util/before-point';
 import afterPoint from '../../../../../util/after-point';
 import { getForcedDisplacement } from '../../../../../util/impact';
 import {
-  getCenterForStartEdge,
-  getCenterForEndEdge,
-} from '../../util/get-center-for-edge';
+  getOffsetForStartEdge,
+  getOffsetForEndEdge,
+} from '../../util/get-offset-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -36,14 +36,14 @@ import {
       viewport: preset.viewport,
     });
 
-    const centerForStartOnInHome1Center: Position = getCenterForStartEdge({
+    const offsetForStartOnInHome1Center: Position = getOffsetForStartEdge({
       startEdgeOn: preset.inHome1.page.borderBox.center,
       dragging: preset.inHome3.page.borderBox,
       axis,
     });
 
     const startBeforeInHome1Center: DragImpact = getDragImpact({
-      pageBorderBoxCenter: beforePoint(axis, centerForStartOnInHome1Center),
+      pageOffset: beforePoint(axis, offsetForStartOnInHome1Center),
       draggable: preset.inHome3,
       draggables: preset.draggables,
       droppables: preset.droppables,
@@ -56,7 +56,7 @@ import {
       // after center of inHome1
       {
         const startOnInHome1Center: DragImpact = getDragImpact({
-          pageBorderBoxCenter: centerForStartOnInHome1Center,
+          pageOffset: offsetForStartOnInHome1Center,
           draggable: preset.inHome3,
           draggables: preset.draggables,
           droppables: preset.droppables,
@@ -120,7 +120,7 @@ import {
         displacedBy.point,
       );
 
-      const centerForEndOnDisplacedInHome1Center: Position = getCenterForEndEdge(
+      const offsetForEndOnDisplacedInHome1Center: Position = getOffsetForEndEdge(
         {
           endEdgeOn: displacedInHome1Center,
           dragging: preset.inHome3.page.borderBox,
@@ -131,7 +131,7 @@ import {
       // still not far enough
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: centerForEndOnDisplacedInHome1Center,
+          pageOffset: offsetForEndOnDisplacedInHome1Center,
           draggable: preset.inHome3,
           draggables: preset.draggables,
           droppables: preset.droppables,
@@ -144,10 +144,7 @@ import {
       // no longer displace as we have moved onto the displaced top edge
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterPoint(
-            axis,
-            centerForEndOnDisplacedInHome1Center,
-          ),
+          pageOffset: afterPoint(axis, offsetForEndOnDisplacedInHome1Center),
           draggable: preset.inHome3,
           draggables: preset.draggables,
           droppables: preset.droppables,

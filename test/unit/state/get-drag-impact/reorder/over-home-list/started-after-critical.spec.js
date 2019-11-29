@@ -17,9 +17,9 @@ import afterPoint from '../../../../../util/after-point';
 import getHomeLocation from '../../../../../../src/state/get-home-location';
 import { getForcedDisplacement } from '../../../../../util/impact';
 import {
-  getCenterForEndEdge,
-  getCenterForStartEdge,
-} from '../../util/get-center-for-edge';
+  getOffsetForEndEdge,
+  getOffsetForStartEdge,
+} from '../../util/get-offset-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -37,14 +37,14 @@ import {
       viewport: preset.viewport,
     });
 
-    const centerForEndOnInHome3Center: Position = getCenterForEndEdge({
+    const offsetForEndOnInHome3Center: Position = getOffsetForEndEdge({
       endEdgeOn: preset.inHome3.page.borderBox.center,
       dragging: preset.inHome2.page.borderBox,
       axis,
     });
 
     const endPastInHome3Center: DragImpact = getDragImpact({
-      pageBorderBoxCenter: afterPoint(axis, centerForEndOnInHome3Center),
+      pageOffset: afterPoint(axis, offsetForEndOnInHome3Center),
       draggable: preset.inHome2,
       draggables: preset.draggables,
       droppables: preset.droppables,
@@ -56,7 +56,7 @@ import {
     it('should displace items backwards when end of dragging item goes past the target center', () => {
       {
         const endOnInHome3Center: DragImpact = getDragImpact({
-          pageBorderBoxCenter: centerForEndOnInHome3Center,
+          pageOffset: offsetForEndOnInHome3Center,
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: preset.droppables,
@@ -121,7 +121,7 @@ import {
         displacedBy.point,
       );
 
-      const centerForStartOnDisplacedInHome2Center: Position = getCenterForStartEdge(
+      const offsetForStartOnDisplacedInHome2Center: Position = getOffsetForStartEdge(
         {
           startEdgeOn: displacedInHome3Center,
           dragging: preset.inHome2.page.borderBox,
@@ -132,7 +132,7 @@ import {
       // still not far enough
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: centerForStartOnDisplacedInHome2Center,
+          pageOffset: offsetForStartOnDisplacedInHome2Center,
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: preset.droppables,
@@ -145,10 +145,7 @@ import {
       // no longer displace as we move backwards past the displaced center
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: beforePoint(
-            axis,
-            centerForStartOnDisplacedInHome2Center,
-          ),
+          pageOffset: beforePoint(axis, offsetForStartOnDisplacedInHome2Center),
           draggable: preset.inHome2,
           draggables: preset.draggables,
           droppables: preset.droppables,

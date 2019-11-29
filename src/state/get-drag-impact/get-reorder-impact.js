@@ -1,5 +1,5 @@
 // @flow
-import { type Position } from 'css-box-model';
+import { type Rect } from 'css-box-model';
 import type {
   DraggableId,
   DraggableDimension,
@@ -20,7 +20,7 @@ import calculateReorderImpact from '../calculate-drag-impact/calculate-reorder-i
 import getIsDisplaced from '../get-is-displaced';
 
 type Args = {|
-  pageBorderBoxCenterWithDroppableScrollChange: Position,
+  pageBorderBoxWithDroppableScroll: Rect,
   draggable: DraggableDimension,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
@@ -52,7 +52,7 @@ function atIndex({ draggable, closest, inHomeList }: AtIndexArgs): ?number {
 }
 
 export default ({
-  pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
+  pageBorderBoxWithDroppableScroll: targetRect,
   draggable,
   destination,
   insideDestination,
@@ -67,10 +67,8 @@ export default ({
   );
   const displacement: number = displacedBy.value;
 
-  const targetCenter: number = currentCenter[axis.line];
-  const targetSize: number = draggable.client.borderBox[axis.size];
-  const targetStart: number = targetCenter - targetSize / 2;
-  const targetEnd: number = targetCenter + targetSize / 2;
+  const targetStart: number = targetRect[axis.start];
+  const targetEnd: number = targetRect[axis.end];
 
   const withoutDragging: DraggableDimension[] = removeDraggableFromList(
     draggable,
