@@ -1,5 +1,5 @@
 // @flow
-import { type Position, type Rect, getRect } from 'css-box-model';
+import { type Position, type Rect } from 'css-box-model';
 import type {
   DroppableDimension,
   DroppableDimensionMap,
@@ -9,7 +9,6 @@ import type {
 } from '../types';
 import { toDroppableList } from './dimension-structures';
 import isPositionInFrame from './visibility/is-position-in-frame';
-import { offsetByPosition } from './spacing';
 import { distance } from './position';
 import { invariant } from '../invariant';
 import isWithin from './is-within';
@@ -27,7 +26,7 @@ function getHasOverlap(first: Rect, second: Rect): boolean {
 }
 
 type Args = {|
-  pageOffset: Position,
+  pageBorderBox: Rect,
   draggable: DraggableDimension,
   droppables: DroppableDimensionMap,
 |};
@@ -62,11 +61,11 @@ function getFurthestAway(
   return sorted[0] ? sorted[0].id : null;
 }
 
-export default ({ pageOffset, draggable, droppables }: Args): ?DroppableId => {
-  const dragging: Rect = getRect(
-    offsetByPosition(draggable.page.borderBox, pageOffset),
-  );
-
+export default function getDroppableOver({
+  pageBorderBox,
+  draggable,
+  droppables,
+}: Args): ?DroppableId {
   const potentials: DroppableDimension[] = toDroppableList(droppables).filter(
     (droppable: DroppableDimension): boolean => {
       if (!droppable.isEnabled) {
@@ -76,7 +75,7 @@ export default ({ pageOffset, draggable, droppables }: Args): ?DroppableId => {
       if (!active) {
         return false;
       }
-      return getHasOverlap(dragging, active);
+      return getHasOverlap(pageBorderBox, active);
     },
   );
 
@@ -90,8 +89,8 @@ export default ({ pageOffset, draggable, droppables }: Args): ?DroppableId => {
       const axis: Axis = item.axis;
       const active: Rect = getActive(item);
       const childCenter: number = active.center[axis.crossAxisLine];
-      const crossAxisStart: number = dragging[axis.crossAxisStart];
-      const crossAxisEnd: number = dragging[axis.crossAxisEnd];
+      const crossAxisStart: number = pageBorderBox[axis.crossAxisStart];
+      const crossAxisEnd: number = pageBorderBox[axis.crossAxisEnd];
 
       const isContained = isWithin(
         active[axis.crossAxisStart],
@@ -136,9 +135,9 @@ export default ({ pageOffset, draggable, droppables }: Args): ?DroppableId => {
   const centerOver: ?DroppableDimension = find(
     potentials,
     (item: DroppableDimension): boolean => {
-      return isPositionInFrame(getActive(item))(dragging.center);
+      return isPositionInFrame(getActive(item))(pageBorderBox.center);
     },
   );
 
   return centerOver ? centerOver.descriptor.id : null;
-};
+}

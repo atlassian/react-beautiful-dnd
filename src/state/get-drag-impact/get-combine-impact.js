@@ -1,5 +1,5 @@
 // @flow
-import type { Rect, Position } from 'css-box-model';
+import type { Rect } from 'css-box-model';
 import type {
   DraggableId,
   Axis,
@@ -17,7 +17,7 @@ import removeDraggableFromList from '../remove-draggable-from-list';
 
 type Args = {|
   draggable: DraggableDimension,
-  pageBorderBoxCenterWithDroppableScrollChange: Position,
+  pageBorderBoxWithDroppableScroll: Rect,
   previousImpact: DragImpact,
   destination: DroppableDimension,
   insideDestination: DraggableDimension[],
@@ -29,7 +29,7 @@ export const combineThresholdDivisor: number = 4;
 
 export default ({
   draggable,
-  pageBorderBoxCenterWithDroppableScrollChange: currentCenter,
+  pageBorderBoxWithDroppableScroll: targetRect,
   previousImpact,
   destination,
   insideDestination,
@@ -45,10 +45,8 @@ export default ({
   );
   const displacement: number = displacedBy.value;
 
-  const targetCenter: number = currentCenter[axis.line];
-  const targetSize: number = draggable.client.borderBox[axis.size];
-  const targetStart: number = targetCenter - targetSize / 2;
-  const targetEnd: number = targetCenter + targetSize / 2;
+  const targetStart: number = targetRect[axis.start];
+  const targetEnd: number = targetRect[axis.end];
 
   const withoutDragging: DraggableDimension[] = removeDraggableFromList(
     draggable,

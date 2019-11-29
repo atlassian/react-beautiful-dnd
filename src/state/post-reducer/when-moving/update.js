@@ -83,7 +83,7 @@ export default ({
   const newImpact: DragImpact =
     forcedImpact ||
     getDragImpact({
-      page,
+      pageOffset: page.offset,
       draggable,
       draggables: dimensions.draggables,
       droppables: dimensions.droppables,
