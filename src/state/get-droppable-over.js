@@ -15,6 +15,7 @@ import { invariant } from '../invariant';
 import isWithin from './is-within';
 import { find } from '../native-with-fallback';
 
+// https://stackoverflow.com/questions/306316/determine-if-two-rectangles-overlap-each-other
 // https://silentmatt.com/rectangle-intersection/
 function getHasOverlap(first: Rect, second: Rect): boolean {
   return (
