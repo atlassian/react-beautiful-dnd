@@ -287,6 +287,7 @@ import {
     // - dragging inHome3 out of home
     // - inHome4 will have shifted backwards
     // - re-enter home list
+    // TODO: I am not sure this test is asserting the right thing
     it('should understand that when re-entering a list, items that started displaced no longer are', () => {
       const inHome4Threshold: Position = getThreshold(axis, preset.inHome4);
       const endOfInHome4: Position = patch(
