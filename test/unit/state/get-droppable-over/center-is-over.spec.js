@@ -40,7 +40,9 @@ import { offsetRectByPosition } from '../../../../src/state/rect';
 
         expect(result).toBe(preset.home.descriptor.id);
       });
+    });
 
+    it('should not return a match when the center is not over a list (and no other candidate conditions are met)', () => {
       const outside: Position[] = getCorners(
         expandByPosition(active, patch(axis.line, 1)),
       );
