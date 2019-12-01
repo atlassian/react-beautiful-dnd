@@ -1,5 +1,5 @@
 // @flow
-import { type Position, type Rect, getRect } from 'css-box-model';
+import { type Position, type Rect } from 'css-box-model';
 import type {
   DroppableId,
   DraggableDimension,
@@ -16,7 +16,6 @@ import withDroppableScroll from '../with-scroll-change/with-droppable-scroll';
 import getReorderImpact from './get-reorder-impact';
 import getCombineImpact from './get-combine-impact';
 import noImpact from '../no-impact';
-import { offsetByPosition } from '../spacing';
 import { offsetRectByPosition } from '../rect';
 
 type Args = {|

@@ -32,6 +32,7 @@ import { offsetRectByPosition } from '../../../../src/state/rect';
           draggable.page.borderBox,
           pageOffset,
         );
+
         const result: ?DroppableId = getDroppableOver({
           pageBorderBox,
           draggable,
@@ -44,6 +45,8 @@ import { offsetRectByPosition } from '../../../../src/state/rect';
 
     it('should not return a match when the center is not over a list (and no other candidate conditions are met)', () => {
       const outside: Position[] = getCorners(
+        // getting corners of a slightly bigger active
+        // which would be outside the current active
         expandByPosition(active, patch(axis.line, 1)),
       );
 
