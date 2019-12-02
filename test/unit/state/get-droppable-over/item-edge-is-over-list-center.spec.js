@@ -64,95 +64,85 @@ const draggable: DraggableDimension = getDraggableDimension({
   borderBox: droppableLarge.client.borderBox,
 });
 
-describe('end edge', () => {
-  it('should hit when dragging cross axis end edge is over the list center', () => {
-    const target: Position = droppableSmall.page.borderBox.center;
-    const distance: Position = subtract(
-      target,
-      draggable.page.borderBox.center,
+it('should hit when dragging cross axis end edge is over the list center', () => {
+  const target: Position = droppableSmall.page.borderBox.center;
+  const distance: Position = subtract(target, draggable.page.borderBox.center);
+
+  const offset = getOffsetForCrossAxisEndEdge({
+    crossAxisEndEdgeOn: droppableSmall.page.borderBox.center,
+    dragging: draggable.page.borderBox,
+    axis: droppableSmall.axis,
+  });
+
+  {
+    const pageBorderBox: Rect = offsetRectByPosition(
+      draggable.page.borderBox,
+      offset,
     );
 
-    const offset = getOffsetForCrossAxisEndEdge({
-      crossAxisEndEdgeOn: droppableSmall.page.borderBox.center,
-      dragging: draggable.page.borderBox,
-      axis: droppableSmall.axis,
+    const result = getDroppableOver({
+      pageBorderBox,
+      draggable,
+      droppables: toDroppableMap([droppableLarge, droppableSmall]),
     });
 
-    {
-      const pageBorderBox: Rect = offsetRectByPosition(
-        draggable.page.borderBox,
-        offset,
-      );
+    expect(result).toEqual(null);
+  }
 
-      const result = getDroppableOver({
-        pageBorderBox,
-        draggable,
-        droppables: toDroppableMap([droppableLarge, droppableSmall]),
-      });
+  {
+    const pageBorderBox: Rect = offsetRectByPosition(
+      draggable.page.borderBox,
+      afterCrossAxisPoint(droppableSmall.axis, offset),
+    );
 
-      expect(result).toEqual(null);
-    }
+    const result = getDroppableOver({
+      pageBorderBox,
+      draggable,
+      droppables: toDroppableMap([droppableLarge, droppableSmall]),
+    });
 
-    {
-      const pageBorderBox: Rect = offsetRectByPosition(
-        draggable.page.borderBox,
-        afterCrossAxisPoint(droppableSmall.axis, offset),
-      );
-
-      const result = getDroppableOver({
-        pageBorderBox,
-        draggable,
-        droppables: toDroppableMap([droppableLarge, droppableSmall]),
-      });
-
-      expect(result).toEqual(droppableSmall.descriptor.id);
-    }
-  });
+    expect(result).toEqual(droppableSmall.descriptor.id);
+  }
 });
 
-describe('start edge', () => {
-  // For this test we are hitting draggableSmall from the (right side) cross axis side
-  it('should hit when dragging cross axis start edge is over the list center', () => {
-    const target: Position = droppableSmall.page.borderBox.center;
-    const distance: Position = subtract(
-      target,
-      draggable.page.borderBox.center,
+// For this test we are hitting draggableSmall from the (right side) cross axis side
+it('should hit when dragging cross axis start edge is over the list center', () => {
+  const target: Position = droppableSmall.page.borderBox.center;
+  const distance: Position = subtract(target, draggable.page.borderBox.center);
+
+  const offset = getOffsetForCrossAxisStartEdge({
+    crossAxisStartEdgeOn: droppableSmall.page.borderBox.center,
+    dragging: draggable.page.borderBox,
+    axis: droppableSmall.axis,
+  });
+
+  {
+    const pageBorderBox: Rect = offsetRectByPosition(
+      draggable.page.borderBox,
+      offset,
     );
 
-    const offset = getOffsetForCrossAxisStartEdge({
-      crossAxisStartEdgeOn: droppableSmall.page.borderBox.center,
-      dragging: draggable.page.borderBox,
-      axis: droppableSmall.axis,
+    const result = getDroppableOver({
+      pageBorderBox,
+      draggable,
+      droppables: toDroppableMap([droppableLarge, droppableSmall]),
     });
 
-    {
-      const pageBorderBox: Rect = offsetRectByPosition(
-        draggable.page.borderBox,
-        offset,
-      );
+    expect(result).toEqual(null);
+  }
 
-      const result = getDroppableOver({
-        pageBorderBox,
-        draggable,
-        droppables: toDroppableMap([droppableLarge, droppableSmall]),
-      });
+  {
+    const pageBorderBox: Rect = offsetRectByPosition(
+      draggable.page.borderBox,
+      beforeCrossAxisPoint(droppableSmall.axis, offset),
+    );
 
-      expect(result).toEqual(null);
-    }
+    const result = getDroppableOver({
+      pageBorderBox,
+      draggable,
+      droppables: toDroppableMap([droppableLarge, droppableSmall]),
+    });
 
-    {
-      const pageBorderBox: Rect = offsetRectByPosition(
-        draggable.page.borderBox,
-        beforeCrossAxisPoint(droppableSmall.axis, offset),
-      );
-
-      const result = getDroppableOver({
-        pageBorderBox,
-        draggable,
-        droppables: toDroppableMap([droppableLarge, droppableSmall]),
-      });
-
-      expect(result).toEqual(droppableSmall.descriptor.id);
-    }
-  });
+    expect(result).toEqual(droppableSmall.descriptor.id);
+  }
 });
