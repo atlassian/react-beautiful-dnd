@@ -110,6 +110,10 @@ export default function getDroppableOver({
         return false;
       }
 
+      /**
+       * edges must go beyond the center line in order to avoid
+       * cases were both conditions are satisfied.
+       */
       if (isStartContained) {
         return crossAxisStart < childCenter;
       }
