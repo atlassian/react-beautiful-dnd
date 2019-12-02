@@ -21,6 +21,24 @@ export function getOffsetForStartEdge({
   return offset;
 }
 
+type ForCrossAxisStart = {|
+  crossAxisStartEdgeOn: Position,
+  dragging: Rect,
+  axis: Axis,
+|};
+
+export function getOffsetForCrossAxisStartEdge({
+  crossAxisStartEdgeOn,
+  dragging,
+  axis,
+}: ForCrossAxisStart): Position {
+  const offset: Position = subtract(
+    crossAxisStartEdgeOn,
+    patch(axis.line, dragging.center[axis.line], dragging[axis.crossAxisStart]),
+  );
+  return offset;
+}
+
 type ForEnd = {|
   endEdgeOn: Position,
   dragging: Rect,
@@ -35,6 +53,24 @@ export function getOffsetForEndEdge({
   const offset: Position = subtract(
     endEdgeOn,
     patch(axis.line, dragging[axis.end], dragging.center[axis.crossAxisLine]),
+  );
+  return offset;
+}
+
+type ForCrossAxisEnd = {|
+  crossAxisEndEdgeOn: Position,
+  dragging: Rect,
+  axis: Axis,
+|};
+
+export function getOffsetForCrossAxisEndEdge({
+  crossAxisEndEdgeOn,
+  dragging,
+  axis,
+}: ForCrossAxisEnd): Position {
+  const offset: Position = subtract(
+    crossAxisEndEdgeOn,
+    patch(axis.line, dragging.center[axis.line], dragging[axis.crossAxisEnd]),
   );
   return offset;
 }
