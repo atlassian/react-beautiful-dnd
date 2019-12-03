@@ -1,31 +1,18 @@
 // @flow
-import { type Position, type Rect, getRect } from 'css-box-model';
+import { type Position, type Rect } from 'css-box-model';
 import {
-  disableDroppable,
   getDroppableDimension,
-  getPreset,
   getDraggableDimension,
 } from '../../../util/dimension';
-import { subtract, patch } from '../../../../src/state/position';
+import { patch } from '../../../../src/state/position';
 import { offsetRectByPosition } from '../../../../src/state/rect';
 import type {
-  TypeId,
-  DraggableId,
   DraggableDimension,
   DroppableDimension,
-  DroppableDimensionMap,
-  DroppableId,
 } from '../../../../src/types';
-
 import getDroppableOver from '../../../../src/state/get-droppable-over';
-import {
-  getOffsetForEndEdge,
-  getOffsetForCrossAxisEndEdge,
-  getOffsetForCrossAxisStartEdge,
-} from '../get-drag-impact/util/get-offset-for-edge';
+import { getOffsetForCrossAxisStartEdge } from '../get-drag-impact/util/get-offset-for-edge';
 import { toDroppableMap } from '../../../../src/state/dimension-structures';
-import { beforeCrossAxisPoint } from '../../../util/before-point';
-import { afterCrossAxisPoint } from '../../../util/after-point';
 
 const droppableLarge: DroppableDimension = getDroppableDimension({
   descriptor: {
@@ -80,9 +67,6 @@ const draggable: DraggableDimension = getDraggableDimension({
 });
 
 it('should prefer lists that are further away in the case that multiple lists are hit', () => {
-  const target: Position = droppableSmallSecondary.page.borderBox.center;
-  const distance: Position = subtract(target, draggable.page.borderBox.center);
-
   const startEdge: Position = patch(
     droppableSmallSecondary.axis.line,
     droppableSmallSecondary.page.borderBox[

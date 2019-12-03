@@ -1,5 +1,4 @@
 // @flow
-import type { Position } from 'css-box-model';
 import type {
   Axis,
   DroppableDimension,
@@ -11,7 +10,7 @@ import getDragImpact from '../../../../src/state/get-drag-impact';
 import noImpact from '../../../../src/state/no-impact';
 import { disableDroppable, getPreset } from '../../../util/dimension';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
-import { origin, subtract } from '../../../../src/state/position';
+import { origin } from '../../../../src/state/position';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {

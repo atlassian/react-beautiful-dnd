@@ -1,20 +1,16 @@
 // @flow
-import { type Position, type Rect, getRect } from 'css-box-model';
+import { type Position, type Rect } from 'css-box-model';
 import {
-  disableDroppable,
   getDroppableDimension,
-  getPreset,
   getDraggableDimension,
 } from '../../../util/dimension';
-import { subtract, patch } from '../../../../src/state/position';
+import { subtract } from '../../../../src/state/position';
 import getDroppableOver from '../../../../src/state/get-droppable-over';
 import { offsetRectByPosition } from '../../../../src/state/rect';
 import type {
   TypeId,
-  DraggableId,
   DraggableDimension,
   DroppableDimension,
-  DroppableDimensionMap,
   DroppableId,
 } from '../../../../src/types';
 

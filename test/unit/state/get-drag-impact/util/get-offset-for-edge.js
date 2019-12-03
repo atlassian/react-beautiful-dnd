@@ -1,7 +1,7 @@
 // @flow
 import type { Position, Rect } from 'css-box-model';
 import type { Axis } from '../../../../../src/types';
-import { add, patch, subtract } from '../../../../../src/state/position';
+import { patch, subtract } from '../../../../../src/state/position';
 
 type ForStart = {|
   startEdgeOn: Position,
