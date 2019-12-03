@@ -1,20 +1,13 @@
 // @flow
-import { type Position, type Rect, getRect } from 'css-box-model';
+import { type Rect } from 'css-box-model';
 import {
-  disableDroppable,
   getDroppableDimension,
-  getPreset,
   getDraggableDimension,
 } from '../../../util/dimension';
-import { subtract, patch } from '../../../../src/state/position';
 import { offsetRectByPosition } from '../../../../src/state/rect';
 import type {
-  TypeId,
-  DraggableId,
   DraggableDimension,
   DroppableDimension,
-  DroppableDimensionMap,
-  DroppableId,
 } from '../../../../src/types';
 
 import getDroppableOver from '../../../../src/state/get-droppable-over';
@@ -65,9 +58,6 @@ const draggable: DraggableDimension = getDraggableDimension({
 });
 
 it('should hit when dragging cross axis end edge is over the list center', () => {
-  const target: Position = droppableSmall.page.borderBox.center;
-  const distance: Position = subtract(target, draggable.page.borderBox.center);
-
   const offset = getOffsetForCrossAxisEndEdge({
     crossAxisEndEdgeOn: droppableSmall.page.borderBox.center,
     dragging: draggable.page.borderBox,
@@ -107,9 +97,6 @@ it('should hit when dragging cross axis end edge is over the list center', () =>
 
 // For this test we are hitting draggableSmall from the (right side) cross axis side
 it('should hit when dragging cross axis start edge is over the list center', () => {
-  const target: Position = droppableSmall.page.borderBox.center;
-  const distance: Position = subtract(target, draggable.page.borderBox.center);
-
   const offset = getOffsetForCrossAxisStartEdge({
     crossAxisStartEdgeOn: droppableSmall.page.borderBox.center,
     dragging: draggable.page.borderBox,

@@ -1,25 +1,17 @@
 // @flow
-import { type Position, type Rect, getRect } from 'css-box-model';
+import { type Position, type Rect } from 'css-box-model';
 import {
-  disableDroppable,
   getDroppableDimension,
-  getPreset,
   getDraggableDimension,
 } from '../../../util/dimension';
-import { subtract, patch } from '../../../../src/state/position';
+import { patch } from '../../../../src/state/position';
 import { offsetRectByPosition } from '../../../../src/state/rect';
 import type {
-  TypeId,
-  DraggableId,
   DraggableDimension,
   DroppableDimension,
-  DroppableDimensionMap,
-  DroppableId,
 } from '../../../../src/types';
-
 import getDroppableOver from '../../../../src/state/get-droppable-over';
 import {
-  getOffsetForEndEdge,
   getOffsetForCrossAxisEndEdge,
   getOffsetForCrossAxisStartEdge,
 } from '../get-drag-impact/util/get-offset-for-edge';
@@ -68,9 +60,6 @@ const draggable: DraggableDimension = getDraggableDimension({
 });
 
 it('should hit when dragging element completely covers the list (end edge +1)', () => {
-  const target: Position = droppableSmall.page.borderBox.center;
-  const distance: Position = subtract(target, draggable.page.borderBox.center);
-
   const endEdge: Position = patch(
     axis.line,
     droppableSmall.page.borderBox[axis.crossAxisEnd],
@@ -117,9 +106,6 @@ it('should hit when dragging element completely covers the list (end edge +1)', 
 });
 
 it('should hit when dragging element completely covers the list (start edge -1)', () => {
-  const target: Position = droppableSmall.page.borderBox.center;
-  const distance: Position = subtract(target, draggable.page.borderBox.center);
-
   const startEdge: Position = patch(
     axis.line,
     droppableSmall.page.borderBox[axis.crossAxisStart],
