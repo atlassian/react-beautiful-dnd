@@ -1,18 +1,18 @@
 // @flow
-import { type Position, type Rect } from 'css-box-model';
+import { type Rect } from 'css-box-model';
 import {
   getDroppableDimension,
   getDraggableDimension,
 } from '../../../util/dimension';
-import { patch } from '../../../../src/state/position';
-import { offsetRectByPosition } from '../../../../src/state/rect';
 import type {
   DraggableDimension,
   DroppableDimension,
 } from '../../../../src/types';
+import { getOffsetForCrossAxisEndEdge } from '../get-drag-impact/util/get-offset-for-edge';
+import { offsetRectByPosition } from '../../../../src/state/rect';
 import getDroppableOver from '../../../../src/state/get-droppable-over';
-import { getOffsetForCrossAxisStartEdge } from '../get-drag-impact/util/get-offset-for-edge';
 import { toDroppableMap } from '../../../../src/state/dimension-structures';
+import { afterCrossAxisPoint } from '../../../util/after-point';
 
 const droppableLarge: DroppableDimension = getDroppableDimension({
   descriptor: {
@@ -42,7 +42,7 @@ const droppableSmall: DroppableDimension = getDroppableDimension({
   },
 });
 
-const droppableSmallSecondary: DroppableDimension = getDroppableDimension({
+const droppableSecondary: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'secondary',
     type: 'standard',
@@ -52,6 +52,20 @@ const droppableSmallSecondary: DroppableDimension = getDroppableDimension({
     top: 1000,
     left: 1200,
     right: 1300,
+    bottom: 1100,
+  },
+});
+
+const droppableTertiary: DroppableDimension = getDroppableDimension({
+  descriptor: {
+    id: 'tertiary',
+    type: 'standard',
+    mode: 'standard',
+  },
+  borderBox: {
+    top: 1000,
+    left: 1100,
+    right: 1200,
     bottom: 1100,
   },
 });
@@ -66,26 +80,20 @@ const draggable: DraggableDimension = getDraggableDimension({
   borderBox: droppableLarge.client.borderBox,
 });
 
-it('should prefer lists that are further away in the case that multiple lists are hit', () => {
-  const startEdge: Position = patch(
-    droppableSmallSecondary.axis.line,
-    droppableSmallSecondary.page.borderBox[
-      droppableSmallSecondary.axis.crossAxisStart
-    ],
-    droppableSmallSecondary.page.borderBox.center[
-      droppableSmallSecondary.axis.line
-    ],
-  );
-
-  const offset = getOffsetForCrossAxisStartEdge({
-    crossAxisStartEdgeOn: startEdge,
+/**
+ * In this case we're hovering over all three lists.
+ * We expect that the furthest away active element is returned.
+ */
+it('should prefer the furthest away droppable when multiple lists are hit', () => {
+  const offset = getOffsetForCrossAxisEndEdge({
+    crossAxisEndEdgeOn: droppableTertiary.page.borderBox.center,
     dragging: draggable.page.borderBox,
-    axis: droppableSmallSecondary.axis,
+    axis: droppableTertiary.axis,
   });
 
   const pageBorderBox: Rect = offsetRectByPosition(
     draggable.page.borderBox,
-    offset,
+    afterCrossAxisPoint(droppableTertiary.axis, offset),
   );
 
   const result = getDroppableOver({
@@ -94,9 +102,40 @@ it('should prefer lists that are further away in the case that multiple lists ar
     droppables: toDroppableMap([
       droppableLarge,
       droppableSmall,
-      droppableSmallSecondary,
+      droppableSecondary,
+      droppableTertiary,
     ]),
   });
 
-  expect(result).toEqual('secondary');
+  expect(result).toEqual(droppableTertiary.descriptor.id);
+});
+
+/**
+ * In this case we're hovering over the primary and secondary and lists.
+ * We expect that the furthest away active element is returned (not including the tertiary list).
+ */
+it('should prefer the second furthest away droppable when multiple lists are hit', () => {
+  const offset = getOffsetForCrossAxisEndEdge({
+    crossAxisEndEdgeOn: droppableSecondary.page.borderBox.center,
+    dragging: draggable.page.borderBox,
+    axis: droppableSecondary.axis,
+  });
+
+  const pageBorderBox: Rect = offsetRectByPosition(
+    draggable.page.borderBox,
+    afterCrossAxisPoint(droppableSecondary.axis, offset),
+  );
+
+  const result = getDroppableOver({
+    pageBorderBox,
+    draggable,
+    droppables: toDroppableMap([
+      droppableLarge,
+      droppableSmall,
+      droppableSecondary,
+      droppableTertiary,
+    ]),
+  });
+
+  expect(result).toEqual(droppableSecondary.descriptor.id);
 });
