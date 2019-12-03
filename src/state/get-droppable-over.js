@@ -10,9 +10,7 @@ import type {
 import { toDroppableList } from './dimension-structures';
 import isPositionInFrame from './visibility/is-position-in-frame';
 import { distance } from './position';
-import { invariant } from '../invariant';
 import isWithin from './is-within';
-import { find } from '../native-with-fallback';
 
 // https://stackoverflow.com/questions/306316/determine-if-two-rectangles-overlap-each-other
 // https://silentmatt.com/rectangle-intersection/
@@ -30,12 +28,6 @@ type Args = {|
   draggable: DraggableDimension,
   droppables: DroppableDimensionMap,
 |};
-
-function getActive(droppable: DroppableDimension): Rect {
-  const active: ?Rect = droppable.subject.active;
-  invariant(active, 'Expected droppable to be visible');
-  return active;
-}
 
 type WithDistance = {|
   distance: number,
@@ -66,28 +58,34 @@ export default function getDroppableOver({
   draggable,
   droppables,
 }: Args): ?DroppableId {
-  const potentials: DroppableDimension[] = toDroppableList(droppables).filter(
-    (droppable: DroppableDimension): boolean => {
-      if (!droppable.isEnabled) {
+  // We know at this point that some overlap has to exist
+  const candidates: DroppableDimension[] = toDroppableList(droppables).filter(
+    (item: DroppableDimension): boolean => {
+      // Cannot be a candidate when disabled
+      if (!item.isEnabled) {
         return false;
       }
-      const active: ?Rect = droppable.subject.active;
+
+      // Cannot be a candidate when there is no visible area
+      const active: ?Rect = item.subject.active;
       if (!active) {
         return false;
       }
-      return getHasOverlap(pageBorderBox, active);
-    },
-  );
 
-  if (!potentials.length) {
-    return null;
-  }
+      // Cannot be a candidate when dragging item is not over the droppable at all
+      if (!getHasOverlap(pageBorderBox, active)) {
+        return false;
+      }
 
-  // We know at this point that some overlap has to exist
-  const candidates: DroppableDimension[] = potentials.filter(
-    (item: DroppableDimension): boolean => {
+      // 1. Candidate if the center position is over a droppable
+      if (isPositionInFrame(active)(pageBorderBox.center)) {
+        return true;
+      }
+
+      // 2. Candidate if an edge is over the cross axis half way point
+      // 3. Candidate if dragging item is totally over droppable on cross axis
+
       const axis: Axis = item.axis;
-      const active: Rect = getActive(item);
       const childCenter: number = active.center[axis.crossAxisLine];
       const crossAxisStart: number = pageBorderBox[axis.crossAxisStart];
       const crossAxisEnd: number = pageBorderBox[axis.crossAxisEnd];
@@ -105,11 +103,6 @@ export default function getDroppableOver({
         return true;
       }
 
-      // Both within edges: going to cover this in a later check (center check)
-      if (isStartContained && isEndContained) {
-        return false;
-      }
-
       /**
        * edges must go beyond the center line in order to avoid
        * cases were both conditions are satisfied.
@@ -122,26 +115,18 @@ export default function getDroppableOver({
     },
   );
 
-  // Yay
+  if (!candidates.length) {
+    return null;
+  }
+
+  // Only one candidate - use that!
   if (candidates.length === 1) {
     return candidates[0].descriptor.id;
   }
 
-  const home: DroppableDimension = droppables[draggable.descriptor.droppableId];
-
   // Multiple options returned
   // Should only occur with really large items
-  // Going to use *crap* fallback: distance from start
-  if (candidates.length > 1) {
-    return getFurthestAway(home, candidates);
-  }
-
-  const centerOver: ?DroppableDimension = find(
-    potentials,
-    (item: DroppableDimension): boolean => {
-      return isPositionInFrame(getActive(item))(pageBorderBox.center);
-    },
-  );
-
-  return centerOver ? centerOver.descriptor.id : null;
+  // Going to use fallback: distance from home
+  const home: DroppableDimension = droppables[draggable.descriptor.droppableId];
+  return getFurthestAway(home, candidates);
 }
