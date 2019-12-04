@@ -177,14 +177,6 @@ export type DisplacedBy = {|
   point: Position,
 |};
 
-export type VerticalUserDirection = 'up' | 'down';
-export type HorizontalUserDirection = 'left' | 'right';
-
-export type UserDirection = {|
-  vertical: VerticalUserDirection,
-  horizontal: HorizontalUserDirection,
-|};
-
 export type Combine = {|
   draggableId: DraggableId,
   droppableId: DroppableId,
@@ -202,7 +194,6 @@ export type ReorderImpact = {|
 
 export type CombineImpact = {|
   type: 'COMBINE',
-  whenEntered: UserDirection,
   combine: Combine,
 |};
 
@@ -233,6 +224,8 @@ export type ClientPositions = {|
 export type PagePositions = {|
   selection: Position,
   borderBoxCenter: Position,
+  // how much the page position has changed from the initial
+  offset: Position,
 |};
 
 // There are two seperate modes that a drag can be in
@@ -349,7 +342,6 @@ export type DraggingState = {|
   dimensions: DimensionMap,
   initial: DragPositions,
   current: DragPositions,
-  userDirection: UserDirection,
   impact: DragImpact,
   viewport: Viewport,
   afterCritical: LiftEffect,

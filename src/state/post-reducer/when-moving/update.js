@@ -9,13 +9,11 @@ import type {
   DragImpact,
   Viewport,
   DimensionMap,
-  UserDirection,
   StateWhenUpdatesAllowed,
   DroppableDimensionMap,
 } from '../../../types';
 import getDragImpact from '../../get-drag-impact';
 import { add, subtract } from '../../position';
-import getUserDirection from '../../user-direction/get-user-direction';
 import recomputePlaceholders from '../../recompute-placeholders';
 
 type Args = {|
@@ -41,7 +39,6 @@ export default ({
   // COLLECTING: can update position but cannot update impact
 
   const viewport: Viewport = forcedViewport || state.viewport;
-  const currentWindowScroll: Position = viewport.scroll.current;
   const dimensions: DimensionMap = forcedDimensions || state.dimensions;
   const clientSelection: Position =
     forcedClientSelection || state.current.client.selection;
@@ -58,20 +55,15 @@ export default ({
   };
 
   const page: PagePositions = {
-    selection: add(client.selection, currentWindowScroll),
-    borderBoxCenter: add(client.borderBoxCenter, currentWindowScroll),
+    selection: add(client.selection, viewport.scroll.current),
+    borderBoxCenter: add(client.borderBoxCenter, viewport.scroll.current),
+    offset: add(client.offset, viewport.scroll.diff.value),
   };
 
   const current: DragPositions = {
     client,
     page,
   };
-
-  const userDirection: UserDirection = getUserDirection(
-    state.userDirection,
-    state.current.page.borderBoxCenter,
-    current.page.borderBoxCenter,
-  );
 
   // Not updating impact while bulk collecting
   if (state.phase === 'COLLECTING') {
@@ -82,7 +74,6 @@ export default ({
       dimensions,
       viewport,
       current,
-      userDirection,
     };
   }
 
@@ -92,13 +83,12 @@ export default ({
   const newImpact: DragImpact =
     forcedImpact ||
     getDragImpact({
-      pageBorderBoxCenter: page.borderBoxCenter,
+      pageOffset: page.offset,
       draggable,
       draggables: dimensions.draggables,
       droppables: dimensions.droppables,
       previousImpact: state.impact,
       viewport,
-      userDirection,
       afterCritical: state.afterCritical,
     });
 
@@ -113,7 +103,6 @@ export default ({
   const result: DraggingState = {
     ...state,
     current,
-    userDirection,
     dimensions: {
       draggables: dimensions.draggables,
       droppables: withUpdatedPlaceholders,

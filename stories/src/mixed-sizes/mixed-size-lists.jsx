@@ -1,22 +1,18 @@
 // @flow
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import { getBox, type Position, type BoxModel } from 'css-box-model';
-import styled from '@emotion/styled';
 import { colors } from '@atlaskit/theme';
-import { getQuotes } from '../data';
-import { type Quote } from '../types';
+import styled from '@emotion/styled';
+import React, { useState } from 'react';
+import { useMemo } from 'use-memo-one';
 import {
   DragDropContext,
-  type BeforeCapture,
-  type DropResult,
-  Droppable,
   Draggable,
+  Droppable,
+  type DropResult,
 } from '../../../src';
-import bindEvents from '../../../src/view/event-bindings/bind-events';
+import type { Quote } from '../types';
 import { grid } from '../constants';
-import reorder, { moveBetween } from '../reorder';
-
-const UseTrimmingContext = React.createContext<boolean>(false);
+import { authorQuoteMap } from '../data';
+import reorder, { reorderQuoteMap } from '../reorder';
 
 const Parent = styled.div`
   display: flex;
@@ -27,7 +23,6 @@ type Width = 'small' | 'large';
 type ItemProps = {|
   quote: Quote,
   index: number,
-  shouldAllowTrimming: boolean,
 |};
 
 const StyledItem = styled.div`
@@ -40,80 +35,6 @@ const StyledItem = styled.div`
 
 function Item(props: ItemProps) {
   const { quote, index } = props;
-  const ref = useRef<?HTMLElement>(null);
-  const useTrimming: boolean = useContext(UseTrimmingContext);
-
-  useEffect(() => {
-    const unsubscribe = bindEvents(window, [
-      {
-        eventName: 'onBeforeCapture',
-        fn: (event: CustomEvent) => {
-          if (!useTrimming) {
-            return;
-          }
-          if (!props.shouldAllowTrimming) {
-            return;
-          }
-
-          const before: BeforeCapture = event.detail.before;
-          const clientSelection: Position = event.detail.clientSelection;
-
-          if (before.mode !== 'FLUID') {
-            return;
-          }
-
-          if (before.draggableId !== quote.id) {
-            return;
-          }
-
-          const el: ?HTMLElement = ref.current;
-
-          if (!el) {
-            return;
-          }
-
-          const box: BoxModel = getBox(el);
-
-          // want to shrink the item to 200px wide.
-          // want it to be centered as much as possible to the cursor
-          const targetWidth: number = 250;
-          const halfWidth: number = targetWidth / 2;
-          const distanceToLeft: number = Math.max(
-            clientSelection.x - box.borderBox.left,
-            0,
-          );
-
-          el.style.width = `${targetWidth}px`;
-
-          // Nothing left to do
-          if (distanceToLeft < halfWidth) {
-            return;
-          }
-
-          // what the new left will be
-          const proposedLeftOffset: number = distanceToLeft - halfWidth;
-          // what the raw right value would be
-          const targetRight: number =
-            box.borderBox.left + proposedLeftOffset + targetWidth;
-
-          // how much we would be going past the right value
-          const rightOverlap: number = Math.max(
-            targetRight - box.borderBox.right,
-            0,
-          );
-
-          // need to ensure that we don't pull the element past
-          // it's resting right position
-          const leftOffset: number = proposedLeftOffset - rightOverlap;
-
-          el.style.position = 'relative';
-          el.style.left = `${leftOffset}px`;
-        },
-      },
-    ]);
-
-    return unsubscribe;
-  }, [props.shouldAllowTrimming, quote.id, useTrimming]);
 
   return (
     <Draggable draggableId={quote.id} index={index}>
@@ -121,11 +42,7 @@ function Item(props: ItemProps) {
         <StyledItem
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          ref={(node: ?HTMLElement) => {
-            provided.innerRef(node);
-            ref.current = node;
-          }}
-          shouldAllowTrimming={props.shouldAllowTrimming}
+          ref={provided.innerRef}
         >
           {quote.content}
         </StyledItem>
@@ -137,8 +54,15 @@ function Item(props: ItemProps) {
 type ListProps = {|
   listId: string,
   quotes: Quote[],
-  width: Width,
 |};
+
+const ListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Controls = styled.div``;
 
 const StyledList = styled.div`
   border: 1px solid ${colors.N100};
@@ -151,107 +75,80 @@ const StyledList = styled.div`
 `;
 
 function List(props: ListProps) {
+  const [width, setWidth] = useState<Width>('small');
   return (
-    <Droppable droppableId={props.listId}>
-      {(provided, snapshot) => (
-        <StyledList
-          {...provided.droppableProps}
-          ref={provided.innerRef}
-          isDraggingOver={snapshot.isDraggingOver}
-          width={props.width}
-        >
-          {props.quotes.map((quote: Quote, index: number) => (
-            <Item
-              key={quote.id}
-              quote={quote}
-              index={index}
-              shouldAllowTrimming={props.width === 'large'}
-            />
-          ))}
-          {provided.placeholder}
-        </StyledList>
-      )}
-    </Droppable>
+    <ListContainer>
+      <Controls>
+        <button type="button" onClick={() => setWidth('small')}>
+          Small
+        </button>
+        <button type="button" onClick={() => setWidth('large')}>
+          Large
+        </button>
+      </Controls>
+      <Droppable droppableId={props.listId}>
+        {(provided, snapshot) => (
+          <StyledList
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            isDraggingOver={snapshot.isDraggingOver}
+            width={width}
+          >
+            {props.quotes.map((quote: Quote, index: number) => (
+              <Item key={quote.id} quote={quote} index={index} />
+            ))}
+            {provided.placeholder}
+          </StyledList>
+        )}
+      </Droppable>
+    </ListContainer>
   );
 }
 
 export default function App() {
-  const [first, setFirst] = useState(() => getQuotes(3));
-  const [second, setSecond] = useState(() => getQuotes(3));
-  const [useTrimming, setUseTrimming] = useState(false);
-  const clientSelectionRef = useRef<Position>({ x: 0, y: 0 });
+  const [columns, setColumns] = useState(authorQuoteMap);
+  const ordered = useMemo(() => Object.keys(columns), [columns]);
 
   function onDragEnd(result: DropResult) {
     const { source, destination } = result;
+
     if (!destination) {
       return;
     }
+
+    // reordering in same list
     if (source.droppableId === destination.droppableId) {
-      if (source.droppableId === 'first') {
-        setFirst(reorder(first, source.index, destination.index));
-      } else {
-        setSecond(reorder(second, source.index, destination.index));
-      }
+      const newQuotes: Quote[] = reorder(
+        columns[source.droppableId],
+        source.index,
+        destination.index,
+      );
+      setColumns({
+        ...columns,
+        [source.droppableId]: newQuotes,
+      });
       return;
     }
 
-    const { list1, list2 } = moveBetween({
-      list1: {
-        id: 'first',
-        values: first,
-      },
-      list2: {
-        id: 'second',
-        values: second,
-      },
+    // moving between columns
+
+    // remove item from source list
+    const newColumns = reorderQuoteMap({
+      quoteMap: columns,
       source,
       destination,
     });
 
-    setFirst(list1.values);
-    setSecond(list2.values);
+    setColumns(newColumns.quoteMap);
   }
 
-  useEffect(() => {
-    const unsubscribe = bindEvents(window, [
-      {
-        eventName: 'mousemove',
-        fn: (event: MouseEvent) => {
-          const current: Position = {
-            x: event.clientX,
-            y: event.clientY,
-          };
-          clientSelectionRef.current = current;
-        },
-        options: { passive: true },
-      },
-    ]);
-    return unsubscribe;
-  });
-
-  function onBeforeCapture(before: BeforeCapture) {
-    window.dispatchEvent(
-      new CustomEvent('onBeforeCapture', {
-        detail: { before, clientSelection: clientSelectionRef.current },
-      }),
-    );
-  }
   return (
-    <UseTrimmingContext.Provider value={useTrimming}>
-      <DragDropContext onBeforeCapture={onBeforeCapture} onDragEnd={onDragEnd}>
-        <Parent>
-          <List listId="first" quotes={first} width="small" />
-          <List listId="second" quotes={second} width="large" />
-        </Parent>
-        Item trimming experiment:{' '}
-        <strong>{useTrimming ? 'enabled' : 'disabled'}</strong>
-        <button
-          type="button"
-          onClick={() => setUseTrimming((value: boolean) => !value)}
-        >
-          {useTrimming ? 'disable' : 'enable'}
-        </button>
-      </DragDropContext>
-    </UseTrimmingContext.Provider>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Parent>
+        {ordered.map((key: string) => (
+          <List listId={key} quotes={columns[key]} key={key} />
+        ))}
+      </Parent>
+    </DragDropContext>
   );
 }

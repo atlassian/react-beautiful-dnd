@@ -5,7 +5,6 @@ import type {
   OwnProps,
   MapProps,
 } from '../../../../src/view/draggable/draggable-types';
-import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import { makeMapStateToProps } from '../../../../src/view/draggable/connected-draggable';
 import { getPreset } from '../../../util/dimension';
 import {
@@ -25,7 +24,6 @@ draggingStates.forEach((withoutMerge: IsDraggingState) => {
       ...withoutMerge.impact,
       at: {
         type: 'COMBINE',
-        whenEntered: forward,
         combine: {
           draggableId: preset.inHome2.descriptor.id,
           droppableId: preset.inHome2.descriptor.droppableId,

@@ -13,7 +13,6 @@ import scrollDroppable from '../../../../src/state/droppable/scroll-droppable';
 import { getPreset, makeScrollable } from '../../../util/dimension';
 import getClientBorderBoxCenter from '../../../../src/state/get-center-from-impact/get-client-border-box-center';
 import getDisplacedBy from '../../../../src/state/get-displaced-by';
-import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import noImpact from '../../../../src/state/no-impact';
 import scrollViewport from '../../../../src/state/scroll-viewport';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
@@ -86,7 +85,6 @@ import { getForcedDisplacement } from '../../../util/impact';
       displacedBy,
       at: {
         type: 'COMBINE',
-        whenEntered: forward,
         combine: {
           draggableId: preset.inHome2.descriptor.id,
           droppableId: preset.home.descriptor.id,

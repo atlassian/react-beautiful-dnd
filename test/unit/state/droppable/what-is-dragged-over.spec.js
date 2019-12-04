@@ -1,7 +1,6 @@
 // @flow
 import noImpact from '../../../../src/state/no-impact';
 import whatIsDraggedOver from '../../../../src/state/droppable/what-is-dragged-over';
-import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import type {
   DraggableLocation,
   DragImpact,
@@ -30,7 +29,6 @@ it('should return the droppableId from a merge impact', () => {
       draggableId: 'draggable',
       droppableId: 'droppable',
     },
-    whenEntered: forward,
   };
   const impact: DragImpact = {
     ...noImpact,

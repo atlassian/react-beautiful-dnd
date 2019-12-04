@@ -5,10 +5,10 @@ import { horizontal, vertical } from '../../../../../../src/state/axis';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
-import { patch } from '../../../../../../src/state/position';
-import { forward } from '../../../../../../src/state/user-direction/user-direction-preset';
 import { getPreset } from '../../../../../util/dimension';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
+import afterPoint from '../../../../../util/after-point';
+import { getOffsetForEndEdge } from '../../util/get-offset-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -21,20 +21,19 @@ import { emptyGroups } from '../../../../../../src/state/no-impact';
         draggables: preset.draggables,
         viewport: preset.viewport,
       });
-      const startOfInHome4: Position = patch(
-        axis.line,
-        preset.inHome4.page.borderBox[axis.start],
-        preset.home.page.borderBox.center[axis.crossAxisLine],
-      );
+      const offsetForEndOnInHome4Center: Position = getOffsetForEndEdge({
+        endEdgeOn: preset.inHome4.page.borderBox.center,
+        dragging: preset.inHome1.page.borderBox,
+        axis,
+      });
 
       const goingForwards: DragImpact = getDragImpact({
-        pageBorderBoxCenter: startOfInHome4,
+        pageOffset: afterPoint(axis, offsetForEndOnInHome4Center),
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: preset.droppables,
         previousImpact: homeImpact,
         viewport,
-        userDirection: forward,
         afterCritical,
       });
 
