@@ -8,10 +8,6 @@ import type {
   DraggableLocation,
   DraggableId,
 } from '../../../../types';
-import {
-  forward,
-  backward,
-} from '../../../user-direction/user-direction-preset';
 import { tryGetDestination } from '../../../get-impact-location';
 import { findIndex } from '../../../../native-with-fallback';
 import removeDraggableFromList from '../../../remove-draggable-from-list';
@@ -44,7 +40,6 @@ export default ({
   function getImpact(target: DraggableId) {
     const at: CombineImpact = {
       type: 'COMBINE',
-      whenEntered: isMovingForward ? forward : backward,
       combine: {
         draggableId: target,
         droppableId: destination.descriptor.id,

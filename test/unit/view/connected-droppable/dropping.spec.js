@@ -13,7 +13,6 @@ import { makeMapStateToProps } from '../../../../src/view/droppable/connected-dr
 import getStatePreset from '../../../util/get-simple-state-preset';
 import getOwnProps from './util/get-own-props';
 import { withImpact } from '../../../util/dragging-state';
-import { forward } from '../../../../src/state/user-direction/user-direction-preset';
 import noImpact from '../../../../src/state/no-impact';
 import cloneImpact from '../../../util/clone-impact';
 import { tryGetDestination } from '../../../../src/state/get-impact-location';
@@ -54,7 +53,6 @@ describe('home list', () => {
         ...state.dragging().impact,
         at: {
           type: 'COMBINE',
-          whenEntered: forward,
           combine: {
             draggableId: preset.inHome2.descriptor.id,
             droppableId: preset.inHome2.descriptor.droppableId,

@@ -11,10 +11,6 @@ import getPageBorderBoxCenter from '../../../../../../src/state/get-center-from-
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../../util/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
-import {
-  forward,
-  backward,
-} from '../../../../../../src/state/user-direction/user-direction-preset';
 import { subtract, add } from '../../../../../../src/state/position';
 import { getForcedDisplacement } from '../../../../../util/impact';
 
@@ -54,7 +50,6 @@ import { getForcedDisplacement } from '../../../../../util/impact';
           displacedBy,
           at: {
             type: 'COMBINE',
-            whenEntered: forward,
             // combining with inHome3
             combine: {
               draggableId: preset.inHome3.descriptor.id,
@@ -84,7 +79,6 @@ import { getForcedDisplacement } from '../../../../../util/impact';
           displacedBy,
           at: {
             type: 'COMBINE',
-            whenEntered: backward,
             // combining with not displaced inHome1
             combine: {
               draggableId: preset.inHome3.descriptor.id,
@@ -134,7 +128,6 @@ import { getForcedDisplacement } from '../../../../../util/impact';
           displacedBy,
           at: {
             type: 'COMBINE',
-            whenEntered: backward,
             // combining with not displaced inHome1
             combine: {
               draggableId: preset.inHome1.descriptor.id,
@@ -177,7 +170,6 @@ import { getForcedDisplacement } from '../../../../../util/impact';
           displacedBy,
           at: {
             type: 'COMBINE',
-            whenEntered: backward,
             // combining with not displaced inHome1
             combine: {
               draggableId: preset.inHome1.descriptor.id,

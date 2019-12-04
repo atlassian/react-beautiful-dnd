@@ -8,7 +8,6 @@ import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../util/dimension';
 import getDisplacedBy from '../../../../../src/state/get-displaced-by';
 import { vertical } from '../../../../../src/state/axis';
-import { forward } from '../../../../../src/state/user-direction/user-direction-preset';
 import { getForcedDisplacement } from '../../../../util/impact';
 
 const preset = getPreset();
@@ -126,7 +125,6 @@ it('should remove any movement when merging so items will collapse', () => {
     displacedBy,
     at: {
       type: 'COMBINE',
-      whenEntered: forward,
       combine: {
         droppableId: preset.home.descriptor.id,
         draggableId: preset.inHome3.descriptor.id,

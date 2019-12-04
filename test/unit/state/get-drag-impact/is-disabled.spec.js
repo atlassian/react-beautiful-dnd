@@ -1,22 +1,16 @@
 // @flow
-import type { Position } from 'css-box-model';
 import type {
   Axis,
   DroppableDimension,
   DroppableDimensionMap,
   DragImpact,
-  UserDirection,
 } from '../../../../src/types';
 import { horizontal, vertical } from '../../../../src/state/axis';
 import getDragImpact from '../../../../src/state/get-drag-impact';
 import noImpact from '../../../../src/state/no-impact';
 import { disableDroppable, getPreset } from '../../../util/dimension';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
-
-const dontCareAboutDirection: UserDirection = {
-  vertical: 'down',
-  horizontal: 'right',
-};
+import { origin } from '../../../../src/state/position';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -36,18 +30,14 @@ const dontCareAboutDirection: UserDirection = {
         [disabled.descriptor.id]: disabled,
       };
 
-      // choosing the center of inHome2 which should have an impact
-      const pageBorderBoxCenter: Position =
-        preset.inHome2.page.borderBox.center;
-
       const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter,
+        // no change - should still be in same spot
+        pageOffset: origin,
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: withDisabled,
         previousImpact: homeImpact,
         viewport: preset.viewport,
-        userDirection: dontCareAboutDirection,
         afterCritical,
       });
 
@@ -60,18 +50,14 @@ const dontCareAboutDirection: UserDirection = {
         ...preset.droppables,
         [disabled.descriptor.id]: disabled,
       };
-      // choosing the center of inForeign2 which should have an impact
-      const pageBorderBoxCenter: Position =
-        preset.inForeign2.page.borderBox.center;
 
       const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter,
+        pageOffset: origin,
         draggable: preset.inForeign1,
         draggables: preset.draggables,
         droppables: withDisabled,
         previousImpact: homeImpact,
         viewport: preset.viewport,
-        userDirection: dontCareAboutDirection,
         afterCritical,
       });
 

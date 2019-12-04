@@ -6,7 +6,6 @@ import getViewport from '../../src/view/window/get-viewport';
 import { add } from '../../src/state/position';
 import getLiftEffect from '../../src/state/get-lift-effect';
 import getHomeLocation from '../../src/state/get-home-location';
-import { forward } from '../../src/state/user-direction/user-direction-preset';
 import type {
   Axis,
   State,
@@ -68,6 +67,7 @@ export default (axis?: Axis = vertical) => {
     const page: PagePositions = {
       selection: add(client.selection, viewport.scroll.initial),
       borderBoxCenter: add(client.borderBoxCenter, viewport.scroll.initial),
+      offset: add(client.offset, viewport.scroll.diff.value),
     };
 
     const initial: DragPositions = {
@@ -93,7 +93,6 @@ export default (axis?: Axis = vertical) => {
       impact,
       afterCritical,
       onLiftImpact: impact,
-      userDirection: forward,
       isWindowScrollAllowed: true,
       viewport,
       scrollJumpRequest: null,

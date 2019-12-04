@@ -5,10 +5,6 @@ import type {
   DroppableDimension,
 } from '../../../../../../../src/types';
 import { vertical, horizontal } from '../../../../../../../src/state/axis';
-import {
-  forward,
-  backward,
-} from '../../../../../../../src/state/user-direction/user-direction-preset';
 import { getPreset } from '../../../../../../util/dimension';
 import moveToNextIndex from '../../../../../../../src/state/move-in-direction/move-to-next-place/move-to-next-index/index';
 import getDisplacedBy from '../../../../../../../src/state/get-displaced-by';
@@ -35,7 +31,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
         ...homeImpact,
         at: {
           type: 'COMBINE',
-          whenEntered: forward,
           combine: {
             draggableId: preset.inHome3.descriptor.id,
             droppableId: preset.home.descriptor.id,
@@ -70,7 +65,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
         ...homeImpact,
         at: {
           type: 'COMBINE',
-          whenEntered: forward,
           combine: {
             draggableId: preset.inHome3.descriptor.id,
             droppableId: preset.home.descriptor.id,
@@ -123,7 +117,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
         displacedBy: getDisplacedBy(axis, preset.inHome2.displaceBy),
         at: {
           type: 'COMBINE',
-          whenEntered: backward,
           combine: {
             draggableId: preset.inHome3.descriptor.id,
             droppableId: preset.home.descriptor.id,
@@ -181,7 +174,6 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
         displacedBy: getDisplacedBy(axis, preset.inHome2.displaceBy),
         at: {
           type: 'COMBINE',
-          whenEntered: backward,
           combine: {
             draggableId: preset.inHome3.descriptor.id,
             droppableId: preset.home.descriptor.id,

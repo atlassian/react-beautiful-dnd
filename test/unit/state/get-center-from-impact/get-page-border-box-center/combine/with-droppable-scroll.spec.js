@@ -13,7 +13,6 @@ import { getPreset, makeScrollable } from '../../../../../util/dimension';
 import getDisplacedBy from '../../../../../../src/state/get-displaced-by';
 import { negate, add } from '../../../../../../src/state/position';
 import scrollDroppable from '../../../../../../src/state/droppable/scroll-droppable';
-import { forward } from '../../../../../../src/state/user-direction/user-direction-preset';
 import { getForcedDisplacement } from '../../../../../util/impact';
 
 [vertical, horizontal].forEach((axis: Axis) => {
@@ -56,7 +55,6 @@ import { getForcedDisplacement } from '../../../../../util/impact';
         displacedBy,
         at: {
           type: 'COMBINE',
-          whenEntered: forward,
           // combining with inHome2
           combine: {
             draggableId: preset.inHome2.descriptor.id,
