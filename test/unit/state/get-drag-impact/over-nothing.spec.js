@@ -14,8 +14,8 @@ import getLiftEffect from '../../../../src/state/get-lift-effect';
     it('should return no impact when not dragging over anything', () => {
       // dragging up above the list
       const farAway: Position = {
-        x: 1000,
-        y: 1000,
+        x: 10000,
+        y: 10000,
       };
       const { afterCritical, impact: homeImpact } = getLiftEffect({
         draggable: preset.inHome1,
@@ -25,7 +25,7 @@ import getLiftEffect from '../../../../src/state/get-lift-effect';
       });
 
       const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter: farAway,
+        pageOffset: farAway,
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: preset.droppables,
