@@ -48,6 +48,7 @@ export const move = (
       client.borderBoxCenter,
       previous.viewport.scroll.current,
     ),
+    offset: add(client.offset, previous.viewport.scroll.diff.value),
   };
 
   return {

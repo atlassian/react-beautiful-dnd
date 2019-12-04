@@ -7,8 +7,8 @@ import getDragImpact from '../../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../../util/dimension';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
-import { getCenterForEndEdge } from '../../util/get-center-for-edge';
 import afterPoint from '../../../../../util/after-point';
+import { getOffsetForEndEdge } from '../../util/get-offset-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -21,14 +21,14 @@ import afterPoint from '../../../../../util/after-point';
         draggables: preset.draggables,
         viewport: preset.viewport,
       });
-      const centerForEndOnInHome4Center: Position = getCenterForEndEdge({
+      const offsetForEndOnInHome4Center: Position = getOffsetForEndEdge({
         endEdgeOn: preset.inHome4.page.borderBox.center,
         dragging: preset.inHome1.page.borderBox,
         axis,
       });
 
       const goingForwards: DragImpact = getDragImpact({
-        pageBorderBoxCenter: afterPoint(axis, centerForEndOnInHome4Center),
+        pageOffset: afterPoint(axis, offsetForEndOnInHome4Center),
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: preset.droppables,

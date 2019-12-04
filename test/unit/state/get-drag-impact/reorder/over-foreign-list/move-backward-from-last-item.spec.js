@@ -13,8 +13,8 @@ import getLiftEffect from '../../../../../../src/state/get-lift-effect';
 import { getPreset } from '../../../../../util/dimension';
 import { emptyGroups } from '../../../../../../src/state/no-impact';
 import { getForcedDisplacement } from '../../../../../util/impact';
-import { getCenterForStartEdge } from '../../util/get-center-for-edge';
 import beforePoint from '../../../../../util/before-point';
+import { getOffsetForStartEdge } from '../../util/get-offset-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -45,14 +45,14 @@ import beforePoint from '../../../../../util/before-point';
         },
       };
 
-      const centerForEndOnInForeign4Center: Position = getCenterForStartEdge({
+      const offsetForEndOnInForeign4Center: Position = getOffsetForStartEdge({
         startEdgeOn: preset.inForeign4.page.borderBox.center,
         dragging: preset.inHome1.page.borderBox,
         axis,
       });
 
       const goingBackwards: DragImpact = getDragImpact({
-        pageBorderBoxCenter: beforePoint(axis, centerForEndOnInForeign4Center),
+        pageOffset: beforePoint(axis, offsetForEndOnInForeign4Center),
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: preset.droppables,

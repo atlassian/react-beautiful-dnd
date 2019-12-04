@@ -1,5 +1,4 @@
 // @flow
-import type { Position } from 'css-box-model';
 import type {
   Axis,
   DroppableDimension,
@@ -11,6 +10,7 @@ import getDragImpact from '../../../../src/state/get-drag-impact';
 import noImpact from '../../../../src/state/no-impact';
 import { disableDroppable, getPreset } from '../../../util/dimension';
 import getLiftEffect from '../../../../src/state/get-lift-effect';
+import { origin } from '../../../../src/state/position';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -30,12 +30,9 @@ import getLiftEffect from '../../../../src/state/get-lift-effect';
         [disabled.descriptor.id]: disabled,
       };
 
-      // choosing the center of inHome2 which should have an impact
-      const pageBorderBoxCenter: Position =
-        preset.inHome2.page.borderBox.center;
-
       const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter,
+        // no change - should still be in same spot
+        pageOffset: origin,
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: withDisabled,
@@ -53,12 +50,9 @@ import getLiftEffect from '../../../../src/state/get-lift-effect';
         ...preset.droppables,
         [disabled.descriptor.id]: disabled,
       };
-      // choosing the center of inForeign2 which should have an impact
-      const pageBorderBoxCenter: Position =
-        preset.inForeign2.page.borderBox.center;
 
       const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter,
+        pageOffset: origin,
         draggable: preset.inForeign1,
         draggables: preset.draggables,
         droppables: withDisabled,

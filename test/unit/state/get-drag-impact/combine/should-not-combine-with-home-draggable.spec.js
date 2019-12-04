@@ -8,6 +8,7 @@ import { horizontal, vertical } from '../../../../../src/state/axis';
 import getDragImpact from '../../../../../src/state/get-drag-impact';
 import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import { enableCombining, getPreset } from '../../../../util/dimension';
+import { origin } from '../../../../../src/state/position';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -27,7 +28,7 @@ import { enableCombining, getPreset } from '../../../../util/dimension';
       // from the home impact
 
       const impact: DragImpact = getDragImpact({
-        pageBorderBoxCenter: preset.inHome1.page.borderBox.center,
+        pageOffset: origin,
         draggable: preset.inHome1,
         draggables: preset.draggables,
         droppables: withCombineEnabled,

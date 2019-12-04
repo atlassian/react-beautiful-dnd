@@ -1,5 +1,5 @@
 // @flow
-import { type Position } from 'css-box-model';
+import { type Position, type Rect } from 'css-box-model';
 import type {
   DroppableId,
   DraggableDimension,
@@ -16,9 +16,10 @@ import withDroppableScroll from '../with-scroll-change/with-droppable-scroll';
 import getReorderImpact from './get-reorder-impact';
 import getCombineImpact from './get-combine-impact';
 import noImpact from '../no-impact';
+import { offsetRectByPosition } from '../rect';
 
 type Args = {|
-  pageBorderBoxCenter: Position,
+  pageOffset: Position,
   draggable: DraggableDimension,
   // all dimensions in system
   draggables: DraggableDimensionMap,
@@ -29,7 +30,7 @@ type Args = {|
 |};
 
 export default ({
-  pageBorderBoxCenter,
+  pageOffset,
   draggable,
   draggables,
   droppables,
@@ -37,8 +38,14 @@ export default ({
   viewport,
   afterCritical,
 }: Args): DragImpact => {
+  const pageBorderBox: Rect = offsetRectByPosition(
+    draggable.page.borderBox,
+    pageOffset,
+  );
+
   const destinationId: ?DroppableId = getDroppableOver({
-    target: pageBorderBoxCenter,
+    pageBorderBox,
+    draggable,
     droppables,
   });
 
@@ -58,15 +65,15 @@ export default ({
 
   // Where the element actually is now.
   // Need to take into account the change of scroll in the droppable
-  const pageBorderBoxCenterWithDroppableScrollChange: Position = withDroppableScroll(
+  const pageBorderBoxWithDroppableScroll: Rect = withDroppableScroll(
     destination,
-    pageBorderBoxCenter,
+    pageBorderBox,
   );
 
   // checking combine first so we combine before any reordering
   return (
     getCombineImpact({
-      pageBorderBoxCenterWithDroppableScrollChange,
+      pageBorderBoxWithDroppableScroll,
       draggable,
       previousImpact,
       destination,
@@ -74,7 +81,7 @@ export default ({
       afterCritical,
     }) ||
     getReorderImpact({
-      pageBorderBoxCenterWithDroppableScrollChange,
+      pageBorderBoxWithDroppableScroll,
       draggable,
       destination,
       insideDestination,

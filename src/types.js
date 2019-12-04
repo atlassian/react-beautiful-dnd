@@ -224,6 +224,8 @@ export type ClientPositions = {|
 export type PagePositions = {|
   selection: Position,
   borderBoxCenter: Position,
+  // how much the page position has changed from the initial
+  offset: Position,
 |};
 
 // There are two seperate modes that a drag can be in

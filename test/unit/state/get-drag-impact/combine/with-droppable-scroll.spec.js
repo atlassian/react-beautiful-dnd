@@ -13,7 +13,7 @@ import getLiftEffect from '../../../../../src/state/get-lift-effect';
 import { patch, add } from '../../../../../src/state/position';
 import { getPreset, makeScrollable } from '../../../../util/dimension';
 import { getThreshold } from '../util/get-combine-threshold';
-import { getCenterForEndEdge } from '../util/get-center-for-edge';
+import { getOffsetForEndEdge } from '../util/get-offset-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -52,7 +52,7 @@ import { getCenterForEndEdge } from '../util/get-center-for-edge';
     );
     const threshold: Position = getThreshold(axis, preset.inHome2);
     const combineStart: Position = add(startOfInHome2, threshold);
-    const onCombineStart: Position = getCenterForEndEdge({
+    const offsetForOnCombineStart: Position = getOffsetForEndEdge({
       endEdgeOn: combineStart,
       dragging: preset.inHome1.page.borderBox,
       axis,
@@ -62,7 +62,7 @@ import { getCenterForEndEdge } from '../util/get-center-for-edge';
       // no combine without droppable scroll
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: onCombineStart,
+          pageOffset: offsetForOnCombineStart,
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: withoutScrolled,
@@ -76,7 +76,7 @@ import { getCenterForEndEdge } from '../util/get-center-for-edge';
       // combine now due to do droppable scroll
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: onCombineStart,
+          pageOffset: offsetForOnCombineStart,
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: withScrolled,

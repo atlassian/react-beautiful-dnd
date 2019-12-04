@@ -16,9 +16,9 @@ import afterPoint from '../../../../../util/after-point';
 import beforePoint from '../../../../../util/before-point';
 import { getForcedDisplacement } from '../../../../../util/impact';
 import {
-  getCenterForStartEdge,
-  getCenterForEndEdge,
-} from '../../util/get-center-for-edge';
+  getOffsetForStartEdge,
+  getOffsetForEndEdge,
+} from '../../util/get-offset-for-edge';
 
 [vertical, horizontal].forEach((axis: Axis) => {
   describe(`on ${axis.direction} axis`, () => {
@@ -36,14 +36,14 @@ import {
       viewport: preset.viewport,
     });
 
-    const centerForStartOnInForeign2Center: Position = getCenterForStartEdge({
+    const offsetForStartOnInForeign2Center: Position = getOffsetForStartEdge({
       startEdgeOn: preset.inForeign2.page.borderBox.center,
       dragging: preset.inHome1.page.borderBox,
       axis,
     });
 
     const goingBackwards: DragImpact = getDragImpact({
-      pageBorderBoxCenter: beforePoint(axis, centerForStartOnInForeign2Center),
+      pageOffset: beforePoint(axis, offsetForStartOnInForeign2Center),
       draggable: preset.inHome1,
       draggables: preset.draggables,
       droppables: preset.droppables,
@@ -55,7 +55,7 @@ import {
     it('should displace items when moving backwards past their bottom edge', () => {
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: centerForStartOnInForeign2Center,
+          pageOffset: offsetForStartOnInForeign2Center,
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: preset.droppables,
@@ -110,20 +110,20 @@ import {
     });
 
     it('should end displacement if moving forward over the displaced center', () => {
-      const centerForEndOnInForeign2Center: Position = getCenterForEndEdge({
+      const offsetForEndOnInForeign2Center: Position = getOffsetForEndEdge({
         endEdgeOn: preset.inForeign2.page.borderBox.center,
         dragging: preset.inHome1.page.borderBox,
         axis,
       });
       const displaced: Position = add(
-        centerForEndOnInForeign2Center,
+        offsetForEndOnInForeign2Center,
         displacedBy.point,
       );
 
       // still not far enough
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: displaced,
+          pageOffset: displaced,
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: preset.droppables,
@@ -136,7 +136,7 @@ import {
       // no longer displace as we have moved forwards past the displaced center
       {
         const impact: DragImpact = getDragImpact({
-          pageBorderBoxCenter: afterPoint(axis, displaced),
+          pageOffset: afterPoint(axis, displaced),
           draggable: preset.inHome1,
           draggables: preset.draggables,
           droppables: preset.droppables,

@@ -67,6 +67,7 @@ export default (axis?: Axis = vertical) => {
     const page: PagePositions = {
       selection: add(client.selection, viewport.scroll.initial),
       borderBoxCenter: add(client.borderBoxCenter, viewport.scroll.initial),
+      offset: add(client.offset, viewport.scroll.diff.value),
     };
 
     const initial: DragPositions = {
