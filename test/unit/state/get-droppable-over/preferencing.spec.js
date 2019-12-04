@@ -14,7 +14,7 @@ import getDroppableOver from '../../../../src/state/get-droppable-over';
 import { toDroppableMap } from '../../../../src/state/dimension-structures';
 import { afterCrossAxisPoint } from '../../../util/after-point';
 
-const droppableLarge: DroppableDimension = getDroppableDimension({
+const droppableOrigin: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'large',
     type: 'standard',
@@ -28,7 +28,7 @@ const droppableLarge: DroppableDimension = getDroppableDimension({
   },
 });
 
-const droppableSmall: DroppableDimension = getDroppableDimension({
+const droppableFirst: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'small',
     type: 'standard',
@@ -42,7 +42,7 @@ const droppableSmall: DroppableDimension = getDroppableDimension({
   },
 });
 
-const droppableSecondary: DroppableDimension = getDroppableDimension({
+const droppableSecond: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'secondary',
     type: 'standard',
@@ -52,11 +52,12 @@ const droppableSecondary: DroppableDimension = getDroppableDimension({
     top: 1000,
     left: 1200,
     right: 1300,
-    bottom: 1100,
+    // This is really tall to test the distance calculation against varied lists
+    bottom: 8000,
   },
 });
 
-const droppableTertiary: DroppableDimension = getDroppableDimension({
+const droppableThird: DroppableDimension = getDroppableDimension({
   descriptor: {
     id: 'tertiary',
     type: 'standard',
@@ -64,8 +65,8 @@ const droppableTertiary: DroppableDimension = getDroppableDimension({
   },
   borderBox: {
     top: 1000,
-    left: 1100,
-    right: 1200,
+    left: 1400,
+    right: 1500,
     bottom: 1100,
   },
 });
@@ -74,10 +75,10 @@ const draggable: DraggableDimension = getDraggableDimension({
   descriptor: {
     id: 'my draggable',
     index: 0,
-    type: droppableLarge.descriptor.type,
-    droppableId: droppableLarge.descriptor.id,
+    type: droppableOrigin.descriptor.type,
+    droppableId: droppableOrigin.descriptor.id,
   },
-  borderBox: droppableLarge.client.borderBox,
+  borderBox: droppableOrigin.client.borderBox,
 });
 
 /**
@@ -86,28 +87,28 @@ const draggable: DraggableDimension = getDraggableDimension({
  */
 it('should prefer the furthest away droppable when multiple lists are hit', () => {
   const offset = getOffsetForCrossAxisEndEdge({
-    crossAxisEndEdgeOn: droppableTertiary.page.borderBox.center,
+    crossAxisEndEdgeOn: droppableThird.page.borderBox.center,
     dragging: draggable.page.borderBox,
-    axis: droppableTertiary.axis,
+    axis: droppableThird.axis,
   });
 
   const pageBorderBox: Rect = offsetRectByPosition(
     draggable.page.borderBox,
-    afterCrossAxisPoint(droppableTertiary.axis, offset),
+    afterCrossAxisPoint(droppableThird.axis, offset),
   );
 
   const result = getDroppableOver({
     pageBorderBox,
     draggable,
     droppables: toDroppableMap([
-      droppableLarge,
-      droppableSmall,
-      droppableSecondary,
-      droppableTertiary,
+      droppableOrigin,
+      droppableFirst,
+      droppableSecond,
+      droppableThird,
     ]),
   });
 
-  expect(result).toEqual(droppableTertiary.descriptor.id);
+  expect(result).toEqual(droppableThird.descriptor.id);
 });
 
 /**
@@ -116,26 +117,26 @@ it('should prefer the furthest away droppable when multiple lists are hit', () =
  */
 it('should prefer the second furthest away droppable when multiple lists are hit', () => {
   const offset = getOffsetForCrossAxisEndEdge({
-    crossAxisEndEdgeOn: droppableSecondary.page.borderBox.center,
+    crossAxisEndEdgeOn: droppableSecond.page.borderBox.center,
     dragging: draggable.page.borderBox,
-    axis: droppableSecondary.axis,
+    axis: droppableSecond.axis,
   });
 
   const pageBorderBox: Rect = offsetRectByPosition(
     draggable.page.borderBox,
-    afterCrossAxisPoint(droppableSecondary.axis, offset),
+    afterCrossAxisPoint(droppableSecond.axis, offset),
   );
 
   const result = getDroppableOver({
     pageBorderBox,
     draggable,
     droppables: toDroppableMap([
-      droppableLarge,
-      droppableSmall,
-      droppableSecondary,
-      droppableTertiary,
+      droppableOrigin,
+      droppableFirst,
+      droppableSecond,
+      droppableThird,
     ]),
   });
 
-  expect(result).toEqual(droppableSecondary.descriptor.id);
+  expect(result).toEqual(droppableSecond.descriptor.id);
 });
