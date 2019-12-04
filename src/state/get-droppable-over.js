@@ -45,10 +45,13 @@ function getFurthestAway({
   draggable,
   candidates,
 }: GetFurthestArgs): ?DroppableId {
+  // We are not comparing the center of the home list with the target list as it would
+  // give preference to giant lists
+
   // We are measuring the distance from where the draggable started
   // to where it is *hitting* the candidate
-  // The hit point might technically not be in the bounds of the candidate
-  // We are not comparing the centers
+  // Note: The hit point might technically not be in the bounds of the candidate
+
   const startCenter: Position = draggable.page.borderBox.center;
   const sorted: WithDistance[] = candidates
     .map((candidate: DroppableDimension): WithDistance => {
