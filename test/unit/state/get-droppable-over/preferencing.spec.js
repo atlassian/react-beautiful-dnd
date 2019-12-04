@@ -52,7 +52,8 @@ const droppableSecondary: DroppableDimension = getDroppableDimension({
     top: 1000,
     left: 1200,
     right: 1300,
-    bottom: 1100,
+    // This is really tall to test the distance calculation against varied lists
+    bottom: 8000,
   },
 });
 
@@ -64,8 +65,8 @@ const droppableTertiary: DroppableDimension = getDroppableDimension({
   },
   borderBox: {
     top: 1000,
-    left: 1100,
-    right: 1200,
+    left: 1400,
+    right: 1500,
     bottom: 1100,
   },
 });
