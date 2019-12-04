@@ -9,7 +9,7 @@ import type {
 } from '../types';
 import { toDroppableList } from './dimension-structures';
 import isPositionInFrame from './visibility/is-position-in-frame';
-import { distance } from './position';
+import { distance, patch } from './position';
 import isWithin from './is-within';
 
 // https://stackoverflow.com/questions/306316/determine-if-two-rectangles-overlap-each-other
@@ -33,17 +33,37 @@ type WithDistance = {|
   distance: number,
   id: DroppableId,
 |};
-function getFurthestAway(
-  home: DroppableDimension,
-  droppables: DroppableDimension[],
-): ?DroppableId {
-  const center: Position = home.page.borderBox.center;
 
-  const sorted: WithDistance[] = droppables
-    .map((item: DroppableDimension): WithDistance => {
+type GetFurthestArgs = {|
+  pageBorderBox: Rect,
+  draggable: DraggableDimension,
+  candidates: DroppableDimension[],
+|};
+
+function getFurthestAway({
+  pageBorderBox,
+  draggable,
+  candidates,
+}: GetFurthestArgs): ?DroppableId {
+  // We are measuring the distance from where the draggable started
+  // to where it is *hitting* the candidate
+  // The hit point might technically not be in the bounds of the candidate
+  // We are not comparing the centers
+  const startCenter: Position = draggable.page.borderBox.center;
+  const sorted: WithDistance[] = candidates
+    .map((candidate: DroppableDimension): WithDistance => {
+      const axis: Axis = candidate.axis;
+      const target: Position = patch(
+        candidate.axis.line,
+        // use the current center of the dragging item on the main axis
+        pageBorderBox.center[axis.line],
+        // use the center of the list on the cross axis
+        candidate.page.borderBox.center[axis.crossAxisLine],
+      );
+
       return {
-        id: item.descriptor.id,
-        distance: distance(center, item.page.borderBox.center),
+        id: candidate.descriptor.id,
+        distance: distance(startCenter, target),
       };
     })
     // largest value will be first
@@ -127,6 +147,9 @@ export default function getDroppableOver({
   // Multiple options returned
   // Should only occur with really large items
   // Going to use fallback: distance from home
-  const home: DroppableDimension = droppables[draggable.descriptor.droppableId];
-  return getFurthestAway(home, candidates);
+  return getFurthestAway({
+    pageBorderBox,
+    draggable,
+    candidates,
+  });
 }
