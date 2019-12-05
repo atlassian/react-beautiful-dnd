@@ -206,7 +206,7 @@ function tryStart({
     }
   }
 
-  const tryDispatchWhenDragging = tryDispatch.bind(this, 'DRAGGING');
+  const tryDispatchWhenDragging = tryDispatch.bind(null, 'DRAGGING');
 
   type LiftArgs = {|
     liftActionArgs: LiftActionArgs,
