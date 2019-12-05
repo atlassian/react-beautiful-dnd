@@ -11,6 +11,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - [Beautiful drag and drop: a year in review](https://medium.com/@alexandereardon/beautiful-drag-and-drop-a-year-in-review-1febc3fac7ce)
 - [Beautiful interactions: Crafting elegant and robust drag and drop animations](https://medium.com/@alexandereardon/beautiful-interactions-8f67502ccf73)
 - [Design process for our new logo](https://www.maryannemade.com/reactbeautifuldnd-logo)
+- [Overhauling our collision engine](https://dev.to/alexandereardon/overhauling-our-collision-engine-962)
 
 ### Performance related
 
@@ -67,6 +68,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 
 ## Articles, tutorials and blogs
 
+- [Drag and Drop Tables with React-Beautiful-DND (Part I)](https://dev.to/milandhar/drag-and-drop-table-with-react-beautiful-dnd-54ad)
 - [Scripted natural motion with react-beautiful-dnd](https://dev.to/raathigesh/scripted-natural-motion-with-react-beautiful-dnd-4ifj)
 - [Drag n’Drop with react-beautiful-dnd](https://medium.com/@reireynoso/drag-ndrop-with-react-beautiful-dnd-73014e5937f2)
 - [How to add Drag and Drop features to your React app](https://medium.com/javascript-in-plain-english/how-to-add-drag-and-drop-feature-to-your-react-app-20cb22fb180)
