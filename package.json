@@ -103,7 +103,7 @@
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^2.2.0",
-    "flow-bin": "0.110.1",
+    "flow-bin": "0.114.0",
     "fs-extra": "^8.0.1",
     "globby": "^10.0.1",
     "jest": "^24.9.0",
