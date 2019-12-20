@@ -91,7 +91,7 @@
     "emotion-theming": "^10.0.19",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
-    "eslint": "6.5.1",
+    "eslint": "6.8.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-prettier": "^6.4.0",
     "eslint-plugin-cypress": "^2.7.0",
