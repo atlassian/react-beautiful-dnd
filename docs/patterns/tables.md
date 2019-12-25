@@ -20,7 +20,7 @@ There are two strategies you can use when reordering tables.
 
 ### Strategy 1: fixed layouts
 
-In order to use this strategy the widths of your columns need to be fixed - that is, they will not change depending on what content is placed in the cells. This can be achieve with either a `table-layout: fixed` or `table-layout: auto` as long as you manually set the width of the cells (eg `50%`).
+In order to use this strategy the widths of your columns need to be fixed - that is, they will not change depending on what content is placed in the cells. This can be achieved with either a `table-layout: fixed` or `table-layout: auto` as long as you manually set the width of the cells (eg `50%`).
 
 The only thing you need to do is set `display: table` on a `<Draggable />` row while it is dragging.
 
