@@ -11,7 +11,7 @@
     fbjs "^1.0.0"
     mkdirp "^0.5.1"
 
-"@atlaskit/theme@^9.2.4", "@atlaskit/theme@^9.2.5":
+"@atlaskit/theme@^9.2.4":
   version "9.2.5"
   resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-9.2.5.tgz#9ef23134c104402a683d3cabe8b59debb22e57a1"
   integrity sha512-Ja9x9pjZNqy5ZW8KbSxV7xHKcslPXH8XGdPEU7r+Vb8k8g/l+47ex//r8RVOgpqvNQSjxZneZXycv5KVcWuvJQ==
@@ -19,6 +19,15 @@
     "@babel/runtime" "^7.0.0"
     exenv "^1.2.2"
     prop-types "^15.5.10"
+
+"@atlaskit/theme@^9.4.0":
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-9.4.0.tgz#09d5e45172e31f2d5aae4f3ac3125d2bb08bd673"
+  integrity sha512-NfSxuLSdalTHL0HU1fKDnX78betMFz3GtIVo/RBvorusZbE0NOg+YasXwxd66j6QU58B04W2CTS/mgGOXhHOjA==
+  dependencies:
+    exenv "^1.2.2"
+    prop-types "^15.5.10"
+    tslib "^1.9.3"
 
 "@babel/code-frame@7.5.5", "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.5.5":
   version "7.5.5"
@@ -12071,7 +12080,7 @@ ts-pnp@^1.1.2:
   resolved "https://registry.yarnpkg.com/ts-pnp/-/ts-pnp-1.1.4.tgz#ae27126960ebaefb874c6d7fa4729729ab200d90"
   integrity sha512-1J/vefLC+BWSo+qe8OnJQfWTYRS6ingxjwqmHMqaMxXMj7kFtKLgAaYW3JeX3mktjgUL+etlU8/B4VUAUI9QGw==
 
-tslib@^1.9.0:
+tslib@^1.9.0, tslib@^1.9.3:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.10.0.tgz#c3c19f95973fb0a62973fb09d90d961ee43e5c8a"
   integrity sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==
