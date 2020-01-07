@@ -8,6 +8,11 @@ import App from '../../util/app';
 import { invariant } from '../../../../../src/invariant';
 
 forEachSensor((control: Control) => {
+  // keyboard has no pre lift
+  if (control.name === 'keyboard') {
+    return;
+  }
+
   it('should cleanup a drag if a lock is forceably released mid drag', () => {
     let api: SensorAPI;
     const sensor: Sensor = (value: SensorAPI) => {
@@ -18,16 +23,20 @@ forEachSensor((control: Control) => {
     const handle: HTMLElement = getByText('item: 0');
     invariant(api);
 
-    simpleLift(control, handle);
+    control.preLift(handle);
 
-    expect(isDragging(handle)).toBe(true);
+    // lock is claimed but not dragging yet
     expect(api.isLockClaimed()).toBe(true);
+    expect(isDragging(handle)).toBe(false);
 
     api.tryReleaseLock();
 
     expect(isDragging(handle)).toBe(false);
     expect(api.isLockClaimed()).toBe(false);
-  });
 
-  it('should allow dragging after a released lock', () => {});
+    // a lift after a released lock can get the lock all good
+    simpleLift(control, handle);
+    expect(api.isLockClaimed()).toBe(true);
+    expect(isDragging(handle)).toBe(true);
+  });
 });
