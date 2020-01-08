@@ -457,7 +457,7 @@ export default function useSensorMarshal({
         return;
       }
 
-      lockAPI.release();
+      lockAPI.tryAbandon();
 
       if (store.getState().phase !== 'IDLE') {
         store.dispatch(flush());
