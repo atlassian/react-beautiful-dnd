@@ -26,6 +26,8 @@ The only thing you need to do is set `display: table` on a `<Draggable />` row w
 
 [See example code here](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20fixed%20width%20columns&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
 
+Some users have experienced issues using the `table-layout` and `display: table` approach. Specifically, that approach of fixed layouts doesn't keep the styling once an element is being dragged. An alternative is to not set `table-layout` or `display: table` when `<Draggable />` is dragging, but rather just set the `width` of each `<td>` permanently. This avoids the need to use any event responders. E.g. in the `<Draggable />`, set each `<td>` to `width: 100px` with inline styling or css. This approach can be found in the [Code Sandbox here](https://codesandbox.io/s/vertical-list-s9rx5?fontsize=14&hidenavigation=1&theme=dark)
+
 ### Strategy 2: dimension locking
 
 This strategy will work with columns that have automatic column widths based on content. It will also work with fixed layouts. **It is a more robust strategy than the first, but it is also less performant.**
