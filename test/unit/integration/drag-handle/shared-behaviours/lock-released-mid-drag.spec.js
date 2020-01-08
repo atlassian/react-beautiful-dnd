@@ -20,14 +20,18 @@ forEachSensor((control: Control) => {
 
     simpleLift(control, handle);
 
-    expect(isDragging(handle)).toBe(true);
     expect(api.isLockClaimed()).toBe(true);
+    expect(isDragging(handle)).toBe(true);
 
     api.tryReleaseLock();
 
-    expect(isDragging(handle)).toBe(false);
     expect(api.isLockClaimed()).toBe(false);
-  });
+    expect(isDragging(handle)).toBe(false);
 
-  it('should allow dragging after a released lock', () => {});
+    // allowing reclaiming after
+    simpleLift(control, handle);
+
+    expect(api.isLockClaimed()).toBe(true);
+    expect(isDragging(handle)).toBe(true);
+  });
 });
