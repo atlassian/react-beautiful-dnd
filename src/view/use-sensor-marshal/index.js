@@ -1,2 +1,2 @@
 // @flow
-export { default } from './use-sensor-marshal';
+export { default, useMouseSensor, useTouchSensor, useKeyboardSensor } from './use-sensor-marshal';
