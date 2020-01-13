@@ -8,7 +8,11 @@ export { default as Draggable } from './view/draggable';
 
 // Default sensors
 
-export { useMouseSensor, useTouchSensor, useKeyboardSensor } from './view/use-sensor-marshal';
+export {
+  useMouseSensor,
+  useTouchSensor,
+  useKeyboardSensor
+} from './view/use-sensor-marshal';
 
 // Utils
 
