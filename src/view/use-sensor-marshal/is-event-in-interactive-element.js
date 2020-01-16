@@ -43,7 +43,9 @@ function isAnInteractiveElement(parent: Element, current: ?Element) {
     return true;
   }
 
-  const dataAttribute: ?string = current.getAttribute('data-interactive-element');
+  const dataAttribute: ?string = current.getAttribute(
+    'data-interactive-element'
+  );
   if (dataAttribute === 'true' || dataAttribute === '') {
     return true;
   }
