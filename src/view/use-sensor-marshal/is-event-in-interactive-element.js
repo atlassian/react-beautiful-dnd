@@ -44,7 +44,7 @@ function isAnInteractiveElement(parent: Element, current: ?Element) {
   }
 
   const dataAttribute: ?string = current.getAttribute(
-    'data-interactive-element'
+    'data-interactive-element',
   );
   if (dataAttribute === 'true' || dataAttribute === '') {
     return true;
