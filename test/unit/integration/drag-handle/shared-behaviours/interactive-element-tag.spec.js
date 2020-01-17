@@ -8,6 +8,7 @@ import {
   type DraggableStateSnapshot,
 } from '../../../../../src';
 import App, { type Item } from '../../util/app';
+import {interactiveElement} from '../../../../../src/view/data-attributes';
 
 forEachSensor((control: Control) => {
   beforeEach(() => {
@@ -18,7 +19,7 @@ forEachSensor((control: Control) => {
     console.error.mockRestore();
   });
 
-  it('should block the drag if the drag handle is itself data-interactive-element', () => {
+  it(`should block the drag if the drag handle is itself ${interactiveElement.base}`, () => {
     const renderItem = (item: Item) => (
       provided: DraggableProvided,
       snapshot: DraggableStateSnapshot,
@@ -29,7 +30,7 @@ forEachSensor((control: Control) => {
         ref={provided.innerRef}
         data-is-dragging={snapshot.isDragging}
         data-testid={item.id}
-        data-interactive-element
+        [interactiveElement.base]
       />
     );
 
@@ -41,7 +42,7 @@ forEachSensor((control: Control) => {
     expect(isDragging(handle)).toBe(false);
   });
 
-  it('should block the drag if originated from a child data-interactive-element', () => {
+  it(`should block the drag if originated from a child ${interactiveElement.base}`, () => {
     const renderItem = (item: Item) => (
       provided: DraggableProvided,
       snapshot: DraggableStateSnapshot,
@@ -53,7 +54,7 @@ forEachSensor((control: Control) => {
         data-is-dragging={snapshot.isDragging}
         data-testid={`handle-${item.id}`}
       >
-        <div data-testid={`inner-${item.id}`} data-interactive-element />
+        <div data-testid={`inner-${item.id}`} [interactiveElement.base] />
       </div>
     );
 
@@ -66,7 +67,7 @@ forEachSensor((control: Control) => {
     expect(isDragging(handle)).toBe(false);
   });
 
-  it('should block the drag if originated from a child of a child data-interactive-element', () => {
+  it(`should block the drag if originated from a child of a child ${interactiveElement.base}`, () => {
     const renderItem = (item: Item) => (
       provided: DraggableProvided,
       snapshot: DraggableStateSnapshot,
@@ -78,7 +79,7 @@ forEachSensor((control: Control) => {
         data-is-dragging={snapshot.isDragging}
         data-testid={`handle-${item.id}`}
       >
-        <div data-interactive-element>
+        <div [interactiveElement.base]>
           <p>hello there</p>
           <span data-testid={`inner-${item.id}`}>Edit me!</span>
         </div>
@@ -94,7 +95,7 @@ forEachSensor((control: Control) => {
     expect(isDragging(handle)).toBe(false);
   });
 
-  it('should not block if data-interactive-element is set to false', () => {
+  it(`should not block if ${interactiveElement.base} is set to false`, () => {
     const renderItem = (item: Item) => (
       provided: DraggableProvided,
       snapshot: DraggableStateSnapshot,
@@ -105,7 +106,7 @@ forEachSensor((control: Control) => {
         ref={provided.innerRef}
         data-is-dragging={snapshot.isDragging}
         data-testid={item.id}
-        data-interactive-element={false}
+        [interactiveElement.base]={false}
       />
     );
 
@@ -130,7 +131,7 @@ forEachSensor((control: Control) => {
         ref={provided.innerRef}
         data-is-dragging={snapshot.isDragging}
         data-testid={item.id}
-        data-interactive-element
+        [interactiveElement.base]
       />
     );
 
