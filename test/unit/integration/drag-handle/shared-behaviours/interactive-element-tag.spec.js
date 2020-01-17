@@ -10,6 +10,8 @@ import {
 import App, { type Item } from '../../util/app';
 import {interactiveElement} from '../../../../../src/view/data-attributes';
 
+const getInteractiveElementAttributeDict = (value: any) => ({[interactiveElement.base]: value});
+
 forEachSensor((control: Control) => {
   beforeEach(() => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -30,7 +32,7 @@ forEachSensor((control: Control) => {
         ref={provided.innerRef}
         data-is-dragging={snapshot.isDragging}
         data-testid={item.id}
-        [interactiveElement.base]
+        {...getInteractiveElementAttributeDict(true)}
       />
     );
 
@@ -54,7 +56,7 @@ forEachSensor((control: Control) => {
         data-is-dragging={snapshot.isDragging}
         data-testid={`handle-${item.id}`}
       >
-        <div data-testid={`inner-${item.id}`} [interactiveElement.base] />
+        <div data-testid={`inner-${item.id}`} {...getInteractiveElementAttributeDict(true)} />
       </div>
     );
 
@@ -79,7 +81,7 @@ forEachSensor((control: Control) => {
         data-is-dragging={snapshot.isDragging}
         data-testid={`handle-${item.id}`}
       >
-        <div [interactiveElement.base]>
+        <div {...getInteractiveElementAttributeDict(true)}>
           <p>hello there</p>
           <span data-testid={`inner-${item.id}`}>Edit me!</span>
         </div>
@@ -106,7 +108,7 @@ forEachSensor((control: Control) => {
         ref={provided.innerRef}
         data-is-dragging={snapshot.isDragging}
         data-testid={item.id}
-        [interactiveElement.base]={false}
+        {...getInteractiveElementAttributeDict(false)}
       />
     );
 
@@ -131,7 +133,7 @@ forEachSensor((control: Control) => {
         ref={provided.innerRef}
         data-is-dragging={snapshot.isDragging}
         data-testid={item.id}
-        [interactiveElement.base]
+        {...getInteractiveElementAttributeDict(true)}
       />
     );
 
