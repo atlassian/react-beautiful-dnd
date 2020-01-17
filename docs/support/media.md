@@ -45,6 +45,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - React Newsletter [issue 124](http://reactjsnewsletter.com/issues/124?#start)
 - React Newsletter [issue 139](http://reactjsnewsletter.com/issues/139?m=web&#5nGfyf)
 - React Newsletter [issue 153](http://reactjsnewsletter.com/issues/153?#start)
+- React Newsletter [issue 195](http://reactjsnewsletter.com/issues/195)
 - React Status [issue 49](https://react.statuscode.com/issues/49)
 - React Status [issue 63](https://react.statuscode.com/issues/63)
 - React Status [issue 71](https://react.statuscode.com/issues/71)
@@ -68,6 +69,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 
 ## Articles, tutorials and blogs
 
+- [Build a beautiful, draggable kanban board with react-beautiful-dnd](https://www.youtube.com/watch?v=uHO3mQgs-e8)
 - [Drag and Drop Tables with React-Beautiful-DND (Part I)](https://dev.to/milandhar/drag-and-drop-table-with-react-beautiful-dnd-54ad)
 - [Scripted natural motion with react-beautiful-dnd](https://dev.to/raathigesh/scripted-natural-motion-with-react-beautiful-dnd-4ifj)
 - [Drag n’Drop with react-beautiful-dnd](https://medium.com/@reireynoso/drag-ndrop-with-react-beautiful-dnd-73014e5937f2)
