@@ -8,9 +8,11 @@ import {
   type DraggableStateSnapshot,
 } from '../../../../../src';
 import App, { type Item } from '../../util/app';
-import {interactiveElement} from '../../../../../src/view/data-attributes';
+import { interactiveElement } from '../../../../../src/view/data-attributes';
 
-const getInteractiveElementAttributeDict = (value: any) => ({[interactiveElement.base]: value});
+const getInteractiveElementAttributeDict = (value: any) => ({
+  [interactiveElement.base]: value,
+});
 
 forEachSensor((control: Control) => {
   beforeEach(() => {
@@ -56,7 +58,10 @@ forEachSensor((control: Control) => {
         data-is-dragging={snapshot.isDragging}
         data-testid={`handle-${item.id}`}
       >
-        <div data-testid={`inner-${item.id}`} {...getInteractiveElementAttributeDict(true)} />
+        <div
+          data-testid={`inner-${item.id}`}
+          {...getInteractiveElementAttributeDict(true)}
+        />
       </div>
     );
 

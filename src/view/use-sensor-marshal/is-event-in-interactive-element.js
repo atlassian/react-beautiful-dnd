@@ -1,6 +1,6 @@
 // @flow
 import isHtmlElement from '../is-type-of-element/is-html-element';
-import {interactiveElement} from '../data-attributes';
+import { interactiveElement } from '../data-attributes';
 
 export type TagNameMap = {
   [tagName: string]: true,
