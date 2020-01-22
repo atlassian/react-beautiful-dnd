@@ -8,6 +8,7 @@ import type {
   State,
   MovementMode,
   ContextId,
+  ElementId,
   DraggableRubric,
 } from '../../types';
 import { dropAnimationFinished } from '../../state/action-creators';
@@ -75,7 +76,7 @@ export type DragHandleProps = {|
   role: string,
 
   // id of drag handle aria description for screen readers
-  'aria-labelledby': string,
+  'aria-labelledby': ElementId,
 
   // Allow tabbing to this element
   tabIndex: number,
