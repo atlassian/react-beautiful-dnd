@@ -8,7 +8,6 @@ import type {
   State,
   MovementMode,
   ContextId,
-  ElementId,
   DraggableRubric,
 } from '../../types';
 import { dropAnimationFinished } from '../../state/action-creators';
@@ -68,8 +67,15 @@ export type DragHandleProps = {|
   // What DragDropContext the drag handle is in
   'data-rbd-drag-handle-context-id': ContextId,
 
+  // required for aria-labelledby on non-interative elements
+  // https://www.w3.org/TR/using-aria/#label-support
+  // Consumers should change the role or remove it if they want to use the
+  // elements default role or another role.
+  // We will be using role="button" initially
+  role: string,
+
   // id of drag handle aria description for screen readers
-  'aria-labelledby': ElementId,
+  'aria-labelledby': string,
 
   // Allow tabbing to this element
   tabIndex: number,

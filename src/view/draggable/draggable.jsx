@@ -104,6 +104,7 @@ export default function Draggable(props: Props) {
             'data-rbd-drag-handle-draggable-id': draggableId,
             'data-rbd-drag-handle-context-id': contextId,
             'aria-labelledby': liftInstructionId,
+            role: 'button',
             // Opting out of html5 drag and drops
             draggable: false,
             onDragStart: preventHtml5Dnd,
