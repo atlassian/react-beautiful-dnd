@@ -68,16 +68,20 @@ export type DragHandleProps = {|
   // What DragDropContext the drag handle is in
   'data-rbd-drag-handle-context-id': ContextId,
 
-  // required for aria-labelledby on non-interative elements
+  // Accessibility property: role (type of the element)
+  // interactive element required for adding custom names / descriptions to be read out
   // https://www.w3.org/TR/using-aria/#label-support
   // Consumers should change the role or remove it if they want to use the
   // elements default role or another role.
   // We will be using role="button" initially
   role: string,
 
-  // id of element containing screen reader name
-  'aria-labelledby': ElementId,
+  // Accessibility property: role description
+  // Sadly not adding this as it does not play well with lighthouse
+  // https://twitter.com/alexandereardon/status/1220563555797229568
+  // 'aria-roledescription': string,
 
+  // Accessibility property: description (using instructions)
   // id of element containing screen reader usage instructions
   'aria-describedby': ElementId,
 

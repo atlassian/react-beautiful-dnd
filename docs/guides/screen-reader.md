@@ -2,7 +2,7 @@
 
 > Because great features should be accessible for everyone
 
-`react-beautiful-dnd` ships with great screen reader support, in English, out of the box. If you just want to get started, then there's nothing you have to do. But if it's tailored messaging you're after, you have total control of that too.
+`react-beautiful-dnd` ships with great screen reader support out of the box with basic English text. If you just want to get started, then there's nothing you have to do. But if it's tailored messaging you're after, you have total control of that too.
 
 This guide is here to help you create messaging that supports and delights your users. The screen reader experience is focused on keyboard interactions, but it's possible for a screen reader user to use any input type (for example mouse and keyboard).
 
@@ -42,6 +42,22 @@ All of our built in screen reader messages use `id`'s to identify `<Draggable />
 ## Instructions to cover
 
 ### Step 1: Introduce draggable item
+
+Each element has a number of accessibility properties associated with it:
+
+- name: a way of identifying the element
+- role: type of element (eg "button")
+- role description: a more specific description of the role
+- description: additional information including [instructions](https://www.w3.org/TR/WCAG20-TECHS/ARIA1.html) for the element
+
+A combination of these properties will control what a screen reader reads out when element is focused on.
+
+Here is how we populate the accessibility properties for _drag handles_ to impact what is read out
+
+- **name**: (We do not control this). By default the content of the element will be used. Otherwise you can use `aria-label` or `aria-labelledby`.
+- **role**: (Default: we add `role="button"` to a drag handle). This is done so that the element is marked as *interactive* and will have information read out. `role="button"` might not be the right role for your element, or it might already be an interactive element. In which case you are welcome to remove or override the `role`.
+- **role description**: (We do not control this). Role description controlled by adding `aria-roledescription`. Ideally we would add `aria-roledescription="Draggable item"` by default. However, [Google lighthouse](https://developers.google.com/web/tools/lighthouse) marks this as a problem even though it is fine according to [axe and the spec](https://twitter.com/alexandereardon/status/1220563555797229568). So you are welcome to add a `aria-roledescription` but keep in mind that [Google lighthouse](https://developers.google.com/web/tools/lighthouse) will mark it as a accessibility problem
+- **description**: (Default: `"Press space bar to lift"`). We control this by using `aria-describedby="${elementId}"`. We create a hidden element for each `<DragDropContext>` and populate the element with the `liftInstruction` text.
 
 When a user `tabs` to a _drag handle_, we need to tell them how to start a drag. We do this by using the `liftInstruction` prop on a `<DragDropContext />`. All _drag handles_ share the same lift announcement message.
 
