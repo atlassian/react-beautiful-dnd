@@ -97,15 +97,10 @@ export default function App(props: Props) {
 
   const announce: Announce = useAnnouncer(contextId);
 
-  const dragHandleNameId: ElementId = useHiddenElement({
-    contextId,
-    uniqueKey: 'drag-handle-name',
-    text: 'Draggable item',
-  });
   const dragHandleInstructionId: ElementId = useHiddenElement({
     contextId,
     uniqueKey: 'drag-handle-usage',
-    text: 'Usages instructions',
+    text: liftInstruction,
   });
 
   const styleMarshal: StyleMarshal = useStyleMarshal(contextId, nonce);
@@ -227,14 +222,12 @@ export default function App(props: Props) {
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
       dragHandleInstructionId,
-      dragHandleNameId,
       registry,
     }),
     [
       contextId,
       dimensionMarshal,
       dragHandleInstructionId,
-      dragHandleNameId,
       focusMarshal,
       getCanLift,
       getIsMovementAllowed,

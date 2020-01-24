@@ -30,12 +30,9 @@ export default function Draggable(props: Props) {
   const getRef = useCallback((): ?HTMLElement => ref.current, []);
 
   // context
-  const {
-    contextId,
-    dragHandleNameId,
-    dragHandleInstructionId,
-    registry,
-  } = useRequiredContext(AppContext);
+  const { contextId, dragHandleInstructionId, registry } = useRequiredContext(
+    AppContext,
+  );
   const { type, droppableId } = useRequiredContext(DroppableContext);
 
   const descriptor: DraggableDescriptor = useMemo(
