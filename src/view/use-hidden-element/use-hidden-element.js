@@ -4,14 +4,24 @@ import { useMemo } from 'use-memo-one';
 import type { ContextId, ElementId } from '../../types';
 import getBodyElement from '../get-body-element';
 
-export const getId = (contextId: ContextId): string =>
-  `rbd-lift-instruction-${contextId}`;
+export const getId = (uniqueKey: string, contextId: ContextId): string =>
+  `rbd-hidden-${uniqueKey}-${contextId}`;
 
-export default function useLiftInstruction(
+type Args = {|
   contextId: ContextId,
-  liftInstruction: string,
-): ElementId {
-  const id: string = useMemo(() => getId(contextId), [contextId]);
+  uniqueKey: string,
+  text: string,
+|};
+
+export default function useHiddenElement({
+  contextId,
+  text,
+  uniqueKey,
+}: Args): ElementId {
+  const id: string = useMemo(() => getId(uniqueKey, contextId), [
+    contextId,
+    uniqueKey,
+  ]);
 
   useEffect(
     function mount() {
@@ -21,7 +31,7 @@ export default function useLiftInstruction(
       el.id = id;
 
       // add the description text
-      el.textContent = liftInstruction;
+      el.textContent = text;
 
       // Using `display: none` prevent screen readers from reading this element in the document flow
       // This element is used as a `aria-labelledby` reference for *other elements* and will be read out for those
@@ -35,7 +45,7 @@ export default function useLiftInstruction(
         getBodyElement().removeChild(el);
       };
     },
-    [id, liftInstruction],
+    [id, text],
   );
 
   return id;

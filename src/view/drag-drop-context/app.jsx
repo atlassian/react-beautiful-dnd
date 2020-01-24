@@ -42,7 +42,7 @@ import {
 } from '../../state/action-creators';
 import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
-import useLiftInstruction from '../use-lift-instruction';
+import useHiddenElement from '../use-hidden-element';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
 import usePrevious from '../use-previous-ref';
@@ -97,10 +97,17 @@ export default function App(props: Props) {
 
   const announce: Announce = useAnnouncer(contextId);
 
-  const liftInstructionId: ElementId = useLiftInstruction(
+  const dragHandleNameId: ElementId = useHiddenElement({
     contextId,
-    liftInstruction,
-  );
+    uniqueKey: 'drag-handle-name',
+    text: 'Draggable item',
+  });
+  const dragHandleInstructionId: ElementId = useHiddenElement({
+    contextId,
+    uniqueKey: 'drag-handle-usage',
+    text: 'Usages instructions',
+  });
+
   const styleMarshal: StyleMarshal = useStyleMarshal(contextId, nonce);
 
   const lazyDispatch: Action => void = useCallback((action: Action): void => {
@@ -219,16 +226,18 @@ export default function App(props: Props) {
       contextId,
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
-      liftInstructionId,
+      dragHandleInstructionId,
+      dragHandleNameId,
       registry,
     }),
     [
       contextId,
       dimensionMarshal,
+      dragHandleInstructionId,
+      dragHandleNameId,
       focusMarshal,
       getCanLift,
       getIsMovementAllowed,
-      liftInstructionId,
       registry,
     ],
   );

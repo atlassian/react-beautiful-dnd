@@ -30,9 +30,12 @@ export default function Draggable(props: Props) {
   const getRef = useCallback((): ?HTMLElement => ref.current, []);
 
   // context
-  const { contextId, liftInstructionId, registry } = useRequiredContext(
-    AppContext,
-  );
+  const {
+    contextId,
+    dragHandleNameId,
+    dragHandleInstructionId,
+    registry,
+  } = useRequiredContext(AppContext);
   const { type, droppableId } = useRequiredContext(DroppableContext);
 
   const descriptor: DraggableDescriptor = useMemo(
@@ -103,14 +106,23 @@ export default function Draggable(props: Props) {
             tabIndex: 0,
             'data-rbd-drag-handle-draggable-id': draggableId,
             'data-rbd-drag-handle-context-id': contextId,
-            'aria-labelledby': liftInstructionId,
+            // need to force the item to be interative
+            // consumers are welcome to remove or change this
             role: 'button',
+
+            // Sadly not giving a nicer role description
+            // Lighthouse currently complains about this as a a11y violation
+            // 'aria-roledescription': 'Draggable item',
+
+            // Adding the lift instruction as a description
+            'aria-describedby': dragHandleInstructionId,
+
             // Opting out of html5 drag and drops
             draggable: false,
             onDragStart: preventHtml5Dnd,
           }
         : null,
-    [contextId, draggableId, isEnabled, liftInstructionId],
+    [contextId, dragHandleInstructionId, draggableId, isEnabled],
   );
 
   const onMoveEnd = useCallback(

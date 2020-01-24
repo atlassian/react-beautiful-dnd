@@ -75,8 +75,11 @@ export type DragHandleProps = {|
   // We will be using role="button" initially
   role: string,
 
-  // id of drag handle aria description for screen readers
+  // id of element containing screen reader name
   'aria-labelledby': ElementId,
+
+  // id of element containing screen reader usage instructions
+  'aria-describedby': ElementId,
 
   // Allow tabbing to this element
   tabIndex: number,
