@@ -1,6 +1,7 @@
 // @flow
 import { useRef } from 'react';
 import { invariant } from '../../invariant';
+import { isInteger } from '../../native-with-fallback.js';
 import type { DraggableId, ContextId } from '../../types';
 import type { Props } from './draggable-types';
 import checkIsValidInnerRef from '../check-is-valid-inner-ref';
@@ -21,7 +22,6 @@ export function useValidation(
 
     // wrapping entire block for better minification
     const id: ?DraggableId = props.draggableId;
-    // Number.isInteger will be provided by @babel/runtime-corejs2
     invariant(id, 'Draggable requires a draggableId');
     invariant(
       typeof id === 'string',
@@ -30,7 +30,7 @@ export function useValidation(
     );
 
     invariant(
-      Number.isInteger(props.index),
+      isInteger(props.index),
       `${prefix(id)} requires an integer index prop`,
     );
 
