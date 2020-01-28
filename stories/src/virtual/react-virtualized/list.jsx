@@ -66,7 +66,7 @@ function App(props: Props) {
   }
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext onDragEnd={onDragEnd} shouldDragStart={() => false}>
       <Droppable
         droppableId="droppable"
         mode="virtual"

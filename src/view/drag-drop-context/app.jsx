@@ -240,6 +240,7 @@ export default function App(props: Props) {
     customSensors: sensors,
     // default to 'true' unless 'false' is explicitly passed
     enableDefaultSensors: props.enableDefaultSensors !== false,
+    shouldDragStart: props.shouldDragStart,
   });
 
   // Clean store when unmounting

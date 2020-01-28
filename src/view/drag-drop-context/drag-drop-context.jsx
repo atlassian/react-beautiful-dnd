@@ -49,6 +49,7 @@ export default function DragDropContext(props: Props) {
           onDragStart={props.onDragStart}
           onDragUpdate={props.onDragUpdate}
           onDragEnd={props.onDragEnd}
+          shouldDragStart={props.shouldDragStart}
         >
           {props.children}
         </App>

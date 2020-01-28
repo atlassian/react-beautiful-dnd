@@ -480,6 +480,7 @@ export type SensorAPI = {|
   tryReleaseLock: () => void,
   findClosestDraggableId: (event: Event) => ?DraggableId,
   findOptionsForDraggable: (id: DraggableId) => ?DraggableOptions,
+  shouldDragStart: (id: DraggableId) =>?Boolean,
 |};
 
 export type Sensor = (api: SensorAPI) => void;
