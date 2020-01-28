@@ -209,6 +209,33 @@ function getCaptureBindings({
 export default function useMouseSensor(api: SensorAPI) {
   const phaseRef = useRef<Phase>(idle);
   const unbindEventsRef = useRef<() => void>(noop);
+  const callStartPendingDrag = (event: MouseEvent, draggableId) => {
+    const actions: ?PreDragActions = api.tryGetLock(
+      draggableId,
+      // stop is defined later
+      // eslint-disable-next-line no-use-before-define
+      stop,
+      { sourceEvent: event },
+    );
+
+    if (!actions) {
+      return;
+    }
+
+    // consuming the event
+    event.preventDefault();
+
+    const point: Position = {
+      x: event.clientX,
+      y: event.clientY,
+    };
+
+    // unbind this listener
+    unbindEventsRef.current();
+    // using this function before it is defined as their is a circular usage pattern
+    // eslint-disable-next-line no-use-before-define
+    startPendingDrag(actions, point);
+  };
 
   const startCaptureBinding: EventBinding = useMemo(
     () => ({
@@ -234,31 +261,23 @@ export default function useMouseSensor(api: SensorAPI) {
           return;
         }
 
-        const actions: ?PreDragActions = api.tryGetLock(
-          draggableId,
-          // stop is defined later
-          // eslint-disable-next-line no-use-before-define
-          stop,
-          { sourceEvent: event },
+        const shouldDragStart = api.shouldDragStart(draggableId);
+
+        invariant(
+          typeof shouldDragStart === 'boolean' ||
+            (typeof shouldDragStart === 'object' && 'then' in shouldDragStart),
+          'The shouldDragStart should return a boolean',
         );
 
-        if (!actions) {
-          return;
+        if (typeof shouldDragStart === 'object' && 'then' in shouldDragStart) {
+          shouldDragStart.then(response => {
+            if (response === true) {
+              callStartPendingDrag(event, draggableId);
+            }
+          });
+        } else if (shouldDragStart === true) {
+          callStartPendingDrag(event, draggableId);
         }
-
-        // consuming the event
-        event.preventDefault();
-
-        const point: Position = {
-          x: event.clientX,
-          y: event.clientY,
-        };
-
-        // unbind this listener
-        unbindEventsRef.current();
-        // using this function before it is defined as their is a circular usage pattern
-        // eslint-disable-next-line no-use-before-define
-        startPendingDrag(actions, point);
       },
     }),
     // not including startPendingDrag as it is not defined initially

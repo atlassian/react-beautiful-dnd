@@ -369,6 +369,7 @@ export default function useSensorMarshal({
   registry,
   customSensors,
   enableDefaultSensors,
+  shouldDragStart,
 }: SensorMarshalArgs) {
   const useSensors: Sensor[] = [
     ...(enableDefaultSensors ? defaultSensors : []),
@@ -475,6 +476,7 @@ export default function useSensorMarshal({
       findOptionsForDraggable,
       tryReleaseLock,
       isLockClaimed,
+      shouldDragStart: shouldDragStart || (() => true),
     }),
     [
       canGetLock,
@@ -483,6 +485,7 @@ export default function useSensorMarshal({
       findOptionsForDraggable,
       tryReleaseLock,
       isLockClaimed,
+      shouldDragStart,
     ],
   );
 
