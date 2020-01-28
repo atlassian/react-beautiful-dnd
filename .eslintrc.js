@@ -17,6 +17,7 @@ module.exports = {
     'react-hooks',
     'import',
     'jest',
+    'es5',
   ],
   env: {
     es6: true,
@@ -62,7 +63,7 @@ module.exports = {
     'no-plusplus': 'off',
 
     // Always enforcing the use of curly braces for if statements
-    'curly': ['error', 'all'],
+    curly: ['error', 'all'],
 
     'no-restricted-syntax': [
       // Nicer booleans #1
@@ -102,14 +103,16 @@ module.exports = {
       // No usage of `tiny-invariant`. Must use our own invariant for error flow
       {
         selector: 'ImportDeclaration[source.value="tiny-invariant"]',
-        message: 'Please use our own invariant function (src/invariant.js) to ensure correct error flow'
+        message:
+          'Please use our own invariant function (src/invariant.js) to ensure correct error flow',
       },
 
       // Must use invariant to throw
       {
         selector: 'ThrowStatement',
-        message: 'Please use invariant (src/invariant.js) for throwing. This is to ensure correct error flows'
-      }
+        message:
+          'Please use invariant (src/invariant.js) for throwing. This is to ensure correct error flows',
+      },
     ],
 
     // Allowing Math.pow rather than forcing `**`
@@ -206,4 +209,14 @@ module.exports = {
     // don't need to initialize state in a constructor
     'react/state-in-constructor': 'off',
   },
+  overrides: [
+    // Forbid using not es5 methods
+    {
+      files: 'src/**/*.js',
+      rules: {
+        'es5/no-es6-methods': 'error',
+        'es5/no-es6-static-methods': 'error',
+      },
+    },
+  ],
 };

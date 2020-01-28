@@ -1,14 +1,30 @@
 // @flow
+/* eslint-disable es5/no-es6-methods */
+
 type Map<T> = {
   [key: string]: T,
 };
 
-// @babel/runtime-corejs2 will replace Object.values
+// Number.isInteger is not forbidden yet
+// https://github.com/nkt/eslint-plugin-es5/pull/37
+export function isInteger(value: mixed): boolean {
+  if (Number.isInteger) {
+    return Number.isInteger(value);
+  }
+  return (
+    typeof value === 'number' && isFinite(value) && Math.floor(value) === value
+  );
+}
+
 // Using this helper to ensure there are correct flow types
 // https://github.com/facebook/flow/issues/2221
 export function values<T>(map: Map<T>): T[] {
-  // $FlowFixMe - Object.values currently does not have good flow support
-  return Object.values(map);
+  if (Object.values) {
+    // $FlowFixMe - Object.values currently does not have good flow support
+    return Object.values(map);
+  }
+
+  return Object.keys(map).map(key => map[key]);
 }
 
 // Could also extend to pass index and list
