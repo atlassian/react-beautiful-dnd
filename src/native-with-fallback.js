@@ -1,5 +1,6 @@
 // @flow
 /* eslint-disable es5/no-es6-methods */
+/* eslint-disable no-restricted-globals */
 
 type Map<T> = {
   [key: string]: T,

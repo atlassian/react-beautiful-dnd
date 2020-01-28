@@ -1,7 +1,7 @@
 // @flow
 import { useRef } from 'react';
 import { invariant } from '../../invariant';
-import { isInteger } from '../../native-with-fallback.js';
+import { isInteger } from '../../native-with-fallback';
 import type { DraggableId, ContextId } from '../../types';
 import type { Props } from './draggable-types';
 import checkIsValidInnerRef from '../check-is-valid-inner-ref';
