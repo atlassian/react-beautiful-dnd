@@ -110,8 +110,6 @@ export const controls: Control[] = [mouse, keyboard, touch];
 
 export const forEachSensor = (tests: (control: Control) => void) => {
   controls.forEach((control: Control) => {
-    /* eslint-disable jest/valid-describe */
-    // Eslint bug: https://github.com/jest-community/eslint-plugin-jest/issues/203
     describe(`with: ${control.name}`, () => {
       beforeEach(() => {
         jest.useFakeTimers();

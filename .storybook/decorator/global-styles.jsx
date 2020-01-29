@@ -1,5 +1,3 @@
-/// <reference path="../../node_modules/@types/react/index.d.ts" />
-
 // @flow
 import React from 'react';
 import styled from '@emotion/styled';
