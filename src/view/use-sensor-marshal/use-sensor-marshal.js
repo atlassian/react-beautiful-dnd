@@ -479,6 +479,8 @@ export default function useSensorMarshal({
       isLockClaimed,
       shouldDragStart: shouldDragStart || (() => true),
     }),
+    // shouldDragStart should not trigger updating.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       canGetLock,
       tryGetLock,
@@ -486,7 +488,6 @@ export default function useSensorMarshal({
       findOptionsForDraggable,
       tryReleaseLock,
       isLockClaimed,
-      shouldDragStart,
     ],
   );
 
