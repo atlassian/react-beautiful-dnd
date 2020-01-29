@@ -20,7 +20,7 @@ type Props = {|
   multiSelectTo: (taskId: Id) => void,
 |};
 
-const Container = styled.div<Function>(`
+const Container = styled.div`
   width: 300px;
   margin: ${grid}px;
   border-radius: ${borderRadius}px;
@@ -30,7 +30,7 @@ const Container = styled.div<Function>(`
   /* we want the column to take up its full height */
   display: flex;
   flex-direction: column;
-`);
+`;
 
 const Title = styled.h3`
   font-weight: bold;
