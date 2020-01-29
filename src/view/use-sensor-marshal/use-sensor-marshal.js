@@ -355,6 +355,7 @@ type SensorMarshalArgs = {|
   store: Store,
   customSensors: ?(Sensor[]),
   enableDefaultSensors: boolean,
+  shouldDragStart?: (draggableId: string) => boolean | Promise<boolean>,
 |};
 
 const defaultSensors: Sensor[] = [

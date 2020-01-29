@@ -205,5 +205,8 @@ module.exports = {
 
     // don't need to initialize state in a constructor
     'react/state-in-constructor': 'off',
+
+    // There is a bug in name: https://github.com/jest-community/eslint-plugin-jest/issues/203
+    'jest/valid-describe': 'off'
   },
 };

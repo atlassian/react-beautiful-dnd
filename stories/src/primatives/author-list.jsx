@@ -44,7 +44,7 @@ const ScrollContainer = styled.div`
   overflow: auto;
 `;
 
-const Container = styled.div`
+const Container = styled.div<Function>(`
   /* flex child */
   flex-grow: 1;
 
@@ -53,7 +53,7 @@ const Container = styled.div`
     needed to allow width to grow greater than body
   */
   display: inline-flex;
-`;
+`);
 
 type Props = {|
   quotes: Quote[],

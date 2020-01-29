@@ -63,6 +63,7 @@ export type Props = {|
 
   // screen reader
   liftInstruction: string,
+  shouldDragStart?: (draggableId: string) => boolean | Promise<boolean>,
 |};
 
 const createResponders = (props: Props): Responders => ({

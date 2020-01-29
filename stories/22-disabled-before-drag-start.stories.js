@@ -5,11 +5,26 @@ import {
   DragDropContext,
   Droppable,
   Draggable,
+  type DropResult,
   type DraggableProvided,
   type DraggableStateSnapshot,
   type DroppableProvided,
   type DroppableStateSnapshot,
 } from '../src';
+
+type Item = {|
+  id: string,
+  content: string,
+|};
+
+// a little function to help us with reordering the result
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
 
 const grid: number = 8;
 
@@ -41,8 +56,8 @@ const getItems = (count: number): Item[] =>
 
 type State = {|
   items: Item[],
-  draggable: Boolean,
-  draggableId: String,
+  draggable: boolean,
+  draggableId?: string,
 |};
 
 class App extends React.Component<*, State> {
@@ -52,17 +67,37 @@ class App extends React.Component<*, State> {
     draggableId: undefined,
   };
 
-  shouldDragStart = (draggableId: string): Boolean => {
+  shouldDragStart = (draggableId: string): boolean => {
     const id: number = Number(draggableId.split('-')[1]);
     const randNum = Math.floor(Math.random() * 10);
-    const draggable = randNum % 2 === 0;
+    const draggable = (id * randNum) % 2 === 0;
     this.setState({ draggable, draggableId });
     return draggable;
-  }
+  };
+
+  onDragEnd = (result: DropResult) => {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const items = reorder(
+      this.state.items,
+      result.source.index,
+      result.destination.index,
+    );
+
+    this.setState({
+      items,
+    });
+  };
 
   render() {
     return (
-      <DragDropContext shouldDragStart={this.shouldDragStart}>
+      <DragDropContext
+        shouldDragStart={this.shouldDragStart}
+        onDragEnd={this.onDragEnd}
+      >
         <div style={{ marginTop: grid * 2 }}>
           Try to drag item and you will find some items could not be dragged.
           It`s random process =D.
