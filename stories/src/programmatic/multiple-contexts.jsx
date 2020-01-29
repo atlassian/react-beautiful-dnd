@@ -116,10 +116,10 @@ function QuoteApp(props: Props) {
   );
 }
 
-const Root = styled.div<Function>(`
+const Root = styled.div`
   display: flex;
   justify-content: space-evenly;
-`);
+`;
 
 const Column = styled.div``;
 
