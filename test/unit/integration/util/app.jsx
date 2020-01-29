@@ -75,10 +75,6 @@ type Props = {|
 
 function noop() {}
 
-function noopWithTrue() {
-  return true;
-}
-
 function getItems() {
   return Array.from({ length: 3 }, (v, k): Item => ({
     id: `${k}`,
@@ -94,7 +90,7 @@ function withDefaultBool(value: ?boolean, defaultValue: boolean) {
 
 export default function App(props: Props) {
   const [items, setItems] = useState(() => props.items || getItems());
-  const shouldDragStart = props.shouldDragStart || noopWithTrue;
+  const shouldDragStart = props.shouldDragStart || (() => true);
   const onBeforeCapture = props.onBeforeCapture || noop;
   const onBeforeDragStart = props.onBeforeDragStart || noop;
   const onDragStart = props.onDragStart || noop;
