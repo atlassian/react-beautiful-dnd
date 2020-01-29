@@ -205,7 +205,10 @@ describe('can partially scroll', () => {
   it('should return false if on the min point and move backward in any direction', () => {
     const current: Position = origin;
     const max: Position = { x: 100, y: 200 };
-    const tooFarBack: Position[] = [{ x: 0, y: -1 }, { x: -1, y: 0 }];
+    const tooFarBack: Position[] = [
+      { x: 0, y: -1 },
+      { x: -1, y: 0 },
+    ];
 
     tooFarBack.forEach((point: Position) => {
       const result: boolean = canPartiallyScroll({
@@ -243,7 +246,10 @@ describe('can partially scroll', () => {
     const max: Position = { x: 100, y: 200 };
     const current: Position = { x: 110, y: 220 };
     // Small changes that would still result in a current scroll greater than the max scroll
-    const backwards: Position[] = [{ x: -1, y: 0 }, { x: 0, y: -1 }];
+    const backwards: Position[] = [
+      { x: -1, y: 0 },
+      { x: 0, y: -1 },
+    ];
 
     backwards.forEach((change: Position) => {
       const result: boolean = canPartiallyScroll({
@@ -259,7 +265,10 @@ describe('can partially scroll', () => {
   it('should return false if moving forwards and the current scroll is greater than the max scroll', () => {
     const max: Position = { x: 100, y: 200 };
     const current: Position = { x: 110, y: 220 };
-    const forwards: Position[] = [{ x: 1, y: 0 }, { x: 0, y: 1 }];
+    const forwards: Position[] = [
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+    ];
 
     forwards.forEach((change: Position) => {
       const result: boolean = canPartiallyScroll({

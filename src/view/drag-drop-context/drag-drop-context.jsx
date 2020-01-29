@@ -18,6 +18,7 @@ type Props = {|
   // See our [sensor api](/docs/sensors/sensor-api.md)
   sensors?: Sensor[],
   enableDefaultSensors?: ?boolean,
+  shouldDragStart?: (draggableId: string) => boolean | Promise<boolean>,
 |};
 
 let instanceCount: number = 0;

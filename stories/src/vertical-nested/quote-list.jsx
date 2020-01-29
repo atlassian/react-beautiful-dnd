@@ -15,9 +15,9 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
-const Root = styled.div`
+const Root = styled.div<Function>(`
   width: 250px;
-`;
+`);
 
 const Container = styled.div`
   background-color: ${({ isDraggingOver }) =>

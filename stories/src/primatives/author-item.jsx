@@ -6,7 +6,7 @@ import { grid } from '../constants';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Author } from '../types';
 
-const Avatar = styled.img`
+const Avatar = styled.img<Function>(`
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -26,7 +26,7 @@ const Avatar = styled.img`
     border-color: ${({ isDragging }) =>
       isDragging ? colors.G50 : colors.B200};
   }
-`;
+`);
 
 type Props = {|
   author: Author,
