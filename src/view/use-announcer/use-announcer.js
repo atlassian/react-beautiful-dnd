@@ -4,7 +4,7 @@ import { useMemo, useCallback } from 'use-memo-one';
 import type { Announce, ContextId } from '../../types';
 import { warning } from '../../dev-warning';
 import getBodyElement from '../get-body-element';
-import assignVisuallyHidden from '../assign-visually-hidden-style';
+import visuallyHidden from '../visually-hidden-style';
 
 export const getId = (contextId: ContextId): string =>
   `rbd-announcement-${contextId}`;
@@ -31,7 +31,8 @@ export default function useAnnouncer(contextId: ContextId): Announce {
       el.setAttribute('aria-atomic', 'true');
 
       // hide the element visually
-      assignVisuallyHidden(el.style);
+      // eslint-disable-next-line es5/no-es6-static-methods
+      Object.assign(el.style, visuallyHidden);
 
       // Add to body
       getBodyElement().appendChild(el);
