@@ -208,7 +208,7 @@ type FluidDragActions = {|
 |};
 ```
 
-Calls to `.move()` are throttled using [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame). So if you make multipole `.move()` calls in the same animation frame, it will only result in a single update
+Calls to `.move()` are throttled using [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame). So if you make multiple `.move()` calls in the same animation frame, it will only result in a single update
 
 ```js
 const drag: SnapDragActions = preDrag.fluidLift({ x: 0, y: 0 });
