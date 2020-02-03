@@ -31,7 +31,6 @@ export default function useAnnouncer(contextId: ContextId): Announce {
       el.setAttribute('aria-atomic', 'true');
 
       // hide the element visually
-      // eslint-disable-next-line es5/no-es6-static-methods
       Object.assign(el.style, visuallyHidden);
 
       // Add to body
