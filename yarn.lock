@@ -5769,10 +5769,10 @@ eslint-plugin-emotion@^10.0.14:
   resolved "https://registry.yarnpkg.com/eslint-plugin-emotion/-/eslint-plugin-emotion-10.0.14.tgz#c643ff2f34f85ae77a65b2056915e939cf7e8129"
   integrity sha512-kI0hTPA5oo7MAc2YcdF1JcT36TZ1Ci0S5sbA9aojZ3leEPyCH34YBB76/8NQ3/9gybqrekIEuEhr8MP6JZf95Q==
 
-eslint-plugin-es5@^1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-es5/-/eslint-plugin-es5-1.4.1.tgz#258fe89bc5f72fbd9f5f7936c840151766821f1e"
-  integrity sha512-kktkmkF2O7pnSZYgrMiYMbt3wCKRIiXePwILv8USDG95YgP0PzhIxSIROLLKmiQQ/Z6LuhDGWTHK04gnbXBvkg==
+eslint-plugin-es5@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-es5/-/eslint-plugin-es5-1.5.0.tgz#aab19af3d4798f7924bba309bc4f87087280fbba"
+  integrity sha512-Qxmfo7v2B7SGAEURJo0dpBweFf+JU15kSyALfiB2rXWcBuJ96r6X9kFHXFnhdopPHCaHjoQs1xQPUJVbGMb1AA==
 
 eslint-plugin-flowtype@^4.3.0:
   version "4.3.0"
