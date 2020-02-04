@@ -6,6 +6,7 @@ import { grid } from '../constants';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Author } from '../types';
 
+// $ExpectError - not sure why
 const Avatar = styled.img`
   width: 60px;
   height: 60px;

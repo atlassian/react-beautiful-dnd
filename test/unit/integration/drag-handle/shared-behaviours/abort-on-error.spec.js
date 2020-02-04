@@ -126,7 +126,7 @@ forEachSensor((control: Control) => {
 
   it('should abort a drag if a runtime error occurs', () => {
     const thrower: Thrower = getThrower();
-    const { getByText, queryByText } = render(
+    const { getByText } = render(
       <App
         anotherChild={
           <Vomit
@@ -147,6 +147,6 @@ forEachSensor((control: Control) => {
       thrower.execute();
     });
 
-    expect(isDragging(queryByText('item: 0'))).toBe(false);
+    expect(isDragging(getByText('item: 0'))).toBe(false);
   });
 });

@@ -116,6 +116,7 @@ function QuoteApp(props: Props) {
   );
 }
 
+// $ExpectError - not sure why
 const Root = styled.div`
   display: flex;
   justify-content: space-evenly;
