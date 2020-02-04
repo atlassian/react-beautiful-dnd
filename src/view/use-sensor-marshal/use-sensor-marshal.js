@@ -431,7 +431,7 @@ export default function useSensorMarshal({
         draggableId,
       });
     },
-    [lockAPI, registry, store],
+    [lockAPI, registry, store, validators],
   );
 
   const tryGetLock: TryGetLock = useCallback(
@@ -451,7 +451,7 @@ export default function useSensorMarshal({
         sourceEvent:
           options && options.sourceEvent ? options.sourceEvent : null,
       }),
-    [contextId, lockAPI, registry, store],
+    [contextId, lockAPI, registry, store, validators],
   );
 
   const findClosestDraggableId = useCallback(

@@ -112,12 +112,9 @@ export default function App(props: Props) {
     getStore(lazyStoreRef).dispatch(action);
   }, []);
 
-  const validators = useMemo<Validators>(
-    () => {
-      return createValidators(lastPropsRef.current);
-    },
-    [lastPropsRef],
-  );
+  const validators = useMemo<Validators>(() => {
+    return createValidators(lastPropsRef.current);
+  }, [lastPropsRef]);
 
   const marshalCallbacks: DimensionMarshalCallbacks = useMemo(
     () =>
