@@ -79,7 +79,7 @@
     "@emotion/core": "^10.0.27",
     "@emotion/styled": "^10.0.27",
     "@storybook/react": "^5.3.12",
-    "@storybook/theming": "^5.3.10",
+    "@storybook/theming": "^5.3.12",
     "@testing-library/react": "^9.4.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.3",
