@@ -20,6 +20,7 @@ type Props = {|
   multiSelectTo: (taskId: Id) => void,
 |};
 
+// $ExpectError - not sure why
 const Container = styled.div`
   width: 300px;
   margin: ${grid}px;

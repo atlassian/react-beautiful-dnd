@@ -15,6 +15,7 @@ import type {
   DraggableStateSnapshot,
 } from '../../../src';
 
+// $ExpectError - not sure why
 const Root = styled.div`
   width: 250px;
 `;

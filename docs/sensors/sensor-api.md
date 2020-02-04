@@ -15,15 +15,15 @@ These are some examples to show off what is possible with the Sensor API. They a
 
 (Please be sure to use prefix `rbd-`)
 
-| Voice 🗣 | Webcam 📷 | Thought 🧠 |
-| :-------: | :---------: | :----------: |
-| ![voice sensor](https://user-images.githubusercontent.com/2182637/66467095-87dc4380-eacf-11e9-9e2e-7ae1a59bfddf.gif) | ![webcam sensor](https://user-images.githubusercontent.com/2182637/66466837-1603fa00-eacf-11e9-8c15-5ed324c8916f.gif) | ![thought sensor](https://raw.githubusercontent.com/charliegerard/rbd-thought-sensor/master/demo.gif) |
+|                                                                 Voice 🗣                                                                  |                                                              Webcam 📷                                                               |                                                                  Thought 🧠                                                                  |
+| :--------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------: |
+|           ![voice sensor](https://user-images.githubusercontent.com/2182637/66467095-87dc4380-eacf-11e9-9e2e-7ae1a59bfddf.gif)           |        ![webcam sensor](https://user-images.githubusercontent.com/2182637/66466837-1603fa00-eacf-11e9-8c15-5ed324c8916f.gif)         |                    ![thought sensor](https://raw.githubusercontent.com/charliegerard/rbd-thought-sensor/master/demo.gif)                     |
 | [`rbd-voice-sensor`](https://github.com/danieldelcore/rbd-voice-sensor)<br>created by [@danieldelcore](https://github.com/danieldelcore) | [`rbd-webcam-sensor`](https://github.com/kangweichan/rbd-webcam-sensor)<br>created by [@kangweichan](https://github.com/kangweichan) | [`rbd-thought-sensor`](https://github.com/charliegerard/rbd-thought-sensor)<br>created by [@charliegerard](https://github.com/charliegerard) |
 
-| With controls | Run sheet | Onboarding   |
-| :--------: | :---------: | :------------: |
+|                                                  With controls                                                   |                                                             Run sheet                                                              |                                                     Onboarding                                                     |
+| :--------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------: |
 | ![controls](https://user-images.githubusercontent.com/2182637/66469550-c07e1c00-ead3-11e9-8e45-3cb114cf3c97.gif) | ![multiple-drag-drop-context](https://user-images.githubusercontent.com/2182637/66472177-6c296b00-ead8-11e9-8966-bd194d3f8070.gif) | ![onboarding](https://user-images.githubusercontent.com/2182637/66466850-1bf9db00-eacf-11e9-958f-82f970f4111b.gif) |
-| Mapping controls to movements | Running scripted experiences along side a user controlled drag | A scripted onboarding experience for a trip planning application |
+|                                          Mapping controls to movements                                           |                                   Running scripted experiences along side a user controlled drag                                   |                          A scripted onboarding experience for a trip planning application                          |
 
 ## Overview
 
