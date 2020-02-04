@@ -132,7 +132,7 @@
     "rollup-plugin-size-snapshot": "^0.11.0",
     "rollup-plugin-strip": "^1.2.2",
     "rollup-plugin-terser": "^5.2.0",
-    "styled-components": "5.0.0",
+    "styled-components": "5.0.1",
     "stylelint": "^13.0.0",
     "stylelint-config-prettier": "^8.0.1",
     "stylelint-config-recommended": "^3.0.0",
