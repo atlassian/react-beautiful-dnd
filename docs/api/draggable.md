@@ -96,7 +96,11 @@ The `React` children of a `<Draggable />` must be a function that returns a `Rea
 ```
 
 ```js
-type DraggableChildrenFn = (DraggableProvided, DraggableStateSnapshot, DraggableRubric) => Node
+type DraggableChildrenFn = (
+  DraggableProvided,
+  DraggableStateSnapshot,
+  DraggableRubric,
+) => Node;
 ```
 
 The function is provided with three arguments:

@@ -146,6 +146,4 @@ function render(provided: DroppableProvided, snapshot: DroppableStateSnapshot) {
 }
 ```
 
-
-
 [← Back to documentation](/README.md#documentation-)
