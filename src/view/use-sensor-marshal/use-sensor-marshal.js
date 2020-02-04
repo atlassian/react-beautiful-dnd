@@ -8,13 +8,14 @@ import type {
   ContextId,
   State,
   Sensor,
+  Validators,
   StopDragOptions,
+  ShouldStartCaptureValidator,
   PreDragActions,
   FluidDragActions,
   SnapDragActions,
   DraggableId,
   SensorAPI,
-  SensorAddons,
   TryGetLock,
   TryGetLockOptions,
   DraggableOptions,
@@ -108,6 +109,7 @@ type CanStartArgs = {|
   lockAPI: LockAPI,
   registry: Registry,
   store: Store,
+  validators: Validators,
   draggableId: DraggableId,
 |};
 
@@ -115,6 +117,7 @@ function canStart({
   lockAPI,
   store,
   registry,
+  validators,
   draggableId,
 }: CanStartArgs): boolean {
   // lock is already claimed - cannot start
@@ -139,6 +142,12 @@ function canStart({
     return false;
   }
 
+  // shouldStartCapture return false - cannot start
+  const fn: ?ShouldStartCaptureValidator = validators.shouldStartCapture;
+  if (fn) {
+    return fn(draggableId);
+  }
+
   return true;
 }
 
@@ -147,6 +156,7 @@ type TryStartArgs = {|
   contextId: ContextId,
   registry: Registry,
   store: Store,
+  validators: Validators,
   draggableId: DraggableId,
   forceSensorStop: ?() => void,
   sourceEvent: ?Event,
@@ -157,6 +167,7 @@ function tryStart({
   contextId,
   store,
   registry,
+  validators,
   draggableId,
   forceSensorStop,
   sourceEvent,
@@ -165,6 +176,7 @@ function tryStart({
     lockAPI,
     store,
     registry,
+    validators,
     draggableId,
   });
 
@@ -354,9 +366,9 @@ type SensorMarshalArgs = {|
   contextId: ContextId,
   registry: Registry,
   store: Store,
+  validators: Validators,
   customSensors: ?(Sensor[]),
   enableDefaultSensors: boolean,
-  shouldDragStart?: (draggableId: string) => boolean | Promise<boolean>,
 |};
 
 const defaultSensors: Sensor[] = [
@@ -369,9 +381,9 @@ export default function useSensorMarshal({
   contextId,
   store,
   registry,
+  validators,
   customSensors,
   enableDefaultSensors,
-  shouldDragStart,
 }: SensorMarshalArgs) {
   const useSensors: Sensor[] = [
     ...(enableDefaultSensors ? defaultSensors : []),
@@ -415,6 +427,7 @@ export default function useSensorMarshal({
         lockAPI,
         registry,
         store,
+        validators,
         draggableId,
       });
     },
@@ -432,6 +445,7 @@ export default function useSensorMarshal({
         registry,
         contextId,
         store,
+        validators,
         draggableId,
         forceSensorStop: forceStop,
         sourceEvent:
@@ -489,18 +503,9 @@ export default function useSensorMarshal({
     ],
   );
 
-  // addons api functions.
-  const addons: SensorAddons = useMemo(
-    () => ({
-      shouldDragStart: shouldDragStart || (() => true),
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [shouldDragStart],
-  );
-
   // Bad ass
   useValidateSensorHooks(useSensors);
   for (let i = 0; i < useSensors.length; i++) {
-    useSensors[i](api, addons);
+    useSensors[i](api);
   }
 }

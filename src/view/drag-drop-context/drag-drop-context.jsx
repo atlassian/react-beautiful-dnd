@@ -18,7 +18,7 @@ type Props = {|
   // See our [sensor api](/docs/sensors/sensor-api.md)
   sensors?: Sensor[],
   enableDefaultSensors?: ?boolean,
-  shouldDragStart?: (draggableId: string) => boolean | Promise<boolean>,
+  shouldStartCapture?: (draggableId: string) => boolean,
 |};
 
 let instanceCount: number = 0;
@@ -45,12 +45,12 @@ export default function DragDropContext(props: Props) {
           liftInstruction={liftInstruction}
           enableDefaultSensors={props.enableDefaultSensors}
           sensors={props.sensors}
+          shouldStartCapture={props.shouldStartCapture}
           onBeforeCapture={props.onBeforeCapture}
           onBeforeDragStart={props.onBeforeDragStart}
           onDragStart={props.onDragStart}
           onDragUpdate={props.onDragUpdate}
           onDragEnd={props.onDragEnd}
-          shouldDragStart={props.shouldDragStart}
         >
           {props.children}
         </App>

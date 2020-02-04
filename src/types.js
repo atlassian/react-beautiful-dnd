@@ -402,6 +402,8 @@ export type ResponderProvided = {|
   announce: Announce,
 |};
 
+export type ShouldStartCaptureValidator = (draggableId: DraggableId) => boolean;
+
 export type OnBeforeCaptureResponder = (before: BeforeCapture) => mixed;
 export type OnBeforeDragStartResponder = (start: DragStart) => mixed;
 export type OnDragStartResponder = (
@@ -416,6 +418,10 @@ export type OnDragEndResponder = (
   result: DropResult,
   provided: ResponderProvided,
 ) => mixed;
+
+export type Validators = {|
+  shouldStartCapture?: ShouldStartCaptureValidator,
+|};
 
 export type Responders = {|
   onBeforeCapture?: OnBeforeCaptureResponder,
@@ -481,8 +487,5 @@ export type SensorAPI = {|
   findClosestDraggableId: (event: Event) => ?DraggableId,
   findOptionsForDraggable: (id: DraggableId) => ?DraggableOptions,
 |};
-export type SensorAddons = {|
-  shouldDragStart: (id: DraggableId) => boolean | Promise<boolean>,
-|};
 
-export type Sensor = (api: SensorAPI, addons: SensorAddons) => void;
+export type Sensor = (api: SensorAPI) => void;

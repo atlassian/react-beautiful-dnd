@@ -67,7 +67,7 @@ class App extends React.Component<*, State> {
     draggableId: undefined,
   };
 
-  shouldDragStart = (draggableId: string): boolean => {
+  shouldStartCapture = (draggableId: string): boolean => {
     const id: number = Number(draggableId.split('-')[1]);
     const randNum = Math.floor(Math.random() * 10);
     const draggable = (id * randNum) % 2 === 0;
@@ -95,7 +95,7 @@ class App extends React.Component<*, State> {
   render() {
     return (
       <DragDropContext
-        shouldDragStart={this.shouldDragStart}
+        shouldStartCapture={this.shouldStartCapture}
         onDragEnd={this.onDragEnd}
       >
         <div style={{ marginTop: grid * 2 }}>
@@ -142,6 +142,6 @@ class App extends React.Component<*, State> {
 }
 
 storiesOf('onDragStart', module).add(
-  'disable dragging by shouldDragStart',
+  'disable dragging by shouldStartCapture',
   () => <App />,
 );
