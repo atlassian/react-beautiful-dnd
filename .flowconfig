@@ -5,7 +5,6 @@
 [ignore]
 # Creating lots of invalid files
 .*/node_modules/jsonlint-mod/.*
-# .*/node_modules/@emotion/.*
 
 [libs]
 ./flow-typed/custom/
