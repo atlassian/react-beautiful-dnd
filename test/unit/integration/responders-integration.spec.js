@@ -1,3 +1,4 @@
+/* eslint-disable jest/expect-expect */
 // @flow
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';

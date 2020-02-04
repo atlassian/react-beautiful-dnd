@@ -208,6 +208,20 @@ module.exports = {
 
     // don't need to initialize state in a constructor
     'react/state-in-constructor': 'off',
+
+    'jest/expect-expect': [
+      'error',
+      {
+        assertFunctionNames: [
+          'expect',
+          // these functions will run expect internally
+          'withWarn',
+          'withError',
+          'withoutError',
+          'withoutWarn',
+        ],
+      },
+    ],
   },
   overrides: [
     // Forbid using not es5 methods
