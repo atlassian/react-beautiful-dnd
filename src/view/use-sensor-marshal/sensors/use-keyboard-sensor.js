@@ -4,7 +4,6 @@ import { useMemo, useCallback } from 'use-memo-one';
 import { invariant } from '../../../invariant';
 import type {
   SensorAPI,
-  SensorAddons,
   PreDragActions,
   SnapDragActions,
   DraggableId,
@@ -139,58 +138,8 @@ function getDraggingBindings(
   ];
 }
 
-export default function useKeyboardSensor(
-  api: SensorAPI,
-  addons: SensorAddons,
-) {
+export default function useKeyboardSensor(api: SensorAPI) {
   const unbindEventsRef = useRef<() => void>(noop);
-  const callStartPendingDrag = (event: KeyboardEvent, draggableId: string) => {
-    const preDrag: ?PreDragActions = api.tryGetLock(
-      draggableId,
-      // abort function not defined yet
-      // eslint-disable-next-line no-use-before-define
-      stop,
-      { sourceEvent: event },
-    );
-
-    // Cannot start capturing at this time
-    if (!preDrag) {
-      return;
-    }
-
-    // we are consuming the event
-    event.preventDefault();
-    let isCapturing: boolean = true;
-
-    // There is no pending period for a keyboard drag
-    // We can lift immediately
-    const actions: SnapDragActions = preDrag.snapLift();
-
-    // unbind this listener
-    unbindEventsRef.current();
-
-    // setup our function to end everything
-    function stop() {
-      invariant(
-        isCapturing,
-        'Cannot stop capturing a keyboard drag when not capturing',
-      );
-      isCapturing = false;
-
-      // unbind dragging bindings
-      unbindEventsRef.current();
-      // start listening for capture again
-      // eslint-disable-next-line no-use-before-define
-      listenForCapture();
-    }
-
-    // bind dragging listeners
-    unbindEventsRef.current = bindEvents(
-      window,
-      getDraggingBindings(actions, stop),
-      { capture: true, passive: false },
-    );
-  };
 
   const startCaptureBinding: EventBinding = useMemo(
     () => ({
@@ -212,23 +161,51 @@ export default function useKeyboardSensor(
           return;
         }
 
-        const shouldDragStart = addons.shouldDragStart(draggableId);
-
-        invariant(
-          typeof shouldDragStart === 'boolean' ||
-            (typeof shouldDragStart === 'object' && 'then' in shouldDragStart),
-          'The shouldDragStart should return a boolean',
+        const preDrag: ?PreDragActions = api.tryGetLock(
+          draggableId,
+          // abort function not defined yet
+          // eslint-disable-next-line no-use-before-define
+          stop,
+          { sourceEvent: event },
         );
 
-        if (typeof shouldDragStart === 'object' && 'then' in shouldDragStart) {
-          shouldDragStart.then(response => {
-            if (response === true) {
-              callStartPendingDrag(event, draggableId);
-            }
-          });
-        } else if (shouldDragStart === true) {
-          callStartPendingDrag(event, draggableId);
+        // Cannot start capturing at this time
+        if (!preDrag) {
+          return;
         }
+
+        // we are consuming the event
+        event.preventDefault();
+        let isCapturing: boolean = true;
+
+        // There is no pending period for a keyboard drag
+        // We can lift immediately
+        const actions: SnapDragActions = preDrag.snapLift();
+
+        // unbind this listener
+        unbindEventsRef.current();
+
+        // setup our function to end everything
+        function stop() {
+          invariant(
+            isCapturing,
+            'Cannot stop capturing a keyboard drag when not capturing',
+          );
+          isCapturing = false;
+
+          // unbind dragging bindings
+          unbindEventsRef.current();
+          // start listening for capture again
+          // eslint-disable-next-line no-use-before-define
+          listenForCapture();
+        }
+
+        // bind dragging listeners
+        unbindEventsRef.current = bindEvents(
+          window,
+          getDraggingBindings(actions, stop),
+          { capture: true, passive: false },
+        );
       },
     }),
     // not including startPendingDrag as it is not defined initially

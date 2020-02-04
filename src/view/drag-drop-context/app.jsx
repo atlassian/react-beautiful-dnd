@@ -24,6 +24,7 @@ import type {
   DraggableId,
   State,
   Responders,
+  Validators,
   Announce,
   Sensor,
   ElementId,
@@ -51,6 +52,7 @@ import useSensorMarshal from '../use-sensor-marshal/use-sensor-marshal';
 
 export type Props = {|
   ...Responders,
+  ...Validators,
   contextId: string,
   setCallbacks: SetAppCallbacks,
   nonce?: string,
@@ -63,9 +65,11 @@ export type Props = {|
 
   // screen reader
   liftInstruction: string,
-  shouldDragStart?: (draggableId: string) => boolean | Promise<boolean>,
 |};
 
+const createValidators = (props: Props): Validators => ({
+  shouldStartCapture: props.shouldStartCapture,
+});
 const createResponders = (props: Props): Responders => ({
   onBeforeCapture: props.onBeforeCapture,
   onBeforeDragStart: props.onBeforeDragStart,
@@ -107,6 +111,13 @@ export default function App(props: Props) {
   const lazyDispatch: Action => void = useCallback((action: Action): void => {
     getStore(lazyStoreRef).dispatch(action);
   }, []);
+
+  const validators = useMemo<Validators>(
+    () => {
+      return createValidators(lastPropsRef.current);
+    },
+    [lastPropsRef],
+  );
 
   const marshalCallbacks: DimensionMarshalCallbacks = useMemo(
     () =>
@@ -237,11 +248,11 @@ export default function App(props: Props) {
   useSensorMarshal({
     contextId,
     store,
+    validators,
     registry,
     customSensors: sensors,
     // default to 'true' unless 'false' is explicitly passed
     enableDefaultSensors: props.enableDefaultSensors !== false,
-    shouldDragStart: props.shouldDragStart,
   });
 
   // Clean store when unmounting

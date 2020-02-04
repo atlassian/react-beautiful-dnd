@@ -6,7 +6,6 @@ import { invariant } from '../../../invariant';
 import type {
   DraggableId,
   SensorAPI,
-  SensorAddons,
   PreDragActions,
   FluidDragActions,
 } from '../../../types';
@@ -244,36 +243,9 @@ function getHandleBindings({
   ];
 }
 
-export default function useMouseSensor(api: SensorAPI, addons: SensorAddons) {
+export default function useMouseSensor(api: SensorAPI) {
   const phaseRef = useRef<Phase>(idle);
   const unbindEventsRef = useRef<() => void>(noop);
-
-  const callStartPendingDrag = (event: TouchEvent, draggableId) => {
-    const actions: ?PreDragActions = api.tryGetLock(
-      draggableId,
-      // eslint-disable-next-line no-use-before-define
-      stop,
-      { sourceEvent: event },
-    );
-
-    // could not start a drag
-    if (!actions) {
-      return;
-    }
-
-    const touch: Touch = event.touches[0];
-    const { clientX, clientY } = touch;
-    const point: Position = {
-      x: clientX,
-      y: clientY,
-    };
-
-    // unbind this event handler
-    unbindEventsRef.current();
-
-    // eslint-disable-next-line no-use-before-define
-    startPendingDrag(actions, point);
-  };
 
   const getPhase = useCallback(function getPhase(): Phase {
     return phaseRef.current;
@@ -302,23 +274,30 @@ export default function useMouseSensor(api: SensorAPI, addons: SensorAddons) {
           return;
         }
 
-        const shouldDragStart = addons.shouldDragStart(draggableId);
-
-        invariant(
-          typeof shouldDragStart === 'boolean' ||
-            (typeof shouldDragStart === 'object' && 'then' in shouldDragStart),
-          'The shouldDragStart should return a boolean',
+        const actions: ?PreDragActions = api.tryGetLock(
+          draggableId,
+          // eslint-disable-next-line no-use-before-define
+          stop,
+          { sourceEvent: event },
         );
 
-        if (typeof shouldDragStart === 'object' && 'then' in shouldDragStart) {
-          shouldDragStart.then(response => {
-            if (response === true) {
-              callStartPendingDrag(event, draggableId);
-            }
-          });
-        } else if (shouldDragStart === true) {
-          callStartPendingDrag(event, draggableId);
+        // could not start a drag
+        if (!actions) {
+          return;
         }
+
+        const touch: Touch = event.touches[0];
+        const { clientX, clientY } = touch;
+        const point: Position = {
+          x: clientX,
+          y: clientY,
+        };
+
+        // unbind this event handler
+        unbindEventsRef.current();
+
+        // eslint-disable-next-line no-use-before-define
+        startPendingDrag(actions, point);
       },
     }),
     // not including stop or startPendingDrag as it is not defined initially
