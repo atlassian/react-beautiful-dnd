@@ -14,6 +14,7 @@ import type {
   SnapDragActions,
   DraggableId,
   SensorAPI,
+  SensorAddons,
   TryGetLock,
   TryGetLockOptions,
   DraggableOptions,
@@ -477,10 +478,7 @@ export default function useSensorMarshal({
       findOptionsForDraggable,
       tryReleaseLock,
       isLockClaimed,
-      shouldDragStart: shouldDragStart || (() => true),
     }),
-    // shouldDragStart should not trigger updating.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       canGetLock,
       tryGetLock,
@@ -491,9 +489,18 @@ export default function useSensorMarshal({
     ],
   );
 
+  // addons api functions.
+  const addons: SensorAddons = useMemo(
+    () => ({
+      shouldDragStart: shouldDragStart || (() => true),
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [shouldDragStart],
+  );
+
   // Bad ass
   useValidateSensorHooks(useSensors);
   for (let i = 0; i < useSensors.length; i++) {
-    useSensors[i](api);
+    useSensors[i](api, addons);
   }
 }

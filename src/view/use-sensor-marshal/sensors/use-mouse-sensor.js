@@ -8,6 +8,7 @@ import type {
   FluidDragActions,
   DraggableId,
   SensorAPI,
+  SensorAddons,
   DraggableOptions,
 } from '../../../types';
 import type {
@@ -206,10 +207,10 @@ function getCaptureBindings({
   ];
 }
 
-export default function useMouseSensor(api: SensorAPI) {
+export default function useMouseSensor(api: SensorAPI, addons: SensorAddons) {
   const phaseRef = useRef<Phase>(idle);
   const unbindEventsRef = useRef<() => void>(noop);
-  const callStartPendingDrag = (event: MouseEvent, draggableId) => {
+  const callStartPendingDrag = (event: MouseEvent, draggableId: string) => {
     const actions: ?PreDragActions = api.tryGetLock(
       draggableId,
       // stop is defined later
@@ -261,7 +262,7 @@ export default function useMouseSensor(api: SensorAPI) {
           return;
         }
 
-        const shouldDragStart = api.shouldDragStart(draggableId);
+        const shouldDragStart = addons.shouldDragStart(draggableId);
 
         invariant(
           typeof shouldDragStart === 'boolean' ||
