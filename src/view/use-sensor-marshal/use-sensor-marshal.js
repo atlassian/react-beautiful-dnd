@@ -109,7 +109,7 @@ type CanStartArgs = {|
   lockAPI: LockAPI,
   registry: Registry,
   store: Store,
-  validators: Validators,
+  getValidators: () => Validators,
   draggableId: DraggableId,
 |};
 
@@ -117,7 +117,7 @@ function canStart({
   lockAPI,
   store,
   registry,
-  validators,
+  getValidators,
   draggableId,
 }: CanStartArgs): boolean {
   // lock is already claimed - cannot start
@@ -143,6 +143,7 @@ function canStart({
   }
 
   // shouldStartCapture return false - cannot start
+  const validators = getValidators();
   const fn: ?ShouldStartCaptureValidator = validators.shouldStartCapture;
   if (fn) {
     return fn(draggableId);
@@ -156,7 +157,7 @@ type TryStartArgs = {|
   contextId: ContextId,
   registry: Registry,
   store: Store,
-  validators: Validators,
+  getValidators: () => Validators,
   draggableId: DraggableId,
   forceSensorStop: ?() => void,
   sourceEvent: ?Event,
@@ -167,7 +168,7 @@ function tryStart({
   contextId,
   store,
   registry,
-  validators,
+  getValidators,
   draggableId,
   forceSensorStop,
   sourceEvent,
@@ -176,7 +177,7 @@ function tryStart({
     lockAPI,
     store,
     registry,
-    validators,
+    getValidators,
     draggableId,
   });
 
@@ -366,7 +367,7 @@ type SensorMarshalArgs = {|
   contextId: ContextId,
   registry: Registry,
   store: Store,
-  validators: Validators,
+  getValidators: () => Validators,
   customSensors: ?(Sensor[]),
   enableDefaultSensors: boolean,
 |};
@@ -381,7 +382,7 @@ export default function useSensorMarshal({
   contextId,
   store,
   registry,
-  validators,
+  getValidators,
   customSensors,
   enableDefaultSensors,
 }: SensorMarshalArgs) {
@@ -427,11 +428,11 @@ export default function useSensorMarshal({
         lockAPI,
         registry,
         store,
-        validators,
+        getValidators,
         draggableId,
       });
     },
-    [lockAPI, registry, store, validators],
+    [lockAPI, registry, store, getValidators],
   );
 
   const tryGetLock: TryGetLock = useCallback(
@@ -445,13 +446,13 @@ export default function useSensorMarshal({
         registry,
         contextId,
         store,
-        validators,
+        getValidators,
         draggableId,
         forceSensorStop: forceStop,
         sourceEvent:
           options && options.sourceEvent ? options.sourceEvent : null,
       }),
-    [contextId, lockAPI, registry, store, validators],
+    [contextId, lockAPI, registry, store, getValidators],
   );
 
   const findClosestDraggableId = useCallback(
