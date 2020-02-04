@@ -72,7 +72,11 @@ export default class ErrorBoundary extends React.Component<Props> {
   getCallbacks = (): AppCallbacks => {
     if (!this.callbacks) {
       // eslint-disable-next-line no-restricted-syntax
-      throw new Error('Unable to find AppCallbacks in <ErrorBoundary/>');
+      throw new Error(
+        process.env.NODE_ENV !== 'production'
+          ? 'Unable to find AppCallbacks in <ErrorBoundary/>'
+          : undefined,
+      );
     }
     return this.callbacks;
   };
