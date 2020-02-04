@@ -37,7 +37,9 @@ import { DragDropContext, Droppable, Draggable } from '../src';
     {/* $ExpectError draggableId is required */}
     <Draggable index={0}>{() => null}</Draggable>
     {/* $ExpectError draggableId must be a string */}
-    <Draggable draggableId={2} index={0}>{() => null}</Draggable>
+    <Draggable draggableId={2} index={0}>
+      {() => null}
+    </Draggable>
     {/* $ExpectError index is required */}
     <Draggable draggableId="">{() => null}</Draggable>
     {/* $ExpectError children as function is required*/}

@@ -18,14 +18,15 @@ Some setup problems will cause errors. These are logged with `console.error`. We
 <details>
   <summary>More details if you are interested</summary>
 
-  If we threw setup errors, here is the infinite loop:
+If we threw setup errors, here is the infinite loop:
 
-  1. Mount application
-  2. Error detected (we usually do it in a `useEffect`) and thrown
-  3. Error caught in `componentDidCatch`
-  4. React tree recovered (remounted). Goto step 2.
+1. Mount application
+2. Error detected (we usually do it in a `useEffect`) and thrown
+3. Error caught in `componentDidCatch`
+4. React tree recovered (remounted). Goto step 2.
 
-  We could work around this loop condition, but it would lead to conditionally throwing, and otherwise logging. It is also tricky to avoid double logging of errors. Given that we are trying to recover the React tree, there is not a lot of value in throwing any setup problem in the first place. So we just log the problem in the `console`.
+We could work around this loop condition, but it would lead to conditionally throwing, and otherwise logging. It is also tricky to avoid double logging of errors. Given that we are trying to recover the React tree, there is not a lot of value in throwing any setup problem in the first place. So we just log the problem in the `console`.
+
 </details>
 
 ### Production builds
@@ -38,7 +39,7 @@ Here are a few guides on how to drop development only code from your production 
 
 ### Disable logging
 
-If you want to disable the warnings in *development*, you just need to update a flag on the `window`:
+If you want to disable the warnings in _development_, you just need to update a flag on the `window`:
 
 ```js
 // disable all react-beautiful-dnd development warnings
