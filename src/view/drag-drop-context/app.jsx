@@ -100,6 +100,10 @@ export default function App(props: Props) {
     return createResponders(lastPropsRef.current);
   }, [lastPropsRef]);
 
+  const getValidators: () => Validators = useCallback(() => {
+    return createValidators(lastPropsRef.current);
+  }, [lastPropsRef]);
+
   const announce: Announce = useAnnouncer(contextId);
 
   const liftInstructionId: ElementId = useLiftInstruction(
@@ -111,10 +115,6 @@ export default function App(props: Props) {
   const lazyDispatch: Action => void = useCallback((action: Action): void => {
     getStore(lazyStoreRef).dispatch(action);
   }, []);
-
-  const validators = useMemo<Validators>(() => {
-    return createValidators(lastPropsRef.current);
-  }, [lastPropsRef]);
 
   const marshalCallbacks: DimensionMarshalCallbacks = useMemo(
     () =>
@@ -245,8 +245,8 @@ export default function App(props: Props) {
   useSensorMarshal({
     contextId,
     store,
-    validators,
     registry,
+    getValidators,
     customSensors: sensors,
     // default to 'true' unless 'false' is explicitly passed
     enableDefaultSensors: props.enableDefaultSensors !== false,
