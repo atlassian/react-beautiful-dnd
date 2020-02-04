@@ -44,6 +44,7 @@ const ScrollContainer = styled.div`
   overflow: auto;
 `;
 
+// $ExpectError - not sure why
 const Container = styled.div`
   /* flex child */
   flex-grow: 1;
