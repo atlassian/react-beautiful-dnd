@@ -4,7 +4,7 @@
 
 `react-beautiful-dnd` ships with great screen reader support, in English, out of the box. If you just want to get started, then there's nothing you have to do. But if it's tailored messaging you're after, you have total control of that too.
 
-This guide is here to help you create messaging that supports and delights your users. The screen reader experience is focused on keyboard interactions, but it's possible for a screen reader user to use any input type (for example mouse and keyboard).
+This guide is here to help you create messaging that supports and delights your users. The screen reader experience is focused on keyboard interactions, but it's possible for a screen reader user to use any input type (for example mouse or touch).
 
 ## Tone
 
@@ -45,13 +45,18 @@ We will not be controlling the **name** of the element. The name is a way to ide
 | **Role description** | (not added by default)                                    | A role description adds more specific description of a widget. We would like the default to be `aria-roledescription="Draggable item"`. However, this does not pass the current [Google lighthouse](TODO) accessibility audit. This is a bug in Google lighthouse, and should be fixed when they upgrade their `axe-core`. You are welcome to add the `aria-roledescription`, but keep in mind that lighthouse might punish you. We plan on adding the `aria-roledescription` in an upcoming release. [follow up issue](TODO) |
 | **Description**      | `DragHandleProps` <br/> `aria-describedby="${elementId}"` | We are using the description of the element to provide lift instructions. By the description will be `"press spacebar to lift"`. We create a hidden element with this text which is pointed to be `aria-describedby`. If you want to change this text you will need to create your own hidden element with an `id` and point to that with `DragHandleProps` > `aria-describedby`.                                                                                                                                             |
 
-## How to control announcements
+## Drag lifecycle announcements
 
-The `announce` function is provided to each of the `<DragDropContext /> > Responder` functions and can be used to deliver your own screen reader messages. Messages will be immediately read out. It's important to deliver messages immediately, so your users have a fast and responsive experience.
+We announce to screen reader users know what is going on during the drag and drop lifecycle. We provide default english messages for every stage of the drag and drop lifecycle out of the box. You can control these announcements by using the `announce` function is provided to each of the `<DragDropContext /> > Responder`s.
 
-If you attempt to hold onto the `announce` function and call it later, it won't work and will just print a warning to the console. If you try to call announce twice for the same event, only the first will be read by the screen reader with subsequent calls to announce being ignored and a warning printed.
+Messages will be immediately read out. It's important to deliver messages immediately, so your users have a fast and responsive experience. If you attempt to hold onto the `announce` function and call it later, it won't work and will just print a warning to the console. If you try to call announce twice for the same event, only the first will be read by the screen reader with subsequent calls to announce being ignored and a warning printed.
 
-## Use position, not index
+> We use [live regions](TODO) to do drag lifecycle announcements
+
+<details>
+  <summary>Some advice when using <code>announce</code></summary>
+
+### Use position, not index
 
 > `position = index + 1`
 
@@ -66,35 +71,15 @@ const startPosition = position(source.index);
 const endPosition = destination ? position(destination.index) : null;
 ```
 
-## Use names where possible
+### Use names where possible
 
 All of our built in screen reader messages use `id`'s to identify `<Draggable />` and `<Droppable />`s. You might want to consider replacing these with more readable names.
 
 > Potentially this could be a prop for `<Draggable />` and `<Droppable />` 🤔. Please raise an issue if you would like to see this happen!
 
-## Instructions to cover
+</details>
 
-### Step 1: Introduce draggable item
-
-When a user `tabs` to a _drag handle_, we need to tell them how to start a drag. We do this by using the `liftInstruction` prop on a `<DragDropContext />`. All _drag handles_ share the same lift announcement message.
-
-**Default message**: "Draggable item. Ensure your screen reader is not in browse mode and then press spacebar to lift."
-
-We tell the user the following:
-
-- The item is draggable
-- To disable _browse mode_
-- How to start a drag
-
-You don't need to give all the drag movement instructions at this point, let's wait until the user decides to start a drag.
-
-Think about substituting the word "item" for a noun that matches your problem domain, for example, "task" or "issue". You might also want to drop the word "item" altogether.
-
-#### Disabling browse mode
-
-Screen readers can run in [various modes](https://www.accessibility-developer-guide.com/knowledge/desktop-screen-readers/browse-focus-modes/). In order for the keyboard shortcuts to work correctly the user needs to leave the _browse mode_ as it remaps a lot of keyboard shortcuts. Alternatively you could use `aria-role="application"` on the `<body>` element, but this can wreck the standard screen reader usage of your page.
-
-### Step 2: Start drag
+### Drag starting
 
 When a user lifts a `<Draggable />` by using the `spacebar` we want to tell them a number of things.
 
@@ -118,9 +103,9 @@ onDragStart = (start: DragStart, provided: ResponderProvided) => {
 };
 ```
 
-### Step 3: Drag movement
+### Drag updates
 
-When a user has started a drag, there are different scenarios that can spring from that, so we'll create different messaging for each scenario.
+After a user has started a drag there are different scenarios that can spring from that, so we'll create different messaging for each scenario.
 
 We can control the announcement through the `<DragDropContext />` > `onDragUpdate` responder.
 
@@ -175,7 +160,7 @@ You can't do this with a keyboard, but it's worthwhile having a message for this
 
 Think about how you could make this messaging friendlier and clearer.
 
-### Step 4: On drop
+### Drag end
 
 There are two ways a drop can happen. Either the drag is cancelled or the user drops the dragging item. You can control the messaging for these events using the `<DragDropContext /> > onDragEnd` responder.
 
