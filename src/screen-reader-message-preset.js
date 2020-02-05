@@ -15,7 +15,7 @@ export type MessagePreset = {|
   onDragEnd: (result: DropResult) => string,
 |};
 
-const liftInstruction: string = `Draggable item. Ensure your screen reader is not in browse mode and then press space bar to lift.`;
+const liftInstruction: string = `Press space bar to lift.`;
 
 const position = (index: number): number => index + 1;
 
