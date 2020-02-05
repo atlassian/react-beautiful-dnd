@@ -68,8 +68,14 @@ export type DragHandleProps = {|
   // What DragDropContext the drag handle is in
   'data-rbd-drag-handle-context-id': ContextId,
 
-  // id of drag handle aria description for screen readers
-  'aria-labelledby': ElementId,
+  // We need a drag handle to be a widget in order to correctly set accessibility properties
+  role: string,
+
+  // Sadly we cannot use this right now due an issue with lighthouse
+  'aria-roledescription': string,
+
+  // Using the description of the element to provide usage instructions
+  'aria-describedby': ElementId,
 
   // Allow tabbing to this element
   tabIndex: number,
