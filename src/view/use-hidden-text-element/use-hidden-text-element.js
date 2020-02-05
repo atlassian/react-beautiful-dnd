@@ -4,8 +4,12 @@ import { useMemo } from 'use-memo-one';
 import type { ContextId, ElementId } from '../../types';
 import getBodyElement from '../get-body-element';
 
-export function getId(key: string, contextId: ContextId): string {
-  return `rbd-hidden-text-${key}-${contextId}`;
+type GetIdArgs = {|
+  contextId: ContextId,
+  key: string,
+|};
+export function getId({ contextId, key }: GetIdArgs): string {
+  return `rbd-hidden-text-${contextId}-${key}`;
 }
 
 type Args = {|
@@ -19,7 +23,7 @@ export default function useHiddenTextElement({
   key,
   text,
 }: Args): ElementId {
-  const id: string = useMemo(() => getId(key, contextId), [contextId, key]);
+  const id: string = useMemo(() => getId({ contextId, key }), [contextId, key]);
 
   useEffect(
     function mount() {
