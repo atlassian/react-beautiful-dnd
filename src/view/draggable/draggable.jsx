@@ -103,7 +103,7 @@ export default function Draggable(props: Props) {
             tabIndex: 0,
             role: 'button',
             'aria-describedby': liftInstructionId,
-            'aria-roledescription': 'Draggable item',
+            // 'aria-roledescription': 'Draggable item',
             'data-rbd-drag-handle-draggable-id': draggableId,
             'data-rbd-drag-handle-context-id': contextId,
             // Opting out of html5 drag and drop
