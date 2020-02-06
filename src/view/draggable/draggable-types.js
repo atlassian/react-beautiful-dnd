@@ -69,12 +69,15 @@ export type DragHandleProps = {|
   'data-rbd-drag-handle-context-id': ContextId,
 
   // We need a drag handle to be a widget in order to correctly set accessibility properties
+  // Decided on role="button" but leaving the public API as a string to allow for changing without a major
   role: string,
 
+  // Overriding default role
   // Sadly we cannot use this right now due an issue with lighthouse
-  'aria-roledescription': string,
+  // 'aria-roledescription': string,
 
-  // Using the description of the element to provide usage instructions
+  // Using the description property of the drag handle to provide usage instructions
+  // e.g. "Press space bar to lift"
   'aria-describedby': ElementId,
 
   // Allow tabbing to this element
