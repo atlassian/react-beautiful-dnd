@@ -1,11 +1,13 @@
 // @flow
 import React, { type Node } from 'react';
-import { useMemo } from 'use-memo-one';
 import type { Responders, ContextId, Sensor } from '../../types';
 import ErrorBoundary from './error-boundary';
 import preset from '../../screen-reader-message-preset';
 import App from './app';
-import { reset } from '../use-unique-id';
+import useUniqueContextId, {
+  reset as resetContextId,
+} from './use-unique-context-id';
+import { reset as resetUniqueIds } from '../use-unique-id';
 
 type Props = {|
   ...Responders,
@@ -21,16 +23,14 @@ type Props = {|
   enableDefaultSensors?: ?boolean,
 |};
 
-let instanceCount: number = 0;
-
 // Reset any context that gets persisted across server side renders
 export function resetServerContext() {
-  instanceCount = 0;
-  reset();
+  resetContextId();
+  resetUniqueIds();
 }
 
 export default function DragDropContext(props: Props) {
-  const contextId: ContextId = useMemo(() => `${instanceCount++}`, []);
+  const contextId: ContextId = useUniqueContextId();
   const liftInstruction: string =
     props.liftInstruction || preset.liftInstruction;
 
