@@ -5,6 +5,7 @@ import type { Responders, ContextId, Sensor } from '../../types';
 import ErrorBoundary from './error-boundary';
 import preset from '../../screen-reader-message-preset';
 import App from './app';
+import { reset } from '../use-unique-id';
 
 type Props = {|
   ...Responders,
@@ -25,6 +26,7 @@ let instanceCount: number = 0;
 // Reset any context that gets persisted across server side renders
 export function resetServerContext() {
   instanceCount = 0;
+  reset();
 }
 
 export default function DragDropContext(props: Props) {
