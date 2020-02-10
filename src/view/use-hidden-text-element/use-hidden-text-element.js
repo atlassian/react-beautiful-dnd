@@ -3,27 +3,31 @@ import { useEffect } from 'react';
 import { useMemo } from 'use-memo-one';
 import type { ContextId, ElementId } from '../../types';
 import getBodyElement from '../get-body-element';
+import useUniqueId from '../use-unique-id';
 
 type GetIdArgs = {|
   contextId: ContextId,
-  key: string,
+  uniqueId: string,
 |};
-export function getId({ contextId, key }: GetIdArgs): string {
-  return `rbd-hidden-text-${contextId}-${key}`;
+
+export function getId({ contextId, uniqueId }: GetIdArgs): string {
+  return `rbd-hidden-text-${contextId}-${uniqueId}`;
 }
 
 type Args = {|
   contextId: ContextId,
-  key: string,
   text: string,
 |};
 
 export default function useHiddenTextElement({
   contextId,
-  key,
   text,
 }: Args): ElementId {
-  const id: string = useMemo(() => getId({ contextId, key }), [contextId, key]);
+  const uniqueId: string = useUniqueId('hidden-text', { separator: '-' });
+  const id: string = useMemo(() => getId({ contextId, uniqueId }), [
+    uniqueId,
+    contextId,
+  ]);
 
   useEffect(
     function mount() {

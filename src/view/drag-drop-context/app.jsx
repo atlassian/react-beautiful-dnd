@@ -99,7 +99,6 @@ export default function App(props: Props) {
 
   const liftInstructionId: ElementId = useHiddenTextElement({
     contextId,
-    key: 'drag-handle-description',
     text: liftInstruction,
   });
   const styleMarshal: StyleMarshal = useStyleMarshal(contextId, nonce);
