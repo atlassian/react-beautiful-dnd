@@ -18,10 +18,8 @@ export default function useUniqueId(
   prefix: string,
   options?: Options = defaults,
 ): Id {
-  return useMemo(
-    function getId() {
-      return `${prefix}${options.separator}${count++}`;
-    },
-    [options.separator, prefix],
-  );
+  return useMemo(() => `${prefix}${options.separator}${count++}`, [
+    options.separator,
+    prefix,
+  ]);
 }
