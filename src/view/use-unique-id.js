@@ -1,5 +1,5 @@
 // @flow
-import { useRef } from 'react';
+import { useMemo } from 'use-memo-one';
 import type { Id } from '../types';
 
 let count: number = 0;
@@ -18,7 +18,10 @@ export default function useUniqueId(
   prefix: string,
   options?: Options = defaults,
 ): Id {
-  const countRef = useRef<number>(count++);
-
-  return `${prefix}${options.separator}${countRef.current}`;
+  return useMemo(
+    function getId() {
+      return `${prefix}${options.separator}${count++}`;
+    },
+    [options.separator, prefix],
+  );
 }
