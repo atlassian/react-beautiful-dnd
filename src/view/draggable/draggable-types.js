@@ -82,6 +82,7 @@ export type DragHandleProps = {|
   'aria-describedby': ElementId,
 
   // Allow tabbing to this element
+  // Adding a tab index marks the element as interactive content: https://www.w3.org/TR/html51/dom.html#kinds-of-content-interactive-content
   tabIndex: number,
 
   // Stop html5 drag and drop
