@@ -101,7 +101,6 @@ export default function Draggable(props: Props) {
       isEnabled
         ? {
             tabIndex: 0,
-            role: 'button',
             'aria-describedby': liftInstructionId,
             // 'aria-roledescription': 'Draggable item',
             'data-rbd-drag-handle-draggable-id': draggableId,
