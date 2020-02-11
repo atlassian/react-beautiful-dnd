@@ -70,9 +70,10 @@ export type DragHandleProps = {|
 
   // We need a drag handle to be a widget in order to correctly set accessibility properties
   // Decided on role="button" but leaving the public API as a string to allow for changing without a major
-  role: string,
+  // Not enabling yet as announcements seem to be working, and it would be good to enable with with aria-roledescription
+  // role: string,
 
-  // Overriding default role
+  // Overriding default role to have a more descriptive text ("Draggable item")
   // Sadly we cannot use this right now due an issue with lighthouse
   // 'aria-roledescription': string,
 
