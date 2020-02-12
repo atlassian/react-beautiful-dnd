@@ -22,7 +22,7 @@ import useLayoutEffect from '../../use-isomorphic-layout-effect';
 //
 // helper to make platform specific changes
 const isIos = (() => {
-  if (typeof(navigator) === 'undefined') {
+  if (typeof navigator === 'undefined') {
     return true;
   }
 
@@ -420,7 +420,7 @@ export default function useMouseSensor(api: SensorAPI) {
     function startPendingDrag(
       actions: PreDragActions,
       point: Position,
-      target: HTMLElement
+      target: HTMLElement,
     ) {
       invariant(
         getPhase().type === 'IDLE',
