@@ -420,7 +420,7 @@ export default function useMouseSensor(api: SensorAPI) {
     function startPendingDrag(
       actions: PreDragActions,
       point: Position,
-      target: HTMLElement,
+      target: ?HTMLElement,
     ) {
       invariant(
         getPhase().type === 'IDLE',
