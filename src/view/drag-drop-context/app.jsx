@@ -62,7 +62,7 @@ export type Props = {|
   enableDefaultSensors?: ?boolean,
 
   // screen reader
-  liftInstruction: string,
+  dragHandleUsageInstructions: string,
 |};
 
 const createResponders = (props: Props): Responders => ({
@@ -83,7 +83,13 @@ function getStore(lazyRef: LazyStoreRef): Store {
 }
 
 export default function App(props: Props) {
-  const { contextId, setCallbacks, sensors, nonce, liftInstruction } = props;
+  const {
+    contextId,
+    setCallbacks,
+    sensors,
+    nonce,
+    dragHandleUsageInstructions,
+  } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
@@ -97,9 +103,9 @@ export default function App(props: Props) {
 
   const announce: Announce = useAnnouncer(contextId);
 
-  const liftInstructionId: ElementId = useHiddenTextElement({
+  const dragHandleUsageInstructionsId: ElementId = useHiddenTextElement({
     contextId,
-    text: liftInstruction,
+    text: dragHandleUsageInstructions,
   });
   const styleMarshal: StyleMarshal = useStyleMarshal(contextId, nonce);
 
@@ -219,16 +225,16 @@ export default function App(props: Props) {
       contextId,
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
-      liftInstructionId,
+      dragHandleUsageInstructionsId,
       registry,
     }),
     [
       contextId,
       dimensionMarshal,
+      dragHandleUsageInstructionsId,
       focusMarshal,
       getCanLift,
       getIsMovementAllowed,
-      liftInstructionId,
       registry,
     ],
   );
