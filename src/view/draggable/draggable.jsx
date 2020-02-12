@@ -102,13 +102,12 @@ export default function Draggable(props: Props) {
     () =>
       isEnabled
         ? {
+            // See `draggable-types` for an explanation of why these are used
             tabIndex: 0,
             role: 'button',
             'aria-describedby': dragHandleUsageInstructionsId,
-            // 'aria-roledescription': 'Draggable item',
             'data-rbd-drag-handle-draggable-id': draggableId,
             'data-rbd-drag-handle-context-id': contextId,
-            // Opting out of html5 drag and drop
             draggable: false,
             onDragStart: preventHtml5Dnd,
           }
