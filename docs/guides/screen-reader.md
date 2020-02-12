@@ -45,7 +45,7 @@ We do not control the **name** of the element. The name is a way to identify the
 | **Interactive content** | `tabindex="0"`                                            | By adding a `tabindex` to a _drag handle_ we are [marking it as interactive content](https://www.w3.org/TR/html51/dom.html#kinds-of-content-interactive-content) that a user can focus on, even if it is semanatically not an interactive element such as `div` or `span`.                                                                                                                                                                                                                                                                                                                                                          |
 | **Role**                | (not added by default - yet)                              | In order to correctly give a role like "Draggable item" we first need to add a `role` (such as `role="button"`) and then give it a more accurate title with `aria-roledescription`. Given that we cannot use `aria-roledescription` for now (see below) we will not be using `role="button"` yet. We plan on adding it in [soon](https://github.com/atlassian/react-beautiful-dnd/issues/1742)                                                                                                                                                                                                                                      |
 | **Role description**    | (not added by default - yet)                              | A role description adds more specific description of a widget. We would like the default to be `aria-roledescription="Draggable item"`. However, this does not pass the current [Google lighthouse](https://developers.google.com/web/tools/lighthouse) accessibility audit. This is a bug in Google lighthouse, and should be fixed when they upgrade their `axe-core`. You are welcome to add the `aria-roledescription`, but keep in mind that lighthouse might punish you. We plan on adding the `aria-roledescription` in an upcoming release. [follow up issue](https://github.com/atlassian/react-beautiful-dnd/issues/1742) |
-| **Description**         | `DragHandleProps` <br/> `aria-describedby="${elementId}"` | We are using the description of the element to provide lift instructions. By the description will be `"press spacebar to lift"`. We create a hidden element with this text which is pointed to be `aria-describedby`. If you want to change this text you will need to create your own hidden element with an `id` and point to that with `DragHandleProps` > `aria-describedby`.                                                                                                                                                                                                                                                   |
+| **Description**         | `DragHandleProps` <br/> `aria-describedby="${elementId}"` | We are using the description of the element to provide usage instructions. The default usage instructions are `"Press space bar to start a drag. When dragging you can use the arrow keys to move the item around and escape to cancel. Ensure your screen reader is in focus mode or forms mode"`. We create a hidden element with this text which is pointed to be `aria-describedby`. If you want to change this text you will need to create your own hidden element with an `id` and point to that with `DragHandleProps` > `aria-describedby`.                                                                                |
 
 ## Drag lifecycle announcements
 
@@ -85,19 +85,18 @@ All of our built in screen reader messages use `id`'s to identify `<Draggable />
 
 When a user lifts a `<Draggable />` by using the `spacebar` we want to tell them a number of things.
 
-**Default message**: "You have lifted an item in position `${startPosition}`. Use the arrow keys to move, space bar to drop, and escape to cancel."
+**Default message**: "You have lifted an item in position `${startPosition}`."
 
 We tell the user the following:
 
 - They have lifted the item
 - What position the item is in
-- How to move the item around
 
 Notice that we don't tell them that they are in position `1 of x`. This is because we don't have access to the size of the list in the current api. This is especially true for [virtual lists](/docs/patterns/virtual-lists.md) where only a portion of the list is rendered at any one time. Feel free to add the the `1 of x` in your own messaging, and what list the item is in.
 
-**Message with more info**: "You have lifted an item in position `${startPosition}` of `${listLength}` in the `${listName}` list. Use the arrow keys to move, space bar to drop, and escape to cancel."
+**Message with more info**: "You have lifted an item in position `${startPosition}` of `${listLength}` in the `${listName}` list."
 
-You control the message printed to the user through the `<DragDropContext />` > `onDragStart` responder
+You control the message printed to the user through the `<DragDropContext />` | `onDragStart` responder
 
 ```js
 onDragStart = (start: DragStart, provided: ResponderProvided) => {
@@ -109,7 +108,7 @@ onDragStart = (start: DragStart, provided: ResponderProvided) => {
 
 After a user has started a drag there are different scenarios that can spring from that, so we'll create different messaging for each scenario.
 
-We can control the announcement through the `<DragDropContext />` > `onDragUpdate` responder.
+We can control the announcement through the `<DragDropContext />` | `onDragUpdate` responder.
 
 ```js
 onDragUpdate = (update: DragUpdate, provided: ResponderProvided) => {

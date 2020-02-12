@@ -9,21 +9,24 @@ import type {
 } from './types';
 
 export type MessagePreset = {|
-  liftInstruction: string,
+  dragHandleUsageInstructions: string,
   onDragStart: (start: DragStart) => string,
   onDragUpdate: (update: DragUpdate) => string,
   onDragEnd: (result: DropResult) => string,
 |};
 
-const liftInstruction: string = `Press space bar to lift.`;
+const dragHandleUsageInstructions: string = `
+  Press space bar to start a drag.
+  When dragging you can use the arrow keys to move the item around and escape to cancel.
+  Ensure your screen reader is in focus mode or forms mode
+`;
 
 const position = (index: number): number => index + 1;
 
 // We cannot list what index the Droppable is in automatically as we are not sure how
 // the Droppable's have been configured
 const onDragStart = (start: DragStart): string => `
-  You have lifted an item in position ${position(start.source.index)}.
-  Use the arrow keys to move, space bar to drop, and escape to cancel.
+  You have lifted an item in position ${position(start.source.index)}
 `;
 
 const withLocation = (
@@ -122,7 +125,7 @@ const onDragEnd = (result: DropResult): string => {
 };
 
 const preset: MessagePreset = {
-  liftInstruction,
+  dragHandleUsageInstructions,
   onDragStart,
   onDragUpdate,
   onDragEnd,

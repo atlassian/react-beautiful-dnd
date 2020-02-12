@@ -30,9 +30,11 @@ export default function Draggable(props: Props) {
   const getRef = useCallback((): ?HTMLElement => ref.current, []);
 
   // context
-  const { contextId, liftInstructionId, registry } = useRequiredContext(
-    AppContext,
-  );
+  const {
+    contextId,
+    dragHandleUsageInstructionsId,
+    registry,
+  } = useRequiredContext(AppContext);
   const { type, droppableId } = useRequiredContext(DroppableContext);
 
   const descriptor: DraggableDescriptor = useMemo(
@@ -101,7 +103,8 @@ export default function Draggable(props: Props) {
       isEnabled
         ? {
             tabIndex: 0,
-            'aria-describedby': liftInstructionId,
+            role: 'button',
+            'aria-describedby': dragHandleUsageInstructionsId,
             // 'aria-roledescription': 'Draggable item',
             'data-rbd-drag-handle-draggable-id': draggableId,
             'data-rbd-drag-handle-context-id': contextId,
@@ -110,7 +113,7 @@ export default function Draggable(props: Props) {
             onDragStart: preventHtml5Dnd,
           }
         : null,
-    [contextId, draggableId, isEnabled, liftInstructionId],
+    [contextId, dragHandleUsageInstructionsId, draggableId, isEnabled],
   );
 
   const onMoveEnd = useCallback(

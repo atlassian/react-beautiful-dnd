@@ -49,7 +49,7 @@ function App(props: AppProps) {
       contextId,
       canLift: () => true,
       isMovementAllowed,
-      liftInstructionId: 'fake-id',
+      dragHandleUsageInstructionsId: 'fake-id',
       marshal: getMarshalStub(),
       registry: createRegistry(),
     }),
