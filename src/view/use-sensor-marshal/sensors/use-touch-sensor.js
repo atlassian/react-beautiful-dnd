@@ -21,10 +21,13 @@ import useLayoutEffect from '../../use-isomorphic-layout-effect';
 
 //
 // helper to make platform specific changes
-const isIos = (() =>
-{
+const isIos = (() => {
+  if (!navigator || !window) {
+    return true;
+  }
+
   const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-  return (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream);
+  return /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
 })();
 
 type TouchWithForce = Touch & {
@@ -302,7 +305,7 @@ export default function useMouseSensor(api: SensorAPI) {
         };
 
         const handle: ?HTMLElement = api.findClosestDragHandle(event);
-        
+
         // unbind this event handler
         unbindEventsRef.current();
 
@@ -414,7 +417,10 @@ export default function useMouseSensor(api: SensorAPI) {
   );
 
   const startPendingDrag = useCallback(
-    function startPendingDrag(actions: PreDragActions, point: Position, target: HTMLElement) {
+    function startPendingDrag(
+      actions: PreDragActions,
+      point: Position,
+      target: HTMLElement) {
       invariant(
         getPhase().type === 'IDLE',
         'Expected to move from IDLE to PENDING drag',
