@@ -19,6 +19,14 @@ import supportedPageVisibilityEventName from './util/supported-page-visibility-e
 import { noop } from '../../../empty';
 import useLayoutEffect from '../../use-isomorphic-layout-effect';
 
+//
+// helper to make platform specific changes
+const isIos = (() =>
+{
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  return (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream);
+})();
+
 type TouchWithForce = Touch & {
   force: number,
 };
@@ -293,11 +301,13 @@ export default function useMouseSensor(api: SensorAPI) {
           y: clientY,
         };
 
+        const handle: ?HTMLElement = api.findClosestDragHandle(event);
+        
         // unbind this event handler
         unbindEventsRef.current();
 
         // eslint-disable-next-line no-use-before-define
-        startPendingDrag(actions, point);
+        startPendingDrag(actions, point, handle);
       },
     }),
     // not including stop or startPendingDrag as it is not defined initially
@@ -350,7 +360,7 @@ export default function useMouseSensor(api: SensorAPI) {
   }, [stop]);
 
   const bindCapturingEvents = useCallback(
-    function bindCapturingEvents() {
+    function bindCapturingEvents(target: HTMLElement) {
       const options: EventOptions = { capture: true, passive: false };
       const args: GetBindingArgs = {
         cancel,
@@ -366,7 +376,14 @@ export default function useMouseSensor(api: SensorAPI) {
       // Old behaviour:
       // https://gist.github.com/parris/dda613e3ae78f14eb2dc9fa0f4bfce3d
       // https://stackoverflow.com/questions/33298828/touch-move-event-dont-fire-after-touch-start-target-is-removed
-      const unbindTarget = bindEvents(window, getHandleBindings(args), options);
+      //
+      // Global listener provides correct behavior on iOS
+      // but on Android target should still be used
+      // so, i can't find simpler and uglier solution
+      const unbindTarget = isIos
+        ? bindEvents(window, getHandleBindings(args), options)
+        : bindEvents(target, getHandleBindings(args), options);
+
       const unbindWindow = bindEvents(window, getWindowBindings(args), options);
 
       unbindEventsRef.current = function unbindAll() {
@@ -397,7 +414,7 @@ export default function useMouseSensor(api: SensorAPI) {
   );
 
   const startPendingDrag = useCallback(
-    function startPendingDrag(actions: PreDragActions, point: Position) {
+    function startPendingDrag(actions: PreDragActions, point: Position, target: HTMLElement) {
       invariant(
         getPhase().type === 'IDLE',
         'Expected to move from IDLE to PENDING drag',
@@ -415,7 +432,7 @@ export default function useMouseSensor(api: SensorAPI) {
         longPressTimerId,
       });
 
-      bindCapturingEvents();
+      bindCapturingEvents(target);
     },
     [bindCapturingEvents, getPhase, setPhase, startDragging],
   );
