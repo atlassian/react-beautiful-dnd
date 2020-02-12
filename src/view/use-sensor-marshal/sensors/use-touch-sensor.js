@@ -22,7 +22,7 @@ import useLayoutEffect from '../../use-isomorphic-layout-effect';
 //
 // helper to make platform specific changes
 const isIos = (() => {
-  if (!navigator || !window) {
+  if (typeof(navigator) == "undefined") {
     return true;
   }
 
