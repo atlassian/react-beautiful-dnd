@@ -8,11 +8,14 @@ This guide is here to help you create messaging that supports and delights your 
 
 ## On focus messaging
 
-A screen reader will read out information about [interactive content](https://www.w3.org/TR/html51/dom.html#interactive-content) when it is given browser focus. Interactive content has a number of _accessibility properties_ that are used to determine what a screen reader will announce when the element is given focus.
+A screen reader will read out information about [interactive content](https://www.w3.org/TR/html51/dom.html#interactive-content) when it is given browser focus (note: NVDA requires interactive content to have a `role` too causing it to be a `widget`). Interactive content has a number of _accessibility properties_ that are used to determine what a screen reader will announce when the element is given focus.
 
 <details>
   <summary>A note about drag and drop accessibility</summary>
-  TODO
+  `rbd` does not use the HTML5 drag and drop API. It does not provide the experience we are trying to achieve. HTML5 drag and drop does not have a _great_ accessibility story out of the box as requires you to build a secondary widget for keyboard interactions.
+
+We do not use the `aria-grabbed` and `aria-dropeffect` as they are [deprecated in wai-aria 1.1](https://www.w3.org/TR/wai-aria-1.1/). There is currently no replacement in [wai-aria 1.2](https://www.w3.org/TR/wai-aria-1.2/). For state information about a drag we rely on [live regions](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions) as an escape hatch to provide our own information to screen reader users during a drag.
+
 </details>
 
 <details>
