@@ -14,7 +14,7 @@ function getOptions(
 }
 
 export default function bindEvents(
-  el: ?HTMLElement,
+  el: HTMLElement,
   bindings: EventBinding[],
   sharedOptions?: EventOptions,
 ): Function {

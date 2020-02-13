@@ -383,9 +383,9 @@ export default function useMouseSensor(api: SensorAPI) {
       // Global listener provides correct behavior on iOS
       // but on Android target should still be used
       // so, i can't find simpler and uglier solution
-      const unbindTarget = isIos
+      const unbindTarget = isIos || !target
         ? bindEvents(window, getHandleBindings(args), options)
-        : bindEvents(target, getHandleBindings(args), options);
+        : bindEvents((target: HTMLElement), getHandleBindings(args), options);
 
       const unbindWindow = bindEvents(window, getWindowBindings(args), options);
 
