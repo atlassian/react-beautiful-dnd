@@ -10,7 +10,7 @@ type GetIdArgs = {|
   uniqueId: string,
 |};
 
-export function getId({ contextId, uniqueId }: GetIdArgs): string {
+export function getElementId({ contextId, uniqueId }: GetIdArgs): ElementId {
   return `rbd-hidden-text-${contextId}-${uniqueId}`;
 }
 
@@ -24,7 +24,7 @@ export default function useHiddenTextElement({
   text,
 }: Args): ElementId {
   const uniqueId: string = useUniqueId('hidden-text', { separator: '-' });
-  const id: string = useMemo(() => getId({ contextId, uniqueId }), [
+  const id: ElementId = useMemo(() => getElementId({ contextId, uniqueId }), [
     uniqueId,
     contextId,
   ]);
