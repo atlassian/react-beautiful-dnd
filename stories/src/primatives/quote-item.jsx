@@ -192,7 +192,6 @@ function QuoteItem(props: Props) {
       data-is-dragging={isDragging}
       data-testid={quote.id}
       data-index={index}
-      aria-roledescription="Draggable item"
       aria-label={`${quote.author.name} quote ${quote.content}`}
     >
       <Avatar src={quote.author.avatarUrl} alt={quote.author.name} />
