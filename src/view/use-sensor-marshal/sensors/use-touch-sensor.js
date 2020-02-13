@@ -363,7 +363,7 @@ export default function useMouseSensor(api: SensorAPI) {
   }, [stop]);
 
   const bindCapturingEvents = useCallback(
-    function bindCapturingEvents(target: HTMLElement) {
+    function bindCapturingEvents(target: ?HTMLElement) {
       const options: EventOptions = { capture: true, passive: false };
       const args: GetBindingArgs = {
         cancel,
