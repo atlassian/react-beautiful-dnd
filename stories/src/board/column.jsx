@@ -52,6 +52,8 @@ export default class Column extends Component<Props> {
               <Title
                 isDragging={snapshot.isDragging}
                 {...provided.dragHandleProps}
+                aria-label={`${title} quote list`}
+                aria-roledescription="Draggable item"
               >
                 {title}
               </Title>
