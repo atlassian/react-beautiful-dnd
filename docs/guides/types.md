@@ -190,9 +190,11 @@ type DragHandleProps = {|
   onMouseDown: (event: MouseEvent) => void,
   onKeyDown: (event: KeyboardEvent) => void,
   onTouchStart: (event: TouchEvent) => void,
-  'data-react-beautiful-dnd-drag-handle': string,
-  'aria-roledescription': string,
   tabIndex: number,
+  'data-rbd-drag-handle-draggable-id': string,
+  'data-rbd-drag-handle-context-id': string,
+  role: string,
+  'aria-describedby': string,
   draggable: boolean,
   onDragStart: (event: DragEvent) => void,
 |};
