@@ -3,15 +3,31 @@ import { useEffect } from 'react';
 import { useMemo } from 'use-memo-one';
 import type { ContextId, ElementId } from '../../types';
 import getBodyElement from '../get-body-element';
+import useUniqueId from '../use-unique-id';
 
-export const getId = (contextId: ContextId): string =>
-  `rbd-lift-instruction-${contextId}`;
-
-export default function useLiftInstruction(
+type GetIdArgs = {|
   contextId: ContextId,
-  liftInstruction: string,
-): ElementId {
-  const id: string = useMemo(() => getId(contextId), [contextId]);
+  uniqueId: string,
+|};
+
+export function getElementId({ contextId, uniqueId }: GetIdArgs): ElementId {
+  return `rbd-hidden-text-${contextId}-${uniqueId}`;
+}
+
+type Args = {|
+  contextId: ContextId,
+  text: string,
+|};
+
+export default function useHiddenTextElement({
+  contextId,
+  text,
+}: Args): ElementId {
+  const uniqueId: string = useUniqueId('hidden-text', { separator: '-' });
+  const id: ElementId = useMemo(() => getElementId({ contextId, uniqueId }), [
+    uniqueId,
+    contextId,
+  ]);
 
   useEffect(
     function mount() {
@@ -21,10 +37,9 @@ export default function useLiftInstruction(
       el.id = id;
 
       // add the description text
-      el.textContent = liftInstruction;
+      el.textContent = text;
 
       // Using `display: none` prevent screen readers from reading this element in the document flow
-      // This element is used as a `aria-labelledby` reference for *other elements* and will be read out for those
       el.style.display = 'none';
 
       // Add to body
@@ -35,7 +50,7 @@ export default function useLiftInstruction(
         getBodyElement().removeChild(el);
       };
     },
-    [id, liftInstruction],
+    [id, text],
   );
 
   return id;
