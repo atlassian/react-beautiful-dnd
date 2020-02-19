@@ -94,7 +94,7 @@ export function WithAppContext(props: WithAppContextProps) {
       contextId: 'fake',
       canLift: () => true,
       isMovementAllowed: () => true,
-      liftInstructionId: '1',
+      dragHandleUsageInstructionsId: '1',
       marshal: props.marshal || getMarshalStub(),
       registry: props.registry,
     }),

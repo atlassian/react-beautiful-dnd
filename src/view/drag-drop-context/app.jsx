@@ -42,7 +42,7 @@ import {
 } from '../../state/action-creators';
 import isMovementAllowed from '../../state/is-movement-allowed';
 import useAnnouncer from '../use-announcer';
-import useLiftInstruction from '../use-lift-instruction';
+import useHiddenTextElement from '../use-hidden-text-element';
 import AppContext, { type AppContextValue } from '../context/app-context';
 import useStartupValidation from './use-startup-validation';
 import usePrevious from '../use-previous-ref';
@@ -62,7 +62,7 @@ export type Props = {|
   enableDefaultSensors?: ?boolean,
 
   // screen reader
-  liftInstruction: string,
+  dragHandleUsageInstructions: string,
 |};
 
 const createResponders = (props: Props): Responders => ({
@@ -83,7 +83,13 @@ function getStore(lazyRef: LazyStoreRef): Store {
 }
 
 export default function App(props: Props) {
-  const { contextId, setCallbacks, sensors, nonce, liftInstruction } = props;
+  const {
+    contextId,
+    setCallbacks,
+    sensors,
+    nonce,
+    dragHandleUsageInstructions,
+  } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
   useStartupValidation();
@@ -97,10 +103,10 @@ export default function App(props: Props) {
 
   const announce: Announce = useAnnouncer(contextId);
 
-  const liftInstructionId: ElementId = useLiftInstruction(
+  const dragHandleUsageInstructionsId: ElementId = useHiddenTextElement({
     contextId,
-    liftInstruction,
-  );
+    text: dragHandleUsageInstructions,
+  });
   const styleMarshal: StyleMarshal = useStyleMarshal(contextId, nonce);
 
   const lazyDispatch: Action => void = useCallback((action: Action): void => {
@@ -219,16 +225,16 @@ export default function App(props: Props) {
       contextId,
       canLift: getCanLift,
       isMovementAllowed: getIsMovementAllowed,
-      liftInstructionId,
+      dragHandleUsageInstructionsId,
       registry,
     }),
     [
       contextId,
       dimensionMarshal,
+      dragHandleUsageInstructionsId,
       focusMarshal,
       getCanLift,
       getIsMovementAllowed,
-      liftInstructionId,
       registry,
     ],
   );
