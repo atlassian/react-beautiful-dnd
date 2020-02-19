@@ -10,7 +10,7 @@ export type AppContextValue = {|
   contextId: ContextId,
   canLift: (id: DraggableId) => boolean,
   isMovementAllowed: () => boolean,
-  liftInstructionId: ElementId,
+  dragHandleUsageInstructionsId: ElementId,
   marshal: DimensionMarshal,
   registry: Registry,
 |};

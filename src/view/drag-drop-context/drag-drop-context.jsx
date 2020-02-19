@@ -1,17 +1,20 @@
 // @flow
 import React, { type Node } from 'react';
-import { useMemo } from 'use-memo-one';
 import type { Responders, ContextId, Sensor } from '../../types';
 import ErrorBoundary from './error-boundary';
 import preset from '../../screen-reader-message-preset';
 import App from './app';
+import useUniqueContextId, {
+  reset as resetContextId,
+} from './use-unique-context-id';
+import { reset as resetUniqueIds } from '../use-unique-id';
 
 type Props = {|
   ...Responders,
   // We do not technically need any children for this component
   children: Node | null,
   // Read out by screen readers when focusing on a drag handle
-  liftInstruction?: string,
+  dragHandleUsageInstructions?: string,
   // Used for strict content security policies
   // See our [content security policy guide](/docs/guides/content-security-policy.md)
   nonce?: string,
@@ -20,17 +23,16 @@ type Props = {|
   enableDefaultSensors?: ?boolean,
 |};
 
-let instanceCount: number = 0;
-
 // Reset any context that gets persisted across server side renders
 export function resetServerContext() {
-  instanceCount = 0;
+  resetContextId();
+  resetUniqueIds();
 }
 
 export default function DragDropContext(props: Props) {
-  const contextId: ContextId = useMemo(() => `${instanceCount++}`, []);
-  const liftInstruction: string =
-    props.liftInstruction || preset.liftInstruction;
+  const contextId: ContextId = useUniqueContextId();
+  const dragHandleUsageInstructions: string =
+    props.dragHandleUsageInstructions || preset.dragHandleUsageInstructions;
 
   // We need the error boundary to be on the outside of App
   // so that it can catch any errors caused by App
@@ -41,7 +43,7 @@ export default function DragDropContext(props: Props) {
           nonce={props.nonce}
           contextId={contextId}
           setCallbacks={setCallbacks}
-          liftInstruction={liftInstruction}
+          dragHandleUsageInstructions={dragHandleUsageInstructions}
           enableDefaultSensors={props.enableDefaultSensors}
           sensors={props.sensors}
           onBeforeCapture={props.onBeforeCapture}

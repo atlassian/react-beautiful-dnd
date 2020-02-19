@@ -26,7 +26,6 @@ export default function useAnnouncer(contextId: ContextId): Announce {
 
       // will force itself to be read
       el.setAttribute('aria-live', 'assertive');
-      el.setAttribute('role', 'log');
       // must read the whole thing every time
       el.setAttribute('aria-atomic', 'true');
 

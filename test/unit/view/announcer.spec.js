@@ -40,7 +40,6 @@ it('should apply the appropriate aria attributes and non visibility styles', () 
   invariant(el, 'Cannot find node');
 
   expect(el.getAttribute('aria-live')).toBe('assertive');
-  expect(el.getAttribute('role')).toBe('log');
   expect(el.getAttribute('aria-atomic')).toBe('true');
 
   // not checking all the styles - just enough to know we are doing something
