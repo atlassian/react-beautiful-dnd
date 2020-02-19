@@ -13,6 +13,7 @@ import {
   type DropResult,
 } from '../../../../src';
 import reorder from '../../../util/reorder';
+import { noop } from '../../../../src/empty';
 
 export type Item = {|
   id: string,
@@ -71,8 +72,6 @@ type Props = {|
   sensors?: Sensor[],
   enableDefaultSensors?: boolean,
 |};
-
-function noop() {}
 
 function getItems() {
   return Array.from({ length: 3 }, (v, k): Item => ({

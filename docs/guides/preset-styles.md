@@ -8,7 +8,7 @@ Here are the styles that are applied at various points in the drag lifecycle:
 
 ### Always: drag handle
 
-Styles applied to: **drag handle element** using the `data-react-beautiful-dnd-drag-handle` attribute.
+Styles applied to: **drag handle element** using the `data-rbd-drag-handle-context-id` attribute.
 
 A long press on anchors usually pops a content menu that has options for the link such as 'Open in new tab'. Because long press is used to start a drag we need to opt out of this behavior
 
@@ -30,7 +30,7 @@ touch-action: manipulation;
 
 ### Always: Droppable
 
-Styles applied to: **droppable element** using the `data-react-beautiful-dnd-droppable` attribute.
+Styles applied to: **droppable element** using the `data-rbd-droppable-context-id` attribute.
 
 Opting out of the browser feature which tries to maintain the scroll position when the DOM changes above the fold. We already correctly maintain the scroll position. The automatic `overflow-anchor` behavior leads to incorrect scroll positioning post drop.
 
@@ -42,7 +42,7 @@ overflow-anchor: none;
 
 ### (Phase: resting): drag handle
 
-Styles applied to: **drag handle element** using the `data-react-beautiful-dnd-drag-handle` attribute.
+Styles applied to: **drag handle element** using the `data-rbd-drag-handle-context-id` attribute.
 
 Adding a cursor style to let the user know this element is draggable. You are welcome to override this.
 
@@ -54,7 +54,7 @@ cursor: grab;
 
 ### (Phase: dragging): drag handle element
 
-**Styles applied using the `data-react-beautiful-dnd-drag-handle` attribute**
+**Styles applied using the `data-rbd-drag-handle-context-id` attribute**
 
 An optimisation to avoid processing `pointer-events` while dragging. Also used to allow scrolling through a drag handle with a track pad or mouse wheel.
 
@@ -64,7 +64,7 @@ pointer-events: none;
 
 ### (Phase: dragging): Draggable element
 
-**Styles applied using the `data-react-beautiful-dnd-draggable` attribute**
+**Styles applied using the `data-rbd-draggable-context-id` attribute**
 
 This is what we use to control `<Draggable />`s that need to move out of the way of a dragging `<Draggable />`.
 
@@ -74,7 +74,7 @@ transition: ${string};
 
 ### (Phase: dragging): Droppable element
 
-**Styles applied using the `data-react-beautiful-dnd-droppable` attribute**
+**Styles applied using the `data-rbd-droppable-context-id` attribute**
 
 We apply `pointer-events: none` to a `<Droppable />` during a drag. This is technically not required as an optimisation. However, it gets around a common issue where hover styles are triggered during a drag. You are welcome to opt out of this one as it is it not required for functinality.
 
@@ -113,7 +113,7 @@ user-select: none;
 
 ### (Phase: dropping): drag handle element
 
-**Styles applied using the `data-react-beautiful-dnd-drag-handle` attribute**
+**Styles applied using the `data-rbd-drag-handle-context-id` attribute**
 
 We apply the grab cursor to all drag handles except the drag handle for the dropping `<Draggable />`. At this point the user is able to drag other `<Draggable />`'s if they like.
 

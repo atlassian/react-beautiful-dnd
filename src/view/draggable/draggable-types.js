@@ -68,13 +68,24 @@ export type DragHandleProps = {|
   // What DragDropContext the drag handle is in
   'data-rbd-drag-handle-context-id': ContextId,
 
-  // id of drag handle aria description for screen readers
-  'aria-labelledby': ElementId,
+  // We need a drag handle to be a widget in order to correctly set accessibility properties
+  // Note: JAWS and VoiceOver don't need the element to be a 'widget' to read the accessibility properties, but NVDA does
+  // Using `role="button"` but leaving the public API as a string to allow for changing without a major
+  role: string,
+
+  // Overriding default role to have a more descriptive text ("Draggable item")
+  // Sadly we cannot use this right now due an issue with lighthouse
+  // https://github.com/atlassian/react-beautiful-dnd/issues/1742
+  // 'aria-roledescription': string,
+
+  // Using the description property of the drag handle to provide usage instructions
+  'aria-describedby': ElementId,
 
   // Allow tabbing to this element
+  // Adding a tab index marks the element as interactive content: https://www.w3.org/TR/html51/dom.html#kinds-of-content-interactive-content
   tabIndex: number,
 
-  // Stop html5 drag and drop
+  // Opting out of html5 drag and drop
   draggable: boolean,
   onDragStart: (event: DragEvent) => void,
 |};
