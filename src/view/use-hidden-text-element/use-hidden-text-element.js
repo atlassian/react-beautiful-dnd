@@ -46,8 +46,11 @@ export default function useHiddenTextElement({
       getBodyElement().appendChild(el);
 
       return function unmount() {
-        // Remove from body
-        getBodyElement().removeChild(el);
+        // checking if element exists as the body might have been changed by things like 'turbolinks'
+        const body: HTMLBodyElement = getBodyElement();
+        if (body.contains(el)) {
+          body.removeChild(el);
+        }
       };
     },
     [id, text],

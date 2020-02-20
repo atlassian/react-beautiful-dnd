@@ -41,10 +41,10 @@ export default function useAnnouncer(contextId: ContextId): Announce {
         // unmounting after a timeout to let any announcements
         // during a mount be published
         setTimeout(function remove() {
-          // checking if element exists before remove to prevent errors
-          if (getBodyElement().contains(el)) {
-            // not clearing the ref as it might have been set by a new effect
-            getBodyElement().removeChild(el);
+          // checking if element exists as the body might have been changed by things like 'turbolinks'
+          const body: HTMLBodyElement = getBodyElement();
+          if (body.contains(el)) {
+            body.removeChild(el);
           }
           // if el was the current ref - clear it so that
           // we can get a warning if announce is called
