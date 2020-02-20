@@ -59,26 +59,6 @@ it('should remove the element when unmounting after a timeout', () => {
   expect(getElement('5')).not.toBeTruthy();
 });
 
-it('should not remove the element when unmounting after a timeout if the element does not exist', () => {
-  const { unmount } = render(
-    <WithAnnouncer contextId="5">{getMock()}</WithAnnouncer>,
-  );
-
-  const doc = new DOMParser().parseFromString(
-    '<!doctype html><title>wat</title>',
-    'text/html',
-  );
-  // $FlowFixMe
-  document.write(doc);
-  unmount();
-  expect(() => jest.runOnlyPendingTimers()).not.toThrow(
-    // $FlowFixMe
-    new DOMException(
-      "Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.",
-    ),
-  );
-});
-
 it('should set the text content of the announcement element', () => {
   // arrange
   const mock = getMock();

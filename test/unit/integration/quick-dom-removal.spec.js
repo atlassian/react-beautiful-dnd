@@ -5,26 +5,10 @@ import { isDragging } from './util/helpers';
 import App from './util/app';
 import { forEachSensor, simpleLift, type Control } from './util/controls';
 import { withoutError, withoutWarn } from '../../util/console';
-import getBodyElement from '../../../src/view/get-body-element';
-
-it('should not log any warnings when unmounted', () => {
-  jest.useFakeTimers();
-  const { unmount } = render(<App />);
-
-  withoutError(() => {
-    withoutWarn(() => {
-      getBodyElement().innerHTML = '';
-      unmount();
-      jest.runOnlyPendingTimers();
-    });
-  });
-
-  jest.useRealTimers();
-});
 
 forEachSensor((control: Control) => {
-  it('should not log any warnings when unmounted mid drag', () => {
-    const { unmount, getByText } = render(<App />);
+  it('should not log any warnings when DOM is removed just before unmount while dragging', () => {
+    const { unmount, getByText, container } = render(<App />);
     const handle: HTMLElement = getByText('item: 0');
 
     // mid drag
@@ -33,9 +17,8 @@ forEachSensor((control: Control) => {
 
     withoutError(() => {
       withoutWarn(() => {
-        getBodyElement().innerHTML = '';
+        console.log('container', container);
         unmount();
-        jest.runOnlyPendingTimers();
       });
     });
   });
