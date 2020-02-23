@@ -66,7 +66,7 @@
   },
   "devDependencies": {
     "@atlaskit/css-reset": "^5.0.9",
-    "@atlaskit/theme": "^9.5.0",
+    "@atlaskit/theme": "^9.5.1",
     "@babel/core": "^7.8.4",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-transform-modules-commonjs": "^7.8.3",
