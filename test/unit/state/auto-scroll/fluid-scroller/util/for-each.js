@@ -14,8 +14,6 @@ type BlockFn = (args: BlockFnArgs) => void;
 
 export default (block: BlockFn) => {
   [vertical, horizontal].forEach((axis: Axis) => {
-    /* eslint-disable jest/valid-describe */
-    // Eslint bug: https://github.com/jest-community/eslint-plugin-jest/issues/203
     describe(`on the ${axis.direction} axis`, () => {
       beforeEach(() => {
         requestAnimationFrame.reset();
