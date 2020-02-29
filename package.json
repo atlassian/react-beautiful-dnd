@@ -123,7 +123,7 @@
     "react-window": "^1.8.5",
     "require-from-string": "^2.0.2",
     "rimraf": "^3.0.1",
-    "rollup": "^1.31.0",
+    "rollup": "^1.32.0",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-json": "^4.0.0",
