@@ -15,7 +15,7 @@
 
 There are two strategies you can use when reordering tables.
 
-1.  Fixed layouts (faster and simplier)
+1.  Fixed layouts (faster and simpler)
 2.  Dimension locking (slower but more robust)
 
 ### Strategy 1: fixed layouts
@@ -49,7 +49,7 @@ If you want to use reparenting (cloning or your own portal) in combination with 
 
 First up, have a read of our [reparenting pattern](/docs/guides/reparenting.md) to get familiar with the approach.
 
-It is important to know things timings of mount / unmount actions in React. We have created a [codesandbox.io example](https://codesandbox.io/s/nkl52y1wn0) to show how the mount timings work when moving in and out of a `ReactDOM.createPortal`.
+It is important to know the timings of mount / unmount actions in React. We have created a [codesandbox.io example](https://codesandbox.io/s/nkl52y1wn0) to show how the mount timings work when moving in and out of a `ReactDOM.createPortal`.
 
 When moving an existing `<tr>` into a `ReactDOM.createPortal` it is important to know that the existing `<tr>` is unmounted and a new `<tr>` is mounted into the portal. Here is the order of those operations:
 
@@ -58,14 +58,14 @@ When moving an existing `<tr>` into a `ReactDOM.createPortal` it is important to
 
 In order to preserve the cell dimensions of the cells in the row that we are moving into a `ReactDOM.createPortal` we need to lock its dimensions using inline styles (see strategy #2). Sadly though, the new component does not directly have access to the information about the component that was in the tree before it moved to the portal. So in order to do this we need to obtain the cell dimensions of the `<tr>` when it is unmounting and re-apply it to the new `<tr>` when it mounted in `componentDidMount`.
 
-There is no great way to do this as when `componentDidMount` is called we are not sure if the component is unmouting as the `tr` is no longer needed, or if it is unmounting because it is about to move into a portal.
+There is no great way to do this as when `componentDidMount` is called we are not sure if the component is unmouting as the `<tr>` is no longer needed, or if it is unmounting because it is about to move into a portal.
 
 It seems like the only way to get things working is to:
 
-1.  In `componentWillUnmount` of the `tr` read the current widths of the cells from the DOM. You then store this value outside of the component so that it can be read by new components that are mounting.
+1.  In `componentWillUnmount` of the `<tr>` read the current widths of the cells from the DOM. You then store this value outside of the component so that it can be read by new components that are mounting.
 2.  If a component is mounting and `DraggableStateSnapshot > isDragging` is true then you can see if there is a previously recorded width. If there is then you can apply that width.
 
-This gets a little complicated - so we created some examples to show you how this technique works
+This gets a little complicated - so we created some examples to show you how this technique works:
 
 - [With our cloning API](https://react-beautiful-dnd.netlify.com/?path=/story/tables--with-clone)
 - [With your own portal](https://react-beautiful-dnd.netlify.com/?path=/story/tables--with-portal)
