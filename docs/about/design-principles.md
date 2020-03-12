@@ -28,7 +28,7 @@ In `react-beautiful-dnd` a dragging items impact is based on its centre of gravi
 
 Drop shadows pose a number of confusing design moments if combined with a natural movement system, including:
 
-- Where the shadow when you are not over a list?
+- Where is the shadow when you are not over a list?
 - How should it move between items?
 - How should it appear as you enter a new list?
 
