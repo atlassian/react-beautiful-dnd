@@ -12,6 +12,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - [Beautiful interactions: Crafting elegant and robust drag and drop animations](https://medium.com/@alexandereardon/beautiful-interactions-8f67502ccf73)
 - [Design process for our new logo](https://www.maryannemade.com/reactbeautifuldnd-logo)
 - [Overhauling our collision engine](https://dev.to/alexandereardon/overhauling-our-collision-engine-962)
+- [react-beautiful-dnd: behind the magic](https://www.youtube.com/watch?v=Kz50msV-zq0)
 
 ### Performance related
 
@@ -53,6 +54,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 - React Status [issue 129](https://react.statuscode.com/issues/129)
 - React Status [issue 134](https://react.statuscode.com/issues/134)
 - React Status [issue 139](https://react.statuscode.com/issues/139)
+- React Status [issue 177](https://react.statuscode.com/issues/177)
 - Fullstack React [issue 72](http://newsletter.fullstackreact.com/issues/72)
 - React Digest [issue 201](https://www.reactdigest.net/digests/201)
 - HashBang Weekly [issue 52](http://hashbangweekly.okgrow.com/2018/01/22/issue-52)
@@ -69,6 +71,7 @@ This page contains a list of articles, blogs and newsletters that `react-beautif
 
 ## Articles, tutorials and blogs
 
+- [Here Are 5 Useful React Components](https://medium.com/javascript-in-plain-english/here-are-5-useful-react-components-fb3927e7d790)
 - [Build a beautiful, draggable kanban board with react-beautiful-dnd](https://www.youtube.com/watch?v=uHO3mQgs-e8)
 - [Drag and Drop Tables with React-Beautiful-DND (Part I)](https://dev.to/milandhar/drag-and-drop-table-with-react-beautiful-dnd-54ad)
 - [Scripted natural motion with react-beautiful-dnd](https://dev.to/raathigesh/scripted-natural-motion-with-react-beautiful-dnd-4ifj)
