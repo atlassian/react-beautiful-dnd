@@ -74,12 +74,13 @@ export default function QuoteApp(props: Props) {
       boxSizing: 'border-box',
     };
 
-    if (transform) {
-      const { y, height } = draggedDOM.getBoundingClientRect();
+    if (transform && draggedDOM) {
+      const { parentNode: containerDOM } = draggedDOM;
+      const { y, height } = draggedDOM.getBoundingClientRect() || {};
       const {
         y: availableY,
         height: availableHeight,
-      } = draggedDOM.parentNode.getBoundingClientRect();
+      } = containerDOM.getBoundingClientRect();
       const currentY = draggedDOM.getAttribute(
         'data-rbd-drag-draggable-trappedY',
       );
@@ -93,10 +94,8 @@ export default function QuoteApp(props: Props) {
 
       if (
         (isMoreThenMin && isLessThenMax) ||
-        (!isMoreThenMin &&
-          parseInt(currentY, 10) < parseInt(trappedY, 10)) ||
-        (!isLessThenMax &&
-          parseInt(currentY, 10) > parseInt(trappedY, 10))
+        (!isMoreThenMin && parseInt(currentY, 10) < parseInt(trappedY, 10)) ||
+        (!isLessThenMax && parseInt(currentY, 10) > parseInt(trappedY, 10))
       ) {
         draggedDOM.setAttribute('data-rbd-drag-draggable-trappedY', trappedY);
         activeTransform = {
