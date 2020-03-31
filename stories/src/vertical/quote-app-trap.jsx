@@ -26,7 +26,6 @@ const queryAttr = 'data-rbd-drag-handle-draggable-id';
 
 export default function QuoteApp(props: Props) {
   const [quotes, setQuotes] = useState(() => props.initial);
-  const [placeholderProps, setPlaceholderProps] = useState({});
 
   function onDragStart() {
     // Add a little vibration if the browser supports it.
@@ -38,7 +37,6 @@ export default function QuoteApp(props: Props) {
 
   function onDragEnd(result: DropResult) {
     // combining item
-    setPlaceholderProps({});
     if (result.combine) {
       // super simple: just removing the dragging item
       const newQuotes: Quote[] = [...quotes];
@@ -63,43 +61,6 @@ export default function QuoteApp(props: Props) {
     );
 
     setQuotes(newQuotes);
-  }
-
-  function onDragUpdate(update: DragUpdate) {
-    if (!update.destination) {
-      return;
-    }
-
-    const draggableId = update.draggableId;
-    const destinationIndex = update.destination.index;
-    const domQuery = `[${queryAttr}='${draggableId}']`;
-    const draggedDOM = document.querySelector(domQuery);
-
-    if (!draggedDOM) {
-      setPlaceholderProps({});
-      return;
-    }
-
-    const { clientHeight, clientWidth } = draggedDOM;
-
-    const parentStyle = window.getComputedStyle(draggedDOM.parentNode);
-
-    const elements = Array.prototype.slice.call(draggedDOM.parentNode.children);
-    const clientY = elements
-      .slice(0, destinationIndex)
-      .reduce((total, curr) => {
-        const style = curr.currentStyle || window.getComputedStyle(curr);
-        const marginBottom = parseInt(style.marginBottom, 10);
-        return total + curr.clientHeight + marginBottom;
-      }, parseInt(parentStyle.paddingTop, 10));
-
-    setPlaceholderProps({
-      clientHeight,
-      clientWidth,
-      clientY,
-      clientX: parseInt(parentStyle.paddingLeft, 10),
-      parentHeight: parseInt(parentStyle.height, 10),
-    });
   }
 
   function getItemStyle(draggableStyle, mode, draggableId) {
@@ -156,18 +117,13 @@ export default function QuoteApp(props: Props) {
   }
 
   return (
-    <DragDropContext
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragUpdate={onDragUpdate}
-    >
+    <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
       <Root>
         <QuoteListTrap
           listId="list"
           style={props.listStyle}
           quotes={quotes}
           isCombineEnabled={props.isCombineEnabled}
-          placeholderProps={placeholderProps}
           getItemStyle={getItemStyle}
         />
       </Root>
