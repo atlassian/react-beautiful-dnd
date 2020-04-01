@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import type { Quote } from '../types';
-import type { DropResult } from '../../../src/types';
+import type { DropResult, MovementMode } from '../../../src/types';
 import { DragDropContext } from '../../../src';
 import QuoteListTrap from '../primatives/quote-list-trap';
 import reorder from '../reorder';
@@ -21,8 +21,6 @@ type Props = {|
   isCombineEnabled?: boolean,
   listStyle?: Object,
 |};
-
-const queryAttr = 'data-rbd-drag-handle-draggable-id';
 
 export default function QuoteApp(props: Props) {
   const [quotes, setQuotes] = useState(() => props.initial);
@@ -63,50 +61,53 @@ export default function QuoteApp(props: Props) {
     setQuotes(newQuotes);
   }
 
-  function getItemStyle(draggableStyle, mode, draggableId) {
+  function getItemStyle(
+    draggableStyle: Object,
+    mode: ?MovementMode,
+    draggableId: string,
+  ) {
     if (mode !== 'FLUID') {
       return draggableStyle;
     }
+    const previousYAttr = 'data-rbd-drag-draggable-currentY';
+    const queryAttr = 'data-rbd-drag-handle-draggable-id';
     const domQuery = `[${queryAttr}='${draggableId}']`;
-    const draggedDOM = document.querySelector(domQuery);
+    const draggedDOM = (document.querySelector(domQuery): ?Element);
     const { transform } = draggableStyle;
-    let activeTransform = {
-      boxSizing: 'border-box',
-    };
+    let activeTransform = {};
 
     if (transform && draggedDOM) {
-      const { parentNode: containerDOM } = draggedDOM;
-      const { y, height } = draggedDOM.getBoundingClientRect() || {};
-      const {
-        y: availableY,
-        height: availableHeight,
-      } = containerDOM.getBoundingClientRect();
-      const currentY = draggedDOM.getAttribute(
-        'data-rbd-drag-draggable-trappedY',
-      );
-      const trappedY = transform.substring(
+      const containerDOM = (draggedDOM.parentElement: ?Element);
+      const { top, height } = draggedDOM.getBoundingClientRect() || {};
+
+      const previousY = `${draggedDOM.getAttribute(previousYAttr) || '0'}`;
+      const currentY = transform.substring(
         transform.indexOf(',') + 1,
         transform.indexOf(')'),
       );
 
-      const isMoreThenMin = y - availableY >= 0;
-      const isLessThenMax = y - availableY + height <= availableHeight;
+      activeTransform = {
+        transform: `translate(0, ${previousY})`,
+      };
 
-      if (
-        (isMoreThenMin && isLessThenMax) ||
-        (!isMoreThenMin && parseInt(currentY, 10) < parseInt(trappedY, 10)) ||
-        (!isLessThenMax && parseInt(currentY, 10) > parseInt(trappedY, 10))
-      ) {
-        draggedDOM.setAttribute('data-rbd-drag-draggable-trappedY', trappedY);
-        activeTransform = {
-          ...activeTransform,
-          transform: `translate(0, ${trappedY})`,
-        };
-      } else if (currentY) {
-        activeTransform = {
-          ...activeTransform,
-          transform: `translate(0, ${currentY})`,
-        };
+      if (containerDOM) {
+        const { top: availableTop, height: availableHeight } =
+          containerDOM.getBoundingClientRect() || {};
+
+        const isMoreThenMin = top - availableTop >= 0;
+        const isLessThenMax = top - availableTop + height <= availableHeight;
+        const previous = parseInt(previousY, 10);
+        const current = parseInt(currentY, 10);
+        if (
+          (isMoreThenMin && isLessThenMax) ||
+          (!isMoreThenMin && previous < current) ||
+          (!isLessThenMax && previous > current)
+        ) {
+          draggedDOM.setAttribute(previousYAttr, currentY);
+          activeTransform = {
+            transform: `translate(0, ${currentY})`,
+          };
+        }
       }
     }
     return {

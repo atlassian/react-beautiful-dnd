@@ -12,6 +12,7 @@ import type {
   DroppableStateSnapshot,
   DraggableProvided,
   DraggableStateSnapshot,
+  MovementMode,
 } from '../../../src';
 
 export const getBackgroundColor = (
@@ -78,12 +79,20 @@ type Props = {|
   // may not be provided - and might be null
   ignoreContainerClipping?: boolean,
   useClone?: boolean,
-  getItemStyle: func,
+  getItemStyle: (
+    draggableStyle: Object,
+    mode: ?MovementMode,
+    draggableId: string,
+  ) => void,
 |};
 
 type QuoteListProps = {|
   quotes: Quote[],
-  getItemStyle: func,
+  getItemStyle: (
+    draggableStyle: Object,
+    mode: ?MovementMode,
+    draggableId: string,
+  ) => void,
 |};
 
 const InnerQuoteList = React.memo(function InnerQuoteList(
@@ -117,7 +126,11 @@ type InnerListProps = {|
   dropProvided: DroppableProvided,
   quotes: Quote[],
   title: ?string,
-  getItemStyle: func,
+  getItemStyle: (
+    draggableStyle: Object,
+    mode: ?MovementMode,
+    draggableId: string,
+  ) => void,
 |};
 
 function InnerList(props: InnerListProps) {
