@@ -28,7 +28,7 @@ Right now it is important that all `Id`'s be strings. `rbd` will throw an error 
 
 ## Avoid reusing ids
 
-For simplicity, it is best to avoid changing a `draggableId` or `droppableId` when a reorder occurs. The safest option is to associate an id with an piece of data and do not update the id between reorders.
+For simplicity, it is best to avoid changing a `draggableId` or `droppableId` when a reorder occurs. The safest option is to associate an id with a piece of data and do not update the id between reorders.
 
 You can change the `draggableId` or `droppableId` at any time except during a drag. Including after reorder. However, to avoid an exception you need to avoid reusing id's between two components. This can happen if you base a draggableId or droppableId on an index.
 
