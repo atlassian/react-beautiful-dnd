@@ -109,7 +109,7 @@ The function is provided with three arguments:
 
 ```js
 type DraggableProvided = {|
-  innerRef: HTMLElement => void,
+  innerRef: (HTMLElement) => void,
   draggableProps: DraggableProps,
   // will be null if the draggable is disabled
   dragHandleProps: ?DragHandleProps,

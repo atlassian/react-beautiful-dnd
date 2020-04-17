@@ -53,15 +53,17 @@ const getColor = ({ isSelected, isGhosting }): string => {
 };
 
 const Container = styled.div`
-  background-color: ${props => getBackgroundColor(props)};
-  color: ${props => getColor(props)};
+  background-color: ${(props) => getBackgroundColor(props)};
+  color: ${(props) => getColor(props)};
   padding: ${grid}px;
   margin-bottom: ${grid}px;
   border-radius: ${borderRadius}px;
   font-size: 18px;
   border: 3px solid ${colors.N90};
-  ${props =>
-    props.isDragging ? `box-shadow: 2px 2px 1px ${colors.N90};` : ''} ${props =>
+  ${(props) =>
+    props.isDragging ? `box-shadow: 2px 2px 1px ${colors.N90};` : ''} ${(
+    props,
+  ) =>
     props.isGhosting
       ? 'opacity: 0.8;'
       : ''}

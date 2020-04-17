@@ -7,13 +7,8 @@ import ports from '../../server-ports';
 function commonTest(url: string, cspTest: string) {
   cy.visit(url);
 
-  cy.get(getHandleSelector())
-    .eq(0)
-    .as('first')
-    .should('contain', 'item 0');
-  cy.get(getHandleSelector())
-    .eq(1)
-    .should('contain', 'item 1');
+  cy.get(getHandleSelector()).eq(0).as('first').should('contain', 'item 0');
+  cy.get(getHandleSelector()).eq(1).should('contain', 'item 1');
 
   // reorder operation
   cy.get('@first')
@@ -28,13 +23,9 @@ function commonTest(url: string, cspTest: string) {
 
   // order now 2, 1
   // note: not using get aliases as they where returning incorrect results
-  cy.get(getHandleSelector())
-    .eq(0)
-    .should('contain', 'item 1');
+  cy.get(getHandleSelector()).eq(0).should('contain', 'item 1');
 
-  cy.get(getHandleSelector())
-    .eq(1)
-    .should('contain', 'item 0');
+  cy.get(getHandleSelector()).eq(1).should('contain', 'item 0');
 
   // element should maintain focus post drag
   cy.focused().should('contain', 'item 0');

@@ -45,7 +45,7 @@ export default function createRegistry(): Registry {
 
   function notify(event: RegistryEvent) {
     if (subscribers.length) {
-      subscribers.forEach(cb => cb(event));
+      subscribers.forEach((cb) => cb(event));
     }
   }
 

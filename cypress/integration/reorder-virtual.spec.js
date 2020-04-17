@@ -11,13 +11,9 @@ describe('reorder: virtual', () => {
   it('should reorder within a list', () => {
     const movements: number = 12;
 
-    cy.get(getHandleSelector())
-      .first()
-      .as('item');
+    cy.get(getHandleSelector()).first().as('item');
 
-    cy.get('@item')
-      .invoke('attr', 'data-testid')
-      .as('item-id');
+    cy.get('@item').invoke('attr', 'data-testid').as('item-id');
 
     cy.get('@item')
       .invoke('attr', 'data-index')
@@ -48,7 +44,7 @@ describe('reorder: virtual', () => {
     // This is setting up a chain of commands and this test will not wait
     // for a 'promise' to resolve. Linting is getting confused by .then
     // eslint-disable-next-line jest/valid-expect-in-promise
-    cy.get('@item-id').then(id => {
+    cy.get('@item-id').then((id) => {
       cy.get(getHandleSelector(id))
         .invoke('attr', 'data-index')
         .should('equal', `${movements}`);

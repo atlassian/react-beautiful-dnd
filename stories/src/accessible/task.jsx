@@ -23,7 +23,7 @@ const Container = styled.div`
   margin-bottom: ${grid}px;
   border-radius: ${borderRadius}px;
   font-size: 18px;
-  filter: blur(${props => props.blur}px);
+  filter: blur(${(props) => props.blur}px);
   ${({ isDragging }) =>
     isDragging ? 'box-shadow: 1px 1px 1px grey; background: lightblue' : ''};
 `;

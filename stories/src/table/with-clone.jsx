@@ -20,7 +20,7 @@ import type { Quote } from '../types';
 const Table = styled.table`
   width: 500px;
   margin: 0 auto;
-  table-layout: ${props => props.layout};
+  table-layout: ${(props) => props.layout};
 `;
 
 const TBody = styled.tbody`
@@ -34,7 +34,7 @@ const THead = styled.thead`
 `;
 
 const Row = styled.tr`
-  ${props => (props.isDragging ? `background: ${colors.G50};` : '')};
+  ${(props) => (props.isDragging ? `background: ${colors.G50};` : '')};
 `;
 
 const Cell = styled.td`

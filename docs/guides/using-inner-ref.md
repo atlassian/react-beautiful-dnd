@@ -62,7 +62,7 @@ class Person extends React.Component {
 }
 
 class App extends React.Component {
-  setPersonRef = ref => {
+  setPersonRef = (ref) => {
     this.personRef = ref;
 
     // When the ref changes it will firstly be set to null
@@ -71,7 +71,7 @@ class App extends React.Component {
       this.personRef.sayHello();
     }
   };
-  setDivRef = ref => {
+  setDivRef = (ref) => {
     this.divRef = ref;
 
     if (this.divRef) {
@@ -190,7 +190,7 @@ If you also need to use the _HTMLElement_ within your _Component_ you can have a
 
 ```js
 class Person extends React.Component {
-  setRef = ref => {
+  setRef = (ref) => {
     // keep a reference to the dom ref as an instance property
     this.ref = ref;
     // give the dom ref to react-beautiful-dnd

@@ -74,7 +74,7 @@ it('should call the onBeforeDragStart before connected components are updated, a
   jest
     .spyOn(window, 'getComputedStyle')
     .mockImplementation(() => getComputedSpacing({}));
-  const { getByTestId } = render(
+  const { getByTestId, unmount } = render(
     <DragDropContext {...responders}>
       <Droppable droppableId="droppable">
         {(droppableProvided: DroppableProvided) => (
@@ -122,4 +122,5 @@ it('should call the onBeforeDragStart before connected components are updated, a
   expect(responders.onBeforeDragStart).toHaveBeenCalledTimes(1);
   expect(responders.onDragStart).toHaveBeenCalledTimes(1);
   expect(onItemRender).toHaveBeenCalledTimes(1);
+  unmount();
 });

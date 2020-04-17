@@ -15,7 +15,7 @@ import {
 } from '../util/helpers';
 
 it('should update the snapshot of an item being combined with', () => {
-  withPoorDimensionMocks(preset => {
+  withPoorDimensionMocks((preset) => {
     const spy = jest.fn();
     const renderItem: RenderItem = renderItemAndSpy(spy);
     const { getByText } = render(

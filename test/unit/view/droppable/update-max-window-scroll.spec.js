@@ -17,10 +17,7 @@ it('should update when a placeholder animation finishes', () => {
     isMovementAllowed: () => true,
   });
 
-  wrapper
-    .find(Placeholder)
-    .props()
-    .onTransitionEnd();
+  wrapper.find(Placeholder).props().onTransitionEnd();
 
   expect(dispatchProps.updateViewportMaxScroll).toHaveBeenCalledWith({
     maxScroll: getMaxWindowScroll(),
@@ -38,10 +35,7 @@ it('should update when a placeholder finishes and the list is not dragged over',
     isMovementAllowed: () => true,
   });
 
-  wrapper
-    .find(Placeholder)
-    .props()
-    .onTransitionEnd();
+  wrapper.find(Placeholder).props().onTransitionEnd();
 
   expect(dispatchProps.updateViewportMaxScroll).toHaveBeenCalledWith({
     maxScroll: getMaxWindowScroll(),
@@ -60,10 +54,7 @@ it('should not update when dropping', () => {
     isMovementAllowed: () => false,
   });
 
-  wrapper
-    .find(Placeholder)
-    .props()
-    .onTransitionEnd();
+  wrapper.find(Placeholder).props().onTransitionEnd();
 
   expect(dispatchProps.updateViewportMaxScroll).not.toHaveBeenCalled();
 });

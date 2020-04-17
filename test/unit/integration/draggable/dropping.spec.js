@@ -97,7 +97,7 @@ it('should provide the correct snapshot to consumers', () => {
 });
 
 it('should animate scale and opacity when combining', () => {
-  withPoorDimensionMocks(preset => {
+  withPoorDimensionMocks((preset) => {
     const spy = jest.fn();
     const renderItem: RenderItem = renderItemAndSpy(spy);
     const box0 = preset.inHome1.client.borderBox;

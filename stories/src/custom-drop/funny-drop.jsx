@@ -28,7 +28,7 @@ type TaskItemProps = {|
 
 const Canvas = styled.div`
   padding: ${grid}px;
-  background: ${props => (props.isDragging ? colors.G50 : colors.B50)};
+  background: ${(props) => (props.isDragging ? colors.G50 : colors.B50)};
   margin-bottom: ${grid}px;
   border-radius: 3px;
 `;

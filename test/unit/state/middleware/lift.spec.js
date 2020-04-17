@@ -33,7 +33,7 @@ const getPopulatedRegistry = (dimensions?: DimensionMap): Registry => {
   return registry;
 };
 
-const getBasicMarshal = (dispatch: Action => void): DimensionMarshal => {
+const getBasicMarshal = (dispatch: (Action) => void): DimensionMarshal => {
   return createMarshal(getPopulatedRegistry(), dispatch);
 };
 

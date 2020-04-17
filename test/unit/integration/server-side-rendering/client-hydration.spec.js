@@ -29,7 +29,7 @@ it('should support hydrating a server side rendered application', () => {
   resetServerContext();
   const serverHTML: string = ReactDOMServer.renderToString(<App />);
 
-  error.mock.calls.forEach(call => {
+  error.mock.calls.forEach((call) => {
     expect(
       call[0].includes('Warning: useLayoutEffect does nothing on the server'),
     ).toBe(true);

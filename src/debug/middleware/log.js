@@ -5,7 +5,7 @@ import type { Action, Store } from '../../state/store-types';
 type Mode = 'verbose' | 'light';
 
 export default (mode?: Mode = 'verbose') => (store: Store) => (
-  next: Action => mixed,
+  next: (Action) => mixed,
 ) => (action: Action): any => {
   if (mode === 'light') {
     console.log('🏃‍ Action:', action.type);

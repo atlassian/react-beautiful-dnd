@@ -82,8 +82,9 @@ export default class TaskApp extends Component<*, State> {
     if (result.reason === 'CANCEL') {
       announce(`
         Movement cancelled.
-        The task has returned to its starting position of ${result.source
-          .index + 1}
+        The task has returned to its starting position of ${
+          result.source.index + 1
+        }
       `);
       return;
     }
@@ -93,8 +94,9 @@ export default class TaskApp extends Component<*, State> {
     if (!destination) {
       announce(`
         The task has been dropped while not over a location.
-        The task has returned to its starting position of ${result.source
-          .index + 1}
+        The task has returned to its starting position of ${
+          result.source.index + 1
+        }
       `);
       return;
     }
@@ -111,8 +113,9 @@ export default class TaskApp extends Component<*, State> {
 
     announce(`
       You have dropped the task.
-      It has moved from position ${result.source.index +
-        1} to ${destination.index + 1}
+      It has moved from position ${result.source.index + 1} to ${
+      destination.index + 1
+    }
     `);
   };
 

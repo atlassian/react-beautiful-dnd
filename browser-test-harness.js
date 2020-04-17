@@ -45,11 +45,11 @@ Promise.all([
     process.on('exit', () => {
       child.kill();
     });
-    child.on('exit', code => {
+    child.on('exit', (code) => {
       process.exit(code);
     });
   })
-  .catch(error => {
+  .catch((error) => {
     // eslint-disable-next-line no-console
     console.error('Unable to spin up standalone servers');
     // eslint-disable-next-line no-console

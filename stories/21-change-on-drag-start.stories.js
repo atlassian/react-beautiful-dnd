@@ -19,7 +19,7 @@ type Item = {|
 
 // fake data generator
 const getItems = (count: number): Item[] =>
-  Array.from({ length: count }, (v, k) => k).map(k => ({
+  Array.from({ length: count }, (v, k) => k).map((k) => ({
     id: `item-${k}`,
     content: `item ${k}`,
   }));
@@ -48,7 +48,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   ...draggableStyle,
 });
 
-const getListStyle = isDraggingOver => ({
+const getListStyle = (isDraggingOver) => ({
   background: isDraggingOver ? 'lightblue' : 'lightgrey',
   padding: grid,
   overflow: 'auto',

@@ -6,8 +6,8 @@ import React, { Component } from 'react';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 
 // fake data generator
-const getItems = count =>
-  Array.from({ length: count }, (v, k) => k).map(k => ({
+const getItems = (count) =>
+  Array.from({ length: count }, (v, k) => k).map((k) => ({
     id: `item-${k}`,
     content: `item ${k}`,
   }));
@@ -36,7 +36,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   ...draggableStyle,
 });
 
-const getListStyle = isDraggingOver => ({
+const getListStyle = (isDraggingOver) => ({
   background: isDraggingOver ? 'lightblue' : 'grey',
   padding: grid,
   width: 250,

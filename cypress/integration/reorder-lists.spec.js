@@ -10,14 +10,9 @@ describe('reorder lists', () => {
 
   it('should reorder lists', () => {
     // order: Jake, BMO
-    cy.get('h4')
-      .eq(0)
-      .as('first')
-      .should('contain', 'Jake');
+    cy.get('h4').eq(0).as('first').should('contain', 'Jake');
 
-    cy.get('h4')
-      .eq(1)
-      .should('contain', 'BMO');
+    cy.get('h4').eq(1).should('contain', 'BMO');
 
     // reorder operation
     cy.get('@first')
@@ -31,13 +26,9 @@ describe('reorder lists', () => {
 
     // order now 2, 1
     // note: not using get aliases as they where returning incorrect results
-    cy.get('h4')
-      .eq(0)
-      .should('contain', 'BMO');
+    cy.get('h4').eq(0).should('contain', 'BMO');
 
     // index of the drag handle has changed
-    cy.get('h4')
-      .eq(1)
-      .should('contain', 'Jake');
+    cy.get('h4').eq(1).should('contain', 'Jake');
   });
 });

@@ -10,7 +10,7 @@ class Person extends Component<{ name: string, provided: Provided }> {
   render() {
     const { provided, name } = this.props;
     return (
-      <div ref={ref => provided.innerRef(ref)} {...provided.droppableProps}>
+      <div ref={(ref) => provided.innerRef(ref)} {...provided.droppableProps}>
         hello {name}
       </div>
     );

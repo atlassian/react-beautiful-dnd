@@ -27,7 +27,7 @@ function getTasks(count: number): Task[] {
 const Item = styled.div`
   padding: ${grid}px;
   border: 1px solid ${colors.N30};
-  background-color: ${props => (props.isDragging ? colors.G100 : colors.N30)};
+  background-color: ${(props) => (props.isDragging ? colors.G100 : colors.N30)};
   margin-top: ${grid}px;
   margin-left: ${grid}px;
   margin-right: ${grid}px;
@@ -138,7 +138,7 @@ export default function AddingThings() {
             </span>
           </ListTitle>
           <Droppable droppableId="tasks">
-            {provided => (
+            {(provided) => (
               <div ref={provided.innerRef} {...provided.droppableProps}>
                 {renderTasks(tasks)}
                 {provided.placeholder}
@@ -155,7 +155,7 @@ export default function AddingThings() {
               </span>
             </ListTitle>
             <Droppable droppableId="bin">
-              {provided => (
+              {(provided) => (
                 <div ref={provided.innerRef} {...provided.droppableProps}>
                   {renderTasks(trash, { isDragEnabled: false })}
                   {provided.placeholder}

@@ -11,7 +11,7 @@ import type {
 export function getDraggableIds(
   draggables: DraggableDimension[],
 ): DraggableId[] {
-  return draggables.map(d => d.descriptor.id);
+  return draggables.map((d) => d.descriptor.id);
 }
 
 export function getDraggableIdMap(ids: DraggableId[]): DraggableIdMap {
@@ -62,6 +62,6 @@ export function getForcedDisplacement({
   return {
     all,
     visible: visibleMap,
-    invisible: getDraggableIdMap(invisible.map(d => d.descriptor.id)),
+    invisible: getDraggableIdMap(invisible.map((d) => d.descriptor.id)),
   };
 }

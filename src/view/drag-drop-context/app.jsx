@@ -109,7 +109,7 @@ export default function App(props: Props) {
   });
   const styleMarshal: StyleMarshal = useStyleMarshal(contextId, nonce);
 
-  const lazyDispatch: Action => void = useCallback((action: Action): void => {
+  const lazyDispatch: (Action) => void = useCallback((action: Action): void => {
     getStore(lazyStoreRef).dispatch(action);
   }, []);
 

@@ -7,8 +7,8 @@ import PropTypes from 'prop-types';
 import { DragDropContext, Droppable, Draggable } from '../src';
 
 // fake data generator
-const getItems = count =>
-  Array.from({ length: count }, (v, k) => k).map(k => ({
+const getItems = (count) =>
+  Array.from({ length: count }, (v, k) => k).map((k) => ({
     id: `item-${k}`,
     content: `item ${k}`,
   }));
@@ -33,8 +33,8 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    document.addEventListener('securitypolicyviolation', e => {
-      this.setState(state => {
+    document.addEventListener('securitypolicyviolation', (e) => {
+      this.setState((state) => {
         return { cspErrors: [...state.cspErrors, e] };
       });
     });
@@ -67,11 +67,11 @@ export default class App extends Component {
           <b id="cspErrors">{this.state.cspErrors.length}</b>
         </h1>
         <Droppable droppableId="droppable">
-          {droppableProvided => (
+          {(droppableProvided) => (
             <div ref={droppableProvided.innerRef}>
               {this.state.items.map((item, index) => (
                 <Draggable key={item.id} draggableId={item.id} index={index}>
-                  {draggableProvided => (
+                  {(draggableProvided) => (
                     <div
                       ref={draggableProvided.innerRef}
                       {...draggableProvided.draggableProps}
