@@ -70,7 +70,7 @@ When making a screen reader announcement we recommend announcing the position of
 It reads more natural to hear "You have moved an item to position 2" than "You have moved an item to index 1"
 
 ```js
-const position = index => index + 1;
+const position = (index) => index + 1;
 
 const startPosition = position(source.index);
 const endPosition = destination ? position(destination.index) : null;

@@ -19,7 +19,7 @@ function Vomit(props: Props) {
 
   function chuck() {
     shouldThrowRef.current = true;
-    setShouldThrow(current => current + 1);
+    setShouldThrow((current) => current + 1);
   }
 
   props.setForceThrow(chuck);

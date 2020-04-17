@@ -8,10 +8,7 @@ const lineStartWithSpaces: RegExp = /^[ \t]*/gm;
 
 // using .trim() to clear the any newlines before the first text and after last text
 const clean = (value: string): string =>
-  value
-    .replace(spacesAndTabs, ' ')
-    .replace(lineStartWithSpaces, '')
-    .trim();
+  value.replace(spacesAndTabs, ' ').replace(lineStartWithSpaces, '').trim();
 
 const getDevMessage = (message: string): string =>
   clean(`

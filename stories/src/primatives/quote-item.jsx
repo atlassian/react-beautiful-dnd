@@ -60,8 +60,8 @@ const CloneBadge = styled.div`
 const Container = styled.a`
   border-radius: ${borderRadius}px;
   border: 2px solid transparent;
-  border-color: ${props => getBorderColor(props.isDragging, props.colors)};
-  background-color: ${props =>
+  border-color: ${(props) => getBorderColor(props.isDragging, props.colors)};
+  background-color: ${(props) =>
     getBackgroundColor(props.isDragging, props.isGroupedOver, props.colors)};
   box-shadow: ${({ isDragging }) =>
     isDragging ? `2px 2px 1px ${colors.N70}` : 'none'};
@@ -82,7 +82,7 @@ const Container = styled.a`
 
   &:focus {
     outline: none;
-    border-color: ${props => props.colors.hard};
+    border-color: ${(props) => props.colors.hard};
     box-shadow: none;
   }
 
@@ -131,10 +131,10 @@ const Footer = styled.div`
 `;
 
 const Author = styled.small`
-  color: ${props => props.colors.hard};
+  color: ${(props) => props.colors.hard};
   flex-grow: 0;
   margin: 0;
-  background-color: ${props => props.colors.soft};
+  background-color: ${(props) => props.colors.soft};
   border-radius: ${borderRadius}px;
   font-weight: normal;
   padding: ${grid / 2}px;

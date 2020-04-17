@@ -13,7 +13,7 @@ import QuoteList from '../primatives/quote-list';
 import reorder from '../reorder';
 
 function delay(fn: Function, time?: number = 300) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       fn();
       resolve();

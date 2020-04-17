@@ -64,7 +64,7 @@ it('should update its registration when a descriptor property changes', () => {
 
   const wrapper = mount(
     <PassThroughProps>
-      {extra => (
+      {(extra) => (
         <WithAppContext registry={registry}>
           <ScrollableItem {...extra} />
         </WithAppContext>

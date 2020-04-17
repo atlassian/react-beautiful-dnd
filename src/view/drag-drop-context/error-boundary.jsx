@@ -27,9 +27,6 @@ export default class ErrorBoundary extends React.Component<Props> {
       },
     ]);
   }
-  componentWillUnmount() {
-    this.unbind();
-  }
 
   componentDidCatch(err: Error) {
     if (err instanceof RbdInvariant) {
@@ -44,6 +41,10 @@ export default class ErrorBoundary extends React.Component<Props> {
     // throwing error for other error boundaries
     // eslint-disable-next-line no-restricted-syntax
     throw err;
+  }
+
+  componentWillUnmount() {
+    this.unbind();
   }
 
   onWindowError = (event: ErrorEvent) => {

@@ -36,7 +36,7 @@ it('should adjust captured values for any changes that impact that dragging item
         onDragStart={onDragStart}
       >
         <Droppable droppableId="droppable">
-          {droppableProvided => (
+          {(droppableProvided) => (
             <div
               {...droppableProvided.droppableProps}
               ref={droppableProvided.innerRef}

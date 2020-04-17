@@ -81,7 +81,7 @@ export default ({
   // need to find the first item before the closest
   const indexOfClosest: number = findIndex(
     withoutDraggable,
-    d => d.descriptor.id === closestId,
+    (d) => d.descriptor.id === closestId,
   );
   invariant(indexOfClosest !== -1, 'Could not find displaced item in set');
 

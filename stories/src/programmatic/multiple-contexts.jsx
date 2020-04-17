@@ -20,7 +20,7 @@ import bindEvents from '../../../src/view/event-bindings/bind-events';
 import { grid } from '../constants';
 
 function sleep(fn: Function, time?: number = 300) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       fn();
       resolve();

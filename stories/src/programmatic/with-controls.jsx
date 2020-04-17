@@ -43,7 +43,7 @@ const Button = styled.button`
 
   background: var(--off-white);
   border-radius: ${borderRadius}px;
-  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
   font-size: 16px;
   position: relative;
   box-sizing: border-box;
@@ -235,7 +235,7 @@ export default function QuoteApp(props: Props) {
       onDragStart={() => setIsDragging(true)}
       onDragEnd={onDragEnd}
       sensors={[
-        api => {
+        (api) => {
           sensorAPIRef.current = api;
         },
       ]}

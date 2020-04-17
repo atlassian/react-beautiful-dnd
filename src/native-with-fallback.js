@@ -24,7 +24,7 @@ export function values<T>(map: Map<T>): T[] {
     return Object.values(map);
   }
 
-  return Object.keys(map).map(key => map[key]);
+  return Object.keys(map).map((key) => map[key]);
 }
 
 // Could also extend to pass index and list

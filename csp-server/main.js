@@ -14,7 +14,7 @@ const compiler = webpack(config);
 // $ExpectError
 compiler.outputFileSystem = fs;
 // $ExpectError
-const outputPath = compiler.compilers.find(cfg => cfg.name === 'client')
+const outputPath = compiler.compilers.find((cfg) => cfg.name === 'client')
   .outputPath;
 
 compiler.run(() => {

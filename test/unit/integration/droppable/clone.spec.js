@@ -88,7 +88,7 @@ it('should give the clone the starting location', () => {
 
 // this test is indirectly validating that a clone does not talk the registry or marshal
 it('should allow reordering other items when dropping', () => {
-  withPoorDimensionMocks(preset => {
+  withPoorDimensionMocks((preset) => {
     const { getByTestId } = render(<App useClone />);
     const box0 = preset.inHome1.client.borderBox;
     const box1 = preset.inHome2.client.borderBox;

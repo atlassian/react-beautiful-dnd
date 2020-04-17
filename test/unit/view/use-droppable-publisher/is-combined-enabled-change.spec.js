@@ -26,7 +26,7 @@ it('should publish updates to the enabled state when dragging', () => {
   const registerSpy = jest.spyOn(registry.droppable, 'register');
   const wrapper = mount(
     <PassThroughProps>
-      {extra => (
+      {(extra) => (
         <WithAppContext marshal={marshal} registry={registry}>
           <ScrollableItem isCombineEnabled {...extra} />
         </WithAppContext>
@@ -67,7 +67,7 @@ it('should not publish updates to the enabled state when there is no drag', () =
   const registry: Registry = createRegistry();
   const wrapper = mount(
     <PassThroughProps>
-      {extra => (
+      {(extra) => (
         <WithAppContext marshal={marshal} registry={registry}>
           <ScrollableItem isCombineEnabled {...extra} />,
         </WithAppContext>
@@ -93,7 +93,7 @@ it('should not publish updates when there is no change', () => {
   const registerSpy = jest.spyOn(registry.droppable, 'register');
   const wrapper = mount(
     <PassThroughProps>
-      {extra => (
+      {(extra) => (
         <WithAppContext marshal={marshal} registry={registry}>
           <ScrollableItem isCombineEnabled {...extra} />,
         </WithAppContext>

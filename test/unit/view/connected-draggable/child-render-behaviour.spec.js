@@ -22,7 +22,7 @@ class Person extends Component<{ name: string, provided: Provided }> {
     const { provided, name } = this.props;
     return (
       <div
-        ref={ref => provided.innerRef(ref)}
+        ref={(ref) => provided.innerRef(ref)}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
       >
@@ -42,7 +42,7 @@ function App({ currentUser, children }: Props) {
     <DragDropContext onDragEnd={() => {}}>
       <DroppableContext.Provider value={droppableContext}>
         <Draggable draggableId="drag-1" index={0}>
-          {dragProvided => children(currentUser, dragProvided)}
+          {(dragProvided) => children(currentUser, dragProvided)}
         </Draggable>
       </DroppableContext.Provider>
     </DragDropContext>
