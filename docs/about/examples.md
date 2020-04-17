@@ -21,5 +21,6 @@ We have created some basic examples on `codesandbox` for you to play with direct
 - [Simple horizontal list](https://codesandbox.io/s/mmrp44okvj)
 - [Using with function components](https://codesandbox.io/s/zqwz5n5p9x)
 - [Simple DnD between two lists](https://codesandbox.io/s/ql08j35j3q) - _Community made_
+- [Simple DnD between a dynamic number of lists (with function components) and ability to delete items](https://codesandbox.io/s/-w5szl) - _Community made_
 
 [← Back to documentation](/README.md#documentation-)
