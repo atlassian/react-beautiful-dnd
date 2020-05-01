@@ -16,6 +16,7 @@
 
 </div>
 
+
 ## Core characteristics
 
 - Beautiful and [natural movement](/docs/about/animations.md) of items 💐
@@ -27,6 +28,10 @@
 - No creation of additional wrapper dom nodes - flexbox and focus management friendly!
 
 ## Get started 👩‍🏫
+
+```npm install react-beautiful-dnd```
+<br>or<br>
+```yarn add react-beautiful-dnd```
 
 We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/beautiful-and-accessible-drag-and-drop-with-react-beautiful-dnd) to help you get started with `react-beautiful-dnd` as quickly as possible.
 
