@@ -357,6 +357,7 @@ type SensorMarshalArgs = {|
   enableDefaultSensors: boolean,
 |};
 
+// default sensors are now exported to library consumers
 const defaultSensors: Sensor[] = [
   useMouseSensor,
   useKeyboardSensor,

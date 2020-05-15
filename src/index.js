@@ -6,6 +6,14 @@ export { default as DragDropContext } from './view/drag-drop-context';
 export { default as Droppable } from './view/droppable';
 export { default as Draggable } from './view/draggable';
 
+// Default sensors
+
+export {
+  useMouseSensor,
+  useTouchSensor,
+  useKeyboardSensor,
+} from './view/use-sensor-marshal';
+
 // Utils
 
 export { resetServerContext } from './view/drag-drop-context';
