@@ -110,7 +110,7 @@ const Row = ({ data, index, style }: RowProps) => {
   const item = data[index];
 
    // We are rendering an extra item for the placeholder
-  if (!quote) {
+  if (!item) {
     return null;
   }
 
