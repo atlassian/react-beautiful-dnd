@@ -402,7 +402,7 @@ export default function useMouseSensor(api: SensorAPI) {
         getPhase().type === 'IDLE',
         'Expected to move from IDLE to PENDING drag',
       );
-      console.log(actions.timeForLongPress());
+
       const longPressTimerId: TimeoutID = setTimeout(
         startDragging,
         actions.timeForLongPress(),
