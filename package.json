@@ -46,14 +46,14 @@
     "lint:css": "stylelint \"stories/**/*.{js,jsx}\"",
     "typecheck": "flow check --max-warnings=0",
     "bundle-size:check": "cross-env SNAPSHOT=match yarn bundle-size:update",
-    "bundle-size:update": "yarn build:clean && yarn build:dist && yarn build:clean",
-    "build": "yarn build:clean && yarn build:dist && yarn build:flow",
+    "bundle-size:update": "npm run build:clean && yarnpm runn build:dist && yarn build:clean",
+    "build": "npm run build:clean && npm run build:dist && npm run build:flow",
     "build:clean": "rimraf dist",
     "build:dist": "rollup -c",
     "build:flow": "echo \"// @flow\n\nexport * from '../src';\" > dist/react-beautiful-dnd.cjs.js.flow",
     "storybook": "start-storybook -p 9002",
     "build-storybook": "build-storybook -c .storybook -o site",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@babel/runtime": "^7.9.2",

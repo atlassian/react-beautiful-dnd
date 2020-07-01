@@ -27,6 +27,23 @@ const isElementScrollable = (el: Element): boolean => {
   return isEither(overflow, isScroll) || isEither(overflow, isAuto);
 };
 
+const isElementScrollableWithoutScrollbar = (el: Element): boolean => {
+  if (el === null) {
+    return false;
+  }
+  let isScrollable = false;
+  let hasScrollbars = false;
+  // first, lets find out if it has scrollable content
+  isScrollable = el.scrollHeight > el.offsetHeight;
+  // if it's scrollable, let's see if it likely has scrollbars
+  if (isScrollable) {
+    hasScrollbars = el.offsetWidth > el.scrollWidth;
+  }
+  if (isScrollable && !hasScrollbars) {
+    return true;
+  }
+  return false;
+};
 // Special case for a body element
 // Playground: https://codepen.io/alexreardon/pen/ZmyLgX?editors=1111
 const isBodyScrollable = (): boolean => {
@@ -66,7 +83,6 @@ const isBodyScrollable = (): boolean => {
   `);
   return false;
 };
-
 const getClosestScrollable = (el: ?Element): ?Element => {
   // cannot do anything else!
   if (el == null) {
@@ -83,7 +99,8 @@ const getClosestScrollable = (el: ?Element): ?Element => {
     return null;
   }
 
-  if (!isElementScrollable(el)) {
+  // if (!isElementScrollable(el)) {
+  if (!isElementScrollableWithoutScrollbar(el)) {
     // keep recursing
     return getClosestScrollable(el.parentElement);
   }
