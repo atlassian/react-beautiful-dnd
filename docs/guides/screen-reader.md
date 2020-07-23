@@ -14,21 +14,21 @@ A screen reader will read out information about [interactive content](https://ww
   <summary>A note about drag and drop accessibility</summary>
   `rbd` does not use the HTML5 drag and drop API. It does not provide the experience we are trying to achieve. HTML5 drag and drop does not have a _great_ accessibility story out of the box as requires you to build a secondary widget for keyboard interactions.
 
-We do not use the `aria-grabbed` and `aria-dropeffect` as they are [deprecated in wai-aria 1.1](https://www.w3.org/TR/wai-aria-1.1/). There is currently no replacement in [wai-aria 1.2](https://www.w3.org/TR/wai-aria-1.2/). For state information about a drag we rely on [live regions](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions) as an escape hatch to provide our own information to screen reader users during a drag.
+We do not use the `aria-grabbed` and `aria-dropeffect` as they are [deprecated in WAI-ARIA 1.1](https://www.w3.org/TR/wai-aria-1.1/). There is currently no replacement in [WAI-ARIA 1.2](https://www.w3.org/TR/wai-aria-1.2/). For state information about a drag we rely on [live regions](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions) as an escape hatch to provide our own information to screen reader users during a drag.
 
 </details>
 
 <details>
   <summary>Background on accessibility properties 📖</summary>
 
-Screen readers use the following accessibility properties about an DOM Element to let assistive technologies what something is and how to describe it.
+Screen readers use these accessibility properties of a DOM element to tell assistive technologies what something is and how to describe it.
 
 | Attribute        | Description                                                                                                                                   | Notes                                                                                                                                                                                                                                                                                    | Examples                                                                                                                                                   |
 | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Name             | A way of identifying the element. Ideally these would be unique, but it doesn't need to be. Often the name is just the content of the element | This property is [computed](https://www.w3.org/TR/accname-1.1/#mapping_additional_nd_name). Can be based on visible text, or invisible attributes such as `aria-label`. The highest priority value will be picked as the name                                                            | `aria-label`, `aria-labelledby`, `title` (but not recommended) element content                                                                             |
-| Role             | Main indicator for type of element. Can be inferred from semantic element type, or controlled by `role="button"`                              |                                                                                                                                                                                                                                                                                          | `<div role="button">Oh no</div>`                                                                                                                           |
-| Role description | Override the role text read out. Useful for adding a more specific role to a widget                                                           |                                                                                                                                                                                                                                                                                          | `<button aria-roledescription="slide"> Quarterly Report</section>` Will announce as: _"Quarterly Report, slide"_ rather than _"Quarterly Report, section"_ |
-| Description      | Adds additional usage information about an element                                                                                            | This property is [computed](https://www.w3.org/TR/accname-1.1/#mapping_additional_nd_te). Mostly controlled by `aria-describedby`<br />["Using the aria-describedby property to provide a descriptive label for user interface controls"](https://www.w3.org/TR/WCAG20-TECHS/ARIA1.html) |                                                                                                                                                            |
+| Name             | A way of identifying the element. Ideally these would be unique, but it doesn't need to be. Often the name is just the content of the element | This property is [computed](https://www.w3.org/TR/accname-1.1/#mapping_additional_nd_name). Can be based on visible text, or invisible attributes such as `aria-label`. The highest priority value will be picked as the name                                                            | `aria-label`, `aria-labelledby`, `title` (not recommended), element content                                                                             |
+| Role             | Main indicator for type of element. Can be inferred from semantic element type, or controlled by `role="button"`                              | ARIA roles (the `role` attribute) communicate semantics to the accessibility API (and by extension, assistive technologies) only. Event handlers, focus styling, and interactivity must be added and managed as well.                                                                                                                                                                                                                                                                                        | `<div role="button">Oh no</div>`                                                                                                                           |
+| Role description | Override the role text read out. Useful for adding a more specific role to a widget                                                           | Only applied on the rare occasions when HTML semantics and ARIA roles cannot describe what an element "is" in a meaningful way.                                                                                                                                                                                                                                                                                         | `<section aria-roledescription="slide"> Quarterly Report</section>` Will announce as: _"Quarterly Report, slide"_ rather than _"Quarterly Report, section"_ |
+| Description      | Adds additional usage information about an element                                                                                            | This property is [computed](https://www.w3.org/TR/accname-1.1/#mapping_additional_nd_te). Typically controlled by `aria-describedby`<br />["Using the aria-describedby property to provide a descriptive label for user interface controls"](https://www.w3.org/TR/WCAG20-TECHS/ARIA1.html) | `<label for="mob">Mobile</label>`<br />`<input type="tel" id="mob" aria-describedby="mobLength" />`<br />`<span id="mobLength">Mobile must contain 10 digits</span>`                                                                                                                                                          |
 
 </details>
 
@@ -52,9 +52,9 @@ We do not control the **name** of the element. The name is a way to identify the
 
 ## Drag lifecycle announcements
 
-We announce to screen reader users know what is going on during the drag and drop lifecycle. We provide default english messages for every stage of the drag and drop lifecycle out of the box. You can control these announcements by using the `announce` function is provided to each of the `<DragDropContext /> > Responder`s.
+We announce to screen reader users know what is going on during the drag and drop lifecycle. We provide default English messages for every stage of the drag and drop lifecycle out of the box. You can control these announcements by using the `announce` function is provided to each of the `<DragDropContext /> > Responder`s.
 
-Messages will be immediately read out. It's important to deliver messages immediately, so your users have a fast and responsive experience. If you attempt to hold onto the `announce` function and call it later, it won't work and will just print a warning to the console. If you try to call announce twice for the same event, only the first will be read by the screen reader with subsequent calls to announce being ignored and a warning printed.
+Messages will be immediately read out. It's important to deliver messages immediately so your users have a fast and responsive experience. If you attempt to hold onto the `announce` function and call it later, it won't work and will just print a warning to the console. If you try to call announce twice for the same event, only the first will be read by the screen reader with subsequent calls to announce being ignored and a warning printed.
 
 > We use [live regions](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions) to do drag lifecycle announcements. They are a way of getting a screen reader to announce some text
 
@@ -232,9 +232,13 @@ We tell the user the following:
 
 ## `VoiceOver` on Mac
 
-If you are using Mac, then you are welcome to test against the inbuilt `VoiceOver` screen reader. Here is a [quick start guide](https://www.imore.com/how-enable-voiceover-mac)
+If you are using Mac, test against the inbuilt `VoiceOver` screen reader. Here is a [quick start guide](https://www.imore.com/how-enable-voiceover-mac)
 
 > To start `VoiceOver`: <kbd>`cmd`</kbd> + <kbd>`f5`</kbd>
+
+## `NVDA` on Windows
+
+If you are using Windows 7 SP 1 or later, [download the free NVDA screen reader](https://www.nvaccess.org/download/). Here is a very comprehensive [NVDA user guide](https://www.nvaccess.org/files/nvda/documentation/userGuide.html).
 
 ## That's all folks
 
