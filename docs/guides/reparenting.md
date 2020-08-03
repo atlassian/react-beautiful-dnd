@@ -52,7 +52,7 @@ function List(props) {
                 </div>
               )}
             </Draggable>
-          )}
+          ))}
         </div>
       )}
     </Droppable>
