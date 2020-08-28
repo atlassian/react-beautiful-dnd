@@ -224,6 +224,6 @@ Here is an [example written in typescript](https://github.com/abeaudoin2013/reac
 
 ## Sample application with flow types
 
-We have created a [sample application](https://github.com/alexreardon/react-beautiful-dnd-flow-example) which exercises the flowtypes. It is a super simple `React` project based on [`react-create-app`](https://github.com/facebookincubator/create-react-app). You can use this as a reference to see how to set things up correctly.
+We have created a [sample application](https://github.com/alexreardon/react-beautiful-dnd-flow-example) which exercises the flowtypes. It is a super simple `React` project based on [`create-react-app`](https://github.com/facebook/create-react-app). You can use this as a reference to see how to set things up correctly.
 
 [← Back to documentation](/README.md#documentation-)
