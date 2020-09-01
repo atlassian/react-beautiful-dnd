@@ -473,21 +473,25 @@ var toDraggableMap = memoizeOne(function (draggables) {
 });
 var oldActiveDroppable = '';
 var getDroppableList = function getDroppableList(draggable, pageBorderBox, droppables) {
-  var draggableParentId = oldActiveDroppable !== draggable.descriptor.droppableId ? document.getElementById('appear-on-top').classList[0] + "-folder-items" : draggable.descriptor.droppableId;
-  var parentRndComponent = document.getElementsByClassName(draggableParentId.replace('-folder-items', ''))[0];
-  var parentPosition = parentRndComponent.getBoundingClientRect();
-  var newDroppables = {};
-  var isInsideParent = !(pageBorderBox.center.x > parentPosition.right || pageBorderBox.center.x < parentPosition.left || pageBorderBox.center.y < parentPosition.top || pageBorderBox.center.y > parentPosition.bottom);
+  if (document.getElementById('appear-on-top')) {
+    var draggableParentId = oldActiveDroppable !== draggable.descriptor.droppableId ? document.getElementById('appear-on-top').classList[0] + "-folder-items" : draggable.descriptor.droppableId;
+    var parentRndComponent = document.getElementsByClassName(draggableParentId.replace('-folder-items', ''))[0];
+    var parentPosition = parentRndComponent.getBoundingClientRect();
+    var newDroppables = {};
+    var isInsideParent = !(pageBorderBox.center.x > parentPosition.right || pageBorderBox.center.x < parentPosition.left || pageBorderBox.center.y < parentPosition.top || pageBorderBox.center.y > parentPosition.bottom);
 
-  if (isInsideParent) {
-    var _newDroppables;
+    if (isInsideParent) {
+      var _newDroppables;
 
-    newDroppables = (_newDroppables = {}, _newDroppables[draggableParentId] = droppables[draggableParentId], _newDroppables['new-folder'] = droppables['new-folder'], _newDroppables);
-  } else {
-    oldActiveDroppable = document.getElementById('appear-on-top').classList[0] + "-folder-items";
+      newDroppables = (_newDroppables = {}, _newDroppables[draggableParentId] = droppables[draggableParentId], _newDroppables['new-folder'] = droppables['new-folder'], _newDroppables);
+    } else {
+      oldActiveDroppable = document.getElementById('appear-on-top').classList[0] + "-folder-items";
+    }
+
+    return isInsideParent ? values(newDroppables) : values(droppables);
   }
 
-  return isInsideParent ? values(newDroppables) : values(droppables);
+  return values(droppables);
 };
 var toDroppableList = memoizeOne(function (droppables) {
   return values(droppables);
