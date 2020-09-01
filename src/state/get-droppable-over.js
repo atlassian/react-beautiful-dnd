@@ -7,7 +7,7 @@ import type {
   DraggableDimension,
   Axis,
 } from '../types';
-import { getDroppableList, toDroppableList } from './dimension-structures';
+import { getDroppableList } from './dimension-structures';
 import isPositionInFrame from './visibility/is-position-in-frame';
 import { distance, patch } from './position';
 import isWithin from './is-within';
