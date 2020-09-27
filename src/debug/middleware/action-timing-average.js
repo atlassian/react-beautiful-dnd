@@ -19,7 +19,7 @@ export default (groupSize: number) => {
   console.log(`Will take an average every ${groupSize} actions`);
   const bucket: Bucket = {};
 
-  return () => (next: Action => mixed) => (action: Action): any => {
+  return () => (next: (Action) => mixed) => (action: Action): any => {
     const start: number = performance.now();
 
     const result: mixed = next(action);

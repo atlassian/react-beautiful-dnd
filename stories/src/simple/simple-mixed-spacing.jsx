@@ -6,8 +6,8 @@ import React, { Component } from 'react';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
 
 // fake data generator
-const getItems = count =>
-  Array.from({ length: count }, (v, k) => k).map(k => ({
+const getItems = (count) =>
+  Array.from({ length: count }, (v, k) => k).map((k) => ({
     id: `item-${k}`,
     content: `item ${k}`,
   }));
@@ -86,7 +86,7 @@ export default class App extends Component {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Droppable droppableId="droppable">
-          {droppableProvided => (
+          {(droppableProvided) => (
             <div
               ref={droppableProvided.innerRef}
               style={{

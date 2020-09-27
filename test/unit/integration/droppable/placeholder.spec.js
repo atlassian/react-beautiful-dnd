@@ -37,18 +37,18 @@ function hasPlaceholder(
 }
 
 it('should not render a placeholder at rest', () => {
-  withPoorBoardDimensions(preset => {
+  withPoorBoardDimensions((preset) => {
     const { container } = render(<Board />);
 
-    toDroppableList(preset.droppables).forEach(droppable => {
+    toDroppableList(preset.droppables).forEach((droppable) => {
       expect(hasPlaceholder(droppable.descriptor.id, container)).toBe(false);
     });
   });
 });
 
 it('should render a placeholder when dragging over', () => {
-  withPoorBoardDimensions(preset => {
-    toDroppableList(preset.droppables).forEach(droppable => {
+  withPoorBoardDimensions((preset) => {
+    toDroppableList(preset.droppables).forEach((droppable) => {
       const { container, getByTestId, unmount } = render(<Board />);
       const handle: HTMLElement = getByTestId(preset.inHome1.descriptor.id);
       const box0 = preset.inHome1.client.borderBox;
@@ -65,8 +65,8 @@ it('should render a placeholder when dragging over', () => {
 });
 
 it('should remove all placeholders if an error occurs while dragging', () => {
-  withPoorBoardDimensions(preset => {
-    toDroppableList(preset.droppables).forEach(droppable => {
+  withPoorBoardDimensions((preset) => {
+    toDroppableList(preset.droppables).forEach((droppable) => {
       const { container, getByTestId, unmount } = render(<Board />);
       const handle: HTMLElement = getByTestId(preset.inHome1.descriptor.id);
       const box0 = preset.inHome1.client.borderBox;
@@ -93,8 +93,8 @@ it('should remove all placeholders if an error occurs while dragging', () => {
 
 describe('home list', () => {
   it('should always render a placeholder while dragging', () => {
-    withPoorBoardDimensions(preset => {
-      toDroppableList(preset.droppables).forEach(droppable => {
+    withPoorBoardDimensions((preset) => {
+      toDroppableList(preset.droppables).forEach((droppable) => {
         const { container, getByTestId, unmount } = render(<Board />);
         const handle: HTMLElement = getByTestId(preset.inHome1.descriptor.id);
         const box0 = preset.inHome1.client.borderBox;
@@ -113,8 +113,8 @@ describe('home list', () => {
   });
 
   it('should immediately remove the home placeholder after dropping into any list', () => {
-    withPoorBoardDimensions(preset => {
-      toDroppableList(preset.droppables).forEach(droppable => {
+    withPoorBoardDimensions((preset) => {
+      toDroppableList(preset.droppables).forEach((droppable) => {
         const { container, getByTestId, unmount } = render(<Board />);
         const handle: HTMLElement = getByTestId(preset.inHome1.descriptor.id);
 
@@ -135,7 +135,7 @@ describe('home list', () => {
   });
 
   it('should immediately remove the home placeholder after dropping nowhere', () => {
-    withPoorBoardDimensions(preset => {
+    withPoorBoardDimensions((preset) => {
       const { container, getByTestId } = render(<Board />);
       const handle: HTMLElement = getByTestId(preset.inHome1.descriptor.id);
 
@@ -157,7 +157,7 @@ describe('home list', () => {
   });
 
   it('should animate the home placeholder closed after dropping into a foreign list', () => {
-    withPoorBoardDimensions(preset => {
+    withPoorBoardDimensions((preset) => {
       const { container, getByTestId } = render(<Board />);
       const handle: HTMLElement = getByTestId(preset.inHome1.descriptor.id);
 
@@ -199,7 +199,7 @@ describe('home list', () => {
   });
 
   it('should flush a home placeholder collapse animation if starting a new drag', () => {
-    withPoorBoardDimensions(preset => {
+    withPoorBoardDimensions((preset) => {
       const { container, getByTestId } = render(<Board />);
       {
         const handle: HTMLElement = getByTestId(preset.inHome1.descriptor.id);
@@ -241,7 +241,7 @@ describe('home list', () => {
 
 describe('foreign list', () => {
   it('should not render a placeholder if not dragging over', () => {
-    withPoorBoardDimensions(preset => {
+    withPoorBoardDimensions((preset) => {
       const { container, getByTestId } = render(<Board />);
       const handle: HTMLElement = getByTestId(preset.inHome1.descriptor.id);
       const box0 = preset.inHome1.client.borderBox;
@@ -256,7 +256,7 @@ describe('foreign list', () => {
   });
 
   it('should animate a placeholder closed when no longer dragging over', () => {
-    withPoorBoardDimensions(preset => {
+    withPoorBoardDimensions((preset) => {
       const { container, getByTestId } = render(<Board />);
       const handle: HTMLElement = getByTestId(preset.inHome1.descriptor.id);
 
@@ -282,7 +282,7 @@ describe('foreign list', () => {
   });
 
   it('should flush a foreign list collapsing animation if a new drag starts', () => {
-    withPoorBoardDimensions(preset => {
+    withPoorBoardDimensions((preset) => {
       const { container, getByTestId } = render(<Board />);
       const handle: HTMLElement = getByTestId(preset.inHome1.descriptor.id);
 

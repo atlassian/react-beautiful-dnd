@@ -15,6 +15,7 @@
   "rules": {
     "declaration-empty-line-before": null,
     "comment-empty-line-before": null,
-    "block-no-empty": null
+    "block-no-empty": null,
+    "value-keyword-case": null
   }
 }

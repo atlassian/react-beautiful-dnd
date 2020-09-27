@@ -31,7 +31,7 @@ export default function App() {
     <DragDropContext onDragEnd={onDragEnd}>
       <button
         type="button"
-        onClick={() => setIsCombineEnabled(value => !value)}
+        onClick={() => setIsCombineEnabled((value) => !value)}
       >
         Combining <strong>{isCombineEnabled ? 'enabled' : 'disabled'}</strong>
       </button>

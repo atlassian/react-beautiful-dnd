@@ -18,7 +18,7 @@ const Container = styled.div`
   width: 300px;
   background-color: ${colors.N100};
   border-radius: ${borderRadius}px;
-  filter: blur(${props => props.blur}px);
+  filter: blur(${(props) => props.blur}px);
 `;
 
 const Title = styled.h3`

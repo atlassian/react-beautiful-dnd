@@ -69,7 +69,7 @@ You can use the `src` of an `<img>` tag (which is a `HTMLElement`) to have a dra
 ```js
 // ✅ supported
 <Draggable draggableId="supported" index={0}>
-  {provided => (
+  {(provided) => (
     <img
       {...provided.draggableProps}
       {...provided.dragHandleProps}
@@ -95,7 +95,7 @@ Alternatively you could also apply the SVG as a `background-image` to another `H
 ```js
 // ✅ supported
 <Draggable draggableId="supported" index={0}>
-  {provided => (
+  {(provided) => (
     <div
       {...provided.draggableProps}
       {...provided.dragHandleProps}

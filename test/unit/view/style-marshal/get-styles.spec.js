@@ -21,7 +21,7 @@ Object.keys(styles).forEach((key: string) => {
           },
         },
       })
-      .then(result => {
+      .then((result) => {
         expect(result.errored).toBe(false);
         // asserting that some CSS was actually generated!
         // eslint-disable-next-line no-underscore-dangle

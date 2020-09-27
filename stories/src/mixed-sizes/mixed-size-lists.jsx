@@ -38,7 +38,7 @@ function Item(props: ItemProps) {
 
   return (
     <Draggable draggableId={quote.id} index={index}>
-      {provided => (
+      {(provided) => (
         <StyledItem
           {...provided.draggableProps}
           {...provided.dragHandleProps}
@@ -69,9 +69,9 @@ const StyledList = styled.div`
   margin: ${grid}px;
   padding: ${grid}px;
   box-sizing: border-box;
-  background-color: ${props =>
+  background-color: ${(props) =>
     props.isDraggingOver ? colors.B100 : 'inherit'};
-  width: ${props => (props.width === 'large' ? 800 : 200)}px;
+  width: ${(props) => (props.width === 'large' ? 800 : 200)}px;
 `;
 
 function List(props: ListProps) {

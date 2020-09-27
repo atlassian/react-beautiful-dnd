@@ -15,7 +15,7 @@ const extensions = ['.js', '.jsx'];
 
 // Treat as externals all not relative and not absolute paths
 // e.g. 'react'
-const excludeAllExternals = id => !id.startsWith('.') && !id.startsWith('/');
+const excludeAllExternals = (id) => !id.startsWith('.') && !id.startsWith('/');
 
 const getBabelOptions = ({ useESModules }) => ({
   exclude: 'node_modules/**',

@@ -92,7 +92,7 @@ it('should animate movements when in snap mode', () => {
 });
 
 it('should update the snapshot and opacity when combining with another item', () => {
-  withPoorDimensionMocks(preset => {
+  withPoorDimensionMocks((preset) => {
     const spy = jest.fn();
     const renderItem: RenderItem = renderItemAndSpy(spy);
     const box1 = preset.inHome1.client.borderBox;

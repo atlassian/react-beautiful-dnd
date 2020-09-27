@@ -43,7 +43,7 @@ class TaskItem extends React.Component<TaskItemProps> {
     return (
       <div
         data-testid="drag-handle"
-        ref={ref => {
+        ref={(ref) => {
           task.setRef(ref);
           provided.innerRef(ref);
         }}
@@ -162,7 +162,7 @@ class App extends React.Component<*, State> {
         <Droppable droppableId="droppable">
           {(droppableProvided: DroppableProvided) => (
             <div
-              ref={ref => {
+              ref={(ref) => {
                 setDroppableBounds(ref);
                 droppableProvided.innerRef(ref);
               }}

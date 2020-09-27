@@ -40,7 +40,7 @@ const SimpleQuote = styled.div`
 
   /* stylelint-disable  comment-empty-line-before */
   /* add little portal indicator when in a portal */
-  ${props =>
+  ${(props) =>
     props.inPortal
       ? `
     ::after {
@@ -52,7 +52,7 @@ const SimpleQuote = styled.div`
       content: "in portal";
     }
   `
-      : ''} /* stylelint-enable */;
+      : ''}/* stylelint-enable */;
 `;
 
 class PortalAwareItem extends Component<ItemProps> {

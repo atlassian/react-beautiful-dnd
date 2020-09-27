@@ -39,7 +39,7 @@ export default function DragDropContext(props: Props) {
   // so that it can catch any errors caused by App
   return (
     <ErrorBoundary>
-      {setCallbacks => (
+      {(setCallbacks) => (
         <App
           nonce={props.nonce}
           contextId={contextId}

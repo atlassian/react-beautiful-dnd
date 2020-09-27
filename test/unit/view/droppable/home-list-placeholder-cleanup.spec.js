@@ -46,10 +46,7 @@ it('should animate a placeholder closed in a home list after a drag', () => {
 
   // finishing the animation
   act(() => {
-    wrapper
-      .find(Placeholder)
-      .props()
-      .onClose();
+    wrapper.find(Placeholder).props().onClose();
   });
 
   // let the wrapper know the react tree has changed

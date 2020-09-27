@@ -43,7 +43,7 @@ export default class AuthorItem extends Component<Props> {
 
     return (
       <Avatar
-        ref={ref => provided.innerRef(ref)}
+        ref={(ref) => provided.innerRef(ref)}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
         src={author.avatarUrl}

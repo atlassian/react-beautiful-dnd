@@ -23,7 +23,7 @@ afterEach(() => {
 });
 
 const getCreatePlaceholderCalls = () => {
-  return spy.mock.calls.filter(call => {
+  return spy.mock.calls.filter((call) => {
     return call[1] && call[1][attributes.placeholder.contextId] === contextId;
   });
 };

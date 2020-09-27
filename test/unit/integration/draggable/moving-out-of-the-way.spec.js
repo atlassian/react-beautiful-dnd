@@ -10,7 +10,7 @@ import {
 } from '../util/helpers';
 
 it('should move out of the way when requested', () => {
-  withPoorDimensionMocks(preset => {
+  withPoorDimensionMocks((preset) => {
     const spy = jest.fn();
     const renderItem = renderItemAndSpy(spy);
     const { getByText } = render(<App renderItem={renderItem} />);

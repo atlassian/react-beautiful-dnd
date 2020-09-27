@@ -11,8 +11,8 @@ import App, { type Item } from '../../util/app';
 import { interactiveTagNames } from '../../../../../src/view/use-sensor-marshal/is-event-in-interactive-element';
 
 const mixedCase = (obj: Object): string[] => [
-  ...Object.keys(obj).map(s => s.toLowerCase()),
-  ...Object.keys(obj).map(s => s.toUpperCase()),
+  ...Object.keys(obj).map((s) => s.toLowerCase()),
+  ...Object.keys(obj).map((s) => s.toUpperCase()),
 ];
 
 const forEachTagName = (fn: (tagName: string) => void) =>

@@ -10,13 +10,8 @@ describe('reorder', () => {
 
   it('should reorder within a list', () => {
     // order: 1, 2
-    cy.get(getHandleSelector())
-      .eq(0)
-      .as('first')
-      .should('contain', 'id:1');
-    cy.get(getHandleSelector())
-      .eq(1)
-      .should('contain', 'id:2');
+    cy.get(getHandleSelector()).eq(0).as('first').should('contain', 'id:1');
+    cy.get(getHandleSelector()).eq(1).should('contain', 'id:2');
 
     // reorder operation
     cy.get('@first')
@@ -31,13 +26,9 @@ describe('reorder', () => {
 
     // order now 2, 1
     // note: not using get aliases as they where returning incorrect results
-    cy.get(getHandleSelector())
-      .eq(0)
-      .should('contain', 'id:2');
+    cy.get(getHandleSelector()).eq(0).should('contain', 'id:2');
 
-    cy.get(getHandleSelector())
-      .eq(1)
-      .should('contain', 'id:1');
+    cy.get(getHandleSelector()).eq(1).should('contain', 'id:1');
 
     // element should maintain focus post drag
     cy.focused().should('contain', 'id:1');

@@ -85,7 +85,7 @@ export const getCallsFor = (
   id: DraggableId,
   mock: JestMockFn<*, *>,
 ): Call[] => {
-  return mock.mock.calls.filter(call => {
+  return mock.mock.calls.filter((call) => {
     const provided: DraggableProvided = call[0];
     return provided.draggableProps['data-rbd-draggable-id'] === id;
   });
@@ -95,7 +95,7 @@ export const getProvidedFor = (
   id: DraggableId,
   mock: JestMockFn<*, *>,
 ): DraggableProvided[] => {
-  return getCallsFor(id, mock).map(call => {
+  return getCallsFor(id, mock).map((call) => {
     return call[0];
   });
 };
@@ -104,7 +104,7 @@ export const getSnapshotsFor = (
   id: DraggableId,
   mock: JestMockFn<*, *>,
 ): DraggableStateSnapshot[] => {
-  return getCallsFor(id, mock).map(call => {
+  return getCallsFor(id, mock).map((call) => {
     return call[1];
   });
 };
@@ -113,7 +113,7 @@ export const getRubricsFor = (
   id: DraggableId,
   mock: JestMockFn<*, *>,
 ): DraggableRubric[] => {
-  return getCallsFor(id, mock).map(call => {
+  return getCallsFor(id, mock).map((call) => {
     return call[2];
   });
 };

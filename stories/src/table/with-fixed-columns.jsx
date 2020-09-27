@@ -16,7 +16,7 @@ import type {
 const Table = styled.table`
   width: 500px;
   margin: 0 auto;
-  table-layout: ${props => props.layout};
+  table-layout: ${(props) => props.layout};
 `;
 
 const TBody = styled.tbody`
@@ -31,7 +31,7 @@ const THead = styled.thead`
 
 const Row = styled.tr`
   /* stylelint-disable comment-empty-line-before */
-  ${props =>
+  ${(props) =>
     props.isDragging
       ? `
     background: ${colors.G100};
@@ -39,7 +39,7 @@ const Row = styled.tr`
     /* maintain cell width while dragging */
     display: table;
   `
-      : ''} /* stylelint-enable */;
+      : ''}/* stylelint-enable */;
 `;
 
 const Cell = styled.td`

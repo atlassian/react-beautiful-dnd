@@ -72,7 +72,7 @@ export default function useStyleMarshal(contextId: ContextId, nonce?: string) {
     setDynamicStyle(styles.resting);
 
     return () => {
-      const remove = ref => {
+      const remove = (ref) => {
         const current: ?HTMLStyleElement = ref.current;
         invariant(current, 'Cannot unmount ref as it is not set');
         getHead().removeChild(current);
