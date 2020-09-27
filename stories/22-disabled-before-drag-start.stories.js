@@ -28,7 +28,7 @@ const reorder = (list, startIndex, endIndex) => {
 
 const grid: number = 8;
 
-const getListStyle = isDraggingOver => ({
+const getListStyle = (isDraggingOver) => ({
   background: isDraggingOver ? 'lightblue' : 'lightgrey',
   padding: grid,
   overflow: 'auto',
@@ -49,7 +49,7 @@ const getItemStyle = (isDragging, draggableStyle, draggable) => ({
 });
 
 const getItems = (count: number): Item[] =>
-  Array.from({ length: count }, (v, k) => k).map(k => ({
+  Array.from({ length: count }, (v, k) => k).map((k) => ({
     id: `item-${k}`,
     content: `item ${k}`,
   }));
