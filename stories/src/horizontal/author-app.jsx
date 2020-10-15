@@ -22,6 +22,9 @@ type State = {|
 const Root = styled.div`
   padding: ${grid}px;
   background: ${colors.B50};
+  display: flex;
+    flex-direction: row;
+    justify-content: center;
 `;
 
 export default class AuthorApp extends Component<Props, State> {

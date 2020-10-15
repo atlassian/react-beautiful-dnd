@@ -8,7 +8,7 @@ import type {
   DroppableSubject,
   ScrollSize,
 } from '../../types';
-import { vertical, horizontal } from '../axis';
+import { vertical, horizontal, grid } from '../axis';
 import { origin } from '../position';
 import getMaxScroll from '../get-max-scroll';
 import getSubject from './util/get-subject';
@@ -26,7 +26,7 @@ type Args = {|
   isEnabled: boolean,
   isCombineEnabled: boolean,
   isFixedOnPage: boolean,
-  direction: 'vertical' | 'horizontal',
+  direction: 'vertical' | 'horizontal' | 'grid',
   client: BoxModel,
   // is null when in a fixed container
   page: BoxModel,
@@ -76,7 +76,7 @@ export default ({
     };
   })();
 
-  const axis: Axis = direction === 'vertical' ? vertical : horizontal;
+  const axis: Axis = direction === 'vertical' ? vertical : direction === 'grid' ? grid : horizontal;
 
   const subject: DroppableSubject = getSubject({
     page,

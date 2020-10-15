@@ -14,6 +14,7 @@ import type {
 } from '../../../src';
 
 const Wrapper = styled.div`
+  max-width:420px;
   background-color: ${({ isDraggingOver }) =>
     isDraggingOver ? colors.B50 : colors.B75};
   display: flex;
@@ -25,6 +26,8 @@ const Wrapper = styled.div`
 `;
 
 const DropZone = styled.div`
+max-width:420px;
+flex-wrap:wrap;
   display: flex;
 
   /*
@@ -34,14 +37,14 @@ const DropZone = styled.div`
   align-items: start;
 
   /* stop the list collapsing when empty */
-  min-width: 600px;
+  /*min-width: 600px;*/
 
   /* stop the list collapsing when it has no items */
   min-height: 60px;
 `;
 
 const ScrollContainer = styled.div`
-  overflow: auto;
+  /*overflow: hidden;*/
 `;
 
 // $ExpectError - not sure why
@@ -101,7 +104,7 @@ export default class AuthorList extends Component<Props> {
       <Droppable
         droppableId={listId}
         type={listType}
-        direction="horizontal"
+        direction="grid"
         isCombineEnabled={isCombineEnabled}
       >
         {(

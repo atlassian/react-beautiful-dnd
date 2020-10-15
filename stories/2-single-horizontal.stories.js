@@ -6,7 +6,7 @@ import AuthorApp from './src/horizontal/author-app';
 import { quotes, getQuotes } from './src/data';
 import type { Quote } from './src/types';
 
-const bigData: Quote[] = getQuotes(30);
+const bigData: Quote[] = getQuotes(20);
 
 const WideWindow = styled.div`
   width: 120vw;

@@ -31,7 +31,7 @@ export type DraggableOptions = {|
   isEnabled: boolean,
 |};
 
-export type Direction = 'horizontal' | 'vertical';
+export type Direction = 'horizontal' | 'vertical' | 'grid';
 
 export type VerticalAxis = {|
   direction: 'vertical',
@@ -57,7 +57,20 @@ export type HorizontalAxis = {|
   crossAxisSize: 'height',
 |};
 
-export type Axis = VerticalAxis | HorizontalAxis;
+export type GridAxis = {|
+  direction: 'horizontal',
+  grid: true,
+  line: 'x',
+  start: 'left',
+  end: 'right',
+  size: 'width',
+  crossAxisLine: 'y',
+  crossAxisStart: 'top',
+  crossAxisEnd: 'bottom',
+  crossAxisSize: 'height',
+|};
+
+export type Axis = VerticalAxis | HorizontalAxis | GridAxis;
 
 export type ScrollSize = {|
   scrollHeight: number,

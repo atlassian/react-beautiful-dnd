@@ -13,6 +13,7 @@ const Avatar = styled.img`
   border-radius: 50%;
   flex-shrink: 0;
   margin-right: ${grid}px;
+  margin-bottom: ${grid}px;
   border-color: ${({ isDragging }) => (isDragging ? colors.G50 : colors.N0)};
   border-style: solid;
   border-width: ${grid}px;

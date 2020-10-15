@@ -242,6 +242,7 @@ function getSecondarySelector(): TrySelect {
     draggingId: DraggableId,
     impact: DragImpact,
     afterCritical: LiftEffect,
+    overrideDisplacement: { x: number, y: number },
   ): ?MapProps => {
     const visualDisplacement: ?Displacement = impact.displaced.visible[ownId];
     const isAfterCriticalInVirtualList: boolean = Boolean(
@@ -280,7 +281,10 @@ function getSecondarySelector(): TrySelect {
       // we can just leave it in the original spot.
       return getFallback(combineTargetFor);
     }
-    const displaceBy: Position = impact.displacedBy.point;
+
+    //mod-start
+    const displaceBy: Position = overrideDisplacement || impact.displacedBy.point;
+    //mod-end
     const offset: Position = memoizedOffset(displaceBy.x, displaceBy.y);
 
     return getMemoizedProps(
@@ -290,6 +294,61 @@ function getSecondarySelector(): TrySelect {
     );
   };
 
+  //mod-start
+  const getDisplacementOverride = (state: State, ownProps: OwnProps): ?{ x: number, y: number } => {
+
+    if (!state.impact || !state.onLiftImpact || !state.dimensions)
+      return null;
+
+    let impact = state.onLiftImpact;
+
+    if(impact.displaced.all.length < state.impact.displaced.all.length)
+      impact = state.impact;
+
+    const dims = state.dimensions.draggables;
+
+    const displaced = impact.displaced.all;
+    const index = displaced.indexOf(ownProps.draggableId);
+
+    if (index > -1 && displaced.length > index + 1) {
+      const ownDimensions = dims[ownProps.draggableId].client.borderBox;
+
+      if (index > 0) {
+        const prevDraggableId = displaced[index - 1];
+        const prevDraggableDimensions = dims[prevDraggableId].client.borderBox;
+
+        if (prevDraggableDimensions.y !== ownDimensions.y) {
+          if (!impact.displaced.visible[ownProps.draggableId].shouldAnimate) {
+            return {
+              x: ownDimensions.x - prevDraggableDimensions.x,
+              y: ownDimensions.y - prevDraggableDimensions.y,
+            };
+          }
+        }
+      }
+
+      const nextDraggableId = displaced[index + 1];
+      const nextDraggableDimensions = dims[nextDraggableId].client.borderBox;
+
+      if (nextDraggableDimensions.y !== ownDimensions.y) {
+
+        if (!impact.displaced.visible[ownProps.draggableId].shouldAnimate)
+          return { x: impact.displacedBy.point.x, y: 0 };
+        return {
+          x: nextDraggableDimensions.x - ownDimensions.x,
+          y: nextDraggableDimensions.y - ownDimensions.y,
+        };
+      }
+    }
+
+    return null;
+
+    //const direction = state.current ? state.current.client.offset.y > 0 ? 'down' : 'up' : 'unknown';
+    //const dragCurrentY = state.current ? state.current.client.offset.y : 0;
+    //const dragInitialY = state.critical ? state.dimensions.draggables[state.critical.draggable.id].client.borderBox.y : 0;
+  };
+  //mod-end
+
   const selector: TrySelect = (state: State, ownProps: OwnProps): ?MapProps => {
     // Dragging
     if (state.isDragging) {
@@ -298,11 +357,23 @@ function getSecondarySelector(): TrySelect {
         return null;
       }
 
+      //mod-start
+      if(state.critical.droppable && state.dimensions.droppables[state.critical.droppable.id].axis.grid){
+        return getProps(
+          ownProps.draggableId,
+          state.critical.draggable.id,
+          state.impact,
+          state.afterCritical,
+          getDisplacementOverride(state, ownProps)
+        );
+      }
+      //mod-end
+
       return getProps(
         ownProps.draggableId,
         state.critical.draggable.id,
         state.impact,
-        state.afterCritical,
+        state.afterCritical
       );
     }
 
@@ -313,11 +384,24 @@ function getSecondarySelector(): TrySelect {
       if (completed.result.draggableId === ownProps.draggableId) {
         return null;
       }
+
+      //mod-start
+      if(state.completed.critical.droppable && state.dimensions.droppables[state.completed.critical.droppable.id].axis.grid) {
+        return getProps(
+          ownProps.draggableId,
+          completed.result.draggableId,
+          completed.impact,
+          completed.afterCritical,
+          getDisplacementOverride(state, ownProps)
+        );
+      }
+      //mod-end
+
       return getProps(
         ownProps.draggableId,
         completed.result.draggableId,
         completed.impact,
-        completed.afterCritical,
+        completed.afterCritical
       );
     }
 
@@ -334,10 +418,11 @@ export const makeMapStateToProps = (): Selector => {
   const draggingSelector: TrySelect = getDraggableSelector();
   const secondarySelector: TrySelect = getSecondarySelector();
 
-  const selector = (state: State, ownProps: OwnProps): MapProps =>
-    draggingSelector(state, ownProps) ||
-    secondarySelector(state, ownProps) ||
-    atRest;
+  const selector = (state: State, ownProps: OwnProps): MapProps => {
+    return draggingSelector(state, ownProps) ||
+      secondarySelector(state, ownProps) ||
+      atRest;
+  };
 
   return selector;
 };

@@ -18,6 +18,7 @@ import { find } from '../../native-with-fallback';
 import getDidStartAfterCritical from '../did-start-after-critical';
 import calculateReorderImpact from '../calculate-drag-impact/calculate-reorder-impact';
 import getIsDisplaced from '../get-is-displaced';
+import { horizontal, vertical } from '../axis';
 
 type Args = {|
   pageBorderBoxWithDroppableScroll: Rect,
@@ -52,14 +53,14 @@ function atIndex({ draggable, closest, inHomeList }: AtIndexArgs): ?number {
 }
 
 export default ({
-  pageBorderBoxWithDroppableScroll: targetRect,
-  draggable,
-  destination,
-  insideDestination,
-  last,
-  viewport,
-  afterCritical,
-}: Args): DragImpact => {
+                  pageBorderBoxWithDroppableScroll: targetRect,
+                  draggable,
+                  destination,
+                  insideDestination,
+                  last,
+                  viewport,
+                  afterCritical,
+                }: Args): DragImpact => {
   const axis: Axis = destination.axis;
   const displacedBy: DisplacedBy = getDisplacedBy(
     destination.axis,
@@ -69,6 +70,11 @@ export default ({
 
   const targetStart: number = targetRect[axis.start];
   const targetEnd: number = targetRect[axis.end];
+
+  //mod-start
+  const uprightAxis = axis.direction === 'horizontal' ? vertical : horizontal;
+  const uprightAxisBoundStart: number = targetRect[uprightAxis.start];
+  //mod-end
 
   const withoutDragging: DraggableDimension[] = removeDraggableFromList(
     draggable,
@@ -80,6 +86,15 @@ export default ({
     (child: DraggableDimension): boolean => {
       const id: DraggableId = child.descriptor.id;
       const childCenter: number = child.page.borderBox.center[axis.line];
+
+      //mod-start
+      if(axis.grid) {
+        const uprightChildCenter: number = child.page.borderBox.center[uprightAxis.line];
+
+        if (!(uprightAxisBoundStart < uprightChildCenter))
+          return false;
+      }
+      //mod-end
 
       const didStartAfterCritical: boolean = getDidStartAfterCritical(
         id,

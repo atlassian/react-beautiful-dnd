@@ -96,8 +96,8 @@ export default function Draggable(props: Props) {
     );
     useDraggablePublisher(forPublisher);
   }
-  /* eslint-enable react-hooks/rules-of-hooks */
 
+  /* eslint-enable react-hooks/rules-of-hooks */
   const dragHandleProps: ?DragHandleProps = useMemo(
     () =>
       isEnabled
