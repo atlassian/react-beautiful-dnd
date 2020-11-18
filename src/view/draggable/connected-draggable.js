@@ -310,7 +310,7 @@ function getSecondarySelector(): TrySelect {
     const displaced = impact.displaced.all;
     const index = displaced.indexOf(ownProps.draggableId);
 
-    if (index > -1 && displaced.length > index + 1) {
+    if (index > -1 && displaced.length > index + 1 && impact.displaced.visible[ownProps.draggableId]) {
       const ownDimensions = dims[ownProps.draggableId].client.borderBox;
 
       if (index > 0) {
