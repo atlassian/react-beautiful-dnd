@@ -52,7 +52,7 @@ We have created [a free course on `egghead.io` 🥚](https://egghead.io/courses/
 - Able to move the dragging item to another element while dragging (clone, portal) - [Reparenting your `<Draggable />`](/docs/guides/reparenting.md)
 - [Create scripted drag and drop experiences 🎮](/docs/sensors/sensor-api.md)
 - Allows extensions to support for [any input type you like 🕹](/docs/sensors/sensor-api.md)
-- 🌲 Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) package
+- 🌲 Tree support through the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/confluence/tree) package
 - A `<Droppable />` list can be a scroll container (without a scrollable parent) or be the child of a scroll container (that also does not have a scrollable parent)
 - Independent nested lists - a list can be a child of another list, but you cannot drag items from the parent list into a child list
 - Server side rendering (SSR) compatible - see [resetServerContext()](/docs/api/reset-server-context.md)
