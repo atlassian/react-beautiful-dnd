@@ -93,7 +93,7 @@ body > * {
 
 **Styles applied using inline styles**
 
-This is described by the type [`DraggableStyle`](https://github.com/atlassian/react-beautiful-dnd#type-information-1).
+This is described by the type `DraggableStyle`.
 
 ### (Phase: dragging): body element
 
