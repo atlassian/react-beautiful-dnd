@@ -1806,6 +1806,25 @@
   dependencies:
     type-detect "4.0.8"
 
+"@storybook/addon-storysource@5.3.18":
+  version "5.3.18"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-storysource/-/addon-storysource-5.3.18.tgz#003374d76c0898c3b74aa4cd008f444eb6b63c68"
+  integrity sha512-uMSu505rbcNErAYngV5raVRQ/eMiOtGNA88WxNzD/8h/0EVpEXlBAewiGzAmooNhCa/3O3iPuwka8Cky6aWPOA==
+  dependencies:
+    "@storybook/addons" "5.3.18"
+    "@storybook/components" "5.3.18"
+    "@storybook/router" "5.3.18"
+    "@storybook/source-loader" "5.3.18"
+    "@storybook/theming" "5.3.18"
+    core-js "^3.0.1"
+    estraverse "^4.2.0"
+    loader-utils "^1.2.3"
+    prettier "^1.16.4"
+    prop-types "^15.7.2"
+    react-syntax-highlighter "^11.0.2"
+    regenerator-runtime "^0.13.3"
+    util-deprecate "^1.0.2"
+
 "@storybook/addons@5.3.18", "@storybook/addons@^5.3.18":
   version "5.3.18"
   resolved "https://registry.yarnpkg.com/@storybook/addons/-/addons-5.3.18.tgz#5cbba6407ef7a802041c5ee831473bc3bed61f64"
@@ -2066,6 +2085,22 @@
     memoizerific "^1.11.3"
     qs "^6.6.0"
     util-deprecate "^1.0.2"
+
+"@storybook/source-loader@5.3.18":
+  version "5.3.18"
+  resolved "https://registry.yarnpkg.com/@storybook/source-loader/-/source-loader-5.3.18.tgz#39ba28d9664ab8204d6b04ee757772369931e7e5"
+  integrity sha512-oljmLt3KMu17W9FAaEgocsI6wrloWczS26SVXadzbDbL+8Tu6vTeFJSd6HcY+e4JIIKjuze0kmaVhpi6wwPbZQ==
+  dependencies:
+    "@storybook/addons" "5.3.18"
+    "@storybook/client-logger" "5.3.18"
+    "@storybook/csf" "0.0.1"
+    core-js "^3.0.1"
+    estraverse "^4.2.0"
+    global "^4.3.2"
+    loader-utils "^1.2.3"
+    prettier "^1.16.4"
+    prop-types "^15.7.2"
+    regenerator-runtime "^0.13.3"
 
 "@storybook/theming@5.3.18", "@storybook/theming@^5.3.18":
   version "5.3.18"
@@ -10582,6 +10617,11 @@ prettier-linter-helpers@^1.0.0:
   integrity sha512-GbK2cP9nraSSUF9N2XwUwqfzlAFlMNYYl+ShE/V+H8a9uNl/oUqB1w2EL54Jh0OlyRSd8RfWYJ3coVS4TROP2w==
   dependencies:
     fast-diff "^1.1.2"
+
+prettier@^1.16.4:
+  version "1.19.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
+  integrity sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
 
 prettier@^2.0.4:
   version "2.0.4"
