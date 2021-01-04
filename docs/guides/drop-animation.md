@@ -77,7 +77,7 @@ Generally speaking you should be avoiding this. A drop animation is an important
 
 If you are seeing a strange drop behaviour, such as dropping to the wrong spot, our recommendation is to raise an issue as it could be a bug with `react-beautiful-dnd` or a setup issue.
 
-If you do have use case where it makes sense to remove the drop animation you will need to add a `[transition-duration](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-duration)` property of _almost_ `0s`. This will skip the drop animation.
+If you do have use case where it makes sense to remove the drop animation you will need to add a [`transition-duration`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-duration) property of _almost_ `0s`. This will skip the drop animation.
 
 Do not make the `transition-duration` actually `0s`. It should be set at a near `0s` value such as `0.001s`. The reason for this is that if you set `transition-duration` to `0s` then a `onTransitionEnd` event will not fire - and we use that to know when the drop animation is finished.
 
