@@ -243,7 +243,7 @@ function getHandleBindings({
   ];
 }
 
-export default function useMouseSensor(api: SensorAPI) {
+export default function useTouchSensor(api: SensorAPI) {
   const phaseRef = useRef<Phase>(idle);
   const unbindEventsRef = useRef<() => void>(noop);
 
