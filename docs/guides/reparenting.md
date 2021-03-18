@@ -82,13 +82,15 @@ function List(props) {
       droppableId="droppable"
       renderClone={renderItem}
     >
-      <div ref={provided.innerRef} {...provided.droppableProps}>
-        {items.map(item) => (
-          <Draggable draggableId={item.id} index={item.index}>
-            {renderItem}
-          </Draggable>
-        )}
-      </div>
+      {(provided, snapshot) => (
+        <div ref={provided.innerRef} {...provided.droppableProps}>
+          {items.map((item) => (
+            <Draggable draggableId={item.id} index={item.index}>
+              {renderItem}
+            </Draggable>
+          ))}
+        </div>
+      )}
     </Droppable>
   );
 }
