@@ -38,6 +38,11 @@ Please raise a pull request if you would like to add examples for other virtuali
 - [Board](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--board) ([source](/stories/src/virtual/react-virtualized/board.jsx))
 - [List](https://react-beautiful-dnd.netlify.com/?path=/story/virtual-react-virtualized--window-list) with [`WindowScroller`](https://github.com/bvaughn/react-virtualized/blob/master/docs/WindowScroller.md) ([source](/stories/src/virtual/react-virtualized/window-list.jsx))
 
+### [`react-virtuoso`](https://github.com/petyosi/react-virtuoso)
+React Virtuoso comes with automatic item measurement out of the box.
+- [List with source](https://virtuoso.dev/react-beautiful-dnd/)
+- [Basic list on `codesandbox.io`](https://codesandbox.io/s/react-virutoso-with-react-beautiful-dnd-e6vmq)
+
 ## Usage
 
 `react-beautiful-dnd` does not provide its own virtual list abstraction so there is a bit of wiring that you will need to do in order to get going with existing virtual list solutions 🛠
