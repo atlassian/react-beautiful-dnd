@@ -88,7 +88,7 @@
     "babel-loader": "8.1.0",
     "babel-plugin-dev-expression": "0.2.2",
     "babel-plugin-emotion": "10.0.33",
-    "cross-env": "7.0.2",
+    "cross-env": "7.0.3",
     "cypress": "4.4.0",
     "emotion-theming": "10.0.27",
     "enzyme": "3.11.0",
