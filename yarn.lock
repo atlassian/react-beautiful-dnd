@@ -11,7 +11,16 @@
     fbjs "^1.0.0"
     mkdirp "^0.5.1"
 
-"@atlaskit/theme@9.5.2", "@atlaskit/theme@^9.5.1":
+"@atlaskit/theme@9.5.6":
+  version "9.5.6"
+  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-9.5.6.tgz#fbc1068eee3af5dbb57c346276b5eb0913e89d0d"
+  integrity sha512-DC+uIP+Gv6MrJQUjzCFHFukSZEoEj2fUzb0ejpnSWqrXoS8uGXvwJ2cI7/k4F+gFBQWOS4ChM+DOHn0UrleRPA==
+  dependencies:
+    exenv "^1.2.2"
+    prop-types "^15.5.10"
+    tslib "^1.9.3"
+
+"@atlaskit/theme@^9.5.1":
   version "9.5.2"
   resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-9.5.2.tgz#a6ede937f5a6870c4acf6a6cbf094b429e0e759d"
   integrity sha512-I5pUi6Ie0eOAwnuFtgoXsB3NoRoCl5itQtiIaZ106eLB+eYd22H9Qr0KXWvl4RY2Dn82MO3KbnVGMTX7DUSGeg==
