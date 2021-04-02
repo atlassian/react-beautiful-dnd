@@ -121,7 +121,7 @@
     "react-dom": "16.13.1",
     "react-test-renderer": "16.13.1",
     "react-virtualized": "9.21.2",
-    "react-window": "1.8.5",
+    "react-window": "1.8.6",
     "require-from-string": "2.0.2",
     "rimraf": "3.0.2",
     "rollup": "2.6.1",
