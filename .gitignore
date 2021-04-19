@@ -9,7 +9,7 @@ node_modules/
 .DS_Store
 
 # generated files
-dist/
+# dist/
 
 # generated site
 site/

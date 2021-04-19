@@ -25,7 +25,7 @@ type Args = {|
 |};
 
 // exported for testing
-export const combineThresholdDivisor: number = 4;
+export const combineThresholdDivisor: number = 8;
 
 export default ({
   draggable,
