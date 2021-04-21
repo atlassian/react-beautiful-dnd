@@ -11423,7 +11423,7 @@ randexp@0.4.6:
     discontinuous-range "1.0.0"
     ret "~0.1.10"
 
-randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5:
+randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5, randombytes@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/randombytes/-/randombytes-2.1.0.tgz#df6f84372f0270dc65cdf6291349ab7a473d4f2a"
   integrity sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==
@@ -12357,15 +12357,15 @@ rollup-plugin-strip@1.2.2:
     magic-string "^0.25.1"
     rollup-pluginutils "^2.8.1"
 
-rollup-plugin-terser@5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-terser/-/rollup-plugin-terser-5.3.0.tgz#9c0dd33d5771df9630cd027d6a2559187f65885e"
-  integrity sha512-XGMJihTIO3eIBsVGq7jiNYOdDMb3pVxuzY0uhOE/FM4x/u9nQgr3+McsjzqBn3QfHIpNSZmFnpoKAwHBEcsT7g==
+rollup-plugin-terser@5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-terser/-/rollup-plugin-terser-5.3.1.tgz#8c650062c22a8426c64268548957463bf981b413"
+  integrity sha512-1pkwkervMJQGFYvM9nscrUoncPwiKR/K+bHdjv6PFgRo3cgPHoRT83y2Aa3GvINj4539S15t/tpFPb775TDs6w==
   dependencies:
     "@babel/code-frame" "^7.5.5"
     jest-worker "^24.9.0"
     rollup-pluginutils "^2.8.2"
-    serialize-javascript "^2.1.2"
+    serialize-javascript "^4.0.0"
     terser "^4.6.2"
 
 rollup-pluginutils@^2.5.0, rollup-pluginutils@^2.6.0, rollup-pluginutils@^2.8.1, rollup-pluginutils@^2.8.2:
@@ -12578,6 +12578,13 @@ serialize-javascript@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-2.1.2.tgz#ecec53b0e0317bdc95ef76ab7074b7384785fa61"
   integrity sha512-rs9OggEUF0V4jUSecXazOYsLfu7OGK2qIn3c7IPBiffz32XniEp/TX9Xmc9LQfK2nQ2QKHvZ2oygKUGU0lG4jQ==
+
+serialize-javascript@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-4.0.0.tgz#b525e1238489a5ecfc42afacc3fe99e666f4b1aa"
+  integrity sha512-GaNA54380uFefWghODBWEGisLZFj00nS5ACs6yHa9nLqlLpVLO8ChDGeKRjZnV4Nh4n0Qi7nhYZD/9fCPzEqkw==
+  dependencies:
+    randombytes "^2.1.0"
 
 serve-favicon@^2.5.0:
   version "2.5.0"
