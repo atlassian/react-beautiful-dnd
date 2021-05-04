@@ -6,7 +6,7 @@
 
 ![combining](https://user-images.githubusercontent.com/2182637/48045145-318dc300-e1e3-11e8-83bd-22c9bd44c442.gif)
 
-> 🌲 If you are looking to build a tree view, we have built one already! [@atlaskit/tree](https://atlaskit.atlassian.com/packages/core/tree)
+> 🌲 If you are looking to build a tree view, we have built one already! [@atlaskit/tree](https://atlaskit.atlassian.com/packages/confluence/tree)
 
 ## Setup
 
