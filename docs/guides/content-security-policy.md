@@ -11,7 +11,7 @@ Background reading on CSP
 - [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 - [Helmetjs guide](https://helmetjs.github.io/docs/csp/)
 
-`react-beautiful-dnd` creates a `<style>` element in the `<head>` and dynamically updates it's value (see [/docs/guides/preset-styles.md] and [Dragging React performance forward](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33)). This is considered a _unsafe inline_ and will violate the strict CSP policy: `Content-Security-Policy: style-src 'self'`
+`react-beautiful-dnd` creates a `<style>` element in the `<head>` and dynamically updates it's value (see [/docs/guides/preset-styles.md] and [Dragging React performance forward](https://medium.com/@alexandereardon/dragging-react-performance-forward-688b30d40a33)). This is considered an _unsafe inline_ and will violate the strict CSP policy: `Content-Security-Policy: style-src 'self'`
 
 ## Option 1: use `unsafe-inline`
 

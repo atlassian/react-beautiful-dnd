@@ -57,7 +57,7 @@ function App() {
 
 ![programmatic state flow](https://user-images.githubusercontent.com/2182637/58779115-35b67d80-8618-11e9-8934-6dfa2b14ce23.jpg)
 
-1. Try to get a **lock** when a `sensor` wants to drag and item. A sensor might not be able to claim a lock for a variety of reasons, such as when another `sensor` already has a **lock**.
+1. Try to get a **lock** when a `sensor` wants to drag an item. A sensor might not be able to claim a lock for a variety of reasons, such as when another `sensor` already has a **lock**.
 2. If a **lock** is obtained then there are a number of _pre drag_ actions available to you (`PreDragActions`). This allows a `sensor` to claim a lock before starting a drag. This is important for things like [sloppy click detection](/docs/sensors/mouse.md#sloppy-clicks-and-click-prevention-) where a drag is only started after a sufficiently large movement.
 3. A _pre drag_ lock can be upgraded to a _drag lock_, which contains a different set of APIs (`FluidDragActions` or `SnapDragActions`). Once a `<Draggable />` has been lifted, it can be moved around.
 
