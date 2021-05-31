@@ -136,7 +136,7 @@
     "storybook-addon-performance": "0.9.0",
     "styled-components": "5.1.0",
     "stylelint": "13.13.1",
-    "stylelint-config-prettier": "8.0.1",
+    "stylelint-config-prettier": "8.0.2",
     "stylelint-config-recommended": "3.0.0",
     "stylelint-config-standard": "20.0.0",
     "stylelint-config-styled-components": "0.1.1",
