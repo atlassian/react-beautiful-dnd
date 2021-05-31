@@ -6295,10 +6295,10 @@ eslint-module-utils@^2.6.0:
     debug "^2.6.9"
     pkg-dir "^2.0.0"
 
-eslint-plugin-cypress@2.11.2:
-  version "2.11.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-cypress/-/eslint-plugin-cypress-2.11.2.tgz#a8f3fe7ec840f55e4cea37671f93293e6c3e76a0"
-  integrity sha512-1SergF1sGbVhsf7MYfOLiBhdOg6wqyeV9pXUAIDIffYTGMN3dTBQS9nFAzhLsHhO+Bn0GaVM1Ecm71XUidQ7VA==
+eslint-plugin-cypress@2.11.3:
+  version "2.11.3"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-cypress/-/eslint-plugin-cypress-2.11.3.tgz#54ee4067aa8192aa62810cd35080eb577e191ab7"
+  integrity sha512-hOoAid+XNFtpvOzZSNWP5LDrQBEJwbZwjib4XJ1KcRYKjeVj0mAmPmucG4Egli4j/aruv+Ow/acacoloWWCl9Q==
   dependencies:
     globals "^11.12.0"
 
