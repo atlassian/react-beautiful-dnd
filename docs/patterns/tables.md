@@ -41,7 +41,8 @@ This has poor performance characteristics at scale as it requires:
 
 For tables with less than 50 rows this should approach be fine!
 
-[See example code here](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20dimension%20locking&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
+[See example code here](https://github.com/atlassian/react-beautiful-dnd/blob/master/stories/src/table/with-dimension-locking.jsx)
+[See storybook here](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20dimension%20locking&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
 
 ## Advanced: reparenting
 
