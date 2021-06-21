@@ -171,7 +171,7 @@ function tryStart({
     return null;
   }
 
-  const entry: DraggableEntry = registry.draggable.getById(draggableId);
+  const entry: DraggableEntry = registry.draggable.getById(draggableId, sourceEvent.srcElement.shadowRoot || document);
   const el: ?HTMLElement = findDraggable(contextId, entry.descriptor.id);
 
   if (!el) {

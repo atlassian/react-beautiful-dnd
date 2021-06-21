@@ -14,7 +14,7 @@ function findClosestDragHandleFromEvent(
   contextId: ContextId,
   event: Event,
 ): ?HTMLElement {
-  const target: ?EventTarget = event.target;
+  const target: ?EventTarget = event.composedPath ? event.composedPath()[0] : event.target;
 
   if (!isElement(target)) {
     warning('event.target must be a Element');

@@ -24,7 +24,7 @@ const createStyleEl = (nonce?: string): HTMLStyleElement => {
   return el;
 };
 
-export default function useStyleMarshal(contextId: ContextId, nonce?: string) {
+export default function useStyleMarshal(contextId: ContextId, nonce?: string, stylesInsertionPoint: HTMLElement) {
   const styles: Styles = useMemo(() => getStyles(contextId), [contextId]);
   const alwaysRef = useRef<?HTMLStyleElement>(null);
   const dynamicRef = useRef<?HTMLStyleElement>(null);
@@ -64,8 +64,8 @@ export default function useStyleMarshal(contextId: ContextId, nonce?: string) {
     dynamic.setAttribute(`${prefix}-dynamic`, contextId);
 
     // add style tags to head
-    getHead().appendChild(always);
-    getHead().appendChild(dynamic);
+    (stylesInsertionPoint || getHead()).appendChild(always);
+    (stylesInsertionPoint || getHead()).appendChild(dynamic);
 
     // set initial style
     setAlwaysStyle(styles.always);
@@ -75,7 +75,7 @@ export default function useStyleMarshal(contextId: ContextId, nonce?: string) {
       const remove = (ref) => {
         const current: ?HTMLStyleElement = ref.current;
         invariant(current, 'Cannot unmount ref as it is not set');
-        getHead().removeChild(current);
+        (stylesInsertionPoint || getHead()).removeChild(current);
         ref.current = null;
       };
 

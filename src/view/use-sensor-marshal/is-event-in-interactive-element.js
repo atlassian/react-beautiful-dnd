@@ -56,7 +56,7 @@ export default function isEventInInteractiveElement(
   draggable: Element,
   event: Event,
 ): boolean {
-  const target: EventTarget = event.target;
+  const target: EventTarget = event.composedPath ? event.composedPath()[0] : event.target;
 
   if (!isHtmlElement(target)) {
     return false;
