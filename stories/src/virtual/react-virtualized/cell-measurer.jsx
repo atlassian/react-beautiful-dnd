@@ -2,7 +2,12 @@
 import React, { useReducer } from 'react';
 import ReactDOM from 'react-dom';
 import 'react-virtualized/styles.css';
-import { List, CellMeasurerCache, CellMeasurer } from 'react-virtualized';
+import {
+  AutoSizer,
+  List,
+  CellMeasurerCache,
+  CellMeasurer,
+} from 'react-virtualized';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
 import { colors } from '@atlaskit/theme';
@@ -137,32 +142,43 @@ const Column = React.memo(function Column(props: ColumnProps) {
             : quotes.length;
 
           return (
-            <List
-              height={500}
-              rowCount={itemCount}
-              rowHeight={cellMeasurerCache.rowHeight}
-              width={300}
-              ref={(ref) => {
-                // react-virtualized has no way to get the list's ref that I can so
-                // So we use the `ReactDOM.findDOMNode(ref)` escape hatch to get the ref
-                if (ref) {
-                  // eslint-disable-next-line react/no-find-dom-node
-                  const whatHasMyLifeComeTo = ReactDOM.findDOMNode(ref);
-                  if (whatHasMyLifeComeTo instanceof HTMLElement) {
-                    droppableProvided.innerRef(whatHasMyLifeComeTo);
-                  }
-                }
-              }}
+            <div
               style={{
-                backgroundColor: getBackgroundColor(
-                  snapshot.isDraggingOver,
-                  Boolean(snapshot.draggingFromThisWith),
-                ),
-                transition: 'background-color 0.2s ease',
+                height: 'calc(100vh - 130px)',
+                width: '300px',
               }}
-              rowRenderer={getRowRender(quotes, cellMeasurerCache)}
-              deferredMeasurementCache={cellMeasurerCache}
-            />
+            >
+              <AutoSizer>
+                {({ height, width }) => (
+                  <List
+                    height={height}
+                    rowCount={itemCount}
+                    rowHeight={cellMeasurerCache.rowHeight}
+                    width={width}
+                    ref={(ref) => {
+                      // react-virtualized has no way to get the list's ref that I can so
+                      // So we use the `ReactDOM.findDOMNode(ref)` escape hatch to get the ref
+                      if (ref) {
+                        // eslint-disable-next-line react/no-find-dom-node
+                        const whatHasMyLifeComeTo = ReactDOM.findDOMNode(ref);
+                        if (whatHasMyLifeComeTo instanceof HTMLElement) {
+                          droppableProvided.innerRef(whatHasMyLifeComeTo);
+                        }
+                      }
+                    }}
+                    style={{
+                      backgroundColor: getBackgroundColor(
+                        snapshot.isDraggingOver,
+                        Boolean(snapshot.draggingFromThisWith),
+                      ),
+                      transition: 'background-color 0.2s ease',
+                    }}
+                    rowRenderer={getRowRender(quotes, cellMeasurerCache)}
+                    deferredMeasurementCache={cellMeasurerCache}
+                  />
+                )}
+              </AutoSizer>
+            </div>
           );
         }}
       </Droppable>
