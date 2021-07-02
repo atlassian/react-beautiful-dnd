@@ -37,6 +37,8 @@ const Container = styled.div`
 type RowProps = {
   index: number,
   style: Object,
+  key?: string | number,
+  parent?: Object,
 };
 
 // Using a higher order function so that we can look up the quotes data to retrieve
