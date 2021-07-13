@@ -1,25 +1,19 @@
 // @flow
+import { queryElements } from './query-elements';
 import type { DraggableId, ContextId } from '../../types';
 import { dragHandle as dragHandleAttr } from '../data-attributes';
 import { warning } from '../../dev-warning';
-import { find, toArray } from '../../native-with-fallback';
+import { find } from '../../native-with-fallback';
 import isHtmlElement from '../is-type-of-element/is-html-element';
 
 export default function findDragHandle(
   contextId: ContextId,
   draggableId: DraggableId,
-  documentFragment: DocumentFragment
+  ref: ?HTMLElement
 ): ?HTMLElement {
   // cannot create a selector with the draggable id as it might not be a valid attribute selector
   const selector: string = `[${dragHandleAttr.contextId}="${contextId}"]`;
-  const possible: Element[] = toArray(documentFragment.querySelectorAll(selector));
-
-  if (!possible.length) {
-    warning(`Unable to find any drag handles in the context "${contextId}"`);
-    return null;
-  }
-
-  const handle: ?Element = find(possible, (el: Element): boolean => {
+  const handle: ?Element = queryElements(ref, selector, (el: Element): boolean => {
     return el.getAttribute(dragHandleAttr.draggableId) === draggableId;
   });
 
