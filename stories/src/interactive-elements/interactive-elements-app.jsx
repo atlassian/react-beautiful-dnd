@@ -204,8 +204,11 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
 
     return (
       <ShadowRootContext.Consumer>
-        {stylesRoot =>
-          <DragDropContext onDragEnd={this.onDragEnd} stylesInsertionPoint={stylesRoot}>
+        {(stylesRoot) => (
+          <DragDropContext
+            onDragEnd={this.onDragEnd}
+            stylesInsertionPoint={stylesRoot}
+          >
             <Container>
               <Droppable droppableId="droppable">
                 {(droppableProvided: DroppableProvided) => (
@@ -250,7 +253,7 @@ export default class InteractiveElementsApp extends React.Component<*, State> {
               </Controls>
             </Container>
           </DragDropContext>
-        }
+        )}
       </ShadowRootContext.Consumer>
     );
   }

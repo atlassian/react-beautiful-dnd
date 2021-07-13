@@ -13,9 +13,13 @@ export default function findDraggable(
 ): ?HTMLElement {
   // cannot create a selector with the draggable id as it might not be a valid attribute selector
   const selector: string = `[${attributes.draggable.contextId}="${contextId}"]`;
-  const draggable: ?Element = queryElements(ref, selector, (el: Element): boolean => {
-    return el.getAttribute(attributes.draggable.id) === draggableId;
-  });
+  const draggable: ?Element = queryElements(
+    ref,
+    selector,
+    (el: Element): boolean => {
+      return el.getAttribute(attributes.draggable.id) === draggableId;
+    },
+  );
 
   if (!draggable) {
     return null;

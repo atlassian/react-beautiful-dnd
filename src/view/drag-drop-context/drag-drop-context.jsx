@@ -22,7 +22,7 @@ type Props = {|
   sensors?: Sensor[],
   enableDefaultSensors?: ?boolean,
   // Allows customizing the element to add the stylesheets to e.g. when being used in a ShadowRoot
-  stylesInsertionPoint?: HTMLElement, 
+  stylesInsertionPoint?: HTMLElement,
 |};
 
 // Reset any context that gets persisted across server side renders

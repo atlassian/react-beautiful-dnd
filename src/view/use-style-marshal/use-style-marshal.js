@@ -10,7 +10,8 @@ import { prefix } from '../data-attributes';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 
 const getStylesRoot = (stylesInsertionPoint?: HTMLElement): HTMLElement => {
-  const stylesRoot: ?HTMLElement = stylesInsertionPoint || document.querySelector('head');
+  const stylesRoot: ?HTMLElement =
+    stylesInsertionPoint || document.querySelector('head');
   invariant(stylesRoot, 'Cannot find the head or root to append a style to');
   return stylesRoot;
 };
@@ -24,7 +25,11 @@ const createStyleEl = (nonce?: string): HTMLStyleElement => {
   return el;
 };
 
-export default function useStyleMarshal(contextId: ContextId, nonce?: string, stylesInsertionPoint?: HTMLElement) {
+export default function useStyleMarshal(
+  contextId: ContextId,
+  nonce?: string,
+  stylesInsertionPoint?: HTMLElement,
+) {
   const styles: Styles = useMemo(() => getStyles(contextId), [contextId]);
   const alwaysRef = useRef<?HTMLStyleElement>(null);
   const dynamicRef = useRef<?HTMLStyleElement>(null);

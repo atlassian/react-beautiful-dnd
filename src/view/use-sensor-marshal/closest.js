@@ -50,7 +50,7 @@ function closestImpl(el: Element, selector: string): ?Element {
 }
 
 export default function closest(el: ?Element, selector: string): ?Element {
-  if (!el || el == document || el == window) {
+  if (!el || el === document || el === window) {
     return null;
   }
   const found = closestImpl(el, selector);

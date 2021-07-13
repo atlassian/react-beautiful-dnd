@@ -86,8 +86,11 @@ export default class App extends Component {
   render() {
     return (
       <ShadowRootContext.Consumer>
-        {stylesRoot =>
-          <DragDropContext onDragEnd={this.onDragEnd} stylesInsertionPoint={stylesRoot}>
+        {(stylesRoot) => (
+          <DragDropContext
+            onDragEnd={this.onDragEnd}
+            stylesInsertionPoint={stylesRoot}
+          >
             <Droppable droppableId="droppable">
               {(droppableProvided, droppableSnapshot) => (
                 <div
@@ -102,7 +105,11 @@ export default class App extends Component {
                   }
                 >
                   {this.state.items.map((item, index) => (
-                    <Draggable key={item.id} draggableId={item.id} index={index}>
+                    <Draggable
+                      key={item.id}
+                      draggableId={item.id}
+                      index={index}
+                    >
                       {(draggableProvided, draggableSnapshot) => (
                         <div
                           ref={draggableProvided.innerRef}
@@ -123,7 +130,7 @@ export default class App extends Component {
               )}
             </Droppable>
           </DragDropContext>
-        }
+        )}
       </ShadowRootContext.Consumer>
     );
   }

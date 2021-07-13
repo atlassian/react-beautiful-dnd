@@ -48,7 +48,7 @@ import { noop } from '../../empty';
 import findClosestDraggableIdFromEvent from './find-closest-draggable-id-from-event';
 import findDraggable from '../get-elements/find-draggable';
 import bindEvents from '../event-bindings/bind-events';
-import { getEventTargetRoot } from '../../view/get-elements/query-elements'
+import { getEventTargetRoot } from '../../view/get-elements/query-elements';
 
 function preventDefault(event: Event) {
   event.preventDefault();
@@ -173,7 +173,11 @@ function tryStart({
   }
 
   const entry: DraggableEntry = registry.draggable.getById(draggableId);
-  const el: ?HTMLElement = findDraggable(contextId, entry.descriptor.id, getEventTargetRoot(sourceEvent));
+  const el: ?HTMLElement = findDraggable(
+    contextId,
+    entry.descriptor.id,
+    getEventTargetRoot(sourceEvent),
+  );
 
   if (!el) {
     warning(`Unable to find draggable element with id: ${draggableId}`);

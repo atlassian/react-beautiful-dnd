@@ -9,13 +9,17 @@ import isHtmlElement from '../is-type-of-element/is-html-element';
 export default function findDragHandle(
   contextId: ContextId,
   draggableId: DraggableId,
-  ref: ?HTMLElement
+  ref: ?HTMLElement,
 ): ?HTMLElement {
   // cannot create a selector with the draggable id as it might not be a valid attribute selector
   const selector: string = `[${dragHandleAttr.contextId}="${contextId}"]`;
-  const handle: ?Element = queryElements(ref, selector, (el: Element): boolean => {
-    return el.getAttribute(dragHandleAttr.draggableId) === draggableId;
-  });
+  const handle: ?Element = queryElements(
+    ref,
+    selector,
+    (el: Element): boolean => {
+      return el.getAttribute(dragHandleAttr.draggableId) === draggableId;
+    },
+  );
 
   if (!handle) {
     warning(
