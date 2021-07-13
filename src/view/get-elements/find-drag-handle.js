@@ -3,7 +3,6 @@ import { queryElements } from './query-elements';
 import type { DraggableId, ContextId } from '../../types';
 import { dragHandle as dragHandleAttr } from '../data-attributes';
 import { warning } from '../../dev-warning';
-import { find } from '../../native-with-fallback';
 import isHtmlElement from '../is-type-of-element/is-html-element';
 
 export default function findDragHandle(

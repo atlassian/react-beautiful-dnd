@@ -48,7 +48,7 @@ import { noop } from '../../empty';
 import findClosestDraggableIdFromEvent from './find-closest-draggable-id-from-event';
 import findDraggable from '../get-elements/find-draggable';
 import bindEvents from '../event-bindings/bind-events';
-import { getEventTargetRoot } from '../../view/get-elements/query-elements';
+import { getEventTargetRoot } from '../get-elements/query-elements';
 
 function preventDefault(event: Event) {
   event.preventDefault();

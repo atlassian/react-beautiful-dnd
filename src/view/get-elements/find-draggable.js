@@ -2,7 +2,6 @@
 import { queryElements } from './query-elements';
 import type { DraggableId, ContextId } from '../../types';
 import * as attributes from '../data-attributes';
-import { find } from '../../native-with-fallback';
 import { warning } from '../../dev-warning';
 import isHtmlElement from '../is-type-of-element/is-html-element';
 

@@ -1,22 +1,11 @@
-import createCache from '@emotion/cache';
-import { Component, createContext } from 'react';
+// @flow
+import React, { Component, createContext } from 'react';
 import * as ReactDOM from 'react-dom';
 import retargetEvents from 'react-shadow-dom-retarget-events';
 
-function BabelHTMLElement() {
-  const newTarget = this.__proto__.constructor;
-  return Reflect.construct(HTMLElement, [], newTarget);
-}
-Object.setPrototypeOf(BabelHTMLElement, HTMLElement);
-Object.setPrototypeOf(BabelHTMLElement.prototype, HTMLElement.prototype);
-
 export const ShadowRootContext = createContext(null);
 
-class MyCustomElement extends BabelHTMLElement {
-  constructor(component: Component) {
-    super();
-  }
-
+class MyCustomElement extends HTMLElement {
   set content(c: Component) {
     this._content = c;
     this.updateComponent();
@@ -30,10 +19,6 @@ class MyCustomElement extends BabelHTMLElement {
     }
 
     if (this._content) {
-      const myCache = createCache({
-        // key: 'my-prefix-key',
-        container: this.appContainer,
-      });
       ReactDOM.render(
         <ShadowRootContext.Provider value={this.appContainer}>
           {this._content}
@@ -66,10 +51,9 @@ class MyCustomElement extends BabelHTMLElement {
   }
 }
 
-!customElements.get('my-custom-element') &&
-  customElements.define('my-custom-element', MyCustomElement);
+customElements.define('my-custom-element', MyCustomElement);
 
-class CompoundCustomElement extends BabelHTMLElement {
+class CompoundCustomElement extends HTMLElement {
   constructor() {
     super();
     this.root = this.attachShadow({ mode: 'open' });
@@ -78,8 +62,7 @@ class CompoundCustomElement extends BabelHTMLElement {
   }
 }
 
-!customElements.get('compound-custom-element') &&
-  customElements.define('compound-custom-element', CompoundCustomElement);
+customElements.define('compound-custom-element', CompoundCustomElement);
 
 export function inShadowRoot(child: Component) {
   return (
@@ -89,7 +72,7 @@ export function inShadowRoot(child: Component) {
           node.content = child;
         }
       }}
-    ></my-custom-element>
+    />
   );
 }
 
@@ -101,6 +84,6 @@ export function inNestedShadowRoot(child: Component) {
           node.childComponent.content = child;
         }
       }}
-    ></compound-custom-element>
+    />
   );
 }

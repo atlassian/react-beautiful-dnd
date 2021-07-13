@@ -95,6 +95,7 @@ export default function useStyleMarshal(
     styles.always,
     styles.resting,
     contextId,
+    stylesInsertionPoint,
   ]);
 
   const dragging = useCallback(() => setDynamicStyle(styles.dragging), [
