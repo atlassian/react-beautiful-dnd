@@ -1,5 +1,6 @@
 // @flow
-import { find, toArray, PredicateFn } from '../../native-with-fallback';
+import { find, toArray } from '../../native-with-fallback';
+import type { PredicateFn } from '../../native-with-fallback';
 
 // declaring composedPath manually, seems it is not defined on Event yet
 type EventWithComposedPath = Event & {

@@ -63,7 +63,7 @@ export type Props = {|
 
   // screen reader
   dragHandleUsageInstructions: string,
-  stylesInsertionPoint?: HTMLElement,
+  stylesInsertionPoint?: ?HTMLElement,
 |};
 
 const createResponders = (props: Props): Responders => ({

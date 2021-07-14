@@ -1,15 +1,14 @@
 // @flow
-import React, { Component, createContext } from 'react';
+import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import retargetEvents from 'react-shadow-dom-retarget-events';
 
-export const ShadowRootContext = createContext(null);
+export const ShadowRootContext = React.createContext<?HTMLElement>(null);
 
 class MyCustomElement extends HTMLElement {
-  set content(c: Component) {
-    this._content = c;
-    this.updateComponent();
-  }
+  content: React.Node;
+  root: ShadowRoot;
+  appContainer: HTMLElement;
 
   mountComponent() {
     if (!this.appContainer) {
@@ -18,10 +17,10 @@ class MyCustomElement extends HTMLElement {
       this.root.appendChild(this.appContainer);
     }
 
-    if (this._content) {
+    if (this.content) {
       ReactDOM.render(
         <ShadowRootContext.Provider value={this.appContainer}>
-          {this._content}
+          {this.content}
         </ShadowRootContext.Provider>,
         this.appContainer,
       );
@@ -35,6 +34,11 @@ class MyCustomElement extends HTMLElement {
     if (this.appContainer) {
       ReactDOM.unmountComponentAtNode(this.appContainer);
     }
+  }
+
+  setContent(content: React.Node) {
+    this.content = content;
+    this.updateComponent();
   }
 
   updateComponent() {
@@ -54,34 +58,39 @@ class MyCustomElement extends HTMLElement {
 customElements.define('my-custom-element', MyCustomElement);
 
 class CompoundCustomElement extends HTMLElement {
+  childComponent: MyCustomElement;
+  root: ShadowRoot;
+
   constructor() {
     super();
     this.root = this.attachShadow({ mode: 'open' });
-    this.childComponent = document.createElement('my-custom-element');
+    this.childComponent = (document.createElement('my-custom-element'): any);
     this.root.appendChild(this.childComponent);
   }
 }
 
 customElements.define('compound-custom-element', CompoundCustomElement);
 
-export function inShadowRoot(child: Component) {
+export function inShadowRoot(child: React.Node) {
   return (
     <my-custom-element
-      ref={(node) => {
+      // $FlowFixMe - flow can neither infer nor cast the type of the custom element
+      ref={(node: ?MyCustomElement) => {
         if (node) {
-          node.content = child;
+          node.setContent(child);
         }
       }}
     />
   );
 }
 
-export function inNestedShadowRoot(child: Component) {
+export function inNestedShadowRoot(child: React.Node) {
   return (
     <compound-custom-element
-      ref={(node) => {
+      // $FlowFixMe - flow can neither infer nor cast the type of the custom element
+      ref={(node: ?CompoundCustomElement) => {
         if (node) {
-          node.childComponent.content = child;
+          node.childComponent.setContent(child);
         }
       }}
     />
