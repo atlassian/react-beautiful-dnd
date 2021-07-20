@@ -45,7 +45,7 @@ const getListStyle = (isDraggingOver) => ({
 });
 
 class SomeCustomElement extends HTMLElement {
-  childComponent: HTMLElement;
+  childComponent;
 
   constructor() {
     super();

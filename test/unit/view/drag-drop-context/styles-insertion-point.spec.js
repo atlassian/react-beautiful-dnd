@@ -5,7 +5,6 @@ import { prefix } from '../../../../src/view/data-attributes';
 import DragDropContext from '../../../../src/view/drag-drop-context';
 import { resetServerContext } from '../../../../src';
 import type { ContextId } from '../../../../src/types';
-import * as attributes from '../../../../src/view/data-attributes';
 
 const getDynamicStyleTagSelector = (contextId: ContextId) =>
   `style[${prefix}-dynamic="${contextId}"]`;

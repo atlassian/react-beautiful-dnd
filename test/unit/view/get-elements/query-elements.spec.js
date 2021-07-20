@@ -1,10 +1,10 @@
-// flow
+// @flow
 import React from 'react';
 import { mount } from 'enzyme';
 import { queryElements } from '../../../../src/view/get-elements/query-elements';
 
-const first = jest.fn((e: HTMLElement) => true);
-const none = jest.fn((e: HTMLElement) => false);
+const first = jest.fn(() => true);
+const none = jest.fn(() => false);
 
 it('should find element in document', () => {
   const wrapper = mount(

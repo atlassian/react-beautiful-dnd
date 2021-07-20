@@ -241,7 +241,7 @@ it('should insert styles if sytlesInsertionPoint', () => {
   );
 
   wrapper.unmount();
-  
+
   // styles should be removed from styles root
   expect(stylesRootRef.querySelector(alwaysSelector)).toBeFalsy();
   expect(stylesRootRef.querySelector(dynamicSelector)).toBeFalsy();
