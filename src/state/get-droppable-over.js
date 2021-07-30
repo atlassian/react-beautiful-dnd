@@ -27,6 +27,8 @@ type Args = {|
   pageBorderBox: Rect,
   draggable: DraggableDimension,
   droppables: DroppableDimensionMap,
+  currentSelection: Position,
+  calculateDroppableUsingCursorPosition: boolean,
 |};
 
 type WithDistance = {|
@@ -39,6 +41,31 @@ type GetFurthestArgs = {|
   draggable: DraggableDimension,
   candidates: DroppableDimension[],
 |};
+
+type GetClosestToCursorArgs = {|
+  currentSelection: Position,
+  draggable: DraggableDimension,
+  candidates: DroppableDimension[],
+|};
+
+function getClosestToCursor({
+  currentSelection,
+  draggable,
+  candidates,
+}) {
+
+  const startCenter = currentSelection;
+  const sorted: WithDistance[] = candidates
+    .map((candidate: DroppableDimension): WithDistance => {
+      return {
+        id: candidate.descriptor.id,
+        distance: distance(startCenter, candidate.page.borderBox.center)
+      }
+    })
+    .sort((a: WithDistance, b: WithDistance) => a.distance - b.distance);
+
+  return sorted[0]?.id ?? null;
+}
 
 function getFurthestAway({
   pageBorderBox,
@@ -80,6 +107,8 @@ export default function getDroppableOver({
   pageBorderBox,
   draggable,
   droppables,
+  currentSelection,
+  calculateDroppableUsingCursorPosition,
 }: Args): ?DroppableId {
   // We know at this point that some overlap has to exist
   const candidates: DroppableDimension[] = toDroppableList(droppables).filter(
@@ -147,6 +176,13 @@ export default function getDroppableOver({
     return candidates[0].descriptor.id;
   }
 
+  if(calculateDroppableUsingCursorPosition) {
+    return getClosestToCursor({
+      currentSelection,
+      draggable,
+      candidates,
+    });
+  }
   // Multiple options returned
   // Should only occur with really large items
   // Going to use fallback: distance from home

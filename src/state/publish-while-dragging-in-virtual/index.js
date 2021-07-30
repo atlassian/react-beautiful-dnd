@@ -117,6 +117,7 @@ export default ({
     previousImpact,
     viewport: state.viewport,
     afterCritical,
+    
   });
 
   timings.finish(timingsKey);

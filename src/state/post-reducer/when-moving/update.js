@@ -90,6 +90,8 @@ export default ({
       previousImpact: state.impact,
       viewport,
       afterCritical: state.afterCritical,
+      currentSelection: state.current.page.selection,
+      calculateDroppableUsingCursorPosition: true
     });
 
   const withUpdatedPlaceholders: DroppableDimensionMap = recomputePlaceholders({

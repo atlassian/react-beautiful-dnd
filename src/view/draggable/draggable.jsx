@@ -52,6 +52,7 @@ export default function Draggable(props: Props) {
     // ownProps
     children,
     draggableId,
+    dropTargetCalculationMode,
     isEnabled,
     shouldRespectForcePress,
     canDragInteractiveElements,
@@ -87,6 +88,7 @@ export default function Draggable(props: Props) {
       }),
       [
         descriptor,
+        dropTargetCalculationMode,
         registry,
         getRef,
         canDragInteractiveElements,
