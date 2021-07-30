@@ -91,7 +91,7 @@ export default ({
       viewport,
       afterCritical: state.afterCritical,
       currentSelection: state.current.page.selection,
-      calculateDroppableUsingCursorPosition: true
+      calculateDroppableUsingCursorPosition: state.critical.draggable.dropTargetCalculationMode === 'pointer'
     });
 
   const withUpdatedPlaceholders: DroppableDimensionMap = recomputePlaceholders({

@@ -28,7 +28,7 @@ type Args = {|
   viewport: Viewport,
   afterCritical: LiftEffect,
   currentSelection: Position,
-  calculateDroppableUsingCursorPosition: Boolean,
+  calculateDroppableUsingCursorPosition: boolean,
 |};
 
 export default ({

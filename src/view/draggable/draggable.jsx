@@ -43,8 +43,9 @@ export default function Draggable(props: Props) {
       index: props.index,
       type,
       droppableId,
+      dropTargetCalculationMode: props.dropTargetCalculationMode,
     }),
-    [props.draggableId, props.index, type, droppableId],
+    [props.draggableId, props.index, type, droppableId, props.dropTargetCalculationMode],
   );
 
   // props
