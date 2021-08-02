@@ -43,9 +43,7 @@ type GetFurthestArgs = {|
 |};
 
 type GetClosestToCursorArgs = {|
-  pageBorderBox: Rect,
   currentSelection: Position,
-  draggable: DraggableDimension,
   candidates: DroppableDimension[],
 |};
 
