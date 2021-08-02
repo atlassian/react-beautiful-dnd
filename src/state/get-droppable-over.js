@@ -23,10 +23,6 @@ function getHasOverlap(first: Rect, second: Rect): boolean {
   );
 }
 
-function pointerIsContainedWithin(box: Rect, pointer: Position): boolean {
-  return isWithin(box.top, box.bottom)(pointer.y) && isWithin(box.left, box.right)(pointer.x);
-}
-
 type Args = {|
   pageBorderBox: Rect,
   draggable: DraggableDimension,
