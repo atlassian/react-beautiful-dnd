@@ -72,8 +72,8 @@ function getClosestToCursor({
       if (isWithinX) {
         return result(
           closest(patch('y', currentSelection.y), [
-            patch('y', box.left),
-            patch('y', box.right),
+            patch('y', box.top),
+            patch('y', box.bottom),
           ]),
         );
       }
@@ -82,8 +82,8 @@ function getClosestToCursor({
       if (isWithinY) {
         return result(
           closest(patch('x', currentSelection.x), [
-            patch('x', box.top),
-            patch('x', box.bottom),
+            patch('x', box.left),
+            patch('x', box.right),
           ]),
         );
       }
