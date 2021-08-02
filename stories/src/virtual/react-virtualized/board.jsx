@@ -24,6 +24,9 @@ import { grid, borderRadius } from '../../constants';
 import { getBackgroundColor } from '../../primatives/quote-list';
 import QuoteCountSlider from '../quote-count-chooser';
 import { generateQuoteMap } from '../../data';
+import DropTargetCalculationModeSelector from '../../primatives/drop-target-calculation-mode-selector';
+import type { DropTargetCalculationMode } from '../../../../src/view/draggable/draggable-types';
+
 
 const Container = styled.div`
   display: flex;
@@ -36,7 +39,7 @@ type RowProps = {
 
 // Using a higher order function so that we can look up the quotes data to retrieve
 // our quote from within the rowRender function
-const getRowRender = (quotes: Quote[]) => ({ index, style }: RowProps) => {
+const getRowRender = (quotes: Quote[], dropTargetCalculationMode: DropTargetCalculationMode) => ({ index, style }: RowProps) => {
   const quote: ?Quote = quotes[index];
 
   // We are rendering an extra item for the placeholder
@@ -55,7 +58,7 @@ const getRowRender = (quotes: Quote[]) => ({ index, style }: RowProps) => {
   };
 
   return (
-    <Draggable draggableId={quote.id} index={index} key={quote.id}>
+    <Draggable draggableId={quote.id} index={index} key={quote.id} dropTargetCalculationMode={dropTargetCalculationMode}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
         <QuoteItem
           provided={provided}
@@ -71,6 +74,7 @@ const getRowRender = (quotes: Quote[]) => ({ index, style }: RowProps) => {
 type ColumnProps = {|
   columnId: string,
   quotes: Quote[],
+  dropTargetCalculationMode: DropTargetCalculationMode,
 |};
 
 const ColumnContainer = styled.div`
@@ -137,7 +141,7 @@ const Column = React.memo(function Column(props: ColumnProps) {
                 ),
                 transition: 'background-color 0.2s ease',
               }}
-              rowRenderer={getRowRender(quotes)}
+              rowRenderer={getRowRender(quotes, props.dropTargetCalculationMode)}
             />
           );
         }}
@@ -150,6 +154,7 @@ type State = {|
   itemCount: number,
   quoteMap: QuoteMap,
   columnKeys: string[],
+  dropTargetCalculationMode: DropTargetCalculationMode,
 |};
 
 function getColumnKeys(quoteMap: QuoteMap): string[] {
@@ -164,6 +169,7 @@ function getInitialState() {
     itemCount,
     quoteMap,
     columnKeys,
+    dropTargetCalculationMode: 'box',
   };
 }
 
@@ -175,6 +181,10 @@ type Action =
   | {|
       type: 'REORDER',
       payload: QuoteMap,
+    |}
+  | {|
+    type: 'CHANGE_TARGET_MODE',
+    payload: DropTargetCalculationMode
     |};
 
 function reducer(state: State, action: Action) {
@@ -192,6 +202,15 @@ function reducer(state: State, action: Action) {
       quoteMap: action.payload,
       columnKeys: getColumnKeys(action.payload),
     };
+  }
+  if (action.type === 'CHANGE_TARGET_MODE') {
+    return {
+      ...state,
+      // itemCount: state.itemCount,
+      // quoteMap: state.quoteMap,
+      // columnKeys: state.columnKeys,
+      dropTargetCalculationMode: action.payload,
+    }
   }
 
   return state;
@@ -234,7 +253,7 @@ function Board(props: Empty) {
           {state.columnKeys.map((key: string) => {
             const quotes: Quote[] = state.quoteMap[key];
 
-            return <Column key={key} quotes={quotes} columnId={key} />;
+            return <Column key={key} quotes={quotes} columnId={key} dropTargetCalculationMode={state.dropTargetCalculationMode}/>;
           })}
         </Container>
         <QuoteCountSlider
@@ -244,6 +263,7 @@ function Board(props: Empty) {
             dispatch({ type: 'CHANGE_COUNT', payload: count })
           }
         />
+        <DropTargetCalculationModeSelector onChange={(payload) => dispatch({ type: 'CHANGE_TARGET_MODE', payload })} />
       </DragDropContext>
       <Global
         styles={css`

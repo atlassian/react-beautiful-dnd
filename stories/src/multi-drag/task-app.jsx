@@ -9,6 +9,8 @@ import { mutliDragAwareReorder, multiSelectTo as multiSelect } from './utils';
 import type { DragStart, DropResult, DraggableLocation } from '../../../src';
 import type { Task, Id } from '../types';
 import type { Entities } from './types';
+import { dropTargetCalculationMode } from '../constants';
+import DropTargetCalculationModeSelector from '../primatives/drop-target-calculation-mode-selector';
 
 const Container = styled.div`
   display: flex;
@@ -28,6 +30,7 @@ const getTasks = (entities: Entities, columnId: Id): Task[] =>
   );
 export default class TaskApp extends Component<*, State> {
   state: State = {
+    dropTargetCalculationMode: dropTargetCalculationMode.box,
     entities: initial,
     selectedTaskIds: [],
     draggingTaskId: null,
@@ -187,25 +190,31 @@ export default class TaskApp extends Component<*, State> {
     const entities: Entities = this.state.entities;
     const selected: Id[] = this.state.selectedTaskIds;
     return (
-      <DragDropContext
-        onDragStart={this.onDragStart}
-        onDragEnd={this.onDragEnd}
-      >
-        <Container>
-          {entities.columnOrder.map((columnId: Id) => (
-            <Column
-              column={entities.columns[columnId]}
-              tasks={getTasks(entities, columnId)}
-              selectedTaskIds={selected}
-              key={columnId}
-              draggingTaskId={this.state.draggingTaskId}
-              toggleSelection={this.toggleSelection}
-              toggleSelectionInGroup={this.toggleSelectionInGroup}
-              multiSelectTo={this.multiSelectTo}
-            />
-          ))}
-        </Container>
-      </DragDropContext>
+      <>
+        <DropTargetCalculationModeSelector onChange={ mode => this.setState({
+          dropTargetCalculationMode: mode,
+        }) } />
+        <DragDropContext
+          onDragStart={this.onDragStart}
+          onDragEnd={this.onDragEnd}
+        >
+          <Container>
+            {entities.columnOrder.map((columnId: Id) => (
+              <Column
+                column={entities.columns[columnId]}
+                tasks={getTasks(entities, columnId)}
+                selectedTaskIds={selected}
+                key={columnId}
+                draggingTaskId={this.state.draggingTaskId}
+                dropTargetCalculationMode={this.state.dropTargetCalculationMode}
+                toggleSelection={this.toggleSelection}
+                toggleSelectionInGroup={this.toggleSelectionInGroup}
+                multiSelectTo={this.multiSelectTo}
+              />
+            ))}
+          </Container>
+        </DragDropContext>
+      </>
     );
   }
 }

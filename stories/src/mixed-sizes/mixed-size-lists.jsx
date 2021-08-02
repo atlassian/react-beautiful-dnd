@@ -10,9 +10,11 @@ import {
   type DropResult,
 } from '../../../src';
 import type { Quote } from '../types';
-import { grid } from '../constants';
+import { dropTargetCalculationMode, grid } from '../constants';
 import { authorQuoteMap } from '../data';
 import reorder, { reorderQuoteMap } from '../reorder';
+import DropTargetCalculationModeSelector from '../primatives/drop-target-calculation-mode-selector';
+import type { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
 
 const Parent = styled.div`
   display: flex;
@@ -23,6 +25,7 @@ type Width = 'small' | 'large';
 type ItemProps = {|
   quote: Quote,
   index: number,
+  dropTargetCalculationMode: DropTargetCalculationMode,
 |};
 
 const StyledItem = styled.div`
@@ -37,7 +40,7 @@ function Item(props: ItemProps) {
   const { quote, index } = props;
 
   return (
-    <Draggable draggableId={quote.id} index={index}>
+    <Draggable draggableId={quote.id} index={index} dropTargetCalculationMode={props.dropTargetCalculationMode}>
       {(provided) => (
         <StyledItem
           {...provided.draggableProps}
@@ -54,6 +57,7 @@ function Item(props: ItemProps) {
 type ListProps = {|
   listId: string,
   quotes: Quote[],
+  dropTargetCalculationMode: DropTargetCalculationMode,
 |};
 
 const ListContainer = styled.div`
@@ -95,7 +99,7 @@ function List(props: ListProps) {
             width={width}
           >
             {props.quotes.map((quote: Quote, index: number) => (
-              <Item key={quote.id} quote={quote} index={index} />
+              <Item key={quote.id} quote={quote} index={index} dropTargetCalculationMode={props.dropTargetCalculationMode} />
             ))}
             {provided.placeholder}
           </StyledList>
@@ -108,6 +112,7 @@ function List(props: ListProps) {
 export default function App() {
   const [columns, setColumns] = useState(authorQuoteMap);
   const ordered = useMemo(() => Object.keys(columns), [columns]);
+  const [ dropTargetCalculationMode, setDropTargetCalculationMode ] = useState();
 
   function onDragEnd(result: DropResult) {
     const { source, destination } = result;
@@ -144,9 +149,10 @@ export default function App() {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      <DropTargetCalculationModeSelector onChange={ setDropTargetCalculationMode } />
       <Parent>
         {ordered.map((key: string) => (
-          <List listId={key} quotes={columns[key]} key={key} />
+          <List listId={key} quotes={columns[key]} key={key} dropTargetCalculationMode={ dropTargetCalculationMode } />
         ))}
       </Parent>
     </DragDropContext>
