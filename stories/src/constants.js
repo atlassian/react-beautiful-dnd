@@ -1,5 +1,5 @@
 // @flow
-import { DropTargetCalculationMode } from '../../src/view/draggable/draggable-types';
+import type { DropTargetCalculationMode } from '../../src/view/draggable/draggable-types';
 
 export const grid: number = 8;
 export const borderRadius: number = 2;
