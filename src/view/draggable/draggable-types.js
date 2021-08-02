@@ -165,7 +165,7 @@ export type PublicOwnProps = {|
   children: ChildrenFn,
 
   // optional own props
-  dropTargetCalculationMode?: DroppableTargetCalculationMode
+  dropTargetCalculationMode?: DroppableTargetCalculationMode,
   isDragDisabled?: boolean,
   disableInteractiveElementBlocking?: boolean,
   shouldRespectForcePress?: boolean,
