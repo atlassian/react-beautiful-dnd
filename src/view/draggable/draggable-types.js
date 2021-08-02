@@ -43,7 +43,7 @@ export type NotDraggingStyle = {|
 |};
 
 export type DraggableStyle = DraggingStyle | NotDraggingStyle;
-export type DroppableTargetCalculationMode = 'box' | 'pointer';
+export type DropTargetCalculationMode = 'box' | 'pointer';
 
 export type ZIndexOptions = {|
   dragging: number,
@@ -165,7 +165,7 @@ export type PublicOwnProps = {|
   children: ChildrenFn,
 
   // optional own props
-  dropTargetCalculationMode?: DroppableTargetCalculationMode,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
   isDragDisabled?: boolean,
   disableInteractiveElementBlocking?: boolean,
   shouldRespectForcePress?: boolean,
