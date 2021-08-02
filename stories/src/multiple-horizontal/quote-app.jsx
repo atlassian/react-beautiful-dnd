@@ -28,7 +28,7 @@ type Props = {|
 |};
 
 type State = ReorderQuoteMapResult & {
-  dropTargetCalculationMode: DropTargetCalculationMode
+  dropTargetCalculationMode: DropTargetCalculationMode,
 };
 
 export default class QuoteApp extends Component<Props, State> {
@@ -59,7 +59,11 @@ export default class QuoteApp extends Component<Props, State> {
 
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
-        <DropTargetCalculationModeSelector onChange={ (dropTargetCalculationMode: DropTargetCalculationMode) => this.setState({ dropTargetCalculationMode }) } />
+        <DropTargetCalculationModeSelector
+          onChange={(dropTargetCalculationMode: DropTargetCalculationMode) =>
+            this.setState({ dropTargetCalculationMode })
+          }
+        />
         <Root>
           {Object.keys(quoteMap).map((key: string) => (
             <AuthorList

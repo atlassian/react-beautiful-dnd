@@ -191,9 +191,13 @@ export default class TaskApp extends Component<*, State> {
     const selected: Id[] = this.state.selectedTaskIds;
     return (
       <>
-        <DropTargetCalculationModeSelector onChange={ mode => this.setState({
-          dropTargetCalculationMode: mode,
-        }) } />
+        <DropTargetCalculationModeSelector
+          onChange={(mode) =>
+            this.setState({
+              dropTargetCalculationMode: mode,
+            })
+          }
+        />
         <DragDropContext
           onDragStart={this.onDragStart}
           onDragEnd={this.onDragEnd}

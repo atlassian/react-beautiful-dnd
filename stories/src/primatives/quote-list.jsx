@@ -5,7 +5,7 @@ import { colors } from '@atlaskit/theme';
 import { Droppable, Draggable } from '../../../src';
 import { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
 import QuoteItem from './quote-item';
-import { dropTargetCalculationMode, grid } from '../constants';
+import { grid } from '../constants';
 import Title from './title';
 import type { Quote } from '../types';
 import type {
@@ -84,13 +84,19 @@ type Props = {|
 
 type QuoteListProps = {|
   quotes: Quote[],
+  dropTargetCalculationMode: DropTargetCalculationMode,
 |};
 
 const InnerQuoteList = React.memo(function InnerQuoteList(
   props: QuoteListProps,
 ) {
   return props.quotes.map((quote: Quote, index: number) => (
-    <Draggable key={quote.id} draggableId={quote.id} index={index} dropTargetCalculationMode={props.dropTargetCalculationMode} >
+    <Draggable
+      key={quote.id}
+      draggableId={quote.id}
+      index={index}
+      dropTargetCalculationMode={props.dropTargetCalculationMode}
+    >
       {(
         dragProvided: DraggableProvided,
         dragSnapshot: DraggableStateSnapshot,
@@ -122,7 +128,10 @@ function InnerList(props: InnerListProps) {
     <Container>
       {title}
       <DropZone ref={dropProvided.innerRef}>
-        <InnerQuoteList quotes={quotes} dropTargetCalculationMode={dropTargetCalculationMode} />
+        <InnerQuoteList
+          quotes={quotes}
+          dropTargetCalculationMode={dropTargetCalculationMode}
+        />
         {dropProvided.placeholder}
       </DropZone>
     </Container>

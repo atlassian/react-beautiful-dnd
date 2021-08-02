@@ -11,7 +11,6 @@ import { toDroppableList } from './dimension-structures';
 import isPositionInFrame from './visibility/is-position-in-frame';
 import { closest, distance, patch } from './position';
 import isWithin from './is-within';
-import { dropTargetCalculationMode } from '../../stories/src/constants';
 
 // https://stackoverflow.com/questions/306316/determine-if-two-rectangles-overlap-each-other
 // https://silentmatt.com/rectangle-intersection/
@@ -52,7 +51,6 @@ function getClosestToCursor({
   currentSelection,
   candidates,
 }: GetClosestToCursorArgs) {
-
   const sorted: WithDistance[] = candidates
     .map((candidate: DroppableDimension): WithDistance => {
       const box = candidate.page.borderBox;
@@ -172,24 +170,22 @@ export default function getDroppableOver({
         return false;
       }
 
+      const hasOverlap = getHasOverlap(pageBorderBox, active);
       // Cannot be a candidate when dragging item is not over the droppable at all
-      if (!getHasOverlap(pageBorderBox, active)) {
+      if (!hasOverlap) {
         return false;
-
-      // 0. If drop target calculation is via pointer position then any overlap of elements 
-      // counts as a candidate
-      } else if(calculateDroppableUsingCursorPosition) {
-        return true;
       }
 
-
+      // 0. If drop target calculation is via pointer position then any overlap of elements
+      // counts as a candidate
+      if (hasOverlap && calculateDroppableUsingCursorPosition) {
+        return true;
+      }
 
       // 1. Candidate if the center position is over a droppable
       if (isPositionInFrame(active)(pageBorderBox.center)) {
         return true;
       }
-
-
 
       // 2. Candidate if an edge is over the cross axis half way point
       // 3. Candidate if dragging item is totally over droppable on cross axis

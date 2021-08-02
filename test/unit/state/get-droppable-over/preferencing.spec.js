@@ -173,7 +173,7 @@ describe('pointer behaviour', () => {
       currentSelection: {
         x: droppableThird.page.borderBox.left,
         y: droppableThird.page.borderBox.top,
-      }
+      },
     });
 
     expect(result).toEqual(droppableThird.descriptor.id);
@@ -208,7 +208,7 @@ describe('pointer behaviour', () => {
       currentSelection: {
         x: droppableThird.page.borderBox.left,
         y: droppableThird.page.borderBox.top,
-      }
+      },
     });
 
     expect(result).toEqual(droppableSecond.descriptor.id);

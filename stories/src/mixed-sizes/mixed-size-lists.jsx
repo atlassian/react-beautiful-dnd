@@ -10,7 +10,7 @@ import {
   type DropResult,
 } from '../../../src';
 import type { Quote } from '../types';
-import { dropTargetCalculationMode, grid } from '../constants';
+import { grid } from '../constants';
 import { authorQuoteMap } from '../data';
 import reorder, { reorderQuoteMap } from '../reorder';
 import DropTargetCalculationModeSelector from '../primatives/drop-target-calculation-mode-selector';
@@ -40,7 +40,11 @@ function Item(props: ItemProps) {
   const { quote, index } = props;
 
   return (
-    <Draggable draggableId={quote.id} index={index} dropTargetCalculationMode={props.dropTargetCalculationMode}>
+    <Draggable
+      draggableId={quote.id}
+      index={index}
+      dropTargetCalculationMode={props.dropTargetCalculationMode}
+    >
       {(provided) => (
         <StyledItem
           {...provided.draggableProps}
@@ -99,7 +103,12 @@ function List(props: ListProps) {
             width={width}
           >
             {props.quotes.map((quote: Quote, index: number) => (
-              <Item key={quote.id} quote={quote} index={index} dropTargetCalculationMode={props.dropTargetCalculationMode} />
+              <Item
+                key={quote.id}
+                quote={quote}
+                index={index}
+                dropTargetCalculationMode={props.dropTargetCalculationMode}
+              />
             ))}
             {provided.placeholder}
           </StyledList>
@@ -112,7 +121,7 @@ function List(props: ListProps) {
 export default function App() {
   const [columns, setColumns] = useState(authorQuoteMap);
   const ordered = useMemo(() => Object.keys(columns), [columns]);
-  const [ dropTargetCalculationMode, setDropTargetCalculationMode ] = useState();
+  const [dropTargetCalculationMode, setDropTargetCalculationMode] = useState();
 
   function onDragEnd(result: DropResult) {
     const { source, destination } = result;
@@ -149,10 +158,17 @@ export default function App() {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <DropTargetCalculationModeSelector onChange={ setDropTargetCalculationMode } />
+      <DropTargetCalculationModeSelector
+        onChange={setDropTargetCalculationMode}
+      />
       <Parent>
         {ordered.map((key: string) => (
-          <List listId={key} quotes={columns[key]} key={key} dropTargetCalculationMode={ dropTargetCalculationMode } />
+          <List
+            listId={key}
+            quotes={columns[key]}
+            key={key}
+            dropTargetCalculationMode={dropTargetCalculationMode}
+          />
         ))}
       </Parent>
     </DragDropContext>

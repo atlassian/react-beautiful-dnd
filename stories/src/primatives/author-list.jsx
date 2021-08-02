@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import { colors } from '@atlaskit/theme';
 import { Droppable, Draggable } from '../../../src';
 import Author from './author-item';
-import { dropTargetCalculationMode, grid } from '../constants';
+import { grid } from '../constants';
 import type { Quote } from '../types';
 import type {
   DroppableProvided,
@@ -63,7 +63,7 @@ type Props = {|
   listType?: string,
   internalScroll?: boolean,
   isCombineEnabled?: boolean,
-  dropTargetCalculationMode?: DropTargetCalculationMode
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 export default class AuthorList extends Component<Props> {
@@ -77,7 +77,12 @@ export default class AuthorList extends Component<Props> {
       <Container>
         <DropZone ref={dropProvided.innerRef}>
           {quotes.map((quote: Quote, index: number) => (
-            <Draggable key={quote.id} draggableId={quote.id} index={index} dropTargetCalculationMode={this.props.dropTargetCalculationMode}>
+            <Draggable
+              key={quote.id}
+              draggableId={quote.id}
+              index={index}
+              dropTargetCalculationMode={this.props.dropTargetCalculationMode}
+            >
               {(
                 dragProvided: DraggableProvided,
                 dragSnapshot: DraggableStateSnapshot,

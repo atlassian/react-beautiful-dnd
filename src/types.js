@@ -1,6 +1,5 @@
 // @flow
 import type { BoxModel, Rect, Position } from 'css-box-model';
-import { dropTargetCalculationMode } from '../stories/src/constants';
 
 export type Id = string;
 export type DraggableId = Id;
@@ -30,7 +29,7 @@ export type DraggableOptions = {|
   canDragInteractiveElements: boolean,
   shouldRespectForcePress: boolean,
   isEnabled: boolean,
-  dropTargetCalculationMode?: DropTargetCalculationMode
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 export type Direction = 'horizontal' | 'vertical';

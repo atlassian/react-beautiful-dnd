@@ -18,7 +18,7 @@ import Title from '../../primatives/title';
 import { reorderQuoteMap } from '../../reorder';
 import { DragDropContext, Droppable, Draggable } from '../../../../src';
 import QuoteItem from '../../primatives/quote-item';
-import { grid, borderRadius, dropTargetCalculationMode } from '../../constants';
+import { grid, borderRadius } from '../../constants';
 import { getBackgroundColor } from '../../primatives/quote-list';
 import QuoteCountSlider from '../quote-count-chooser';
 import { generateQuoteMap } from '../../data';
@@ -32,7 +32,7 @@ const Container = styled.div`
 type RowProps = {
   data: {
     quotes: Quote[],
-    dropTargetCalculationMode: DropTargetCalculationMode
+    dropTargetCalculationMode: DropTargetCalculationMode,
   },
   index: number,
   style: Object,
@@ -58,7 +58,12 @@ const Row = React.memo(({ data, index, style }: RowProps) => {
   };
 
   return (
-    <Draggable draggableId={quote.id} index={index} key={quote.id} dropTargetCalculationMode={data.dropTargetCalculationMode}>
+    <Draggable
+      draggableId={quote.id}
+      index={index}
+      key={quote.id}
+      dropTargetCalculationMode={data.dropTargetCalculationMode}
+    >
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
         <QuoteItem
           provided={provided}
@@ -90,7 +95,10 @@ const ColumnContainer = styled.div`
 const Column = React.memo(function Column(props: ColumnProps) {
   const { columnId, quotes, dropTargetCalculationMode } = props;
 
-  const itemData = useMemo(() => ({ quotes, dropTargetCalculationMode}), [ quotes, dropTargetCalculationMode]);
+  const itemData = useMemo(() => ({ quotes, dropTargetCalculationMode }), [
+    quotes,
+    dropTargetCalculationMode,
+  ]);
   return (
     <ColumnContainer>
       <Title>{columnId}</Title>
@@ -137,7 +145,7 @@ const Column = React.memo(function Column(props: ColumnProps) {
                 // We add this spacing so that when we drop into an empty list we will animate to the correct visual position.
                 padding: grid,
               }}
-              itemData={ itemData }
+              itemData={itemData}
             >
               {Row}
             </List>
@@ -152,7 +160,7 @@ type State = {|
   itemCount: number,
   quoteMap: QuoteMap,
   columnKeys: string[],
-  dropTargetCalculationMode: DropTargetCalculationMode
+  dropTargetCalculationMode: DropTargetCalculationMode,
 |};
 
 function getColumnKeys(quoteMap: QuoteMap): string[] {
@@ -167,7 +175,7 @@ function getInitialState() {
     itemCount,
     quoteMap,
     columnKeys,
-    dropTargetCalculationMode: 'box'
+    dropTargetCalculationMode: 'box',
   };
 }
 
@@ -181,8 +189,8 @@ type Action =
       payload: QuoteMap,
     |}
   | {|
-    type: 'CHANGE_TARGET_MODE',
-    payload: DropTargetCalculationMode
+      type: 'CHANGE_TARGET_MODE',
+      payload: DropTargetCalculationMode,
     |};
 
 function reducer(state: State, action: Action) {
@@ -208,7 +216,7 @@ function reducer(state: State, action: Action) {
       // quoteMap: state.quoteMap,
       // columnKeys: state.columnKeys,
       dropTargetCalculationMode: action.payload,
-    }
+    };
   }
 
   return state;
@@ -251,7 +259,14 @@ function Board(props: Empty) {
           {state.columnKeys.map((key: string) => {
             const quotes: Quote[] = state.quoteMap[key];
 
-            return <Column key={key} quotes={quotes} columnId={key} dropTargetCalculationMode={state.dropTargetCalculationMode} />;
+            return (
+              <Column
+                key={key}
+                quotes={quotes}
+                columnId={key}
+                dropTargetCalculationMode={state.dropTargetCalculationMode}
+              />
+            );
           })}
         </Container>
         <QuoteCountSlider
@@ -261,7 +276,11 @@ function Board(props: Empty) {
             dispatch({ type: 'CHANGE_COUNT', payload: count })
           }
         />
-        <DropTargetCalculationModeSelector onChange={(payload) => dispatch({ type: 'CHANGE_TARGET_MODE', payload })} />
+        <DropTargetCalculationModeSelector
+          onChange={(payload) =>
+            dispatch({ type: 'CHANGE_TARGET_MODE', payload })
+          }
+        />
       </DragDropContext>
       <Global
         styles={css`

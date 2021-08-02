@@ -196,7 +196,11 @@ export default class Task extends Component<Props> {
     const selectionCount: number = this.props.selectionCount;
     const isGhosting: boolean = this.props.isGhosting;
     return (
-      <Draggable draggableId={task.id} index={index} dropTargetCalculationMode={this.props.dropTargetCalculationMode}>
+      <Draggable
+        draggableId={task.id}
+        index={index}
+        dropTargetCalculationMode={this.props.dropTargetCalculationMode}
+      >
         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
           const shouldShowSelection: boolean =
             snapshot.isDragging && selectionCount > 1;
