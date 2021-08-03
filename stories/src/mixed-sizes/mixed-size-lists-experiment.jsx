@@ -30,7 +30,7 @@ type ItemProps = {|
   quote: Quote,
   index: number,
   shouldAllowTrimming: boolean,
-  dropTargetCalculationMode: DropTargetCalculationMode,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 const StyledItem = styled.div`
@@ -145,7 +145,7 @@ type ListProps = {|
   listId: string,
   quotes: Quote[],
   width: Width,
-  dropTargetCalculationMode: DropTargetCalculationMode,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 const StyledList = styled.div`

@@ -9,7 +9,7 @@ import Task from './task';
 import type { DroppableProvided, DroppableStateSnapshot } from '../../../src';
 import type { Column as ColumnType } from './types';
 import type { Task as TaskType, Id } from '../types';
-import { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
+import type { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
 
 type Props = {|
   column: ColumnType,

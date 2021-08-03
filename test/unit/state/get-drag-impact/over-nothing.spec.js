@@ -32,7 +32,8 @@ import getLiftEffect from '../../../../src/state/get-lift-effect';
         previousImpact: homeImpact,
         viewport: preset.viewport,
         afterCritical,
-        calculateDroppableUsingCursorPosition: false,
+        calculateDroppableUsingPointerPosition: false,
+        currentSelection: { x: 0, y: 0 },
       });
 
       expect(impact).toEqual(noImpact);

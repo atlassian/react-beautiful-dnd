@@ -25,7 +25,7 @@ type Width = 'small' | 'large';
 type ItemProps = {|
   quote: Quote,
   index: number,
-  dropTargetCalculationMode: DropTargetCalculationMode,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 const StyledItem = styled.div`
@@ -61,7 +61,7 @@ function Item(props: ItemProps) {
 type ListProps = {|
   listId: string,
   quotes: Quote[],
-  dropTargetCalculationMode: DropTargetCalculationMode,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 const ListContainer = styled.div`

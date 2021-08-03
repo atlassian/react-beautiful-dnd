@@ -28,7 +28,7 @@ type Args = {|
   draggable: DraggableDimension,
   droppables: DroppableDimensionMap,
   currentSelection: Position,
-  calculateDroppableUsingCursorPosition: boolean,
+  calculateDroppableUsingPointerPosition: boolean,
 |};
 
 type WithDistance = {|
@@ -110,7 +110,7 @@ function getClosestToCursor({
     })
     .sort((a: WithDistance, b: WithDistance) => a.distance - b.distance);
 
-  return sorted[0]?.id ?? null;
+  return sorted[0] ? sorted[0].id : null;
 }
 
 function getFurthestAway({
@@ -154,7 +154,7 @@ export default function getDroppableOver({
   draggable,
   droppables,
   currentSelection,
-  calculateDroppableUsingCursorPosition,
+  calculateDroppableUsingPointerPosition,
 }: Args): ?DroppableId {
   // We know at this point that some overlap has to exist
   const candidates: DroppableDimension[] = toDroppableList(droppables).filter(
@@ -178,7 +178,7 @@ export default function getDroppableOver({
 
       // 0. If drop target calculation is via pointer position then any overlap of elements
       // counts as a candidate
-      if (hasOverlap && calculateDroppableUsingCursorPosition) {
+      if (hasOverlap && calculateDroppableUsingPointerPosition) {
         return true;
       }
 
@@ -229,7 +229,7 @@ export default function getDroppableOver({
     return candidates[0].descriptor.id;
   }
 
-  if (calculateDroppableUsingCursorPosition) {
+  if (calculateDroppableUsingPointerPosition) {
     return getClosestToCursor({
       currentSelection,
       candidates,

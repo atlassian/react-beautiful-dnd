@@ -27,9 +27,11 @@ type Props = {|
   initial: QuoteMap,
 |};
 
-type State = ReorderQuoteMapResult & {
-  dropTargetCalculationMode: DropTargetCalculationMode,
-};
+type State = $ReadOnly<
+  ReorderQuoteMapResult & {
+    dropTargetCalculationMode: DropTargetCalculationMode,
+  },
+>;
 
 export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */

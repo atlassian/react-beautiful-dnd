@@ -107,6 +107,8 @@ describe('box (default) behaviour', () => {
         droppableSecond,
         droppableThird,
       ]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
     });
 
     expect(result).toEqual(droppableThird.descriptor.id);
@@ -137,6 +139,8 @@ describe('box (default) behaviour', () => {
         droppableSecond,
         droppableThird,
       ]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
     });
 
     expect(result).toEqual(droppableSecond.descriptor.id);
@@ -169,7 +173,7 @@ describe('pointer behaviour', () => {
         droppableSecond,
         droppableThird,
       ]),
-      calculateDroppableUsingCursorPosition: true,
+      calculateDroppableUsingPointerPosition: true,
       currentSelection: {
         x: droppableThird.page.borderBox.left,
         y: droppableThird.page.borderBox.top,
@@ -204,7 +208,7 @@ describe('pointer behaviour', () => {
         droppableSecond,
         droppableThird,
       ]),
-      calculateDroppableUsingCursorPosition: true,
+      calculateDroppableUsingPointerPosition: true,
       currentSelection: {
         x: droppableThird.page.borderBox.left,
         y: droppableThird.page.borderBox.top,

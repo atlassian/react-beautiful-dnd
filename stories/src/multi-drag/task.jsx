@@ -6,7 +6,7 @@ import { Draggable } from '../../../src';
 import { grid, borderRadius } from '../constants';
 import type { DraggableProvided, DraggableStateSnapshot } from '../../../src';
 import type { Id, Task as TaskType } from '../types';
-import { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
+import type { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 const primaryButton = 0;
