@@ -50,6 +50,7 @@ import {
       previousImpact: homeImpact,
       viewport,
       afterCritical,
+      calculateDroppableUsingCursorPosition: false,
     });
 
     it('should displace items forward when the start edge of the dragging item goes backwards past the items center', () => {
@@ -63,6 +64,7 @@ import {
           previousImpact: homeImpact,
           viewport,
           afterCritical,
+          calculateDroppableUsingCursorPosition: false,
         });
 
         const expected: DragImpact = {
@@ -138,6 +140,7 @@ import {
           previousImpact: startBeforeInHome1Center,
           viewport,
           afterCritical,
+          calculateDroppableUsingCursorPosition: false,
         });
         expect(impact).toEqual(startBeforeInHome1Center);
       }
@@ -151,6 +154,7 @@ import {
           previousImpact: startBeforeInHome1Center,
           viewport,
           afterCritical,
+          calculateDroppableUsingCursorPosition: false,
         });
 
         const expected: DragImpact = {

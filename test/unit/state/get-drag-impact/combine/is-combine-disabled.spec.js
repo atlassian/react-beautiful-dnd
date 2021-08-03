@@ -52,6 +52,7 @@ import { getOffsetForEndEdge } from '../util/get-offset-for-edge';
           previousImpact: homeImpact,
           viewport: preset.viewport,
           afterCritical,
+          calculateDroppableUsingCursorPosition: false,
         });
 
         expect(impact).toEqual(homeImpact);

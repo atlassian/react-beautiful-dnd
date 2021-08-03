@@ -200,6 +200,7 @@ function reducer(state: State, action: Action) {
       itemCount: action.payload,
       quoteMap,
       columnKeys: getColumnKeys(quoteMap),
+      dropTargetCalculationMode: state.dropTargetCalculationMode,
     };
   }
   if (action.type === 'REORDER') {
@@ -207,6 +208,7 @@ function reducer(state: State, action: Action) {
       itemCount: state.itemCount,
       quoteMap: action.payload,
       columnKeys: getColumnKeys(action.payload),
+      dropTargetCalculationMode: state.dropTargetCalculationMode,
     };
   }
   if (action.type === 'CHANGE_TARGET_MODE') {

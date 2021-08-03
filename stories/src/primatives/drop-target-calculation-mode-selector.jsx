@@ -1,7 +1,7 @@
 // @flow
-import React, { type SyntheticEvent } from 'react';
+import React from 'react';
 import { dropTargetCalculationMode } from '../constants';
-import { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
+import type { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
 
 export default function DropTargetCalculationModeSelector({
   onChange,
@@ -15,7 +15,7 @@ export default function DropTargetCalculationModeSelector({
       {...rest}
       onChange={
         onChange
-          ? (e: SyntheticEvent) => onChange(e.target.selectedOptions[0].value)
+          ? (e) => onChange(e.target.selectedOptions[0].value)
           : undefined
       }
     >

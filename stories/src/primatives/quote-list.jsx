@@ -3,7 +3,7 @@ import React from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@atlaskit/theme';
 import { Droppable, Draggable } from '../../../src';
-import { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
+import type { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
 import QuoteItem from './quote-item';
 import { grid } from '../constants';
 import Title from './title';
@@ -74,7 +74,7 @@ type Props = {|
   scrollContainerStyle?: Object,
   isDropDisabled?: boolean,
   isCombineEnabled?: boolean,
-  dropTargetCalculationMode: DropTargetCalculationMode,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
   style?: Object,
   // may not be provided - and might be null
   ignoreContainerClipping?: boolean,
@@ -84,7 +84,7 @@ type Props = {|
 
 type QuoteListProps = {|
   quotes: Quote[],
-  dropTargetCalculationMode: DropTargetCalculationMode,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 const InnerQuoteList = React.memo(function InnerQuoteList(
@@ -115,7 +115,7 @@ const InnerQuoteList = React.memo(function InnerQuoteList(
 
 type InnerListProps = {|
   dropProvided: DroppableProvided,
-  dropTargetCalculationMode: DropTargetCalculationMode,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
   quotes: Quote[],
   title: ?string,
 |};

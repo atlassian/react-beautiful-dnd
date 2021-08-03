@@ -35,6 +35,7 @@ import { getOffsetForEndEdge } from '../../util/get-offset-for-edge';
         previousImpact: homeImpact,
         viewport,
         afterCritical,
+        calculateDroppableUsingCursorPosition: false,
       });
 
       const expected: DragImpact = {

@@ -181,6 +181,7 @@ const viewport: Viewport = getViewport();
         previousImpact: homeImpact,
         viewport,
         afterCritical,
+        calculateDroppableUsingCursorPosition: false,
       });
 
       expect(impact).toEqual(expected);
@@ -308,6 +309,7 @@ const viewport: Viewport = getViewport();
         previousImpact: noImpact,
         viewport,
         afterCritical: noAfterCritical,
+        calculateDroppableUsingCursorPosition: false,
       });
 
       expect(impact).toEqual(expected);

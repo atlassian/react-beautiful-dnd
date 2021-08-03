@@ -57,7 +57,7 @@ type Props = {|
   initial: QuoteMap,
 |};
 
-type State = ReorderQuoteMapResult & {
+type State = RReorderQuoteMapResult & {
   DropTargetCalculationMode: DropTargetCalculationMode,
 };
 

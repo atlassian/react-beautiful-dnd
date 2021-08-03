@@ -39,6 +39,7 @@ import { origin } from '../../../../src/state/position';
         previousImpact: homeImpact,
         viewport: preset.viewport,
         afterCritical,
+        calculateDroppableUsingCursorPosition: false,
       });
 
       expect(impact).toEqual(noImpact);
@@ -59,6 +60,7 @@ import { origin } from '../../../../src/state/position';
         previousImpact: homeImpact,
         viewport: preset.viewport,
         afterCritical,
+        calculateDroppableUsingCursorPosition: false,
       });
 
       expect(impact).toEqual(noImpact);

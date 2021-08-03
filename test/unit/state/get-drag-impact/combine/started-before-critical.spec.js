@@ -127,6 +127,7 @@ import {
               previousImpact: whenEnteredForeign,
               viewport: preset.viewport,
               afterCritical,
+              calculateDroppableUsingCursorPosition: false,
             });
             expect(impact).toEqual(whenEnteredForeign);
           }
@@ -140,6 +141,7 @@ import {
               previousImpact: whenEnteredForeign,
               viewport: preset.viewport,
               afterCritical,
+              calculateDroppableUsingCursorPosition: false,
             });
             expect(impact).toEqual(combineWithDisplacedInForeign3);
           }
@@ -162,6 +164,7 @@ import {
               previousImpact: whenEnteredForeign,
               viewport: preset.viewport,
               afterCritical,
+              calculateDroppableUsingCursorPosition: false,
             });
             expect(impact).toEqual(combineWithDisplacedInForeign3);
           }
@@ -174,6 +177,7 @@ import {
               previousImpact: whenEnteredForeign,
               viewport: preset.viewport,
               afterCritical,
+              calculateDroppableUsingCursorPosition: false,
             });
 
             const expected: DragImpact = {
@@ -245,6 +249,7 @@ import {
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingCursorPosition: false,
           });
           expect(impact).toEqual(whenEnteredForeign);
         }
@@ -258,6 +263,7 @@ import {
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingCursorPosition: false,
           });
           expect(impact).toEqual(combineWithInForeign2);
         }
@@ -279,6 +285,7 @@ import {
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingCursorPosition: false,
           });
           expect(impact).toEqual(combineWithInForeign2);
         }
@@ -292,6 +299,7 @@ import {
             previousImpact: whenEnteredForeign,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingCursorPosition: false,
           });
 
           const expected: DragImpact = {
