@@ -137,12 +137,12 @@ export default function Draggable(props: Props) {
   );
 
   const provided: Provided = useMemo(() => {
-    const style: DraggableStyle =
-      getStyle(
-        mapped,
-        props.lockedAxis ? {axis:props.lockedAxis, allowedDeviation:props.allowedDeviation}
-          : null
-      );
+    const style: DraggableStyle = getStyle(
+      mapped,
+      props.lockedAxis
+        ? {axis:props.lockedAxis, allowedDeviation:props.allowedDeviation}
+        : null
+    );
     const onTransitionEnd =
       mapped.type === 'DRAGGING' && mapped.dropping ? onMoveEnd : null;
 

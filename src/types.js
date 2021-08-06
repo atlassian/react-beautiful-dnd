@@ -160,8 +160,8 @@ export type DraggableIdMap = {
 
 export type DraggableLockedAxis = {
   axis: 'x' | 'y',
-  allowedDeviation?:number,
-}
+  allowedDeviation?: number,
+};
 
 export type DroppableIdMap = {
   [id: DroppableId]: true,
