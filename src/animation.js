@@ -73,30 +73,27 @@ const moveTo = (
   if (!lockedAxis) {
     return `translate(${offset.x}px, ${offset.y}px)`;
   }
-  if (
-    !lockedAxis.allowedDeviation ||
-    lockedAxis.allowedDeviation === 0
-  ) {
+  if ( !lockedAxis.allowedDeviation || lockedAxis.allowedDeviation === 0 ) {
     // Locked rigidly to an axis
     if (lockedAxis.axis === 'x') {
       return `translate(0px, ${offset.y}px)`;
     }
     return `translate(${offset.x}px, 0px)`;
-  } else {
-    // Locked loosely to an axis
-    if (lockedAxis.axis === 'x') {
-      return `translate(${clamp(
-        offset.x,
-        -lockedAxis.allowedDeviation,
-        lockedAxis.allowedDeviation,
-      )}px, ${offset.y}px)`;
-    }
-    return `translate(${offset.x}px, ${clamp(
-      offset.y,
+  }
+  // Locked loosely to an axis
+  if (lockedAxis.axis === 'x') {
+    return `translate(${clamp(
+      offset.x,
       -lockedAxis.allowedDeviation,
       lockedAxis.allowedDeviation,
-    )}px)`;
+    )}px, ${offset.y}px)`;
   }
+  return `translate(${offset.x}px, ${clamp(
+    offset.y,
+    -lockedAxis.allowedDeviation,
+    lockedAxis.allowedDeviation,
+  )}px)`;
+  
 };
 
 export const transforms = {

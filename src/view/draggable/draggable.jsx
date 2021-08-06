@@ -166,7 +166,7 @@ export default function Draggable(props: Props) {
     onMoveEnd,
     setRef,
     props.lockedAxis,
-    props.allowedDeviation
+    props.allowedDeviation,
   ]);
 
   const rubric: DraggableRubric = useMemo(
