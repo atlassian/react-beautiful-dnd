@@ -53,8 +53,22 @@ export const transitions = {
   placeholder: `height ${outOfTheWayTiming}, width ${outOfTheWayTiming}, margin ${outOfTheWayTiming}`,
 };
 
-const moveTo = (offset: Position): ?string =>
-  isEqual(offset, origin) ? null : `translate(${offset.x}px, ${offset.y}px)`;
+const clamp = (value:number, min:number, max:number) =>
+  value > max ? max : value < min ? min : value;
+
+const moveTo = (offset: Position, lockedAxis?:DraggableLockedAxis): ?string => {
+  if(isEqual(offset, origin)) return null;
+  else if(!lockedAxis) return `translate(${offset.x}px, ${offset.y}px)`;
+  else if(!lockedAxis.allowedDeviation || lockedAxis.allowedDeviation === 0) {
+    //Locked rigidly to an axis
+    if(lockedAxis.axis === 'x') return `translate(0px, ${offset.y}px)`;
+    else return `translate(${offset.x}px, 0px)`;
+  } else {
+    //Locked loosely to an axis
+    if(lockedAxis.axis === 'x') return `translate(${clamp(offset.x, -lockedAxis.allowedDeviation, lockedAxis.allowedDeviation)}px, ${offset.y}px)`;
+    else return `translate(${offset.x}px, ${clamp(offset.y, -lockedAxis.allowedDeviation, lockedAxis.allowedDeviation)}px)`;
+  }
+}
 
 export const transforms = {
   moveTo,
