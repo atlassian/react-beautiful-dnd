@@ -140,8 +140,8 @@ export default function Draggable(props: Props) {
     const style: DraggableStyle = getStyle(
       mapped,
       props.lockedAxis
-        ? {axis:props.lockedAxis, allowedDeviation:props.allowedDeviation}
-        : null
+        ? {axis: props.lockedAxis, allowedDeviation: props.allowedDeviation}
+        : null,
     );
     const onTransitionEnd =
       mapped.type === 'DRAGGING' && mapped.dropping ? onMoveEnd : null;
@@ -158,7 +158,7 @@ export default function Draggable(props: Props) {
     };
 
     return result;
-  }, [contextId, dragHandleProps, draggableId, mapped, onMoveEnd, setRef]);
+  }, [contextId, dragHandleProps, draggableId, mapped, onMoveEnd, setRef, props.lockedAxis, props.allowedDeviation]);
 
   const rubric: DraggableRubric = useMemo(
     () => ({

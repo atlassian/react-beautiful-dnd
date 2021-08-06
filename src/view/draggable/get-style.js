@@ -104,7 +104,7 @@ function getSecondaryStyle(secondary: SecondaryMapProps): NotDraggingStyle {
 
 export default function getStyle(
   mapped: MappedProps,
-  lockedAxis?: DraggableLockedAxis
+  lockedAxis?: DraggableLockedAxis,
 ): DraggableStyle {
   return mapped.type === 'DRAGGING'
     ? getDraggingStyle(mapped, lockedAxis)

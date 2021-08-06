@@ -53,52 +53,48 @@ export const transitions = {
   placeholder: `height ${outOfTheWayTiming}, width ${outOfTheWayTiming}, margin ${outOfTheWayTiming}`,
 };
 
-const clamp = (
-  value: number,
-  min: number,
-  max: number
-) => {
+const clamp = (value: number, min: number, max: number) => {
   if (value >= max) {
     return max;
   } else if (value <= min) {
     return min;
-  } else {
-    return value;
   }
-}
+  return value;
+};
 
 const moveTo = (
   offset: Position,
-  lockedAxis?: DraggableLockedAxis
+  lockedAxis?: DraggableLockedAxis,
 ): ?string => {
   if (isEqual(offset, origin)) {
     return null;
   } else if (!lockedAxis) {
     return `translate(${offset.x}px, ${offset.y}px)`;
-  } else if (!lockedAxis.allowedDeviation || lockedAxis.allowedDeviation === 0) {
-    //Locked rigidly to an axis
+  } else if (
+    !lockedAxis.allowedDeviation ||
+    lockedAxis.allowedDeviation === 0
+  ) {
+    // Locked rigidly to an axis
     if (lockedAxis.axis === 'x') {
       return `translate(0px, ${offset.y}px)`;
-    } else {
-      return `translate(${offset.x}px, 0px)`;
     }
+    return `translate(${offset.x}px, 0px)`;
   } else {
-    //Locked loosely to an axis
+    // Locked loosely to an axis
     if (lockedAxis.axis === 'x') {
       return `translate(${clamp(
         offset.x,
         -lockedAxis.allowedDeviation,
-        lockedAxis.allowedDeviation
+        lockedAxis.allowedDeviation,
       )}px, ${offset.y}px)`;
-    } else {
-      return `translate(${offset.x}px, ${clamp(
-        offset.y,
-        -lockedAxis.allowedDeviation,
-        lockedAxis.allowedDeviation
-      )}px)`;
     }
+    return `translate(${offset.x}px, ${clamp(
+      offset.y,
+      -lockedAxis.allowedDeviation,
+      lockedAxis.allowedDeviation,
+    )}px)`;
   }
-}
+};
 
 export const transforms = {
   moveTo,
