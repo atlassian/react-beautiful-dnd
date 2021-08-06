@@ -56,7 +56,8 @@ export const transitions = {
 const clamp = (value: number, min: number, max: number) => {
   if (value >= max) {
     return max;
-  } else if (value <= min) {
+  }
+  if (value <= min) {
     return min;
   }
   return value;
@@ -68,9 +69,11 @@ const moveTo = (
 ): ?string => {
   if (isEqual(offset, origin)) {
     return null;
-  } else if (!lockedAxis) {
+  }
+  if (!lockedAxis) {
     return `translate(${offset.x}px, ${offset.y}px)`;
-  } else if (
+  }
+  if (
     !lockedAxis.allowedDeviation ||
     lockedAxis.allowedDeviation === 0
   ) {
