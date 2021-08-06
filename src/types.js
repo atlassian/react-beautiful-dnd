@@ -159,7 +159,7 @@ export type DraggableIdMap = {
 };
 
 export type DraggableLockedAxis = {
-  axis: `x` | `y`,
+  axis: 'x' | 'y',
   allowedDeviation?:number,
 }
 
