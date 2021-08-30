@@ -148,7 +148,7 @@ There are a lot of libraries out there that allow for drag and drop interactions
 
 Alex Reardon [@alexandereardon](https://twitter.com/alexandereardon)
 
-> Alex is longer personally maintaing this project. The other wonderful maintainers are carrying this project forward
+> Alex is no longer personally maintaning this project. The other wonderful maintainers are carrying this project forward.
 
 ## Maintainers
 
