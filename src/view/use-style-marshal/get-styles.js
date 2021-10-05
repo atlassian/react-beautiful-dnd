@@ -107,7 +107,13 @@ export default (contextId: ContextId): Styles => {
     return {
       selector: getSelector(attributes.draggable.contextId),
       styles: {
-        dragging: transition,
+        dragging: `
+          ${transition}
+          user-select: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+        `,
         dropAnimating: transition,
         userCancel: transition,
       },
@@ -149,10 +155,6 @@ export default (contextId: ContextId): Styles => {
       dragging: `
         cursor: grabbing;
         cursor: -webkit-grabbing;
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
         overflow-anchor: none;
       `,
     },
