@@ -100,6 +100,9 @@ export default (contextId: ContextId): Styles => {
   // This controls the animation of draggables that are moving out of the way
   // The main draggable is controlled by react-motion.
 
+  // user-select: none
+  // This prevents the user from selecting text on the page while dragging
+
   const draggable: Rule = (() => {
     const transition: string = `
       transition: ${transitions.outOfTheWay};
@@ -141,9 +144,6 @@ export default (contextId: ContextId): Styles => {
   // cursor: grab
   // We apply this by default for an improved user experience. It is such a common default that we
   // bake it right in. Consumers can opt out of this by adding a selector with higher specificity
-
-  // user-select: none
-  // This prevents the user from selecting text on the page while dragging
 
   // overflow-anchor: none
   // We are in control and aware of all of the window scrolls that occur
