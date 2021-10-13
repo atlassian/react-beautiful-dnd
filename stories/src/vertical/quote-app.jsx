@@ -62,7 +62,11 @@ export default function QuoteApp(props: Props) {
   }
 
   return (
-    <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+    <DragDropContext
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      isAutoScrollDisabled
+    >
       <Root>
         <QuoteList
           listId="list"

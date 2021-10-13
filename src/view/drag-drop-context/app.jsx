@@ -63,6 +63,8 @@ export type Props = {|
 
   // screen reader
   dragHandleUsageInstructions: string,
+
+  isAutoScrollDisabled?: boolean,
 |};
 
 const createResponders = (props: Props): Responders => ({
@@ -89,6 +91,7 @@ export default function App(props: Props) {
     sensors,
     nonce,
     dragHandleUsageInstructions,
+    isAutoScrollDisabled,
   } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
@@ -147,8 +150,9 @@ export default function App(props: Props) {
           // $FlowFixMe - not sure why this is wrong
           lazyDispatch,
         ),
+        isAutoScrollDisabled,
       }),
-    [dimensionMarshal.scrollDroppable, lazyDispatch],
+    [dimensionMarshal.scrollDroppable, lazyDispatch, isAutoScrollDisabled],
   );
 
   const focusMarshal: FocusMarshal = useFocusMarshal(contextId);

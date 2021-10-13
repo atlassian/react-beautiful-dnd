@@ -10,12 +10,14 @@ export type Args = {|
   scrollWindow: (offset: Position) => void,
   scrollDroppable: (id: DroppableId, change: Position) => void,
   move: (args: MoveArgs) => mixed,
+  isAutoScrollDisabled?: boolean,
 |};
 
 export default ({
   scrollDroppable,
   scrollWindow,
   move,
+  isAutoScrollDisabled,
 }: Args): AutoScroller => {
   const fluidScroller: FluidScroller = createFluidScroller({
     scrollWindow,
@@ -29,6 +31,9 @@ export default ({
   });
 
   const scroll = (state: State) => {
+    if (isAutoScrollDisabled) {
+      return;
+    }
     // Only allowing auto scrolling in the DRAGGING phase
     if (state.phase !== 'DRAGGING') {
       return;
