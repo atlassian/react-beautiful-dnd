@@ -1,3 +1,14 @@
+
+## ⚠️ Maintenance & support
+
+This library continues to be relied upon heavily by Atlassian products, but we are focused on other priorities right now and have no current plans for further feature development or improvements.
+
+It will continue to be here on GitHub and we will still make critical updates (e.g. security fixes, if any) as required, but will not be actively monitoring or replying to issues and pull requests.
+
+We recommend that you don’t raise issues or pull requests, as they will won’t be reviewed or actioned until further notice.
+
+---
+
 <p align="center">
   <img src="https://user-images.githubusercontent.com/2182637/53611918-54c1ff80-3c24-11e9-9917-66ac3cef513d.png" alt="react beautiful dnd logo" />
 </p>
