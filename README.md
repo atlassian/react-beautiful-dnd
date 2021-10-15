@@ -16,7 +16,7 @@
 
 </div>
 
-## ⚠️ Maintanance & support
+## ⚠️ Maintenance & support
 
 This library continues to be relied upon heavily by Atlassian products, but we are focused on other priorities right now and have no current plans for further feature development or improvements.
 It will continue to be here on GitHub and we will still make critical updates (e.g. security fixes, if any) as required, but will not be actively monitoring or replying to issues and pull requests.
