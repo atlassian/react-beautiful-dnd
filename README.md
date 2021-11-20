@@ -9,6 +9,10 @@ We recommend that you don’t raise issues or pull requests, as they will not be
 
 ---
 
+### ⚠️ Nested scroll containers are currently not supported.
+
+Right now you can't use this library to build Kanban board or Trello clone. Check this issue for more detail https://github.com/atlassian/react-beautiful-dnd/issues/131.
+
 <p align="center">
   <img src="https://user-images.githubusercontent.com/2182637/53611918-54c1ff80-3c24-11e9-9917-66ac3cef513d.png" alt="react beautiful dnd logo" />
 </p>
