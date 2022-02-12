@@ -90,6 +90,8 @@ function getStyle(style, snapshot) {
     ...style,
     // cannot be 0, but make it super tiny
     transitionDuration: `0.001s`,
+    // some browsers may still show the element for a frame
+    opacity: 0,
   };
 }
 
