@@ -8,6 +8,7 @@ type Args = {|
   viewport: Viewport,
   subject: Rect,
   center: Position,
+  centerIntitial: Position,
   dragStartTime: number,
   shouldUseTimeDampening: boolean,
 |};
@@ -16,6 +17,7 @@ export default ({
   viewport,
   subject,
   center,
+  centerIntitial,
   dragStartTime,
   shouldUseTimeDampening,
 }: Args): ?Position => {
@@ -24,6 +26,7 @@ export default ({
     container: viewport.frame,
     subject,
     center,
+    centerIntitial,
     shouldUseTimeDampening,
   });
 

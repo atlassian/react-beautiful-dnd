@@ -28,6 +28,7 @@ export default ({
   scrollDroppable,
 }: Args): void => {
   const center: Position = state.current.page.borderBoxCenter;
+  const centerIntitial = state.initial.client.borderBoxCenter;
   const draggable: DraggableDimension =
     state.dimensions.draggables[state.critical.draggable.id];
   const subject: Rect = draggable.page.marginBox;
@@ -39,6 +40,7 @@ export default ({
       viewport,
       subject,
       center,
+      centerIntitial,
       shouldUseTimeDampening,
     });
 
@@ -63,6 +65,7 @@ export default ({
     droppable,
     subject,
     center,
+    centerIntitial,
     shouldUseTimeDampening,
   });
 

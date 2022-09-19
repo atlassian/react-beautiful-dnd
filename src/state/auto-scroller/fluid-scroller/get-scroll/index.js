@@ -4,6 +4,10 @@ import { apply, isEqual, origin } from '../../../position';
 import getScrollOnAxis from './get-scroll-on-axis';
 import adjustForSizeLimits from './adjust-for-size-limits';
 import { horizontal, vertical } from '../../../axis';
+import didStartInScrollThreshold from './did-start-in-scroll-threshold';
+import getDistanceThresholds, {
+  type DistanceThresholds,
+} from './get-scroll-on-axis/get-distance-thresholds';
 
 // will replace -0 and replace with +0
 const clean = apply((value: number) => (value === 0 ? 0 : value));
@@ -13,6 +17,7 @@ type Args = {|
   container: Rect,
   subject: Rect,
   center: Position,
+  centerIntitial: Position,
   shouldUseTimeDampening: boolean,
 |};
 
@@ -21,6 +26,7 @@ export default ({
   container,
   subject,
   center,
+  centerIntitial,
   shouldUseTimeDampening,
 }: Args): ?Position => {
   // get distance to each edge
@@ -30,6 +36,16 @@ export default ({
     bottom: container.bottom - center.y,
     left: center.x - container.left,
   };
+
+  const thresholdsVertical: DistanceThresholds = getDistanceThresholds(
+    container,
+    vertical,
+  );
+
+  const thresholdsHorizontal: DistanceThresholds = getDistanceThresholds(
+    container,
+    horizontal,
+  );
 
   // 1. Figure out which x,y values are the best target
   // 2. Can the container scroll in that direction at all?
@@ -45,6 +61,7 @@ export default ({
     dragStartTime,
     axis: vertical,
     shouldUseTimeDampening,
+    thresholds: thresholdsVertical,
   });
   const x: number = getScrollOnAxis({
     container,
@@ -52,6 +69,7 @@ export default ({
     dragStartTime,
     axis: horizontal,
     shouldUseTimeDampening,
+    thresholds: thresholdsHorizontal,
   });
 
   const required: Position = clean({ x, y });
@@ -72,5 +90,16 @@ export default ({
     return null;
   }
 
-  return isEqual(limited, origin) ? null : limited;
+  // if the draggable originates inside a scroll threshold
+  // don't autoscroll in that threshold's direction until dragged in that direction
+  const buffered: Position = didStartInScrollThreshold({
+    center,
+    centerIntitial,
+    container,
+    scroll: limited,
+    thresholdsHorizontal,
+    thresholdsVertical,
+  });
+
+  return isEqual(buffered, origin) ? null : buffered;
 };
