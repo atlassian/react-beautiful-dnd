@@ -8,6 +8,7 @@ type Args = {|
   droppable: DroppableDimension,
   subject: Rect,
   center: Position,
+  centerIntitial: Position,
   dragStartTime: number,
   shouldUseTimeDampening: boolean,
 |};
@@ -16,6 +17,7 @@ export default ({
   droppable,
   subject,
   center,
+  centerIntitial,
   dragStartTime,
   shouldUseTimeDampening,
 }: Args): ?Position => {
@@ -32,6 +34,7 @@ export default ({
     container: frame.pageMarginBox,
     subject,
     center,
+    centerIntitial,
     shouldUseTimeDampening,
   });
 
