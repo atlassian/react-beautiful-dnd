@@ -278,6 +278,46 @@ export type ScrollOptions = {|
   shouldPublishImmediately: boolean,
 |};
 
+// all in pixels
+export type DistanceThresholds = {|
+  startScrollingFrom: number,
+  maxScrollValueAt: number,
+|};
+
+// all in ms
+export type DurationDampening = {|
+  stopDampeningAt?: Number,
+  accelerateAt?: Number,
+|};
+
+export type FluidScrollerConfigOverride = {|
+  // percentage distance from edge of container, decimal
+  startFromPercentage?: number,
+  maxScrollAtPercentage?: number,
+  // pixels per frame
+  ease?: (percentage: number) => number,
+  maxPixelScroll?: number,
+  durationDampening?: DurationDampening,
+|};
+
+export type FluidScrollerOptions = {|
+  // opt into new autoscroll behavior: if the draggable originates inside a scroll threshold
+  // don't autoscroll in that threshold's direction until dragged in that direction
+  bufferThresholds?: boolean,
+  configOverride?: FluidScrollerConfigOverride,
+  // customize your own fluid scroll logic
+  // when present, this function will be called directly before the return of get-scroll/index.js
+  // takes presedence over bufferThresholds: true
+  thruGetScroll?: (args: {|
+    center: Position,
+    centerIntitial: Position,
+    container: Rect,
+    scroll: Position,
+    thresholdsHorizontal: DistanceThresholds,
+    thresholdsVertical: DistanceThresholds,
+  |}) => Position,
+|};
+
 // using the draggable id rather than the descriptor as the descriptor
 // may change as a result of the initial flush. This means that the lift
 // descriptor may not be the same as the actual descriptor. To avoid
