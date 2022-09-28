@@ -1,6 +1,6 @@
 // @flow
 import type { Position, Rect } from 'css-box-model';
-import { type DistanceThresholds } from './get-scroll-on-axis/get-distance-thresholds';
+import { type DistanceThresholds } from '../../../../types';
 
 type Args = {|
   center: Position,
@@ -11,7 +11,7 @@ type Args = {|
   thresholdsVertical: DistanceThresholds,
 |};
 
-const minScrollThreshold = 24;
+const THRESHOLD_BUFFER = 24;
 
 export default ({
   center,
@@ -23,24 +23,24 @@ export default ({
 }: Args): Position => {
   if (
     center.x > container.width - thresholdsHorizontal.startScrollingFrom &&
-    center.x < centerIntitial.x + minScrollThreshold
+    center.x < centerIntitial.x + THRESHOLD_BUFFER
   ) {
     scroll.x = 0;
   } else if (
     center.x < thresholdsHorizontal.startScrollingFrom &&
-    center.x > centerIntitial.x - minScrollThreshold
+    center.x > centerIntitial.x - THRESHOLD_BUFFER
   ) {
     scroll.x = 0;
   }
 
   if (
     center.y > container.height - thresholdsVertical.startScrollingFrom &&
-    center.y < centerIntitial.y + minScrollThreshold
+    center.y < centerIntitial.y + THRESHOLD_BUFFER
   ) {
     scroll.y = 0;
   } else if (
     center.y < thresholdsVertical.startScrollingFrom &&
-    center.y > centerIntitial.y - minScrollThreshold
+    center.y > centerIntitial.y - THRESHOLD_BUFFER
   ) {
     scroll.y = 0;
   }
