@@ -80,6 +80,8 @@ export default ({
     fluidScrollerOptions,
   });
 
+  let scroll: Position = { x: 0, y: 0 };
+
   const required: Position = clean({ x, y });
 
   // nothing required
@@ -98,16 +100,33 @@ export default ({
     return null;
   }
 
-  // if the draggable originates inside a scroll threshold
-  // don't autoscroll in that threshold's direction until dragged in that direction
-  const buffered: Position = didStartInScrollThreshold({
-    center,
-    centerIntitial,
-    container,
-    scroll: limited,
-    thresholdsHorizontal,
-    thresholdsVertical,
-  });
+  scroll = limited;
 
-  return isEqual(buffered, origin) ? null : buffered;
+  if (fluidScrollerOptions) {
+    if (fluidScrollerOptions.thruGetScroll) {
+      // apply consumer injected scroll behavior
+      scroll = fluidScrollerOptions.thruGetScroll({
+        center,
+        centerIntitial,
+        container,
+        scroll,
+        thresholdsHorizontal,
+        thresholdsVertical,
+      });
+    }
+    if (fluidScrollerOptions.bufferThresholds) {
+      // if the draggable originates inside a scroll threshold
+      // don't autoscroll in that threshold's direction until dragged in that direction
+      scroll = didStartInScrollThreshold({
+        center,
+        centerIntitial,
+        container,
+        scroll,
+        thresholdsHorizontal,
+        thresholdsVertical,
+      });
+    }
+  }
+
+  return isEqual(scroll, origin) ? null : scroll;
 };
