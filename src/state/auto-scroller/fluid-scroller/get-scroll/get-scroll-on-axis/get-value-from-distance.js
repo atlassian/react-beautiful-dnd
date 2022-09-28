@@ -36,9 +36,13 @@ export default (
     return 0;
   }
 
+  const maxSpeed =
+    fluidScrollerOptions?.configOverride?.maxPixelScroll ||
+    config.maxPixelScroll;
+
   // use max speed when on or over boundary
   if (distanceToEdge <= thresholds.maxScrollValueAt) {
-    return config.maxPixelScroll;
+    return maxSpeed;
   }
 
   // when just going on the boundary return the minimum integer
@@ -58,7 +62,7 @@ export default (
     1 - percentageFromMaxScrollValueAt;
 
   const scroll: number =
-    config.maxPixelScroll * config.ease(percentageFromStartScrollingFrom);
+    maxSpeed * config.ease(percentageFromStartScrollingFrom);
 
   // scroll will always be a positive integer
   return Math.ceil(scroll);
