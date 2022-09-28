@@ -1,6 +1,10 @@
 // @flow
 import type { Position, Rect } from 'css-box-model';
-import type { Scrollable, DroppableDimension } from '../../../types';
+import type {
+  DroppableDimension,
+  FluidScrollerOptions,
+  Scrollable,
+} from '../../../types';
 import getScroll from './get-scroll';
 import { canScrollDroppable } from '../can-scroll';
 
@@ -11,6 +15,7 @@ type Args = {|
   centerIntitial: Position,
   dragStartTime: number,
   shouldUseTimeDampening: boolean,
+  fluidScrollerOptions?: FluidScrollerOptions,
 |};
 
 export default ({
@@ -20,6 +25,7 @@ export default ({
   centerIntitial,
   dragStartTime,
   shouldUseTimeDampening,
+  fluidScrollerOptions,
 }: Args): ?Position => {
   // We know this has a closestScrollable
   const frame: ?Scrollable = droppable.frame;
@@ -36,6 +42,7 @@ export default ({
     center,
     centerIntitial,
     shouldUseTimeDampening,
+    fluidScrollerOptions,
   });
 
   return scroll && canScrollDroppable(droppable, scroll) ? scroll : null;

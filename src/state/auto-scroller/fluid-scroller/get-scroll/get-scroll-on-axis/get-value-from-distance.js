@@ -1,5 +1,8 @@
 // @flow
-import { type DistanceThresholds } from './get-distance-thresholds';
+import type {
+  DistanceThresholds,
+  FluidScrollerOptions,
+} from '../../../../../types';
 import getPercentage from '../../get-percentage';
 import config from '../../config';
 import minScroll from './min-scroll';
@@ -7,6 +10,7 @@ import minScroll from './min-scroll';
 export default (
   distanceToEdge: number,
   thresholds: DistanceThresholds,
+  fluidScrollerOptions?: FluidScrollerOptions,
 ): number => {
   /*
   // This function only looks at the distance to one edge

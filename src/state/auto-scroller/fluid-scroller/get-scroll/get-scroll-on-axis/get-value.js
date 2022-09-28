@@ -1,5 +1,8 @@
 // @flow
-import { type DistanceThresholds } from './get-distance-thresholds';
+import type {
+  DistanceThresholds,
+  FluidScrollerOptions,
+} from '../../../../../types';
 import getValueFromDistance from './get-value-from-distance';
 import dampenValueByTime from './dampen-value-by-time';
 import minScroll from './min-scroll';
@@ -9,6 +12,7 @@ type Args = {|
   thresholds: DistanceThresholds,
   dragStartTime: number,
   shouldUseTimeDampening: boolean,
+  fluidScrollerOptions?: FluidScrollerOptions,
 |};
 
 export default ({
@@ -16,8 +20,13 @@ export default ({
   thresholds,
   dragStartTime,
   shouldUseTimeDampening,
+  fluidScrollerOptions,
 }: Args): number => {
-  const scroll: number = getValueFromDistance(distanceToEdge, thresholds);
+  const scroll: number = getValueFromDistance(
+    distanceToEdge,
+    thresholds,
+    fluidScrollerOptions,
+  );
 
   // not enough distance to trigger a minimum scroll
   // we can bail here

@@ -5,9 +5,11 @@ import getScrollOnAxis from './get-scroll-on-axis';
 import adjustForSizeLimits from './adjust-for-size-limits';
 import { horizontal, vertical } from '../../../axis';
 import didStartInScrollThreshold from './did-start-in-scroll-threshold';
-import getDistanceThresholds, {
-  type DistanceThresholds,
-} from './get-scroll-on-axis/get-distance-thresholds';
+import getDistanceThresholds from './get-scroll-on-axis/get-distance-thresholds';
+import type {
+  DistanceThresholds,
+  FluidScrollerOptions,
+} from '../../../../types';
 
 // will replace -0 and replace with +0
 const clean = apply((value: number) => (value === 0 ? 0 : value));
@@ -19,6 +21,7 @@ type Args = {|
   center: Position,
   centerIntitial: Position,
   shouldUseTimeDampening: boolean,
+  fluidScrollerOptions?: FluidScrollerOptions,
 |};
 
 export default ({
@@ -28,6 +31,7 @@ export default ({
   center,
   centerIntitial,
   shouldUseTimeDampening,
+  fluidScrollerOptions,
 }: Args): ?Position => {
   // get distance to each edge
   const distanceToEdges: Spacing = {
@@ -40,11 +44,13 @@ export default ({
   const thresholdsVertical: DistanceThresholds = getDistanceThresholds(
     container,
     vertical,
+    fluidScrollerOptions,
   );
 
   const thresholdsHorizontal: DistanceThresholds = getDistanceThresholds(
     container,
     horizontal,
+    fluidScrollerOptions,
   );
 
   // 1. Figure out which x,y values are the best target
@@ -62,6 +68,7 @@ export default ({
     axis: vertical,
     shouldUseTimeDampening,
     thresholds: thresholdsVertical,
+    fluidScrollerOptions,
   });
   const x: number = getScrollOnAxis({
     container,
@@ -70,6 +77,7 @@ export default ({
     axis: horizontal,
     shouldUseTimeDampening,
     thresholds: thresholdsHorizontal,
+    fluidScrollerOptions,
   });
 
   const required: Position = clean({ x, y });

@@ -1,6 +1,6 @@
 // @flow
 import type { Position, Rect } from 'css-box-model';
-import type { Viewport } from '../../../types';
+import type { FluidScrollerOptions, Viewport } from '../../../types';
 import getScroll from './get-scroll';
 import { canScrollWindow } from '../can-scroll';
 
@@ -11,6 +11,7 @@ type Args = {|
   centerIntitial: Position,
   dragStartTime: number,
   shouldUseTimeDampening: boolean,
+  fluidScrollerOptions?: FluidScrollerOptions,
 |};
 
 export default ({
@@ -20,6 +21,7 @@ export default ({
   centerIntitial,
   dragStartTime,
   shouldUseTimeDampening,
+  fluidScrollerOptions,
 }: Args): ?Position => {
   const scroll: ?Position = getScroll({
     dragStartTime,
@@ -28,6 +30,7 @@ export default ({
     center,
     centerIntitial,
     shouldUseTimeDampening,
+    fluidScrollerOptions,
   });
 
   return scroll && canScrollWindow(viewport, scroll) ? scroll : null;
