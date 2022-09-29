@@ -44,5 +44,8 @@ export default ({
   // we must let at least 1px through to trigger a scroll event an
   // another auto scroll call
 
-  return Math.max(dampenValueByTime(scroll, dragStartTime), minScroll);
+  return Math.max(
+    dampenValueByTime(scroll, dragStartTime, fluidScrollerOptions),
+    minScroll,
+  );
 };

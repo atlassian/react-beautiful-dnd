@@ -286,8 +286,8 @@ export type DistanceThresholds = {|
 
 // all in ms
 export type DurationDampening = {|
-  stopDampeningAt?: Number,
-  accelerateAt?: Number,
+  stopDampeningAt?: number,
+  accelerateAt?: number,
 |};
 
 export type FluidScrollerConfigOverride = {|
