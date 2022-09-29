@@ -62,7 +62,6 @@ export default ({
   // Maximum speed value should be hit before the distance is 0
   // Negative values to not continue to increase the speed
   const y: number = getScrollOnAxis({
-    container,
     distanceToEdges,
     dragStartTime,
     axis: vertical,
@@ -71,7 +70,6 @@ export default ({
     fluidScrollerOptions,
   });
   const x: number = getScrollOnAxis({
-    container,
     distanceToEdges,
     dragStartTime,
     axis: horizontal,

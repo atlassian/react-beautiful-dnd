@@ -1,5 +1,5 @@
 // @flow
-import type { Rect, Spacing } from 'css-box-model';
+import type { Spacing } from 'css-box-model';
 import type {
   Axis,
   DistanceThresholds,
@@ -8,7 +8,6 @@ import type {
 import getValue from './get-value';
 
 type GetOnAxisArgs = {|
-  container: Rect,
   distanceToEdges: Spacing,
   dragStartTime: number,
   axis: Axis,
