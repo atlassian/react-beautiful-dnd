@@ -31,7 +31,6 @@ export default ({
   fluidScrollerOptions,
 }: Args): void => {
   const center: Position = state.current.page.borderBoxCenter;
-  const centerPage: Position = state.current.page.borderBoxCenter;
   const centerIntitialPage = state.initial.page.borderBoxCenter;
   const centerIntitialClient = state.initial.client.borderBoxCenter;
   const draggable: DraggableDimension =
@@ -44,7 +43,7 @@ export default ({
       dragStartTime,
       viewport,
       subject,
-      center: centerPage,
+      center,
       centerIntitial: centerIntitialPage,
       shouldUseTimeDampening,
       fluidScrollerOptions,
