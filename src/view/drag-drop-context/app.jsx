@@ -140,6 +140,8 @@ export default function App(props: Props) {
     return createDimensionMarshal(registry, marshalCallbacks);
   }, [registry, marshalCallbacks]);
 
+  const fluidScrollerOptionsRef = useRef(fluidScrollerOptions);
+
   const autoScroller: AutoScroller = useMemo<AutoScroller>(
     () =>
       createAutoScroller({
@@ -152,7 +154,7 @@ export default function App(props: Props) {
           // $FlowFixMe - not sure why this is wrong
           lazyDispatch,
         ),
-        fluidScrollerOptions,
+        fluidScrollerOptions: fluidScrollerOptionsRef.current,
       }),
     [dimensionMarshal.scrollDroppable, lazyDispatch],
   );
