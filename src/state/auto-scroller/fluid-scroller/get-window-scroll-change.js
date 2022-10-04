@@ -26,6 +26,7 @@ export default ({
   const scroll: ?Position = getScroll({
     dragStartTime,
     container: viewport.frame,
+    containerScroll: viewport.scroll,
     subject,
     center,
     centerIntitial,

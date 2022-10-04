@@ -38,6 +38,7 @@ export default ({
   const scroll: ?Position = getScroll({
     dragStartTime,
     container: frame.pageMarginBox,
+    containerScroll: frame.scroll,
     subject,
     center,
     centerIntitial,

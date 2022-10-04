@@ -9,6 +9,7 @@ import getDistanceThresholds from './get-scroll-on-axis/get-distance-thresholds'
 import type {
   DistanceThresholds,
   FluidScrollerOptions,
+  ScrollDetails,
 } from '../../../../types';
 
 // will replace -0 and replace with +0
@@ -17,6 +18,7 @@ const clean = apply((value: number) => (value === 0 ? 0 : value));
 type Args = {|
   dragStartTime: number,
   container: Rect,
+  containerScroll: ScrollDetails,
   subject: Rect,
   center: Position,
   centerIntitial: Position,
@@ -27,6 +29,7 @@ type Args = {|
 export default ({
   dragStartTime,
   container,
+  containerScroll,
   subject,
   center,
   centerIntitial,
@@ -116,10 +119,10 @@ export default ({
       // if the draggable originates inside a scroll threshold
       // don't autoscroll in that threshold's direction until dragged in that direction
       scroll = didStartInScrollThreshold({
-        distanceToEdges,
         center,
         centerIntitial,
         container,
+        containerScroll,
         scroll,
         thresholdsHorizontal,
         thresholdsVertical,
