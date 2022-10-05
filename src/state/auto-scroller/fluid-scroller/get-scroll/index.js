@@ -21,7 +21,7 @@ type Args = {|
   containerScroll: ScrollDetails,
   subject: Rect,
   center: Position,
-  centerIntitial: Position,
+  centerInitial: Position,
   shouldUseTimeDampening: boolean,
   fluidScrollerOptions?: FluidScrollerOptions,
 |};
@@ -32,7 +32,7 @@ export default ({
   containerScroll,
   subject,
   center,
-  centerIntitial,
+  centerInitial,
   shouldUseTimeDampening,
   fluidScrollerOptions,
 }: Args): ?Position => {
@@ -108,7 +108,7 @@ export default ({
       // apply consumer injected scroll behavior
       scroll = fluidScrollerOptions.thruGetScroll({
         center,
-        centerIntitial,
+        centerInitial,
         container,
         containerScroll,
         distanceToEdges,
@@ -122,7 +122,7 @@ export default ({
       // don't autoscroll in that threshold's direction until dragged in that direction
       scroll = didStartInScrollThreshold({
         center,
-        centerIntitial,
+        centerInitial,
         container,
         containerScroll,
         distanceToEdges,

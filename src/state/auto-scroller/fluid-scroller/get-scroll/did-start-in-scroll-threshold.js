@@ -5,7 +5,7 @@ import { horizontal, vertical } from '../../../axis';
 
 type Args = {|
   center: Position,
-  centerIntitial: Position,
+  centerInitial: Position,
   container: Rect,
   containerScroll: ScrollDetails,
   scroll: Position,
@@ -19,7 +19,7 @@ const THRESHOLD_BUFFER = 24;
 const calcScrollConditions = ({
   axis,
   center,
-  centerIntitial,
+  centerInitial,
   container,
   containerScroll,
   distanceToEdges,
@@ -37,9 +37,9 @@ const calcScrollConditions = ({
     center[axis.line] < thresholds.startScrollingFrom + windowScrollOffset;
 
   const draggedTowardsStart =
-    center[axis.line] < centerIntitial[axis.line] - THRESHOLD_BUFFER;
+    center[axis.line] < centerInitial[axis.line] - THRESHOLD_BUFFER;
   const draggedTowardsEnd =
-    center[axis.line] > centerIntitial[axis.line] + THRESHOLD_BUFFER;
+    center[axis.line] > centerInitial[axis.line] + THRESHOLD_BUFFER;
 
   const scrolledTowardsStart =
     containerScroll.initial[axis.line] > containerScroll.current[axis.line];
@@ -61,14 +61,14 @@ const getScrollConditions = ({
   thresholdsHorizontal,
   thresholdsVertical,
   center,
-  centerIntitial,
+  centerInitial,
   container,
   containerScroll,
 }) => ({
   xAxis: calcScrollConditions({
     axis: horizontal,
     center,
-    centerIntitial,
+    centerInitial,
     container,
     containerScroll,
     distanceToEdges,
@@ -78,7 +78,7 @@ const getScrollConditions = ({
   yAxis: calcScrollConditions({
     axis: vertical,
     center,
-    centerIntitial,
+    centerInitial,
     container,
     containerScroll,
     distanceToEdges,
@@ -89,7 +89,7 @@ const getScrollConditions = ({
 
 export default ({
   center,
-  centerIntitial,
+  centerInitial,
   container,
   containerScroll,
   scroll,
@@ -102,7 +102,7 @@ export default ({
     thresholdsHorizontal,
     thresholdsVertical,
     center,
-    centerIntitial,
+    centerInitial,
     container,
     containerScroll,
   });

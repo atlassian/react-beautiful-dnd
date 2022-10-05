@@ -310,7 +310,7 @@ export type FluidScrollerOptions = {|
   // takes presedence over bufferThresholds: true
   thruGetScroll?: (args: {|
     center: Position,
-    centerIntitial: Position,
+    centerInitial: Position,
     container: Rect,
     containerScroll: ScrollDetails,
     distanceToEdges: Spacing,
