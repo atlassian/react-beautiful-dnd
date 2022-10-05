@@ -6,7 +6,7 @@ import type {
   DistanceThresholds,
 } from '../../../../../types';
 import { horizontal, vertical } from '../../../../axis';
-import calcScrollConditions from './calc-scroll-conditions';
+import calcAxisScrollConditions from './calc-axis-scroll-conditions';
 
 type Args = {|
   distanceToEdges: Spacing,
@@ -27,7 +27,7 @@ export default ({
   thresholdsHorizontal,
   thresholdsVertical,
 }: Args): ScrollConditions => ({
-  xAxis: calcScrollConditions({
+  xAxis: calcAxisScrollConditions({
     axis: horizontal,
     center,
     centerInitial,
@@ -37,7 +37,7 @@ export default ({
     thresholds: thresholdsHorizontal,
     windowScrollOffset: window.scrollX,
   }),
-  yAxis: calcScrollConditions({
+  yAxis: calcAxisScrollConditions({
     axis: vertical,
     center,
     centerInitial,
