@@ -83,7 +83,7 @@ const getScrollConditions = ({
     containerScroll,
     distanceToEdges,
     thresholds: thresholdsVertical,
-    windowScrollOffset: window.scrolly,
+    windowScrollOffset: window.scrollY,
   }),
 });
 
