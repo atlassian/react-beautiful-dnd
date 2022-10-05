@@ -1,5 +1,5 @@
 // @flow
-import type { BoxModel, Rect, Position } from 'css-box-model';
+import type { BoxModel, Rect, Position, Spacing } from 'css-box-model';
 
 export type Id = string;
 export type DraggableId = Id;
@@ -312,6 +312,8 @@ export type FluidScrollerOptions = {|
     center: Position,
     centerIntitial: Position,
     container: Rect,
+    containerScroll: ScrollDetails,
+    distanceToEdges: Spacing,
     scroll: Position,
     thresholdsHorizontal: DistanceThresholds,
     thresholdsVertical: DistanceThresholds,

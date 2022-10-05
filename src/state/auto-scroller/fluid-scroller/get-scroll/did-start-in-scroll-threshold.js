@@ -1,5 +1,5 @@
 // @flow
-import type { Position, Rect } from 'css-box-model';
+import type { Position, Rect, Spacing } from 'css-box-model';
 import type { DistanceThresholds, ScrollDetails } from '../../../../types';
 
 type Args = {|
@@ -10,6 +10,7 @@ type Args = {|
   scroll: Position,
   thresholdsHorizontal: DistanceThresholds,
   thresholdsVertical: DistanceThresholds,
+  distanceToEdges: Spacing,
 |};
 
 const THRESHOLD_BUFFER = 24;
@@ -22,6 +23,7 @@ export default ({
   scroll,
   thresholdsHorizontal,
   thresholdsVertical,
+  distanceToEdges,
 }: Args): Position => {
   if (
     center.x > container.width - thresholdsHorizontal.startScrollingFrom &&
@@ -40,7 +42,10 @@ export default ({
 
   const itemIsInsideThresholdBottom =
     center.y >
-    container.height - thresholdsVertical.startScrollingFrom + window.scrollY;
+      container.height -
+        thresholdsVertical.startScrollingFrom +
+        window.scrollY ||
+    distanceToEdges.bottom < thresholdsVertical.startScrollingFrom;
 
   const hasDraggedUp = center.y < centerIntitial.y - THRESHOLD_BUFFER;
 
@@ -60,7 +65,6 @@ export default ({
   } else if (itemIsInsideThresholdBottom) {
     if (hasDraggedDown || hasScrolledUp) {
       // noop
-      // console.log({ initial: centerIntitial.y, current: center.y });
     } else {
       // stomp
       scroll.y = 0;
