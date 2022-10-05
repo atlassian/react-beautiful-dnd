@@ -37,36 +37,31 @@ export default ({
     scroll.x = 0;
   }
 
-  const itemIsInsideThresholdTop =
+  const distanceInsideThresholdBottom =
+    distanceToEdges.bottom < thresholdsVertical.startScrollingFrom;
+  const centerInsideThresholdBottom =
+    center.y >
+    container.height - thresholdsVertical.startScrollingFrom + window.scrollY;
+
+  const withinThresholdBottom =
+    centerInsideThresholdBottom || distanceInsideThresholdBottom;
+  const withinThresholdTop =
     center.y < thresholdsVertical.startScrollingFrom + window.scrollY;
 
-  const itemIsInsideThresholdBottom =
-    center.y >
-      container.height -
-        thresholdsVertical.startScrollingFrom +
-        window.scrollY ||
-    distanceToEdges.bottom < thresholdsVertical.startScrollingFrom;
-
   const hasDraggedUp = center.y < centerIntitial.y - THRESHOLD_BUFFER;
-
   const hasDraggedDown = center.y > centerIntitial.y + THRESHOLD_BUFFER;
 
+  const hasScrolledUp = containerScroll.initial.y > containerScroll.current.y;
   const hasScrolledDown = containerScroll.initial.y < containerScroll.current.y;
 
-  const hasScrolledUp = containerScroll.initial.y > containerScroll.current.y;
-
-  if (itemIsInsideThresholdTop) {
-    if (hasDraggedUp || hasScrolledDown) {
-      // noop
-    } else {
-      // stomp
+  // stomp on vertical scroll
+  if (withinThresholdTop) {
+    if (!hasDraggedUp && !hasScrolledDown) {
       scroll.y = 0;
     }
-  } else if (itemIsInsideThresholdBottom) {
-    if (hasDraggedDown || hasScrolledUp) {
-      // noop
-    } else {
-      // stomp
+  }
+  if (withinThresholdBottom) {
+    if (!hasDraggedDown && !hasScrolledUp) {
       scroll.y = 0;
     }
   }
