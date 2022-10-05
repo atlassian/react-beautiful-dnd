@@ -78,6 +78,20 @@ export type ScrollDetails = {|
   |},
 |};
 
+export type AxisScrollConditions = {|
+  inThresholdStart: boolean,
+  inThresholdEnd: boolean,
+  draggedTowardsStart: boolean,
+  draggedTowardsEnd: boolean,
+  scrolledTowardsStart: boolean,
+  scrolledTowardsEnd: boolean,
+|};
+
+export type ScrollConditions = {|
+  xAxis: AxisScrollConditions,
+  yAxis: AxisScrollConditions,
+|};
+
 export type Placeholder = {|
   client: BoxModel,
   tagName: string,

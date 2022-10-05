@@ -4,7 +4,7 @@ import { apply, isEqual, origin } from '../../../position';
 import getScrollOnAxis from './get-scroll-on-axis';
 import adjustForSizeLimits from './adjust-for-size-limits';
 import { horizontal, vertical } from '../../../axis';
-import didStartInScrollThreshold from './did-start-in-scroll-threshold';
+import bufferThresholds from './buffer-thresholds';
 import getDistanceThresholds from './get-scroll-on-axis/get-distance-thresholds';
 import type {
   DistanceThresholds,
@@ -120,7 +120,7 @@ export default ({
     if (fluidScrollerOptions.bufferThresholds) {
       // if the draggable originates inside a scroll threshold
       // don't autoscroll in that threshold's direction until dragged in that direction
-      scroll = didStartInScrollThreshold({
+      scroll = bufferThresholds({
         center,
         centerInitial,
         container,
