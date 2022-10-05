@@ -1,6 +1,7 @@
 // @flow
 import type { Position, Rect, Spacing } from 'css-box-model';
 import type { DistanceThresholds, ScrollDetails } from '../../../../types';
+import { horizontal, vertical } from '../../../axis';
 
 type Args = {|
   center: Position,
@@ -15,6 +16,77 @@ type Args = {|
 
 const THRESHOLD_BUFFER = 24;
 
+const calcScrollConditions = ({
+  axis,
+  center,
+  centerIntitial,
+  container,
+  containerScroll,
+  distanceToEdges,
+  thresholds,
+  windowScrollOffset,
+}) => {
+  const distanceInsideThresholdEnd =
+    distanceToEdges[axis.end] < thresholds.startScrollingFrom;
+  const centerInsideThresholdEnd =
+    center[axis.line] >
+    container[axis.size] - thresholds.startScrollingFrom + windowScrollOffset;
+
+  const inThresholdEnd = centerInsideThresholdEnd || distanceInsideThresholdEnd;
+  const inThresholdStart =
+    center[axis.line] < thresholds.startScrollingFrom + windowScrollOffset;
+
+  const draggedTowardsStart =
+    center[axis.line] < centerIntitial[axis.line] - THRESHOLD_BUFFER;
+  const draggedTowardsEnd =
+    center[axis.line] > centerIntitial[axis.line] + THRESHOLD_BUFFER;
+
+  const scrolledTowardsStart =
+    containerScroll.initial[axis.line] > containerScroll.current[axis.line];
+  const scrolledTowardsEnd =
+    containerScroll.initial[axis.line] < containerScroll.current[axis.line];
+
+  return {
+    inThresholdStart,
+    inThresholdEnd,
+    draggedTowardsStart,
+    draggedTowardsEnd,
+    scrolledTowardsStart,
+    scrolledTowardsEnd,
+  };
+};
+
+const getScrollConditions = ({
+  distanceToEdges,
+  thresholdsHorizontal,
+  thresholdsVertical,
+  center,
+  centerIntitial,
+  container,
+  containerScroll,
+}) => ({
+  xAxis: calcScrollConditions({
+    axis: horizontal,
+    center,
+    centerIntitial,
+    container,
+    containerScroll,
+    distanceToEdges,
+    thresholds: thresholdsHorizontal,
+    windowScrollOffset: window.scrollX,
+  }),
+  yAxis: calcScrollConditions({
+    axis: vertical,
+    center,
+    centerIntitial,
+    container,
+    containerScroll,
+    distanceToEdges,
+    thresholds: thresholdsVertical,
+    windowScrollOffset: window.scrolly,
+  }),
+});
+
 export default ({
   center,
   centerIntitial,
@@ -25,61 +97,32 @@ export default ({
   thresholdsVertical,
   distanceToEdges,
 }: Args): Position => {
-  const distanceInsideThresholdRight =
-    distanceToEdges.right < thresholdsHorizontal.startScrollingFrom;
-  const centerInsideThresholdRight =
-    center.x >
-    container.width - thresholdsHorizontal.startScrollingFrom + window.scrollX;
+  const { xAxis, yAxis } = getScrollConditions({
+    distanceToEdges,
+    thresholdsHorizontal,
+    thresholdsVertical,
+    center,
+    centerIntitial,
+    container,
+    containerScroll,
+  });
 
-  const withinThresholdRight =
-    centerInsideThresholdRight || distanceInsideThresholdRight;
-  const withinThresholdLeft =
-    center.x < thresholdsHorizontal.startScrollingFrom + window.scrollX;
-
-  const hasDraggedLeft = center.x < centerIntitial.x - THRESHOLD_BUFFER;
-  const hasDraggedRight = center.x > centerIntitial.x + THRESHOLD_BUFFER;
-
-  const hasScrolledLeft = containerScroll.initial.x > containerScroll.current.x;
-  const hasScrolledRight =
-    containerScroll.initial.x < containerScroll.current.x;
-
-  // stomp on horizontal scroll
-  if (withinThresholdLeft) {
-    if (!hasDraggedLeft && !hasScrolledRight) {
+  if (xAxis.inThresholdStart) {
+    if (!xAxis.draggedTowardsStart && !xAxis.scrolledTowardsEnd) {
       scroll.x = 0;
     }
-  }
-  if (withinThresholdRight) {
-    if (!hasDraggedRight && !hasScrolledLeft) {
+  } else if (xAxis.inThresholdEnd) {
+    if (!xAxis.draggedTowardsEnd && !xAxis.scrolledTowardsStart) {
       scroll.x = 0;
     }
   }
 
-  const distanceInsideThresholdBottom =
-    distanceToEdges.bottom < thresholdsVertical.startScrollingFrom;
-  const centerInsideThresholdBottom =
-    center.y >
-    container.height - thresholdsVertical.startScrollingFrom + window.scrollY;
-
-  const withinThresholdBottom =
-    centerInsideThresholdBottom || distanceInsideThresholdBottom;
-  const withinThresholdTop =
-    center.y < thresholdsVertical.startScrollingFrom + window.scrollY;
-
-  const hasDraggedUp = center.y < centerIntitial.y - THRESHOLD_BUFFER;
-  const hasDraggedDown = center.y > centerIntitial.y + THRESHOLD_BUFFER;
-
-  const hasScrolledUp = containerScroll.initial.y > containerScroll.current.y;
-  const hasScrolledDown = containerScroll.initial.y < containerScroll.current.y;
-
-  // stomp on vertical scroll
-  if (withinThresholdTop) {
-    if (!hasDraggedUp && !hasScrolledDown) {
+  if (yAxis.inThresholdStart) {
+    if (!yAxis.draggedTowardsStart && !yAxis.scrolledTowardsEnd) {
       scroll.y = 0;
     }
-  }
-  if (withinThresholdBottom) {
-    if (!hasDraggedDown && !hasScrolledUp) {
+  } else if (yAxis.inThresholdEnd) {
+    if (!yAxis.draggedTowardsEnd && !yAxis.scrolledTowardsStart) {
       scroll.y = 0;
     }
   }
