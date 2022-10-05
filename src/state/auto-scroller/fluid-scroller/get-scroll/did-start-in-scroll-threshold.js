@@ -25,16 +25,34 @@ export default ({
   thresholdsVertical,
   distanceToEdges,
 }: Args): Position => {
-  if (
-    center.x > container.width - thresholdsHorizontal.startScrollingFrom &&
-    center.x < centerIntitial.x + THRESHOLD_BUFFER
-  ) {
-    scroll.x = 0;
-  } else if (
-    center.x < thresholdsHorizontal.startScrollingFrom &&
-    center.x > centerIntitial.x - THRESHOLD_BUFFER
-  ) {
-    scroll.x = 0;
+  const distanceInsideThresholdRight =
+    distanceToEdges.right < thresholdsHorizontal.startScrollingFrom;
+  const centerInsideThresholdRight =
+    center.x >
+    container.width - thresholdsHorizontal.startScrollingFrom + window.scrollX;
+
+  const withinThresholdRight =
+    centerInsideThresholdRight || distanceInsideThresholdRight;
+  const withinThresholdLeft =
+    center.x < thresholdsHorizontal.startScrollingFrom + window.scrollX;
+
+  const hasDraggedLeft = center.x < centerIntitial.x - THRESHOLD_BUFFER;
+  const hasDraggedRight = center.x > centerIntitial.x + THRESHOLD_BUFFER;
+
+  const hasScrolledLeft = containerScroll.initial.x > containerScroll.current.x;
+  const hasScrolledRight =
+    containerScroll.initial.x < containerScroll.current.x;
+
+  // stomp on horizontal scroll
+  if (withinThresholdLeft) {
+    if (!hasDraggedLeft && !hasScrolledRight) {
+      scroll.x = 0;
+    }
+  }
+  if (withinThresholdRight) {
+    if (!hasDraggedRight && !hasScrolledLeft) {
+      scroll.x = 0;
+    }
   }
 
   const distanceInsideThresholdBottom =
