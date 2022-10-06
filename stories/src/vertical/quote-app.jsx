@@ -14,6 +14,21 @@ const Root = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  border: 5px solid blue; // TODO: delete
+`;
+
+// TODO: delete
+const Threshold = styled.div`
+  background-color: blue;
+  opacity: 0.15;
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 25%;
+  top: ${({ placement }) => (placement === 'top' ? 0 : 'initial')};
+  bottom: ${({ placement }) => (placement === 'bottom' ? 0 : 'initial')};
+  pointer-events: none;
+  z-index: 1000;
 `;
 
 type Props = {|
@@ -62,8 +77,37 @@ export default function QuoteApp(props: Props) {
   }
 
   return (
-    <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+    <DragDropContext
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      fluidScrollerOptions={{
+        bufferThresholds: true,
+        bufferMinScroll: 5,
+        // thruGetScroll: ({ center, scroll, thresholdsVertical, container }) => {
+        //   if (
+        //     center.y >
+        //     container.height - thresholdsVertical.startScrollingFrom
+        //   ) {
+        //     return {
+        //       x: scroll.x * 4,
+        //       y: scroll.y * 4,
+        //     };
+        //   }
+
+        //   return {
+        //     x: scroll.x / 4,
+        //     y: scroll.y / 4,
+        //   };
+        // },
+        // configOverride: {
+        //   startFromPercentage: 0.4,
+        //   maxScrollAtPercentage: 0.15,
+        // },
+      }}
+    >
       <Root>
+        <Threshold placement="top" />
+        <Threshold placement="bottom" />
         <QuoteList
           listId="list"
           style={props.listStyle}

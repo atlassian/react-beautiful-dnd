@@ -1,5 +1,5 @@
 // @flow
-import type { BoxModel, Rect, Position } from 'css-box-model';
+import type { BoxModel, Rect, Position, Spacing } from 'css-box-model';
 
 export type Id = string;
 export type DraggableId = Id;
@@ -76,6 +76,20 @@ export type ScrollDetails = {|
     // upwards. This value is the negated version of the 'value'
     displacement: Position,
   |},
+|};
+
+export type AxisScrollConditions = {|
+  inThresholdStart: boolean,
+  inThresholdEnd: boolean,
+  draggedTowardsStart: boolean,
+  draggedTowardsEnd: boolean,
+  scrolledTowardsStart: boolean,
+  scrolledTowardsEnd: boolean,
+|};
+
+export type ScrollConditions = {|
+  xAxis: AxisScrollConditions,
+  yAxis: AxisScrollConditions,
 |};
 
 export type Placeholder = {|
@@ -276,6 +290,48 @@ export type DropResult = {|
 
 export type ScrollOptions = {|
   shouldPublishImmediately: boolean,
+|};
+
+// all in pixels
+export type DistanceThresholds = {|
+  startScrollingFrom: number,
+  maxScrollValueAt: number,
+|};
+
+// all in ms
+export type DurationDampening = {|
+  stopDampeningAt?: number,
+  accelerateAt?: number,
+|};
+
+export type FluidScrollerConfigOverride = {|
+  // percentage distance from edge of container, decimal
+  startFromPercentage?: number,
+  maxScrollAtPercentage?: number,
+  // pixels per frame
+  ease?: (percentage: number) => number,
+  maxPixelScroll?: number,
+  durationDampening?: DurationDampening,
+|};
+
+export type FluidScrollerOptions = {|
+  // opt into new autoscroll behavior: if the draggable originates inside a scroll threshold
+  // don't autoscroll in that threshold's direction until dragged in that direction
+  bufferThresholds?: boolean,
+  // the distance required to cause a scroll to occur inside a buffered threshold
+  bufferMinScroll?: number,
+  configOverride?: FluidScrollerConfigOverride,
+  // customize your own fluid scroll logic
+  thruGetScroll?: (args: {|
+    center: Position,
+    centerInitial: Position,
+    container: Rect,
+    containerScroll: ScrollDetails,
+    distanceToEdges: Spacing,
+    scroll: Position,
+    thresholdsHorizontal: DistanceThresholds,
+    thresholdsVertical: DistanceThresholds,
+  |}) => Position,
 |};
 
 // using the draggable id rather than the descriptor as the descriptor

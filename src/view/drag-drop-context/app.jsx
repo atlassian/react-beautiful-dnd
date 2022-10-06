@@ -27,6 +27,7 @@ import type {
   Announce,
   Sensor,
   ElementId,
+  FluidScrollerOptions,
 } from '../../types';
 import type { Store, Action } from '../../state/store-types';
 import type { SetAppCallbacks, AppCallbacks } from './drag-drop-context-types';
@@ -63,6 +64,9 @@ export type Props = {|
 
   // screen reader
   dragHandleUsageInstructions: string,
+
+  // fluidScroller behavior options
+  fluidScrollerOptions?: FluidScrollerOptions,
 |};
 
 const createResponders = (props: Props): Responders => ({
@@ -89,6 +93,7 @@ export default function App(props: Props) {
     sensors,
     nonce,
     dragHandleUsageInstructions,
+    fluidScrollerOptions,
   } = props;
   const lazyStoreRef: LazyStoreRef = useRef<?Store>(null);
 
@@ -135,6 +140,8 @@ export default function App(props: Props) {
     return createDimensionMarshal(registry, marshalCallbacks);
   }, [registry, marshalCallbacks]);
 
+  const fluidScrollerOptionsRef = useRef(fluidScrollerOptions);
+
   const autoScroller: AutoScroller = useMemo<AutoScroller>(
     () =>
       createAutoScroller({
@@ -147,6 +154,7 @@ export default function App(props: Props) {
           // $FlowFixMe - not sure why this is wrong
           lazyDispatch,
         ),
+        fluidScrollerOptions: fluidScrollerOptionsRef.current,
       }),
     [dimensionMarshal.scrollDroppable, lazyDispatch],
   );
@@ -227,6 +235,7 @@ export default function App(props: Props) {
       isMovementAllowed: getIsMovementAllowed,
       dragHandleUsageInstructionsId,
       registry,
+      fluidScrollerOptions,
     }),
     [
       contextId,
@@ -236,6 +245,7 @@ export default function App(props: Props) {
       getCanLift,
       getIsMovementAllowed,
       registry,
+      fluidScrollerOptions,
     ],
   );
 

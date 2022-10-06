@@ -1,16 +1,14 @@
 // @flow
 import type { Position } from 'css-box-model';
 import forEach, { type BlockFnArgs } from './util/for-each';
-import type { Viewport } from '../../../../../src/types';
+import type { Viewport, DistanceThresholds } from '../../../../../src/types';
 import { scrollableViewport } from './util/viewport';
 import scrollViewport from '../../../../../src/state/scroll-viewport';
 import dragTo from './util/drag-to';
 import getScroller, {
   type FluidScroller,
 } from '../../../../../src/state/auto-scroller/fluid-scroller';
-import getDistanceThresholds, {
-  type DistanceThresholds,
-} from '../../../../../src/state/auto-scroller/fluid-scroller/get-scroll/get-scroll-on-axis/get-distance-thresholds';
+import getDistanceThresholds from '../../../../../src/state/auto-scroller/fluid-scroller/get-scroll/get-scroll-on-axis/get-distance-thresholds';
 import {
   patch,
   add,

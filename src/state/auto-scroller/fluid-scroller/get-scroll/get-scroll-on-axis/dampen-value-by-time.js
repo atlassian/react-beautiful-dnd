@@ -2,11 +2,22 @@
 import getPercentage from '../../get-percentage';
 import config from '../../config';
 import minScroll from './min-scroll';
+import type { FluidScrollerConfigOverride } from '../../../../../types';
 
-const accelerateAt: number = config.durationDampening.accelerateAt;
-const stopAt: number = config.durationDampening.stopDampeningAt;
+const defaultAccelerateAt: number = config.durationDampening.accelerateAt;
+const defaultStopAt: number = config.durationDampening.stopDampeningAt;
 
-export default (proposedScroll: number, dragStartTime: number): number => {
+export default (
+  proposedScroll: number,
+  dragStartTime: number,
+  configOverride?: FluidScrollerConfigOverride,
+): number => {
+  const accelerateAt: number =
+    configOverride?.durationDampening?.accelerateAt || defaultAccelerateAt;
+  const stopAt: number =
+    configOverride?.durationDampening?.stopDampeningAt || defaultStopAt;
+  const ease: Function = configOverride?.ease || config.ease;
+
   const startOfRange: number = dragStartTime;
   const endOfRange: number = stopAt;
   const now: number = Date.now();
@@ -31,7 +42,7 @@ export default (proposedScroll: number, dragStartTime: number): number => {
   });
 
   const scroll: number =
-    proposedScroll * config.ease(betweenAccelerateAtAndStopAtPercentage);
+    proposedScroll * ease(betweenAccelerateAtAndStopAtPercentage);
 
   return Math.ceil(scroll);
 };

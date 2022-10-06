@@ -1,7 +1,11 @@
 // @flow
 import rafSchd from 'raf-schd';
 import { type Position } from 'css-box-model';
-import type { DraggingState, DroppableId } from '../../../types';
+import type {
+  DraggingState,
+  DroppableId,
+  FluidScrollerOptions,
+} from '../../../types';
 import scroll from './scroll';
 import { invariant } from '../../../invariant';
 import * as timings from '../../../debug/timings';
@@ -9,12 +13,14 @@ import * as timings from '../../../debug/timings';
 export type PublicArgs = {|
   scrollWindow: (change: Position) => void,
   scrollDroppable: (id: DroppableId, change: Position) => void,
+  fluidScrollerOptions?: FluidScrollerOptions,
 |};
 
 export type FluidScroller = {|
   scroll: (state: DraggingState) => void,
   start: (state: DraggingState) => void,
   stop: () => void,
+  fluidScrollerOptions?: FluidScrollerOptions,
 |};
 
 type WhileDragging = {|
@@ -25,6 +31,7 @@ type WhileDragging = {|
 export default ({
   scrollWindow,
   scrollDroppable,
+  fluidScrollerOptions,
 }: PublicArgs): FluidScroller => {
   const scheduleWindowScroll = rafSchd(scrollWindow);
   const scheduleDroppableScroll = rafSchd(scrollDroppable);
@@ -40,6 +47,7 @@ export default ({
       scrollDroppable: scheduleDroppableScroll,
       dragStartTime,
       shouldUseTimeDampening,
+      fluidScrollerOptions,
     });
   };
 
@@ -58,6 +66,7 @@ export default ({
       shouldUseTimeDampening: false,
       scrollWindow: fakeScrollCallback,
       scrollDroppable: fakeScrollCallback,
+      fluidScrollerOptions,
     });
 
     dragging = {

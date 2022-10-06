@@ -1,20 +1,26 @@
 // @flow
 import type { Rect } from 'css-box-model';
 import config from '../../config';
-import type { Axis } from '../../../../../types';
+import type {
+  Axis,
+  DistanceThresholds,
+  FluidScrollerConfigOverride,
+} from '../../../../../types';
 
-// all in pixels
-export type DistanceThresholds = {|
-  startScrollingFrom: number,
-  maxScrollValueAt: number,
-|};
+// converts the percentages in the config (or override) into actual pixel values
+export default (
+  container: Rect,
+  axis: Axis,
+  configOverride?: FluidScrollerConfigOverride,
+): DistanceThresholds => {
+  const startFromPercentage =
+    configOverride?.startFromPercentage || config.startFromPercentage;
 
-// converts the percentages in the config into actual pixel values
-export default (container: Rect, axis: Axis): DistanceThresholds => {
-  const startScrollingFrom: number =
-    container[axis.size] * config.startFromPercentage;
-  const maxScrollValueAt: number =
-    container[axis.size] * config.maxScrollAtPercentage;
+  const maxScrollAtPercentage =
+    configOverride?.maxScrollAtPercentage || config.maxScrollAtPercentage;
+
+  const startScrollingFrom: number = container[axis.size] * startFromPercentage;
+  const maxScrollValueAt: number = container[axis.size] * maxScrollAtPercentage;
 
   const thresholds: DistanceThresholds = {
     startScrollingFrom,
