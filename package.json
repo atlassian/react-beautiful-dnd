@@ -2,7 +2,7 @@
   "name": "@hufort/react-beautiful-dnd",
   "version": "13.1.1",
   "description": "Beautiful and accessible drag and drop for lists with React",
-  "author": "Alex Reardon <areardon@atlassian.com>",
+  "author": "Front End Systems Engineering <frontend@planningcenter.com>",
   "keywords": [
     "drag and drop",
     "dnd",
@@ -17,7 +17,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/hufort/react-beautiful-dnd.git"
+    "url": "https://github.com/planningcenter/react-beautiful-dnd.git"
+  },
+  "bugs": {
+    "url": "https://github.com/planningcenter/react-beautiful-dnd/issues"
   },
   "main": "dist/react-beautiful-dnd.cjs.js",
   "module": "dist/react-beautiful-dnd.esm.js",

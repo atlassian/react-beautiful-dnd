@@ -1,4 +1,10 @@
 
+react-beautiful-dnd (RBDND) drives drag & drop within [Tapestry-React](https://github.com/ministrycentered/tapestry-react).
+Unfortunately, Atlassian is no longer actively maintaining RBDND.
+This repo is a fork of the original library giving Planning Center a way to add functionality when needed.
+
+---
+
 ## ⚠️ Maintenance & support
 
 This library continues to be relied upon heavily by Atlassian products, but we are focused on other priorities right now and have no current plans for further feature development or improvements.

@@ -1,0 +1,29 @@
+name: Build and test
+
+on:
+  push:
+    branches:
+      - main
+    tag:
+      - "v*"
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14.x"
+          cache: "yarn"
+
+      - run: yarn install
+      - run: yarn build
+      - run: yarn test
