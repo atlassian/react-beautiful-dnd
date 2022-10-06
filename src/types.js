@@ -320,8 +320,6 @@ export type FluidScrollerOptions = {|
   bufferThresholds?: boolean,
   configOverride?: FluidScrollerConfigOverride,
   // customize your own fluid scroll logic
-  // when present, this function will be called directly before the return of get-scroll/index.js
-  // takes presedence over bufferThresholds: true
   thruGetScroll?: (args: {|
     center: Position,
     centerInitial: Position,
