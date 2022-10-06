@@ -21,12 +21,12 @@ type Args = {|
 
 export default ({
   axis,
+  bufferMinScroll,
   center,
   centerInitial,
   container,
   containerScroll,
   distanceToEdges,
-  bufferMinScroll,
   thresholds,
   windowScrollOffset,
 }: Args): AxisScrollConditions => {

@@ -47,13 +47,13 @@ export default ({
   const thresholdsVertical: DistanceThresholds = getDistanceThresholds(
     container,
     vertical,
-    fluidScrollerOptions,
+    fluidScrollerOptions?.configOverride,
   );
 
   const thresholdsHorizontal: DistanceThresholds = getDistanceThresholds(
     container,
     horizontal,
-    fluidScrollerOptions,
+    fluidScrollerOptions?.configOverride,
   );
 
   // 1. Figure out which x,y values are the best target
@@ -65,20 +65,20 @@ export default ({
   // Maximum speed value should be hit before the distance is 0
   // Negative values to not continue to increase the speed
   const y: number = getScrollOnAxis({
+    axis: vertical,
+    configOverride: fluidScrollerOptions?.configOverride,
     distanceToEdges,
     dragStartTime,
-    axis: vertical,
     shouldUseTimeDampening,
     thresholds: thresholdsVertical,
-    fluidScrollerOptions,
   });
   const x: number = getScrollOnAxis({
+    axis: horizontal,
+    configOverride: fluidScrollerOptions?.configOverride,
     distanceToEdges,
     dragStartTime,
-    axis: horizontal,
     shouldUseTimeDampening,
     thresholds: thresholdsHorizontal,
-    fluidScrollerOptions,
   });
 
   let scroll: Position = { x: 0, y: 0 };

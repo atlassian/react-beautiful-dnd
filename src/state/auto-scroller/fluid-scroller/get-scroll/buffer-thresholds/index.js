@@ -3,6 +3,8 @@ import type { Position, Rect, Spacing } from 'css-box-model';
 import type { DistanceThresholds, ScrollDetails } from '../../../../../types';
 import getScrollConditions from './get-scroll-conditions';
 
+const BUFFER_MIN_SCROLL_DEFAULT = 24;
+
 type Args = {|
   center: Position,
   centerInitial: Position,
@@ -16,23 +18,23 @@ type Args = {|
 |};
 
 export default ({
+  bufferMinScroll = BUFFER_MIN_SCROLL_DEFAULT,
   center,
   centerInitial,
   container,
   containerScroll,
   distanceToEdges,
-  bufferMinScroll = 24,
   scroll,
   thresholdsHorizontal,
   thresholdsVertical,
 }: Args): Position => {
   const { xAxis, yAxis } = getScrollConditions({
+    bufferMinScroll,
     center,
     centerInitial,
     container,
     containerScroll,
     distanceToEdges,
-    bufferMinScroll,
     thresholdsHorizontal,
     thresholdsVertical,
   });

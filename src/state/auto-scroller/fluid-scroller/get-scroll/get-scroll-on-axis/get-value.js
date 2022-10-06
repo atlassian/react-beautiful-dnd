@@ -1,31 +1,31 @@
 // @flow
 import type {
   DistanceThresholds,
-  FluidScrollerOptions,
+  FluidScrollerConfigOverride,
 } from '../../../../../types';
 import getValueFromDistance from './get-value-from-distance';
 import dampenValueByTime from './dampen-value-by-time';
 import minScroll from './min-scroll';
 
 type Args = {|
+  configOverride?: FluidScrollerConfigOverride,
   distanceToEdge: number,
-  thresholds: DistanceThresholds,
   dragStartTime: number,
   shouldUseTimeDampening: boolean,
-  fluidScrollerOptions?: FluidScrollerOptions,
+  thresholds: DistanceThresholds,
 |};
 
 export default ({
+  configOverride,
   distanceToEdge,
-  thresholds,
   dragStartTime,
   shouldUseTimeDampening,
-  fluidScrollerOptions,
+  thresholds,
 }: Args): number => {
   const scroll: number = getValueFromDistance(
     distanceToEdge,
     thresholds,
-    fluidScrollerOptions,
+    configOverride,
   );
 
   // not enough distance to trigger a minimum scroll
@@ -45,7 +45,7 @@ export default ({
   // another auto scroll call
 
   return Math.max(
-    dampenValueByTime(scroll, dragStartTime, fluidScrollerOptions),
+    dampenValueByTime(scroll, dragStartTime, configOverride),
     minScroll,
   );
 };

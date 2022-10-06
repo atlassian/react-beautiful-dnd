@@ -9,45 +9,45 @@ import { horizontal, vertical } from '../../../../axis';
 import calcAxisScrollConditions from './calc-axis-scroll-conditions';
 
 type Args = {|
+  bufferMinScroll: number,
   center: Position,
   centerInitial: Position,
   container: Rect,
   containerScroll: ScrollDetails,
   distanceToEdges: Spacing,
-  bufferMinScroll: number,
   thresholdsHorizontal: DistanceThresholds,
   thresholdsVertical: DistanceThresholds,
 |};
 
 export default ({
+  bufferMinScroll,
   center,
   centerInitial,
   container,
   containerScroll,
   distanceToEdges,
-  bufferMinScroll,
   thresholdsHorizontal,
   thresholdsVertical,
 }: Args): ScrollConditions => ({
   xAxis: calcAxisScrollConditions({
     axis: horizontal,
+    bufferMinScroll,
     center,
     centerInitial,
     container,
     containerScroll,
     distanceToEdges,
-    bufferMinScroll,
     thresholds: thresholdsHorizontal,
     windowScrollOffset: window.scrollX,
   }),
   yAxis: calcAxisScrollConditions({
     axis: vertical,
+    bufferMinScroll,
     center,
     centerInitial,
     container,
     containerScroll,
     distanceToEdges,
-    bufferMinScroll,
     thresholds: thresholdsVertical,
     windowScrollOffset: window.scrollY,
   }),

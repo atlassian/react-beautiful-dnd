@@ -3,48 +3,48 @@ import type { Spacing } from 'css-box-model';
 import type {
   Axis,
   DistanceThresholds,
-  FluidScrollerOptions,
+  FluidScrollerConfigOverride,
 } from '../../../../../types';
 import getValue from './get-value';
 
 type GetOnAxisArgs = {|
+  axis: Axis,
+  configOverride?: FluidScrollerConfigOverride,
   distanceToEdges: Spacing,
   dragStartTime: number,
-  axis: Axis,
   shouldUseTimeDampening: boolean,
   thresholds: DistanceThresholds,
-  fluidScrollerOptions?: FluidScrollerOptions,
 |};
 
 export default ({
-  thresholds,
+  axis,
+  configOverride,
   distanceToEdges,
   dragStartTime,
-  axis,
   shouldUseTimeDampening,
-  fluidScrollerOptions,
+  thresholds,
 }: GetOnAxisArgs): number => {
   const isCloserToEnd: boolean =
     distanceToEdges[axis.end] < distanceToEdges[axis.start];
 
   if (isCloserToEnd) {
     return getValue({
+      configOverride,
       distanceToEdge: distanceToEdges[axis.end],
-      thresholds,
       dragStartTime,
       shouldUseTimeDampening,
-      fluidScrollerOptions,
+      thresholds,
     });
   }
 
   return (
     -1 *
     getValue({
+      configOverride,
       distanceToEdge: distanceToEdges[axis.start],
-      thresholds,
       dragStartTime,
       shouldUseTimeDampening,
-      fluidScrollerOptions,
+      thresholds,
     })
   );
 };

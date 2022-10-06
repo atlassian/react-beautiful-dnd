@@ -1,7 +1,7 @@
 // @flow
 import type {
   DistanceThresholds,
-  FluidScrollerOptions,
+  FluidScrollerConfigOverride,
 } from '../../../../../types';
 import getPercentage from '../../get-percentage';
 import config from '../../config';
@@ -10,7 +10,7 @@ import minScroll from './min-scroll';
 export default (
   distanceToEdge: number,
   thresholds: DistanceThresholds,
-  fluidScrollerOptions?: FluidScrollerOptions,
+  configOverride?: FluidScrollerConfigOverride,
 ): number => {
   /*
   // This function only looks at the distance to one edge
@@ -36,9 +36,7 @@ export default (
     return 0;
   }
 
-  const maxSpeed =
-    fluidScrollerOptions?.configOverride?.maxPixelScroll ||
-    config.maxPixelScroll;
+  const maxSpeed = configOverride?.maxPixelScroll || config.maxPixelScroll;
 
   // use max speed when on or over boundary
   if (distanceToEdge <= thresholds.maxScrollValueAt) {
