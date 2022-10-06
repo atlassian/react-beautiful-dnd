@@ -121,6 +121,7 @@ export default ({
       // if the draggable originates inside a scroll threshold
       // don't autoscroll in that threshold's direction until dragged in that direction
       scroll = bufferThresholds({
+        bufferMinScroll: fluidScrollerOptions?.bufferMinScroll,
         center,
         centerInitial,
         container,

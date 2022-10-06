@@ -8,10 +8,11 @@ type Args = {|
   centerInitial: Position,
   container: Rect,
   containerScroll: ScrollDetails,
+  distanceToEdges: Spacing,
+  bufferMinScroll?: number,
   scroll: Position,
   thresholdsHorizontal: DistanceThresholds,
   thresholdsVertical: DistanceThresholds,
-  distanceToEdges: Spacing,
 |};
 
 export default ({
@@ -19,19 +20,21 @@ export default ({
   centerInitial,
   container,
   containerScroll,
+  distanceToEdges,
+  bufferMinScroll = 24,
   scroll,
   thresholdsHorizontal,
   thresholdsVertical,
-  distanceToEdges,
 }: Args): Position => {
   const { xAxis, yAxis } = getScrollConditions({
-    distanceToEdges,
-    thresholdsHorizontal,
-    thresholdsVertical,
     center,
     centerInitial,
     container,
     containerScroll,
+    distanceToEdges,
+    bufferMinScroll,
+    thresholdsHorizontal,
+    thresholdsVertical,
   });
 
   if (xAxis.inThresholdStart) {

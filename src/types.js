@@ -318,6 +318,8 @@ export type FluidScrollerOptions = {|
   // opt into new autoscroll behavior: if the draggable originates inside a scroll threshold
   // don't autoscroll in that threshold's direction until dragged in that direction
   bufferThresholds?: boolean,
+  // the distance required to cause a scroll to occur inside a buffered threshold
+  bufferMinScroll?: number,
   configOverride?: FluidScrollerConfigOverride,
   // customize your own fluid scroll logic
   thruGetScroll?: (args: {|

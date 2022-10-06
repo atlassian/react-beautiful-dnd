@@ -14,11 +14,10 @@ type Args = {|
   container: Rect,
   containerScroll: ScrollDetails,
   distanceToEdges: Spacing,
+  bufferMinScroll: number,
   thresholds: DistanceThresholds,
   windowScrollOffset: number,
 |};
-
-const THRESHOLD_BUFFER = 24;
 
 export default ({
   axis,
@@ -27,6 +26,7 @@ export default ({
   container,
   containerScroll,
   distanceToEdges,
+  bufferMinScroll,
   thresholds,
   windowScrollOffset,
 }: Args): AxisScrollConditions => {
@@ -43,10 +43,10 @@ export default ({
     center[axis.line] < thresholds.startScrollingFrom + windowScrollOffset;
 
   const draggedTowardsStart =
-    center[axis.line] < centerInitial[axis.line] - THRESHOLD_BUFFER;
+    center[axis.line] < centerInitial[axis.line] - bufferMinScroll;
 
   const draggedTowardsEnd =
-    center[axis.line] > centerInitial[axis.line] + THRESHOLD_BUFFER;
+    center[axis.line] > centerInitial[axis.line] + bufferMinScroll;
 
   const scrolledTowardsStart =
     containerScroll.initial[axis.line] > containerScroll.current[axis.line];

@@ -66,7 +66,10 @@ export default class AuthorApp extends Component<Props, State> {
 
   render() {
     return (
-      <DragDropContext onDragEnd={this.onDragEnd}>
+      <DragDropContext
+        onDragEnd={this.onDragEnd}
+        fluidScrollerOptions={{ bufferThresholds: true }}
+      >
         <Root>
           <AuthorList
             listId="AUTHOR"

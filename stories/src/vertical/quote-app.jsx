@@ -81,7 +81,8 @@ export default function QuoteApp(props: Props) {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       fluidScrollerOptions={{
-        bufferThresholds: true, // this causes "Large data set" to break
+        bufferThresholds: true,
+        bufferMinScroll: 5,
         // thruGetScroll: ({ center, scroll, thresholdsVertical, container }) => {
         //   if (
         //     center.y >
@@ -98,10 +99,10 @@ export default function QuoteApp(props: Props) {
         //     y: scroll.y / 4,
         //   };
         // },
-        configOverride: {
-          startFromPercentage: 0.25,
-          maxScrollAtPercentage: 0.05,
-        },
+        // configOverride: {
+        //   startFromPercentage: 0.4,
+        //   maxScrollAtPercentage: 0.15,
+        // },
       }}
     >
       <Root>
