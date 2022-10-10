@@ -23,6 +23,10 @@ export default ({
   shouldUseTimeDampening,
   fluidScrollerOptions,
 }: Args): ?Position => {
+  const windowScrollOffset: Position = {
+    x: viewport.scroll.current.x,
+    y: viewport.scroll.current.y,
+  };
   const scroll: ?Position = getScroll({
     dragStartTime,
     container: viewport.frame,
@@ -32,6 +36,7 @@ export default ({
     centerInitial,
     shouldUseTimeDampening,
     fluidScrollerOptions,
+    windowScrollOffset,
   });
 
   return scroll && canScrollWindow(viewport, scroll) ? scroll : null;

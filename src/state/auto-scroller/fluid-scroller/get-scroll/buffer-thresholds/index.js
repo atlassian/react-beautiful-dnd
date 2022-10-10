@@ -15,6 +15,7 @@ type Args = {|
   scroll: Position,
   thresholdsHorizontal: DistanceThresholds,
   thresholdsVertical: DistanceThresholds,
+  windowScrollOffset: Position,
 |};
 
 export default ({
@@ -27,6 +28,7 @@ export default ({
   scroll,
   thresholdsHorizontal,
   thresholdsVertical,
+  windowScrollOffset,
 }: Args): Position => {
   const { xAxis, yAxis } = getScrollConditions({
     bufferMinScroll,
@@ -37,6 +39,7 @@ export default ({
     distanceToEdges,
     thresholdsHorizontal,
     thresholdsVertical,
+    windowScrollOffset,
   });
 
   if (xAxis.inThresholdStart) {

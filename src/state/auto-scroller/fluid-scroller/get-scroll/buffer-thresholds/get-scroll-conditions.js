@@ -17,6 +17,7 @@ type Args = {|
   distanceToEdges: Spacing,
   thresholdsHorizontal: DistanceThresholds,
   thresholdsVertical: DistanceThresholds,
+  windowScrollOffset: Position,
 |};
 
 export default ({
@@ -28,6 +29,7 @@ export default ({
   distanceToEdges,
   thresholdsHorizontal,
   thresholdsVertical,
+  windowScrollOffset,
 }: Args): ScrollConditions => ({
   xAxis: calcAxisScrollConditions({
     axis: horizontal,
@@ -38,7 +40,7 @@ export default ({
     containerScroll,
     distanceToEdges,
     thresholds: thresholdsHorizontal,
-    windowScrollOffset: window.scrollX,
+    windowScrollOffset,
   }),
   yAxis: calcAxisScrollConditions({
     axis: vertical,
@@ -49,6 +51,6 @@ export default ({
     containerScroll,
     distanceToEdges,
     thresholds: thresholdsVertical,
-    windowScrollOffset: window.scrollY,
+    windowScrollOffset,
   }),
 });

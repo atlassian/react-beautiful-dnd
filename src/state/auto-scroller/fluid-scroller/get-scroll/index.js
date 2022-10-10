@@ -24,6 +24,7 @@ type Args = {|
   centerInitial: Position,
   shouldUseTimeDampening: boolean,
   fluidScrollerOptions?: FluidScrollerOptions,
+  windowScrollOffset?: Position,
 |};
 
 export default ({
@@ -35,6 +36,7 @@ export default ({
   centerInitial,
   shouldUseTimeDampening,
   fluidScrollerOptions,
+  windowScrollOffset = origin,
 }: Args): ?Position => {
   // get distance to each edge
   const distanceToEdges: Spacing = {
@@ -115,6 +117,7 @@ export default ({
         scroll,
         thresholdsHorizontal,
         thresholdsVertical,
+        windowScrollOffset,
       });
     }
     if (fluidScrollerOptions.bufferThresholds) {
@@ -130,6 +133,7 @@ export default ({
         scroll,
         thresholdsHorizontal,
         thresholdsVertical,
+        windowScrollOffset,
       });
     }
   }

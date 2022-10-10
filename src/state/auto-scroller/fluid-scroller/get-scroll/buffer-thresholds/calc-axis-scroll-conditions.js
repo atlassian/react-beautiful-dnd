@@ -16,7 +16,7 @@ type Args = {|
   distanceToEdges: Spacing,
   bufferMinScroll: number,
   thresholds: DistanceThresholds,
-  windowScrollOffset: number,
+  windowScrollOffset: Position,
 |};
 
 export default ({
@@ -35,12 +35,15 @@ export default ({
 
   const centerInsideThresholdEnd =
     center[axis.line] >
-    container[axis.size] - thresholds.startScrollingFrom + windowScrollOffset;
+    container[axis.size] -
+      thresholds.startScrollingFrom +
+      windowScrollOffset[axis.line];
 
   const inThresholdEnd = centerInsideThresholdEnd || distanceInsideThresholdEnd;
 
   const inThresholdStart =
-    center[axis.line] < thresholds.startScrollingFrom + windowScrollOffset;
+    center[axis.line] <
+    thresholds.startScrollingFrom + windowScrollOffset[axis.line];
 
   const draggedTowardsStart =
     center[axis.line] < centerInitial[axis.line] - bufferMinScroll;

@@ -331,6 +331,7 @@ export type FluidScrollerOptions = {|
     scroll: Position,
     thresholdsHorizontal: DistanceThresholds,
     thresholdsVertical: DistanceThresholds,
+    windowScrollOffset: Position,
   |}) => Position,
 |};
 
