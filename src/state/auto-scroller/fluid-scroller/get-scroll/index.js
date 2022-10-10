@@ -106,9 +106,11 @@ export default ({
   scroll = limited;
 
   if (fluidScrollerOptions) {
-    if (fluidScrollerOptions.thruGetScroll) {
-      // apply consumer injected scroll behavior
-      scroll = fluidScrollerOptions.thruGetScroll({
+    if (fluidScrollerOptions.bufferThresholds) {
+      // if the draggable originates inside a scroll threshold
+      // don't autoscroll in that threshold's direction until dragged in that direction
+      scroll = bufferThresholds({
+        bufferMinScroll: fluidScrollerOptions?.bufferMinScroll,
         center,
         centerInitial,
         container,
@@ -120,11 +122,9 @@ export default ({
         windowScrollOffset,
       });
     }
-    if (fluidScrollerOptions.bufferThresholds) {
-      // if the draggable originates inside a scroll threshold
-      // don't autoscroll in that threshold's direction until dragged in that direction
-      scroll = bufferThresholds({
-        bufferMinScroll: fluidScrollerOptions?.bufferMinScroll,
+    if (fluidScrollerOptions.thruGetScroll) {
+      // apply consumer injected scroll behavior
+      scroll = fluidScrollerOptions.thruGetScroll({
         center,
         centerInitial,
         container,
