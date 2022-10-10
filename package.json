@@ -1,5 +1,5 @@
 {
-  "name": "@hufort/react-beautiful-dnd",
+  "name": "react-beautiful-dnd",
   "version": "13.1.1",
   "description": "Beautiful and accessible drag and drop for lists with React",
   "author": "Front End Systems Engineering <frontend@planningcenter.com>",
