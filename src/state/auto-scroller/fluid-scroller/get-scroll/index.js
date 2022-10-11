@@ -82,9 +82,6 @@ export default ({
     shouldUseTimeDampening,
     thresholds: thresholdsHorizontal,
   });
-
-  let scroll: Position = { x: 0, y: 0 };
-
   const required: Position = clean({ x, y });
 
   // nothing required
@@ -103,7 +100,7 @@ export default ({
     return null;
   }
 
-  scroll = limited;
+  let scroll: Position = limited;
 
   if (fluidScrollerOptions) {
     if (fluidScrollerOptions.bufferThresholds) {
