@@ -5,6 +5,7 @@ import type {
   DroppableId,
   DraggableDimension,
   DroppableDimension,
+  FluidScrollerOptions,
   Viewport,
 } from '../../../types';
 import getBestScrollableDroppable from './get-best-scrollable-droppable';
@@ -18,6 +19,7 @@ type Args = {|
   shouldUseTimeDampening: boolean,
   scrollWindow: (scroll: Position) => void,
   scrollDroppable: (id: DroppableId, scroll: Position) => void,
+  fluidScrollerOptions?: FluidScrollerOptions,
 |};
 
 export default ({
@@ -26,8 +28,10 @@ export default ({
   shouldUseTimeDampening,
   scrollWindow,
   scrollDroppable,
+  fluidScrollerOptions,
 }: Args): void => {
   const center: Position = state.current.page.borderBoxCenter;
+  const centerInitial = state.initial.page.borderBoxCenter;
   const draggable: DraggableDimension =
     state.dimensions.draggables[state.critical.draggable.id];
   const subject: Rect = draggable.page.marginBox;
@@ -39,7 +43,9 @@ export default ({
       viewport,
       subject,
       center,
+      centerInitial,
       shouldUseTimeDampening,
+      fluidScrollerOptions,
     });
 
     if (change) {
@@ -63,7 +69,9 @@ export default ({
     droppable,
     subject,
     center,
+    centerInitial,
     shouldUseTimeDampening,
+    fluidScrollerOptions,
   });
 
   if (change) {

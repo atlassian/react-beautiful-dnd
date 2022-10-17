@@ -1,11 +1,15 @@
 // @flow
 import type { Position } from 'css-box-model';
-import type { DroppableId } from '../../../../../../src/types';
+import type {
+  DroppableId,
+  FluidScrollerOptions,
+} from '../../../../../../src/types';
 
 // Similiar to PublicArgs
 type Result = {|
   scrollWindow: JestMockFn<[Position], void>,
   scrollDroppable: JestMockFn<[DroppableId, Position], void>,
+  fluidScrollerOptions?: FluidScrollerOptions,
 |};
 
 export default (): Result => {

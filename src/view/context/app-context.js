@@ -13,6 +13,7 @@ export type AppContextValue = {|
   dragHandleUsageInstructionsId: ElementId,
   marshal: DimensionMarshal,
   registry: Registry,
+  fluidScrollerOptions: Object,
 |};
 
 export default React.createContext<?AppContextValue>(null);

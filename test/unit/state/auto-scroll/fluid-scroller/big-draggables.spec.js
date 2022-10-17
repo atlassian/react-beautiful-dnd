@@ -2,6 +2,7 @@
 import type { Position, Spacing } from 'css-box-model';
 import forEach, { type BlockFnArgs } from './util/for-each';
 import type {
+  DistanceThresholds,
   DraggableDimension,
   DraggingState,
 } from '../../../../../src/types';
@@ -12,9 +13,7 @@ import getScroller, {
   type PublicArgs,
   type FluidScroller,
 } from '../../../../../src/state/auto-scroller/fluid-scroller';
-import getDistanceThresholds, {
-  type DistanceThresholds,
-} from '../../../../../src/state/auto-scroller/fluid-scroller/get-scroll/get-scroll-on-axis/get-distance-thresholds';
+import getDistanceThresholds from '../../../../../src/state/auto-scroller/fluid-scroller/get-scroll/get-scroll-on-axis/get-distance-thresholds';
 import { patch } from '../../../../../src/state/position';
 import getArgsMock from './util/get-args-mock';
 import { vertical, horizontal } from '../../../../../src/state/axis';

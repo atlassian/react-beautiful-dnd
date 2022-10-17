@@ -1,6 +1,11 @@
 // @flow
 import React, { type Node } from 'react';
-import type { Responders, ContextId, Sensor } from '../../types';
+import type {
+  FluidScrollerOptions,
+  Responders,
+  ContextId,
+  Sensor,
+} from '../../types';
 import ErrorBoundary from './error-boundary';
 import preset from '../../screen-reader-message-preset';
 import App from './app';
@@ -21,6 +26,8 @@ type Props = {|
   // See our [sensor api](/docs/sensors/sensor-api.md)
   sensors?: Sensor[],
   enableDefaultSensors?: ?boolean,
+  // fluid scroller options
+  fluidScrollerOptions?: FluidScrollerOptions,
 |};
 
 // Reset any context that gets persisted across server side renders
@@ -51,6 +58,7 @@ export default function DragDropContext(props: Props) {
           onDragStart={props.onDragStart}
           onDragUpdate={props.onDragUpdate}
           onDragEnd={props.onDragEnd}
+          fluidScrollerOptions={props.fluidScrollerOptions}
         >
           {props.children}
         </App>

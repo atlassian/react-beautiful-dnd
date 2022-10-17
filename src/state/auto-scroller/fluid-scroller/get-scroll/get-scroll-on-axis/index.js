@@ -1,46 +1,50 @@
 // @flow
-import type { Rect, Spacing } from 'css-box-model';
-import getDistanceThresholds, {
-  type DistanceThresholds,
-} from './get-distance-thresholds';
-import type { Axis } from '../../../../../types';
+import type { Spacing } from 'css-box-model';
+import type {
+  Axis,
+  DistanceThresholds,
+  FluidScrollerConfigOverride,
+} from '../../../../../types';
 import getValue from './get-value';
 
 type GetOnAxisArgs = {|
-  container: Rect,
+  axis: Axis,
+  configOverride?: FluidScrollerConfigOverride,
   distanceToEdges: Spacing,
   dragStartTime: number,
-  axis: Axis,
   shouldUseTimeDampening: boolean,
+  thresholds: DistanceThresholds,
 |};
 
 export default ({
-  container,
+  axis,
+  configOverride,
   distanceToEdges,
   dragStartTime,
-  axis,
   shouldUseTimeDampening,
+  thresholds,
 }: GetOnAxisArgs): number => {
-  const thresholds: DistanceThresholds = getDistanceThresholds(container, axis);
   const isCloserToEnd: boolean =
     distanceToEdges[axis.end] < distanceToEdges[axis.start];
 
   if (isCloserToEnd) {
     return getValue({
+      configOverride,
       distanceToEdge: distanceToEdges[axis.end],
-      thresholds,
       dragStartTime,
       shouldUseTimeDampening,
+      thresholds,
     });
   }
 
   return (
     -1 *
     getValue({
+      configOverride,
       distanceToEdge: distanceToEdges[axis.start],
-      thresholds,
       dragStartTime,
       shouldUseTimeDampening,
+      thresholds,
     })
   );
 };

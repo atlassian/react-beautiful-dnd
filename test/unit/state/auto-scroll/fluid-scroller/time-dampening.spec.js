@@ -6,9 +6,8 @@ import dragTo from './util/drag-to';
 import getScroller, {
   type FluidScroller,
 } from '../../../../../src/state/auto-scroller/fluid-scroller';
-import getDistanceThresholds, {
-  type DistanceThresholds,
-} from '../../../../../src/state/auto-scroller/fluid-scroller/get-scroll/get-scroll-on-axis/get-distance-thresholds';
+import type { DistanceThresholds } from '../../../../../src/types';
+import getDistanceThresholds from '../../../../../src/state/auto-scroller/fluid-scroller/get-scroll/get-scroll-on-axis/get-distance-thresholds';
 import { patch } from '../../../../../src/state/position';
 import getArgsMock from './util/get-args-mock';
 import config from '../../../../../src/state/auto-scroller/fluid-scroller/config';
