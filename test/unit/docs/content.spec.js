@@ -30,7 +30,11 @@ it('should end all nested docs with a link back to the documentation root', asyn
 });
 
 it('should use correct wording', async () => {
-  const files: string[] = await globby(['**/*.md', '!node_modules/']);
+  const files: string[] = await globby([
+    '**/*.md',
+    '!node_modules/',
+    '!CHANGELOG.md',
+  ]);
   expect(files.length).toBeGreaterThan(0);
 
   for (const file of files) {
