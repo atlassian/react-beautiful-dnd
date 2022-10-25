@@ -1,6 +1,6 @@
 {
   "name": "@planningcenter/react-beautiful-dnd",
-  "version": "13.2.0",
+  "version": "13.2.1",
   "description": "Beautiful and accessible drag and drop for lists with React",
   "author": "Front End Systems Engineering <frontend@planningcenter.com>",
   "keywords": [
