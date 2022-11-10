@@ -256,9 +256,9 @@ If you are overriding inline styles be sure to do it after you spread the `provi
   {(provided, snapshot) => {
     // extending the DraggableStyle with our own inline styles
     const style = {
+      ...provided.draggableProps.style,
       backgroundColor: snapshot.isDragging ? 'blue' : 'white',
       fontSize: 18,
-      ...provided.draggableProps.style,
     };
     return (
       <div ref={provided.innerRef} {...provided.draggableProps} style={style}>
