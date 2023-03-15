@@ -146,7 +146,8 @@
   },
   "peerDependencies": {
     "react": "^16.8.5 || ^17.0.0 || ^18.0.0",
-    "react-dom": "^16.8.5 || ^17.0.0 || ^18.0.0"
+    "react-dom": "^16.8.5 || ^17.0.0 || ^18.0.0",
+    "react-redux": "^7.2.0"
   },
   "license": "Apache-2.0",
   "jest-junit": {
