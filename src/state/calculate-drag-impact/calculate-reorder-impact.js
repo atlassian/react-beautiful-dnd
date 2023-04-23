@@ -130,7 +130,7 @@ export default function calculateReorderImpact({
       destination: {
         droppableId: destination.descriptor.id,
         index,
-        draggableId: match.descriptor?.id,
+        draggableId: match.descriptor.id,
       },
     },
   };
