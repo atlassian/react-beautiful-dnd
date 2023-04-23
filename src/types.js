@@ -152,7 +152,6 @@ export type DroppableDimension = {|
 export type DraggableLocation = {|
   droppableId: DroppableId,
   index: number,
-  draggableId?: DraggableId,
 |};
 
 export type DraggableIdMap = {
