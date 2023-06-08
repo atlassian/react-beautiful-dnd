@@ -68,7 +68,7 @@ React [error boundaries](https://reactjs.org/docs/error-boundaries.html) do not 
 
 #### non-rbd error or runtime error
 
-- can any active drag
+- cancel any active drag
 - **`throw` the error** for your own error boundary. We will not recover from errors that are not caused explicitly by `rbd`. A run time error (such as a `TypeError`) that is caused by `rbd` will not be recovered. `rbd` will only recover from explicitly thrown `rbd` errors.
 
 ### Error is caught by `window` `error` listener
