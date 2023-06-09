@@ -167,6 +167,8 @@ export type PublicOwnProps = {|
   isDragDisabled?: boolean,
   disableInteractiveElementBlocking?: boolean,
   shouldRespectForcePress?: boolean,
+  lockedAxis?: 'x' | 'y',
+  allowedDeviation?: number,
 |};
 
 export type PrivateOwnProps = {|
