@@ -144,7 +144,7 @@ export default (contextId: ContextId): Styles => {
   // we do not want the browser to have behaviors we do not expect
 
   const body: Rule = {
-    selector: 'body',
+    selector: 'body, :host',
     styles: {
       dragging: `
         cursor: grabbing;
