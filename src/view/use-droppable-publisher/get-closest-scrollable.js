@@ -11,6 +11,7 @@ type Overflow = {|
 const isEqual = (base: string) => (value: string): boolean => base === value;
 const isScroll = isEqual('scroll');
 const isAuto = isEqual('auto');
+const isOverlay = isEqual('overlay');
 const isVisible = isEqual('visible');
 const isEither = (overflow: Overflow, fn: (value: string) => boolean) =>
   fn(overflow.overflowX) || fn(overflow.overflowY);
@@ -24,7 +25,7 @@ const isElementScrollable = (el: Element): boolean => {
     overflowY: style.overflowY,
   };
 
-  return isEither(overflow, isScroll) || isEither(overflow, isAuto);
+  return isEither(overflow, isScroll) || isEither(overflow, isAuto) || isEither(overflow, isOverlay);
 };
 
 // Special case for a body element
