@@ -12,6 +12,7 @@ import type {
   DraggableProvided,
   DraggableStateSnapshot,
 } from '../../../src';
+import type { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
 
 const Wrapper = styled.div`
   background-color: ${({ isDraggingOver }) =>
@@ -62,6 +63,7 @@ type Props = {|
   listType?: string,
   internalScroll?: boolean,
   isCombineEnabled?: boolean,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 export default class AuthorList extends Component<Props> {
@@ -75,7 +77,12 @@ export default class AuthorList extends Component<Props> {
       <Container>
         <DropZone ref={dropProvided.innerRef}>
           {quotes.map((quote: Quote, index: number) => (
-            <Draggable key={quote.id} draggableId={quote.id} index={index}>
+            <Draggable
+              key={quote.id}
+              draggableId={quote.id}
+              index={index}
+              dropTargetCalculationMode={this.props.dropTargetCalculationMode}
+            >
               {(
                 dragProvided: DraggableProvided,
                 dragSnapshot: DraggableStateSnapshot,

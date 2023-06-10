@@ -9,6 +9,8 @@ import { reorderQuoteMap } from '../reorder';
 import type { ReorderQuoteMapResult } from '../reorder';
 import type { QuoteMap } from '../types';
 import type { DropResult, DraggableLocation } from '../../../src/types';
+import DropTargetCalculationModeSelector from '../primatives/drop-target-calculation-mode-selector';
+import type { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
 
 const Root = styled.div`
   background-color: ${colors.B200};
@@ -55,13 +57,18 @@ type Props = {|
   initial: QuoteMap,
 |};
 
-type State = ReorderQuoteMapResult;
+type State = $ReadOnly<
+  ReorderQuoteMapResult & {
+    dropTargetCalculationMode: DropTargetCalculationMode,
+  },
+>;
 
 export default class QuoteApp extends Component<Props, State> {
   /* eslint-disable react/sort-comp */
 
   state: State = {
     quoteMap: this.props.initial,
+    dropTargetCalculationMode: 'box',
   };
 
   onDragEnd = (result: DropResult) => {
@@ -101,6 +108,11 @@ export default class QuoteApp extends Component<Props, State> {
 
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
+        <DropTargetCalculationModeSelector
+          onChange={(dropTargetCalculationMode: DropTargetCalculationMode) =>
+            this.setState({ dropTargetCalculationMode })
+          }
+        />
         <Root>
           <HorizontalScrollContainer>
             <Column>
@@ -110,6 +122,7 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'alpha'}
                 quotes={quoteMap.alpha}
+                dropTargetCalculationMode={this.state.dropTargetCalculationMode}
               />
             </Column>
             <Column>
@@ -119,6 +132,7 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'beta'}
                 quotes={quoteMap.beta}
+                dropTargetCalculationMode={this.state.dropTargetCalculationMode}
               />
             </Column>
             <Column>
@@ -128,6 +142,7 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'gamma'}
                 quotes={quoteMap.gamma}
+                dropTargetCalculationMode={this.state.dropTargetCalculationMode}
               />
             </Column>
           </HorizontalScrollContainer>
@@ -139,6 +154,7 @@ export default class QuoteApp extends Component<Props, State> {
               listType="card"
               isDropDisabled={disabledDroppable === 'delta'}
               quotes={quoteMap.delta}
+              dropTargetCalculationMode={this.state.dropTargetCalculationMode}
             />
             <QuoteList
               title="epsilon"
@@ -147,6 +163,7 @@ export default class QuoteApp extends Component<Props, State> {
               internalScroll
               isDropDisabled={disabledDroppable === 'epsilon'}
               quotes={quoteMap.epsilon}
+              dropTargetCalculationMode={this.state.dropTargetCalculationMode}
             />
           </Column>
           <VerticalScrollContainer>
@@ -157,6 +174,7 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'zeta'}
                 quotes={quoteMap.zeta}
+                dropTargetCalculationMode={this.state.dropTargetCalculationMode}
               />
             </Column>
             <Column>
@@ -166,6 +184,7 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'eta'}
                 quotes={quoteMap.eta}
+                dropTargetCalculationMode={this.state.dropTargetCalculationMode}
               />
             </Column>
             <Column>
@@ -175,6 +194,7 @@ export default class QuoteApp extends Component<Props, State> {
                 listType="card"
                 isDropDisabled={disabledDroppable === 'theta'}
                 quotes={quoteMap.theta}
+                dropTargetCalculationMode={this.state.dropTargetCalculationMode}
               />
             </Column>
           </VerticalScrollContainer>
@@ -185,6 +205,7 @@ export default class QuoteApp extends Component<Props, State> {
               listType="card"
               isDropDisabled={disabledDroppable === 'iota'}
               quotes={quoteMap.iota}
+              dropTargetCalculationMode={this.state.dropTargetCalculationMode}
             />
           </Column>
           <Column>
@@ -195,6 +216,7 @@ export default class QuoteApp extends Component<Props, State> {
               internalScroll
               isDropDisabled={disabledDroppable === 'kappa'}
               quotes={quoteMap.kappa}
+              dropTargetCalculationMode={this.state.dropTargetCalculationMode}
             />
           </Column>
         </Root>
