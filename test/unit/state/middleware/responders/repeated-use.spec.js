@@ -15,6 +15,7 @@ import type {
   Responders,
   DragUpdate,
   DropResult,
+  DraggingState,
 } from '../../../../../src/types';
 import createResponders from './util/get-responders-stub';
 import getAnnounce from './util/get-announce-stub';
@@ -37,9 +38,8 @@ it('should behave correctly across multiple drags', () => {
 
     // update
     const newIndex = initialPublishArgs.critical.draggable.index + 1;
-    const newDraggableId = Object.keys(store.getState().dimensions.draggables)[
-      newIndex
-    ];
+    const state: DraggingState = store.getState();
+    const newDraggableId = Object.keys(state.dimensions.draggables)[newIndex];
     const update: DragUpdate = {
       ...getDragStart(),
       destination: {

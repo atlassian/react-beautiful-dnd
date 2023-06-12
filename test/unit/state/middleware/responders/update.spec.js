@@ -15,7 +15,12 @@ import {
 import createStore from '../util/create-store';
 import getAnnounce from './util/get-announce-stub';
 import createResponders from './util/get-responders-stub';
-import type { Responders, State, DragUpdate } from '../../../../../src/types';
+import type {
+  Responders,
+  State,
+  DragUpdate,
+  DraggingState,
+} from '../../../../../src/types';
 import type { Store, Dispatch } from '../../../../../src/state/store-types';
 
 jest.useFakeTimers();
@@ -40,9 +45,8 @@ it('should call onDragUpdate if the position has changed on move', () => {
 
   jest.runOnlyPendingTimers();
   const newIndex = initialPublishArgs.critical.draggable.index + 1;
-  const newDraggableId = Object.keys(store.getState().dimensions.draggables)[
-    newIndex
-  ];
+  const state: DraggingState = store.getState();
+  const newDraggableId = Object.keys(state.dimensions.draggables)[newIndex];
   const update: DragUpdate = {
     ...getDragStart(),
     combine: null,
