@@ -51,6 +51,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               index: preset.inHome3.descriptor.index,
               droppableId: preset.home.descriptor.id,
+              draggableId: preset.inHome3.descriptor.id,
             },
           },
         };
@@ -77,6 +78,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               index: preset.inHome4.descriptor.index,
               droppableId: preset.home.descriptor.id,
+              draggableId: preset.inHome4.descriptor.id,
             },
           },
         };
@@ -106,6 +108,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               index: preset.inHome3.descriptor.index,
               droppableId: preset.home.descriptor.id,
+              draggableId: preset.inHome3.descriptor.id,
             },
           },
         };
@@ -138,6 +141,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               index: preset.inHome2.descriptor.index,
               droppableId: preset.home.descriptor.id,
+              draggableId: preset.inHome2.descriptor.id,
             },
           },
         };
@@ -171,6 +175,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               index: preset.inHome1.descriptor.index,
               droppableId: preset.home.descriptor.id,
+              draggableId: preset.inHome1.descriptor.id,
             },
           },
         };
@@ -218,6 +223,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.home.descriptor.id,
               index: preset.inHome2.descriptor.index,
+              draggableId: preset.inHome2.descriptor.id,
             },
           },
         };
@@ -263,6 +269,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.home.descriptor.id,
               index: preset.inHome1.descriptor.index,
+              draggableId: preset.inHome1.descriptor.id,
             },
           },
         };
@@ -303,6 +310,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.home.descriptor.id,
               index: preset.inHome2.descriptor.index,
+              draggableId: preset.inHome2.descriptor.id,
             },
           },
         };
@@ -332,6 +340,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.home.descriptor.id,
               index: preset.inHome3.descriptor.index,
+              draggableId: preset.inHome3.descriptor.id,
             },
           },
         };
@@ -358,6 +367,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.home.descriptor.id,
               index: preset.inHome4.descriptor.index,
+              draggableId: preset.inHome4.descriptor.id,
             },
           },
         };

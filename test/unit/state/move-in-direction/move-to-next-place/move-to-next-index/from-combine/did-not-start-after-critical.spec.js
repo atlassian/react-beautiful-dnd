@@ -74,6 +74,7 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           destination: {
             index: preset.inForeign2.descriptor.index,
             droppableId: preset.foreign.descriptor.id,
+            draggableId: preset.inForeign2.descriptor.id,
           },
         },
       };
@@ -127,6 +128,7 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           destination: {
             index: preset.inForeign1.descriptor.index,
             droppableId: preset.foreign.descriptor.id,
+            draggableId: preset.inForeign1.descriptor.id,
           },
         },
       };
@@ -194,6 +196,7 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           destination: {
             index: preset.inForeign2.descriptor.index,
             droppableId: preset.foreign.descriptor.id,
+            draggableId: preset.inForeign2.descriptor.id,
           },
         },
       };
@@ -263,6 +266,7 @@ const enableCombine = (droppable: DroppableDimension): DroppableDimension => ({
           destination: {
             index: preset.inForeign1.descriptor.index,
             droppableId: preset.foreign.descriptor.id,
+            draggableId: preset.inForeign1.descriptor.id,
           },
         },
       };

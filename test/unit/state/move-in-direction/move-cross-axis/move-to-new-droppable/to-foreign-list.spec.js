@@ -322,6 +322,7 @@ import {
             destination: {
               droppableId: preset.foreign.descriptor.id,
               index: preset.inForeign2.descriptor.index,
+              draggableId: preset.inForeign2.descriptor.id,
             },
           },
         };
@@ -372,6 +373,7 @@ import {
             destination: {
               droppableId: preset.foreign.descriptor.id,
               index: preset.inForeign2.descriptor.index,
+              draggableId: preset.inForeign2.descriptor.id,
             },
           },
         };

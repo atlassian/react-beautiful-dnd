@@ -57,6 +57,7 @@ it('should not animate any displacement', () => {
         destination: {
           index: preset.inForeign2.descriptor.index,
           droppableId: preset.foreign.descriptor.id,
+          draggableId: preset.inForeign2.descriptor.id,
         },
       },
     };

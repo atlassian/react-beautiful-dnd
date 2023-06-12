@@ -80,6 +80,7 @@ import {
               // is now in position of inForeign3
               droppableId: preset.foreign.descriptor.id,
               index: preset.inForeign3.descriptor.index,
+              draggableId: preset.inForeign3.descriptor.id,
             },
           },
         };
@@ -103,6 +104,7 @@ import {
             // is now in position of inForeign2
             droppableId: preset.inForeign2.descriptor.droppableId,
             index: preset.inForeign2.descriptor.index,
+            draggableId: preset.inForeign2.descriptor.id,
           },
         },
       };
@@ -160,6 +162,7 @@ import {
               // is now in position of inForeign3
               droppableId: preset.inForeign3.descriptor.droppableId,
               index: preset.inForeign3.descriptor.index,
+              draggableId: preset.inForeign3.descriptor.id,
             },
           },
         };
