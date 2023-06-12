@@ -16,6 +16,7 @@ import { tryGetDestination } from '../../../../src/state/get-impact-location';
 describe('on the vertical axis', () => {
   const preset = getPreset(vertical);
   const state = getStatePreset(vertical);
+  const draggables = Object.keys(state.preset.dimensions.draggables);
 
   it('should move forward on a MOVE_DOWN', () => {
     const result: ?PublicResult = moveInDirection({
@@ -24,9 +25,12 @@ describe('on the vertical axis', () => {
     });
 
     invariant(result, 'expected a result');
+    const idx = 1;
+    const newDraggableId = draggables[idx];
     const expected: DraggableLocation = {
       droppableId: preset.home.descriptor.id,
-      index: 1,
+      index: idx,
+      draggableId: newDraggableId,
     };
     expect(tryGetDestination(result.impact)).toEqual(expected);
   });
@@ -38,9 +42,12 @@ describe('on the vertical axis', () => {
     });
 
     invariant(result, 'expected a result');
+    const idx = 0;
+    const newDraggableId = draggables[idx];
     const expected: DraggableLocation = {
       droppableId: preset.home.descriptor.id,
-      index: 0,
+      index: idx,
+      draggableId: newDraggableId,
     };
     expect(tryGetDestination(result.impact)).toEqual(expected);
   });
@@ -55,6 +62,7 @@ describe('on the vertical axis', () => {
     const expected: DraggableLocation = {
       droppableId: preset.foreign.descriptor.id,
       index: 1,
+      draggableId: preset.inForeign2.descriptor.id,
     };
     expect(tryGetDestination(result.impact)).toEqual(expected);
   });
@@ -69,6 +77,7 @@ describe('on the vertical axis', () => {
     const expected: DraggableLocation = {
       droppableId: preset.home.descriptor.id,
       index: 0,
+      draggableId: preset.inHome1.descriptor.id,
     };
     expect(tryGetDestination(result.impact)).toEqual(expected);
   });
@@ -77,6 +86,7 @@ describe('on the vertical axis', () => {
 describe('on the horizontal axis', () => {
   const preset = getPreset(horizontal);
   const state = getStatePreset(horizontal);
+  const draggables = Object.keys(state.preset.dimensions.draggables);
 
   it('should move forward on a MOVE_RIGHT', () => {
     const result: ?PublicResult = moveInDirection({
@@ -85,9 +95,12 @@ describe('on the horizontal axis', () => {
     });
 
     invariant(result, 'expected a result');
+    const idx = 1;
+    const newDraggableId = draggables[idx];
     const expected: DraggableLocation = {
       droppableId: preset.home.descriptor.id,
-      index: 1,
+      index: idx,
+      draggableId: newDraggableId,
     };
     expect(tryGetDestination(result.impact)).toEqual(expected);
   });
@@ -99,9 +112,12 @@ describe('on the horizontal axis', () => {
     });
 
     invariant(result, 'expected a result');
+    const idx = 0;
+    const newDraggableId = draggables[idx];
     const expected: DraggableLocation = {
       droppableId: preset.home.descriptor.id,
-      index: 0,
+      index: idx,
+      draggableId: newDraggableId,
     };
     expect(tryGetDestination(result.impact)).toEqual(expected);
   });
@@ -116,6 +132,7 @@ describe('on the horizontal axis', () => {
     const expected: DraggableLocation = {
       droppableId: preset.foreign.descriptor.id,
       index: 1,
+      draggableId: preset.inForeign2.descriptor.id,
     };
     expect(tryGetDestination(result.impact)).toEqual(expected);
   });
@@ -127,9 +144,12 @@ describe('on the horizontal axis', () => {
     });
 
     invariant(result, 'expected a result');
+    const idx = 0;
+    const newDraggableId = draggables[idx];
     const expected: DraggableLocation = {
       droppableId: preset.home.descriptor.id,
-      index: 0,
+      index: idx,
+      draggableId: newDraggableId,
     };
     expect(tryGetDestination(result.impact)).toEqual(expected);
   });
@@ -181,6 +201,7 @@ describe('on the horizontal axis', () => {
       const expected: DraggableLocation = {
         droppableId: preset.foreign.descriptor.id,
         index: 1,
+        draggableId: preset.inForeign2.descriptor.id,
       };
       expect(tryGetDestination(result.impact)).toEqual(expected);
     });
