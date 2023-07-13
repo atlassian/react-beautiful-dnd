@@ -16,7 +16,7 @@
 
 ### Collapsing and expanding groups
 
-> We recommend you use the [`@atlaskit/tree`](https://atlaskit.atlassian.com/packages/core/tree) component for this behaviour
+> We recommend you use the [`@atlaskit/tree`](https://atlassian.design/components/table-tree) component for this behaviour
 
 ![hover_to_expand](https://user-images.githubusercontent.com/2182637/45996092-3d637100-c0de-11e8-8837-8d66e7cc73b8.gif)
 
