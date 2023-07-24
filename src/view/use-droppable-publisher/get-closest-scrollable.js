@@ -24,6 +24,10 @@ const isElementScrollable = (el: Element): boolean => {
     overflowY: style.overflowY,
   };
 
+  if (el instanceof HTMLElement && el.dataset.dndIgnoreScrollable) {
+    return false;
+  }
+
   return isEither(overflow, isScroll) || isEither(overflow, isAuto);
 };
 
