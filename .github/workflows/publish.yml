@@ -1,0 +1,9 @@
+name: Use shared workflow to publish to NPM
+
+on:
+  release:
+    types: [published]
+jobs:
+  publish-to-npm:
+    uses: planningcenter/shared-workflows/.github/workflows/publish-to-npm-on-release.yml@main
+    secrets: inherit
