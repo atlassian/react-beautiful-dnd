@@ -106,18 +106,18 @@ There are a lot of libraries out there that allow for drag and drop interactions
 ![diagram](https://user-images.githubusercontent.com/2182637/53607406-c8f3a780-3c12-11e9-979c-7f3b5bd1bfbd.gif)
 
 - [`<DragDropContext />`](/docs/api/drag-drop-context.md) - _Wraps the part of your application you want to have drag and drop enabled for_
-- [`<Droppable />`](/docs/api/droppable.md) - _An area that can be dropped into. Contains `<Draggable />`s_
+- [`<Droppable />`](/docs/api/droppable.md) - _An area that can be dropped into. Contains `<Draggable />`_
 - [`<Draggable />`](/docs/api/draggable.md) - _What can be dragged around_
 - [`resetServerContext()`](/docs/api/reset-server-context.md) - _Utility for server side rendering (SSR)_
 
 ### Guides 🗺
 
 - [`<DragDropContext />` responders](/docs/guides/responders.md) - _`onDragStart`, `onDragUpdate`, `onDragEnd` and `onBeforeDragStart`_
-- [Combining `<Draggable />`s](/docs/guides/combining.md)
+- [Combining `<Draggable />`](/docs/guides/combining.md)
 - [Common setup issues](/docs/guides/common-setup-issues.md)
 - [Using `innerRef`](/docs/guides/using-inner-ref.md)
 - [Setup problem detection and error recovery](/docs/guides/setup-problem-detection-and-error-recovery.md)
-- [Rules for `draggableId` and `droppableId`s](/docs/guides/identifiers.md)
+- [Rules for `draggableId` and `droppableId`](/docs/guides/identifiers.md)
 - [Browser focus retention](/docs/guides/browser-focus.md)
 - [Customising or skipping the drop animation](/docs/guides/drop-animation.md)
 - [Auto scrolling](/docs/guides/auto-scrolling.md)
@@ -165,7 +165,7 @@ Alex Reardon [@alexandereardon](https://twitter.com/alexandereardon)
 ## Maintainers
 
 - [Daniel Del Core](https://twitter.com/danieldelcore)
-- Many other [@Atlassian](https://twitter.com/Atlassian)'s!
+- Many other [@Atlassian](https://twitter.com/Atlassian's)!
 
 ## Collaborators 🤝
 
