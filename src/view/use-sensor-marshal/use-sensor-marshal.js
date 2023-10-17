@@ -437,7 +437,9 @@ export default function useSensorMarshal({
       }),
     [contextId, lockAPI, registry, store],
   );
-
+  var findClosestDragHandle = useCallback(function (event) {
+      return findClosestDragHandleFromEvent(contextId, event);
+      }, [contextId]);
   const findClosestDraggableId = useCallback(
     (event: Event): ?DraggableId =>
       findClosestDraggableIdFromEvent(contextId, event),
@@ -473,6 +475,7 @@ export default function useSensorMarshal({
       canGetLock,
       tryGetLock,
       findClosestDraggableId,
+      findClosestDragHandle,
       findOptionsForDraggable,
       tryReleaseLock,
       isLockClaimed,
@@ -481,6 +484,7 @@ export default function useSensorMarshal({
       canGetLock,
       tryGetLock,
       findClosestDraggableId,
+      findClosestDragHandle,
       findOptionsForDraggable,
       tryReleaseLock,
       isLockClaimed,
