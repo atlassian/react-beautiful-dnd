@@ -294,7 +294,13 @@ export default function useTouchSensor(api: SensorAPI) {
         };
 
         const handle = api.findClosestDraggableId(event);
-        !handle ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Touch sensor unable to find drag handle') : invariant(false) : void 0;
+        if (!handle) {
+          if (process.env.NODE_ENV !== 'production') {
+            invariant(false, 'Touch sensor unable to find drag handle');
+          } else {
+            invariant(false);
+          }
+        }
         // unbind this event handler
         unbindEventsRef.current();
 
@@ -399,7 +405,11 @@ export default function useTouchSensor(api: SensorAPI) {
   );
 
   const startPendingDrag = useCallback(
-    function startPendingDrag(actions: PreDragActions, point: Position, target) {
+    function startPendingDrag(
+      actions: PreDragActions,
+      point: Position,
+      target,
+    ) {
       invariant(
         getPhase().type === 'IDLE',
         'Expected to move from IDLE to PENDING drag',

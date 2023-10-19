@@ -6221,7 +6221,15 @@ function useTouchSensor(api) {
           y: clientY
         };
         var handle = api.findClosestDraggableId(event);
-        !handle ? process.env.NODE_ENV !== 'production' ?  process.env.NODE_ENV !== "production" ? invariant(false, 'Touch sensor unable to find drag handle') : invariant(false)  :  process.env.NODE_ENV !== "production" ? invariant(false) : invariant(false)  : void 0;
+
+        if (!handle) {
+          if (process.env.NODE_ENV !== 'production') {
+             process.env.NODE_ENV !== "production" ? invariant(false, 'Touch sensor unable to find drag handle') : invariant(false) ;
+          } else {
+             process.env.NODE_ENV !== "production" ? invariant(false) : invariant(false) ;
+          }
+        }
+
         unbindEventsRef.current();
         startPendingDrag(actions, point, handle);
       }

@@ -9225,7 +9225,13 @@
             y: clientY
           };
           var handle = api.findClosestDraggableId(event);
-          !handle ?    invariant(false, 'Touch sensor unable to find drag handle')    : void 0;
+
+          if (!handle) {
+            {
+                invariant(false, 'Touch sensor unable to find drag handle')  ;
+            }
+          }
+
           unbindEventsRef.current();
           startPendingDrag(actions, point, handle);
         }
