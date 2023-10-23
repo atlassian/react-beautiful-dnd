@@ -295,11 +295,12 @@ export default function useTouchSensor(api: SensorAPI) {
 
         const handle = api.findClosestDraggableId(event);
         if (!handle) {
-          if (process.env.NODE_ENV !== 'production') {
-            invariant(false, 'Touch sensor unable to find drag handle');
-          } else {
-            invariant(false);
-          }
+          invariant(
+            false,
+            process.env.NODE_ENV !== 'production'
+              ? 'Touch sensor unable to find drag handle'
+              : undefined,
+          );
         }
         // unbind this event handler
         unbindEventsRef.current();
