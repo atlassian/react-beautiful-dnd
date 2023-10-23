@@ -437,7 +437,7 @@ export default function useSensorMarshal({
       }),
     [contextId, lockAPI, registry, store],
   );
-  var findClosestDragHandle = useCallback(function (event) {
+  const findClosestDragHandle = useCallback(function (event) {
       return findClosestDragHandleFromEvent(contextId, event);
       }, [contextId]);
   const findClosestDraggableId = useCallback(
