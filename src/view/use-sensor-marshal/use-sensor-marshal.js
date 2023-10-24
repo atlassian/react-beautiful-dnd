@@ -45,7 +45,9 @@ import getBorderBoxCenterPosition from '../get-border-box-center-position';
 import { warning } from '../../dev-warning';
 import useLayoutEffect from '../use-isomorphic-layout-effect';
 import { noop } from '../../empty';
-import findClosestDraggableIdFromEvent from './find-closest-draggable-id-from-event';
+import findClosestDraggableIdFromEvent, {
+  findClosestDragHandleFromEvent,
+} from './find-closest-draggable-id-from-event';
 import findDraggable from '../get-elements/find-draggable';
 import bindEvents from '../event-bindings/bind-events';
 
@@ -437,9 +439,12 @@ export default function useSensorMarshal({
       }),
     [contextId, lockAPI, registry, store],
   );
-  const findClosestDragHandle = useCallback(function (event) {
+  const findClosestDragHandle = useCallback(
+    function (event: Event): ?DraggableId {
       return findClosestDragHandleFromEvent(contextId, event);
-      }, [contextId]);
+    },
+    [contextId],
+  );
   const findClosestDraggableId = useCallback(
     (event: Event): ?DraggableId =>
       findClosestDraggableIdFromEvent(contextId, event),

@@ -293,7 +293,7 @@ export default function useTouchSensor(api: SensorAPI) {
           y: clientY,
         };
 
-        const handle = api.findClosestDraggableId(event);
+        const handle: ?HTMLElement = api.findClosestDraggableId(event);
         if (!handle) {
           invariant(
             false,
@@ -359,7 +359,7 @@ export default function useTouchSensor(api: SensorAPI) {
   }, [stop]);
 
   const bindCapturingEvents = useCallback(
-    function bindCapturingEvents(target) {
+    function bindCapturingEvents(target: HTMLElement) {
       const options: EventOptions = { capture: true, passive: false };
       const args: GetBindingArgs = {
         cancel,
@@ -409,7 +409,7 @@ export default function useTouchSensor(api: SensorAPI) {
     function startPendingDrag(
       actions: PreDragActions,
       point: Position,
-      target,
+      target: HTMLElement,
     ) {
       invariant(
         getPhase().type === 'IDLE',
