@@ -293,7 +293,7 @@ export default function useTouchSensor(api: SensorAPI) {
           y: clientY,
         };
 
-        const handle: ?HTMLElement = api.findClosestDraggableId(event);
+        const handle: ?HTMLElement = api.findClosestDragHandle(event);
         if (!handle) {
           invariant(
             false,
