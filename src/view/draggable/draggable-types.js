@@ -152,7 +152,7 @@ export type MapProps = {|
   // secondary: ?SecondaryMapProps,
 |};
 
-export type ChildrenFn = (
+export type DraggableChildrenFn = (
   Provided,
   StateSnapshot,
   DraggableRubric,
@@ -161,7 +161,7 @@ export type ChildrenFn = (
 export type PublicOwnProps = {|
   draggableId: DraggableId,
   index: number,
-  children: ChildrenFn,
+  children: DraggableChildrenFn,
 
   // optional own props
   isDragDisabled?: boolean,

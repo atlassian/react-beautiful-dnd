@@ -11,10 +11,10 @@ import type {
   DraggableRubric,
   DroppableMode,
 } from '../../types';
-import type { ChildrenFn } from '../draggable/draggable-types';
+import type { DraggableChildrenFn } from '../draggable/draggable-types';
 import { updateViewportMaxScroll } from '../../state/action-creators';
 
-export type DraggableChildrenFn = ChildrenFn;
+export type DraggableChildrenFn;
 
 export type DroppableProps = {|
   // used for shared global styles
@@ -73,9 +73,14 @@ export type DispatchProps = {|
   updateViewportMaxScroll: typeof updateViewportMaxScroll,
 |};
 
+export type DroppableChildrenFn = (
+  Provided,
+  StateSnapshot,
+) => Node;
+
 export type OwnProps = {|
   ...DefaultProps,
-  children: (Provided, StateSnapshot) => Node,
+  children: DroppableChildrenFn,
   droppableId: DroppableId,
   renderClone: ?DraggableChildrenFn,
 |};
