@@ -3,7 +3,7 @@ name: Publish package to npmjs
 # This workflow runs when code is pushed to `main` (i.e: when a pull request is merged)
 on:
     push:
-        branches: [main]
+        branches: [master]
 
 # Ensure that only once instance of this workflow executes at a time.
 # If multiple PRs are merged in quick succession, there will only ever be one publish workflow running and one pending.
