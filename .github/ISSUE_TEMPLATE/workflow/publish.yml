@@ -1,6 +1,6 @@
 name: Publish package to npmjs
 
-# This workflow runs when code is pushed to `main` (i.e: when a pull request is merged)
+# This workflow runs when code is pushed to `master` (i.e: when a pull request is merged)
 on:
     push:
         branches: [master]
@@ -13,13 +13,13 @@ jobs:
     version:
         runs-on: ubuntu-latest
 
-        # OSBotify will update the version on `main`, so this check is important to prevent an infinite loop
+        # OSBotify will update the version on `master`, so this check is important to prevent an infinite loop
         if: ${{ github.actor != 'OSBotify' }}
 
         steps:
             - uses: actions/checkout@v4
               with:
-                  ref: main
+                  ref: master
 
             - name: Decrypt & Import OSBotify GPG key
               run: |
