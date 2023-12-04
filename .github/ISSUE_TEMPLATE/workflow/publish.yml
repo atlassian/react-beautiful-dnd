@@ -1,0 +1,88 @@
+name: Publish package to npmjs
+
+# This workflow runs when code is pushed to `master` (i.e: when a pull request is merged)
+on:
+    push:
+        branches: [master]
+
+# Ensure that only once instance of this workflow executes at a time.
+# If multiple PRs are merged in quick succession, there will only ever be one publish workflow running and one pending.
+concurrency: ${{ github.workflow }}
+
+jobs:
+    version:
+        runs-on: ubuntu-latest
+
+        # OSBotify will update the version on `master`, so this check is important to prevent an infinite loop
+        if: ${{ github.actor != 'OSBotify' }}
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: master
+
+            - name: Decrypt & Import OSBotify GPG key
+              run: |
+                  cd .github
+                  gpg --quiet --batch --yes --decrypt --passphrase="$LARGE_SECRET_PASSPHRASE" --output OSBotify-private-key.asc OSBotify-private-key.asc.gpg
+                  gpg --import OSBotify-private-key.asc
+              env:
+                  LARGE_SECRET_PASSPHRASE: ${{ secrets.LARGE_SECRET_PASSPHRASE }}
+
+            - name: Set up git for OSBotify
+              run: |
+                  git config --global user.signingkey 367811D53E34168C
+                  git config --global commit.gpgsign true
+                  git config --global user.name OSBotify
+                  git config --global user.email infra+osbotify@expensify.com
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version-file: ".nvmrc"
+                  registry-url: "https://registry.npmjs.org"
+
+            - name: Generate branch name
+              run: echo "BRANCH_NAME=OSBotify-bump-version-$(uuidgen)" >> $GITHUB_ENV
+
+            - name: Create branch for version-bump pull request
+              run: git checkout -b ${{ env.BRANCH_NAME }}
+
+            - name: Install npm packages
+              run: npm ci
+
+            - name: Update npm version
+              run: npm version patch
+
+            - name: Set new version in GitHub ENV
+              run: echo "NEW_VERSION=$(jq '.version' package.json)" >> $GITHUB_ENV
+
+            - name: Push branch and publish tags
+              run: git push --set-upstream origin ${{ env.BRANCH_NAME }} && git push --tags
+
+            - name: Create pull request
+              run: |
+                  gh pr create \
+                    --title "Update version to ${{ env.NEW_VERSION }}" \
+                    --body "Update version to ${{ env.NEW_VERSION }}"
+                  sleep 5
+              env:
+                  GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
+
+            - name: Auto-approve pull request
+              run: gh pr review --approve ${{ env.BRANCH_NAME }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Auto-merge pull request
+              run: gh pr merge --merge --delete-branch ${{ env.BRANCH_NAME }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build package
+              run: npm run build
+
+            - name: Publish to npm
+              run: npm publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                  
