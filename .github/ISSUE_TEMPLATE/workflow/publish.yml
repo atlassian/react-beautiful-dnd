@@ -4,6 +4,7 @@ name: Publish package to npmjs
 on:
     push:
         branches: [master]
+    workflow_dispatch:
 
 # Ensure that only once instance of this workflow executes at a time.
 # If multiple PRs are merged in quick succession, there will only ever be one publish workflow running and one pending.
