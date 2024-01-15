@@ -35,11 +35,11 @@ function isAnInteractiveElement(parent: Element, current: ?Element) {
     return true;
   }
 
-  // contenteditable="true" or contenteditable="" are valid ways
+  // contenteditable="true", contenteditable="" and contenteditable="plaintext-only" are valid ways
   // of creating a contenteditable container
   // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable
   const attribute: ?string = current.getAttribute('contenteditable');
-  if (attribute === 'true' || attribute === '') {
+  if (attribute === 'true' || attribute === '' || attribute === "plaintext-only") {
     return true;
   }
 
