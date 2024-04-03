@@ -1,4 +1,3 @@
-
 ## ⚠️ Maintenance & support
 
 This library continues to be relied upon heavily by Atlassian products, but we are focused on other priorities right now and have no current plans for further feature development or improvements.
@@ -6,6 +5,16 @@ This library continues to be relied upon heavily by Atlassian products, but we a
 It will continue to be here on GitHub and we will still make critical updates (e.g. security fixes, if any) as required, but will not be actively monitoring or replying to issues and pull requests.
 
 We recommend that you don’t raise issues or pull requests, as they will not be reviewed or actioned until further notice.
+
+> [!IMPORTANT]
+>
+> **Update: 3rd April 2024**
+>
+> <a href="https://www.youtube.com/watch?v=uySl2yiUYE4"><img src="https://github.com/alexreardon/files/assets/2182637/bb7740a3-875c-49aa-be54-e7268d836d60" width="300px" /></a>
+>
+> [📺 Watch on Youtube](https://www.youtube.com/watch?v=uySl2yiUYE4) <br> [🗣️ Discussion](https://github.com/atlassian/react-beautiful-dnd/issues/2573)
+
+<br>
 
 ---
 
