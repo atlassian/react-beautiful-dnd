@@ -24,12 +24,12 @@ Promise.all([
   waitPort({
     host: 'localhost',
     port: ports.storybook,
-    timeout: 60000,
+    timeout: 120000,
   }),
   waitPort({
     host: 'localhost',
     port: ports.cspServer,
-    timeout: 60000,
+    timeout: 120000,
   }),
 ])
   .then(() => {
