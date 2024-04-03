@@ -6,7 +6,7 @@ It will continue to be here on GitHub and we will still make critical updates (e
 
 We recommend that you don’t raise issues or pull requests, as they will not be reviewed or actioned until further notice.
 
-> [!NOTE]
+> [!IMPORTANT]
 > Update: 3rd April 2024
 >
 > <a href="https://www.youtube.com/watch?v=uySl2yiUYE4"><img src="https://github.com/alexreardon/files/assets/2182637/bb7740a3-875c-49aa-be54-e7268d836d60" width="300px" /></a>
