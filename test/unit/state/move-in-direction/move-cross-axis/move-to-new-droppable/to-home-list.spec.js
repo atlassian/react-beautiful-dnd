@@ -84,6 +84,7 @@ const dontCare: Position = { x: 0, y: 0 };
             destination: {
               droppableId: preset.home.descriptor.id,
               index: preset.inHome2.descriptor.index,
+              draggableId: preset.inHome2.descriptor.id,
             },
           },
         };
@@ -131,6 +132,7 @@ const dontCare: Position = { x: 0, y: 0 };
             destination: {
               droppableId: preset.home.descriptor.id,
               index: preset.inHome2.descriptor.index,
+              draggableId: preset.inHome2.descriptor.id,
             },
           },
         };
@@ -171,6 +173,7 @@ const dontCare: Position = { x: 0, y: 0 };
             destination: {
               droppableId: preset.home.descriptor.id,
               index: preset.inHome4.descriptor.index,
+              draggableId: preset.inHome4.descriptor.id,
             },
           },
         };
