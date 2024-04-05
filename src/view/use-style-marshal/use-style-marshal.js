@@ -75,7 +75,9 @@ export default function useStyleMarshal(contextId: ContextId, nonce?: string) {
       const remove = (ref) => {
         const current: ?HTMLStyleElement = ref.current;
         invariant(current, 'Cannot unmount ref as it is not set');
-        getHead().removeChild(current);
+        if (getHead().contains(current)) {
+          getHead().removeChild(current);
+        }
         ref.current = null;
       };
 
