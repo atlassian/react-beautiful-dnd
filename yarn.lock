@@ -11947,6 +11947,11 @@ react-redux@^7.2.0:
     prop-types "^15.7.2"
     react-is "^16.9.0"
 
+react-shadow-dom-retarget-events@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-shadow-dom-retarget-events/-/react-shadow-dom-retarget-events-1.1.0.tgz#ffe3a9dc4e6287b5239e863d0e5f1e392de0410a"
+  integrity sha512-hI/naZ8fUARf5He4PpvQtqhs/VWoocfg3ULeCOE3ccWiXGEsFpshlx2iB1XNtm2SFDdvZYoSo25a8JViYdAcgQ==
+
 react-sizeme@^2.6.7:
   version "2.6.12"
   resolved "https://registry.yarnpkg.com/react-sizeme/-/react-sizeme-2.6.12.tgz#ed207be5476f4a85bf364e92042520499455453e"
