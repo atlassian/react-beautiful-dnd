@@ -6,11 +6,13 @@
 
 1. Add the `react-beautiful-dnd` package
 
+#### yarn
 ```bash
-# yarn
 yarn add react-beautiful-dnd
+```
 
-# npm
+#### npm
+```bash
 npm install react-beautiful-dnd --save
 ```
 
