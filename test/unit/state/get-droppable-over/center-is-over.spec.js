@@ -37,6 +37,8 @@ import { offsetRectByPosition } from '../../../../src/state/rect';
           pageBorderBox,
           draggable,
           droppables: preset.droppables,
+          currentSelection: { x: 0, y: 0 },
+          calculateDroppableUsingPointerPosition: false,
         });
 
         expect(result).toBe(preset.home.descriptor.id);
@@ -63,6 +65,8 @@ import { offsetRectByPosition } from '../../../../src/state/rect';
           pageBorderBox,
           draggable,
           droppables: preset.droppables,
+          currentSelection: { x: 0, y: 0 },
+          calculateDroppableUsingPointerPosition: false,
         });
 
         expect(result).toBe(null);

@@ -15,6 +15,8 @@ import {
 import bindEvents from '../../../src/view/event-bindings/bind-events';
 import { grid } from '../constants';
 import reorder, { moveBetween } from '../reorder';
+import DropTargetCalculationModeSelector from '../primatives/drop-target-calculation-mode-selector';
+import type { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
 
 const UseTrimmingContext = React.createContext<boolean>(false);
 
@@ -28,6 +30,7 @@ type ItemProps = {|
   quote: Quote,
   index: number,
   shouldAllowTrimming: boolean,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 const StyledItem = styled.div`
@@ -116,7 +119,11 @@ function Item(props: ItemProps) {
   }, [props.shouldAllowTrimming, quote.id, useTrimming]);
 
   return (
-    <Draggable draggableId={quote.id} index={index}>
+    <Draggable
+      draggableId={quote.id}
+      index={index}
+      dropTargetCalculationMode={props.dropTargetCalculationMode}
+    >
       {(provided) => (
         <StyledItem
           {...provided.draggableProps}
@@ -138,6 +145,7 @@ type ListProps = {|
   listId: string,
   quotes: Quote[],
   width: Width,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 const StyledList = styled.div`
@@ -166,6 +174,7 @@ function List(props: ListProps) {
               quote={quote}
               index={index}
               shouldAllowTrimming={props.width === 'large'}
+              dropTargetCalculationMode={props.dropTargetCalculationMode}
             />
           ))}
           {provided.placeholder}
@@ -180,6 +189,7 @@ export default function App() {
   const [second, setSecond] = useState(() => getQuotes(3));
   const [useTrimming, setUseTrimming] = useState(false);
   const clientSelectionRef = useRef<Position>({ x: 0, y: 0 });
+  const [dropTargetCalculationMode, setDropTargetCalculationMode] = useState();
 
   function onDragEnd(result: DropResult) {
     const { source, destination } = result;
@@ -238,10 +248,23 @@ export default function App() {
   }
   return (
     <UseTrimmingContext.Provider value={useTrimming}>
+      <DropTargetCalculationModeSelector
+        onChange={setDropTargetCalculationMode}
+      />
       <DragDropContext onBeforeCapture={onBeforeCapture} onDragEnd={onDragEnd}>
         <Parent>
-          <List listId="first" quotes={first} width="small" />
-          <List listId="second" quotes={second} width="large" />
+          <List
+            listId="first"
+            quotes={first}
+            width="small"
+            dropTargetCalculationMode={dropTargetCalculationMode}
+          />
+          <List
+            listId="second"
+            quotes={second}
+            width="large"
+            dropTargetCalculationMode={dropTargetCalculationMode}
+          />
         </Parent>
         Item trimming experiment:{' '}
         <strong>{useTrimming ? 'enabled' : 'disabled'}</strong>

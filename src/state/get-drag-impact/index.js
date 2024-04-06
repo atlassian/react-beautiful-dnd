@@ -27,6 +27,8 @@ type Args = {|
   previousImpact: DragImpact,
   viewport: Viewport,
   afterCritical: LiftEffect,
+  currentSelection: Position,
+  calculateDroppableUsingPointerPosition: boolean,
 |};
 
 export default ({
@@ -37,6 +39,8 @@ export default ({
   previousImpact,
   viewport,
   afterCritical,
+  currentSelection,
+  calculateDroppableUsingPointerPosition,
 }: Args): DragImpact => {
   const pageBorderBox: Rect = offsetRectByPosition(
     draggable.page.borderBox,
@@ -45,8 +49,10 @@ export default ({
 
   const destinationId: ?DroppableId = getDroppableOver({
     pageBorderBox,
+    currentSelection,
     draggable,
     droppables,
+    calculateDroppableUsingPointerPosition,
   });
 
   // not dragging over anything

@@ -1,5 +1,6 @@
 // @flow
 import type { BoxModel, Rect, Position } from 'css-box-model';
+import type { DropTargetCalculationMode } from './view/draggable/draggable-types';
 
 export type Id = string;
 export type DraggableId = Id;
@@ -23,12 +24,14 @@ export type DraggableDescriptor = {|
   // This is technically redundant but it avoids
   // needing to look up a parent droppable just to get its type
   type: TypeId,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 export type DraggableOptions = {|
   canDragInteractiveElements: boolean,
   shouldRespectForcePress: boolean,
   isEnabled: boolean,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 export type Direction = 'horizontal' | 'vertical';

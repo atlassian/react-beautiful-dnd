@@ -14,6 +14,8 @@ it('should return null when over nothing', () => {
     }),
     draggable: preset.inHome1,
     droppables: preset.droppables,
+    currentSelection: { x: 0, y: 0 },
+    calculateDroppableUsingPointerPosition: false,
   });
 
   expect(result).toBe(null);
