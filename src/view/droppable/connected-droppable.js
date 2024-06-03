@@ -19,7 +19,6 @@ import type {
 import type {
   MapProps,
   OwnProps,
-  DefaultProps,
   Selector,
   DispatchProps,
   StateSnapshot,
@@ -227,22 +226,6 @@ const mapDispatchToProps: DispatchProps = {
   updateViewportMaxScroll: updateViewportMaxScrollAction,
 };
 
-function getBody(): HTMLElement {
-  invariant(document.body, 'document.body is not ready');
-  return document.body;
-}
-
-const defaultProps = ({
-  mode: 'standard',
-  type: 'DEFAULT',
-  direction: 'vertical',
-  isDropDisabled: false,
-  isCombineEnabled: false,
-  ignoreContainerClipping: false,
-  renderClone: null,
-  getContainerForClone: getBody,
-}: DefaultProps);
-
 // Abstract class allows to specify props and defaults to component.
 // All other ways give any or do not let add default props.
 // eslint-disable-next-line
@@ -274,7 +257,5 @@ const ConnectedDroppable: typeof DroppableType = connect(
     areStatePropsEqual: isStrictEqual,
   },
 )(Droppable);
-
-ConnectedDroppable.defaultProps = defaultProps;
 
 export default ConnectedDroppable;
