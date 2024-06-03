@@ -4,7 +4,7 @@ import { useMemo, useCallback } from 'use-memo-one';
 import React, { useRef, useContext, type Node } from 'react';
 import { invariant } from '../../invariant';
 import type { DraggableId } from '../../types';
-import type { Props, Provided } from './droppable-types';
+import type { DefaultProps, Props, Provided } from './droppable-types';
 import useDroppablePublisher from '../use-droppable-publisher';
 import Placeholder from '../placeholder';
 import AppContext, { type AppContextValue } from '../context/app-context';
@@ -23,7 +23,24 @@ import AnimateInOut, {
 } from '../animate-in-out/animate-in-out';
 import { PrivateDraggable } from '../draggable/draggable-api';
 
-export default function Droppable(props: Props) {
+function getBody(): HTMLElement {
+  invariant(document.body, 'document.body is not ready');
+  return document.body;
+}
+
+export const defaultProps: DefaultProps = {
+  mode: 'standard',
+  type: 'DEFAULT',
+  direction: 'vertical',
+  isDropDisabled: false,
+  isCombineEnabled: false,
+  ignoreContainerClipping: false,
+  renderClone: null,
+  getContainerForClone: getBody,
+};
+
+export default function Droppable(passedProps: Props) {
+  const props = { ...defaultProps, ...passedProps };
   const appContext: ?AppContextValue = useContext<?AppContextValue>(AppContext);
   invariant(appContext, 'Could not find app context');
   const { contextId, isMovementAllowed } = appContext;
