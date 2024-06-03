@@ -3,7 +3,6 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
-import { invariant } from '../../invariant';
 import type {
   State,
   DroppableId,
