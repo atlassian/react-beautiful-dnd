@@ -3,6 +3,7 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
+import { invariant } from '../../invariant';
 import type {
   State,
   DroppableId,
@@ -18,6 +19,7 @@ import type {
 import type {
   MapProps,
   OwnProps,
+  DefaultProps,
   Selector,
   DispatchProps,
   StateSnapshot,
@@ -225,6 +227,22 @@ const mapDispatchToProps: DispatchProps = {
   updateViewportMaxScroll: updateViewportMaxScrollAction,
 };
 
+function getBody(): HTMLElement {
+  invariant(document.body, 'document.body is not ready');
+  return document.body;
+}
+
+const defaultProps = ({
+  mode: 'standard',
+  type: 'DEFAULT',
+  direction: 'vertical',
+  isDropDisabled: false,
+  isCombineEnabled: false,
+  ignoreContainerClipping: false,
+  renderClone: null,
+  getContainerForClone: getBody,
+}: DefaultProps);
+
 // Abstract class allows to specify props and defaults to component.
 // All other ways give any or do not let add default props.
 // eslint-disable-next-line
@@ -243,7 +261,12 @@ const ConnectedDroppable: typeof DroppableType = connect(
   // no dispatch props for droppable
   mapDispatchToProps,
   // mergeProps - using default
-  null,
+  (stateProps, dispatchProps, ownProps) => ({
+    ...defaultProps,
+    ...ownProps,
+    ...stateProps,
+    ...dispatchProps,
+  }),
   // $FlowFixMe: current react-redux type does not know about context property
   {
     // Ensuring our context does not clash with consumers
