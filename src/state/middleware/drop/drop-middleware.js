@@ -90,6 +90,7 @@ export default ({ getState, dispatch }: MiddlewareStore) => (
   const source: DraggableLocation = {
     index: critical.draggable.index,
     droppableId: critical.droppable.id,
+    payload: critical.draggable.payload,
   };
 
   const result: DropResult = {
