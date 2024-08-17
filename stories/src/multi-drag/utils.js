@@ -120,8 +120,13 @@ const reorderMultiDrag = ({
         }
 
         const index: number = column.taskIds.indexOf(current);
-
-        if (index >= destination.index) {
+        // When dragging up, do not increment the indexOffset while source.index equal to destination.index.
+        // When dragging down, increment the indexOffset while source.index equal to destination.index
+        if (
+          source.index >= destination.index
+            ? index >= destination.index
+            : index > destination.index
+        ) {
           return previous;
         }
 
@@ -131,7 +136,6 @@ const reorderMultiDrag = ({
       },
       0,
     );
-
     const result: number = destination.index - destinationIndexOffset;
     return result;
   })();
