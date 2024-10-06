@@ -126,7 +126,7 @@ getContainerForClone: () => HTMLElement,
 
 ⚠️ You are welcome to use your own `portal` solution if you want to from within your `<Draggable />`. Before we had a cloning API, reparenting needed to be done by using your own portal. It is now recommended that you use the cloning API.
 
-We have created a [working example](https://react-beautiful-dnd.netlify.com/?selectedKind=Portals&selectedStory=Using%20your%20own%20portal&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel) that uses `ReactDOM.createPortal` directly to guide you. You can view the [source here](https://github.com/atlassian/react-beautiful-dnd/blob/master/stories/11-portal.stories.js).
+We have created a [working example](https://react-beautiful-dnd.netlify.app/?selectedKind=Portals&selectedStory=Using%20your%20own%20portal&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel) that uses `ReactDOM.createPortal` directly to guide you. You can view the [source here](https://github.com/atlassian/react-beautiful-dnd/blob/master/stories/11-portal.stories.js).
 
 If you are doing drag and drop reordering within a `<table>` we have created a portal section inside our [table guide](/docs/patterns/tables.md)
 

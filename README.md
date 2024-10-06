@@ -32,7 +32,7 @@ We recommend that you don’t raise issues or pull requests, as they will not be
 
 ![quote application example](https://user-images.githubusercontent.com/2182637/53614150-efbed780-3c2c-11e9-9204-a5d2e746faca.gif)
 
-[Play with this example if you want!](https://react-beautiful-dnd.netlify.com/iframe.html?selectedKind=board&selectedStory=simple)
+[Play with this example if you want!](https://react-beautiful-dnd.netlify.app/iframe.html?selectedKind=board&selectedStory=simple)
 
 </div>
 
