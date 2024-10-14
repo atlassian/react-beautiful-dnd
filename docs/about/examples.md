@@ -4,12 +4,12 @@ See how beautiful it is for yourself!
 
 ## Viewing on a desktop
 
-[All the examples!](https://react-beautiful-dnd.netlify.com)
+[All the examples!](https://react-beautiful-dnd.netlify.app)
 
 ## Viewing on a mobile or tablet
 
-- [Simple list](https://react-beautiful-dnd.netlify.com/iframe.html?id=single-vertical-list--basic)
-- [Board](https://react-beautiful-dnd.netlify.com/iframe.html?id=board--simple) - best viewed in landscape
+- [Simple list](https://react-beautiful-dnd.netlify.app/iframe.html?id=single-vertical-list--basic)
+- [Board](https://react-beautiful-dnd.netlify.app/iframe.html?id=board--simple) - best viewed in landscape
 
 > We provide different links for touch devices as [storybook](https://github.com/storybooks/storybook) runs examples in an iframe which can result in a strange auto scroll experience
 

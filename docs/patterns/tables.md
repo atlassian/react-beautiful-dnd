@@ -24,7 +24,7 @@ In order to use this strategy the widths of your columns need to be fixed - that
 
 The only thing you need to do is set `display: table` on a `<Draggable />` row while it is dragging.
 
-[See example code here](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20fixed%20width%20columns&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
+[See example code here](https://react-beautiful-dnd.netlify.app/?selectedKind=Tables&selectedStory=with%20fixed%20width%20columns&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
 
 Some users have experienced issues using the `table-layout` and `display: table` approach. Specifically, that approach of fixed layouts doesn't keep the styling once an element is being dragged. An alternative is to not set `table-layout` or `display: table` when `<Draggable />` is dragging, but rather just set the `width` of each `<td>` permanently. This avoids the need to use any event responders. E.g. in the `<Draggable />`, set each `<td>` to `width: 100px` with inline styling or css. This approach can be found in the [Code Sandbox here](https://codesandbox.io/s/vertical-list-s9rx5?fontsize=14&hidenavigation=1&theme=dark)
 
@@ -41,7 +41,7 @@ This has poor performance characteristics at scale as it requires:
 
 For tables with less than 50 rows this should approach be fine!
 
-[See example code here](https://react-beautiful-dnd.netlify.com/?selectedKind=Tables&selectedStory=with%20dimension%20locking&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
+[See example code here](https://react-beautiful-dnd.netlify.app/?selectedKind=Tables&selectedStory=with%20dimension%20locking&full=0&addons=1&stories=1&panelRight=0&addonPanel=storybook%2Factions%2Factions-panel)
 
 ## Advanced: reparenting
 
@@ -67,8 +67,8 @@ It seems like the only way to get things working is to:
 
 This gets a little complicated - so we created some examples to show you how this technique works:
 
-- [With our cloning API](https://react-beautiful-dnd.netlify.com/?path=/story/tables--with-clone)
-- [With your own portal](https://react-beautiful-dnd.netlify.com/?path=/story/tables--with-portal)
+- [With our cloning API](https://react-beautiful-dnd.netlify.app/?path=/story/tables--with-clone)
+- [With your own portal](https://react-beautiful-dnd.netlify.app/?path=/story/tables--with-portal)
 
 You're welcome!
 
