@@ -1,18 +1,15 @@
-## ⚠️ Maintenance & support
+## ⚠️ Deprecated
 
-This library continues to be relied upon heavily by Atlassian products, but we are focused on other priorities right now and have no current plans for further feature development or improvements.
+Hey all,
 
-It will continue to be here on GitHub and we will still make critical updates (e.g. security fixes, if any) as required, but will not be actively monitoring or replying to issues and pull requests.
+We are taking the next step in saying thank you and goodbye to our friend `react-beautiful-dnd`.
 
-We recommend that you don’t raise issues or pull requests, as they will not be reviewed or actioned until further notice.
+- ⚠️ We will be soon deprecating `react-beautiful-dnd` on [npm](https://www.npmjs.com/package/react-beautiful-dnd). When we do you will start to get console warnings in your build tools.
+- 🔒 On Apr 30, 2025 (six months from posting) we will [archiving](https://docs.github.com/en/repositories/archiving-a-github-repository/archiving-repositories) the `react-beautiful-dnd` Github repository (it will become read only).
 
-> [!IMPORTANT]
->
-> **Update: 3rd April 2024**
->
-> <a href="https://www.youtube.com/watch?v=uySl2yiUYE4"><img src="https://github.com/alexreardon/files/assets/2182637/bb7740a3-875c-49aa-be54-e7268d836d60" width="300px" /></a>
->
-> [📺 Watch on Youtube](https://www.youtube.com/watch?v=uySl2yiUYE4) <br> [🗣️ Discussion](https://github.com/atlassian/react-beautiful-dnd/issues/2573)
+Thank you everybody for your support of this project.
+
+[More information](https://github.com/atlassian/react-beautiful-dnd/issues/2672)
 
 <br>
 
