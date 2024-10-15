@@ -46,6 +46,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
           destination: {
             droppableId: preset.foreign.descriptor.id,
             index: preset.inForeign2.descriptor.index,
+            draggableId: preset.inForeign2.descriptor.id,
           },
         },
       };
@@ -77,6 +78,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.foreign.descriptor.id,
               index: preset.inForeign3.descriptor.index,
+              draggableId: preset.inForeign3.descriptor.id,
             },
           },
         };
@@ -107,6 +109,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.foreign.descriptor.id,
               index: preset.inForeign4.descriptor.index,
+              draggableId: preset.inForeign4.descriptor.id,
             },
           },
         };
@@ -142,6 +145,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.foreign.descriptor.id,
               index: preset.inForeign3.descriptor.index,
+              draggableId: preset.inForeign3.descriptor.id,
             },
           },
         };
@@ -176,6 +180,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.foreign.descriptor.id,
               index: preset.inForeign2.descriptor.index,
+              draggableId: preset.inForeign2.descriptor.id,
             },
           },
         };
@@ -200,6 +205,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
           destination: {
             droppableId: preset.foreign.descriptor.id,
             index: preset.inForeign3.descriptor.index,
+            draggableId: preset.inForeign3.descriptor.id,
           },
         },
       };
@@ -232,6 +238,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.foreign.descriptor.id,
               index: preset.inForeign2.descriptor.index,
+              draggableId: preset.inForeign2.descriptor.id,
             },
           },
         };
@@ -267,6 +274,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.foreign.descriptor.id,
               index: preset.inForeign1.descriptor.index,
+              draggableId: preset.inForeign1.descriptor.id,
             },
           },
         };
@@ -304,6 +312,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.foreign.descriptor.id,
               index: preset.inForeign2.descriptor.index,
+              draggableId: preset.inForeign2.descriptor.id,
             },
           },
         };
@@ -338,6 +347,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
             destination: {
               droppableId: preset.foreign.descriptor.id,
               index: preset.inForeign3.descriptor.index,
+              draggableId: preset.inForeign3.descriptor.id,
             },
           },
         };
@@ -363,6 +373,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
           destination: {
             droppableId: preset.foreign.descriptor.id,
             index: preset.inForeign1.descriptor.index,
+            draggableId: preset.inForeign1.descriptor.id,
           },
         },
       };
@@ -397,6 +408,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
           destination: {
             droppableId: preset.foreign.descriptor.id,
             index: preset.inForeign4.descriptor.index,
+            draggableId: preset.inForeign4.descriptor.id,
           },
         },
       };
@@ -485,6 +497,7 @@ import { emptyGroups } from '../../../../../../../src/state/no-impact';
           destination: {
             droppableId: preset.foreign.descriptor.id,
             index: preset.inForeign4.descriptor.index,
+            draggableId: preset.inForeign4.descriptor.id,
           },
         },
       };

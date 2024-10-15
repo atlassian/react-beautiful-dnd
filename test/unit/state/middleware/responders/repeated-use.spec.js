@@ -36,11 +36,15 @@ it('should behave correctly across multiple drags', () => {
     expect(responders.onDragStart).toHaveBeenCalledTimes(1);
 
     // update
+    const newIndex = initialPublishArgs.critical.draggable.index + 1;
+    const state: State = store.getState();
+    const newDraggableId = Object.keys(state.dimensions.draggables)[newIndex];
     const update: DragUpdate = {
       ...getDragStart(),
       destination: {
         droppableId: initialPublishArgs.critical.droppable.id,
-        index: initialPublishArgs.critical.draggable.index + 1,
+        index: newIndex,
+        draggableId: newDraggableId,
       },
       combine: null,
     };
