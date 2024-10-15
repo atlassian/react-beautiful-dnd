@@ -23,6 +23,7 @@ export type DraggableDescriptor = {|
   // This is technically redundant but it avoids
   // needing to look up a parent droppable just to get its type
   type: TypeId,
+  payload?: any,
 |};
 
 export type DraggableOptions = {|
@@ -152,6 +153,7 @@ export type DroppableDimension = {|
 export type DraggableLocation = {|
   droppableId: DroppableId,
   index: number,
+  payload?: any,
 |};
 
 export type DraggableIdMap = {

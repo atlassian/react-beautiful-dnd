@@ -43,8 +43,9 @@ export default function Draggable(props: Props) {
       index: props.index,
       type,
       droppableId,
+      payload: props.payload,
     }),
-    [props.draggableId, props.index, type, droppableId],
+    [props.draggableId, props.index, props.payload, type, droppableId],
   );
 
   // props
