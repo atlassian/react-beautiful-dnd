@@ -80,9 +80,9 @@ function useMyCoolSensor(api: SensorAPI) {
     if (!preDrag) {
       return;
     }
-    preDrag.snapLift();
-    preDrag.moveDown();
-    preDrag.drop();
+    const drag: SnapDragActions = preDrag.snapLift();
+    drag.moveDown();
+    drag.drop();
   }, []);
 
   useEffect(() => {
