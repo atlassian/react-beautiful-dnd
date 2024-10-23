@@ -81,62 +81,140 @@ const draggable: DraggableDimension = getDraggableDimension({
   borderBox: droppableOrigin.client.borderBox,
 });
 
-/**
- * In this case we're hovering over all three lists.
- * We expect that the furthest away active element is returned.
- */
-it('should prefer the furthest away droppable when multiple lists are hit', () => {
-  const offset = getOffsetForCrossAxisEndEdge({
-    crossAxisEndEdgeOn: droppableThird.page.borderBox.center,
-    dragging: draggable.page.borderBox,
-    axis: droppableThird.axis,
+describe('box (default) behaviour', () => {
+  /**
+   * In this case we're hovering over all three lists.
+   * We expect that the furthest away active element is returned.
+   */
+  it('should prefer the furthest away droppable when multiple lists are hit', () => {
+    const offset = getOffsetForCrossAxisEndEdge({
+      crossAxisEndEdgeOn: droppableThird.page.borderBox.center,
+      dragging: draggable.page.borderBox,
+      axis: droppableThird.axis,
+    });
+
+    const pageBorderBox: Rect = offsetRectByPosition(
+      draggable.page.borderBox,
+      afterCrossAxisPoint(droppableThird.axis, offset),
+    );
+
+    const result = getDroppableOver({
+      pageBorderBox,
+      draggable,
+      droppables: toDroppableMap([
+        droppableOrigin,
+        droppableFirst,
+        droppableSecond,
+        droppableThird,
+      ]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
+    });
+
+    expect(result).toEqual(droppableThird.descriptor.id);
   });
 
-  const pageBorderBox: Rect = offsetRectByPosition(
-    draggable.page.borderBox,
-    afterCrossAxisPoint(droppableThird.axis, offset),
-  );
+  /**
+   * In this case we're hovering over the primary and secondary and lists.
+   * We expect that the furthest away active element is returned (not including the tertiary list).
+   */
+  it('should prefer the second furthest away droppable when multiple lists are hit', () => {
+    const offset = getOffsetForCrossAxisEndEdge({
+      crossAxisEndEdgeOn: droppableSecond.page.borderBox.center,
+      dragging: draggable.page.borderBox,
+      axis: droppableSecond.axis,
+    });
 
-  const result = getDroppableOver({
-    pageBorderBox,
-    draggable,
-    droppables: toDroppableMap([
-      droppableOrigin,
-      droppableFirst,
-      droppableSecond,
-      droppableThird,
-    ]),
+    const pageBorderBox: Rect = offsetRectByPosition(
+      draggable.page.borderBox,
+      afterCrossAxisPoint(droppableSecond.axis, offset),
+    );
+
+    const result = getDroppableOver({
+      pageBorderBox,
+      draggable,
+      droppables: toDroppableMap([
+        droppableOrigin,
+        droppableFirst,
+        droppableSecond,
+        droppableThird,
+      ]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
+    });
+
+    expect(result).toEqual(droppableSecond.descriptor.id);
   });
-
-  expect(result).toEqual(droppableThird.descriptor.id);
 });
 
-/**
- * In this case we're hovering over the primary and secondary and lists.
- * We expect that the furthest away active element is returned (not including the tertiary list).
- */
-it('should prefer the second furthest away droppable when multiple lists are hit', () => {
-  const offset = getOffsetForCrossAxisEndEdge({
-    crossAxisEndEdgeOn: droppableSecond.page.borderBox.center,
-    dragging: draggable.page.borderBox,
-    axis: droppableSecond.axis,
+describe('pointer behaviour', () => {
+  /**
+   * In this case we're hovering over all three lists.
+   * We expect that the furthest away active element is returned.
+   */
+  it('should prefer the droppable closest to the pointer location when three lists are hit', () => {
+    const offset = getOffsetForCrossAxisEndEdge({
+      crossAxisEndEdgeOn: droppableThird.page.borderBox.center,
+      dragging: draggable.page.borderBox,
+      axis: droppableThird.axis,
+    });
+
+    const pageBorderBox: Rect = offsetRectByPosition(
+      draggable.page.borderBox,
+      afterCrossAxisPoint(droppableThird.axis, offset),
+    );
+
+    const result = getDroppableOver({
+      pageBorderBox,
+      draggable,
+      droppables: toDroppableMap([
+        droppableOrigin,
+        droppableFirst,
+        droppableSecond,
+        droppableThird,
+      ]),
+      calculateDroppableUsingPointerPosition: true,
+      currentSelection: {
+        x: droppableThird.page.borderBox.left,
+        y: droppableThird.page.borderBox.top,
+      },
+    });
+
+    expect(result).toEqual(droppableThird.descriptor.id);
   });
 
-  const pageBorderBox: Rect = offsetRectByPosition(
-    draggable.page.borderBox,
-    afterCrossAxisPoint(droppableSecond.axis, offset),
-  );
+  /**
+   * In this case we're hovering over the primary and secondary and lists.
+   * We expect that the furthest away active element is returned (not including the tertiary list).
+   */
+  it('should prefer the droppable closes to the cursor location when multiple lists are hit even if the pointer itself is not over the droppable', () => {
+    const offset = getOffsetForCrossAxisEndEdge({
+      crossAxisEndEdgeOn: droppableSecond.page.borderBox.center,
+      dragging: draggable.page.borderBox,
+      axis: droppableSecond.axis,
+    });
 
-  const result = getDroppableOver({
-    pageBorderBox,
-    draggable,
-    droppables: toDroppableMap([
-      droppableOrigin,
-      droppableFirst,
-      droppableSecond,
-      droppableThird,
-    ]),
+    const pageBorderBox: Rect = offsetRectByPosition(
+      draggable.page.borderBox,
+      afterCrossAxisPoint(droppableSecond.axis, offset),
+    );
+
+    const result = getDroppableOver({
+      pageBorderBox,
+      draggable,
+      droppables: toDroppableMap([
+        droppableOrigin,
+        droppableFirst,
+        droppableSecond,
+        droppableThird,
+      ]),
+      calculateDroppableUsingPointerPosition: true,
+      currentSelection: {
+        x: droppableThird.page.borderBox.left,
+        y: droppableThird.page.borderBox.top,
+      },
+    });
+
+    expect(result).toEqual(droppableSecond.descriptor.id);
   });
-
-  expect(result).toEqual(droppableSecond.descriptor.id);
 });

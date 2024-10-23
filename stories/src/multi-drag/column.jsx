@@ -9,9 +9,11 @@ import Task from './task';
 import type { DroppableProvided, DroppableStateSnapshot } from '../../../src';
 import type { Column as ColumnType } from './types';
 import type { Task as TaskType, Id } from '../types';
+import type { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
 
 type Props = {|
   column: ColumnType,
+  dropTargetCalculationMode: DropTargetCalculationMode,
   tasks: TaskType[],
   selectedTaskIds: Id[],
   draggingTaskId: ?Id,
@@ -85,6 +87,9 @@ export default class Column extends Component<Props> {
                 return (
                   <Task
                     task={task}
+                    dropTargetCalculationMode={
+                      this.props.dropTargetCalculationMode
+                    }
                     index={index}
                     key={task.id}
                     isSelected={isSelected}

@@ -15,11 +15,15 @@ it('should not consider lists that are disabled', () => {
     pageBorderBox: preset.inHome1.page.borderBox,
     draggable: preset.inHome1,
     droppables: preset.droppables,
+    currentSelection: { x: 0, y: 0 },
+    calculateDroppableUsingPointerPosition: false,
   });
   const whileDisabled: ?DroppableId = getDroppableOver({
     pageBorderBox: preset.inHome1.page.borderBox,
     draggable: preset.inHome1,
     droppables: withDisabled,
+    currentSelection: { x: 0, y: 0 },
+    calculateDroppableUsingPointerPosition: false,
   });
 
   expect(whileEnabled).toBe(preset.home.descriptor.id);

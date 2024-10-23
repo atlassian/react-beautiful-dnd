@@ -3,6 +3,7 @@ import React from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@atlaskit/theme';
 import { Droppable, Draggable } from '../../../src';
+import type { DropTargetCalculationMode } from '../../../src/view/draggable/draggable-types';
 import QuoteItem from './quote-item';
 import { grid } from '../constants';
 import Title from './title';
@@ -73,6 +74,7 @@ type Props = {|
   scrollContainerStyle?: Object,
   isDropDisabled?: boolean,
   isCombineEnabled?: boolean,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
   style?: Object,
   // may not be provided - and might be null
   ignoreContainerClipping?: boolean,
@@ -82,13 +84,19 @@ type Props = {|
 
 type QuoteListProps = {|
   quotes: Quote[],
+  dropTargetCalculationMode?: DropTargetCalculationMode,
 |};
 
 const InnerQuoteList = React.memo(function InnerQuoteList(
   props: QuoteListProps,
 ) {
   return props.quotes.map((quote: Quote, index: number) => (
-    <Draggable key={quote.id} draggableId={quote.id} index={index}>
+    <Draggable
+      key={quote.id}
+      draggableId={quote.id}
+      index={index}
+      dropTargetCalculationMode={props.dropTargetCalculationMode}
+    >
       {(
         dragProvided: DraggableProvided,
         dragSnapshot: DraggableStateSnapshot,
@@ -107,19 +115,23 @@ const InnerQuoteList = React.memo(function InnerQuoteList(
 
 type InnerListProps = {|
   dropProvided: DroppableProvided,
+  dropTargetCalculationMode?: DropTargetCalculationMode,
   quotes: Quote[],
   title: ?string,
 |};
 
 function InnerList(props: InnerListProps) {
-  const { quotes, dropProvided } = props;
+  const { quotes, dropProvided, dropTargetCalculationMode } = props;
   const title = props.title ? <Title>{props.title}</Title> : null;
 
   return (
     <Container>
       {title}
       <DropZone ref={dropProvided.innerRef}>
-        <InnerQuoteList quotes={quotes} />
+        <InnerQuoteList
+          quotes={quotes}
+          dropTargetCalculationMode={dropTargetCalculationMode}
+        />
         {dropProvided.placeholder}
       </DropZone>
     </Container>
@@ -128,6 +140,7 @@ function InnerList(props: InnerListProps) {
 
 export default function QuoteList(props: Props) {
   const {
+    dropTargetCalculationMode,
     ignoreContainerClipping,
     internalScroll,
     scrollContainerStyle,
@@ -178,6 +191,7 @@ export default function QuoteList(props: Props) {
                 quotes={quotes}
                 title={title}
                 dropProvided={dropProvided}
+                dropTargetCalculationMode={dropTargetCalculationMode}
               />
             </ScrollContainer>
           ) : (
@@ -185,6 +199,7 @@ export default function QuoteList(props: Props) {
               quotes={quotes}
               title={title}
               dropProvided={dropProvided}
+              dropTargetCalculationMode={dropTargetCalculationMode}
             />
           )}
         </Wrapper>
