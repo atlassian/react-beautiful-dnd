@@ -1,10 +1,9 @@
 // disabling flowtype to keep this example super simple
-// It matches
 /* eslint-disable flowtype/require-valid-file-annotation */
 
 import React, { Component } from 'react';
 import { DragDropContext, Droppable, Draggable } from '../../../src';
-import { ShadowRootContext } from '../shadow-root/inside-shadow-root';
+import { ShadowRootContext } from './inside-shadow-root';
 
 // fake data generator
 const getItems = (count) =>
@@ -25,6 +24,8 @@ const reorder = (list, startIndex, endIndex) => {
 const grid = 8;
 
 const getItemStyle = (isDragging, draggableStyle) => ({
+  display: 'block',
+
   // some basic styles to make the items look a bit nicer
   userSelect: 'none',
   padding: grid * 2,
@@ -42,6 +43,23 @@ const getListStyle = (isDraggingOver) => ({
   padding: grid,
   width: 250,
 });
+
+class SomeCustomElement extends HTMLElement {
+  childComponent;
+
+  constructor() {
+    super();
+    const root = this.attachShadow({ mode: 'open' });
+    this.childComponent = document.createElement('div');
+    root.appendChild(this.childComponent);
+  }
+
+  connectedCallback() {
+    this.childComponent.textContent = this.getAttribute('content');
+  }
+}
+
+customElements.define('some-custom-element', SomeCustomElement);
 
 export default class App extends Component {
   constructor(props, context) {
@@ -93,17 +111,17 @@ export default class App extends Component {
                       index={index}
                     >
                       {(draggableProvided, draggableSnapshot) => (
-                        <div
+                        <some-custom-element
                           ref={draggableProvided.innerRef}
                           {...draggableProvided.draggableProps}
                           {...draggableProvided.dragHandleProps}
                           style={getItemStyle(
                             draggableSnapshot.isDragging,
                             draggableProvided.draggableProps.style,
+                            false,
                           )}
-                        >
-                          {item.content}
-                        </div>
+                          content={item.content}
+                        />
                       )}
                     </Draggable>
                   ))}

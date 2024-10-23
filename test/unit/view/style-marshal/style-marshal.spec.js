@@ -15,11 +15,16 @@ const getMock = () => jest.fn().mockImplementation(() => null);
 type Props = {|
   contextId: ContextId,
   nonce?: string,
+  stylesInsertionPoint?: HTMLElement,
   children: (marshal: StyleMarshal) => Node,
 |};
 
 function WithMarshal(props: Props) {
-  const marshal: StyleMarshal = useStyleMarshal(props.contextId, props.nonce);
+  const marshal: StyleMarshal = useStyleMarshal(
+    props.contextId,
+    props.nonce,
+    props.stylesInsertionPoint,
+  );
   return props.children(marshal);
 }
 
@@ -210,4 +215,36 @@ it('should insert nonce into tag attribute', () => {
 
   // now unmounted
   wrapper.unmount();
+});
+
+it('should insert styles if sytlesInsertionPoint', () => {
+  const contextId: ContextId = '1';
+  const dynamicSelector: string = getDynamicStyleTagSelector(contextId);
+  const alwaysSelector: string = getAlwaysStyleTagSelector(contextId);
+
+  const stylesRoot = mount(<div />);
+  const stylesRootRef = stylesRoot.getDOMNode();
+  expect(stylesRootRef).toBeInstanceOf(HTMLDivElement);
+
+  const wrapper: ReactWrapper<*> = mount(
+    <WithMarshal contextId={contextId} stylesInsertionPoint={stylesRootRef}>
+      {getMock()}
+    </WithMarshal>,
+  );
+
+  // styles should be created in styles root
+  expect(stylesRootRef.querySelector(alwaysSelector)).toBeInstanceOf(
+    HTMLStyleElement,
+  );
+  expect(stylesRootRef.querySelector(dynamicSelector)).toBeInstanceOf(
+    HTMLStyleElement,
+  );
+
+  wrapper.unmount();
+
+  // styles should be removed from styles root
+  expect(stylesRootRef.querySelector(alwaysSelector)).toBeFalsy();
+  expect(stylesRootRef.querySelector(dynamicSelector)).toBeFalsy();
+
+  stylesRoot.unmount();
 });
