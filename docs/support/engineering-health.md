@@ -40,6 +40,6 @@ This codebase is designed to be **extremely performant** - it is part of its DNA
 
 [![minzip](https://img.shields.io/bundlephobia/minzip/react-beautiful-dnd.svg)](https://www.npmjs.com/package/react-beautiful-dnd)
 
-Great care has been taken to keep the library as light as possible. There could be a smaller net cost if you where already using one of the underlying dependencies.
+Great care has been taken to keep the library as light as possible. There could be a smaller net cost if you were already using one of the underlying dependencies.
 
 [← Back to documentation](/README.md#documentation-)
