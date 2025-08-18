@@ -51,6 +51,7 @@ export type {
   Provided as DroppableProvided,
   StateSnapshot as DroppableStateSnapshot,
   DroppableProps,
+  DroppableChildrenFn,
 } from './view/droppable/droppable-types';
 
 // Draggable types
@@ -63,5 +64,5 @@ export type {
   DraggableStyle,
   DraggingStyle,
   NotDraggingStyle,
-  ChildrenFn as DraggableChildrenFn,
+  DraggableChildrenFn,
 } from './view/draggable/draggable-types';

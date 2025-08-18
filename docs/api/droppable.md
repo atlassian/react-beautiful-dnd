@@ -36,7 +36,7 @@ type Props = {|
   ignoreContainerClipping?: boolean,
   renderClone?: DraggableChildrenFn,
   getContainerForClone?: () => HTMLElement,
-  children: (DroppableProvided, DroppableStateSnapshot) => Node,
+  children: DroppableChildrenFn,
 |};
 
 type DroppableMode = 'standard' | 'virtual';
@@ -70,6 +70,13 @@ The `React` children of a `<Droppable />` must be a function that returns a [`Re
     /*...*/
   })}
 </Droppable>
+```
+
+```js
+type DroppableChildrenFn = (
+  DroppableProvided,
+  DroppableStateSnapshot,
+) => Node;
 ```
 
 The function is provided with two arguments:

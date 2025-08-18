@@ -132,6 +132,10 @@ type DroppableStateSnapshot = {|
   draggingFromThisWith: ?DraggableId,
   isUsingPlaceholder: boolean,
 |};
+type DroppableChildrenFn = (
+  DroppableProvided,
+  DroppableStateSnapshot,
+) => Node;
 ```
 
 ### Draggable
@@ -164,7 +168,6 @@ type DraggableChildrenFn = (
   DraggableStateSnapshot,
   DraggableRubric,
 ) => Node | null;
-|};
 type DraggableStyle = DraggingStyle | NotDraggingStyle;
 type DraggingStyle = {|
   position: 'fixed',
