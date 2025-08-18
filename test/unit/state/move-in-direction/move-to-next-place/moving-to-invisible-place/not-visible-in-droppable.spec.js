@@ -326,6 +326,7 @@ import { emptyGroups } from '../../../../../../src/state/no-impact';
             destination: {
               droppableId: foreign.descriptor.id,
               index: inForeign.descriptor.index,
+              draggableId: inForeign.descriptor.id,
             },
           },
         };

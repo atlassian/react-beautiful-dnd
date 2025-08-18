@@ -39,12 +39,16 @@ it('should call onDragUpdate if the position has changed on move', () => {
   expect(responders.onDragUpdate).not.toHaveBeenCalled();
 
   jest.runOnlyPendingTimers();
+  const newIndex = initialPublishArgs.critical.draggable.index + 1;
+  const state: State = store.getState();
+  const newDraggableId = Object.keys(state.dimensions.draggables)[newIndex];
   const update: DragUpdate = {
     ...getDragStart(),
     combine: null,
     destination: {
       droppableId: initialPublishArgs.critical.droppable.id,
-      index: initialPublishArgs.critical.draggable.index + 1,
+      index: newIndex,
+      draggableId: newDraggableId,
     },
   };
   expect(responders.onDragUpdate).toHaveBeenCalledWith(

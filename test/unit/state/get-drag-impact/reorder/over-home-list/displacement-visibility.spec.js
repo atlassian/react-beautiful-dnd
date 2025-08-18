@@ -157,6 +157,7 @@ const viewport: Viewport = getViewport();
           destination: {
             droppableId: droppable.descriptor.id,
             index: 0,
+            draggableId: visible.descriptor.id,
           },
         },
       };
@@ -296,6 +297,7 @@ const viewport: Viewport = getViewport();
           destination: {
             droppableId: droppable.descriptor.id,
             index: 0,
+            draggableId: visible.descriptor.id,
           },
         },
       };

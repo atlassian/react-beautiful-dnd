@@ -72,6 +72,7 @@ import { getOffsetForStartEdge } from '../../util/get-offset-for-edge';
           destination: {
             index: preset.inForeign4.descriptor.index,
             droppableId: preset.inForeign4.descriptor.droppableId,
+            draggableId: preset.inForeign4.descriptor.id,
           },
         },
       };

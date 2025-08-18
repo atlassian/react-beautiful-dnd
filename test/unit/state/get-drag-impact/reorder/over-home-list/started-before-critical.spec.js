@@ -82,6 +82,7 @@ import {
               // is now in position of inHome2
               droppableId: preset.home.descriptor.id,
               index: preset.inHome2.descriptor.index,
+              draggableId: preset.inHome2.descriptor.id,
             },
           },
         };
@@ -107,6 +108,7 @@ import {
               // is now in position of inHome1
               droppableId: preset.home.descriptor.id,
               index: preset.inHome1.descriptor.index,
+              draggableId: preset.inHome1.descriptor.id,
             },
           },
         };
@@ -168,6 +170,7 @@ import {
               droppableId: preset.home.descriptor.id,
               // is now in position of inHome2
               index: preset.inHome2.descriptor.index,
+              draggableId: preset.inHome2.descriptor.id,
             },
           },
         };

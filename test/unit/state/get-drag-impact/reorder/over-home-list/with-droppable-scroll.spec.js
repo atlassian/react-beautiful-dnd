@@ -86,6 +86,7 @@ const viewport: Viewport = getViewport();
               // now in position of inHome2 as it has moved backwards (it started displaced)
               droppableId: preset.home.descriptor.id,
               index: preset.inHome2.descriptor.index,
+              draggableId: preset.inHome2.descriptor.id,
             },
           },
         };
@@ -151,6 +152,7 @@ const viewport: Viewport = getViewport();
               // is now in place of inHome2
               droppableId: preset.home.descriptor.id,
               index: preset.inHome2.descriptor.index,
+              draggableId: preset.inHome2.descriptor.id,
             },
           },
         };

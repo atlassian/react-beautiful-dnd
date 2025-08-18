@@ -106,6 +106,7 @@ import {
             // is now in position of inHome3
             droppableId: preset.home.descriptor.id,
             index: preset.inHome3.descriptor.index,
+            draggableId: preset.inHome3.descriptor.id,
           },
         },
       };
@@ -176,6 +177,7 @@ import {
             destination: {
               droppableId: preset.home.descriptor.id,
               index: preset.inHome2.descriptor.index,
+              draggableId: preset.inHome2.descriptor.id,
             },
           },
         };
