@@ -43,6 +43,10 @@ React Virtuoso comes with automatic item measurement out of the box.
 - [List with source](https://virtuoso.dev/react-beautiful-dnd/)
 - [Basic list on `codesandbox.io`](https://codesandbox.io/s/react-virutoso-with-react-beautiful-dnd-e6vmq)
 
+### [`virtua`](https://github.com/inokawa/virtua)
+
+- [List](https://inokawa.github.io/virtua/?path=/story/advanced-with-react-beautiful-dnd--default) ([source](https://github.com/inokawa/virtua/blob/main/stories/react/advanced/With%20react-beautiful-dnd.stories.tsx))
+
 ## Usage
 
 `react-beautiful-dnd` does not provide its own virtual list abstraction so there is a bit of wiring that you will need to do in order to get going with existing virtual list solutions 🛠
