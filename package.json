@@ -86,7 +86,7 @@
     "babel-eslint": "10.1.0",
     "babel-jest": "25.5.1",
     "babel-loader": "8.1.0",
-    "babel-plugin-dev-expression": "0.2.2",
+    "babel-plugin-dev-expression": "0.2.3",
     "babel-plugin-emotion": "10.0.33",
     "cross-env": "7.0.3",
     "cypress": "4.4.0",
