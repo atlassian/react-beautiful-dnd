@@ -83,6 +83,8 @@ it('should hit when dragging element completely covers the list (end edge +1)', 
       pageBorderBox,
       draggable,
       droppables: toDroppableMap([droppableLarge, droppableSmall]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
     });
 
     expect(result).toEqual(null);
@@ -99,6 +101,8 @@ it('should hit when dragging element completely covers the list (end edge +1)', 
       pageBorderBox,
       draggable,
       droppables: toDroppableMap([droppableLarge, droppableSmall]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
     });
 
     expect(result).toEqual(droppableSmall.descriptor.id);
@@ -129,6 +133,8 @@ it('should hit when dragging element completely covers the list (start edge -1)'
       pageBorderBox,
       draggable,
       droppables: toDroppableMap([droppableLarge, droppableSmall]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
     });
 
     expect(result).toEqual(null);
@@ -145,6 +151,8 @@ it('should hit when dragging element completely covers the list (start edge -1)'
       pageBorderBox,
       draggable,
       droppables: toDroppableMap([droppableLarge, droppableSmall]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
     });
 
     expect(result).toEqual(droppableSmall.descriptor.id);

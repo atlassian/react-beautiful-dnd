@@ -39,6 +39,8 @@ import { origin } from '../../../../src/state/position';
         previousImpact: homeImpact,
         viewport: preset.viewport,
         afterCritical,
+        calculateDroppableUsingPointerPosition: false,
+        currentSelection: { x: 0, y: 0 },
       });
 
       expect(impact).toEqual(noImpact);
@@ -59,6 +61,8 @@ import { origin } from '../../../../src/state/position';
         previousImpact: homeImpact,
         viewport: preset.viewport,
         afterCritical,
+        calculateDroppableUsingPointerPosition: false,
+        currentSelection: { x: 0, y: 0 },
       });
 
       expect(impact).toEqual(noImpact);

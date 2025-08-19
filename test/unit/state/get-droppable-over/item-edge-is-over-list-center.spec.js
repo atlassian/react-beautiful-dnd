@@ -74,6 +74,8 @@ it('should hit when dragging cross axis end edge is over the list center', () =>
       pageBorderBox,
       draggable,
       droppables: toDroppableMap([droppableLarge, droppableSmall]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
     });
 
     expect(result).toEqual(null);
@@ -89,6 +91,8 @@ it('should hit when dragging cross axis end edge is over the list center', () =>
       pageBorderBox,
       draggable,
       droppables: toDroppableMap([droppableLarge, droppableSmall]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
     });
 
     expect(result).toEqual(droppableSmall.descriptor.id);
@@ -113,6 +117,8 @@ it('should hit when dragging cross axis start edge is over the list center', () 
       pageBorderBox,
       draggable,
       droppables: toDroppableMap([droppableLarge, droppableSmall]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
     });
 
     expect(result).toEqual(null);
@@ -128,6 +134,8 @@ it('should hit when dragging cross axis start edge is over the list center', () 
       pageBorderBox,
       draggable,
       droppables: toDroppableMap([droppableLarge, droppableSmall]),
+      currentSelection: { x: 0, y: 0 },
+      calculateDroppableUsingPointerPosition: false,
     });
 
     expect(result).toEqual(droppableSmall.descriptor.id);

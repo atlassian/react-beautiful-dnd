@@ -72,6 +72,8 @@ it('should hit when inside subject, but outside the frame', () => {
     pageBorderBox,
     draggable: dragging,
     droppables: { [droppableId]: droppable },
+    currentSelection: { x: 0, y: 0 },
+    calculateDroppableUsingPointerPosition: false,
   });
 
   expect(result).toBe(droppableId);
@@ -117,6 +119,8 @@ it('should not hit when inside subject, but outside the frame', () => {
     pageBorderBox,
     draggable: dragging,
     droppables: { [droppableId]: droppable },
+    currentSelection: { x: 0, y: 0 },
+    calculateDroppableUsingPointerPosition: false,
   });
 
   expect(result).toBe(null);
@@ -162,6 +166,8 @@ it('should not hit when outside subject and inside the frame (partially visible 
     pageBorderBox,
     draggable: dragging,
     droppables: { [droppableId]: droppable },
+    currentSelection: { x: 0, y: 0 },
+    calculateDroppableUsingPointerPosition: false,
   });
 
   expect(result).toBe(null);
@@ -207,6 +213,8 @@ it('should not hit when outside subject and inside the frame (invisible subject)
     pageBorderBox,
     draggable: dragging,
     droppables: { [droppableId]: droppable },
+    currentSelection: { x: 0, y: 0 },
+    calculateDroppableUsingPointerPosition: false,
   });
 
   expect(result).toBe(null);

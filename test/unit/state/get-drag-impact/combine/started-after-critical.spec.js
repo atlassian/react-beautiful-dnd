@@ -91,6 +91,8 @@ import {
             previousImpact: homeImpact,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingPointerPosition: false,
+            currentSelection: { x: 0, y: 0 },
           });
 
           expect(impact).toEqual(homeImpact);
@@ -105,6 +107,8 @@ import {
             previousImpact: homeImpact,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingPointerPosition: false,
+            currentSelection: { x: 0, y: 0 },
           });
 
           expect(impact).toEqual(combineWithInHome3Impact);
@@ -126,6 +130,8 @@ import {
             previousImpact: homeImpact,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingPointerPosition: false,
+            currentSelection: { x: 0, y: 0 },
           });
 
           expect(impact).toEqual(combineWithInHome3Impact);
@@ -139,6 +145,8 @@ import {
             previousImpact: homeImpact,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingPointerPosition: false,
+            currentSelection: { x: 0, y: 0 },
           });
 
           const expected: DragImpact = {
@@ -228,6 +236,8 @@ import {
             previousImpact: first,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingPointerPosition: false,
+            currentSelection: { x: 0, y: 0 },
           });
           expect(impact.at).toHaveProperty('type', 'REORDER');
         }
@@ -241,6 +251,8 @@ import {
             previousImpact: first,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingPointerPosition: false,
+            currentSelection: { x: 0, y: 0 },
           });
 
           expect(impact).toEqual(combineWithDisplacedInHome3Impact);
@@ -264,6 +276,8 @@ import {
             previousImpact: first,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingPointerPosition: false,
+            currentSelection: { x: 0, y: 0 },
           });
           expect(impact).toEqual(combineWithDisplacedInHome3Impact);
         }
@@ -277,6 +291,8 @@ import {
             previousImpact: first,
             viewport: preset.viewport,
             afterCritical,
+            calculateDroppableUsingPointerPosition: false,
+            currentSelection: { x: 0, y: 0 },
           });
 
           expect(impact.at).toHaveProperty('type', 'REORDER');
@@ -319,6 +335,8 @@ import {
         previousImpact: noImpact,
         viewport: preset.viewport,
         afterCritical,
+        calculateDroppableUsingPointerPosition: false,
+        currentSelection: { x: 0, y: 0 },
       });
       const expected: DragImpact = {
         displaced: emptyGroups,

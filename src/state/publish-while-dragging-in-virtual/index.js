@@ -117,6 +117,9 @@ export default ({
     previousImpact,
     viewport: state.viewport,
     afterCritical,
+    currentSelection: state.current.page.selection,
+    calculateDroppableUsingPointerPosition:
+      draggable.descriptor.dropTargetCalculationMode === 'pointer',
   });
 
   timings.finish(timingsKey);

@@ -1,5 +1,5 @@
 // @flow
-import React, { useReducer } from 'react';
+import React, { useMemo, useReducer } from 'react';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/core';
@@ -22,20 +22,25 @@ import { grid, borderRadius } from '../../constants';
 import { getBackgroundColor } from '../../primatives/quote-list';
 import QuoteCountSlider from '../quote-count-chooser';
 import { generateQuoteMap } from '../../data';
+import DropTargetCalculationModeSelector from '../../primatives/drop-target-calculation-mode-selector';
+import type { DropTargetCalculationMode } from '../../../../src/view/draggable/draggable-types';
 
 const Container = styled.div`
   display: flex;
 `;
 
 type RowProps = {
-  data: Quote[],
+  data: {
+    quotes: Quote[],
+    dropTargetCalculationMode: DropTargetCalculationMode,
+  },
   index: number,
   style: Object,
 };
 
 // Memoizing row items for even better performance!
-const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
-  const quote: ?Quote = quotes[index];
+const Row = React.memo(({ data, index, style }: RowProps) => {
+  const quote: ?Quote = data.quotes[index];
 
   // We are rendering an extra item for the placeholder
   // Do do this we increased our data set size to include one 'fake' item
@@ -53,7 +58,12 @@ const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
   };
 
   return (
-    <Draggable draggableId={quote.id} index={index} key={quote.id}>
+    <Draggable
+      draggableId={quote.id}
+      index={index}
+      key={quote.id}
+      dropTargetCalculationMode={data.dropTargetCalculationMode}
+    >
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
         <QuoteItem
           provided={provided}
@@ -69,6 +79,7 @@ const Row = React.memo(({ data: quotes, index, style }: RowProps) => {
 type ColumnProps = {|
   columnId: string,
   quotes: Quote[],
+  dropTargetCalculationMode: DropTargetCalculationMode,
 |};
 
 const ColumnContainer = styled.div`
@@ -82,8 +93,12 @@ const ColumnContainer = styled.div`
 `;
 
 const Column = React.memo(function Column(props: ColumnProps) {
-  const { columnId, quotes } = props;
+  const { columnId, quotes, dropTargetCalculationMode } = props;
 
+  const itemData = useMemo(() => ({ quotes, dropTargetCalculationMode }), [
+    quotes,
+    dropTargetCalculationMode,
+  ]);
   return (
     <ColumnContainer>
       <Title>{columnId}</Title>
@@ -130,7 +145,7 @@ const Column = React.memo(function Column(props: ColumnProps) {
                 // We add this spacing so that when we drop into an empty list we will animate to the correct visual position.
                 padding: grid,
               }}
-              itemData={quotes}
+              itemData={itemData}
             >
               {Row}
             </List>
@@ -145,6 +160,7 @@ type State = {|
   itemCount: number,
   quoteMap: QuoteMap,
   columnKeys: string[],
+  dropTargetCalculationMode: DropTargetCalculationMode,
 |};
 
 function getColumnKeys(quoteMap: QuoteMap): string[] {
@@ -159,6 +175,7 @@ function getInitialState() {
     itemCount,
     quoteMap,
     columnKeys,
+    dropTargetCalculationMode: 'box',
   };
 }
 
@@ -170,6 +187,10 @@ type Action =
   | {|
       type: 'REORDER',
       payload: QuoteMap,
+    |}
+  | {|
+      type: 'CHANGE_TARGET_MODE',
+      payload: DropTargetCalculationMode,
     |};
 
 function reducer(state: State, action: Action) {
@@ -179,6 +200,7 @@ function reducer(state: State, action: Action) {
       itemCount: action.payload,
       quoteMap,
       columnKeys: getColumnKeys(quoteMap),
+      dropTargetCalculationMode: state.dropTargetCalculationMode,
     };
   }
   if (action.type === 'REORDER') {
@@ -186,6 +208,16 @@ function reducer(state: State, action: Action) {
       itemCount: state.itemCount,
       quoteMap: action.payload,
       columnKeys: getColumnKeys(action.payload),
+      dropTargetCalculationMode: state.dropTargetCalculationMode,
+    };
+  }
+  if (action.type === 'CHANGE_TARGET_MODE') {
+    return {
+      ...state,
+      // itemCount: state.itemCount,
+      // quoteMap: state.quoteMap,
+      // columnKeys: state.columnKeys,
+      dropTargetCalculationMode: action.payload,
     };
   }
 
@@ -229,7 +261,14 @@ function Board(props: Empty) {
           {state.columnKeys.map((key: string) => {
             const quotes: Quote[] = state.quoteMap[key];
 
-            return <Column key={key} quotes={quotes} columnId={key} />;
+            return (
+              <Column
+                key={key}
+                quotes={quotes}
+                columnId={key}
+                dropTargetCalculationMode={state.dropTargetCalculationMode}
+              />
+            );
           })}
         </Container>
         <QuoteCountSlider
@@ -237,6 +276,11 @@ function Board(props: Empty) {
           count={state.itemCount}
           onCountChange={(count: number) =>
             dispatch({ type: 'CHANGE_COUNT', payload: count })
+          }
+        />
+        <DropTargetCalculationModeSelector
+          onChange={(payload) =>
+            dispatch({ type: 'CHANGE_TARGET_MODE', payload })
           }
         />
       </DragDropContext>
